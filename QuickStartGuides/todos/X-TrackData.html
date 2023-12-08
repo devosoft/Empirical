@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Tracking &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/QuickStartGuides/todos/X-TrackData.7d0588a7-d0b8-46d1-8b74-09f716ff7834.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="General Purpose Debugging Tools" href="../../library/base/base.html" />
+    <link rel="prev" title="Evolutionary Tools" href="X-EvoTools.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Quick Start Guides</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../0-Overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../1-HelloWorld.html">Hello World</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2-BaseTools.html">Base Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../3-WebTools.html">Web Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4-UsingProjectTemplate.html">Using the Project Template</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="todo.html">Work In Progress</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="X-CreateWorld.html">Create a world</a></li>
+<li class="toctree-l3"><a class="reference internal" href="X-EvoTools.html">Evolutionary Tools</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Data Tracking</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../library/base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../library/web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Quick Start Guides</a></li>
+          <li class="breadcrumb-item"><a href="todo.html">Work In Progress</a></li>
+      <li class="breadcrumb-item active">Data Tracking</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-tracking">
+<h1>Data Tracking<a class="headerlink" href="#data-tracking" title="Link to this heading"></a></h1>
+<p>Overview of data tracking:</p>
+<ol class="arabic simple">
+<li><p>Make a <code class="docutils literal notranslate"><span class="pre">emp::Ptr&lt;DataMonitor&lt;type,</span> <span class="pre">structure&gt;&gt;</span></code> where your data will be stored in private</p></li>
+<li><p>Make public method <code class="docutils literal notranslate"><span class="pre">SetupMyDataFile</span></code>, which sets up the file and plugs the node into the file for whatever stats you want</p></li>
+<li><p>Make public method <code class="docutils literal notranslate"><span class="pre">GetMyDataNode</span></code>, which instantiates you DataMonitor (special type of DataNode) and sets an update
+trigger to collect the data you want to track</p></li>
+<li><p>Make public method <code class="docutils literal notranslate"><span class="pre">CalcMyVal</span></code> which grabs the data from an individual organism and does any necessary processing before it is put
+in the data node</p></li>
+<li><p>Set up the files in your .cc file</p></li>
+<li><p>Test</p></li>
+<li><p>Prosper</p></li>
+</ol>
+<p>To track data in your new world:</p>
+<p>in private:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">emp</span><span class="o">::</span><span class="n">Ptr</span><span class="o">&lt;</span><span class="n">DataMonitor</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="n">emp</span><span class="o">::&lt;</span><span class="n">data</span><span class="o">::</span><span class="n">Histogram</span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="n">my_data_node</span><span class="p">;</span><span class="w"> </span><span class="c1">// double and Histogram can be replaced by what you need</span>
+<span class="cm">/*</span>
+<span class="cm">Current modifiers (found in include/emp/data/DataNode.h):</span>
+<span class="cm">    Current, Info, Log, Archive, Range, FullRange,</span>
+<span class="cm">    Histogram, Pull, SignalReset, SignalData,</span>
+<span class="cm">    SignalDatum, SignalRange, SignalLimits</span>
+<span class="cm">*/</span>
+</pre></div>
+</div>
+<p>in public:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">World_file</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nf">SetupMyDataFile</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">filename</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SetupFile</span><span class="p">(</span><span class="n">filename</span><span class="p">);</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetMyDataNode</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// Histogram needs bins set up, most others don&#39;t need anything</span>
+<span class="w">    </span><span class="n">node</span><span class="p">.</span><span class="n">SetupBins</span><span class="p">(</span><span class="mf">-1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// Update will be the first column</span>
+<span class="w">    </span><span class="n">file</span><span class="p">.</span><span class="n">AddVar</span><span class="p">(</span><span class="n">update</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;update&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Update&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// Mean of my interaction value will be calculated and put in the second column automagically</span>
+<span class="w">    </span><span class="n">file</span><span class="p">.</span><span class="n">AddMean</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mean_intval&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Average org int val&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">//Histograms need every bin set up, most others don&#39;t need anything else</span>
+<span class="w">    </span><span class="n">file</span><span class="p">.</span><span class="n">AddHistBin</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;[Hist]()-1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Count for hist bin -1&quot;</span><span class="p">);</span>
+
+<span class="w">    </span><span class="cm">/* Current options for Add: (Found in include/emp/data/DataFile.h)</span>
+<span class="cm">        Add, AddFun, AddVar, AddCurrent, AddMean,</span>
+<span class="cm">        AddTotal, AddMin, AddMax, AddHistBin, AddInferiority</span>
+<span class="cm">    */</span>
+
+<span class="w">    </span><span class="n">file</span><span class="p">.</span><span class="n">PrintHeaderKeys</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">DataMonitor</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">GetMyDataNode</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">my_data_node</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">my_data_node</span><span class="p">.</span><span class="n">New</span><span class="p">();</span>
+<span class="w">        </span><span class="n">OnUpdate</span><span class="p">(</span>
+<span class="w">            </span><span class="p">[</span><span class="k">this</span><span class="p">](</span><span class="kt">size_t</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">my_data_node</span><span class="o">-&gt;</span><span class="n">Reset</span><span class="p">();</span>
+<span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">pop</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IsOccupied</span><span class="p">(</span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="n">my_data_node</span><span class="o">-&gt;</span><span class="n">AddDatum</span><span class="p">(</span><span class="n">CalcMyVal</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">);</span>
+
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">*</span><span class="n">my_data_node</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">double</span><span class="w"> </span><span class="nf">CalcMyVal</span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">pop</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">GetMyVal</span><span class="p">();</span><span class="w"> </span><span class="c1">// Defined in your organism class</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In your <code class="docutils literal notranslate"><span class="pre">project_name.cc</span></code> file in main:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">//Timing repeat for how often you want data printed</span>
+<span class="n">my_world</span><span class="p">.</span><span class="n">SetupPopulationFile</span><span class="p">().</span><span class="n">SetTimingRepeat</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+
+<span class="cm">/* Lots of premade options for files (found in include/emp/Evolve/World.h)</span>
+<span class="cm">    SetupFile, setupFitnessFile,</span>
+<span class="cm">    SetupSystematicsFile, SetupPopulationFile</span>
+<span class="cm">*/</span>
+
+<span class="n">my_world</span><span class="p">.</span><span class="n">SetupMyDataFile</span><span class="p">().</span><span class="n">SetTimingRepeat</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"> </span><span class="c1">//Use your custom built stat tracker if you&#39;d like</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="X-EvoTools.html" class="btn btn-neutral float-left" title="Evolutionary Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../library/base/base.html" class="btn btn-neutral float-right" title="General Purpose Debugging Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

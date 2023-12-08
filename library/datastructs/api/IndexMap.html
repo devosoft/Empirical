@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IndexMap.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/datastructs/api/IndexMap.ba17b046-5d10-4334-a8c4-1c9d3b256348.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="IndexSet.hpp" href="IndexSet.html" />
+    <link rel="prev" title="Graph.hpp" href="Graph.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../datastructs.html">Data structures</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../datastructs.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BloomFilter.html">BloomFilter.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Bool.html">Bool.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Cache.html">Cache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DynamicString.html">DynamicString.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Graph.html">Graph.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">IndexMap.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv48IndexMap"><code class="docutils literal notranslate"><span class="pre">IndexMap</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="IndexSet.html">IndexSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="QueueCache.html">QueueCache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallFifoMap.html">SmallFifoMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallVector.html">SmallVector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StringMap.html">StringMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TimeQueue.html">TimeQueue.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypeMap.html">TypeMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UnorderedIndexMap.html">UnorderedIndexMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graph_utils.html">graph_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hash_utils.html">hash_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="map_utils.html">map_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_map.html">ra_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_set.html">ra_set.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference_vector.html">reference_vector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="set_utils.html">set_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_utils.html">span_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_struct.html">tuple_struct.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_utils.html">tuple_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="valsort_map.html">valsort_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector_utils.html">vector_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../datastructs.html">Data structures</a></li>
+      <li class="breadcrumb-item active">IndexMap.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="indexmap-hpp">
+<h1>IndexMap.hpp<a class="headerlink" href="#indexmap-hpp" title="Link to this heading"></a></h1>
+<p>A simple class to weight items differently within a container and return the correct index. </p>
+<p>
+An IndexMap is a container where each item has a specified weight (specified as a double). The total weight of the container determines the max index point. When indexing into the container, each item is represented by a range of values equal to it’s weight. Randomly indexing into the container will provide either item with a probability proportional to its weight.</p>
+<p>In this regular IndexMap, all items are kept in order (so the map starts at 0, then 1, then 2, etc.) If order is not required, UnorderedIndexMap is slightly faster.</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Convert to a template that acts as a glorified vector, simplifying random selection? </p>
+<p>Make Raw*() function private. </p>
+</dd></dl>
+
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA</p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv48IndexMap">
+<span id="_CPPv38IndexMap"></span><span id="_CPPv28IndexMap"></span><span id="IndexMap"></span><span class="target" id="classIndexMap"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IndexMap</span></span></span><a class="headerlink" href="#_CPPv48IndexMap" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;IndexMap.hpp&gt;</em></div>
+<p>A map of weighted indices. If a random index is selected, the probability of an index being returned is directly proportional to its weight. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap8IndexMapE6size_t">
+<span id="_CPPv3N8IndexMap8IndexMapE6size_t"></span><span id="_CPPv2N8IndexMap8IndexMapE6size_t"></span><span id="IndexMap::IndexMap__s"></span><span class="target" id="classIndexMap_1a35fc45fd4de48c9e792224a5de054879"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IndexMap</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_items</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMap8IndexMapE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct an IndexMap where num_items is the maximum number of items that can be placed into the data structure. All item weights default to zero. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap8IndexMapE6size_td">
+<span id="_CPPv3N8IndexMap8IndexMapE6size_td"></span><span id="_CPPv2N8IndexMap8IndexMapE6size_td"></span><span id="IndexMap::IndexMap__s.double"></span><span class="target" id="classIndexMap_1a00dcf0eda6b993877ed07bf05d32504d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IndexMap</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_items</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">init_weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMap8IndexMapE6size_td" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap8IndexMapERK8IndexMap">
+<span id="_CPPv3N8IndexMap8IndexMapERK8IndexMap"></span><span id="_CPPv2N8IndexMap8IndexMapERK8IndexMap"></span><span id="IndexMap::IndexMap__IndexMapCR"></span><span class="target" id="classIndexMap_1a02ab26ae171299a59301ee705bd1b8bd"></span><span class="sig-name descname"><span class="n"><span class="pre">IndexMap</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8IndexMap8IndexMapERK8IndexMap" title="IndexMap::IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N8IndexMap8IndexMapERK8IndexMap" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap8IndexMapERR8IndexMap">
+<span id="_CPPv3N8IndexMap8IndexMapERR8IndexMap"></span><span id="_CPPv2N8IndexMap8IndexMapERR8IndexMap"></span><span id="IndexMap::IndexMap__IndexMapRR"></span><span class="target" id="classIndexMap_1a6a5b71208d8e21a87fd59931cf96660b"></span><span class="sig-name descname"><span class="n"><span class="pre">IndexMap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8IndexMap8IndexMapERR8IndexMap" title="IndexMap::IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N8IndexMap8IndexMapERR8IndexMap" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMapD0Ev">
+<span id="_CPPv3N8IndexMapD0Ev"></span><span id="_CPPv2N8IndexMapD0Ev"></span><span id="IndexMap::~IndexMap"></span><span class="target" id="classIndexMap_1a23ec2284e1f98a894aaf31a1e6393a3b"></span><span class="sig-name descname"><span class="n"><span class="pre">~IndexMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N8IndexMapD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMapaSERK8IndexMap">
+<span id="_CPPv3N8IndexMapaSERK8IndexMap"></span><span id="_CPPv2N8IndexMapaSERK8IndexMap"></span><span id="IndexMap::assign-operator__IndexMapCR"></span><span class="target" id="classIndexMap_1a5caedbe0b763b285d92855ad93dc3007"></span><a class="reference internal" href="#_CPPv48IndexMap" title="IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48IndexMap" title="IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N8IndexMapaSERK8IndexMap" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMapaSERR8IndexMap">
+<span id="_CPPv3N8IndexMapaSERR8IndexMap"></span><span id="_CPPv2N8IndexMapaSERR8IndexMap"></span><span id="IndexMap::assign-operator__IndexMapRR"></span><span class="target" id="classIndexMap_1a62ab1a29ac0aedebad6426b1677e8a1e"></span><a class="reference internal" href="#_CPPv48IndexMap" title="IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv48IndexMap" title="IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N8IndexMapaSERR8IndexMap" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap7GetSizeEv">
+<span id="_CPPv3NK8IndexMap7GetSizeEv"></span><span id="_CPPv2NK8IndexMap7GetSizeEv"></span><span id="IndexMap::GetSizeC"></span><span class="target" id="classIndexMap_1a1478e2ddfa45da41da38ea7b62968215"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many indices are in this map? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap9GetWeightEv">
+<span id="_CPPv3NK8IndexMap9GetWeightEv"></span><span id="_CPPv2NK8IndexMap9GetWeightEv"></span><span id="IndexMap::GetWeightC"></span><span class="target" id="classIndexMap_1a5945b22ad556370ffc6a1b30783ae4c8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetWeight</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap9GetWeightEv" title="Link to this definition"></a><br /></dt>
+<dd><p>What is the total weight of all indices in this map? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap9GetWeightE6size_t">
+<span id="_CPPv3NK8IndexMap9GetWeightE6size_t"></span><span id="_CPPv2NK8IndexMap9GetWeightE6size_t"></span><span id="IndexMap::GetWeight__sC"></span><span class="target" id="classIndexMap_1a39d7cc8433d6a8916a52cbf63f0a349f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetWeight</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap9GetWeightE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>What is the current weight of the specified index? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap7GetProbE6size_t">
+<span id="_CPPv3NK8IndexMap7GetProbE6size_t"></span><span id="_CPPv2NK8IndexMap7GetProbE6size_t"></span><span id="IndexMap::GetProb__sC"></span><span class="target" id="classIndexMap_1ade1753e20dede23e03b9fa1ed530cfc8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetProb</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap7GetProbE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>What is the probability of the specified index being selected? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap6ResizeE6size_td">
+<span id="_CPPv3N8IndexMap6ResizeE6size_td"></span><span id="_CPPv2N8IndexMap6ResizeE6size_td"></span><span id="IndexMap::Resize__s.double"></span><span class="target" id="classIndexMap_1a5af97c2b2729a52ebf8f7cd6a527e5cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_size</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">def_value</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMap6ResizeE6size_td" title="Link to this definition"></a><br /></dt>
+<dd><p>Change the number of indices in the map. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap8PushBackEd">
+<span id="_CPPv3N8IndexMap8PushBackEd"></span><span id="_CPPv2N8IndexMap8PushBackEd"></span><span id="IndexMap::PushBack__double"></span><span class="target" id="classIndexMap_1a9a0d865da9c424f8a75580e5ff19a125"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PushBack</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMap8PushBackEd" title="Link to this definition"></a><br /></dt>
+<dd><p>Added a new value to the end of the index map. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap5ClearEv">
+<span id="_CPPv3N8IndexMap5ClearEv"></span><span id="_CPPv2N8IndexMap5ClearEv"></span><span id="IndexMap::Clear"></span><span class="target" id="classIndexMap_1a6c6f702c95d76228a1541e11a210a483"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMap5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset all item weights to zero. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap11ResizeClearE6size_t">
+<span id="_CPPv3N8IndexMap11ResizeClearE6size_t"></span><span id="_CPPv2N8IndexMap11ResizeClearE6size_t"></span><span id="IndexMap::ResizeClear__s"></span><span class="target" id="classIndexMap_1a382a94b3c4b2442b5bd4ec1fccd3453f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResizeClear</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMap11ResizeClearE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Change the size of this map AND change all weights to zero. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap6AdjustE6size_tKd">
+<span id="_CPPv3N8IndexMap6AdjustE6size_tKd"></span><span id="_CPPv2N8IndexMap6AdjustE6size_tKd"></span><span id="IndexMap::Adjust__s.doubleC"></span><span class="target" id="classIndexMap_1a517fe40a38c880c82ccaabb6ce5fd0c3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Adjust</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMap6AdjustE6size_tKd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap6AdjustERK6vectorIdE">
+<span id="_CPPv3N8IndexMap6AdjustERK6vectorIdE"></span><span id="_CPPv2N8IndexMap6AdjustERK6vectorIdE"></span><span id="IndexMap::Adjust__vector:double:CR"></span><span class="target" id="classIndexMap_1a7f8e664d78726e123f2826d28c174d62"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Adjust</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">new_weights</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMap6AdjustERK6vectorIdE" title="Link to this definition"></a><br /></dt>
+<dd><p>Adjust all index weights to the set provided. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap9AdjustAllEd">
+<span id="_CPPv3N8IndexMap9AdjustAllEd"></span><span id="_CPPv2N8IndexMap9AdjustAllEd"></span><span id="IndexMap::AdjustAll__double"></span><span class="target" id="classIndexMap_1a00014994e92b0eb101e96d25a7e44528"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdjustAll</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMap9AdjustAllEd" title="Link to this definition"></a><br /></dt>
+<dd><p>Adjust all index weights to the set provided. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap5IndexEd6size_t">
+<span id="_CPPv3NK8IndexMap5IndexEd6size_t"></span><span id="_CPPv2NK8IndexMap5IndexEd6size_t"></span><span id="IndexMap::Index__double.sC"></span><span class="target" id="classIndexMap_1a1b7c992be35a1e9e6ba505e94fcd4163"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Index</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cur_id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap5IndexEd6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine the ID at the specified index position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMapixE6size_t">
+<span id="_CPPv3N8IndexMapixE6size_t"></span><span id="_CPPv2N8IndexMapixE6size_t"></span><span id="IndexMap::subscript-operator__s"></span><span class="target" id="classIndexMap_1ad9ddaf1ab485b3d81bfcc91e6e5400ae"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8IndexMap5ProxyE" title="IndexMap::Proxy"><span class="n"><span class="pre">Proxy</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMapixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Index into a specified ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMapixE6size_t">
+<span id="_CPPv3NK8IndexMapixE6size_t"></span><span id="_CPPv2NK8IndexMapixE6size_t"></span><span id="IndexMap::subscript-operator__sC"></span><span class="target" id="classIndexMap_1aa636d12c6b74a05564119d5f5c6d82f6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMapixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMappLER8IndexMap">
+<span id="_CPPv3N8IndexMappLER8IndexMap"></span><span id="_CPPv2N8IndexMappLER8IndexMap"></span><span id="IndexMap::add-assign-operator__IndexMapR"></span><span class="target" id="classIndexMap_1a04d90c5708d7170f24cf32b5405e0237"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48IndexMap" title="IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">+=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv48IndexMap" title="IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMappLER8IndexMap" title="Link to this definition"></a><br /></dt>
+<dd><p>Add the weights in another index map to this one. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMapmIER8IndexMap">
+<span id="_CPPv3N8IndexMapmIER8IndexMap"></span><span id="_CPPv2N8IndexMapmIER8IndexMap"></span><span id="IndexMap::sub-assign-operator__IndexMapR"></span><span class="target" id="classIndexMap_1a80cb5ee726ba6a7712c8a5b9e2bfd7fc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48IndexMap" title="IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">-=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv48IndexMap" title="IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMapmIER8IndexMap" title="Link to this definition"></a><br /></dt>
+<dd><p>Substract the weights from another index map from this one. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap12DeferRefreshEv">
+<span id="_CPPv3N8IndexMap12DeferRefreshEv"></span><span id="_CPPv2N8IndexMap12DeferRefreshEv"></span><span id="IndexMap::DeferRefresh"></span><span class="target" id="classIndexMap_1a8b81b5c1de97888127332da350a9c9db"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DeferRefresh</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMap12DeferRefreshEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Indicate that we need to adjust weights before relying on them in the future; this will prevent refreshes from occuring immediately and is useful when many updates to weights are likely to be done before any are accessed again. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap8ParentIDE6size_t">
+<span id="_CPPv3NK8IndexMap8ParentIDE6size_t"></span><span id="_CPPv2NK8IndexMap8ParentIDE6size_t"></span><span id="IndexMap::ParentID__sC"></span><span class="target" id="classIndexMap_1a7aaba11af573a162e86219267d7ce74a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ParentID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap8ParentIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Which ID is the parent of the ID provided? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap6LeftIDE6size_t">
+<span id="_CPPv3NK8IndexMap6LeftIDE6size_t"></span><span id="_CPPv2NK8IndexMap6LeftIDE6size_t"></span><span id="IndexMap::LeftID__sC"></span><span class="target" id="classIndexMap_1a25d7f42a17aa73d0deba1afdfbea2f47"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LeftID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap6LeftIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Which ID is the left child of the ID provided? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap7RightIDE6size_t">
+<span id="_CPPv3NK8IndexMap7RightIDE6size_t"></span><span id="_CPPv2NK8IndexMap7RightIDE6size_t"></span><span id="IndexMap::RightID__sC"></span><span class="target" id="classIndexMap_1a805207983427b4e597028916ab7d3bc2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RightID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap7RightIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Which ID is the right child of the ID provided? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap14CalcZeroOffsetEv">
+<span id="_CPPv3NK8IndexMap14CalcZeroOffsetEv"></span><span id="_CPPv2NK8IndexMap14CalcZeroOffsetEv"></span><span id="IndexMap::CalcZeroOffsetC"></span><span class="target" id="classIndexMap_1a6473bd238a54c1eefcaee2eeb93c0384"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CalcZeroOffset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap14CalcZeroOffsetEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Sift through the nodes to find where index zero maps to. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap12ToInternalIDE6size_t">
+<span id="_CPPv3NK8IndexMap12ToInternalIDE6size_t"></span><span id="_CPPv2NK8IndexMap12ToInternalIDE6size_t"></span><span id="IndexMap::ToInternalID__sC"></span><span class="target" id="classIndexMap_1ae40f6edc2e43a5ccac660a1bd981a279"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToInternalID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap12ToInternalIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert an item ID to the internal position where it’s stored. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap12ToInternalIDE6size_t6size_t6size_t">
+<span id="_CPPv3NK8IndexMap12ToInternalIDE6size_t6size_t6size_t"></span><span id="_CPPv2NK8IndexMap12ToInternalIDE6size_t6size_t6size_t"></span><span id="IndexMap::ToInternalID__s.s.sC"></span><span class="target" id="classIndexMap_1a1bb6871fc433d74ebd6aeb8120bdb372"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToInternalID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_items</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_offset</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap12ToInternalIDE6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap12ToExternalIDE6size_t">
+<span id="_CPPv3NK8IndexMap12ToExternalIDE6size_t"></span><span id="_CPPv2NK8IndexMap12ToExternalIDE6size_t"></span><span id="IndexMap::ToExternalID__sC"></span><span class="target" id="classIndexMap_1a346d46c2dc9b3a08806d407216266f7f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToExternalID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap12ToExternalIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert and internal position to the item ID to which it refers. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap9RawWeightE6size_t">
+<span id="_CPPv3NK8IndexMap9RawWeightE6size_t"></span><span id="_CPPv2NK8IndexMap9RawWeightE6size_t"></span><span id="IndexMap::RawWeight__sC"></span><span class="target" id="classIndexMap_1a30d4fa7770c45ad92c4c0272c87f6cdb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RawWeight</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap9RawWeightE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap7RawProbE6size_t">
+<span id="_CPPv3NK8IndexMap7RawProbE6size_t"></span><span id="_CPPv2NK8IndexMap7RawProbE6size_t"></span><span id="IndexMap::RawProb__sC"></span><span class="target" id="classIndexMap_1adb79979b40104c1cd2da1c880f683f50"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RawProb</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap7RawProbE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap9RawAdjustE6size_tKd">
+<span id="_CPPv3N8IndexMap9RawAdjustE6size_tKd"></span><span id="_CPPv2N8IndexMap9RawAdjustE6size_tKd"></span><span id="IndexMap::RawAdjust__s.doubleC"></span><span class="target" id="classIndexMap_1ae9d8a3fa78d8a898b62fd33075bdcc13"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RawAdjust</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMap9RawAdjustE6size_tKd" title="Link to this definition"></a><br /></dt>
+<dd><p>Adjust the weight associated with a particular index in the map. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – is the identification number of the item whose weight is being adjusted. </p></li>
+<li><p><strong>new_weight</strong> – is the new weight for that entry. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap14ResolveRefreshEv">
+<span id="_CPPv3NK8IndexMap14ResolveRefreshEv"></span><span id="_CPPv2NK8IndexMap14ResolveRefreshEv"></span><span id="IndexMap::ResolveRefreshC"></span><span class="target" id="classIndexMap_1a04ae28c71a8defcb7b16fd56c5fbe7f2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResolveRefresh</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap14ResolveRefreshEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Check if we need to do a refresh, and if so do it! </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap9num_itemsE">
+<span id="_CPPv3N8IndexMap9num_itemsE"></span><span id="_CPPv2N8IndexMap9num_itemsE"></span><span id="IndexMap::num_items__s"></span><span class="target" id="classIndexMap_1ac3336a4a39e357df2bb200247b8aee82"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_items</span></span></span><a class="headerlink" href="#_CPPv4N8IndexMap9num_itemsE" title="Link to this definition"></a><br /></dt>
+<dd><p>How many items are being stored in this IndexMap? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap11zero_offsetE">
+<span id="_CPPv3N8IndexMap11zero_offsetE"></span><span id="_CPPv2N8IndexMap11zero_offsetE"></span><span id="IndexMap::zero_offset__s"></span><span class="target" id="classIndexMap_1a12868ce54866995aec42daac165457f7"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">zero_offset</span></span></span><a class="headerlink" href="#_CPPv4N8IndexMap11zero_offsetE" title="Link to this definition"></a><br /></dt>
+<dd><p>Position of id zero. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap13needs_refreshE">
+<span id="_CPPv3N8IndexMap13needs_refreshE"></span><span id="_CPPv2N8IndexMap13needs_refreshE"></span><span id="IndexMap::needs_refresh__b"></span><span class="target" id="classIndexMap_1a9b770fdd62ea9ecc7fac92a1d7655182"></span><span class="k"><span class="pre">mutable</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">needs_refresh</span></span></span><a class="headerlink" href="#_CPPv4N8IndexMap13needs_refreshE" title="Link to this definition"></a><br /></dt>
+<dd><p>Are tree weights out of date? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap7weightsE">
+<span id="_CPPv3N8IndexMap7weightsE"></span><span id="_CPPv2N8IndexMap7weightsE"></span><span id="IndexMap::weights__vector:double:"></span><span class="target" id="classIndexMap_1a505b65ef56674c4deeff842b01181e15"></span><span class="k"><span class="pre">mutable</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">weights</span></span></span><a class="headerlink" href="#_CPPv4N8IndexMap7weightsE" title="Link to this definition"></a><br /></dt>
+<dd><p>The total weights in each sub-tree. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap5ProxyE">
+<span id="_CPPv3N8IndexMap5ProxyE"></span><span id="_CPPv2N8IndexMap5ProxyE"></span><span id="IndexMap::Proxy"></span><span class="target" id="classIndexMap_1_1Proxy"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Proxy</span></span></span><a class="headerlink" href="#_CPPv4N8IndexMap5ProxyE" title="Link to this definition"></a><br /></dt>
+<dd><p>A Proxy class so that an index can be treated as an l-value. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap5Proxy5ProxyER8IndexMap6size_t">
+<span id="_CPPv3N8IndexMap5Proxy5ProxyER8IndexMap6size_t"></span><span id="_CPPv2N8IndexMap5Proxy5ProxyER8IndexMap6size_t"></span><span id="IndexMap::Proxy::Proxy__IndexMapR.s"></span><span class="target" id="classIndexMap_1_1Proxy_1a07aa208ad663a119abce7bdd9395b4b9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Proxy</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv48IndexMap" title="IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_im</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMap5Proxy5ProxyER8IndexMap6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8IndexMap5ProxycvdEv">
+<span id="_CPPv3NK8IndexMap5ProxycvdEv"></span><span id="_CPPv2NK8IndexMap5ProxycvdEv"></span><span id="IndexMap::Proxy::castto-double-operatorC"></span><span class="target" id="classIndexMap_1_1Proxy_1a58f05f9bbbc071fb6003bb4a4f42232e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8IndexMap5ProxycvdEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap5ProxyaSEd">
+<span id="_CPPv3N8IndexMap5ProxyaSEd"></span><span id="_CPPv2N8IndexMap5ProxyaSEd"></span><span id="IndexMap::Proxy::assign-operator__double"></span><span class="target" id="classIndexMap_1_1Proxy_1afe172d0ed0411096da2db0dba3b1bb23"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8IndexMap5ProxyE" title="IndexMap::Proxy"><span class="n"><span class="pre">Proxy</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8IndexMap5ProxyaSEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap5Proxy9index_mapE">
+<span id="_CPPv3N8IndexMap5Proxy9index_mapE"></span><span id="_CPPv2N8IndexMap5Proxy9index_mapE"></span><span id="IndexMap::Proxy::index_map__IndexMapR"></span><span class="target" id="classIndexMap_1_1Proxy_1a3884b850d37df23b1bb102e17079f6b8"></span><a class="reference internal" href="#_CPPv48IndexMap" title="IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">index_map</span></span></span><a class="headerlink" href="#_CPPv4N8IndexMap5Proxy9index_mapE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which index map is this proxy from? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8IndexMap5Proxy2idE">
+<span id="_CPPv3N8IndexMap5Proxy2idE"></span><span id="_CPPv2N8IndexMap5Proxy2idE"></span><span id="IndexMap::Proxy::id__s"></span><span class="target" id="classIndexMap_1_1Proxy_1a2103f57f21c52d3d0147f3b78c01ac8c"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id</span></span></span><a class="headerlink" href="#_CPPv4N8IndexMap5Proxy2idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which id does it represent? </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Graph.html" class="btn btn-neutral float-left" title="Graph.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="IndexSet.html" class="btn btn-neutral float-right" title="IndexSet.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

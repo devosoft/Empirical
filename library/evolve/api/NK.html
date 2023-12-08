@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NK.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/evolve/api/NK.4db634a0-7fa4-407a-ab57-d0e21675f585.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="NK-const.hpp" href="NK-const.html" />
+    <link rel="prev" title="Evolution tools" href="../evolve.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../evolve.html">Evolution tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../evolve.html#phylotracklib-systematics-manager">Phylotracklib (Systematics Manager)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../evolve.html#api">API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">NK.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411NKLandscape"><code class="docutils literal notranslate"><span class="pre">NKLandscape</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415NKLandscapeMemo"><code class="docutils literal notranslate"><span class="pre">NKLandscapeMemo</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="NK-const.html">NK-const.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="OEE.html">OEE.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="OrgInterface.html">OrgInterface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Resource.html">Resource.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StateGrid.html">StateGrid.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Systematics.html">Systematics.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SystematicsAnalysis.html">SystematicsAnalysis.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World.html">World.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_iterator.html">World_iterator.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_output.html">World_output.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_reflect.html">World_reflect.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_select.html">World_select.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_structure.html">World_structure.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../evolve.html">Evolution tools</a></li>
+      <li class="breadcrumb-item active">NK.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="nk-hpp">
+<h1>NK.hpp<a class="headerlink" href="#nk-hpp" title="Link to this heading"></a></h1>
+<p>This file provides code to build NK-based algorithms. </p>
+<p>Two version of landscapes are provided. NKLandscape pre-calculates the entire landscape, for easy lookup. NKLandscapeMemo does lazy evaluation, memorizing values when they’re first used. NKLandscape is faster, but goes up in memory size exponentially with K. NKLandscapeMemo is slightly slower, but can handle arbitrarily large landscapes.</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Right now we make the library user decide between NKLandscape and NKLandscapeMemo. Based on K value, we should be able to do this automatically, so we could merge the two. </p>
+</dd></dl>
+
+</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv411NKLandscape">
+<span id="_CPPv311NKLandscape"></span><span id="_CPPv211NKLandscape"></span><span id="NKLandscape"></span><span class="target" id="classNKLandscape"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NKLandscape</span></span></span><a class="headerlink" href="#_CPPv411NKLandscape" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;NK.hpp&gt;</em></div>
+<p>An NK Landscape is a popular tool for studying theoretical questions about evolutionary dynamics. It is a randomly generated fitness landscape on which bitstrings can evolve. NK Landscapes have two parameters: N (the length of the bitstrings) and K (epistasis). Since you have control over the amount of epistasis, NK Landscapes are often called “tunably rugged” - a useful feature, since the ruggedness of the fitness landscape is thought to be important to many evolutionary dynamics. For each possible value that a site and its K neighbors to the right can have, a random fitness contribution is chosen. These contributions are summed across the bitstring. So when K = 0, each site has a single optimal value, resulting in a single smooth fitness peak.</p>
+<p>For more information, see Kauffman and Levin, 1987 (Towards a general theory of adaptive walks on rugged landscapes).</p>
+<p>This object handles generating and maintaining an NK fitness landscape. Note: Overly large Ns and Ks currently trigger a seg-fault, caused by trying to build a table that is larger than will fit in memory. If you are using small values for N and K, you can get better performance by using an NKLandscapeConst instead. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscape11NKLandscapeEv">
+<span id="_CPPv3N11NKLandscape11NKLandscapeEv"></span><span id="_CPPv2N11NKLandscape11NKLandscapeEv"></span><span id="NKLandscape::NKLandscape"></span><span class="target" id="classNKLandscape_1a5f69123e0c2c92db96e3be889d35e5db"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NKLandscape</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11NKLandscape11NKLandscapeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscape11NKLandscapeERK11NKLandscape">
+<span id="_CPPv3N11NKLandscape11NKLandscapeERK11NKLandscape"></span><span id="_CPPv2N11NKLandscape11NKLandscapeERK11NKLandscape"></span><span id="NKLandscape::NKLandscape__NKLandscapeCR"></span><span class="target" id="classNKLandscape_1aa8a25144669f4eadb5dbeb74898824ed"></span><span class="sig-name descname"><span class="n"><span class="pre">NKLandscape</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11NKLandscape11NKLandscapeERK11NKLandscape" title="NKLandscape::NKLandscape"><span class="n"><span class="pre">NKLandscape</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11NKLandscape11NKLandscapeERK11NKLandscape" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscape11NKLandscapeERR11NKLandscape">
+<span id="_CPPv3N11NKLandscape11NKLandscapeERR11NKLandscape"></span><span id="_CPPv2N11NKLandscape11NKLandscapeERR11NKLandscape"></span><span id="NKLandscape::NKLandscape__NKLandscapeRR"></span><span class="target" id="classNKLandscape_1aa1941f8ce474fc7677933e1b49137dcf"></span><span class="sig-name descname"><span class="n"><span class="pre">NKLandscape</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N11NKLandscape11NKLandscapeERR11NKLandscape" title="NKLandscape::NKLandscape"><span class="n"><span class="pre">NKLandscape</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11NKLandscape11NKLandscapeERR11NKLandscape" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscape11NKLandscapeE6size_t6size_tR6Random">
+<span id="_CPPv3N11NKLandscape11NKLandscapeE6size_t6size_tR6Random"></span><span id="_CPPv2N11NKLandscape11NKLandscapeE6size_t6size_tR6Random"></span><span id="NKLandscape::NKLandscape__s.s.RandomR"></span><span class="target" id="classNKLandscape_1ac9625b7a4de6094944a31f8b62b90f2c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NKLandscape</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_N</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_K</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11NKLandscape11NKLandscapeE6size_t6size_tR6Random" title="Link to this definition"></a><br /></dt>
+<dd><p>N is the length of bitstrings in your population, K is the number of neighboring sites the affect the fitness contribution of each site (i.e. epistasis or ruggedness), random is the random number generator to use to generate this landscape. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscapeD0Ev">
+<span id="_CPPv3N11NKLandscapeD0Ev"></span><span id="_CPPv2N11NKLandscapeD0Ev"></span><span id="NKLandscape::~NKLandscape"></span><span class="target" id="classNKLandscape_1a17c4a56377e080ce3a6b198c11a9714a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~NKLandscape</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11NKLandscapeD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscapeaSERK11NKLandscape">
+<span id="_CPPv3N11NKLandscapeaSERK11NKLandscape"></span><span id="_CPPv2N11NKLandscapeaSERK11NKLandscape"></span><span id="NKLandscape::assign-operator__NKLandscapeCR"></span><span class="target" id="classNKLandscape_1a1315aed263395ae42a1fd813a087cc30"></span><a class="reference internal" href="#_CPPv411NKLandscape" title="NKLandscape"><span class="n"><span class="pre">NKLandscape</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411NKLandscape" title="NKLandscape"><span class="n"><span class="pre">NKLandscape</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N11NKLandscapeaSERK11NKLandscape" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscapeaSERR11NKLandscape">
+<span id="_CPPv3N11NKLandscapeaSERR11NKLandscape"></span><span id="_CPPv2N11NKLandscapeaSERR11NKLandscape"></span><span id="NKLandscape::assign-operator__NKLandscapeRR"></span><span class="target" id="classNKLandscape_1accf4f5149c0ba4355229ef44721950b6"></span><a class="reference internal" href="#_CPPv411NKLandscape" title="NKLandscape"><span class="n"><span class="pre">NKLandscape</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411NKLandscape" title="NKLandscape"><span class="n"><span class="pre">NKLandscape</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11NKLandscapeaSERR11NKLandscape" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscape5ResetER6Random">
+<span id="_CPPv3N11NKLandscape5ResetER6Random"></span><span id="_CPPv2N11NKLandscape5ResetER6Random"></span><span id="NKLandscape::Reset__RandomR"></span><span class="target" id="classNKLandscape_1a0c18e51d17ab5e38a24f9f28fa05b7ff"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Reset</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11NKLandscape5ResetER6Random" title="Link to this definition"></a><br /></dt>
+<dd><p>Randomize the landscape without changing the landscape size. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscape6ConfigE6size_t6size_tR6Random">
+<span id="_CPPv3N11NKLandscape6ConfigE6size_t6size_tR6Random"></span><span id="_CPPv2N11NKLandscape6ConfigE6size_t6size_tR6Random"></span><span id="NKLandscape::Config__s.s.RandomR"></span><span class="target" id="classNKLandscape_1aea71368998ce39b6b404659b420f8637"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Config</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_N</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_K</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11NKLandscape6ConfigE6size_t6size_tR6Random" title="Link to this definition"></a><br /></dt>
+<dd><p>Configure for new values of N and K. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11NKLandscape4GetNEv">
+<span id="_CPPv3NK11NKLandscape4GetNEv"></span><span id="_CPPv2NK11NKLandscape4GetNEv"></span><span id="NKLandscape::GetNC"></span><span class="target" id="classNKLandscape_1a56cb83d98dacb7fd241c9ce7aa85836e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetN</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11NKLandscape4GetNEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns N. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11NKLandscape4GetKEv">
+<span id="_CPPv3NK11NKLandscape4GetKEv"></span><span id="_CPPv2NK11NKLandscape4GetKEv"></span><span id="NKLandscape::GetKC"></span><span class="target" id="classNKLandscape_1af2ed52a6e13b5e142bbb533d9fdb9dea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetK</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11NKLandscape4GetKEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns K. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11NKLandscape13GetStateCountEv">
+<span id="_CPPv3NK11NKLandscape13GetStateCountEv"></span><span id="_CPPv2NK11NKLandscape13GetStateCountEv"></span><span id="NKLandscape::GetStateCountC"></span><span class="target" id="classNKLandscape_1afb8d00d32b3c0c7cfa286a9bd0be1b98"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetStateCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11NKLandscape13GetStateCountEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the number of posssible states for a given site. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11NKLandscape13GetTotalCountEv">
+<span id="_CPPv3NK11NKLandscape13GetTotalCountEv"></span><span id="_CPPv2NK11NKLandscape13GetTotalCountEv"></span><span id="NKLandscape::GetTotalCountC"></span><span class="target" id="classNKLandscape_1a4082cebfc7d54d53377fa28e8a55e350"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTotalCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11NKLandscape13GetTotalCountEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the total number of states possible in the landscape (i.e. the number of different fitness contributions in the table) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11NKLandscape10GetFitnessE6size_t6size_t">
+<span id="_CPPv3NK11NKLandscape10GetFitnessE6size_t6size_t"></span><span id="_CPPv2NK11NKLandscape10GetFitnessE6size_t6size_t"></span><span id="NKLandscape::GetFitness__s.sC"></span><span class="target" id="classNKLandscape_1a39c312c216fa4d3329da5618431b5021"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetFitness</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11NKLandscape10GetFitnessE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the fitness contribution of position [n] when it (and its K neighbors) have the value [state] </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11NKLandscape10GetFitnessENSt6vectorI6size_tEE">
+<span id="_CPPv3NK11NKLandscape10GetFitnessENSt6vectorI6size_tEE"></span><span id="_CPPv2NK11NKLandscape10GetFitnessENSt6vectorI6size_tEE"></span><span id="NKLandscape::GetFitness__std::vector:s:C"></span><span class="target" id="classNKLandscape_1a7ab669b471a2bf54409be91bfebf1ce9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetFitness</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">states</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11NKLandscape10GetFitnessENSt6vectorI6size_tEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the fitness of a whole bitstring. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11NKLandscape10GetFitnessE9BitVector">
+<span id="_CPPv3NK11NKLandscape10GetFitnessE9BitVector"></span><span id="_CPPv2NK11NKLandscape10GetFitnessE9BitVector"></span><span id="NKLandscape::GetFitness__BitVectorC"></span><span class="target" id="classNKLandscape_1aee19876577ebcec1044735b6fda94806"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetFitness</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">genome</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11NKLandscape10GetFitnessE9BitVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the fitness of a whole bitstring (pass by value so can be modified.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11NKLandscape14GetSiteFitnessE6size_t9BitVector">
+<span id="_CPPv3NK11NKLandscape14GetSiteFitnessE6size_t9BitVector"></span><span id="_CPPv2NK11NKLandscape14GetSiteFitnessE6size_t9BitVector"></span><span id="NKLandscape::GetSiteFitness__s.BitVectorC"></span><span class="target" id="classNKLandscape_1a95e341bbce50626991036b4fd8985912"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSiteFitness</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">genome</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11NKLandscape14GetSiteFitnessE6size_t9BitVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the fitness of a site in a bitstring. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscape8SetStateE6size_t6size_td">
+<span id="_CPPv3N11NKLandscape8SetStateE6size_t6size_td"></span><span id="_CPPv2N11NKLandscape8SetStateE6size_t6size_td"></span><span id="NKLandscape::SetState__s.s.double"></span><span class="target" id="classNKLandscape_1ad2af20e788334dbacfa8cda63744ac4e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetState</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">state</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_fit</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11NKLandscape8SetStateE6size_t6size_td" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscape15RandomizeStatesER6Random6size_t">
+<span id="_CPPv3N11NKLandscape15RandomizeStatesER6Random6size_t"></span><span id="_CPPv2N11NKLandscape15RandomizeStatesER6Random6size_t"></span><span id="NKLandscape::RandomizeStates__RandomR.s"></span><span class="target" id="classNKLandscape_1ae071f27737b2620696f22f1b7103369c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandomizeStates</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_states</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11NKLandscape15RandomizeStatesER6Random6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscape1NE">
+<span id="_CPPv3N11NKLandscape1NE"></span><span id="_CPPv2N11NKLandscape1NE"></span><span id="NKLandscape::N__s"></span><span class="target" id="classNKLandscape_1a7f81adae9af5d7607c794a3ff5c6e371"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">N</span></span></span><a class="headerlink" href="#_CPPv4N11NKLandscape1NE" title="Link to this definition"></a><br /></dt>
+<dd><p>The number of bits in each genome. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscape1KE">
+<span id="_CPPv3N11NKLandscape1KE"></span><span id="_CPPv2N11NKLandscape1KE"></span><span id="NKLandscape::K__s"></span><span class="target" id="classNKLandscape_1a86617ba7ed182dea0f6e9d7e2a41ea9c"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">K</span></span></span><a class="headerlink" href="#_CPPv4N11NKLandscape1KE" title="Link to this definition"></a><br /></dt>
+<dd><p>The number of OTHER bits with which each bit is epistatic. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscape11state_countE">
+<span id="_CPPv3N11NKLandscape11state_countE"></span><span id="_CPPv2N11NKLandscape11state_countE"></span><span id="NKLandscape::state_count__s"></span><span class="target" id="classNKLandscape_1a609f7d648ac21e7405de8f6cd64a8875"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">state_count</span></span></span><a class="headerlink" href="#_CPPv4N11NKLandscape11state_countE" title="Link to this definition"></a><br /></dt>
+<dd><p>The total number of states associated with each bit table. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscape11total_countE">
+<span id="_CPPv3N11NKLandscape11total_countE"></span><span id="_CPPv2N11NKLandscape11total_countE"></span><span id="NKLandscape::total_count__s"></span><span class="target" id="classNKLandscape_1a04f54fe9c070bbafefd5830be63ef51e"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">total_count</span></span></span><a class="headerlink" href="#_CPPv4N11NKLandscape11total_countE" title="Link to this definition"></a><br /></dt>
+<dd><p>The total number of states in the entire landscape space. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11NKLandscape9landscapeE">
+<span id="_CPPv3N11NKLandscape9landscapeE"></span><span id="_CPPv2N11NKLandscape9landscapeE"></span><span id="NKLandscape::landscape__vector:vector:double::"></span><span class="target" id="classNKLandscape_1a6627d5587062b287f6bb66f6cdc58f09"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">landscape</span></span></span><a class="headerlink" href="#_CPPv4N11NKLandscape9landscapeE" title="Link to this definition"></a><br /></dt>
+<dd><p>The actual values in the landscape. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv415NKLandscapeMemo">
+<span id="_CPPv315NKLandscapeMemo"></span><span id="_CPPv215NKLandscapeMemo"></span><span id="NKLandscapeMemo"></span><span class="target" id="classNKLandscapeMemo"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NKLandscapeMemo</span></span></span><a class="headerlink" href="#_CPPv415NKLandscapeMemo" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;NK.hpp&gt;</em></div>
+<p>The NKLandscapeMemo class is simialar to NKLandscape, but it does not pre-calculate all of the landscape states. Instead it determines the value of each gene combination on first use and memorizes it. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15NKLandscapeMemo15NKLandscapeMemoEv">
+<span id="_CPPv3N15NKLandscapeMemo15NKLandscapeMemoEv"></span><span id="_CPPv2N15NKLandscapeMemo15NKLandscapeMemoEv"></span><span id="NKLandscapeMemo::NKLandscapeMemo"></span><span class="target" id="classNKLandscapeMemo_1af30c51efbe8cdd1d15130177b753dd89"></span><span class="sig-name descname"><span class="n"><span class="pre">NKLandscapeMemo</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N15NKLandscapeMemo15NKLandscapeMemoEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15NKLandscapeMemo15NKLandscapeMemoERK15NKLandscapeMemo">
+<span id="_CPPv3N15NKLandscapeMemo15NKLandscapeMemoERK15NKLandscapeMemo"></span><span id="_CPPv2N15NKLandscapeMemo15NKLandscapeMemoERK15NKLandscapeMemo"></span><span id="NKLandscapeMemo::NKLandscapeMemo__NKLandscapeMemoCR"></span><span class="target" id="classNKLandscapeMemo_1af194cfc96d0dcdec79f89efc9f182a62"></span><span class="sig-name descname"><span class="n"><span class="pre">NKLandscapeMemo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15NKLandscapeMemo15NKLandscapeMemoERK15NKLandscapeMemo" title="NKLandscapeMemo::NKLandscapeMemo"><span class="n"><span class="pre">NKLandscapeMemo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N15NKLandscapeMemo15NKLandscapeMemoERK15NKLandscapeMemo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15NKLandscapeMemo15NKLandscapeMemoERR15NKLandscapeMemo">
+<span id="_CPPv3N15NKLandscapeMemo15NKLandscapeMemoERR15NKLandscapeMemo"></span><span id="_CPPv2N15NKLandscapeMemo15NKLandscapeMemoERR15NKLandscapeMemo"></span><span id="NKLandscapeMemo::NKLandscapeMemo__NKLandscapeMemoRR"></span><span class="target" id="classNKLandscapeMemo_1ab6ae6739d1ed6a9d4d06ee0f023d669e"></span><span class="sig-name descname"><span class="n"><span class="pre">NKLandscapeMemo</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N15NKLandscapeMemo15NKLandscapeMemoERR15NKLandscapeMemo" title="NKLandscapeMemo::NKLandscapeMemo"><span class="n"><span class="pre">NKLandscapeMemo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N15NKLandscapeMemo15NKLandscapeMemoERR15NKLandscapeMemo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15NKLandscapeMemo15NKLandscapeMemoE6size_t6size_tR6Random">
+<span id="_CPPv3N15NKLandscapeMemo15NKLandscapeMemoE6size_t6size_tR6Random"></span><span id="_CPPv2N15NKLandscapeMemo15NKLandscapeMemoE6size_t6size_tR6Random"></span><span id="NKLandscapeMemo::NKLandscapeMemo__s.s.RandomR"></span><span class="target" id="classNKLandscapeMemo_1a787a8f3d25b46b5975ef6568d4d8e52e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NKLandscapeMemo</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_N</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_K</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15NKLandscapeMemo15NKLandscapeMemoE6size_t6size_tR6Random" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15NKLandscapeMemoD0Ev">
+<span id="_CPPv3N15NKLandscapeMemoD0Ev"></span><span id="_CPPv2N15NKLandscapeMemoD0Ev"></span><span id="NKLandscapeMemo::~NKLandscapeMemo"></span><span class="target" id="classNKLandscapeMemo_1a635ac34cc34c6624c8fcfdf10c328f0a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~NKLandscapeMemo</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15NKLandscapeMemoD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15NKLandscapeMemoaSERK15NKLandscapeMemo">
+<span id="_CPPv3N15NKLandscapeMemoaSERK15NKLandscapeMemo"></span><span id="_CPPv2N15NKLandscapeMemoaSERK15NKLandscapeMemo"></span><span id="NKLandscapeMemo::assign-operator__NKLandscapeMemoCR"></span><span class="target" id="classNKLandscapeMemo_1a08551c82fda8f8ce2eecd71acba5803e"></span><a class="reference internal" href="#_CPPv415NKLandscapeMemo" title="NKLandscapeMemo"><span class="n"><span class="pre">NKLandscapeMemo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415NKLandscapeMemo" title="NKLandscapeMemo"><span class="n"><span class="pre">NKLandscapeMemo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N15NKLandscapeMemoaSERK15NKLandscapeMemo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15NKLandscapeMemoaSERR15NKLandscapeMemo">
+<span id="_CPPv3N15NKLandscapeMemoaSERR15NKLandscapeMemo"></span><span id="_CPPv2N15NKLandscapeMemoaSERR15NKLandscapeMemo"></span><span id="NKLandscapeMemo::assign-operator__NKLandscapeMemoRR"></span><span class="target" id="classNKLandscapeMemo_1a03703df5ec4695ef7a677bf7851c7c6b"></span><a class="reference internal" href="#_CPPv415NKLandscapeMemo" title="NKLandscapeMemo"><span class="n"><span class="pre">NKLandscapeMemo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv415NKLandscapeMemo" title="NKLandscapeMemo"><span class="n"><span class="pre">NKLandscapeMemo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N15NKLandscapeMemoaSERR15NKLandscapeMemo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK15NKLandscapeMemo4GetNEv">
+<span id="_CPPv3NK15NKLandscapeMemo4GetNEv"></span><span id="_CPPv2NK15NKLandscapeMemo4GetNEv"></span><span id="NKLandscapeMemo::GetNC"></span><span class="target" id="classNKLandscapeMemo_1ab303f66339a27aacc479cb4bbe6d8ae8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetN</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK15NKLandscapeMemo4GetNEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK15NKLandscapeMemo4GetKEv">
+<span id="_CPPv3NK15NKLandscapeMemo4GetKEv"></span><span id="_CPPv2NK15NKLandscapeMemo4GetKEv"></span><span id="NKLandscapeMemo::GetKC"></span><span class="target" id="classNKLandscapeMemo_1abbec0dd03e119309a887bec0e8ce6c05"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetK</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK15NKLandscapeMemo4GetKEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK15NKLandscapeMemo10GetFitnessE6size_tRK9BitVector">
+<span id="_CPPv3NK15NKLandscapeMemo10GetFitnessE6size_tRK9BitVector"></span><span id="_CPPv2NK15NKLandscapeMemo10GetFitnessE6size_tRK9BitVector"></span><span id="NKLandscapeMemo::GetFitness__s.BitVectorCRC"></span><span class="target" id="classNKLandscapeMemo_1a10555d689e7909a4c9e90573f97d19e0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetFitness</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK15NKLandscapeMemo10GetFitnessE6size_tRK9BitVector" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK15NKLandscapeMemo10GetFitnessERK9BitVector">
+<span id="_CPPv3NK15NKLandscapeMemo10GetFitnessERK9BitVector"></span><span id="_CPPv2NK15NKLandscapeMemo10GetFitnessERK9BitVector"></span><span id="NKLandscapeMemo::GetFitness__BitVectorCRC"></span><span class="target" id="classNKLandscapeMemo_1ac44c0085bebc8f8582f8281213e470d0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetFitness</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">genome</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK15NKLandscapeMemo10GetFitnessERK9BitVector" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15NKLandscapeMemo1NE">
+<span id="_CPPv3N15NKLandscapeMemo1NE"></span><span id="_CPPv2N15NKLandscapeMemo1NE"></span><span id="NKLandscapeMemo::N__s"></span><span class="target" id="classNKLandscapeMemo_1a0843a966097f83cb4d8f7aba0f99de4f"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">N</span></span></span><a class="headerlink" href="#_CPPv4N15NKLandscapeMemo1NE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15NKLandscapeMemo1KE">
+<span id="_CPPv3N15NKLandscapeMemo1KE"></span><span id="_CPPv2N15NKLandscapeMemo1KE"></span><span id="NKLandscapeMemo::K__s"></span><span class="target" id="classNKLandscapeMemo_1a1b40a172dbb589cbe1844fec7dd40036"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">K</span></span></span><a class="headerlink" href="#_CPPv4N15NKLandscapeMemo1KE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15NKLandscapeMemo9landscapeE">
+<span id="_CPPv3N15NKLandscapeMemo9landscapeE"></span><span id="_CPPv2N15NKLandscapeMemo9landscapeE"></span><span class="target" id="classNKLandscapeMemo_1ae411f77c00db5e33175977001b9c9121"></span><span class="k"><span class="pre">mutable</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../functional/api/memo_function.html#_CPPv4I0E13memo_function" title="memo_function"><span class="n"><span class="pre">memo_function</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">landscape</span></span></span><a class="headerlink" href="#_CPPv4N15NKLandscapeMemo9landscapeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15NKLandscapeMemo5masksE">
+<span id="_CPPv3N15NKLandscapeMemo5masksE"></span><span id="_CPPv2N15NKLandscapeMemo5masksE"></span><span id="NKLandscapeMemo::masks__vector:BitVector:"></span><span class="target" id="classNKLandscapeMemo_1af24e4b0e5467be444bcc86ccdce10719"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">masks</span></span></span><a class="headerlink" href="#_CPPv4N15NKLandscapeMemo5masksE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../evolve.html" class="btn btn-neutral float-left" title="Evolution tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="NK-const.html" class="btn btn-neutral float-right" title="NK-const.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

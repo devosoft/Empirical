@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmallFifoMap.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/datastructs/api/SmallFifoMap.6cf0b519-582f-48e1-959a-115bc1b23b58.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="SmallVector.hpp" href="SmallVector.html" />
+    <link rel="prev" title="QueueCache.hpp" href="QueueCache.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../datastructs.html">Data structures</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../datastructs.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BloomFilter.html">BloomFilter.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Bool.html">Bool.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Cache.html">Cache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DynamicString.html">DynamicString.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Graph.html">Graph.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="IndexMap.html">IndexMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="IndexSet.html">IndexSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="QueueCache.html">QueueCache.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">SmallFifoMap.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap"><code class="docutils literal notranslate"><span class="pre">SmallFifoMap</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="SmallVector.html">SmallVector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StringMap.html">StringMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TimeQueue.html">TimeQueue.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypeMap.html">TypeMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UnorderedIndexMap.html">UnorderedIndexMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graph_utils.html">graph_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hash_utils.html">hash_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="map_utils.html">map_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_map.html">ra_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_set.html">ra_set.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference_vector.html">reference_vector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="set_utils.html">set_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_utils.html">span_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_struct.html">tuple_struct.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_utils.html">tuple_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="valsort_map.html">valsort_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector_utils.html">vector_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../datastructs.html">Data structures</a></li>
+      <li class="breadcrumb-item active">SmallFifoMap.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="smallfifomap-hpp">
+<h1>SmallFifoMap.hpp<a class="headerlink" href="#smallfifomap-hpp" title="Link to this heading"></a></h1>
+<p>Store key value pairs in a fixed-sized array, bumping out the oldest value when full. Optimized for small N. Requires N &lt; 256. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I00_6size_tE12SmallFifoMap">
+<span id="_CPPv3I00_6size_tE12SmallFifoMap"></span><span id="_CPPv2I00_6size_tE12SmallFifoMap"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Key</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Value</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">N</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSmallFifoMap"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SmallFifoMap</span></span></span><a class="headerlink" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;SmallFifoMap.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMap8iteratorE">
+<span id="_CPPv3N12SmallFifoMap8iteratorE"></span><span id="_CPPv2N12SmallFifoMap8iteratorE"></span><span class="target" id="classSmallFifoMap_1ad1cb9f8ff14dabeefa9a3c3756f4dee9"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iterator</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SmallFifoMap9storage_tE" title="SmallFifoMap::storage_t"><span class="n"><span class="pre">storage_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">iterator</span></span><a class="headerlink" href="#_CPPv4N12SmallFifoMap8iteratorE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMap14const_iteratorE">
+<span id="_CPPv3N12SmallFifoMap14const_iteratorE"></span><span id="_CPPv2N12SmallFifoMap14const_iteratorE"></span><span class="target" id="classSmallFifoMap_1ad0e6e1f0d2f7f4f3a69392c217417af2"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">const_iterator</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SmallFifoMap9storage_tE" title="SmallFifoMap::storage_t"><span class="n"><span class="pre">storage_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">const_iterator</span></span><a class="headerlink" href="#_CPPv4N12SmallFifoMap14const_iteratorE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMap5beginEv">
+<span id="_CPPv3N12SmallFifoMap5beginEv"></span><span id="_CPPv2N12SmallFifoMap5beginEv"></span><span id="SmallFifoMap::begin"></span><span class="target" id="classSmallFifoMap_1a84cdb443c7705e157fa158bbce1998a5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SmallFifoMap8iteratorE" title="SmallFifoMap::iterator"><span class="n"><span class="pre">iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SmallFifoMap5beginEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SmallFifoMap5beginEv">
+<span id="_CPPv3NK12SmallFifoMap5beginEv"></span><span id="_CPPv2NK12SmallFifoMap5beginEv"></span><span id="SmallFifoMap::beginC"></span><span class="target" id="classSmallFifoMap_1a344de9c3ae4c3b1706b3fc6b93c0d675"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SmallFifoMap14const_iteratorE" title="SmallFifoMap::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SmallFifoMap5beginEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SmallFifoMap6cbeginEv">
+<span id="_CPPv3NK12SmallFifoMap6cbeginEv"></span><span id="_CPPv2NK12SmallFifoMap6cbeginEv"></span><span id="SmallFifoMap::cbeginC"></span><span class="target" id="classSmallFifoMap_1a2a778bfa354eb8e5792b8924249c5951"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SmallFifoMap14const_iteratorE" title="SmallFifoMap::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cbegin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SmallFifoMap6cbeginEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMap3endEv">
+<span id="_CPPv3N12SmallFifoMap3endEv"></span><span id="_CPPv2N12SmallFifoMap3endEv"></span><span id="SmallFifoMap::end"></span><span class="target" id="classSmallFifoMap_1ade8733d5a4cb5bea1bba3f9ca28e09f1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SmallFifoMap8iteratorE" title="SmallFifoMap::iterator"><span class="n"><span class="pre">iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SmallFifoMap3endEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SmallFifoMap3endEv">
+<span id="_CPPv3NK12SmallFifoMap3endEv"></span><span id="_CPPv2NK12SmallFifoMap3endEv"></span><span id="SmallFifoMap::endC"></span><span class="target" id="classSmallFifoMap_1af22a3c6022e81fabdcdd6b18eeb55d0b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SmallFifoMap14const_iteratorE" title="SmallFifoMap::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SmallFifoMap3endEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SmallFifoMap4cendEv">
+<span id="_CPPv3NK12SmallFifoMap4cendEv"></span><span id="_CPPv2NK12SmallFifoMap4cendEv"></span><span id="SmallFifoMap::cendC"></span><span class="target" id="classSmallFifoMap_1a6a642881a12b9146ad05db196a2a3eab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SmallFifoMap14const_iteratorE" title="SmallFifoMap::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cend</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SmallFifoMap4cendEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SmallFifoMap4sizeEv">
+<span id="_CPPv3NK12SmallFifoMap4sizeEv"></span><span id="_CPPv2NK12SmallFifoMap4sizeEv"></span><span id="SmallFifoMap::sizeC"></span><span class="target" id="classSmallFifoMap_1ab3f6f1d504fdf0a059580c184021a079"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SmallFifoMap4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many key-value pairs are in the cache? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SmallFifoMap5emptyEv">
+<span id="_CPPv3NK12SmallFifoMap5emptyEv"></span><span id="_CPPv2NK12SmallFifoMap5emptyEv"></span><span id="SmallFifoMap::emptyC"></span><span class="target" id="classSmallFifoMap_1acdbcc213358d4657d72003bba6c94082"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">empty</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SmallFifoMap5emptyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Does the cache contain any key-value pairs? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMap5clearEv">
+<span id="_CPPv3N12SmallFifoMap5clearEv"></span><span id="_CPPv2N12SmallFifoMap5clearEv"></span><span id="SmallFifoMap::clear"></span><span class="target" id="classSmallFifoMap_1ac62bd864dbd136ab2b56cb695f27ec1d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SmallFifoMap5clearEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Clear the cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMap4findERK3Key">
+<span id="_CPPv3N12SmallFifoMap4findERK3Key"></span><span id="_CPPv2N12SmallFifoMap4findERK3Key"></span><span id="SmallFifoMap::find__KeyCR"></span><span class="target" id="classSmallFifoMap_1ad5632d3f00f0cebcc4e64f9531120011"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SmallFifoMap8iteratorE" title="SmallFifoMap::iterator"><span class="n"><span class="pre">iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">find</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Key"><span class="n"><span class="pre">Key</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SmallFifoMap4findERK3Key" title="Link to this definition"></a><br /></dt>
+<dd><p>Find key-value pair iterator in cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SmallFifoMap4findERK3Key">
+<span id="_CPPv3NK12SmallFifoMap4findERK3Key"></span><span id="_CPPv2NK12SmallFifoMap4findERK3Key"></span><span id="SmallFifoMap::find__KeyCRC"></span><span class="target" id="classSmallFifoMap_1a4d99ad80b75848156b6f000ed7696eaa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SmallFifoMap14const_iteratorE" title="SmallFifoMap::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">find</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Key"><span class="n"><span class="pre">Key</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SmallFifoMap4findERK3Key" title="Link to this definition"></a><br /></dt>
+<dd><p>Find key-value pair iterator in cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMap3getERK3Key">
+<span id="_CPPv3N12SmallFifoMap3getERK3Key"></span><span id="_CPPv2N12SmallFifoMap3getERK3Key"></span><span id="SmallFifoMap::get__KeyCR"></span><span class="target" id="classSmallFifoMap_1aac9d197ea9054c7ebd90b0c3796ca194"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Value"><span class="n"><span class="pre">Value</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">get</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Key"><span class="n"><span class="pre">Key</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SmallFifoMap3getERK3Key" title="Link to this definition"></a><br /></dt>
+<dd><p>Get corresponding value from cache. Return nullptr if key not in cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SmallFifoMap3getERK3Key">
+<span id="_CPPv3NK12SmallFifoMap3getERK3Key"></span><span id="_CPPv2NK12SmallFifoMap3getERK3Key"></span><span id="SmallFifoMap::get__KeyCRC"></span><span class="target" id="classSmallFifoMap_1a562fca86e5ff25a5c3214581249d1da4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Value"><span class="n"><span class="pre">Value</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">get</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Key"><span class="n"><span class="pre">Key</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SmallFifoMap3getERK3Key" title="Link to this definition"></a><br /></dt>
+<dd><p>Get corresponding value from cache. Return nullptr if key not in cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMapixERK3Key">
+<span id="_CPPv3N12SmallFifoMapixERK3Key"></span><span id="_CPPv2N12SmallFifoMapixERK3Key"></span><span id="SmallFifoMap::subscript-operator__KeyCR"></span><span class="target" id="classSmallFifoMap_1afdfaeaaed1999facff5ef7b56183c41a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Value"><span class="n"><span class="pre">Value</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Key"><span class="n"><span class="pre">Key</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SmallFifoMapixERK3Key" title="Link to this definition"></a><br /></dt>
+<dd><p>Get corresponding value from cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SmallFifoMapixERK3Key">
+<span id="_CPPv3NK12SmallFifoMapixERK3Key"></span><span id="_CPPv2NK12SmallFifoMapixERK3Key"></span><span id="SmallFifoMap::subscript-operator__KeyCRC"></span><span class="target" id="classSmallFifoMap_1a25266890fe608eed09f803e9acc2fc72"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Value"><span class="n"><span class="pre">Value</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Key"><span class="n"><span class="pre">Key</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SmallFifoMapixERK3Key" title="Link to this definition"></a><br /></dt>
+<dd><p>Get corresponding value from cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I000EN12SmallFifoMap3setEvRR1KRR1V">
+<span id="_CPPv3I000EN12SmallFifoMap3setERR1KRR1V"></span><span id="_CPPv2I000EN12SmallFifoMap3setERR1KRR1V"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">K</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_convertible</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000EN12SmallFifoMap3setEvRR1KRR1V" title="SmallFifoMap::set::K"><span class="n"><span class="pre">K</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Key"><span class="n"><span class="pre">Key</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><span class="w"> </span><span class="o"><span class="pre">&amp;&amp;</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_convertible</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000EN12SmallFifoMap3setEvRR1KRR1V" title="SmallFifoMap::set::V"><span class="n"><span class="pre">V</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Value"><span class="n"><span class="pre">Value</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSmallFifoMap_1a1a8ce561c725ca263a6ac8c871ddc918"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I000EN12SmallFifoMap3setEvRR1KRR1V" title="SmallFifoMap::set::K"><span class="n"><span class="pre">K</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">key</span></span>, <a class="reference internal" href="#_CPPv4I000EN12SmallFifoMap3setEvRR1KRR1V" title="SmallFifoMap::set::V"><span class="n"><span class="pre">V</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I000EN12SmallFifoMap3setEvRR1KRR1V" title="Link to this definition"></a><br /></dt>
+<dd><p>Put a key-value pair in the cache. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMap8capacityEv">
+<span id="_CPPv3N12SmallFifoMap8capacityEv"></span><span id="_CPPv2N12SmallFifoMap8capacityEv"></span><span id="SmallFifoMap::capacityCE"></span><span class="target" id="classSmallFifoMap_1abc1a7bc1731c33e33344289c487e7307"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">capacity</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SmallFifoMap8capacityEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many key-value pairs can the cache contain? </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMap10value_typeE">
+<span id="_CPPv3N12SmallFifoMap10value_typeE"></span><span id="_CPPv2N12SmallFifoMap10value_typeE"></span><span class="target" id="classSmallFifoMap_1a0ac5333b9744320b1c8ee52f01799ef4"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Key"><span class="n"><span class="pre">Key</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::Value"><span class="n"><span class="pre">Value</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SmallFifoMap10value_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMap9storage_tE">
+<span id="_CPPv3N12SmallFifoMap9storage_tE"></span><span id="_CPPv2N12SmallFifoMap9storage_tE"></span><span class="target" id="classSmallFifoMap_1a95d6c1c2971874b1c49b95689e5b0046"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">storage_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12SmallFifoMap10value_typeE" title="SmallFifoMap::value_type"><span class="n"><span class="pre">value_type</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap::N"><span class="n"><span class="pre">N</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SmallFifoMap9storage_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMap7storageE">
+<span id="_CPPv3N12SmallFifoMap7storageE"></span><span id="_CPPv2N12SmallFifoMap7storageE"></span><span id="SmallFifoMap::storage__storage_t"></span><span class="target" id="classSmallFifoMap_1a0271ad86c0fde4a8ea3c78fdc7262569"></span><a class="reference internal" href="#_CPPv4N12SmallFifoMap9storage_tE" title="SmallFifoMap::storage_t"><span class="n"><span class="pre">storage_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">storage</span></span></span><a class="headerlink" href="#_CPPv4N12SmallFifoMap7storageE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMap5size_E">
+<span id="_CPPv3N12SmallFifoMap5size_E"></span><span id="_CPPv2N12SmallFifoMap5size_E"></span><span id="SmallFifoMap::size___unsigned-c"></span><span class="target" id="classSmallFifoMap_1aa05f07f6c74ab3d3c7d609c612479331"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N12SmallFifoMap5size_E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SmallFifoMap6oldestE">
+<span id="_CPPv3N12SmallFifoMap6oldestE"></span><span id="_CPPv2N12SmallFifoMap6oldestE"></span><span id="SmallFifoMap::oldest__unsigned-c"></span><span class="target" id="classSmallFifoMap_1a760937e949fade79cb105a98fa475582"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">oldest</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N12SmallFifoMap6oldestE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="QueueCache.html" class="btn btn-neutral float-left" title="QueueCache.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SmallVector.html" class="btn btn-neutral float-right" title="SmallVector.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

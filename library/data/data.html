@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Collection and Recording Tools &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/data/data.af794f48-b0d1-4d4e-9386-1545f387fa10.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="AnnotatedType.hpp" href="api/AnnotatedType.html" />
+    <link rel="prev" title="SignalManager.hpp" href="../control/api/SignalManager.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Collection and Recording Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-tools-api">Data Tools API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html">AnnotatedType.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html">DataFile.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html">DataInterface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html">DataLayout.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html">DataLog.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html">DataManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html">DataMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html">DataNode.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html">Datum.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html">MemoryImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html">SimpleParser.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html">Trait.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html">VarMap.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Data Collection and Recording Tools</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-collection-and-recording-tools">
+<h1>Data Collection and Recording Tools<a class="headerlink" href="#data-collection-and-recording-tools" title="Link to this heading"></a></h1>
+<p>Empirical includes a variety of tools for gathering and recording data.
+The core of these tools is the DataNode class. DataNodes are containers
+that you can pass as much data as you like into. When DataNodes are
+built, they can be given various modifiers (specified as template
+arguments) which control how much information they will collect about
+the data they are passed. For instance, the <code class="docutils literal notranslate"><span class="pre">data::Current</span></code> modifier
+gives the DataNode the power to remember the last value it was passed,
+whereas the <code class="docutils literal notranslate"><span class="pre">data::Stats</span></code> modifier keeps track of a variety of
+statistics about the distribution of data that the node has been
+passed. Except where otherwise noted, modifiers can be combined freely.
+Some also have dependencies on simpler modifiers. On the whole,
+DataNodes are designed to be as light-weight as possible while still
+keeping track of the desired information.</p>
+<p>DataNodes that accept the same type of data and have the same modifiers
+can be grouped together using a DataManager.</p>
+<p>The DataInterface class provides a general interface for interacting
+with DataNodes of any type. This is useful in cases where you have a
+collection of different types of DataNodes and want to operate on them
+without casting.</p>
+<p>The DataFile class provides an interface for recording data at regular
+intervals. This data can come from DataNodes, the return of a specified
+function, or the contents of a specified variable. DataFiles are useful
+for collecting data over the course of a computational experiment.</p>
+<section id="data-tools-api">
+<h2>Data Tools API<a class="headerlink" href="#data-tools-api" title="Link to this heading"></a></h2>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/AnnotatedType.html">AnnotatedType.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/AnnotatedType.html#_CPPv413AnnotatedType"><code class="docutils literal notranslate"><span class="pre">AnnotatedType</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4N13AnnotatedType10GetDataMapEv"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetDataMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4NK13AnnotatedType10GetDataMapEv"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetDataMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4N13AnnotatedType10SetDataMapER7DataMap"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::SetDataMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4N13AnnotatedType13GetDataLayoutEv"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetDataLayout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4NK13AnnotatedType13GetDataLayoutEv"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetDataLayout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4NK13AnnotatedType10HasTraitIDE6size_t"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::HasTraitID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4NK13AnnotatedType8HasTraitERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::HasTrait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4I0ENK13AnnotatedType13TestTraitTypeEb6size_t"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::TestTraitType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4I0ENK13AnnotatedType13TestTraitTypeEbRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::TestTraitType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4NK13AnnotatedType10GetTraitIDERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetTraitID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4I00EN13AnnotatedType8GetTraitERDaRR5KEY_T"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetTrait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4I00EN13AnnotatedType8GetTraitEDaRR5KEY_T6size_t"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetTrait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4I00ENK13AnnotatedType8GetTraitERKDaRR5KEY_T"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetTrait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4I00ENK13AnnotatedType8GetTraitEDaRR5KEY_T6size_t"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetTrait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4I0EN13AnnotatedType8SetTraitER1T6size_tRK1T"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::SetTrait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4I0EN13AnnotatedType8SetTraitER1TRKNSt6stringERK1T"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::SetTrait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4NK13AnnotatedType12GetTraitTypeE6size_t"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetTraitType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4NK13AnnotatedType12GetTraitTypeERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetTraitType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4NK13AnnotatedType16GetTraitAsDoubleE6size_t"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetTraitAsDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4NK13AnnotatedType16GetTraitAsDoubleE6size_t6TypeID"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetTraitAsDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4NK13AnnotatedType16GetTraitAsStringE6size_t"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetTraitAsString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4NK13AnnotatedType16GetTraitAsStringE6size_t6TypeID6size_t"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::GetTraitAsString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnnotatedType.html#_CPPv4N13AnnotatedType8data_mapE"><code class="docutils literal notranslate"><span class="pre">AnnotatedType::data_map</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/DataFile.html">DataFile.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/DataFile.html#_CPPv4I0E21MakeContainerDataFile17ContainerDataFileI9CONTAINERENSt8functionIF9CONTAINERvEEERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">MakeContainerDataFile()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataFile.html#_CPPv48DataFile"><code class="docutils literal notranslate"><span class="pre">DataFile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile8DataFileERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataFile::DataFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile8DataFileERNSt7ostreamERKNSt6stringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataFile::DataFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile8DataFileERK8DataFile"><code class="docutils literal notranslate"><span class="pre">DataFile::DataFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile8DataFileERR8DataFile"><code class="docutils literal notranslate"><span class="pre">DataFile::DataFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFileD0Ev"><code class="docutils literal notranslate"><span class="pre">DataFile::~DataFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFileaSERK8DataFile"><code class="docutils literal notranslate"><span class="pre">DataFile::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFileaSERR8DataFile"><code class="docutils literal notranslate"><span class="pre">DataFile::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4NK8DataFile11GetFilenameEv"><code class="docutils literal notranslate"><span class="pre">DataFile::GetFilename()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4NK8DataFile12GetLineBeginEv"><code class="docutils literal notranslate"><span class="pre">DataFile::GetLineBegin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4NK8DataFile9GetSpacerEv"><code class="docutils literal notranslate"><span class="pre">DataFile::GetSpacer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4NK8DataFile10GetLineEndEv"><code class="docutils literal notranslate"><span class="pre">DataFile::GetLineEnd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile9SetTimingE10time_fun_t"><code class="docutils literal notranslate"><span class="pre">DataFile::SetTiming()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile13SetTimingOnceE6size_t"><code class="docutils literal notranslate"><span class="pre">DataFile::SetTimingOnce()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile15SetTimingRepeatE6size_t"><code class="docutils literal notranslate"><span class="pre">DataFile::SetTimingRepeat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile14SetTimingRangeE6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">DataFile::SetTimingRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile12SetLineBeginERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataFile::SetLineBegin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile9SetSpacerERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataFile::SetSpacer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile10SetLineEndERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataFile::SetLineEnd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile9SetupLineERKNSt6stringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataFile::SetupLine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile15PrintHeaderKeysEv"><code class="docutils literal notranslate"><span class="pre">DataFile::PrintHeaderKeys()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile18PrintHeaderCommentERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataFile::PrintHeaderComment()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile6UpdateEv"><code class="docutils literal notranslate"><span class="pre">DataFile::Update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile6UpdateE6size_t"><code class="docutils literal notranslate"><span class="pre">DataFile::Update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile9AddPreFunE9pre_fun_t"><code class="docutils literal notranslate"><span class="pre">DataFile::AddPreFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile3AddERKNSt8functionIFvRNSt7ostreamEEEERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataFile::Add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0EN8DataFile6AddFunE6size_tRKNSt8functionIF1TvEEERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataFile::AddFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0EN8DataFile6AddVarE6size_tRK1TRKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataFile::AddVar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile10AddCurrentE6size_tR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddCurrent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile7AddMeanE6size_tR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddMean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile9AddMedianE6size_tR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddMedian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile13AddPercentileE6size_tR8DataNodeI8VAL_TYPEDp4MODSEKdRKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddPercentile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile8AddTotalE6size_tR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddTotal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile6AddMinE6size_tR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddMin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile6AddMaxE6size_tR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddMax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile11AddVarianceE6size_tR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddVariance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile20AddStandardDeviationE6size_tR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddStandardDeviation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile7AddSkewE6size_tR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddSkew()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile11AddKurtosisE6size_tR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddKurtosis()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile8AddStatsEvR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddStats()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile11AddAllStatsEvR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddAllStats()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile10AddHistBinE6size_tR8DataNodeI8VAL_TYPEDp4MODSE6size_tRKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddHistBin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile14AddAllHistBinsEvR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddAllHistBins()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0_Dp4dataEN8DataFile14AddInferiorityE6size_tR8DataNodeI8VAL_TYPEDp4MODSERKNSt6stringERKNSt6stringERKbRKb"><code class="docutils literal notranslate"><span class="pre">DataFile::AddInferiority()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile5fun_tE"><code class="docutils literal notranslate"><span class="pre">DataFile::fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile10time_fun_tE"><code class="docutils literal notranslate"><span class="pre">DataFile::time_fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile9pre_fun_tE"><code class="docutils literal notranslate"><span class="pre">DataFile::pre_fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile8filenameE"><code class="docutils literal notranslate"><span class="pre">DataFile::filename</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile2osE"><code class="docutils literal notranslate"><span class="pre">DataFile::os</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile4funsE"><code class="docutils literal notranslate"><span class="pre">DataFile::funs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile8pre_funsE"><code class="docutils literal notranslate"><span class="pre">DataFile::pre_funs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile4keysE"><code class="docutils literal notranslate"><span class="pre">DataFile::keys</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile5descsE"><code class="docutils literal notranslate"><span class="pre">DataFile::descs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile10timing_funE"><code class="docutils literal notranslate"><span class="pre">DataFile::timing_fun</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile10line_beginE"><code class="docutils literal notranslate"><span class="pre">DataFile::line_begin</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile11line_spacerE"><code class="docutils literal notranslate"><span class="pre">DataFile::line_spacer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N8DataFile8line_endE"><code class="docutils literal notranslate"><span class="pre">DataFile::line_end</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataFile.html#_CPPv4I0E17ContainerDataFile"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4IDpEN17ContainerDataFile17ContainerDataFileEDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::ContainerDataFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFileD0Ev"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::~ContainerDataFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile21SetUpdateContainerFunEK22fun_update_container_t"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::SetUpdateContainerFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile15PrintHeaderKeysEv"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::PrintHeaderKeys()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile18PrintHeaderCommentERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::PrintHeaderComment()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4NK17ContainerDataFile14GetCurrentRowsEv"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::GetCurrentRows()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile10OutputLineEK6data_t"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::OutputLine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile6UpdateEv"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::Update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile6UpdateE6size_t"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::Update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile3AddERKNSt8functionIFvRNSt7ostreamE6data_tEEERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::Add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4I0EN17ContainerDataFile15AddContainerFunE6size_tRKNSt8functionIF1TK6data_tEEERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::AddContainerFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile11container_tE"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::container_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile15raw_container_tE"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::raw_container_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile6data_tE"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::data_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile15container_fun_tE"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::container_fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile22fun_update_container_tE"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::fun_update_container_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile20update_container_funE"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::update_container_fun</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile12current_rowsE"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::current_rows</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile14container_funsE"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::container_funs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile14container_keysE"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::container_keys</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataFile.html#_CPPv4N17ContainerDataFile15container_descsE"><code class="docutils literal notranslate"><span class="pre">ContainerDataFile::container_descs</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/DataInterface.html">DataInterface.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/DataInterface.html#_CPPv4I0_Dp4dataE17MakeDataInterfaceP13DataInterfacev"><code class="docutils literal notranslate"><span class="pre">MakeDataInterface()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataInterface.html#_CPPv413DataInterface"><code class="docutils literal notranslate"><span class="pre">DataInterface</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4N13DataInterfaceD0Ev"><code class="docutils literal notranslate"><span class="pre">DataInterface::~DataInterface()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4NK13DataInterface8GetCountEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::GetCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4NK13DataInterface13GetResetCountEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::GetResetCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4NK13DataInterface8GetTotalEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::GetTotal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4NK13DataInterface7GetMeanEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::GetMean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4NK13DataInterface6GetMinEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::GetMin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4NK13DataInterface6GetMaxEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::GetMax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4NK13DataInterface11GetVarianceEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::GetVariance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4NK13DataInterface20GetStandardDeviationEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::GetStandardDeviation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4NK13DataInterface7GetSkewEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::GetSkew()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4NK13DataInterface11GetKurtosisEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::GetKurtosis()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4N13DataInterface8PullDataEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::PullData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4N13DataInterface5ResetEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4N13DataInterface10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">DataInterface::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4N13DataInterface7GetNameEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4N13DataInterface14GetDescriptionEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::GetDescription()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataInterface.html#_CPPv4N13DataInterface10GetKeywordEv"><code class="docutils literal notranslate"><span class="pre">DataInterface::GetKeyword()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/DataLayout.html">DataLayout.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/DataLayout.html#_CPPv410DataLayout"><code class="docutils literal notranslate"><span class="pre">DataLayout</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout10DataLayoutEv"><code class="docutils literal notranslate"><span class="pre">DataLayout::DataLayout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout10DataLayoutERK10DataLayout"><code class="docutils literal notranslate"><span class="pre">DataLayout::DataLayout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayoutD0Ev"><code class="docutils literal notranslate"><span class="pre">DataLayout::~DataLayout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayoutaSERK10DataLayout"><code class="docutils literal notranslate"><span class="pre">DataLayout::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayoutaSERR10DataLayout"><code class="docutils literal notranslate"><span class="pre">DataLayout::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout7IncMapsEv"><code class="docutils literal notranslate"><span class="pre">DataLayout::IncMaps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout7DecMapsEv"><code class="docutils literal notranslate"><span class="pre">DataLayout::DecMaps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout10GetNumMapsEv"><code class="docutils literal notranslate"><span class="pre">DataLayout::GetNumMaps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout8IsLockedEv"><code class="docutils literal notranslate"><span class="pre">DataLayout::IsLocked()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout7HasNameERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataLayout::HasName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout5HasIDE6size_t"><code class="docutils literal notranslate"><span class="pre">DataLayout::HasID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4I0ENK10DataLayout6IsTypeEb6size_t"><code class="docutils literal notranslate"><span class="pre">DataLayout::IsType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4I0ENK10DataLayout3HasEb6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">DataLayout::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4I0ENK10DataLayout3HasEbRKNSt6stringE6size_t"><code class="docutils literal notranslate"><span class="pre">DataLayout::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4I00ENK10DataLayout11DiagnoseHasENSt6stringE5KEY_T6size_t"><code class="docutils literal notranslate"><span class="pre">DataLayout::DiagnoseHas()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout12GetImageSizeEv"><code class="docutils literal notranslate"><span class="pre">DataLayout::GetImageSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout5GetIDERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataLayout::GetID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout7GetTypeE6size_t"><code class="docutils literal notranslate"><span class="pre">DataLayout::GetType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout8GetCountE6size_t"><code class="docutils literal notranslate"><span class="pre">DataLayout::GetCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout9IsNumericE6size_t"><code class="docutils literal notranslate"><span class="pre">DataLayout::IsNumeric()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout9IsNumericERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataLayout::IsNumeric()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout4LockEv"><code class="docutils literal notranslate"><span class="pre">DataLayout::Lock()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4I0EN10DataLayout3AddE6size_tR11MemoryImageRKNSt6stringERK1TRKNSt6stringERKNSt6stringEK6size_t"><code class="docutils literal notranslate"><span class="pre">DataLayout::Add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout13DestructImageER11MemoryImage"><code class="docutils literal notranslate"><span class="pre">DataLayout::DestructImage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout10ClearImageER11MemoryImage"><code class="docutils literal notranslate"><span class="pre">DataLayout::ClearImage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout9CopyImageERK11MemoryImageR11MemoryImage"><code class="docutils literal notranslate"><span class="pre">DataLayout::CopyImage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4NK10DataLayout17MoveImageContentsER11MemoryImageR11MemoryImage"><code class="docutils literal notranslate"><span class="pre">DataLayout::MoveImageContents()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout10copy_fun_tE"><code class="docutils literal notranslate"><span class="pre">DataLayout::copy_fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout10move_fun_tE"><code class="docutils literal notranslate"><span class="pre">DataLayout::move_fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout14destruct_fun_tE"><code class="docutils literal notranslate"><span class="pre">DataLayout::destruct_fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout6id_mapE"><code class="docutils literal notranslate"><span class="pre">DataLayout::id_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout11setting_mapE"><code class="docutils literal notranslate"><span class="pre">DataLayout::setting_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout10image_sizeE"><code class="docutils literal notranslate"><span class="pre">DataLayout::image_size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout8num_mapsE"><code class="docutils literal notranslate"><span class="pre">DataLayout::num_maps</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout9is_lockedE"><code class="docutils literal notranslate"><span class="pre">DataLayout::is_locked</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout17copy_constructorsE"><code class="docutils literal notranslate"><span class="pre">DataLayout::copy_constructors</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout17move_constructorsE"><code class="docutils literal notranslate"><span class="pre">DataLayout::move_constructors</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout11destructorsE"><code class="docutils literal notranslate"><span class="pre">DataLayout::destructors</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout11SettingInfoE"><code class="docutils literal notranslate"><span class="pre">DataLayout::SettingInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout11SettingInfo4typeE"><code class="docutils literal notranslate"><span class="pre">DataLayout::SettingInfo::type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout11SettingInfo4nameE"><code class="docutils literal notranslate"><span class="pre">DataLayout::SettingInfo::name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout11SettingInfo4descE"><code class="docutils literal notranslate"><span class="pre">DataLayout::SettingInfo::desc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout11SettingInfo5notesE"><code class="docutils literal notranslate"><span class="pre">DataLayout::SettingInfo::notes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout11SettingInfo5countE"><code class="docutils literal notranslate"><span class="pre">DataLayout::SettingInfo::count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/DataLayout.html#_CPPv4N10DataLayout11SettingInfo6is_logE"><code class="docutils literal notranslate"><span class="pre">DataLayout::SettingInfo::is_log</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/DataLog.html">DataLog.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/DataLog.html#_CPPv4I0E7DataLog"><code class="docutils literal notranslate"><span class="pre">DataLog</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLog7DataLogEv"><code class="docutils literal notranslate"><span class="pre">DataLog::DataLog()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLog7DataLogERK7DataLog"><code class="docutils literal notranslate"><span class="pre">DataLog::DataLog()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLog7DataLogERR7DataLog"><code class="docutils literal notranslate"><span class="pre">DataLog::DataLog()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLog7DataLogERK6vectorI1TE"><code class="docutils literal notranslate"><span class="pre">DataLog::DataLog()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLogaSERK7DataLog"><code class="docutils literal notranslate"><span class="pre">DataLog::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLogaSERR7DataLog"><code class="docutils literal notranslate"><span class="pre">DataLog::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLogaSERK6vectorI1TE"><code class="docutils literal notranslate"><span class="pre">DataLog::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLog7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">DataLog::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLog4sizeEv"><code class="docutils literal notranslate"><span class="pre">DataLog::size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLogixE6size_t"><code class="docutils literal notranslate"><span class="pre">DataLog::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4NK7DataLogixE6size_t"><code class="docutils literal notranslate"><span class="pre">DataLog::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLog4PushE1T"><code class="docutils literal notranslate"><span class="pre">DataLog::Push()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLog4SortEv"><code class="docutils literal notranslate"><span class="pre">DataLog::Sort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4NK7DataLog3MinEv"><code class="docutils literal notranslate"><span class="pre">DataLog::Min()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4NK7DataLog3MaxEv"><code class="docutils literal notranslate"><span class="pre">DataLog::Max()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4NK7DataLog4MeanEv"><code class="docutils literal notranslate"><span class="pre">DataLog::Mean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4NK7DataLog8VarianceEv"><code class="docutils literal notranslate"><span class="pre">DataLog::Variance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4NK7DataLog6StdDevEv"><code class="docutils literal notranslate"><span class="pre">DataLog::StdDev()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4NK7DataLog8StdErrorEv"><code class="docutils literal notranslate"><span class="pre">DataLog::StdError()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLog13AsciiBarGraphE6size_tbbRNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">DataLog::AsciiBarGraph()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLog14AsciiHistogramE6size_t6size_tbRNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">DataLog::AsciiHistogram()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLog6data_tE"><code class="docutils literal notranslate"><span class="pre">DataLog::data_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataLog.html#_CPPv4N7DataLog4dataE"><code class="docutils literal notranslate"><span class="pre">DataLog::data</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/DataManager.html">DataManager.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/DataManager.html#_CPPv4I0_Dp4dataE11DataManager"><code class="docutils literal notranslate"><span class="pre">DataManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4N11DataManager11DataManagerEv"><code class="docutils literal notranslate"><span class="pre">DataManager::DataManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4N11DataManagerD0Ev"><code class="docutils literal notranslate"><span class="pre">DataManager::~DataManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4N11DataManager5beginEv"><code class="docutils literal notranslate"><span class="pre">DataManager::begin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4N11DataManager3endEv"><code class="docutils literal notranslate"><span class="pre">DataManager::end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4NK11DataManager5beginEv"><code class="docutils literal notranslate"><span class="pre">DataManager::begin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4NK11DataManager3endEv"><code class="docutils literal notranslate"><span class="pre">DataManager::end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4NK11DataManager7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">DataManager::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4NK11DataManager8GetNodesEv"><code class="docutils literal notranslate"><span class="pre">DataManager::GetNodes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4N11DataManager7HasNodeERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataManager::HasNode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4N11DataManager3NewERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataManager::New()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4N11DataManager6DeleteERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataManager::Delete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4NK11DataManager3GetERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataManager::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4N11DataManager3GetERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataManager::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4IDpEN11DataManager7AddDataEvRKNSt6stringEDp2Ts"><code class="docutils literal notranslate"><span class="pre">DataManager::AddData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4N11DataManager8ResetAllEv"><code class="docutils literal notranslate"><span class="pre">DataManager::ResetAll()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4N11DataManager6data_tE"><code class="docutils literal notranslate"><span class="pre">DataManager::data_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4N11DataManager6node_tE"><code class="docutils literal notranslate"><span class="pre">DataManager::node_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataManager.html#_CPPv4N11DataManager8node_mapE"><code class="docutils literal notranslate"><span class="pre">DataManager::node_map</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/DataMap.html">DataMap.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/DataMap.html#_CPPv47DataMap"><code class="docutils literal notranslate"><span class="pre">DataMap</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMap8key_typeE"><code class="docutils literal notranslate"><span class="pre">DataMap::key_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMap7DataMapEv"><code class="docutils literal notranslate"><span class="pre">DataMap::DataMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMap7DataMapERK7DataMap"><code class="docutils literal notranslate"><span class="pre">DataMap::DataMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMap7DataMapERR7DataMap"><code class="docutils literal notranslate"><span class="pre">DataMap::DataMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMapaSERK7DataMap"><code class="docutils literal notranslate"><span class="pre">DataMap::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMapD0Ev"><code class="docutils literal notranslate"><span class="pre">DataMap::~DataMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">DataMap::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap5GetIDERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataMap::GetID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap5HasIDE6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::HasID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap7HasNameERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataMap::HasName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0ENK7DataMap6IsTypeEb6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::IsType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0ENK7DataMap6IsTypeEbRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataMap::IsType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0DpENK7DataMap3HasEbDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">DataMap::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0EN7DataMap3GetER1T6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0ENK7DataMap3GetERK1T6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0EN7DataMap3GetER1TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataMap::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0ENK7DataMap3GetERK1TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataMap::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0EN7DataMap3GetENSt4spanI1TEE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0ENK7DataMap3GetENSt4spanIK1TEE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0EN7DataMap3GetENSt4spanI1TEERKNSt6stringE6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0ENK7DataMap3GetENSt4spanIK1TEERKNSt6stringE6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0EN7DataMap3SetER1T6size_tRK1T"><code class="docutils literal notranslate"><span class="pre">DataMap::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0EN7DataMap3SetER1TRKNSt6stringERK1T"><code class="docutils literal notranslate"><span class="pre">DataMap::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap7GetTypeE6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::GetType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap7GetTypeERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataMap::GetType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap9IsNumericE6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::IsNumeric()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap9IsNumericERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataMap::IsNumeric()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap11GetAsDoubleE6size_t6TypeID"><code class="docutils literal notranslate"><span class="pre">DataMap::GetAsDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap11GetAsDoubleE6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::GetAsDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap11GetAsStringE6size_t6TypeID6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::GetAsString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap11GetAsStringE6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::GetAsString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0EN7DataMap6AddVarE6size_tRKNSt6stringERK1TRKNSt6stringERKNSt6stringE6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::AddVar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4I0EN7DataMap6AddVarE6size_tRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataMap::AddVar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap9HasLayoutERK10DataLayout"><code class="docutils literal notranslate"><span class="pre">DataMap::HasLayout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap9HasLayoutEv"><code class="docutils literal notranslate"><span class="pre">DataMap::HasLayout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap10SameLayoutERK7DataMap"><code class="docutils literal notranslate"><span class="pre">DataMap::SameLayout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMap9GetLayoutEv"><code class="docutils literal notranslate"><span class="pre">DataMap::GetLayout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap9GetLayoutEv"><code class="docutils literal notranslate"><span class="pre">DataMap::GetLayout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4NK7DataMap8IsLockedEv"><code class="docutils literal notranslate"><span class="pre">DataMap::IsLocked()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMap10LockLayoutEv"><code class="docutils literal notranslate"><span class="pre">DataMap::LockLayout()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMap17MakeDatumAccessorERK10DataLayout6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::MakeDatumAccessor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMap17MakeDatumAccessorERK10DataLayoutRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataMap::MakeDatumAccessor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMap7DataMapE3PtrI10DataLayoutE6size_t"><code class="docutils literal notranslate"><span class="pre">DataMap::DataMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMap16MakeLayoutUniqueEv"><code class="docutils literal notranslate"><span class="pre">DataMap::MakeLayoutUnique()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMap6memoryE"><code class="docutils literal notranslate"><span class="pre">DataMap::memory</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataMap.html#_CPPv4N7DataMap10layout_ptrE"><code class="docutils literal notranslate"><span class="pre">DataMap::layout_ptr</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/DataNode.html">DataNode.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv4I0_Dp4dataE11DataMonitor"><code class="docutils literal notranslate"><span class="pre">DataMonitor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv4I0_Dp4dataE7DataLog"><code class="docutils literal notranslate"><span class="pre">DataLog</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv4I0_Dp4dataE11DataArchive"><code class="docutils literal notranslate"><span class="pre">DataArchive</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv44data"><code class="docutils literal notranslate"><span class="pre">data</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data7CurrentE"><code class="docutils literal notranslate"><span class="pre">data::Current</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data4InfoE"><code class="docutils literal notranslate"><span class="pre">data::Info</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data3LogE"><code class="docutils literal notranslate"><span class="pre">data::Log</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data7ArchiveE"><code class="docutils literal notranslate"><span class="pre">data::Archive</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data5RangeE"><code class="docutils literal notranslate"><span class="pre">data::Range</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data9FullRangeE"><code class="docutils literal notranslate"><span class="pre">data::FullRange</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data9HistogramE"><code class="docutils literal notranslate"><span class="pre">data::Histogram</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data5StatsE"><code class="docutils literal notranslate"><span class="pre">data::Stats</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data4PullE"><code class="docutils literal notranslate"><span class="pre">data::Pull</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data11SignalResetE"><code class="docutils literal notranslate"><span class="pre">data::SignalReset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data10SignalDataE"><code class="docutils literal notranslate"><span class="pre">data::SignalData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data11SignalDatumE"><code class="docutils literal notranslate"><span class="pre">data::SignalDatum</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data11SignalRangeE"><code class="docutils literal notranslate"><span class="pre">data::SignalRange</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data12SignalLimitsE"><code class="docutils literal notranslate"><span class="pre">data::SignalLimits</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N4data7UNKNOWNE"><code class="docutils literal notranslate"><span class="pre">data::UNKNOWN</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv4I0E14DataNodeModule"><code class="docutils literal notranslate"><span class="pre">DataNodeModule</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N14DataNodeModule7value_tE"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::value_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N14DataNodeModule14DataNodeModuleEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::DataNodeModule()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule8GetCountEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule13GetResetCountEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetResetCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule8GetTotalEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetTotal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule7GetMeanEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetMean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule6GetMinEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetMin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule6GetMaxEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetMax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule11GetVarianceEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetVariance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule20GetStandardDeviationEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetStandardDeviation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule7GetSkewEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetSkew()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule11GetKurtosisEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetKurtosis()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule9GetMedianEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetMedian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule13GetPercentileEKd"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetPercentile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule7GetNameEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule14GetDescriptionEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetDescription()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK14DataNodeModule10GetKeywordEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::GetKeyword()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N14DataNodeModule7SetNameERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::SetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N14DataNodeModule14SetDescriptionERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::SetDescription()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N14DataNodeModule10SetKeywordERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::SetKeyword()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N14DataNodeModule7SetInfoERKNSt6stringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::SetInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N14DataNodeModule8AddDatumERK8VAL_TYPE"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::AddDatum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N14DataNodeModule5ResetEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N14DataNodeModule10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N14DataNodeModule13PullData_implEv"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::PullData_impl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N14DataNodeModule9val_countE"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::val_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N14DataNodeModule7in_valsE"><code class="docutils literal notranslate"><span class="pre">DataNodeModule::in_vals</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv413CurrentModule"><code class="docutils literal notranslate"><span class="pre">CurrentModule</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13CurrentModule14DataNodeModuleEv"><code class="docutils literal notranslate"><span class="pre">CurrentModule::DataNodeModule()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK13CurrentModule10GetCurrentEv"><code class="docutils literal notranslate"><span class="pre">CurrentModule::GetCurrent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13CurrentModule8AddDatumERK8VAL_TYPE"><code class="docutils literal notranslate"><span class="pre">CurrentModule::AddDatum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13CurrentModule10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">CurrentModule::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13CurrentModule6this_tE"><code class="docutils literal notranslate"><span class="pre">CurrentModule::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13CurrentModule8parent_tE"><code class="docutils literal notranslate"><span class="pre">CurrentModule::parent_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13CurrentModule6base_tE"><code class="docutils literal notranslate"><span class="pre">CurrentModule::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13CurrentModule7cur_valE"><code class="docutils literal notranslate"><span class="pre">CurrentModule::cur_val</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv410InfoModule"><code class="docutils literal notranslate"><span class="pre">InfoModule</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10InfoModule14DataNodeModuleEv"><code class="docutils literal notranslate"><span class="pre">InfoModule::DataNodeModule()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK10InfoModule7GetNameEv"><code class="docutils literal notranslate"><span class="pre">InfoModule::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK10InfoModule14GetDescriptionEv"><code class="docutils literal notranslate"><span class="pre">InfoModule::GetDescription()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK10InfoModule10GetKeywordEv"><code class="docutils literal notranslate"><span class="pre">InfoModule::GetKeyword()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10InfoModule7SetNameERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">InfoModule::SetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10InfoModule14SetDescriptionERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">InfoModule::SetDescription()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10InfoModule10SetKeywordERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">InfoModule::SetKeyword()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10InfoModule7SetInfoERKNSt6stringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">InfoModule::SetInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10InfoModule10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">InfoModule::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10InfoModule8parent_tE"><code class="docutils literal notranslate"><span class="pre">InfoModule::parent_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10InfoModule4nameE"><code class="docutils literal notranslate"><span class="pre">InfoModule::name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10InfoModule4descE"><code class="docutils literal notranslate"><span class="pre">InfoModule::desc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10InfoModule7keywordE"><code class="docutils literal notranslate"><span class="pre">InfoModule::keyword</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv49LogModule"><code class="docutils literal notranslate"><span class="pre">LogModule</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N9LogModule14DataNodeModuleEv"><code class="docutils literal notranslate"><span class="pre">LogModule::DataNodeModule()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK9LogModule7GetDataEv"><code class="docutils literal notranslate"><span class="pre">LogModule::GetData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK9LogModule9GetMedianEv"><code class="docutils literal notranslate"><span class="pre">LogModule::GetMedian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK9LogModule13GetPercentileEKd"><code class="docutils literal notranslate"><span class="pre">LogModule::GetPercentile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N9LogModule8AddDatumERK8VAL_TYPE"><code class="docutils literal notranslate"><span class="pre">LogModule::AddDatum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N9LogModule5ResetEv"><code class="docutils literal notranslate"><span class="pre">LogModule::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N9LogModule10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">LogModule::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N9LogModule6this_tE"><code class="docutils literal notranslate"><span class="pre">LogModule::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N9LogModule8parent_tE"><code class="docutils literal notranslate"><span class="pre">LogModule::parent_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N9LogModule6base_tE"><code class="docutils literal notranslate"><span class="pre">LogModule::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N9LogModule7val_setE"><code class="docutils literal notranslate"><span class="pre">LogModule::val_set</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N9LogModule9val_countE"><code class="docutils literal notranslate"><span class="pre">LogModule::val_count</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv413ArchiveModule"><code class="docutils literal notranslate"><span class="pre">ArchiveModule</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13ArchiveModule14DataNodeModuleEv"><code class="docutils literal notranslate"><span class="pre">ArchiveModule::DataNodeModule()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK13ArchiveModule10GetArchiveEv"><code class="docutils literal notranslate"><span class="pre">ArchiveModule::GetArchive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK13ArchiveModule7GetDataE6size_t"><code class="docutils literal notranslate"><span class="pre">ArchiveModule::GetData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK13ArchiveModule7GetDataEv"><code class="docutils literal notranslate"><span class="pre">ArchiveModule::GetData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK13ArchiveModule13GetResetCountEv"><code class="docutils literal notranslate"><span class="pre">ArchiveModule::GetResetCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13ArchiveModule5ResetEv"><code class="docutils literal notranslate"><span class="pre">ArchiveModule::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13ArchiveModule10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">ArchiveModule::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13ArchiveModule6this_tE"><code class="docutils literal notranslate"><span class="pre">ArchiveModule::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13ArchiveModule8parent_tE"><code class="docutils literal notranslate"><span class="pre">ArchiveModule::parent_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13ArchiveModule6base_tE"><code class="docutils literal notranslate"><span class="pre">ArchiveModule::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13ArchiveModule7archiveE"><code class="docutils literal notranslate"><span class="pre">ArchiveModule::archive</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N13ArchiveModule9val_countE"><code class="docutils literal notranslate"><span class="pre">ArchiveModule::val_count</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv411RangeModule"><code class="docutils literal notranslate"><span class="pre">RangeModule</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11RangeModule14DataNodeModuleEv"><code class="docutils literal notranslate"><span class="pre">RangeModule::DataNodeModule()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK11RangeModule8GetTotalEv"><code class="docutils literal notranslate"><span class="pre">RangeModule::GetTotal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK11RangeModule7GetMeanEv"><code class="docutils literal notranslate"><span class="pre">RangeModule::GetMean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK11RangeModule6GetMinEv"><code class="docutils literal notranslate"><span class="pre">RangeModule::GetMin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK11RangeModule6GetMaxEv"><code class="docutils literal notranslate"><span class="pre">RangeModule::GetMax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11RangeModule8AddDatumERK8VAL_TYPE"><code class="docutils literal notranslate"><span class="pre">RangeModule::AddDatum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11RangeModule5ResetEv"><code class="docutils literal notranslate"><span class="pre">RangeModule::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11RangeModule10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">RangeModule::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11RangeModule6this_tE"><code class="docutils literal notranslate"><span class="pre">RangeModule::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11RangeModule8parent_tE"><code class="docutils literal notranslate"><span class="pre">RangeModule::parent_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11RangeModule6base_tE"><code class="docutils literal notranslate"><span class="pre">RangeModule::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11RangeModule5totalE"><code class="docutils literal notranslate"><span class="pre">RangeModule::total</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11RangeModule3minE"><code class="docutils literal notranslate"><span class="pre">RangeModule::min</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11RangeModule3maxE"><code class="docutils literal notranslate"><span class="pre">RangeModule::max</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11RangeModule9val_countE"><code class="docutils literal notranslate"><span class="pre">RangeModule::val_count</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv415FullRangeModule"><code class="docutils literal notranslate"><span class="pre">FullRangeModule</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15FullRangeModule14DataNodeModuleEv"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::DataNodeModule()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15FullRangeModule8GetTotalEv"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::GetTotal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15FullRangeModule7GetMeanEv"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::GetMean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15FullRangeModule6GetMinEv"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::GetMin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15FullRangeModule6GetMaxEv"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::GetMax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15FullRangeModule8GetTotalE6size_t"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::GetTotal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15FullRangeModule7GetMeanE6size_t"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::GetMean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15FullRangeModule6GetMinE6size_t"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::GetMin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15FullRangeModule6GetMaxE6size_t"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::GetMax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15FullRangeModule13GetResetCountEv"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::GetResetCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15FullRangeModule5ResetEv"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15FullRangeModule10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15FullRangeModule6this_tE"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15FullRangeModule8parent_tE"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::parent_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15FullRangeModule6base_tE"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15FullRangeModule10total_valsE"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::total_vals</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15FullRangeModule8num_valsE"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::num_vals</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15FullRangeModule8min_valsE"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::min_vals</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15FullRangeModule8max_valsE"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::max_vals</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15FullRangeModule9val_countE"><code class="docutils literal notranslate"><span class="pre">FullRangeModule::val_count</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv411StatsModule"><code class="docutils literal notranslate"><span class="pre">StatsModule</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11StatsModule14DataNodeModuleEv"><code class="docutils literal notranslate"><span class="pre">StatsModule::DataNodeModule()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK11StatsModule11GetVarianceEv"><code class="docutils literal notranslate"><span class="pre">StatsModule::GetVariance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK11StatsModule20GetStandardDeviationEv"><code class="docutils literal notranslate"><span class="pre">StatsModule::GetStandardDeviation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK11StatsModule7GetSkewEv"><code class="docutils literal notranslate"><span class="pre">StatsModule::GetSkew()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK11StatsModule11GetKurtosisEv"><code class="docutils literal notranslate"><span class="pre">StatsModule::GetKurtosis()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11StatsModule8AddDatumERK8VAL_TYPE"><code class="docutils literal notranslate"><span class="pre">StatsModule::AddDatum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11StatsModule5ResetEv"><code class="docutils literal notranslate"><span class="pre">StatsModule::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11StatsModule10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">StatsModule::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11StatsModule6this_tE"><code class="docutils literal notranslate"><span class="pre">StatsModule::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11StatsModule8parent_tE"><code class="docutils literal notranslate"><span class="pre">StatsModule::parent_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11StatsModule6base_tE"><code class="docutils literal notranslate"><span class="pre">StatsModule::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11StatsModule2M2E"><code class="docutils literal notranslate"><span class="pre">StatsModule::M2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11StatsModule2M3E"><code class="docutils literal notranslate"><span class="pre">StatsModule::M3</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11StatsModule2M4E"><code class="docutils literal notranslate"><span class="pre">StatsModule::M4</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N11StatsModule9val_countE"><code class="docutils literal notranslate"><span class="pre">StatsModule::val_count</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv415HistogramModule"><code class="docutils literal notranslate"><span class="pre">HistogramModule</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule14DataNodeModuleEv"><code class="docutils literal notranslate"><span class="pre">HistogramModule::DataNodeModule()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15HistogramModule10GetHistMinEv"><code class="docutils literal notranslate"><span class="pre">HistogramModule::GetHistMin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15HistogramModule10GetHistMaxEv"><code class="docutils literal notranslate"><span class="pre">HistogramModule::GetHistMax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15HistogramModule12GetHistCountE6size_t"><code class="docutils literal notranslate"><span class="pre">HistogramModule::GetHistCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15HistogramModule12GetHistWidthE6size_t"><code class="docutils literal notranslate"><span class="pre">HistogramModule::GetHistWidth()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15HistogramModule13GetHistCountsEv"><code class="docutils literal notranslate"><span class="pre">HistogramModule::GetHistCounts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15HistogramModule11GetOverflowEv"><code class="docutils literal notranslate"><span class="pre">HistogramModule::GetOverflow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15HistogramModule12GetUnderflowEv"><code class="docutils literal notranslate"><span class="pre">HistogramModule::GetUnderflow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK15HistogramModule10GetBinMinsEv"><code class="docutils literal notranslate"><span class="pre">HistogramModule::GetBinMins()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule9SetupBinsE8VAL_TYPE8VAL_TYPE6size_t"><code class="docutils literal notranslate"><span class="pre">HistogramModule::SetupBins()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule8AddDatumERK8VAL_TYPE"><code class="docutils literal notranslate"><span class="pre">HistogramModule::AddDatum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule5ResetEv"><code class="docutils literal notranslate"><span class="pre">HistogramModule::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">HistogramModule::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule6this_tE"><code class="docutils literal notranslate"><span class="pre">HistogramModule::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule8parent_tE"><code class="docutils literal notranslate"><span class="pre">HistogramModule::parent_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule6base_tE"><code class="docutils literal notranslate"><span class="pre">HistogramModule::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule6offsetE"><code class="docutils literal notranslate"><span class="pre">HistogramModule::offset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule5widthE"><code class="docutils literal notranslate"><span class="pre">HistogramModule::width</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule4binsE"><code class="docutils literal notranslate"><span class="pre">HistogramModule::bins</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule6countsE"><code class="docutils literal notranslate"><span class="pre">HistogramModule::counts</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule8overflowE"><code class="docutils literal notranslate"><span class="pre">HistogramModule::overflow</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule9underflowE"><code class="docutils literal notranslate"><span class="pre">HistogramModule::underflow</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N15HistogramModule9val_countE"><code class="docutils literal notranslate"><span class="pre">HistogramModule::val_count</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv410PullModule"><code class="docutils literal notranslate"><span class="pre">PullModule</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10PullModule14DataNodeModuleEv"><code class="docutils literal notranslate"><span class="pre">PullModule::DataNodeModule()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10PullModule7AddPullERKNSt8functionIF8VAL_TYPEvEEE"><code class="docutils literal notranslate"><span class="pre">PullModule::AddPull()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10PullModule10AddPullSetERKNSt8functionIF6vectorI8VAL_TYPEEvEEE"><code class="docutils literal notranslate"><span class="pre">PullModule::AddPullSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N10PullModule10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">PullModule::PrintDebug()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/DataNode.html#_CPPv4I0_Dp4dataE8DataNode"><code class="docutils literal notranslate"><span class="pre">DataNode</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N8DataNode3AddEv"><code class="docutils literal notranslate"><span class="pre">DataNode::Add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4IDpEN8DataNode3AddEvRK8VAL_TYPEDpRK2Ts"><code class="docutils literal notranslate"><span class="pre">DataNode::Add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N8DataNode8PullDataEv"><code class="docutils literal notranslate"><span class="pre">DataNode::PullData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N8DataNode5ResetEv"><code class="docutils literal notranslate"><span class="pre">DataNode::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK8DataNode12PrintCurrentERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">DataNode::PrintCurrent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4NK8DataNode8PrintLogERNSt7ostreamERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DataNode::PrintLog()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N8DataNode10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">DataNode::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DataNode.html#_CPPv4N8DataNode8parent_tE"><code class="docutils literal notranslate"><span class="pre">DataNode::parent_t</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Datum.html">Datum.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Datum.html#_CPPv4lsRNSt7ostreamERK5Datum"><code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Datum.html#_CPPv4rmd5Datum"><code class="docutils literal notranslate"><span class="pre">operator%()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Datum.html#_CPPv45Datum"><code class="docutils literal notranslate"><span class="pre">Datum</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum5DatumEv"><code class="docutils literal notranslate"><span class="pre">Datum::Datum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum5DatumEd"><code class="docutils literal notranslate"><span class="pre">Datum::Datum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum5DatumERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Datum::Datum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum5DatumERRNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Datum::Datum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum5DatumEPKc"><code class="docutils literal notranslate"><span class="pre">Datum::Datum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum5DatumERK5Datum"><code class="docutils literal notranslate"><span class="pre">Datum::Datum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum5DatumERR5Datum"><code class="docutils literal notranslate"><span class="pre">Datum::Datum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5DatumD0Ev"><code class="docutils literal notranslate"><span class="pre">Datum::~Datum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum12NativeDoubleEv"><code class="docutils literal notranslate"><span class="pre">Datum::NativeDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5Datum12NativeDoubleEv"><code class="docutils literal notranslate"><span class="pre">Datum::NativeDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum12NativeStringEv"><code class="docutils literal notranslate"><span class="pre">Datum::NativeString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5Datum12NativeStringEv"><code class="docutils literal notranslate"><span class="pre">Datum::NativeString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5Datum8AsDoubleEv"><code class="docutils literal notranslate"><span class="pre">Datum::AsDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5Datum8AsStringEv"><code class="docutils literal notranslate"><span class="pre">Datum::AsString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatumcvdEv"><code class="docutils literal notranslate"><span class="pre">Datum::operator</span> <span class="pre">double()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatumcvNSt6stringEEv"><code class="docutils literal notranslate"><span class="pre">Datum::operator</span> <span class="pre">std::string()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum9SetDoubleEd"><code class="docutils literal notranslate"><span class="pre">Datum::SetDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum9SetStringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Datum::SetString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum3SetERK5Datum"><code class="docutils literal notranslate"><span class="pre">Datum::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5DatumaSEd"><code class="docutils literal notranslate"><span class="pre">Datum::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5DatumaSERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Datum::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5DatumaSEPKc"><code class="docutils literal notranslate"><span class="pre">Datum::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5DatumaSERK5Datum"><code class="docutils literal notranslate"><span class="pre">Datum::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatumplEv"><code class="docutils literal notranslate"><span class="pre">Datum::operator+()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatummiEv"><code class="docutils literal notranslate"><span class="pre">Datum::operator-()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatumntEv"><code class="docutils literal notranslate"><span class="pre">Datum::operator!()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5Datum13CompareNumberEd"><code class="docutils literal notranslate"><span class="pre">Datum::CompareNumber()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5Datum13CompareStringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Datum::CompareString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5Datum7CompareEd"><code class="docutils literal notranslate"><span class="pre">Datum::Compare()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5Datum7CompareERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Datum::Compare()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5Datum7CompareEPKc"><code class="docutils literal notranslate"><span class="pre">Datum::Compare()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5Datum7CompareERK5Datum"><code class="docutils literal notranslate"><span class="pre">Datum::Compare()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4I0ENK5DatumeqEbRK1T"><code class="docutils literal notranslate"><span class="pre">Datum::operator==()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4I0ENK5DatumneEbRK1T"><code class="docutils literal notranslate"><span class="pre">Datum::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4I0ENK5DatumltEbRK1T"><code class="docutils literal notranslate"><span class="pre">Datum::operator&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4I0ENK5DatumgeEbRK1T"><code class="docutils literal notranslate"><span class="pre">Datum::operator&gt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4I0ENK5DatumgtEbRK1T"><code class="docutils literal notranslate"><span class="pre">Datum::operator&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4I0ENK5DatumleEbRK1T"><code class="docutils literal notranslate"><span class="pre">Datum::operator&lt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatumplEd"><code class="docutils literal notranslate"><span class="pre">Datum::operator+()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatummlEd"><code class="docutils literal notranslate"><span class="pre">Datum::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatummiEd"><code class="docutils literal notranslate"><span class="pre">Datum::operator-()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatumdvEd"><code class="docutils literal notranslate"><span class="pre">Datum::operator/()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatumrmEd"><code class="docutils literal notranslate"><span class="pre">Datum::operator%()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatumplERK5Datum"><code class="docutils literal notranslate"><span class="pre">Datum::operator+()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatummlERK5Datum"><code class="docutils literal notranslate"><span class="pre">Datum::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatummiERK5Datum"><code class="docutils literal notranslate"><span class="pre">Datum::operator-()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatumdvERK5Datum"><code class="docutils literal notranslate"><span class="pre">Datum::operator/()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4NK5DatumrmERK5Datum"><code class="docutils literal notranslate"><span class="pre">Datum::operator%()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4I0EN5DatumpLE5DatumRR1T"><code class="docutils literal notranslate"><span class="pre">Datum::operator+=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4I0EN5DatummIE5DatumRR1T"><code class="docutils literal notranslate"><span class="pre">Datum::operator-=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4I0EN5DatummLE5DatumRR1T"><code class="docutils literal notranslate"><span class="pre">Datum::operator*=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4I0EN5DatumdVE5DatumRR1T"><code class="docutils literal notranslate"><span class="pre">Datum::operator/=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4I0EN5DatumrME5DatumRR1T"><code class="docutils literal notranslate"><span class="pre">Datum::operator%=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum3numE"><code class="docutils literal notranslate"><span class="pre">Datum::num</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum3strE"><code class="docutils literal notranslate"><span class="pre">Datum::str</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum10InitStringEv"><code class="docutils literal notranslate"><span class="pre">Datum::InitString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4I0EN5Datum10InitStringEvRR1T"><code class="docutils literal notranslate"><span class="pre">Datum::InitString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum10FreeStringEv"><code class="docutils literal notranslate"><span class="pre">Datum::FreeString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5DatumUt1_1E"><code class="docutils literal notranslate"><span class="pre">Datum::&#64;1</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Datum.html#_CPPv4N5Datum6is_numE"><code class="docutils literal notranslate"><span class="pre">Datum::is_num</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/MemoryImage.html">MemoryImage.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/MemoryImage.html#_CPPv411MemoryImage"><code class="docutils literal notranslate"><span class="pre">MemoryImage</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4N11MemoryImage11MemoryImageEv"><code class="docutils literal notranslate"><span class="pre">MemoryImage::MemoryImage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4N11MemoryImage11MemoryImageE6size_t"><code class="docutils literal notranslate"><span class="pre">MemoryImage::MemoryImage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4N11MemoryImageD0Ev"><code class="docutils literal notranslate"><span class="pre">MemoryImage::~MemoryImage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4NK11MemoryImage7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">MemoryImage::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4NK11MemoryImage11GetInitSizeEv"><code class="docutils literal notranslate"><span class="pre">MemoryImage::GetInitSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4I0EN11MemoryImage6GetPtrE3PtrI1TE6size_t"><code class="docutils literal notranslate"><span class="pre">MemoryImage::GetPtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4I0ENK11MemoryImage6GetPtrE3PtrIK1TE6size_t"><code class="docutils literal notranslate"><span class="pre">MemoryImage::GetPtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4I0EN11MemoryImage3GetER1T6size_t"><code class="docutils literal notranslate"><span class="pre">MemoryImage::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4I0ENK11MemoryImage3GetERK1T6size_t"><code class="docutils literal notranslate"><span class="pre">MemoryImage::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4I0EN11MemoryImage3GetENSt4spanI1TEE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">MemoryImage::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4I0ENK11MemoryImage3GetENSt4spanIK1TEE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">MemoryImage::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4N11MemoryImage9RawResizeE6size_t"><code class="docutils literal notranslate"><span class="pre">MemoryImage::RawResize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4N11MemoryImage7RawCopyERK11MemoryImage"><code class="docutils literal notranslate"><span class="pre">MemoryImage::RawCopy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4N11MemoryImage7RawMoveER11MemoryImage"><code class="docutils literal notranslate"><span class="pre">MemoryImage::RawMove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4I0DpEN11MemoryImage9ConstructEv6size_tDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">MemoryImage::Construct()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4I0EN11MemoryImage8DestructEv6size_t"><code class="docutils literal notranslate"><span class="pre">MemoryImage::Destruct()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4I0EN11MemoryImage7CopyObjEv6size_tRK11MemoryImage"><code class="docutils literal notranslate"><span class="pre">MemoryImage::CopyObj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4I0EN11MemoryImage7MoveObjEv6size_tR11MemoryImage"><code class="docutils literal notranslate"><span class="pre">MemoryImage::MoveObj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4N11MemoryImage4FuzzEv"><code class="docutils literal notranslate"><span class="pre">MemoryImage::Fuzz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4N11MemoryImage5imageE"><code class="docutils literal notranslate"><span class="pre">MemoryImage::image</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4N11MemoryImage4sizeE"><code class="docutils literal notranslate"><span class="pre">MemoryImage::size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryImage.html#_CPPv4N11MemoryImage7init_toE"><code class="docutils literal notranslate"><span class="pre">MemoryImage::init_to</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/SimpleParser.html">SimpleParser.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/SimpleParser.html#_CPPv412SimpleParser"><code class="docutils literal notranslate"><span class="pre">SimpleParser</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser12SimpleParserEb"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SimpleParser()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser12SimpleParserEbR6Random"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SimpleParser()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser12GetNamesUsedEv"><code class="docutils literal notranslate"><span class="pre">SimpleParser::GetNamesUsed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser12GetNamesUsedERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::GetNamesUsed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser5AddOpERKNSt6stringENSt8functionIF5Datum5DatumEEE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::AddOp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser5AddOpERKNSt6stringE6size_tNSt8functionIF5Datum5Datum5DatumEEE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::AddOp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser19AddDefaultOperatorsEv"><code class="docutils literal notranslate"><span class="pre">SimpleParser::AddDefaultOperators()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser19AddDefaultFunctionsEv"><code class="docutils literal notranslate"><span class="pre">SimpleParser::AddDefaultFunctions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser18AddRandomFunctionsER6Random"><code class="docutils literal notranslate"><span class="pre">SimpleParser::AddRandomFunctions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4I0EN12SimpleParser10ParseValueEN9SYMBOLS_T7value_tERK9SYMBOLS_TR5pos_t"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ParseValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4I0EN12SimpleParser9ParseMathEN9SYMBOLS_T7value_tERK9SYMBOLS_TR5pos_t6size_t"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ParseMath()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4I0DpEN12SimpleParser17SetupStaticValuesEv2T1Dp2Ts"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SetupStaticValues()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser17SetupStaticValuesEv"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SetupStaticValues()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4I0DpEN12SimpleParser17BuildMathFunctionEDaRK5MAP_TRKNSt6stringEDp8EXTRA_Ts"><code class="docutils literal notranslate"><span class="pre">SimpleParser::BuildMathFunction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4I0DpEN12SimpleParser15RunMathFunctionE5DatumRK5MAP_TDp6ARG_Ts"><code class="docutils literal notranslate"><span class="pre">SimpleParser::RunMathFunction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser13ApproxCompareEdd"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ApproxCompare()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser5pos_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::pos_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4IDpEN12SimpleParser10ParseErrorE6size_tDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ParseError()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser5lexerE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::lexer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9unary_opsE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::unary_ops</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser10binary_opsE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::binary_ops</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9functionsE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::functions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser13external_valsE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::external_vals</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9var_namesE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::var_names</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser7verboseE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::verbose</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser14BinaryOperatorE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::BinaryOperator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser14BinaryOperator5fun_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::BinaryOperator::fun_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser14BinaryOperator3SetE6size_t5fun_t"><code class="docutils literal notranslate"><span class="pre">SimpleParser::BinaryOperator::Set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser14BinaryOperator4precE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::BinaryOperator::prec</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser14BinaryOperator3funE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::BinaryOperator::fun</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8FunctionE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8Function6fun0_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function::fun0_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8Function6fun1_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function::fun1_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8Function6fun2_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function::fun2_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8Function6fun3_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function::fun3_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8Function4Set0E6fun0_t"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function::Set0()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8Function4Set1E6fun1_t"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function::Set1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8Function4Set2E6fun2_t"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function::Set2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8Function4Set3E6fun3_t"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function::Set3()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8Function8num_argsE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function::num_args</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8Function4fun0E"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function::fun0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8Function4fun1E"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function::fun1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8Function4fun2E"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function::fun2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8Function4fun3E"><code class="docutils literal notranslate"><span class="pre">SimpleParser::Function::fun3</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8MapLexerE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8MapLexer8MapLexerEv"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer::MapLexer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser8MapLexer4IsIDERK5Token"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer::IsID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser8MapLexer8IsNumberERK5Token"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer::IsNumber()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser8MapLexer8IsStringERK5Token"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer::IsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser8MapLexer6IsCharERK5Token"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer::IsChar()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser8MapLexer10IsExternalERK5Token"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer::IsExternal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser8MapLexer8IsSymbolERK5Token"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer::IsSymbol()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8MapLexer16token_identifierE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer::token_identifier</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8MapLexer12token_numberE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer::token_number</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8MapLexer12token_stringE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer::token_string</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8MapLexer10token_charE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer::token_char</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8MapLexer14token_externalE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer::token_external</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser8MapLexer12token_symbolE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::MapLexer::token_symbol</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4I00EN12SimpleParser11SymbolTableE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTable5arg_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::arg_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTable5fun_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::fun_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTable7value_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::value_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTable11SymbolTableEv"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::SymbolTable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTable11SymbolTableE5arg_t"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::SymbolTable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser11SymbolTable10AsFunctionER9ValueTypeI5arg_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::AsFunction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTable17MakeDatumAccessorERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::MakeDatumAccessor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4I0EN12SimpleParser11SymbolTableI10DataLayout7DUMMY_TEE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE5arg_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::arg_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE5fun_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::fun_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE7value_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::value_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE11SymbolTableERK10DataLayout"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::SymbolTable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE17MakeDatumAccessorERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::MakeDatumAccessor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE10AsFunctionER9ValueTypeI5arg_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::AsFunction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE6layoutE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::layout</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4I0EN12SimpleParser11SymbolTableI7DataMap7DUMMY_TEE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTableI7DataMap7DUMMY_TE11SymbolTableERK7DataMap"><code class="docutils literal notranslate"><span class="pre">SimpleParser::SymbolTable::SymbolTable()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4I0EN12SimpleParser9ValueTypeE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType6type_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::type_t</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType6type_t5ERRORE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::type_t::ERROR</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType6type_t5VALUEE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::type_t::VALUE</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType6type_t8FUNCTIONE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::type_t::FUNCTION</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType5fun_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::fun_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType9ValueTypeEv"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::ValueType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType9ValueTypeERK9ValueType"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::ValueType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType9ValueTypeEd"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::ValueType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType9ValueTypeENSt6stringE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::ValueType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType9ValueTypeE5Datum"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::ValueType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType9ValueTypeE5fun_t"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::ValueType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueTypeaSERK9ValueType"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueTypeaSE5Datum"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueTypeaSEd"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueTypeaSERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueTypeaSE5fun_t"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType10AsFunctionEv"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::AsFunction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType4typeE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType5valueE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::value</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser9ValueType3funE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::ValueType::fun</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/SimpleParser.html#_CPPv4I00EN12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TEE"><code class="docutils literal notranslate"><span class="pre">SymbolTable</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5map_tE"><code class="docutils literal notranslate"><span class="pre">SymbolTable::map_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5arg_tE"><code class="docutils literal notranslate"><span class="pre">SymbolTable::arg_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5fun_tE"><code class="docutils literal notranslate"><span class="pre">SymbolTable::fun_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE7value_tE"><code class="docutils literal notranslate"><span class="pre">SymbolTable::value_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE11SymbolTableERK6ra_mapINSt6stringE7VALUE_TE"><code class="docutils literal notranslate"><span class="pre">SymbolTable::SymbolTable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE17MakeDatumAccessorERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SymbolTable::MakeDatumAccessor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE10AsFunctionER9ValueTypeI5arg_tE"><code class="docutils literal notranslate"><span class="pre">SymbolTable::AsFunction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE6layoutE"><code class="docutils literal notranslate"><span class="pre">SymbolTable::layout</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser19PhonyNameDueToError5map_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::map_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser19PhonyNameDueToError5arg_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::arg_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser19PhonyNameDueToError5fun_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::fun_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser19PhonyNameDueToError7value_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::value_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser19PhonyNameDueToError11SymbolTableERK6ra_mapINSt6stringE7VALUE_TE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::SymbolTable()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser19PhonyNameDueToError17MakeDatumAccessorERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::MakeDatumAccessor()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/SimpleParser.html#_CPPv4NK12SimpleParser19PhonyNameDueToError10AsFunctionER9ValueTypeI5arg_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::AsFunction()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/SimpleParser.html#_CPPv4N12SimpleParser19PhonyNameDueToError6layoutE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::layout</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Trait.html">Trait.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Trait.html#_CPPv4I00E5Trait"><code class="docutils literal notranslate"><span class="pre">Trait</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait6this_tE"><code class="docutils literal notranslate"><span class="pre">Trait::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait8target_tE"><code class="docutils literal notranslate"><span class="pre">Trait::target_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait7value_tE"><code class="docutils literal notranslate"><span class="pre">Trait::value_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait5fun_tE"><code class="docutils literal notranslate"><span class="pre">Trait::fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait7range_tE"><code class="docutils literal notranslate"><span class="pre">Trait::range_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait5TraitERKNSt6stringERK5fun_t"><code class="docutils literal notranslate"><span class="pre">Trait::Trait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait5TraitERKNSt6stringERK5fun_t7value_t7value_t"><code class="docutils literal notranslate"><span class="pre">Trait::Trait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait5TraitERKNSt6stringERK5fun_tRK7range_t"><code class="docutils literal notranslate"><span class="pre">Trait::Trait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait5TraitERK5Trait"><code class="docutils literal notranslate"><span class="pre">Trait::Trait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait5TraitERR5Trait"><code class="docutils literal notranslate"><span class="pre">Trait::Trait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5TraitaSERK5Trait"><code class="docutils literal notranslate"><span class="pre">Trait::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5TraitaSERR5Trait"><code class="docutils literal notranslate"><span class="pre">Trait::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK5Trait7GetNameEv"><code class="docutils literal notranslate"><span class="pre">Trait::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK5Trait7GetDescEv"><code class="docutils literal notranslate"><span class="pre">Trait::GetDesc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK5Trait6GetFunEv"><code class="docutils literal notranslate"><span class="pre">Trait::GetFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK5Trait8GetRangeEv"><code class="docutils literal notranslate"><span class="pre">Trait::GetRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait7SetNameERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Trait::SetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait7SetDescERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Trait::SetDesc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait6SetFunERK5fun_t"><code class="docutils literal notranslate"><span class="pre">Trait::SetFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait8SetRangeERK7range_t"><code class="docutils literal notranslate"><span class="pre">Trait::SetRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait8SetRangeE7value_t7value_t"><code class="docutils literal notranslate"><span class="pre">Trait::SetRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait6SetMinE7value_t"><code class="docutils literal notranslate"><span class="pre">Trait::SetMin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait6SetMaxE7value_t"><code class="docutils literal notranslate"><span class="pre">Trait::SetMax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK5Trait4EvalER8target_t"><code class="docutils literal notranslate"><span class="pre">Trait::Eval()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK5Trait9EvalLimitER8target_t"><code class="docutils literal notranslate"><span class="pre">Trait::EvalLimit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK5Trait10EvalStringER8target_t"><code class="docutils literal notranslate"><span class="pre">Trait::EvalString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK5Trait9EvalValueER8target_t"><code class="docutils literal notranslate"><span class="pre">Trait::EvalValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK5Trait7EvalBinER8target_t6size_t"><code class="docutils literal notranslate"><span class="pre">Trait::EvalBin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK5Trait5CloneEv"><code class="docutils literal notranslate"><span class="pre">Trait::Clone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait4nameE"><code class="docutils literal notranslate"><span class="pre">Trait::name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait4descE"><code class="docutils literal notranslate"><span class="pre">Trait::desc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait3funE"><code class="docutils literal notranslate"><span class="pre">Trait::fun</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N5Trait5rangeE"><code class="docutils literal notranslate"><span class="pre">Trait::range</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Trait.html#_CPPv4I0E9BaseTrait"><code class="docutils literal notranslate"><span class="pre">BaseTrait</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N9BaseTraitD0Ev"><code class="docutils literal notranslate"><span class="pre">BaseTrait::~BaseTrait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK9BaseTrait10EvalStringER8TARGET_T"><code class="docutils literal notranslate"><span class="pre">BaseTrait::EvalString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK9BaseTrait9EvalValueER8TARGET_T"><code class="docutils literal notranslate"><span class="pre">BaseTrait::EvalValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK9BaseTrait7EvalBinER8TARGET_T6size_t"><code class="docutils literal notranslate"><span class="pre">BaseTrait::EvalBin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK9BaseTrait5CloneEv"><code class="docutils literal notranslate"><span class="pre">BaseTrait::Clone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4I0EN9BaseTrait6IsTypeEbv"><code class="docutils literal notranslate"><span class="pre">BaseTrait::IsType()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Trait.html#_CPPv4I0E8TraitSet"><code class="docutils literal notranslate"><span class="pre">TraitSet</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N8TraitSet8target_tE"><code class="docutils literal notranslate"><span class="pre">TraitSet::target_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N8TraitSet7trait_tE"><code class="docutils literal notranslate"><span class="pre">TraitSet::trait_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N8TraitSet8TraitSetEv"><code class="docutils literal notranslate"><span class="pre">TraitSet::TraitSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N8TraitSet8TraitSetERR8TraitSet"><code class="docutils literal notranslate"><span class="pre">TraitSet::TraitSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N8TraitSet8TraitSetERK8TraitSet"><code class="docutils literal notranslate"><span class="pre">TraitSet::TraitSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N8TraitSetD0Ev"><code class="docutils literal notranslate"><span class="pre">TraitSet::~TraitSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N8TraitSetaSERR8TraitSet"><code class="docutils literal notranslate"><span class="pre">TraitSet::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N8TraitSetaSERK8TraitSet"><code class="docutils literal notranslate"><span class="pre">TraitSet::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N8TraitSetixE6size_t"><code class="docutils literal notranslate"><span class="pre">TraitSet::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK8TraitSetixE6size_t"><code class="docutils literal notranslate"><span class="pre">TraitSet::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK8TraitSet7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">TraitSet::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N8TraitSet5ClearEv"><code class="docutils literal notranslate"><span class="pre">TraitSet::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK8TraitSet4FindERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">TraitSet::Find()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK8TraitSet3HasERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">TraitSet::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4I0DpEN8TraitSet8AddTraitEvRKNSt6stringERKNSt8functionIF7VALUE_TR8target_tEEEDpRR5EXTRA"><code class="docutils literal notranslate"><span class="pre">TraitSet::AddTrait()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK8TraitSet10EvalStringE6size_tR8target_t"><code class="docutils literal notranslate"><span class="pre">TraitSet::EvalString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK8TraitSet9EvalValueE6size_tR8target_t"><code class="docutils literal notranslate"><span class="pre">TraitSet::EvalValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK8TraitSet11EvalStringsER8target_t"><code class="docutils literal notranslate"><span class="pre">TraitSet::EvalStrings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK8TraitSet10EvalValuesER8target_t"><code class="docutils literal notranslate"><span class="pre">TraitSet::EvalValues()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK8TraitSet7EvalBinER8target_t6vectorI6size_tE"><code class="docutils literal notranslate"><span class="pre">TraitSet::EvalBin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4NK8TraitSet11CalcOffsetsER8target_tR8target_t"><code class="docutils literal notranslate"><span class="pre">TraitSet::CalcOffsets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Trait.html#_CPPv4N8TraitSet6traitsE"><code class="docutils literal notranslate"><span class="pre">TraitSet::traits</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/VarMap.html">VarMap.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/VarMap.html#_CPPv46VarMap"><code class="docutils literal notranslate"><span class="pre">VarMap</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap6VarMapEv"><code class="docutils literal notranslate"><span class="pre">VarMap::VarMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap6VarMapERK6VarMap"><code class="docutils literal notranslate"><span class="pre">VarMap::VarMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap6VarMapERR6VarMap"><code class="docutils literal notranslate"><span class="pre">VarMap::VarMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMapD0Ev"><code class="docutils literal notranslate"><span class="pre">VarMap::~VarMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap7GetNameE6size_t"><code class="docutils literal notranslate"><span class="pre">VarMap::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap5GetIDERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::GetID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap3HasERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4I0EN6VarMap3AddE6size_tRKNSt6stringERK1T"><code class="docutils literal notranslate"><span class="pre">VarMap::Add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap9AddStringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::AddString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap6AddIntERKNSt6stringEi"><code class="docutils literal notranslate"><span class="pre">VarMap::AddInt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap9AddDoubleERKNSt6stringEd"><code class="docutils literal notranslate"><span class="pre">VarMap::AddDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap7AddCharERKNSt6stringEc"><code class="docutils literal notranslate"><span class="pre">VarMap::AddChar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap7AddBoolERKNSt6stringEb"><code class="docutils literal notranslate"><span class="pre">VarMap::AddBool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4I0EN6VarMap3GetER1T6size_t"><code class="docutils literal notranslate"><span class="pre">VarMap::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4I0EN6VarMap3GetER1TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4I0ENK6VarMap3GetERK1T6size_t"><code class="docutils literal notranslate"><span class="pre">VarMap::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4I0ENK6VarMap3GetERK1TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap7GetTypeE6size_t"><code class="docutils literal notranslate"><span class="pre">VarMap::GetType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap7GetTypeENSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::GetType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap9GetStringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::GetString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap6GetIntERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::GetInt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap9GetDoubleERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::GetDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap7GetCharERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::GetChar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap7GetBoolERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::GetBool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap9GetStringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::GetString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap6GetIntERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::GetInt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap9GetDoubleERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::GetDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap7GetCharERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::GetChar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap7GetBoolERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::GetBool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4I0EN6VarMap3SetEv6size_tRK1T"><code class="docutils literal notranslate"><span class="pre">VarMap::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4I0EN6VarMap3SetEvRKNSt6stringERK1T"><code class="docutils literal notranslate"><span class="pre">VarMap::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap4varsE"><code class="docutils literal notranslate"><span class="pre">VarMap::vars</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap6id_mapE"><code class="docutils literal notranslate"><span class="pre">VarMap::id_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap7VarBaseE"><code class="docutils literal notranslate"><span class="pre">VarMap::VarBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap7VarBase7VarBaseERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">VarMap::VarBase::VarBase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap7VarBaseD0Ev"><code class="docutils literal notranslate"><span class="pre">VarMap::VarBase::~VarBase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap7VarBase5CloneEv"><code class="docutils literal notranslate"><span class="pre">VarMap::VarBase::Clone()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap7VarBase9GetTypeIDEv"><code class="docutils literal notranslate"><span class="pre">VarMap::VarBase::GetTypeID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap7VarBase8ToStringEv"><code class="docutils literal notranslate"><span class="pre">VarMap::VarBase::ToString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap7VarBase4nameE"><code class="docutils literal notranslate"><span class="pre">VarMap::VarBase::name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/VarMap.html#_CPPv4I0EN6VarMap7VarInfoE"><code class="docutils literal notranslate"><span class="pre">VarMap::VarInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap7VarInfo7VarInfoERKNSt6stringERK1T"><code class="docutils literal notranslate"><span class="pre">VarMap::VarInfo::VarInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap7VarInfo5CloneEv"><code class="docutils literal notranslate"><span class="pre">VarMap::VarInfo::Clone()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap7VarInfo9GetTypeIDEv"><code class="docutils literal notranslate"><span class="pre">VarMap::VarInfo::GetTypeID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/VarMap.html#_CPPv4NK6VarMap7VarInfo8ToStringEv"><code class="docutils literal notranslate"><span class="pre">VarMap::VarInfo::ToString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/VarMap.html#_CPPv4N6VarMap7VarInfo5valueE"><code class="docutils literal notranslate"><span class="pre">VarMap::VarInfo::value</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../control/api/SignalManager.html" class="btn btn-neutral float-left" title="SignalManager.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/AnnotatedType.html" class="btn btn-neutral float-right" title="AnnotatedType.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

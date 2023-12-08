@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tween.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/web/api/Tween.73826dff-bec3-44d2-8f60-6f60b5c3cdf3.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="UrlParams.hpp" href="UrlParams.html" />
+    <link rel="prev" title="TextFeed.hpp" href="TextFeed.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../web.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Animate.html">Animate.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Attributes.html">Attributes.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Button.html">Button.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Canvas.html">Canvas.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasAction.html">CanvasAction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasShape.html">CanvasShape.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Div.html">Div.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DocuExtras.html">DocuExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Document.html">Document.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Element.html">Element.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FileInput.html">FileInput.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Font.html">Font.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Image.html">Image.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Input.html">Input.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="JSWrap.html">JSWrap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="KeypressManager.html">KeypressManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Listeners.html">Listeners.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NodeDomShim.html">NodeDomShim.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RawImage.html">RawImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Selector.html">Selector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style.html">Style.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Table.html">Table.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Text.html">Text.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextArea.html">TextArea.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextFeed.html">TextFeed.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Tween.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv45Tween"><code class="docutils literal notranslate"><span class="pre">Tween</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="UrlParams.html">UrlParams.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Widget.html">Widget.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WidgetExtras.html">WidgetExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="canvas_utils.html">canvas_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="color_map.html">color_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html">commands.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emfunctions.html">emfunctions.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="events.html">events.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="init.html">init.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="js_utils.html">js_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="web.html">web.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../web.html">Web Tools (for use with Emscripten)</a></li>
+      <li class="breadcrumb-item active">Tween.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tween-hpp">
+<h1>Tween.hpp<a class="headerlink" href="#tween-hpp" title="Link to this heading"></a></h1>
+<p>A Tween manages the gradual shift in properties of one or more widgets over time. </p>
+<p>To create a Tween, a duration must be specified, along with an optional default target. Once a Tween is setup, paths can be added to it, which represent the changes that should occur over the specified duration.</p>
+<p>A path can be a function to call (with the 0.0 to 1.0 fraction of the time that’s gone by) or a variable to set to the current fraction. Dependants can also be set to refresh with each Tween update.</p>
+<p>Available methods include: Tween &amp; AddPath(std::function&lt;void(double)&gt; set_fun, double start_val, double end_val, std::function&lt;double(double)&gt; timing=LINEAR); Tween &amp; AddPath(double &amp; set_var, double start_val, double end_val, std::function&lt;double(double)&gt; timing=LINEAR); Tween &amp; AddDependant(Widget w); void Start(); void Stop();</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Need to setup an AddPath that actually uses widgets and properties (stub in place). </p>
+<p>Need a Reverse(), which swaps start and end positions. </p>
+<p>Need a Reset() </p>
+</dd></dl>
+
+</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv45Tween">
+<span id="_CPPv35Tween"></span><span id="_CPPv25Tween"></span><span id="Tween"></span><span class="target" id="classTween"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Tween</span></span></span><a class="headerlink" href="#_CPPv45Tween" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Tween.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween5TweenEdRK6Widget">
+<span id="_CPPv3N5Tween5TweenEdRK6Widget"></span><span id="_CPPv2N5Tween5TweenEdRK6Widget"></span><span id="Tween::Tween__double.WidgetCR"></span><span class="target" id="classTween_1a60ba4de3f9bf3f892e1be17e9b8d26f5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Tween</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">d</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.0</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Tween5TweenEdRK6Widget" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a new tween, specifying the duration it should run for and the widget it should modify. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5TweenD0Ev">
+<span id="_CPPv3N5TweenD0Ev"></span><span id="_CPPv2N5TweenD0Ev"></span><span id="Tween::~Tween"></span><span class="target" id="classTween_1ac561b7c2d24fb5d6045ebd62290f0cba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Tween</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5TweenD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Tween11GetDurationEv">
+<span id="_CPPv3NK5Tween11GetDurationEv"></span><span id="_CPPv2NK5Tween11GetDurationEv"></span><span id="Tween::GetDurationC"></span><span class="target" id="classTween_1a5bffc8fb1aca3dc276ef701c7cc9fa32"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetDuration</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Tween11GetDurationEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Retrieve the full duration of this Tween. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Tween16GetDefaultTargetEv">
+<span id="_CPPv3NK5Tween16GetDefaultTargetEv"></span><span id="_CPPv2NK5Tween16GetDefaultTargetEv"></span><span id="Tween::GetDefaultTargetC"></span><span class="target" id="classTween_1abee0252127960cf701a2a57ac6103fdd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetDefaultTarget</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Tween16GetDefaultTargetEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Which widget does this Tween modify? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween11SetDurationEd">
+<span id="_CPPv3N5Tween11SetDurationEd"></span><span id="_CPPv2N5Tween11SetDurationEd"></span><span id="Tween::SetDuration__double"></span><span class="target" id="classTween_1aca74a35a8e4c823eaed417966c33cbd7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Tween" title="Tween"><span class="n"><span class="pre">Tween</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetDuration</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">d</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Tween11SetDurationEd" title="Link to this definition"></a><br /></dt>
+<dd><p>Change the duration of this Tween. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween16SetDefaultTargetERK6Widget">
+<span id="_CPPv3N5Tween16SetDefaultTargetERK6Widget"></span><span id="_CPPv2N5Tween16SetDefaultTargetERK6Widget"></span><span id="Tween::SetDefaultTarget__WidgetCR"></span><span class="target" id="classTween_1a2c0014759566788c77434fead8149036"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Tween" title="Tween"><span class="n"><span class="pre">Tween</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetDefaultTarget</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">w</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Tween16SetDefaultTargetERK6Widget" title="Link to this definition"></a><br /></dt>
+<dd><p>Change the target of this tween. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween7AddPathENSt8functionIFvdEEEddNSt8functionIFddEEE">
+<span id="_CPPv3N5Tween7AddPathENSt8functionIFvdEEEddNSt8functionIFddEEE"></span><span id="_CPPv2N5Tween7AddPathENSt8functionIFvdEEEddNSt8functionIFddEEE"></span><span class="target" id="classTween_1a2494ca7f971470affe59f6c4291fe073"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Tween" title="Tween"><span class="n"><span class="pre">Tween</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddPath</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">set_fun</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_val</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end_val</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">timing</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Tween6LINEAREd" title="Tween::LINEAR"><span class="n"><span class="pre">LINEAR</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Tween7AddPathENSt8functionIFvdEEEddNSt8functionIFddEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Alter the path of the change that this tween should take and the function it should call. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween7AddPathERdddNSt8functionIFddEEE">
+<span id="_CPPv3N5Tween7AddPathERdddNSt8functionIFddEEE"></span><span id="_CPPv2N5Tween7AddPathERdddNSt8functionIFddEEE"></span><span class="target" id="classTween_1a33ebb5bd29b35140371706b8c31b674c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Tween" title="Tween"><span class="n"><span class="pre">Tween</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddPath</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">set_var</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_val</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end_val</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">timing</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Tween6LINEAREd" title="Tween::LINEAR"><span class="n"><span class="pre">LINEAR</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Tween7AddPathERdddNSt8functionIFddEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Alter the path of the change that this tween should take and the variable it should modify. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween7AddPathE6WidgetNSt6stringEdd">
+<span id="_CPPv3N5Tween7AddPathE6WidgetNSt6stringEdd"></span><span id="_CPPv2N5Tween7AddPathE6WidgetNSt6stringEdd"></span><span id="Tween::AddPath__Widget.ss.double.double"></span><span class="target" id="classTween_1a1cef13aabf4e3dedeff107917ade056b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Tween" title="Tween"><span class="n"><span class="pre">Tween</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddPath</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">w</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">setting</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_val</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end_val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Tween7AddPathE6WidgetNSt6stringEdd" title="Link to this definition"></a><br /></dt>
+<dd><p>Alter the path of the change that this tween should take and the widget setting it should alter. (TODO!) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween9AddUpdateENSt8functionIFvvEEE">
+<span id="_CPPv3N5Tween9AddUpdateENSt8functionIFvvEEE"></span><span id="_CPPv2N5Tween9AddUpdateENSt8functionIFvvEEE"></span><span class="target" id="classTween_1a1f1ef30c8bb1e6e4168810924b3b8015"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Tween" title="Tween"><span class="n"><span class="pre">Tween</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddUpdate</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ud_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Tween9AddUpdateENSt8functionIFvvEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add an additional function to update as the Tween runs. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween12AddDependantE6Widget">
+<span id="_CPPv3N5Tween12AddDependantE6Widget"></span><span id="_CPPv2N5Tween12AddDependantE6Widget"></span><span id="Tween::AddDependant__Widget"></span><span class="target" id="classTween_1aef25755c12fb17677c2ca16d3e5dab44"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Tween" title="Tween"><span class="n"><span class="pre">Tween</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddDependant</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">w</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Tween12AddDependantE6Widget" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a dependant Widget to update as the Tween runs. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween5StartEv">
+<span id="_CPPv3N5Tween5StartEv"></span><span id="_CPPv2N5Tween5StartEv"></span><span id="Tween::Start"></span><span class="target" id="classTween_1a3565300e3f9872468a8f26a15b51c5af"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Start</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Tween5StartEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Start running this Tween, as configured. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween4StopEv">
+<span id="_CPPv3N5Tween4StopEv"></span><span id="_CPPv2N5Tween4StopEv"></span><span id="Tween::Stop"></span><span class="target" id="classTween_1a561ef9de5bcb4fd173caf060a9785fe7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Stop</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Tween4StopEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Pause this Tween. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween12AdvanceFrameEv">
+<span id="_CPPv3N5Tween12AdvanceFrameEv"></span><span id="_CPPv2N5Tween12AdvanceFrameEv"></span><span id="Tween::AdvanceFrame"></span><span class="target" id="classTween_1a1275a68e90f193d7c2774446b2cb4184"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdvanceFrame</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Tween12AdvanceFrameEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween8durationE">
+<span id="_CPPv3N5Tween8durationE"></span><span id="_CPPv2N5Tween8durationE"></span><span id="Tween::duration__double"></span><span class="target" id="classTween_1ad25432568f029eaa03ffce4771a2d242"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">duration</span></span></span><a class="headerlink" href="#_CPPv4N5Tween8durationE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween14default_targetE">
+<span id="_CPPv3N5Tween14default_targetE"></span><span id="_CPPv2N5Tween14default_targetE"></span><span id="Tween::default_target__Widget"></span><span class="target" id="classTween_1aa36fb201214f21b2a0cf7fbbead1ba07"></span><a class="reference internal" href="Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_target</span></span></span><a class="headerlink" href="#_CPPv4N5Tween14default_targetE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween5pathsE">
+<span id="_CPPv3N5Tween5pathsE"></span><span id="_CPPv2N5Tween5pathsE"></span><span id="Tween::paths__vector:PathP:"></span><span class="target" id="classTween_1a84236069c359bdeac70e6787b50547fd"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5Tween4PathE" title="Tween::Path"><span class="n"><span class="pre">Path</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">paths</span></span></span><a class="headerlink" href="#_CPPv4N5Tween5pathsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween6eventsE">
+<span id="_CPPv3N5Tween6eventsE"></span><span id="_CPPv2N5Tween6eventsE"></span><span id="Tween::events__vector:EventP:"></span><span class="target" id="classTween_1a65644a9b0f1a8906f5ef4f400c411d61"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5Tween5EventE" title="Tween::Event"><span class="n"><span class="pre">Event</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">events</span></span></span><a class="headerlink" href="#_CPPv4N5Tween6eventsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween11update_funsE">
+<span id="_CPPv3N5Tween11update_funsE"></span><span id="_CPPv2N5Tween11update_funsE"></span><span class="target" id="classTween_1a30369162a2627928fdcbdfdc7691225b"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">update_funs</span></span></span><a class="headerlink" href="#_CPPv4N5Tween11update_funsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween10dependantsE">
+<span id="_CPPv3N5Tween10dependantsE"></span><span id="_CPPv2N5Tween10dependantsE"></span><span id="Tween::dependants__vector:Widget:"></span><span class="target" id="classTween_1a8ab20d0761dec086e94c7cb6088f964c"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dependants</span></span></span><a class="headerlink" href="#_CPPv4N5Tween10dependantsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween7runningE">
+<span id="_CPPv3N5Tween7runningE"></span><span id="_CPPv2N5Tween7runningE"></span><span id="Tween::running__b"></span><span class="target" id="classTween_1ada0359370c08318a5cd03fc0c9a29136"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">running</span></span></span><a class="headerlink" href="#_CPPv4N5Tween7runningE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween11callback_idE">
+<span id="_CPPv3N5Tween11callback_idE"></span><span id="_CPPv2N5Tween11callback_idE"></span><span id="Tween::callback_id__s"></span><span class="target" id="classTween_1a557776d194c3799890cb0d6930094ae9"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">callback_id</span></span></span><a class="headerlink" href="#_CPPv4N5Tween11callback_idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween10start_timeE">
+<span id="_CPPv3N5Tween10start_timeE"></span><span id="_CPPv2N5Tween10start_timeE"></span><span id="Tween::start_time__double"></span><span class="target" id="classTween_1ad16aaa43881823e9391e086a377e9544"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">start_time</span></span></span><a class="headerlink" href="#_CPPv4N5Tween10start_timeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween8cur_timeE">
+<span id="_CPPv3N5Tween8cur_timeE"></span><span id="_CPPv2N5Tween8cur_timeE"></span><span id="Tween::cur_time__double"></span><span class="target" id="classTween_1adc597b3489f948afa4d9d7176fc65461"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cur_time</span></span></span><a class="headerlink" href="#_CPPv4N5Tween8cur_timeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween8run_timeE">
+<span id="_CPPv3N5Tween8run_timeE"></span><span id="_CPPv2N5Tween8run_timeE"></span><span id="Tween::run_time__double"></span><span class="target" id="classTween_1a1a4b1d3e3d7c525072465d1f7eddac52"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">run_time</span></span></span><a class="headerlink" href="#_CPPv4N5Tween8run_timeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-static-functions">Private Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween6LINEAREd">
+<span id="_CPPv3N5Tween6LINEAREd"></span><span id="_CPPv2N5Tween6LINEAREd"></span><span id="Tween::LINEAR__double"></span><span class="target" id="classTween_1aea2f2f5051a7adc42118b24fa02e48be"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LINEAR</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Tween6LINEAREd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween5EventE">
+<span id="_CPPv3N5Tween5EventE"></span><span id="_CPPv2N5Tween5EventE"></span><span id="Tween::Event"></span><span class="target" id="structTween_1_1Event"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Event</span></span></span><a class="headerlink" href="#_CPPv4N5Tween5EventE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween5Event4timeE">
+<span id="_CPPv3N5Tween5Event4timeE"></span><span id="_CPPv2N5Tween5Event4timeE"></span><span id="Tween::Event::time__double"></span><span class="target" id="structTween_1_1Event_1ac54888058170e40316cf25b08214cf11"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">time</span></span></span><a class="headerlink" href="#_CPPv4N5Tween5Event4timeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween5Event7triggerE">
+<span id="_CPPv3N5Tween5Event7triggerE"></span><span id="_CPPv2N5Tween5Event7triggerE"></span><span class="target" id="structTween_1_1Event_1a6b046b7cfc95e6b9a3d9ad222ac6a09c"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">trigger</span></span></span><a class="headerlink" href="#_CPPv4N5Tween5Event7triggerE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween4PathE">
+<span id="_CPPv3N5Tween4PathE"></span><span id="_CPPv2N5Tween4PathE"></span><span id="Tween::Path"></span><span class="target" id="structTween_1_1Path"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Path</span></span></span><a class="headerlink" href="#_CPPv4N5Tween4PathE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween4Path3SetEKd">
+<span id="_CPPv3N5Tween4Path3SetEKd"></span><span id="_CPPv2N5Tween4Path3SetEKd"></span><span id="Tween::Path::Set__doubleC"></span><span class="target" id="structTween_1_1Path_1acc42f6f00c0abf5344106e47b1022335"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">frac</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Tween4Path3SetEKd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween4Path7set_funE">
+<span id="_CPPv3N5Tween4Path7set_funE"></span><span id="_CPPv2N5Tween4Path7set_funE"></span><span class="target" id="structTween_1_1Path_1a1926aa7a6a54d69d2266f404d9cd248b"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set_fun</span></span></span><a class="headerlink" href="#_CPPv4N5Tween4Path7set_funE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween4Path9start_valE">
+<span id="_CPPv3N5Tween4Path9start_valE"></span><span id="_CPPv2N5Tween4Path9start_valE"></span><span id="Tween::Path::start_val__double"></span><span class="target" id="structTween_1_1Path_1a38c91e2cf008312da6611cdbaa0cef51"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">start_val</span></span></span><a class="headerlink" href="#_CPPv4N5Tween4Path9start_valE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween4Path7end_valE">
+<span id="_CPPv3N5Tween4Path7end_valE"></span><span id="_CPPv2N5Tween4Path7end_valE"></span><span id="Tween::Path::end_val__double"></span><span class="target" id="structTween_1_1Path_1af851363ff15db8329b0635dfc618d03e"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end_val</span></span></span><a class="headerlink" href="#_CPPv4N5Tween4Path7end_valE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Tween4Path6timingE">
+<span id="_CPPv3N5Tween4Path6timingE"></span><span id="_CPPv2N5Tween4Path6timingE"></span><span class="target" id="structTween_1_1Path_1af44b3e24431e36a56ed45faa174b979f"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">timing</span></span></span><a class="headerlink" href="#_CPPv4N5Tween4Path6timingE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="TextFeed.html" class="btn btn-neutral float-left" title="TextFeed.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="UrlParams.html" class="btn btn-neutral float-right" title="UrlParams.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

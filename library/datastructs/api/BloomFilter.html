@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BloomFilter.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/datastructs/api/BloomFilter.6379a0d2-96b7-4754-a108-3c6b74c75bfb.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Bool.hpp" href="Bool.html" />
+    <link rel="prev" title="Data structures" href="../datastructs.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../datastructs.html">Data structures</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../datastructs.html#api">API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">BloomFilter.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4anRK11BloomFilterRK11BloomFilter"><code class="docutils literal notranslate"><span class="pre">operator&amp;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4orRK11BloomFilterRK11BloomFilter"><code class="docutils literal notranslate"><span class="pre">operator|()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4eoRK11BloomFilterRK11BloomFilter"><code class="docutils literal notranslate"><span class="pre">operator^()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413bits_per_char"><code class="docutils literal notranslate"><span class="pre">bits_per_char</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv48bit_mask"><code class="docutils literal notranslate"><span class="pre">bit_mask</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411BloomFilter"><code class="docutils literal notranslate"><span class="pre">BloomFilter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv423CompressibleBloomFilter"><code class="docutils literal notranslate"><span class="pre">CompressibleBloomFilter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Bool.html">Bool.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Cache.html">Cache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DynamicString.html">DynamicString.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Graph.html">Graph.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="IndexMap.html">IndexMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="IndexSet.html">IndexSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="QueueCache.html">QueueCache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallFifoMap.html">SmallFifoMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallVector.html">SmallVector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StringMap.html">StringMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TimeQueue.html">TimeQueue.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypeMap.html">TypeMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UnorderedIndexMap.html">UnorderedIndexMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graph_utils.html">graph_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hash_utils.html">hash_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="map_utils.html">map_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_map.html">ra_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_set.html">ra_set.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference_vector.html">reference_vector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="set_utils.html">set_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_utils.html">span_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_struct.html">tuple_struct.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_utils.html">tuple_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="valsort_map.html">valsort_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector_utils.html">vector_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../datastructs.html">Data structures</a></li>
+      <li class="breadcrumb-item active">BloomFilter.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bloomfilter-hpp">
+<h1>BloomFilter.hpp<a class="headerlink" href="#bloomfilter-hpp" title="Link to this heading"></a></h1>
+<p>A Bloom filter implementation. </p>
+<p><dl class="simple">
+<dt><strong>Copyright</strong></dt><dd><p>Arash Partow, 2000 (modified slightly by Emily Dolson) </p>
+</dd>
+</dl>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This file is included in Empirical (<a class="reference external" href="https://github.com/devosoft/Empirical">https://github.com/devosoft/Empirical</a>) for convenience. The Bloom filter class was written by Arash Partow (<a class="reference external" href="http://www.partow.net/programming/hashfunctions/index.html">http://www.partow.net/programming/hashfunctions/index.html</a>) and distributed under the MIT License. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4anRK11BloomFilterRK11BloomFilter">
+<span id="_CPPv3anRK11BloomFilterRK11BloomFilter"></span><span id="_CPPv2anRK11BloomFilterRK11BloomFilter"></span><span id="and-operator__BloomFilterCR.BloomFilterCR"></span><span class="target" id="BloomFilter_8hpp_1a5441f6b0a6ba8de8439e1d63e6f2f404"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&amp;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4anRK11BloomFilterRK11BloomFilter" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate the intersection of two Bloom filters. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4orRK11BloomFilterRK11BloomFilter">
+<span id="_CPPv3orRK11BloomFilterRK11BloomFilter"></span><span id="_CPPv2orRK11BloomFilterRK11BloomFilter"></span><span id="or-operator__BloomFilterCR.BloomFilterCR"></span><span class="target" id="BloomFilter_8hpp_1affc9c2fad7d9c9e3f909afe7ea909e22"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">|</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4orRK11BloomFilterRK11BloomFilter" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate the union of two Bloom filters. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4eoRK11BloomFilterRK11BloomFilter">
+<span id="_CPPv3eoRK11BloomFilterRK11BloomFilter"></span><span id="_CPPv2eoRK11BloomFilterRK11BloomFilter"></span><span id="xor-operator__BloomFilterCR.BloomFilterCR"></span><span class="target" id="BloomFilter_8hpp_1adbc4f4be9c78d021b39358b5887d49c5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">^</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4eoRK11BloomFilterRK11BloomFilter" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate the difference of two Bloom filters. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-variables">Variables</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv413bits_per_char">
+<span id="_CPPv313bits_per_char"></span><span id="_CPPv213bits_per_char"></span><span id="bits_per_char__std::sC"></span><span class="target" id="BloomFilter_8hpp_1af7f0947bbb7d57153df699c642db6a38"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bits_per_char</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x08</span></span><a class="headerlink" href="#_CPPv413bits_per_char" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv48bit_mask">
+<span id="_CPPv38bit_mask"></span><span id="_CPPv28bit_mask"></span><span id="bit_mask__unsigned-cCA"></span><span class="target" id="BloomFilter_8hpp_1ad8efa1f72bd4e98e84492918f19bd2a2"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bit_mask</span></span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#_CPPv413bits_per_char" title="bits_per_char"><span class="n"><span class="pre">bits_per_char</span></span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">0x01</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0x02</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0x04</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0x08</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0x10</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0x20</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0x40</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0x80</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv48bit_mask" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv411BloomFilter">
+<span id="_CPPv311BloomFilter"></span><span id="_CPPv211BloomFilter"></span><span id="BloomFilter"></span><span class="target" id="classBloomFilter"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BloomFilter</span></span></span><a class="headerlink" href="#_CPPv411BloomFilter" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;BloomFilter.hpp&gt;</em></div>
+<p>This class implements a Bloom filter, which is a memory-efficient data structure for identifying values that have been seen before (with a tunable probability of a false positive - thinking that we have already seen a value when we actually haven’t) </p>
+<p>Subclassed by CompressibleBloomFilter</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter11BloomFilterEv">
+<span id="_CPPv3N11BloomFilter11BloomFilterEv"></span><span id="_CPPv2N11BloomFilter11BloomFilterEv"></span><span id="BloomFilter::BloomFilter"></span><span class="target" id="classBloomFilter_1a64e9f133cd9bb65d55a5e31f701bbca0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BloomFilter</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFilter11BloomFilterEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter11BloomFilterERK15BloomParameters">
+<span id="_CPPv3N11BloomFilter11BloomFilterERK15BloomParameters"></span><span id="_CPPv2N11BloomFilter11BloomFilterERK15BloomParameters"></span><span id="BloomFilter::BloomFilter__BloomParametersCR"></span><span class="target" id="classBloomFilter_1a316698c1d13011d287ada354c23a26db"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BloomFilter</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">BloomParameters</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFilter11BloomFilterERK15BloomParameters" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter11BloomFilterERK11BloomFilter">
+<span id="_CPPv3N11BloomFilter11BloomFilterERK11BloomFilter"></span><span id="_CPPv2N11BloomFilter11BloomFilterERK11BloomFilter"></span><span id="BloomFilter::BloomFilter__BloomFilterCR"></span><span class="target" id="classBloomFilter_1aa9342a94a473fe36b7c10aac241be37f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BloomFilter</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11BloomFilter11BloomFilterERK11BloomFilter" title="BloomFilter::BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">filter</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFilter11BloomFilterERK11BloomFilter" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11BloomFiltereqERK11BloomFilter">
+<span id="_CPPv3NK11BloomFiltereqERK11BloomFilter"></span><span id="_CPPv2NK11BloomFiltereqERK11BloomFilter"></span><span id="BloomFilter::eq-operator__BloomFilterCRC"></span><span class="target" id="classBloomFilter_1a0f61f91d3bdb7a4ea3e5ef516ae74348"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11BloomFiltereqERK11BloomFilter" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11BloomFilterneERK11BloomFilter">
+<span id="_CPPv3NK11BloomFilterneERK11BloomFilter"></span><span id="_CPPv2NK11BloomFilterneERK11BloomFilter"></span><span id="BloomFilter::neq-operator__BloomFilterCRC"></span><span class="target" id="classBloomFilter_1a63e45d5b2b4fc492bd318d27d0f4a90f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11BloomFilterneERK11BloomFilter" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilteraSERK11BloomFilter">
+<span id="_CPPv3N11BloomFilteraSERK11BloomFilter"></span><span id="_CPPv2N11BloomFilteraSERK11BloomFilter"></span><span id="BloomFilter::assign-operator__BloomFilterCR"></span><span class="target" id="classBloomFilter_1a1f9fddf38c4428cf5291e6dc03b3a370"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFilteraSERK11BloomFilter" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilterD0Ev">
+<span id="_CPPv3N11BloomFilterD0Ev"></span><span id="_CPPv2N11BloomFilterD0Ev"></span><span id="BloomFilter::~BloomFilter"></span><span class="target" id="classBloomFilter_1af31164aa81a9d3f8d6696018c169f835"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~BloomFilter</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFilterD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11BloomFilterntEv">
+<span id="_CPPv3NK11BloomFilterntEv"></span><span id="_CPPv2NK11BloomFilterntEv"></span><span id="BloomFilter::not-operatorC"></span><span class="target" id="classBloomFilter_1ad4b4b482af6cf2c8d67a35c3cfa68c6d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11BloomFilterntEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter5clearEv">
+<span id="_CPPv3N11BloomFilter5clearEv"></span><span id="_CPPv2N11BloomFilter5clearEv"></span><span id="BloomFilter::clear"></span><span class="target" id="classBloomFilter_1a03a60de35a49eb2bf82b5db6ec20deff"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFilter5clearEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Resets table to starting conditions, as if nothing had been added. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter6insertEPKhRKNSt6size_tE">
+<span id="_CPPv3N11BloomFilter6insertEPKhRKNSt6size_tE"></span><span id="_CPPv2N11BloomFilter6insertEPKhRKNSt6size_tE"></span><span id="BloomFilter::insert__unsigned-cCP.std::sCR"></span><span class="target" id="classBloomFilter_1a9f3cb9bb7326236c3b92043ab4b86a89"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">insert</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">key_begin</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFilter6insertEPKhRKNSt6size_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Insert a value into the Bloom filter (i.e. indicate that we have seen it) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN11BloomFilter6insertEvRK1T">
+<span id="_CPPv3I0EN11BloomFilter6insertERK1T"></span><span id="_CPPv2I0EN11BloomFilter6insertERK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classBloomFilter_1a1d2ee8087b559a2f42526c043421c8b6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">insert</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN11BloomFilter6insertEvRK1T" title="BloomFilter::insert::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN11BloomFilter6insertEvRK1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Insert a value into the Bloom filter (i.e. indicate that we have seen it) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter6insertERKNSt6stringE">
+<span id="_CPPv3N11BloomFilter6insertERKNSt6stringE"></span><span id="_CPPv2N11BloomFilter6insertERKNSt6stringE"></span><span id="BloomFilter::insert__ssCR"></span><span class="target" id="classBloomFilter_1a9d4f3ab39f0f15693c773c5bee16ebe5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">insert</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFilter6insertERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Insert a value into the Bloom filter (i.e. indicate that we have seen it) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter6insertEPKcRKNSt6size_tE">
+<span id="_CPPv3N11BloomFilter6insertEPKcRKNSt6size_tE"></span><span id="_CPPv2N11BloomFilter6insertEPKcRKNSt6size_tE"></span><span id="BloomFilter::insert__cCP.std::sCR"></span><span class="target" id="classBloomFilter_1ab252e3ec643f2727feb44f8f23486a80"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">insert</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFilter6insertEPKcRKNSt6size_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Insert a value into the Bloom filter (i.e. indicate that we have seen it) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN11BloomFilter6insertEvK13InputIteratorK13InputIterator">
+<span id="_CPPv3I0EN11BloomFilter6insertEK13InputIteratorK13InputIterator"></span><span id="_CPPv2I0EN11BloomFilter6insertEK13InputIteratorK13InputIterator"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InputIterator</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classBloomFilter_1a1f0f90dae45bb792161dd793b68a00d1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">insert</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN11BloomFilter6insertEvK13InputIteratorK13InputIterator" title="BloomFilter::insert::InputIterator"><span class="n"><span class="pre">InputIterator</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">begin</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN11BloomFilter6insertEvK13InputIteratorK13InputIterator" title="BloomFilter::insert::InputIterator"><span class="n"><span class="pre">InputIterator</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">end</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN11BloomFilter6insertEvK13InputIteratorK13InputIterator" title="Link to this definition"></a><br /></dt>
+<dd><p>Insert a sequence of values into the Bloom filter (i.e. indicate that we have seen it) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11BloomFilter8containsEPKhKNSt6size_tE">
+<span id="_CPPv3NK11BloomFilter8containsEPKhKNSt6size_tE"></span><span id="_CPPv2NK11BloomFilter8containsEPKhKNSt6size_tE"></span><span id="BloomFilter::contains__unsigned-cCP.std::sCC"></span><span class="target" id="classBloomFilter_1a3307c4b0b3134998337551b811e4a587"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">contains</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">key_begin</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11BloomFilter8containsEPKhKNSt6size_tE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true if it’s possible that the specified element was previously added to the Bloom filter. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK11BloomFilter8containsEbRK1T">
+<span id="_CPPv3I0ENK11BloomFilter8containsERK1T"></span><span id="_CPPv2I0ENK11BloomFilter8containsERK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classBloomFilter_1af5966de6f5aaaa9c095f31bf00d8dd43"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">contains</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK11BloomFilter8containsEbRK1T" title="BloomFilter::contains::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK11BloomFilter8containsEbRK1T" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true if it’s possible that the specified element was previously added to the Bloom filter. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11BloomFilter8containsERKNSt6stringE">
+<span id="_CPPv3NK11BloomFilter8containsERKNSt6stringE"></span><span id="_CPPv2NK11BloomFilter8containsERKNSt6stringE"></span><span id="BloomFilter::contains__ssCRC"></span><span class="target" id="classBloomFilter_1a92edc1af74e2865a650e8271eba74ae7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">contains</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11BloomFilter8containsERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true if it’s possible that the specified element was previously added to the Bloom filter. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11BloomFilter8containsEPKcRKNSt6size_tE">
+<span id="_CPPv3NK11BloomFilter8containsEPKcRKNSt6size_tE"></span><span id="_CPPv2NK11BloomFilter8containsEPKcRKNSt6size_tE"></span><span id="BloomFilter::contains__cCP.std::sCRC"></span><span class="target" id="classBloomFilter_1acd8d4ee2fcc4925eec44635f36e1b0be"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">contains</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">length</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11BloomFilter8containsEPKcRKNSt6size_tE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true if it’s possible that the specified element was previously added to the Bloom filter. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK11BloomFilter12contains_allE13InputIteratorK13InputIteratorK13InputIterator">
+<span id="_CPPv3I0ENK11BloomFilter12contains_allEK13InputIteratorK13InputIterator"></span><span id="_CPPv2I0ENK11BloomFilter12contains_allEK13InputIteratorK13InputIterator"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InputIterator</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classBloomFilter_1a2d3805c98a8f340e1a906a81f447c0b0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK11BloomFilter12contains_allE13InputIteratorK13InputIteratorK13InputIterator" title="BloomFilter::contains_all::InputIterator"><span class="n"><span class="pre">InputIterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">contains_all</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK11BloomFilter12contains_allE13InputIteratorK13InputIteratorK13InputIterator" title="BloomFilter::contains_all::InputIterator"><span class="n"><span class="pre">InputIterator</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">begin</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK11BloomFilter12contains_allE13InputIteratorK13InputIteratorK13InputIterator" title="BloomFilter::contains_all::InputIterator"><span class="n"><span class="pre">InputIterator</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">end</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK11BloomFilter12contains_allE13InputIteratorK13InputIteratorK13InputIterator" title="Link to this definition"></a><br /></dt>
+<dd><p>Checks whether its possible that the Bloom filter has seen all of the elements within the specified range. If so, returns <code class="docutils literal notranslate"><span class="pre">end</span></code>. Otherwise returns an iterator to the first element that has definitely not previously been added to the Bloom filter. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK11BloomFilter13contains_noneE13InputIteratorK13InputIteratorK13InputIterator">
+<span id="_CPPv3I0ENK11BloomFilter13contains_noneEK13InputIteratorK13InputIterator"></span><span id="_CPPv2I0ENK11BloomFilter13contains_noneEK13InputIteratorK13InputIterator"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InputIterator</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classBloomFilter_1ad5689794dcd401fc9b408ed14db9b167"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK11BloomFilter13contains_noneE13InputIteratorK13InputIteratorK13InputIterator" title="BloomFilter::contains_none::InputIterator"><span class="n"><span class="pre">InputIterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">contains_none</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK11BloomFilter13contains_noneE13InputIteratorK13InputIteratorK13InputIterator" title="BloomFilter::contains_none::InputIterator"><span class="n"><span class="pre">InputIterator</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">begin</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK11BloomFilter13contains_noneE13InputIteratorK13InputIteratorK13InputIterator" title="BloomFilter::contains_none::InputIterator"><span class="n"><span class="pre">InputIterator</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">end</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK11BloomFilter13contains_noneE13InputIteratorK13InputIteratorK13InputIterator" title="Link to this definition"></a><br /></dt>
+<dd><p>Checks whether its possible that the Bloom filter has seen none of the elements within the specified range. If so, returns <code class="docutils literal notranslate"><span class="pre">end</span></code>. Otherwise returns an iterator to the first element that has possible previously been added to the Bloom filter. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11BloomFilter4sizeEv">
+<span id="_CPPv3NK11BloomFilter4sizeEv"></span><span id="_CPPv2NK11BloomFilter4sizeEv"></span><span id="BloomFilter::sizeC"></span><span class="target" id="classBloomFilter_1a2d84f2dffe241edd1a5438d89ff7d556"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11BloomFilter4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the size of the Bloom filter’s internal table </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11BloomFilter13element_countEv">
+<span id="_CPPv3NK11BloomFilter13element_countEv"></span><span id="_CPPv2NK11BloomFilter13element_countEv"></span><span id="BloomFilter::element_countC"></span><span class="target" id="classBloomFilter_1a61bd5faf325cca2e9cc6b3fe92633434"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">element_count</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11BloomFilter13element_countEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the number of elements that have been added to the Bloom filter </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11BloomFilter13effective_fppEv">
+<span id="_CPPv3NK11BloomFilter13effective_fppEv"></span><span id="_CPPv2NK11BloomFilter13effective_fppEv"></span><span id="BloomFilter::effective_fppC"></span><span class="target" id="classBloomFilter_1a7016bd51a78a530ca9625219341ea203"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">effective_fpp</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11BloomFilter13effective_fppEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate effective false positive probability. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilteraNERK11BloomFilter">
+<span id="_CPPv3N11BloomFilteraNERK11BloomFilter"></span><span id="_CPPv2N11BloomFilteraNERK11BloomFilter"></span><span id="BloomFilter::and-assign-operator__BloomFilterCR"></span><span class="target" id="classBloomFilter_1a68dac1595b405f0b615528094cc2b13a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&amp;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFilteraNERK11BloomFilter" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate the intersection of two Bloom filters. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilteroRERK11BloomFilter">
+<span id="_CPPv3N11BloomFilteroRERK11BloomFilter"></span><span id="_CPPv2N11BloomFilteroRERK11BloomFilter"></span><span id="BloomFilter::or-assign-operator__BloomFilterCR"></span><span class="target" id="classBloomFilter_1aa4914d475eb3a2d4f1f2b58cc864f585"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">|=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFilteroRERK11BloomFilter" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate the union of two Bloom filters. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFiltereOERK11BloomFilter">
+<span id="_CPPv3N11BloomFiltereOERK11BloomFilter"></span><span id="_CPPv2N11BloomFiltereOERK11BloomFilter"></span><span id="BloomFilter::xor-assign-operator__BloomFilterCR"></span><span class="target" id="classBloomFilter_1a9c906a06da8590aaf43a5fc55bfa8e71"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">^=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFiltereOERK11BloomFilter" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate the difference of two Bloom filters. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11BloomFilter5tableEv">
+<span id="_CPPv3NK11BloomFilter5tableEv"></span><span id="_CPPv2NK11BloomFilter5tableEv"></span><span id="BloomFilter::tableC"></span><span class="target" id="classBloomFilter_1a1f97cf25ce8a23d8bbdcb226dba1dcca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11BloomFilter9cell_typeE" title="BloomFilter::cell_type"><span class="n"><span class="pre">cell_type</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">table</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11BloomFilter5tableEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the Bloom filter’s internal bit table </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter10hash_countEv">
+<span id="_CPPv3N11BloomFilter10hash_countEv"></span><span id="_CPPv2N11BloomFilter10hash_countEv"></span><span id="BloomFilter::hash_count"></span><span class="target" id="classBloomFilter_1a7f294062dc7ef3f6624da47ba33608d0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hash_count</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFilter10hash_countEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the number of hash functions being used by this Bloom filter </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-types">Protected Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter10bloom_typeE">
+<span id="_CPPv3N11BloomFilter10bloom_typeE"></span><span id="_CPPv2N11BloomFilter10bloom_typeE"></span><span id="BloomFilter::bloom_type"></span><span class="target" id="classBloomFilter_1addc1e480e80fc315bafa336897974244"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bloom_type</span></span></span><a class="headerlink" href="#_CPPv4N11BloomFilter10bloom_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter9cell_typeE">
+<span id="_CPPv3N11BloomFilter9cell_typeE"></span><span id="_CPPv2N11BloomFilter9cell_typeE"></span><span id="BloomFilter::cell_type"></span><span class="target" id="classBloomFilter_1a62537022cc49f9fb602caf03e2ca5edf"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cell_type</span></span></span><a class="headerlink" href="#_CPPv4N11BloomFilter9cell_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter10table_typeE">
+<span id="_CPPv3N11BloomFilter10table_typeE"></span><span id="_CPPv2N11BloomFilter10table_typeE"></span><span id="BloomFilter::table_type"></span><span class="target" id="classBloomFilter_1a52bdac3bb3f8a70160024b81232ae6ce"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">table_type</span></span></span><a class="headerlink" href="#_CPPv4N11BloomFilter10table_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11BloomFilter15compute_indicesERK10bloom_typeRNSt6size_tERNSt6size_tE">
+<span id="_CPPv3NK11BloomFilter15compute_indicesERK10bloom_typeRNSt6size_tERNSt6size_tE"></span><span id="_CPPv2NK11BloomFilter15compute_indicesERK10bloom_typeRNSt6size_tERNSt6size_tE"></span><span id="BloomFilter::compute_indices__bloom_typeCR.std::sR.std::sRC"></span><span class="target" id="classBloomFilter_1a7f2378bd107073ecfb277887fec3cb5d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute_indices</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11BloomFilter10bloom_typeE" title="BloomFilter::bloom_type"><span class="n"><span class="pre">bloom_type</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hash</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">bit_index</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">bit</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11BloomFilter15compute_indicesERK10bloom_typeRNSt6size_tERNSt6size_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter20generate_unique_saltEv">
+<span id="_CPPv3N11BloomFilter20generate_unique_saltEv"></span><span id="_CPPv2N11BloomFilter20generate_unique_saltEv"></span><span id="BloomFilter::generate_unique_salt"></span><span class="target" id="classBloomFilter_1a7e94502aa932cd7d86369b3f32fa80d7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generate_unique_salt</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11BloomFilter20generate_unique_saltEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11BloomFilter7hash_apEPKhNSt6size_tE10bloom_type">
+<span id="_CPPv3NK11BloomFilter7hash_apEPKhNSt6size_tE10bloom_type"></span><span id="_CPPv2NK11BloomFilter7hash_apEPKhNSt6size_tE10bloom_type"></span><span id="BloomFilter::hash_ap__unsigned-cCP.std::s.bloom_typeC"></span><span class="target" id="classBloomFilter_1a91fc2009fe762255430ced75bec2b17e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11BloomFilter10bloom_typeE" title="BloomFilter::bloom_type"><span class="n"><span class="pre">bloom_type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hash_ap</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">begin</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">remaining_length</span></span>, <a class="reference internal" href="#_CPPv4N11BloomFilter10bloom_typeE" title="BloomFilter::bloom_type"><span class="n"><span class="pre">bloom_type</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">hash</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11BloomFilter7hash_apEPKhNSt6size_tE10bloom_type" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter5salt_E">
+<span id="_CPPv3N11BloomFilter5salt_E"></span><span id="_CPPv2N11BloomFilter5salt_E"></span><span id="BloomFilter::salt___std::vector:bloom_type:"></span><span class="target" id="classBloomFilter_1a3cbbd09e006c0fd9738ab6304a801566"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N11BloomFilter10bloom_typeE" title="BloomFilter::bloom_type"><span class="n"><span class="pre">bloom_type</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">salt_</span></span></span><a class="headerlink" href="#_CPPv4N11BloomFilter5salt_E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter10bit_table_E">
+<span id="_CPPv3N11BloomFilter10bit_table_E"></span><span id="_CPPv2N11BloomFilter10bit_table_E"></span><span id="BloomFilter::bit_table___std::vector:unsigned-c:"></span><span class="target" id="classBloomFilter_1a534f10c3b005789989fc03809047546c"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bit_table_</span></span></span><a class="headerlink" href="#_CPPv4N11BloomFilter10bit_table_E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter11salt_count_E">
+<span id="_CPPv3N11BloomFilter11salt_count_E"></span><span id="_CPPv2N11BloomFilter11salt_count_E"></span><span id="BloomFilter::salt_count___unsigned-i"></span><span class="target" id="classBloomFilter_1aa2882cfc2f923e8862421b9c8e58461a"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">salt_count_</span></span></span><a class="headerlink" href="#_CPPv4N11BloomFilter11salt_count_E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter11table_size_E">
+<span id="_CPPv3N11BloomFilter11table_size_E"></span><span id="_CPPv2N11BloomFilter11table_size_E"></span><span id="BloomFilter::table_size___unsigned-l-l-i"></span><span class="target" id="classBloomFilter_1abbe006e347118a3f0bf138762aebae04"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">table_size_</span></span></span><a class="headerlink" href="#_CPPv4N11BloomFilter11table_size_E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter24projected_element_count_E">
+<span id="_CPPv3N11BloomFilter24projected_element_count_E"></span><span id="_CPPv2N11BloomFilter24projected_element_count_E"></span><span id="BloomFilter::projected_element_count___unsigned-l-l-i"></span><span class="target" id="classBloomFilter_1a22c29b48ae224d8838fa05966dcb2ed6"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">projected_element_count_</span></span></span><a class="headerlink" href="#_CPPv4N11BloomFilter24projected_element_count_E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter23inserted_element_count_E">
+<span id="_CPPv3N11BloomFilter23inserted_element_count_E"></span><span id="_CPPv2N11BloomFilter23inserted_element_count_E"></span><span id="BloomFilter::inserted_element_count___unsigned-l-l-i"></span><span class="target" id="classBloomFilter_1a303955ce177bd9fcd1aadd90bae8dd76"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">inserted_element_count_</span></span></span><a class="headerlink" href="#_CPPv4N11BloomFilter23inserted_element_count_E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter12random_seed_E">
+<span id="_CPPv3N11BloomFilter12random_seed_E"></span><span id="_CPPv2N11BloomFilter12random_seed_E"></span><span id="BloomFilter::random_seed___unsigned-l-l-i"></span><span class="target" id="classBloomFilter_1a0f86a93616eb7a8aa42ddf04500f559e"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">random_seed_</span></span></span><a class="headerlink" href="#_CPPv4N11BloomFilter12random_seed_E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11BloomFilter35desired_false_positive_probability_E">
+<span id="_CPPv3N11BloomFilter35desired_false_positive_probability_E"></span><span id="_CPPv2N11BloomFilter35desired_false_positive_probability_E"></span><span id="BloomFilter::desired_false_positive_probability___double"></span><span class="target" id="classBloomFilter_1ab7fc6f8c84beffc8766c7a4b75271b07"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">desired_false_positive_probability_</span></span></span><a class="headerlink" href="#_CPPv4N11BloomFilter35desired_false_positive_probability_E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv423CompressibleBloomFilter">
+<span id="_CPPv323CompressibleBloomFilter"></span><span id="_CPPv223CompressibleBloomFilter"></span><span id="CompressibleBloomFilter"></span><span class="target" id="classCompressibleBloomFilter"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompressibleBloomFilter</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411BloomFilter" title="BloomFilter"><span class="n"><span class="pre">BloomFilter</span></span></a><a class="headerlink" href="#_CPPv423CompressibleBloomFilter" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;BloomFilter.hpp&gt;</em></div>
+<p>A Bloom filter that can be compressed. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N23CompressibleBloomFilter23CompressibleBloomFilterERK15BloomParameters">
+<span id="_CPPv3N23CompressibleBloomFilter23CompressibleBloomFilterERK15BloomParameters"></span><span id="_CPPv2N23CompressibleBloomFilter23CompressibleBloomFilterERK15BloomParameters"></span><span id="CompressibleBloomFilter::CompressibleBloomFilter__BloomParametersCR"></span><span class="target" id="classCompressibleBloomFilter_1addba038b9996ced367b7085ef65acbf8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompressibleBloomFilter</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">BloomParameters</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N23CompressibleBloomFilter23CompressibleBloomFilterERK15BloomParameters" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK23CompressibleBloomFilter4sizeEv">
+<span id="_CPPv3NK23CompressibleBloomFilter4sizeEv"></span><span id="_CPPv2NK23CompressibleBloomFilter4sizeEv"></span><span id="CompressibleBloomFilter::sizeC"></span><span class="target" id="classCompressibleBloomFilter_1ad07541943eae0820b397fb19af7ec61b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK23CompressibleBloomFilter4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the current size of the bloom filter (i.e. the size of the internal table) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N23CompressibleBloomFilter8compressERKd">
+<span id="_CPPv3N23CompressibleBloomFilter8compressERKd"></span><span id="_CPPv2N23CompressibleBloomFilter8compressERKd"></span><span id="CompressibleBloomFilter::compress__doubleCR"></span><span class="target" id="classCompressibleBloomFilter_1a70dea5716a0c17112154468f2a8a383a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compress</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">percentage</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N23CompressibleBloomFilter8compressERKd" title="Link to this definition"></a><br /></dt>
+<dd><p>Compress the Bloom filter </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>percentage</strong> – the percentage of the Bloom filter’s current size to compress to (e.g. 50 would reduce the current size by half) </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK23CompressibleBloomFilter15compute_indicesERK10bloom_typeRNSt6size_tERNSt6size_tE">
+<span id="_CPPv3NK23CompressibleBloomFilter15compute_indicesERK10bloom_typeRNSt6size_tERNSt6size_tE"></span><span id="_CPPv2NK23CompressibleBloomFilter15compute_indicesERK10bloom_typeRNSt6size_tERNSt6size_tE"></span><span id="CompressibleBloomFilter::compute_indices__bloom_typeCR.std::sR.std::sRC"></span><span class="target" id="classCompressibleBloomFilter_1a22cf829a161da46dbad1bfdd42fa83ba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute_indices</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">bloom_type</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hash</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">bit_index</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">bit</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK23CompressibleBloomFilter15compute_indicesERK10bloom_typeRNSt6size_tERNSt6size_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N23CompressibleBloomFilter9size_listE">
+<span id="_CPPv3N23CompressibleBloomFilter9size_listE"></span><span id="_CPPv2N23CompressibleBloomFilter9size_listE"></span><span id="CompressibleBloomFilter::size_list__std::vector:unsigned-l-l-i:"></span><span class="target" id="classCompressibleBloomFilter_1a154c88e5c738407d28aca4f269098ea2"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size_list</span></span></span><a class="headerlink" href="#_CPPv4N23CompressibleBloomFilter9size_listE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../datastructs.html" class="btn btn-neutral float-left" title="Data structures" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Bool.html" class="btn btn-neutral float-right" title="Bool.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

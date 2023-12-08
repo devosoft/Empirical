@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NFA.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/compiler/api/NFA.1cae45a0-bdad-4151-8511-dd89c9398203.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="RegEx.hpp" href="RegEx.html" />
+    <link rel="prev" title="Lexer.hpp" href="Lexer.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../compiler.html">Compiler</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../compiler.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="DFA.html">DFA.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Lexer.html">Lexer.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">NFA.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv43NFA"><code class="docutils literal notranslate"><span class="pre">NFA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49NFA_State"><code class="docutils literal notranslate"><span class="pre">NFA_State</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA"><code class="docutils literal notranslate"><span class="pre">tNFA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_6size_t0E10tNFA_State"><code class="docutils literal notranslate"><span class="pre">tNFA_State</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RegEx.html">RegEx.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lexer_utils.html">lexer_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="regex_utils.html">regex_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../compiler.html">Compiler</a></li>
+      <li class="breadcrumb-item active">NFA.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="nfa-hpp">
+<h1>NFA.hpp<a class="headerlink" href="#nfa-hpp" title="Link to this heading"></a></h1>
+<p>A Non-deterministic Finite Automata simulator. </p>
+<p>
+To build a standard NFA, use NFA. If you want to have more symbols or more stop states, use tNFA&lt;S,T&gt; where S is the number of symbols and T is the type used for stop. (defaults are 128 for ASCII-128 and uint8_t respectively.)</p>
+<p>The constructor can take as parameters the number of states and the id of the start state (both default to 0)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>DFA’s use SetTransition(), but NFA’s use AddTransition. This distinction is intentional since in a DFA a second SetTransition with the same start state and symbol will override first, while in an NFA a second AddTransition will always add a new option. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv43NFA">
+<span id="_CPPv33NFA"></span><span id="_CPPv23NFA"></span><span class="target" id="NFA_8hpp_1a6264006192b7a64500e0b4d060e3e727"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NFA</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA"><span class="n"><span class="pre">tNFA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">128</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv43NFA" title="Link to this definition"></a><br /></dt>
+<dd><p>NFA is the most standard tNFA setup. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv49NFA_State">
+<span id="_CPPv39NFA_State"></span><span id="_CPPv29NFA_State"></span><span class="target" id="NFA_8hpp_1a853fbe64b1cb376cd90366b8b4b7135f"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NFA_State</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E10tNFA_State" title="tNFA_State"><span class="n"><span class="pre">tNFA_State</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">128</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv49NFA_State" title="Link to this definition"></a><br /></dt>
+<dd><p>NFA_State is the most standard tNFA_State setup. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_t0E4tNFA">
+<span id="_CPPv3I_6size_t0E4tNFA"></span><span id="_CPPv2I_6size_t0E4tNFA"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">S</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">128</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">STOP_TYPE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classtNFA"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tNFA</span></span></span><a class="headerlink" href="#_CPPv4I_6size_t0E4tNFA" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;NFA.hpp&gt;</em></div>
+<p>A dynamic NFA class, for easily building non-determanistic finite automata. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA6opts_tE">
+<span id="_CPPv3N4tNFA6opts_tE"></span><span id="_CPPv2N4tNFA6opts_tE"></span><span class="target" id="classtNFA_1ab037f20d5ecf6572022453327c233508"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opts_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4I_6size_tE6BitSet" title="BitSet"><span class="n"><span class="pre">BitSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4tNFA11NUM_SYMBOLSE" title="tNFA::NUM_SYMBOLS"><span class="n"><span class="pre">NUM_SYMBOLS</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N4tNFA6opts_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA6stop_tE">
+<span id="_CPPv3N4tNFA6stop_tE"></span><span id="_CPPv2N4tNFA6stop_tE"></span><span class="target" id="classtNFA_1aa3b5c3380b574732e29193a1b986c0b8"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stop_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA::STOP_TYPE"><span class="n"><span class="pre">STOP_TYPE</span></span></a><a class="headerlink" href="#_CPPv4N4tNFA6stop_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA4tNFAE6size_t6size_t">
+<span id="_CPPv3N4tNFA4tNFAE6size_t6size_t"></span><span id="_CPPv2N4tNFA4tNFAE6size_t6size_t"></span><span id="tNFA::tNFA__s.s"></span><span class="target" id="classtNFA_1a3f02638a77f3dd44f2d5d8fe40d05aa4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tNFA</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_states</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_state</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFA4tNFAE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA4tNFAERK4tNFAI1S9STOP_TYPEE">
+<span id="_CPPv3N4tNFA4tNFAERK4tNFAI1S9STOP_TYPEE"></span><span id="_CPPv2N4tNFA4tNFAERK4tNFAI1S9STOP_TYPEE"></span><span id="tNFA::tNFA__tNFA:S.STOP_TYPE:CR"></span><span class="target" id="classtNFA_1a90032871f7526e36de9b85ee1ffaf2fc"></span><span class="sig-name descname"><span class="n"><span class="pre">tNFA</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4tNFA4tNFAERK4tNFAI1S9STOP_TYPEE" title="tNFA::tNFA"><span class="n"><span class="pre">tNFA</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA::S"><span class="n"><span class="pre">S</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA::STOP_TYPE"><span class="n"><span class="pre">STOP_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N4tNFA4tNFAERK4tNFAI1S9STOP_TYPEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFAD0Ev">
+<span id="_CPPv3N4tNFAD0Ev"></span><span id="_CPPv2N4tNFAD0Ev"></span><span id="tNFA::~tNFA"></span><span class="target" id="classtNFA_1ac87e6c1ee208b814dddbb3362dd2dabe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~tNFA</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFAD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFAaSERK4tNFAI1S9STOP_TYPEE">
+<span id="_CPPv3N4tNFAaSERK4tNFAI1S9STOP_TYPEE"></span><span id="_CPPv2N4tNFAaSERK4tNFAI1S9STOP_TYPEE"></span><span id="tNFA::assign-operator__tNFA:S.STOP_TYPE:CR"></span><span class="target" id="classtNFA_1abc0f84e24835aebf58848a3333d92d98"></span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA"><span class="n"><span class="pre">tNFA</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA::S"><span class="n"><span class="pre">S</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA::STOP_TYPE"><span class="n"><span class="pre">STOP_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA"><span class="n"><span class="pre">tNFA</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA::S"><span class="n"><span class="pre">S</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA::STOP_TYPE"><span class="n"><span class="pre">STOP_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N4tNFAaSERK4tNFAI1S9STOP_TYPEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4tNFA7GetSizeEv">
+<span id="_CPPv3NK4tNFA7GetSizeEv"></span><span id="_CPPv2NK4tNFA7GetSizeEv"></span><span id="tNFA::GetSizeC"></span><span class="target" id="classtNFA_1a331005efc42b2e116f4cc61fc3fec02c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4tNFA7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the current number of states. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4tNFA8GetStartEv">
+<span id="_CPPv3NK4tNFA8GetStartEv"></span><span id="_CPPv2NK4tNFA8GetStartEv"></span><span id="tNFA::GetStartC"></span><span class="target" id="classtNFA_1a94f0be18b15e3afa2f324c78292225c9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetStart</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4tNFA8GetStartEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return start state and all others reachable through empty transitions. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4tNFA7GetNextE6size_t6size_t">
+<span id="_CPPv3NK4tNFA7GetNextE6size_t6size_t"></span><span id="_CPPv2NK4tNFA7GetNextE6size_t6size_t"></span><span id="tNFA::GetNext__s.sC"></span><span class="target" id="classtNFA_1ad20f98721b7dbf56fc02df599f75bd5a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNext</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sym</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from_id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4tNFA7GetNextE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the states reachable from the current state given the provided symbol. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4tNFA7GetNextE6size_tKNSt3setI6size_tEE">
+<span id="_CPPv3NK4tNFA7GetNextE6size_tKNSt3setI6size_tEE"></span><span id="_CPPv2NK4tNFA7GetNextE6size_tKNSt3setI6size_tEE"></span><span id="tNFA::GetNext__s.std::set:s:CC"></span><span class="target" id="classtNFA_1aa5f22a857f891647d9a5b787835ac6e1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNext</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sym</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from_set</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4tNFA7GetNextE6size_tKNSt3setI6size_tEE" title="Link to this definition"></a><br /></dt>
+<dd><p>return the states reachable from the current set of states given the provided symbol. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4tNFA18HasFreeTransitionsE6size_t">
+<span id="_CPPv3NK4tNFA18HasFreeTransitionsE6size_t"></span><span id="_CPPv2NK4tNFA18HasFreeTransitionsE6size_t"></span><span id="tNFA::HasFreeTransitions__sC"></span><span class="target" id="classtNFA_1a0be608c8c01ec7c71cce7991e8c35d46"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasFreeTransitions</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4tNFA18HasFreeTransitionsE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Does the provided state have free transitions? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4tNFA17HasSymTransitionsE6size_t">
+<span id="_CPPv3NK4tNFA17HasSymTransitionsE6size_t"></span><span id="_CPPv2NK4tNFA17HasSymTransitionsE6size_t"></span><span id="tNFA::HasSymTransitions__sC"></span><span class="target" id="classtNFA_1a8a4cc1f396000c04d82820ecf16439e5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasSymTransitions</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4tNFA17HasSymTransitionsE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Does the provided state have symbol-transitions? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4tNFA16GetSymbolOptionsERKNSt3setI6size_tEE">
+<span id="_CPPv3NK4tNFA16GetSymbolOptionsERKNSt3setI6size_tEE"></span><span id="_CPPv2NK4tNFA16GetSymbolOptionsERKNSt3setI6size_tEE"></span><span id="tNFA::GetSymbolOptions__std::set:s:CRC"></span><span class="target" id="classtNFA_1a19ca4b0af107db80461836cee96000da"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4tNFA6opts_tE" title="tNFA::opts_t"><span class="n"><span class="pre">opts_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSymbolOptions</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">test_set</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4tNFA16GetSymbolOptionsERKNSt3setI6size_tEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Return an BitSet indicating the symbols available from the provided set of states. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA6ResizeE6size_t">
+<span id="_CPPv3N4tNFA6ResizeE6size_t"></span><span id="_CPPv2N4tNFA6ResizeE6size_t"></span><span id="tNFA::Resize__s"></span><span class="target" id="classtNFA_1ab197514c8d5940ccc6dd890df9972caa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFA6ResizeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Change the number of available states. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA11AddNewStateEv">
+<span id="_CPPv3N4tNFA11AddNewStateEv"></span><span id="_CPPv2N4tNFA11AddNewStateEv"></span><span id="tNFA::AddNewState"></span><span class="target" id="classtNFA_1a464bd3e2415079636acaed559d063920"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddNewState</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFA11AddNewStateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new state into the NFA and return its id. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA19AddTransitionSymbolE6size_t6size_t6size_t">
+<span id="_CPPv3N4tNFA19AddTransitionSymbolE6size_t6size_t6size_t"></span><span id="_CPPv2N4tNFA19AddTransitionSymbolE6size_t6size_t6size_t"></span><span id="tNFA::AddTransitionSymbol__s.s.s"></span><span class="target" id="classtNFA_1abd46d3af85c1241df34382401208b3f8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddTransitionSymbol</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sym</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFA19AddTransitionSymbolE6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a transition between states ‘from’ and ‘to’ that can be taken with the provided symbol. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA13AddTransitionE6size_t6size_tKc">
+<span id="_CPPv3N4tNFA13AddTransitionE6size_t6size_tKc"></span><span id="_CPPv2N4tNFA13AddTransitionE6size_t6size_tKc"></span><span id="tNFA::AddTransition__s.s.cC"></span><span class="target" id="classtNFA_1a102453ba815102c9adad820c013084f7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddTransition</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sym</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFA13AddTransitionE6size_t6size_tKc" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a transition between states ‘from’ and ‘to’ that can be taken with a char symbol. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA13AddTransitionE6size_t6size_tRKNSt6stringE">
+<span id="_CPPv3N4tNFA13AddTransitionE6size_t6size_tRKNSt6stringE"></span><span id="_CPPv2N4tNFA13AddTransitionE6size_t6size_tRKNSt6stringE"></span><span id="tNFA::AddTransition__s.s.ssCR"></span><span class="target" id="classtNFA_1a1394648b4c75807e1cbaa46a74dfe436"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddTransition</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sym_set</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFA13AddTransitionE6size_t6size_tRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a transition between states ‘from’ and ‘to’ that can be taken with the provided symbols. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA13AddTransitionE6size_t6size_tPKc">
+<span id="_CPPv3N4tNFA13AddTransitionE6size_t6size_tPKc"></span><span id="_CPPv2N4tNFA13AddTransitionE6size_t6size_tPKc"></span><span id="tNFA::AddTransition__s.s.cCP"></span><span class="target" id="classtNFA_1ae0bceca405bf4ee8e3e33e0958b2c9ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddTransition</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">sym_set</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFA13AddTransitionE6size_t6size_tPKc" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a transition between states ‘from’ and ‘to’ that can be taken with the provided symbols. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA13AddTransitionE6size_t6size_tRK6BitSetI11NUM_SYMBOLSE">
+<span id="_CPPv3N4tNFA13AddTransitionE6size_t6size_tRK6BitSetI11NUM_SYMBOLSE"></span><span id="_CPPv2N4tNFA13AddTransitionE6size_t6size_tRK6BitSetI11NUM_SYMBOLSE"></span><span id="tNFA::AddTransition__s.s.BitSet:NUM_SYMBOLS:CR"></span><span class="target" id="classtNFA_1a1782fd82e4479c521e9a24ed6876c72b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddTransition</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4I_6size_tE6BitSet" title="BitSet"><span class="n"><span class="pre">BitSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4tNFA11NUM_SYMBOLSE" title="tNFA::NUM_SYMBOLS"><span class="n"><span class="pre">NUM_SYMBOLS</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sym_set</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFA13AddTransitionE6size_t6size_tRK6BitSetI11NUM_SYMBOLSE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a transition between states ‘from’ and ‘to’ that can be taken with the provided symbols. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA17AddFreeTransitionE6size_t6size_t">
+<span id="_CPPv3N4tNFA17AddFreeTransitionE6size_t6size_t"></span><span id="_CPPv2N4tNFA17AddFreeTransitionE6size_t6size_t"></span><span id="tNFA::AddFreeTransition__s.s"></span><span class="target" id="classtNFA_1aee61629c585ab480d73dd21fb790115e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddFreeTransition</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFA17AddFreeTransitionE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Create a free transition between ‘from’ and ‘to’. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4tNFA7SetStopEv6size_t1T">
+<span id="_CPPv3I0EN4tNFA7SetStopE6size_t1T"></span><span id="_CPPv2I0EN4tNFA7SetStopE6size_t1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4tNFA6stop_tE" title="tNFA::stop_t"><span class="n"><span class="pre">stop_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classtNFA_1addd46f3af0898e0e902027c4f3f3dd1b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetStop</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">state</span></span>, <a class="reference internal" href="#_CPPv4I0EN4tNFA7SetStopEv6size_t1T" title="tNFA::SetStop::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">stop_val</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4tNFA7SetStopEv6size_t1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the specified state to be a stop state (with an optional stop value.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4tNFA7GetStopE6size_t">
+<span id="_CPPv3NK4tNFA7GetStopE6size_t"></span><span id="_CPPv2NK4tNFA7GetStopE6size_t"></span><span id="tNFA::GetStop__sC"></span><span class="target" id="classtNFA_1ad70b5a8a01ae2c5978932f6ce6fba375"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4tNFA6stop_tE" title="tNFA::stop_t"><span class="n"><span class="pre">stop_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetStop</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4tNFA7GetStopE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get any stop value associated with the provided state. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4tNFA7IsStartE6size_t">
+<span id="_CPPv3NK4tNFA7IsStartE6size_t"></span><span id="_CPPv2NK4tNFA7IsStartE6size_t"></span><span id="tNFA::IsStart__sC"></span><span class="target" id="classtNFA_1a25859fbe5458e3e73a64ca9380babe4e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsStart</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4tNFA7IsStartE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if NFA begins at provided state (may have free transitions to other states) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4tNFA6IsStopE6size_t">
+<span id="_CPPv3NK4tNFA6IsStopE6size_t"></span><span id="_CPPv2NK4tNFA6IsStopE6size_t"></span><span id="tNFA::IsStop__sC"></span><span class="target" id="classtNFA_1a863072918322e96f406d1146c90cb598"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsStop</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4tNFA6IsStopE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if this state is a legal endpoint for the NFA. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4tNFA7IsEmptyE6size_t">
+<span id="_CPPv3NK4tNFA7IsEmptyE6size_t"></span><span id="_CPPv2NK4tNFA7IsEmptyE6size_t"></span><span id="tNFA::IsEmpty__sC"></span><span class="target" id="classtNFA_1a52f047cd8c8363b48e3df8c766e54325"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsEmpty</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4tNFA7IsEmptyE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if this state has only empty transitions from it, and not stop state. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA5MergeERK4tNFAI11NUM_SYMBOLS9STOP_TYPEE">
+<span id="_CPPv3N4tNFA5MergeERK4tNFAI11NUM_SYMBOLS9STOP_TYPEE"></span><span id="_CPPv2N4tNFA5MergeERK4tNFAI11NUM_SYMBOLS9STOP_TYPEE"></span><span id="tNFA::Merge__tNFA:NUM_SYMBOLS.STOP_TYPE:CR"></span><span class="target" id="classtNFA_1a4e72ac527f3135a7fe4c4fa2286c3c1c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Merge</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA"><span class="n"><span class="pre">tNFA</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4tNFA11NUM_SYMBOLSE" title="tNFA::NUM_SYMBOLS"><span class="n"><span class="pre">NUM_SYMBOLS</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA::STOP_TYPE"><span class="n"><span class="pre">STOP_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nfa2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFA5MergeERK4tNFAI11NUM_SYMBOLS9STOP_TYPEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Merge another NFA into this one. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4tNFA5PrintEv">
+<span id="_CPPv3NK4tNFA5PrintEv"></span><span id="_CPPv2NK4tNFA5PrintEv"></span><span id="tNFA::PrintC"></span><span class="target" id="classtNFA_1a53c62f7447dbfe2a906219bcfb36b1d2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4tNFA5PrintEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Print information about this NFA (for debugging) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA14PrintFreeMovesEv">
+<span id="_CPPv3N4tNFA14PrintFreeMovesEv"></span><span id="_CPPv2N4tNFA14PrintFreeMovesEv"></span><span id="tNFA::PrintFreeMoves"></span><span class="target" id="classtNFA_1a4383e831a3563a1bffff20023e207850"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintFreeMoves</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFA14PrintFreeMovesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Identify free moves in NFA (for debugging) </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA11NUM_SYMBOLSE">
+<span id="_CPPv3N4tNFA11NUM_SYMBOLSE"></span><span id="_CPPv2N4tNFA11NUM_SYMBOLSE"></span><span id="tNFA::NUM_SYMBOLS__sC"></span><span class="target" id="classtNFA_1a1353636c70e842665afdcc0f06955153"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NUM_SYMBOLS</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA::S"><span class="n"><span class="pre">S</span></span></a><a class="headerlink" href="#_CPPv4N4tNFA11NUM_SYMBOLSE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA6statesE">
+<span id="_CPPv3N4tNFA6statesE"></span><span id="_CPPv2N4tNFA6statesE"></span><span id="tNFA::states__vector:State:"></span><span class="target" id="classtNFA_1a065a18450cc8179f1904e893490a5fff"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N4tNFA5StateE" title="tNFA::State"><span class="n"><span class="pre">State</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">states</span></span></span><a class="headerlink" href="#_CPPv4N4tNFA6statesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Information about available states. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA5startE">
+<span id="_CPPv3N4tNFA5startE"></span><span id="_CPPv2N4tNFA5startE"></span><span id="tNFA::start__s"></span><span class="target" id="classtNFA_1ab16606ad34a89f56d30ad3547b5bb6cc"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">start</span></span></span><a class="headerlink" href="#_CPPv4N4tNFA5startE" title="Link to this definition"></a><br /></dt>
+<dd><p>Main start state (others might be reached for free.) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA7is_stopE">
+<span id="_CPPv3N4tNFA7is_stopE"></span><span id="_CPPv2N4tNFA7is_stopE"></span><span id="tNFA::is_stop__vector:STOP_TYPE:"></span><span class="target" id="classtNFA_1a8e67ad9b68bd11cc29c92b41911e3752"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA::STOP_TYPE"><span class="n"><span class="pre">STOP_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_stop</span></span></span><a class="headerlink" href="#_CPPv4N4tNFA7is_stopE" title="Link to this definition"></a><br /></dt>
+<dd><p>0=no 1=yes (char instead of bool for speed) </p>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA5StateE">
+<span id="_CPPv3N4tNFA5StateE"></span><span id="_CPPv2N4tNFA5StateE"></span><span id="tNFA::State"></span><span class="target" id="structtNFA_1_1State"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">State</span></span></span><a class="headerlink" href="#_CPPv4N4tNFA5StateE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA5State5StateEv">
+<span id="_CPPv3N4tNFA5State5StateEv"></span><span id="_CPPv2N4tNFA5State5StateEv"></span><span id="tNFA::State::State"></span><span class="target" id="structtNFA_1_1State_1aa50988d5098919af0a0052135343f7e5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">State</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFA5State5StateEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA5State5transE">
+<span id="_CPPv3N4tNFA5State5transE"></span><span id="_CPPv2N4tNFA5State5transE"></span><span id="tNFA::State::trans__std::map:s.Transition:"></span><span class="target" id="structtNFA_1_1State_1ad89c6549c6b5698eff6267930fff440a"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4tNFA10TransitionE" title="tNFA::Transition"><span class="n"><span class="pre">Transition</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">trans</span></span></span><a class="headerlink" href="#_CPPv4N4tNFA5State5transE" title="Link to this definition"></a><br /></dt>
+<dd><p>What symbol transitions are available? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA5State7free_toE">
+<span id="_CPPv3N4tNFA5State7free_toE"></span><span id="_CPPv2N4tNFA5State7free_toE"></span><span id="tNFA::State::free_to__std::set:s:"></span><span class="target" id="structtNFA_1_1State_1a282971c4f8d0bb595eac1a794d193b7c"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">free_to</span></span></span><a class="headerlink" href="#_CPPv4N4tNFA5State7free_toE" title="Link to this definition"></a><br /></dt>
+<dd><p>What other states can you move to for free? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA5State9free_fromE">
+<span id="_CPPv3N4tNFA5State9free_fromE"></span><span id="_CPPv2N4tNFA5State9free_fromE"></span><span id="tNFA::State::free_from__std::set:s:"></span><span class="target" id="structtNFA_1_1State_1af16fd51f791f10f4d3f41776772deb4f"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">free_from</span></span></span><a class="headerlink" href="#_CPPv4N4tNFA5State9free_fromE" title="Link to this definition"></a><br /></dt>
+<dd><p>What other states can move here for free? </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA10TransitionE">
+<span id="_CPPv3N4tNFA10TransitionE"></span><span id="_CPPv2N4tNFA10TransitionE"></span><span id="tNFA::Transition"></span><span class="target" id="structtNFA_1_1Transition"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Transition</span></span></span><a class="headerlink" href="#_CPPv4N4tNFA10TransitionE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA10Transition10TransitionEv">
+<span id="_CPPv3N4tNFA10Transition10TransitionEv"></span><span id="_CPPv2N4tNFA10Transition10TransitionEv"></span><span id="tNFA::Transition::Transition"></span><span class="target" id="structtNFA_1_1Transition_1aabf8156ee1adae3371849f6dd17c895f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Transition</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4tNFA10Transition10TransitionEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4tNFA10Transition7symbolsE">
+<span id="_CPPv3N4tNFA10Transition7symbolsE"></span><span id="_CPPv2N4tNFA10Transition7symbolsE"></span><span id="tNFA::Transition::symbols__opts_t"></span><span class="target" id="structtNFA_1_1Transition_1aaef628c1146410f84bb686d5b185875a"></span><a class="reference internal" href="#_CPPv4N4tNFA6opts_tE" title="tNFA::opts_t"><span class="n"><span class="pre">opts_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">symbols</span></span></span><a class="headerlink" href="#_CPPv4N4tNFA10Transition7symbolsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_t0E10tNFA_State">
+<span id="_CPPv3I_6size_t0E10tNFA_State"></span><span id="_CPPv2I_6size_t0E10tNFA_State"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NUM_SYMBOLS</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">128</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">STOP_TYPE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classtNFA__State"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tNFA_State</span></span></span><a class="headerlink" href="#_CPPv4I_6size_t0E10tNFA_State" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;NFA.hpp&gt;</em></div>
+<p>Information about the current full state (i.e., set of legal states) of an NFA. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10tNFA_State10tNFA_StateERK4tNFAI11NUM_SYMBOLS9STOP_TYPEE">
+<span id="_CPPv3N10tNFA_State10tNFA_StateERK4tNFAI11NUM_SYMBOLS9STOP_TYPEE"></span><span id="_CPPv2N10tNFA_State10tNFA_StateERK4tNFAI11NUM_SYMBOLS9STOP_TYPEE"></span><span id="tNFA_State::tNFA_State__tNFA:NUM_SYMBOLS.STOP_TYPE:CR"></span><span class="target" id="classtNFA__State_1a2a2d7357147714934acc8973f9eb5bb3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tNFA_State</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA"><span class="n"><span class="pre">tNFA</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t0E10tNFA_State" title="tNFA_State::NUM_SYMBOLS"><span class="n"><span class="pre">NUM_SYMBOLS</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E10tNFA_State" title="tNFA_State::STOP_TYPE"><span class="n"><span class="pre">STOP_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_nfa</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10tNFA_State10tNFA_StateERK4tNFAI11NUM_SYMBOLS9STOP_TYPEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10tNFA_StateD0Ev">
+<span id="_CPPv3N10tNFA_StateD0Ev"></span><span id="_CPPv2N10tNFA_StateD0Ev"></span><span id="tNFA_State::~tNFA_State"></span><span class="target" id="classtNFA__State_1ac260f8690c74f26d4a2c339947d174f8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~tNFA_State</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10tNFA_StateD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10tNFA_State6GetNFAEv">
+<span id="_CPPv3NK10tNFA_State6GetNFAEv"></span><span id="_CPPv2NK10tNFA_State6GetNFAEv"></span><span id="tNFA_State::GetNFAC"></span><span class="target" id="classtNFA__State_1a6c8651372359f9e77dbcd13d17403dec"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA"><span class="n"><span class="pre">tNFA</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t0E10tNFA_State" title="tNFA_State::NUM_SYMBOLS"><span class="n"><span class="pre">NUM_SYMBOLS</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E10tNFA_State" title="tNFA_State::STOP_TYPE"><span class="n"><span class="pre">STOP_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetNFA</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10tNFA_State6GetNFAEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the NFA associated with this state. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10tNFA_State11GetStateSetEv">
+<span id="_CPPv3NK10tNFA_State11GetStateSetEv"></span><span id="_CPPv2NK10tNFA_State11GetStateSetEv"></span><span id="tNFA_State::GetStateSetC"></span><span class="target" id="classtNFA__State_1a7494917f825c44441cf354257cf457d7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetStateSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10tNFA_State11GetStateSetEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a set of states that are currently active. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10tNFA_State8IsActiveEv">
+<span id="_CPPv3NK10tNFA_State8IsActiveEv"></span><span id="_CPPv2NK10tNFA_State8IsActiveEv"></span><span id="tNFA_State::IsActiveC"></span><span class="target" id="classtNFA__State_1a5cb008e21ffb6b725ffbd7a92b2338bb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsActive</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10tNFA_State8IsActiveEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Are there currently any legal NFA states? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10tNFA_State6IsStopEv">
+<span id="_CPPv3NK10tNFA_State6IsStopEv"></span><span id="_CPPv2NK10tNFA_State6IsStopEv"></span><span id="tNFA_State::IsStopC"></span><span class="target" id="classtNFA__State_1ab3d3580004f3bb38c0a00742cfb09c29"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsStop</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10tNFA_State6IsStopEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Can we legally stop in any of the current states? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10tNFA_State8HasStateE6size_t">
+<span id="_CPPv3N10tNFA_State8HasStateE6size_t"></span><span id="_CPPv2N10tNFA_State8HasStateE6size_t"></span><span id="tNFA_State::HasState__s"></span><span class="target" id="classtNFA__State_1a77c7c938336da5c670fbf3a694b1b23e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasState</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10tNFA_State8HasStateE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Is a particular NFA state currently included? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10tNFA_State7GetSizeEv">
+<span id="_CPPv3N10tNFA_State7GetSizeEv"></span><span id="_CPPv2N10tNFA_State7GetSizeEv"></span><span id="tNFA_State::GetSize"></span><span class="target" id="classtNFA__State_1a9f1495dcb2b0d464248fc7a79754d3f3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10tNFA_State7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many states are currently included? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10tNFA_State11SetStateSetERKNSt3setI6size_tEE">
+<span id="_CPPv3N10tNFA_State11SetStateSetERKNSt3setI6size_tEE"></span><span id="_CPPv2N10tNFA_State11SetStateSetERKNSt3setI6size_tEE"></span><span id="tNFA_State::SetStateSet__std::set:s:CR"></span><span class="target" id="classtNFA__State_1a93c92c3b6128a6d540163bd59dfbe8bd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetStateSet</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10tNFA_State11SetStateSetERKNSt3setI6size_tEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the current states. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10tNFA_State5ResetEv">
+<span id="_CPPv3N10tNFA_State5ResetEv"></span><span id="_CPPv2N10tNFA_State5ResetEv"></span><span id="tNFA_State::Reset"></span><span class="target" id="classtNFA__State_1a710f4e59630bb709cdf370876cc8896c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Reset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10tNFA_State5ResetEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Change current states to start + free transitions from start. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10tNFA_State4NextE6size_t">
+<span id="_CPPv3N10tNFA_State4NextE6size_t"></span><span id="_CPPv2N10tNFA_State4NextE6size_t"></span><span id="tNFA_State::Next__s"></span><span class="target" id="classtNFA__State_1af3b8b0baea72fbc4a64c3b8587dd12ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Next</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sym</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10tNFA_State4NextE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Update states given a new input symbol. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10tNFA_State4NextERKNSt6stringE">
+<span id="_CPPv3N10tNFA_State4NextERKNSt6stringE"></span><span id="_CPPv2N10tNFA_State4NextERKNSt6stringE"></span><span id="tNFA_State::Next__ssCR"></span><span class="target" id="classtNFA__State_1a686967cc849e1f25aaf80320d5c026a5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Next</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sym_set</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10tNFA_State4NextERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Update states given a new series of input symbols (as a string) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10tNFA_State5PrintEv">
+<span id="_CPPv3N10tNFA_State5PrintEv"></span><span id="_CPPv2N10tNFA_State5PrintEv"></span><span id="tNFA_State::Print"></span><span class="target" id="classtNFA__State_1a3ade343ca726d0f2e71e455dbbb83e51"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10tNFA_State5PrintEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Print out current information about this NFA State (for debugging) </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10tNFA_State3nfaE">
+<span id="_CPPv3N10tNFA_State3nfaE"></span><span id="_CPPv2N10tNFA_State3nfaE"></span><span id="tNFA_State::nfa__tNFA:NUM_SYMBOLS.STOP_TYPE:CR"></span><span class="target" id="classtNFA__State_1a591e1bc2b42cb12f3c8cabab8a11edca"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E4tNFA" title="tNFA"><span class="n"><span class="pre">tNFA</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t0E10tNFA_State" title="tNFA_State::NUM_SYMBOLS"><span class="n"><span class="pre">NUM_SYMBOLS</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E10tNFA_State" title="tNFA_State::STOP_TYPE"><span class="n"><span class="pre">STOP_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">nfa</span></span></span><a class="headerlink" href="#_CPPv4N10tNFA_State3nfaE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which NFA is this state set associated with? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10tNFA_State9state_setE">
+<span id="_CPPv3N10tNFA_State9state_setE"></span><span id="_CPPv2N10tNFA_State9state_setE"></span><span id="tNFA_State::state_set__std::set:s:"></span><span class="target" id="classtNFA__State_1a97400cca4fc46d474cef81ecb5c82085"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">state_set</span></span></span><a class="headerlink" href="#_CPPv4N10tNFA_State9state_setE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which states are currently legal? </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Lexer.html" class="btn btn-neutral float-left" title="Lexer.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RegEx.html" class="btn btn-neutral float-right" title="RegEx.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

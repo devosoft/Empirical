@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>combos.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/math/api/combos.225c412f-800f-4bc9-aa9d-2305f4b48a3d.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="constants.hpp" href="constants.html" />
+    <link rel="prev" title="RangeSet.hpp" href="RangeSet.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../math.html">Math</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../math.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="CombinedBinomialDistribution.html">CombinedBinomialDistribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Distribution.html">Distribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DistributionSet.html">DistributionSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Fraction.html">Fraction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Random.html">Random.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Range.html">Range.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RangeSet.html">RangeSet.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">combos.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv48ComboIDs"><code class="docutils literal notranslate"><span class="pre">ComboIDs</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="constants.html">constants.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="distances.html">distances.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="info_theory.html">info_theory.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="math.html">math.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="random_utils.html">random_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sequence_utils.html">sequence_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spatial_stats.html">spatial_stats.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stats.html">stats.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../math.html">Math</a></li>
+      <li class="breadcrumb-item active">combos.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="combos-hpp">
+<h1>combos.hpp<a class="headerlink" href="#combos-hpp" title="Link to this heading"></a></h1>
+<p>Tools to step through combinations of items. </p>
+<p>Step through all combinations of size K from a set of N values. For ComboIDs just return the indecies (the specific of the container don’t matter). Other versions will directly wrapper containers.</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Allow a minimum and maximum combo size, not just a fixed combo size. If no sizes are specifed, all sizes should be explored (all possible combinations). </p>
+<p>Create a ComboGenerator template to take a container and generate all combinations </p>
+<p>Create a combos function that will build a ComboGenerator for the container type passed in. </p>
+</dd></dl>
+
+</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv48ComboIDs">
+<span id="_CPPv38ComboIDs"></span><span id="_CPPv28ComboIDs"></span><span id="ComboIDs"></span><span class="target" id="classComboIDs"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ComboIDs</span></span></span><a class="headerlink" href="#_CPPv48ComboIDs" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;combos.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDs8ComboIDsE6size_t6size_t">
+<span id="_CPPv3N8ComboIDs8ComboIDsE6size_t6size_t"></span><span id="_CPPv2N8ComboIDs8ComboIDsE6size_t6size_t"></span><span id="ComboIDs::ComboIDs__s.s"></span><span class="target" id="classComboIDs_1a14a47a2f6b8812e0679863983c811029"></span><span class="sig-name descname"><span class="n"><span class="pre">ComboIDs</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_max</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">combo_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8ComboIDs8ComboIDsE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDsD0Ev">
+<span id="_CPPv3N8ComboIDsD0Ev"></span><span id="_CPPv2N8ComboIDsD0Ev"></span><span id="ComboIDs::~ComboIDs"></span><span class="target" id="classComboIDs_1a4bb87bbd9ec0257ac917855a0d7f3920"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~ComboIDs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8ComboIDsD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8ComboIDs8GetComboEv">
+<span id="_CPPv3NK8ComboIDs8GetComboEv"></span><span id="_CPPv2NK8ComboIDs8GetComboEv"></span><span id="ComboIDs::GetComboC"></span><span class="target" id="classComboIDs_1a154a184eab78c2d139a69a3a0a227629"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetCombo</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8ComboIDs8GetComboEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8ComboIDs11GetMaxComboEv">
+<span id="_CPPv3NK8ComboIDs11GetMaxComboEv"></span><span id="_CPPv2NK8ComboIDs11GetMaxComboEv"></span><span id="ComboIDs::GetMaxComboC"></span><span class="target" id="classComboIDs_1a2d70e75947d580309d98a6c0ce6059b7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetMaxCombo</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8ComboIDs11GetMaxComboEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8ComboIDs12GetComboSizeEv">
+<span id="_CPPv3NK8ComboIDs12GetComboSizeEv"></span><span id="_CPPv2NK8ComboIDs12GetComboSizeEv"></span><span id="ComboIDs::GetComboSizeC"></span><span class="target" id="classComboIDs_1ab5ae82fda732a7677e069c25fdb72db2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetComboSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8ComboIDs12GetComboSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8ComboIDs12GetNumCombosEv">
+<span id="_CPPv3NK8ComboIDs12GetNumCombosEv"></span><span id="_CPPv2NK8ComboIDs12GetNumCombosEv"></span><span id="ComboIDs::GetNumCombosC"></span><span class="target" id="classComboIDs_1a2ca5b988a518d8c9760ba3c0b8c4f07d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumCombos</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8ComboIDs12GetNumCombosEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDsixEK6size_t">
+<span id="_CPPv3N8ComboIDsixEK6size_t"></span><span id="_CPPv2N8ComboIDsixEK6size_t"></span><span id="ComboIDs::subscript-operator__sC"></span><span class="target" id="classComboIDs_1a9253ddadc93508fe091ca69d1a910db9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8ComboIDsixEK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8ComboIDsixEK6size_t">
+<span id="_CPPv3NK8ComboIDsixEK6size_t"></span><span id="_CPPv2NK8ComboIDsixEK6size_t"></span><span id="ComboIDs::subscript-operator__sCC"></span><span class="target" id="classComboIDs_1a08bc7ea2e19fc23b7c0debdb9df9932f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8ComboIDsixEK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDs5ResetEv">
+<span id="_CPPv3N8ComboIDs5ResetEv"></span><span id="_CPPv2N8ComboIDs5ResetEv"></span><span id="ComboIDs::Reset"></span><span class="target" id="classComboIDs_1af2ceff699e26129e498128f9cbf5b2e4"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Reset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8ComboIDs5ResetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDs9NextComboEv">
+<span id="_CPPv3N8ComboIDs9NextComboEv"></span><span id="_CPPv2N8ComboIDs9NextComboEv"></span><span id="ComboIDs::NextCombo"></span><span class="target" id="classComboIDs_1ae919fdf0648ffc4b105a64de84fc9239"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NextCombo</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8ComboIDs9NextComboEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDs12ResizeCombosE6size_t">
+<span id="_CPPv3N8ComboIDs12ResizeCombosE6size_t"></span><span id="_CPPv2N8ComboIDs12ResizeCombosE6size_t"></span><span id="ComboIDs::ResizeCombos__s"></span><span class="target" id="classComboIDs_1aa7b0e722b71bdfd6f5e34e5ce65b3b8e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResizeCombos</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8ComboIDs12ResizeCombosE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDs15GetInverseComboEv">
+<span id="_CPPv3N8ComboIDs15GetInverseComboEv"></span><span id="_CPPv2N8ComboIDs15GetInverseComboEv"></span><span id="ComboIDs::GetInverseCombo"></span><span class="target" id="classComboIDs_1a5866212b0eaee92b329de75a69e32115"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetInverseCombo</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8ComboIDs15GetInverseComboEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDsppEv">
+<span id="_CPPv3N8ComboIDsppEv"></span><span id="_CPPv2N8ComboIDsppEv"></span><span id="ComboIDs::inc-operator"></span><span class="target" id="classComboIDs_1ac4ad7192a131057229b8a2b55940de08"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ComboIDs" title="ComboIDs"><span class="n"><span class="pre">ComboIDs</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">++</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8ComboIDsppEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDsppEi">
+<span id="_CPPv3N8ComboIDsppEi"></span><span id="_CPPv2N8ComboIDsppEi"></span><span id="ComboIDs::inc-operator__i"></span><span class="target" id="classComboIDs_1a09746fa2c98472c7a2863b1537624298"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ComboIDs" title="ComboIDs"><span class="n"><span class="pre">ComboIDs</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">++</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8ComboIDsppEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDs4sizeEv">
+<span id="_CPPv3N8ComboIDs4sizeEv"></span><span id="_CPPv2N8ComboIDs4sizeEv"></span><span id="ComboIDs::size"></span><span class="target" id="classComboIDs_1a09e679749e4a173f1613cf340edd179a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8ComboIDs4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDs9max_countE">
+<span id="_CPPv3N8ComboIDs9max_countE"></span><span id="_CPPv2N8ComboIDs9max_countE"></span><span id="ComboIDs::max_count__s"></span><span class="target" id="classComboIDs_1aa89ab057228a94782ade1da2f5dc3e03"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_count</span></span></span><a class="headerlink" href="#_CPPv4N8ComboIDs9max_countE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDs9cur_comboE">
+<span id="_CPPv3N8ComboIDs9cur_comboE"></span><span id="_CPPv2N8ComboIDs9cur_comboE"></span><span id="ComboIDs::cur_combo__vector:s:"></span><span class="target" id="classComboIDs_1a4330dd7b41ea7964fa9d721335a6abef"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cur_combo</span></span></span><a class="headerlink" href="#_CPPv4N8ComboIDs9cur_comboE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDs9max_comboE">
+<span id="_CPPv3N8ComboIDs9max_comboE"></span><span id="_CPPv2N8ComboIDs9max_comboE"></span><span id="ComboIDs::max_combo__vector:s:"></span><span class="target" id="classComboIDs_1a140b7f469e138e321e97698738a0b438"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_combo</span></span></span><a class="headerlink" href="#_CPPv4N8ComboIDs9max_comboE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDs10num_combosE">
+<span id="_CPPv3N8ComboIDs10num_combosE"></span><span id="_CPPv2N8ComboIDs10num_combosE"></span><span id="ComboIDs::num_combos__s"></span><span class="target" id="classComboIDs_1a2fb8abbee414c80acc8338eab4f1da11"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_combos</span></span></span><a class="headerlink" href="#_CPPv4N8ComboIDs10num_combosE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-static-functions">Private Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8ComboIDs11CountCombosE6size_t6size_t">
+<span id="_CPPv3N8ComboIDs11CountCombosE6size_t6size_t"></span><span id="_CPPv2N8ComboIDs11CountCombosE6size_t6size_t"></span><span id="ComboIDs::CountCombos__s.s"></span><span class="target" id="classComboIDs_1a66ce2af6a08a1296e6d028d4159c1cb0"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountCombos</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_count</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">combo_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8ComboIDs11CountCombosE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RangeSet.html" class="btn btn-neutral float-left" title="RangeSet.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="constants.html" class="btn btn-neutral float-right" title="constants.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

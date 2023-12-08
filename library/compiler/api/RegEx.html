@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RegEx.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/compiler/api/RegEx.eb70c490-3684-4ee6-aa94-7712a5a85afe.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="lexer_utils.hpp" href="lexer_utils.html" />
+    <link rel="prev" title="NFA.hpp" href="NFA.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../compiler.html">Compiler</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../compiler.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="DFA.html">DFA.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Lexer.html">Lexer.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NFA.html">NFA.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">RegEx.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv46to_NFARK5RegEx6size_t"><code class="docutils literal notranslate"><span class="pre">to_NFA()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv46to_DFARK5RegEx"><code class="docutils literal notranslate"><span class="pre">to_DFA()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv45RegEx"><code class="docutils literal notranslate"><span class="pre">RegEx</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lexer_utils.html">lexer_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="regex_utils.html">regex_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../compiler.html">Compiler</a></li>
+      <li class="breadcrumb-item active">RegEx.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="regex-hpp">
+<h1>RegEx.hpp<a class="headerlink" href="#regex-hpp" title="Link to this heading"></a></h1>
+<p>Basic regular expression handler. </p>
+<p>
+A fully (well, mostly) functional regular expression processor.</p>
+<p><p>Special chars: ‘|’ - or ‘*’ - zero or more of previous ‘+’ - one or more of previous ‘?’ - previous is optional ‘.’ - Match any character except</p>
+<p>Plus the following group contents (and change may translation rules) ‘(’ and ‘)’ - group contents ‘”’ - Ignore special characters in contents (quotes still need to be escaped) ‘[’ and ‘]’ - character set</p>
+&amp;#8212; choose ONE character ‘^’ as first char negates contents ‘-’ indicates range UNLESS first or last.</p>
+<p>Additional overloads for functions in lexer_utils.h:</p>
+<p>static NFA to_NFA(const RegEx &amp; regex, int stop_id=1); static DFA to_DFA(const RegEx &amp; regex);</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Implement ^ and $ (beginning and end of line) </p>
+<p>Implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respectively) </p>
+<p>Implement \d (for digits), \s (for whitespace), etc. </p>
+<p>Consider a separator (maybe backtick?) to divide up a regex expression; the result can be returned by each section as a vector of strings. </p>
+</dd></dl>
+
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA</p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv46to_NFARK5RegEx6size_t">
+<span id="_CPPv36to_NFARK5RegEx6size_t"></span><span id="_CPPv26to_NFARK5RegEx6size_t"></span><span id="to_NFA__RegExCR.s"></span><span class="target" id="RegEx_8hpp_1af795231c51f8ed5ec4cea33e96ce5739"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="NFA.html#_CPPv43NFA" title="NFA"><span class="n"><span class="pre">NFA</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">to_NFA</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45RegEx" title="RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">regex</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop_id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv46to_NFARK5RegEx6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Simple conversion of RegEx to NFA (mostly implemented in RegEx) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv46to_DFARK5RegEx">
+<span id="_CPPv36to_DFARK5RegEx"></span><span id="_CPPv26to_DFARK5RegEx"></span><span id="to_DFA__RegExCR"></span><span class="target" id="RegEx_8hpp_1ad98491cb6e0de7f368d60030032160eb"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="DFA.html#_CPPv43DFA" title="DFA"><span class="n"><span class="pre">DFA</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">to_DFA</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45RegEx" title="RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">regex</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv46to_DFARK5RegEx" title="Link to this definition"></a><br /></dt>
+<dd><p>Conversion of RegEx to DFA, via NFA intermediate. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv45RegEx">
+<span id="_CPPv35RegEx"></span><span id="_CPPv25RegEx"></span><span id="RegEx"></span><span class="target" id="classRegEx"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RegEx</span></span></span><a class="headerlink" href="#_CPPv45RegEx" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;RegEx.hpp&gt;</em></div>
+<p>A basic regular expression handler. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx5RegExEv">
+<span id="_CPPv3N5RegEx5RegExEv"></span><span id="_CPPv2N5RegEx5RegExEv"></span><span id="RegEx::RegEx"></span><span class="target" id="classRegEx_1a2ccf0ec26b72795461ad53a86d146752"></span><span class="sig-name descname"><span class="n"><span class="pre">RegEx</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N5RegEx5RegExEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx5RegExERKNSt6stringE">
+<span id="_CPPv3N5RegEx5RegExERKNSt6stringE"></span><span id="_CPPv2N5RegEx5RegExERKNSt6stringE"></span><span id="RegEx::RegEx__ssCR"></span><span class="target" id="classRegEx_1aaf898055d7ecd015c66e998514231051"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RegEx</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx5RegExERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx5RegExERK5RegEx">
+<span id="_CPPv3N5RegEx5RegExERK5RegEx"></span><span id="_CPPv2N5RegEx5RegExERK5RegEx"></span><span id="RegEx::RegEx__RegExCR"></span><span class="target" id="classRegEx_1af2922af31dd4667db9d978468d93fe44"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RegEx</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5RegEx5RegExERK5RegEx" title="RegEx::RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx5RegExERK5RegEx" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegExD0Ev">
+<span id="_CPPv3N5RegExD0Ev"></span><span id="_CPPv2N5RegExD0Ev"></span><span id="RegEx::~RegEx"></span><span class="target" id="classRegEx_1a4b914d4a518ce6ba6e636be05751abcc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~RegEx</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegExD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegExaSERK5RegEx">
+<span id="_CPPv3N5RegExaSERK5RegEx"></span><span id="_CPPv2N5RegExaSERK5RegEx"></span><span id="RegEx::assign-operator__RegExCR"></span><span class="target" id="classRegEx_1a30061db1344651b6af8aaeaa9988ded4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45RegEx" title="RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45RegEx" title="RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegExaSERK5RegEx" title="Link to this definition"></a><br /></dt>
+<dd><p>Set this RegEx equal to another. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx8AsStringEv">
+<span id="_CPPv3NK5RegEx8AsStringEv"></span><span id="_CPPv2NK5RegEx8AsStringEv"></span><span id="RegEx::AsStringC"></span><span class="target" id="classRegEx_1a1ac70f3ab9f0be7b7cabbe669b36cda9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5RegEx8AsStringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert the RegEx to an standard string, readable from outsite this class. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx8AddToNFAER3NFA6size_t6size_t">
+<span id="_CPPv3NK5RegEx8AddToNFAER3NFA6size_t6size_t"></span><span id="_CPPv2NK5RegEx8AddToNFAER3NFA6size_t6size_t"></span><span id="RegEx::AddToNFA__NFAR.s.sC"></span><span class="target" id="classRegEx_1ab608016883a6e5a226c07ec4aa57ca33"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddToNFA</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="NFA.html#_CPPv43NFA" title="NFA"><span class="n"><span class="pre">NFA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nfa</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5RegEx8AddToNFAER3NFA6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Add this regex to an NFA being built. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx8GenerateEv">
+<span id="_CPPv3NK5RegEx8GenerateEv"></span><span id="_CPPv2NK5RegEx8GenerateEv"></span><span id="RegEx::GenerateC"></span><span class="target" id="classRegEx_1af6f8af3571bec840cd9d7b7e77f334b1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Generate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5RegEx8GenerateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Assume the RegEx is ready and setup processing for it. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx4TestERKNSt6stringE">
+<span id="_CPPv3NK5RegEx4TestERKNSt6stringE"></span><span id="_CPPv2NK5RegEx4TestERKNSt6stringE"></span><span id="RegEx::Test__ssCRC"></span><span class="target" id="classRegEx_1aa362f45f6310b8a2a9fd1aba30f193cb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Test</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">str</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5RegEx4TestERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if a string statisfies this regex. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx13PrintInternalEv">
+<span id="_CPPv3NK5RegEx13PrintInternalEv"></span><span id="_CPPv2NK5RegEx13PrintInternalEv"></span><span id="RegEx::PrintInternalC"></span><span class="target" id="classRegEx_1a8b5ac1860872f62f3d46c50c92c598e2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintInternal</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5RegEx13PrintInternalEv" title="Link to this definition"></a><br /></dt>
+<dd><p>For debugging: print the internal representation of the regex. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx10PrintNotesEv">
+<span id="_CPPv3NK5RegEx10PrintNotesEv"></span><span id="_CPPv2NK5RegEx10PrintNotesEv"></span><span id="RegEx::PrintNotesC"></span><span class="target" id="classRegEx_1a15f14129cffc21e581796524805638ec"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintNotes</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5RegEx10PrintNotesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>For debugging: print any internal notes generated about this regex. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx10PrintDebugEv">
+<span id="_CPPv3NK5RegEx10PrintDebugEv"></span><span id="_CPPv2NK5RegEx10PrintDebugEv"></span><span id="RegEx::PrintDebugC"></span><span class="target" id="classRegEx_1a6a87340722c7b29159912f7e97703998"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintDebug</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5RegEx10PrintDebugEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Print general debuging information about this regex. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx6opts_tE">
+<span id="_CPPv3N5RegEx6opts_tE"></span><span id="_CPPv2N5RegEx6opts_tE"></span><span class="target" id="classRegEx_1a8cdc804da1dc3a3e36609c7274c6f385"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opts_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4I_6size_tE6BitSet" title="BitSet"><span class="n"><span class="pre">BitSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx11NUM_SYMBOLSE" title="RegEx::NUM_SYMBOLS"><span class="n"><span class="pre">NUM_SYMBOLS</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N5RegEx6opts_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN5RegEx5ErrorEvDpRR1T">
+<span id="_CPPv3IDpEN5RegEx5ErrorEDpRR1T"></span><span id="_CPPv2IDpEN5RegEx5ErrorEDpRR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classRegEx_1a8f3ebc07e5d4e4c43883187cb81327f2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Error</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN5RegEx5ErrorEvDpRR1T" title="RegEx::Error::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN5RegEx5ErrorEvDpRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx10EnsureNextEc">
+<span id="_CPPv3N5RegEx10EnsureNextEc"></span><span id="_CPPv2N5RegEx10EnsureNextEc"></span><span id="RegEx::EnsureNext__c"></span><span class="target" id="classRegEx_1a8c4a805e5dbbf642999ff875d937adbd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EnsureNext</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx10EnsureNextEc" title="Link to this definition"></a><br /></dt>
+<dd><p>Make sure that there is another element in the RegEx (e.g., after an ‘|’) or else trigger and error to report the problem. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx12ConstructSetEv">
+<span id="_CPPv3N5RegEx12ConstructSetEv"></span><span id="_CPPv2N5RegEx12ConstructSetEv"></span><span id="RegEx::ConstructSet"></span><span class="target" id="classRegEx_1ac34b12edded7f41061c142cc9b8825f3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx10re_charsetE" title="RegEx::re_charset"><span class="n"><span class="pre">re_charset</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ConstructSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx12ConstructSetEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a character range. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx15ConstructStringEv">
+<span id="_CPPv3N5RegEx15ConstructStringEv"></span><span id="_CPPv2N5RegEx15ConstructStringEv"></span><span id="RegEx::ConstructString"></span><span class="target" id="classRegEx_1a4dc1fae624a48113961e5e6d2c4e2535"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx9re_stringE" title="RegEx::re_string"><span class="n"><span class="pre">re_string</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ConstructString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx15ConstructStringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a string, loading everything needed. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx16ConstructSegmentEv">
+<span id="_CPPv3N5RegEx16ConstructSegmentEv"></span><span id="_CPPv2N5RegEx16ConstructSegmentEv"></span><span id="RegEx::ConstructSegment"></span><span class="target" id="classRegEx_1ac3d3bd1f68c4801a37c4b5436518dece"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx7re_baseE" title="RegEx::re_base"><span class="n"><span class="pre">re_base</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ConstructSegment</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx16ConstructSegmentEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Should only be called when we know we have a single unit to produce. Build and return it. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx7ProcessE3PtrI8re_blockE">
+<span id="_CPPv3N5RegEx7ProcessE3PtrI8re_blockE"></span><span id="_CPPv2N5RegEx7ProcessE3PtrI8re_blockE"></span><span id="RegEx::Process__Ptr:re_block:"></span><span class="target" id="classRegEx_1aeade0bb4eacbd93fce1ea088fdcb771a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx8re_blockE" title="RegEx::re_block"><span class="n"><span class="pre">re_block</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Process</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx8re_blockE" title="RegEx::re_block"><span class="n"><span class="pre">re_block</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cur_block</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx7ProcessE3PtrI8re_blockE" title="Link to this definition"></a><br /></dt>
+<dd><p>Process the input regex into a tree representaion. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx5regexE">
+<span id="_CPPv3N5RegEx5regexE"></span><span id="_CPPv2N5RegEx5regexE"></span><span id="RegEx::regex__ss"></span><span class="target" id="classRegEx_1a4289a755cf62790cf9ee74a2c1d554fb"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">regex</span></span></span><a class="headerlink" href="#_CPPv4N5RegEx5regexE" title="Link to this definition"></a><br /></dt>
+<dd><p>Original string to define this RegEx. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx5notesE">
+<span id="_CPPv3N5RegEx5notesE"></span><span id="_CPPv2N5RegEx5notesE"></span><span id="RegEx::notes__vector:ss:"></span><span class="target" id="classRegEx_1a2947182a2d304ede92a6a50071a560f0"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">notes</span></span></span><a class="headerlink" href="#_CPPv4N5RegEx5notesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Any warnings or errors would be provided here. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx5validE">
+<span id="_CPPv3N5RegEx5validE"></span><span id="_CPPv2N5RegEx5validE"></span><span id="RegEx::valid__b"></span><span class="target" id="classRegEx_1aeca0ca4cf42a711428237f5577dddfd0"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">valid</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><a class="headerlink" href="#_CPPv4N5RegEx5validE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set to false if regex cannot be processed. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx3posE">
+<span id="_CPPv3N5RegEx3posE"></span><span id="_CPPv2N5RegEx3posE"></span><span id="RegEx::pos__s"></span><span class="target" id="classRegEx_1a3db5a780b9a26ed94b65757831545daa"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pos</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N5RegEx3posE" title="Link to this definition"></a><br /></dt>
+<dd><p>Position being read in regex. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx3dfaE">
+<span id="_CPPv3N5RegEx3dfaE"></span><span id="_CPPv2N5RegEx3dfaE"></span><span id="RegEx::dfa__DFA"></span><span class="target" id="classRegEx_1a36f9be1f858b2836342649ceaa29bbcf"></span><span class="k"><span class="pre">mutable</span></span><span class="w"> </span><a class="reference internal" href="DFA.html#_CPPv43DFA" title="DFA"><span class="n"><span class="pre">DFA</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dfa</span></span></span><a class="headerlink" href="#_CPPv4N5RegEx3dfaE" title="Link to this definition"></a><br /></dt>
+<dd><p>DFA that this RegEx translates to. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9dfa_readyE">
+<span id="_CPPv3N5RegEx9dfa_readyE"></span><span id="_CPPv2N5RegEx9dfa_readyE"></span><span id="RegEx::dfa_ready__b"></span><span class="target" id="classRegEx_1a5c208c5332ce090fe44bff2bff8a25b9"></span><span class="k"><span class="pre">mutable</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dfa_ready</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N5RegEx9dfa_readyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Is the dfa ready? (or does it need to be generated?) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx4headE">
+<span id="_CPPv3N5RegEx4headE"></span><span id="_CPPv2N5RegEx4headE"></span><span id="RegEx::head__re_block"></span><span class="target" id="classRegEx_1a3dd299ef39f1b19a667e012fb1ade830"></span><a class="reference internal" href="#_CPPv4N5RegEx8re_blockE" title="RegEx::re_block"><span class="n"><span class="pre">re_block</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">head</span></span></span><a class="headerlink" href="#_CPPv4N5RegEx4headE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-static-attributes">Private Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx11NUM_SYMBOLSE">
+<span id="_CPPv3N5RegEx11NUM_SYMBOLSE"></span><span id="_CPPv2N5RegEx11NUM_SYMBOLSE"></span><span id="RegEx::NUM_SYMBOLS__s"></span><span class="target" id="classRegEx_1a6527fdf3af0d02af9a58535c31c24fe2"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NUM_SYMBOLS</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">128</span></span><a class="headerlink" href="#_CPPv4N5RegEx11NUM_SYMBOLSE" title="Link to this definition"></a><br /></dt>
+<dd><p>Maximum number of symbol the RegEx can handle. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx7re_baseE">
+<span id="_CPPv3N5RegEx7re_baseE"></span><span id="_CPPv2N5RegEx7re_baseE"></span><span id="RegEx::re_base"></span><span class="target" id="structRegEx_1_1re__base"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_base</span></span></span><a class="headerlink" href="#_CPPv4N5RegEx7re_baseE" title="Link to this definition"></a><br /></dt>
+<dd><p>Internal base representation of a portion of a regex. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx7re_baseD0Ev">
+<span id="_CPPv3N5RegEx7re_baseD0Ev"></span><span id="_CPPv2N5RegEx7re_baseD0Ev"></span><span id="RegEx::re_base::~re_base"></span><span class="target" id="structRegEx_1_1re__base_1af84bdb88c96f7c934ac7071477cc79e7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~re_base</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx7re_baseD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx7re_base5PrintERNSt7ostreamE">
+<span id="_CPPv3NK5RegEx7re_base5PrintERNSt7ostreamE"></span><span id="_CPPv2NK5RegEx7re_base5PrintERNSt7ostreamE"></span><span id="RegEx::re_base::Print__osRC"></span><span class="target" id="structRegEx_1_1re__base_1aa5ef6e6b073510e30f8029037d0010cb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5RegEx7re_base5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx7re_base7AsBlockEv">
+<span id="_CPPv3N5RegEx7re_base7AsBlockEv"></span><span id="_CPPv2N5RegEx7re_base7AsBlockEv"></span><span id="RegEx::re_base::AsBlock"></span><span class="target" id="structRegEx_1_1re__base_1af85e0d1237e0b9054550ba8fb81a2835"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx8re_blockE" title="RegEx::re_block"><span class="n"><span class="pre">re_block</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsBlock</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx7re_base7AsBlockEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx7re_base9AsCharSetEv">
+<span id="_CPPv3N5RegEx7re_base9AsCharSetEv"></span><span id="_CPPv2N5RegEx7re_base9AsCharSetEv"></span><span id="RegEx::re_base::AsCharSet"></span><span class="target" id="structRegEx_1_1re__base_1a257abfca343c79b209852c6c72607304"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx10re_charsetE" title="RegEx::re_charset"><span class="n"><span class="pre">re_charset</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsCharSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx7re_base9AsCharSetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx7re_base8AsParentEv">
+<span id="_CPPv3N5RegEx7re_base8AsParentEv"></span><span id="_CPPv2N5RegEx7re_base8AsParentEv"></span><span id="RegEx::re_base::AsParent"></span><span class="target" id="structRegEx_1_1re__base_1ac62232a639e02a82a6862e6b8bc24ac6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx9re_parentE" title="RegEx::re_parent"><span class="n"><span class="pre">re_parent</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsParent</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx7re_base8AsParentEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx7re_base8AsStringEv">
+<span id="_CPPv3N5RegEx7re_base8AsStringEv"></span><span id="_CPPv2N5RegEx7re_base8AsStringEv"></span><span id="RegEx::re_base::AsString"></span><span class="target" id="structRegEx_1_1re__base_1aea14d78a463a418fb4a4ab5f2d0578fb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx9re_stringE" title="RegEx::re_string"><span class="n"><span class="pre">re_string</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx7re_base8AsStringEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx7re_base7GetSizeEv">
+<span id="_CPPv3NK5RegEx7re_base7GetSizeEv"></span><span id="_CPPv2NK5RegEx7re_base7GetSizeEv"></span><span id="RegEx::re_base::GetSizeC"></span><span class="target" id="structRegEx_1_1re__base_1a94140ca3b9a81a04c994272584c39cce"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5RegEx7re_base7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx7re_base8SimplifyEv">
+<span id="_CPPv3N5RegEx7re_base8SimplifyEv"></span><span id="_CPPv2N5RegEx7re_base8SimplifyEv"></span><span id="RegEx::re_base::Simplify"></span><span class="target" id="structRegEx_1_1re__base_1af605221512104b781bd61fae9b4165f2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Simplify</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx7re_base8SimplifyEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx7re_base8AddToNFAER3NFA6size_t6size_t">
+<span id="_CPPv3NK5RegEx7re_base8AddToNFAER3NFA6size_t6size_t"></span><span id="_CPPv2NK5RegEx7re_base8AddToNFAER3NFA6size_t6size_t"></span><span id="RegEx::re_base::AddToNFA__NFAR.s.sC"></span><span class="target" id="structRegEx_1_1re__base_1a50974840c117d5eb1886335d870db890"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddToNFA</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="NFA.html#_CPPv43NFA" title="NFA"><span class="n"><span class="pre">NFA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nfa</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5RegEx7re_base8AddToNFAER3NFA6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx8re_blockE">
+<span id="_CPPv3N5RegEx8re_blockE"></span><span id="_CPPv2N5RegEx8re_blockE"></span><span id="RegEx::re_block"></span><span class="target" id="structRegEx_1_1re__block"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_block</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45RegEx" title="RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5RegEx9re_parentE" title="RegEx::re_parent"><span class="n"><span class="pre">re_parent</span></span></a><a class="headerlink" href="#_CPPv4N5RegEx8re_blockE" title="Link to this definition"></a><br /></dt>
+<dd><p>Representation of a series of components… </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx8re_block5PrintERNSt7ostreamE">
+<span id="_CPPv3NK5RegEx8re_block5PrintERNSt7ostreamE"></span><span id="_CPPv2NK5RegEx8re_block5PrintERNSt7ostreamE"></span><span id="RegEx::re_block::Print__osRC"></span><span class="target" id="structRegEx_1_1re__block_1a742791d7d63c3af4455ff5966f9c403d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx8re_block5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx8re_block7AsBlockEv">
+<span id="_CPPv3N5RegEx8re_block7AsBlockEv"></span><span id="_CPPv2N5RegEx8re_block7AsBlockEv"></span><span id="RegEx::re_block::AsBlock"></span><span class="target" id="structRegEx_1_1re__block_1a5bde645520af23f91d2baffdad65016e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx8re_blockE" title="RegEx::re_block"><span class="n"><span class="pre">re_block</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsBlock</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5RegEx8re_block7AsBlockEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx8re_block8SimplifyEv">
+<span id="_CPPv3N5RegEx8re_block8SimplifyEv"></span><span id="_CPPv2N5RegEx8re_block8SimplifyEv"></span><span id="RegEx::re_block::Simplify"></span><span class="target" id="structRegEx_1_1re__block_1adcaa9a61a29a0841ad5a406cfeaba99f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Simplify</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5RegEx8re_block8SimplifyEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx8re_block8AddToNFAER3NFA6size_t6size_t">
+<span id="_CPPv3NK5RegEx8re_block8AddToNFAER3NFA6size_t6size_t"></span><span id="_CPPv2NK5RegEx8re_block8AddToNFAER3NFA6size_t6size_t"></span><span id="RegEx::re_block::AddToNFA__NFAR.s.sC"></span><span class="target" id="structRegEx_1_1re__block_1a0793711d186756ed3c5c5eeb65d4b5e9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddToNFA</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="NFA.html#_CPPv43NFA" title="NFA"><span class="n"><span class="pre">NFA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nfa</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx8re_block8AddToNFAER3NFA6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx10re_charsetE">
+<span id="_CPPv3N5RegEx10re_charsetE"></span><span id="_CPPv2N5RegEx10re_charsetE"></span><span id="RegEx::re_charset"></span><span class="target" id="structRegEx_1_1re__charset"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_charset</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45RegEx" title="RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5RegEx7re_baseE" title="RegEx::re_base"><span class="n"><span class="pre">re_base</span></span></a><a class="headerlink" href="#_CPPv4N5RegEx10re_charsetE" title="Link to this definition"></a><br /></dt>
+<dd><p>Representation of a character set e.g., [abc]. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx10re_charset10re_charsetEv">
+<span id="_CPPv3N5RegEx10re_charset10re_charsetEv"></span><span id="_CPPv2N5RegEx10re_charset10re_charsetEv"></span><span id="RegEx::re_charset::re_charset"></span><span class="target" id="structRegEx_1_1re__charset_1a40c4afdd0d319ccee4d6ef060a0ef027"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_charset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx10re_charset10re_charsetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx10re_charset10re_charsetEcb">
+<span id="_CPPv3N5RegEx10re_charset10re_charsetEcb"></span><span id="_CPPv2N5RegEx10re_charset10re_charsetEcb"></span><span id="RegEx::re_charset::re_charset__c.b"></span><span class="target" id="structRegEx_1_1re__charset_1a79f2593f2ce2b2aa3947bddfaad41c6f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_charset</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">neg</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx10re_charset10re_charsetEcb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx10re_charset10re_charsetERKNSt6stringEb">
+<span id="_CPPv3N5RegEx10re_charset10re_charsetERKNSt6stringEb"></span><span id="_CPPv2N5RegEx10re_charset10re_charsetERKNSt6stringEb"></span><span id="RegEx::re_charset::re_charset__ssCR.b"></span><span class="target" id="structRegEx_1_1re__charset_1a169a8434767c56aec92a0d4fcb26c067"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_charset</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">neg</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx10re_charset10re_charsetERKNSt6stringEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx10re_charset5PrintERNSt7ostreamE">
+<span id="_CPPv3NK5RegEx10re_charset5PrintERNSt7ostreamE"></span><span id="_CPPv2NK5RegEx10re_charset5PrintERNSt7ostreamE"></span><span id="RegEx::re_charset::Print__osRC"></span><span class="target" id="structRegEx_1_1re__charset_1a6bf9bdc4c0d1a398f84ab256c977d069"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx10re_charset5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx10re_charset9AsCharSetEv">
+<span id="_CPPv3N5RegEx10re_charset9AsCharSetEv"></span><span id="_CPPv2N5RegEx10re_charset9AsCharSetEv"></span><span id="RegEx::re_charset::AsCharSet"></span><span class="target" id="structRegEx_1_1re__charset_1a21cb06ba71639c84f5d1eee974b7d82e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx10re_charsetE" title="RegEx::re_charset"><span class="n"><span class="pre">re_charset</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsCharSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5RegEx10re_charset9AsCharSetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx10re_charset7GetSizeEv">
+<span id="_CPPv3NK5RegEx10re_charset7GetSizeEv"></span><span id="_CPPv2NK5RegEx10re_charset7GetSizeEv"></span><span id="RegEx::re_charset::GetSizeC"></span><span class="target" id="structRegEx_1_1re__charset_1a14c52e59f02da477452f6d3d66cdd83d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx10re_charset7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx10re_charset5FirstEv">
+<span id="_CPPv3NK5RegEx10re_charset5FirstEv"></span><span id="_CPPv2NK5RegEx10re_charset5FirstEv"></span><span id="RegEx::re_charset::FirstC"></span><span class="target" id="structRegEx_1_1re__charset_1a20108cd74515ab64ff3ec37e4c83844e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">First</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5RegEx10re_charset5FirstEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx10re_charset8AddToNFAER3NFA6size_t6size_t">
+<span id="_CPPv3NK5RegEx10re_charset8AddToNFAER3NFA6size_t6size_t"></span><span id="_CPPv2NK5RegEx10re_charset8AddToNFAER3NFA6size_t6size_t"></span><span id="RegEx::re_charset::AddToNFA__NFAR.s.sC"></span><span class="target" id="structRegEx_1_1re__charset_1aaafd6405158dd421da4589e6982ea187"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddToNFA</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="NFA.html#_CPPv43NFA" title="NFA"><span class="n"><span class="pre">NFA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nfa</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx10re_charset8AddToNFAER3NFA6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx10re_charset8char_setE">
+<span id="_CPPv3N5RegEx10re_charset8char_setE"></span><span id="_CPPv2N5RegEx10re_charset8char_setE"></span><span id="RegEx::re_charset::char_set__opts_t"></span><span class="target" id="structRegEx_1_1re__charset_1ac281e2a48dedc5fe23e8f30038c40903"></span><a class="reference internal" href="#_CPPv4N5RegEx6opts_tE" title="RegEx::opts_t"><span class="n"><span class="pre">opts_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">char_set</span></span></span><a class="headerlink" href="#_CPPv4N5RegEx10re_charset8char_setE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx5re_orE">
+<span id="_CPPv3N5RegEx5re_orE"></span><span id="_CPPv2N5RegEx5re_orE"></span><span id="RegEx::re_or"></span><span class="target" id="structRegEx_1_1re__or"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_or</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45RegEx" title="RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5RegEx9re_parentE" title="RegEx::re_parent"><span class="n"><span class="pre">re_parent</span></span></a><a class="headerlink" href="#_CPPv4N5RegEx5re_orE" title="Link to this definition"></a><br /></dt>
+<dd><p>Representation of two options in a regex, e.g., a|b. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx5re_or5re_orE3PtrI7re_baseE3PtrI7re_baseE">
+<span id="_CPPv3N5RegEx5re_or5re_orE3PtrI7re_baseE3PtrI7re_baseE"></span><span id="_CPPv2N5RegEx5re_or5re_orE3PtrI7re_baseE3PtrI7re_baseE"></span><span id="RegEx::re_or::re_or__Ptr:re_base:.Ptr:re_base:"></span><span class="target" id="structRegEx_1_1re__or_1af3191cd54cd8866fda701586fc291a7a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_or</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx7re_baseE" title="RegEx::re_base"><span class="n"><span class="pre">re_base</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">l</span></span>, <a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx7re_baseE" title="RegEx::re_base"><span class="n"><span class="pre">re_base</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx5re_or5re_orE3PtrI7re_baseE3PtrI7re_baseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx5re_or5PrintERNSt7ostreamE">
+<span id="_CPPv3NK5RegEx5re_or5PrintERNSt7ostreamE"></span><span id="_CPPv2NK5RegEx5re_or5PrintERNSt7ostreamE"></span><span id="RegEx::re_or::Print__osRC"></span><span class="target" id="structRegEx_1_1re__or_1aaed1f0dfb70ec1af56e34da29596e9da"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx5re_or5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx5re_or8AddToNFAER3NFA6size_t6size_t">
+<span id="_CPPv3NK5RegEx5re_or8AddToNFAER3NFA6size_t6size_t"></span><span id="_CPPv2NK5RegEx5re_or8AddToNFAER3NFA6size_t6size_t"></span><span id="RegEx::re_or::AddToNFA__NFAR.s.sC"></span><span class="target" id="structRegEx_1_1re__or_1a4578f455bacfce11c5d3eb58a94a434a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddToNFA</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="NFA.html#_CPPv43NFA" title="NFA"><span class="n"><span class="pre">NFA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nfa</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx5re_or8AddToNFAER3NFA6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_parentE">
+<span id="_CPPv3N5RegEx9re_parentE"></span><span id="_CPPv2N5RegEx9re_parentE"></span><span id="RegEx::re_parent"></span><span class="target" id="structRegEx_1_1re__parent"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_parent</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45RegEx" title="RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5RegEx7re_baseE" title="RegEx::re_base"><span class="n"><span class="pre">re_base</span></span></a><a class="headerlink" href="#_CPPv4N5RegEx9re_parentE" title="Link to this definition"></a><br /></dt>
+<dd><p>Intermediate base class for RegEx components that have children (such as “and” and “or”) </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_parent9re_parentEv">
+<span id="_CPPv3N5RegEx9re_parent9re_parentEv"></span><span id="_CPPv2N5RegEx9re_parent9re_parentEv"></span><span id="RegEx::re_parent::re_parent"></span><span class="target" id="structRegEx_1_1re__parent_1a57534367e5bee573dfefa28d97202aa7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_parent</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx9re_parent9re_parentEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_parentD0Ev">
+<span id="_CPPv3N5RegEx9re_parentD0Ev"></span><span id="_CPPv2N5RegEx9re_parentD0Ev"></span><span id="RegEx::re_parent::~re_parent"></span><span class="target" id="structRegEx_1_1re__parent_1adf5719392978c25ee34a1804b903d516"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~re_parent</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx9re_parentD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_parent5ClearEv">
+<span id="_CPPv3N5RegEx9re_parent5ClearEv"></span><span id="_CPPv2N5RegEx9re_parent5ClearEv"></span><span id="RegEx::re_parent::Clear"></span><span class="target" id="structRegEx_1_1re__parent_1a533032cab1c827ea6573ab7d5ab14090"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx9re_parent5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_parent4pushE3PtrI7re_baseE">
+<span id="_CPPv3N5RegEx9re_parent4pushE3PtrI7re_baseE"></span><span id="_CPPv2N5RegEx9re_parent4pushE3PtrI7re_baseE"></span><span id="RegEx::re_parent::push__Ptr:re_base:"></span><span class="target" id="structRegEx_1_1re__parent_1a3db6e4c70f4ab2d0ca68b2a98786cd1b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">push</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx7re_baseE" title="RegEx::re_base"><span class="n"><span class="pre">re_base</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx9re_parent4pushE3PtrI7re_baseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_parent3popEv">
+<span id="_CPPv3N5RegEx9re_parent3popEv"></span><span id="_CPPv2N5RegEx9re_parent3popEv"></span><span id="RegEx::re_parent::pop"></span><span class="target" id="structRegEx_1_1re__parent_1a057e7ad0ef47e62be600ea6413153d4c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx7re_baseE" title="RegEx::re_base"><span class="n"><span class="pre">re_base</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pop</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx9re_parent3popEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx9re_parent7GetSizeEv">
+<span id="_CPPv3NK5RegEx9re_parent7GetSizeEv"></span><span id="_CPPv2NK5RegEx9re_parent7GetSizeEv"></span><span id="RegEx::re_parent::GetSizeC"></span><span class="target" id="structRegEx_1_1re__parent_1a4079c90b926a8443886750fb6808e1ea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx9re_parent7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_parent8AsParentEv">
+<span id="_CPPv3N5RegEx9re_parent8AsParentEv"></span><span id="_CPPv2N5RegEx9re_parent8AsParentEv"></span><span id="RegEx::re_parent::AsParent"></span><span class="target" id="structRegEx_1_1re__parent_1a43ebf3b788877274f1eada6eec4a5bc4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx9re_parentE" title="RegEx::re_parent"><span class="n"><span class="pre">re_parent</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsParent</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5RegEx9re_parent8AsParentEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_parent8SimplifyEv">
+<span id="_CPPv3N5RegEx9re_parent8SimplifyEv"></span><span id="_CPPv2N5RegEx9re_parent8SimplifyEv"></span><span id="RegEx::re_parent::Simplify"></span><span class="target" id="structRegEx_1_1re__parent_1a9c782c1684a8acd6369cc8d9f20b0e3d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Simplify</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5RegEx9re_parent8SimplifyEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_parent5nodesE">
+<span id="_CPPv3N5RegEx9re_parent5nodesE"></span><span id="_CPPv2N5RegEx9re_parent5nodesE"></span><span id="RegEx::re_parent::nodes__vector:Ptr:re_base::"></span><span class="target" id="structRegEx_1_1re__parent_1acafca14abfeae9e3ddd1d23e4da9c71e"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx7re_baseE" title="RegEx::re_base"><span class="n"><span class="pre">re_base</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nodes</span></span></span><a class="headerlink" href="#_CPPv4N5RegEx9re_parent5nodesE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx7re_plusE">
+<span id="_CPPv3N5RegEx7re_plusE"></span><span id="_CPPv2N5RegEx7re_plusE"></span><span id="RegEx::re_plus"></span><span class="target" id="structRegEx_1_1re__plus"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_plus</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45RegEx" title="RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5RegEx9re_parentE" title="RegEx::re_parent"><span class="n"><span class="pre">re_parent</span></span></a><a class="headerlink" href="#_CPPv4N5RegEx7re_plusE" title="Link to this definition"></a><br /></dt>
+<dd><p>Representations of one-or-more instances of a component. e.g., a+. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx7re_plus7re_plusE3PtrI7re_baseE">
+<span id="_CPPv3N5RegEx7re_plus7re_plusE3PtrI7re_baseE"></span><span id="_CPPv2N5RegEx7re_plus7re_plusE3PtrI7re_baseE"></span><span id="RegEx::re_plus::re_plus__Ptr:re_base:"></span><span class="target" id="structRegEx_1_1re__plus_1abea7f14a045f277213d7caaf8612f1bf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_plus</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx7re_baseE" title="RegEx::re_base"><span class="n"><span class="pre">re_base</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx7re_plus7re_plusE3PtrI7re_baseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx7re_plus5PrintERNSt7ostreamE">
+<span id="_CPPv3NK5RegEx7re_plus5PrintERNSt7ostreamE"></span><span id="_CPPv2NK5RegEx7re_plus5PrintERNSt7ostreamE"></span><span id="RegEx::re_plus::Print__osRC"></span><span class="target" id="structRegEx_1_1re__plus_1aa7f67945904aad0ce0f432400c089315"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx7re_plus5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx7re_plus8AddToNFAER3NFA6size_t6size_t">
+<span id="_CPPv3NK5RegEx7re_plus8AddToNFAER3NFA6size_t6size_t"></span><span id="_CPPv2NK5RegEx7re_plus8AddToNFAER3NFA6size_t6size_t"></span><span id="RegEx::re_plus::AddToNFA__NFAR.s.sC"></span><span class="target" id="structRegEx_1_1re__plus_1a9e8dba966e5ddcef4c2249a5ca607a53"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddToNFA</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="NFA.html#_CPPv43NFA" title="NFA"><span class="n"><span class="pre">NFA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nfa</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx7re_plus8AddToNFAER3NFA6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx5re_qmE">
+<span id="_CPPv3N5RegEx5re_qmE"></span><span id="_CPPv2N5RegEx5re_qmE"></span><span id="RegEx::re_qm"></span><span class="target" id="structRegEx_1_1re__qm"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_qm</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45RegEx" title="RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5RegEx9re_parentE" title="RegEx::re_parent"><span class="n"><span class="pre">re_parent</span></span></a><a class="headerlink" href="#_CPPv4N5RegEx5re_qmE" title="Link to this definition"></a><br /></dt>
+<dd><p>Representations of zero-or-one instances of a component. e.g., a? </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx5re_qm5re_qmE3PtrI7re_baseE">
+<span id="_CPPv3N5RegEx5re_qm5re_qmE3PtrI7re_baseE"></span><span id="_CPPv2N5RegEx5re_qm5re_qmE3PtrI7re_baseE"></span><span id="RegEx::re_qm::re_qm__Ptr:re_base:"></span><span class="target" id="structRegEx_1_1re__qm_1a993304fd8a8200c37286c3826ddd8b22"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_qm</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx7re_baseE" title="RegEx::re_base"><span class="n"><span class="pre">re_base</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx5re_qm5re_qmE3PtrI7re_baseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx5re_qm5PrintERNSt7ostreamE">
+<span id="_CPPv3NK5RegEx5re_qm5PrintERNSt7ostreamE"></span><span id="_CPPv2NK5RegEx5re_qm5PrintERNSt7ostreamE"></span><span id="RegEx::re_qm::Print__osRC"></span><span class="target" id="structRegEx_1_1re__qm_1aabc83c544e7c65f0204979c46cfc5965"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx5re_qm5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx5re_qm8AddToNFAER3NFA6size_t6size_t">
+<span id="_CPPv3NK5RegEx5re_qm8AddToNFAER3NFA6size_t6size_t"></span><span id="_CPPv2NK5RegEx5re_qm8AddToNFAER3NFA6size_t6size_t"></span><span id="RegEx::re_qm::AddToNFA__NFAR.s.sC"></span><span class="target" id="structRegEx_1_1re__qm_1a32b8e3bc808358a708cd15c0d35407e4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddToNFA</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="NFA.html#_CPPv43NFA" title="NFA"><span class="n"><span class="pre">NFA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nfa</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx5re_qm8AddToNFAER3NFA6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx7re_starE">
+<span id="_CPPv3N5RegEx7re_starE"></span><span id="_CPPv2N5RegEx7re_starE"></span><span id="RegEx::re_star"></span><span class="target" id="structRegEx_1_1re__star"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_star</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45RegEx" title="RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5RegEx9re_parentE" title="RegEx::re_parent"><span class="n"><span class="pre">re_parent</span></span></a><a class="headerlink" href="#_CPPv4N5RegEx7re_starE" title="Link to this definition"></a><br /></dt>
+<dd><p>Representations of zero-or-more instances of a component. e.g., a*. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx7re_star7re_starE3PtrI7re_baseE">
+<span id="_CPPv3N5RegEx7re_star7re_starE3PtrI7re_baseE"></span><span id="_CPPv2N5RegEx7re_star7re_starE3PtrI7re_baseE"></span><span id="RegEx::re_star::re_star__Ptr:re_base:"></span><span class="target" id="structRegEx_1_1re__star_1a67814a6e7722fa570a3a2d1a702f193b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_star</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx7re_baseE" title="RegEx::re_base"><span class="n"><span class="pre">re_base</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx7re_star7re_starE3PtrI7re_baseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx7re_star5PrintERNSt7ostreamE">
+<span id="_CPPv3NK5RegEx7re_star5PrintERNSt7ostreamE"></span><span id="_CPPv2NK5RegEx7re_star5PrintERNSt7ostreamE"></span><span id="RegEx::re_star::Print__osRC"></span><span class="target" id="structRegEx_1_1re__star_1a939a1f0a2d6c1adb0d01db31dd605dcb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx7re_star5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx7re_star8AddToNFAER3NFA6size_t6size_t">
+<span id="_CPPv3NK5RegEx7re_star8AddToNFAER3NFA6size_t6size_t"></span><span id="_CPPv2NK5RegEx7re_star8AddToNFAER3NFA6size_t6size_t"></span><span id="RegEx::re_star::AddToNFA__NFAR.s.sC"></span><span class="target" id="structRegEx_1_1re__star_1a6d3bf1803edbec79cfb3354423bdf822"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddToNFA</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="NFA.html#_CPPv43NFA" title="NFA"><span class="n"><span class="pre">NFA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nfa</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx7re_star8AddToNFAER3NFA6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_stringE">
+<span id="_CPPv3N5RegEx9re_stringE"></span><span id="_CPPv2N5RegEx9re_stringE"></span><span id="RegEx::re_string"></span><span class="target" id="structRegEx_1_1re__string"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_string</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45RegEx" title="RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5RegEx7re_baseE" title="RegEx::re_base"><span class="n"><span class="pre">re_base</span></span></a><a class="headerlink" href="#_CPPv4N5RegEx9re_stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Representation of strings stored in a RegEx. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_string9re_stringEv">
+<span id="_CPPv3N5RegEx9re_string9re_stringEv"></span><span id="_CPPv2N5RegEx9re_string9re_stringEv"></span><span id="RegEx::re_string::re_string"></span><span class="target" id="structRegEx_1_1re__string_1aa313a8d088637cc3b32219cc3d302e96"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_string</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx9re_string9re_stringEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_string9re_stringEc">
+<span id="_CPPv3N5RegEx9re_string9re_stringEc"></span><span id="_CPPv2N5RegEx9re_string9re_stringEc"></span><span id="RegEx::re_string::re_string__c"></span><span class="target" id="structRegEx_1_1re__string_1a0abdb4c03cad97e3463df3288b2c693e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_string</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx9re_string9re_stringEc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_string9re_stringERKNSt6stringE">
+<span id="_CPPv3N5RegEx9re_string9re_stringERKNSt6stringE"></span><span id="_CPPv2N5RegEx9re_string9re_stringERKNSt6stringE"></span><span id="RegEx::re_string::re_string__ssCR"></span><span class="target" id="structRegEx_1_1re__string_1a6cc97e5f8e32417548d26491df0fa1b2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">re_string</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5RegEx9re_string9re_stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx9re_string5PrintERNSt7ostreamE">
+<span id="_CPPv3NK5RegEx9re_string5PrintERNSt7ostreamE"></span><span id="_CPPv2NK5RegEx9re_string5PrintERNSt7ostreamE"></span><span id="RegEx::re_string::Print__osRC"></span><span class="target" id="structRegEx_1_1re__string_1a51c75ab7f1f8ceb4cf723bb2c13c7203"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx9re_string5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_string8AsStringEv">
+<span id="_CPPv3N5RegEx9re_string8AsStringEv"></span><span id="_CPPv2N5RegEx9re_string8AsStringEv"></span><span id="RegEx::re_string::AsString"></span><span class="target" id="structRegEx_1_1re__string_1a4d7e51b4ece8bc99f281d895eb277c56"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5RegEx9re_stringE" title="RegEx::re_string"><span class="n"><span class="pre">re_string</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5RegEx9re_string8AsStringEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx9re_string7GetSizeEv">
+<span id="_CPPv3NK5RegEx9re_string7GetSizeEv"></span><span id="_CPPv2NK5RegEx9re_string7GetSizeEv"></span><span id="RegEx::re_string::GetSizeC"></span><span class="target" id="structRegEx_1_1re__string_1a22e23a72d1442b97f069863cc2498b8f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx9re_string7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RegEx9re_string8AddToNFAER3NFA6size_t6size_t">
+<span id="_CPPv3NK5RegEx9re_string8AddToNFAER3NFA6size_t6size_t"></span><span id="_CPPv2NK5RegEx9re_string8AddToNFAER3NFA6size_t6size_t"></span><span id="RegEx::re_string::AddToNFA__NFAR.s.sC"></span><span class="target" id="structRegEx_1_1re__string_1a135028c95e3868993630b3fd9e4a9424"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddToNFA</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="NFA.html#_CPPv43NFA" title="NFA"><span class="n"><span class="pre">NFA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nfa</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK5RegEx9re_string8AddToNFAER3NFA6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5RegEx9re_string3strE">
+<span id="_CPPv3N5RegEx9re_string3strE"></span><span id="_CPPv2N5RegEx9re_string3strE"></span><span id="RegEx::re_string::str__ss"></span><span class="target" id="structRegEx_1_1re__string_1afc720abe8e39ef29b966839950b3ddf1"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">str</span></span></span><a class="headerlink" href="#_CPPv4N5RegEx9re_string3strE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="NFA.html" class="btn btn-neutral float-left" title="NFA.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lexer_utils.html" class="btn btn-neutral float-right" title="lexer_utils.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

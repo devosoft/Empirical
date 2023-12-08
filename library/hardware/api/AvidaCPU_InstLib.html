@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AvidaCPU_InstLib.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/hardware/api/AvidaCPU_InstLib.cfd3c705-60f7-4a6b-8512-1538a8a9b83a.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="AvidaGP.hpp" href="AvidaGP.html" />
+    <link rel="prev" title="Hardware" href="../hardware.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../hardware.html">Hardware</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../hardware.html#api">API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AvidaCPU_InstLib.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00_6size_tE16AvidaCPU_InstLib"><code class="docutils literal notranslate"><span class="pre">AvidaCPU_InstLib</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="AvidaGP.html">AvidaGP.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BitSorter.html">BitSorter.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="EventDrivenGP.html">EventDrivenGP.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="EventLib.html">EventLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Genome.html">Genome.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="InstLib.html">InstLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LinearCode.html">LinearCode.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="VirtualCPU.html">VirtualCPU.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="VirtualCPU_InstLib.html">VirtualCPU_InstLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="signalgp_utils.html">signalgp_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../hardware.html">Hardware</a></li>
+      <li class="breadcrumb-item active">AvidaCPU_InstLib.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="avidacpu-instlib-hpp">
+<h1>AvidaCPU_InstLib.hpp<a class="headerlink" href="#avidacpu-instlib-hpp" title="Link to this heading"></a></h1>
+<p>A specialized version of InstLib to handle AvidaCPU Instructions. </p>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I00_6size_tE16AvidaCPU_InstLib">
+<span id="_CPPv3I00_6size_tE16AvidaCPU_InstLib"></span><span id="_CPPv2I00_6size_tE16AvidaCPU_InstLib"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HARDWARE_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_T</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_COUNT</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structAvidaCPU__InstLib"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AvidaCPU_InstLib</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="InstLib.html#_CPPv4I00_6size_tE7InstLib" title="InstLib"><span class="n"><span class="pre">InstLib</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00_6size_tE16AvidaCPU_InstLib" title="AvidaCPU_InstLib::HARDWARE_T"><span class="n"><span class="pre">HARDWARE_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I00_6size_tE16AvidaCPU_InstLib" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;AvidaCPU_InstLib.hpp&gt;</em></div>
+<p>AvidaCPU_InstLib is a pure-virtual class that defines a series of instructions that can be used with AvidaCPU_Base or any of its derived classes. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib10hardware_tE">
+<span id="_CPPv3N16AvidaCPU_InstLib10hardware_tE"></span><span id="_CPPv2N16AvidaCPU_InstLib10hardware_tE"></span><span class="target" id="structAvidaCPU__InstLib_1a7989373961944a25036d03a530ea81dd"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hardware_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE16AvidaCPU_InstLib" title="AvidaCPU_InstLib::HARDWARE_T"><span class="n"><span class="pre">HARDWARE_T</span></span></a><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib5arg_tE">
+<span id="_CPPv3N16AvidaCPU_InstLib5arg_tE"></span><span id="_CPPv2N16AvidaCPU_InstLib5arg_tE"></span><span class="target" id="structAvidaCPU__InstLib_1a3323e2511e3ea8c47fcdd985f601a7f8"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">arg_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE16AvidaCPU_InstLib" title="AvidaCPU_InstLib::ARG_T"><span class="n"><span class="pre">ARG_T</span></span></a><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib5arg_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib6this_tE">
+<span id="_CPPv3N16AvidaCPU_InstLib6this_tE"></span><span id="_CPPv2N16AvidaCPU_InstLib6this_tE"></span><span class="target" id="structAvidaCPU__InstLib_1a50dde90ab2e89621d54610be33430bf2"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE16AvidaCPU_InstLib" title="AvidaCPU_InstLib"><span class="n"><span class="pre">AvidaCPU_InstLib</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00_6size_tE16AvidaCPU_InstLib" title="AvidaCPU_InstLib::HARDWARE_T"><span class="n"><span class="pre">HARDWARE_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE16AvidaCPU_InstLib" title="AvidaCPU_InstLib::ARG_T"><span class="n"><span class="pre">ARG_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE16AvidaCPU_InstLib" title="AvidaCPU_InstLib::ARG_COUNT"><span class="n"><span class="pre">ARG_COUNT</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib6inst_tE">
+<span id="_CPPv3N16AvidaCPU_InstLib6inst_tE"></span><span id="_CPPv2N16AvidaCPU_InstLib6inst_tE"></span><span class="target" id="structAvidaCPU__InstLib_1a4c7e6c96e58f55415e8e36eb3a047c1e"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">inst_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">inst_t</span></span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib8Inst_IncER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib8Inst_IncER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib8Inst_IncER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Inc__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a61e13315116c7c6e3e8ffc89461413b1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Inc</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib8Inst_IncER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib8Inst_DecER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib8Inst_DecER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib8Inst_DecER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Dec__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a836a7288c1dfee4ec0aa3cc09e2ba3ae"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Dec</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib8Inst_DecER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib8Inst_NotER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib8Inst_NotER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib8Inst_NotER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Not__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a4742306ce86dfe6e344fbbb153141400"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Not</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib8Inst_NotER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib11Inst_SetRegER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib11Inst_SetRegER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib11Inst_SetRegER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_SetReg__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1af96a04055a33a3207e7b0122042d6682"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_SetReg</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib11Inst_SetRegER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib8Inst_AddER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib8Inst_AddER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib8Inst_AddER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Add__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1ae65fed3aa5e3271884210527cf32683e"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Add</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib8Inst_AddER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib8Inst_SubER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib8Inst_SubER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib8Inst_SubER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Sub__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1ae221cff6848095e06f50db8b96058195"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Sub</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib8Inst_SubER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib9Inst_MultER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib9Inst_MultER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib9Inst_MultER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Mult__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1adf620e63c41f43b363d7c48ef67b2d28"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Mult</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib9Inst_MultER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib8Inst_DivER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib8Inst_DivER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib8Inst_DivER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Div__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a04bea164433222e8427316b6a66f1aaa"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Div</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib8Inst_DivER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib8Inst_ModER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib8Inst_ModER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib8Inst_ModER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Mod__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1ac3a8248aef285a00d7e56acd3ddfc83c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Mod</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib8Inst_ModER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib12Inst_TestEquER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib12Inst_TestEquER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib12Inst_TestEquER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_TestEqu__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a21ae1b1429653e5a0db9c21c2b694d1d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_TestEqu</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib12Inst_TestEquER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib13Inst_TestNEquER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib13Inst_TestNEquER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib13Inst_TestNEquER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_TestNEqu__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a175180ca94af41b1eb2c2b378c9d9752"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_TestNEqu</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib13Inst_TestNEquER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib13Inst_TestLessER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib13Inst_TestLessER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib13Inst_TestLessER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_TestLess__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a46d8f99660043d4514c11db7ae69fbf1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_TestLess</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib13Inst_TestLessER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib7Inst_IfER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib7Inst_IfER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib7Inst_IfER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_If__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1aff31c308128b3401f3ba625bb3ed35c9"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_If</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib7Inst_IfER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib10Inst_WhileER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib10Inst_WhileER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib10Inst_WhileER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_While__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a6a2c7c254f32ab18dc0baa3989b07fb4"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_While</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib10Inst_WhileER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib14Inst_CountdownER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib14Inst_CountdownER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib14Inst_CountdownER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Countdown__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1ae364d0f1baa42ef674df4a7cc1906b46"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Countdown</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib14Inst_CountdownER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib10Inst_BreakER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib10Inst_BreakER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib10Inst_BreakER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Break__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a57e598e381a96a7ac0fc938a61e86ee6"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Break</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib10Inst_BreakER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib10Inst_ScopeER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib10Inst_ScopeER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib10Inst_ScopeER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Scope__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a3af7fa30947b0c4ba3ce126a3c8d2ec9"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Scope</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib10Inst_ScopeER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib11Inst_DefineER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib11Inst_DefineER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib11Inst_DefineER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Define__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a9f3591a02fd3965d4fc2eb7995b9f081"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Define</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib11Inst_DefineER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib9Inst_CallER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib9Inst_CallER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib9Inst_CallER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Call__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a2ea21b8ea25ba06d5d0d0241862e4ccc"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Call</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib9Inst_CallER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib9Inst_PushER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib9Inst_PushER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib9Inst_PushER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Push__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a56a23ff1e7938c2dd6d5f13bcc2ad76f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Push</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib9Inst_PushER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib8Inst_PopER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib8Inst_PopER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib8Inst_PopER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Pop__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a3393555fb5c15024a79580cf8fabed43"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Pop</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib8Inst_PopER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib10Inst_InputER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib10Inst_InputER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib10Inst_InputER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Input__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1ab062b6c4b8167ac718d06b9ef5a26aff"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Input</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib10Inst_InputER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib11Inst_OutputER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib11Inst_OutputER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib11Inst_OutputER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_Output__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1ab5f0ec1e6b348f178af40ba0a01f6f4b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Output</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib11Inst_OutputER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib12Inst_CopyValER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib12Inst_CopyValER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib12Inst_CopyValER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_CopyVal__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1a1229983b2e7236add1cf851931898282"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_CopyVal</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib12Inst_CopyValER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib13Inst_ScopeRegER10hardware_tRK6inst_t">
+<span id="_CPPv3N16AvidaCPU_InstLib13Inst_ScopeRegER10hardware_tRK6inst_t"></span><span id="_CPPv2N16AvidaCPU_InstLib13Inst_ScopeRegER10hardware_tRK6inst_t"></span><span id="AvidaCPU_InstLib::Inst_ScopeReg__hardware_tR.inst_tCR"></span><span class="target" id="structAvidaCPU__InstLib_1aa4beb228762aaeec672ac9530550be66"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_ScopeReg</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib10hardware_tE" title="AvidaCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6inst_tE" title="AvidaCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib13Inst_ScopeRegER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib14DefaultInstLibEv">
+<span id="_CPPv3N16AvidaCPU_InstLib14DefaultInstLibEv"></span><span id="_CPPv2N16AvidaCPU_InstLib14DefaultInstLibEv"></span><span id="AvidaCPU_InstLib::DefaultInstLib"></span><span class="target" id="structAvidaCPU__InstLib_1a35907a0620b4dae1a13efa8a74e31d8f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16AvidaCPU_InstLib6this_tE" title="AvidaCPU_InstLib::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">DefaultInstLib</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib14DefaultInstLibEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16AvidaCPU_InstLib9arg_countE">
+<span id="_CPPv3N16AvidaCPU_InstLib9arg_countE"></span><span id="_CPPv2N16AvidaCPU_InstLib9arg_countE"></span><span id="AvidaCPU_InstLib::arg_count__s"></span><span class="target" id="structAvidaCPU__InstLib_1a2f61b04991ca3733e85d666021a09c9e"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">arg_count</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE16AvidaCPU_InstLib" title="AvidaCPU_InstLib::ARG_COUNT"><span class="n"><span class="pre">ARG_COUNT</span></span></a><a class="headerlink" href="#_CPPv4N16AvidaCPU_InstLib9arg_countE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../hardware.html" class="btn btn-neutral float-left" title="Hardware" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="AvidaGP.html" class="btn btn-neutral float-right" title="AvidaGP.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

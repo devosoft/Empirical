@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Font.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/web/api/Font.1b3792c4-eea4-4fb2-9146-887d4fbfe2dd.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Image.hpp" href="Image.html" />
+    <link rel="prev" title="FileInput.hpp" href="FileInput.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../web.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Animate.html">Animate.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Attributes.html">Attributes.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Button.html">Button.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Canvas.html">Canvas.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasAction.html">CanvasAction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasShape.html">CanvasShape.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Div.html">Div.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DocuExtras.html">DocuExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Document.html">Document.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Element.html">Element.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FileInput.html">FileInput.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Font.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv44Font"><code class="docutils literal notranslate"><span class="pre">Font</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Image.html">Image.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Input.html">Input.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="JSWrap.html">JSWrap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="KeypressManager.html">KeypressManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Listeners.html">Listeners.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NodeDomShim.html">NodeDomShim.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RawImage.html">RawImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Selector.html">Selector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style.html">Style.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Table.html">Table.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Text.html">Text.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextArea.html">TextArea.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextFeed.html">TextFeed.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tween.html">Tween.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UrlParams.html">UrlParams.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Widget.html">Widget.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WidgetExtras.html">WidgetExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="canvas_utils.html">canvas_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="color_map.html">color_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html">commands.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emfunctions.html">emfunctions.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="events.html">events.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="init.html">init.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="js_utils.html">js_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="web.html">web.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../web.html">Web Tools (for use with Emscripten)</a></li>
+      <li class="breadcrumb-item active">Font.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="font-hpp">
+<h1>Font.hpp<a class="headerlink" href="#font-hpp" title="Link to this heading"></a></h1>
+<p>Maintains basic information about a font to be used in HTML. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv44Font">
+<span id="_CPPv34Font"></span><span id="_CPPv24Font"></span><span id="Font"></span><span class="target" id="classFont"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Font</span></span></span><a class="headerlink" href="#_CPPv44Font" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Font.hpp&gt;</em></div>
+<p>Maintain information about an HTML font. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font4FontERK4Font">
+<span id="_CPPv3N4Font4FontERK4Font"></span><span id="_CPPv2N4Font4FontERK4Font"></span><span id="Font::Font__FontCR"></span><span class="target" id="classFont_1a4de375cb88508a13c2aa9e4628071c2b"></span><span class="sig-name descname"><span class="n"><span class="pre">Font</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4Font4FontERK4Font" title="Font::Font"><span class="n"><span class="pre">Font</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N4Font4FontERK4Font" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font4FontERR4Font">
+<span id="_CPPv3N4Font4FontERR4Font"></span><span id="_CPPv2N4Font4FontERR4Font"></span><span id="Font::Font__FontRR"></span><span class="target" id="classFont_1a7649942a29d53b33d3b3837e89026a41"></span><span class="sig-name descname"><span class="n"><span class="pre">Font</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4Font4FontERR4Font" title="Font::Font"><span class="n"><span class="pre">Font</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N4Font4FontERR4Font" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font4FontERKNSt6stringEiRKNSt6stringEbb">
+<span id="_CPPv3N4Font4FontERKNSt6stringEiRKNSt6stringEbb"></span><span id="_CPPv2N4Font4FontERKNSt6stringEiRKNSt6stringEbb"></span><span id="Font::Font__ssCR.i.ssCR.b.b"></span><span class="target" id="classFont_1a1f827429f1551ba4a96cc158de871e4a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Font</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_family</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;Helvetica&quot;</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_size</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">15</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_color</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;black&quot;</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_bold</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_italic</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font4FontERKNSt6stringEiRKNSt6stringEbb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font4FontEiRKNSt6stringEbb">
+<span id="_CPPv3N4Font4FontEiRKNSt6stringEbb"></span><span id="_CPPv2N4Font4FontEiRKNSt6stringEbb"></span><span id="Font::Font__i.ssCR.b.b"></span><span class="target" id="classFont_1a65a1c23c1ffd73c7e5e23251d0c7a8e6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Font</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_color</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;black&quot;</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_bold</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_italic</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font4FontEiRKNSt6stringEbb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4FontD0Ev">
+<span id="_CPPv3N4FontD0Ev"></span><span id="_CPPv2N4FontD0Ev"></span><span id="Font::~Font"></span><span class="target" id="classFont_1a134aaa2f78af0c12d3ce504957169768"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Font</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4FontD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4FontaSERK4Font">
+<span id="_CPPv3N4FontaSERK4Font"></span><span id="_CPPv2N4FontaSERK4Font"></span><span id="Font::assign-operator__FontCR"></span><span class="target" id="classFont_1a33bbaafeca46c61bc1a8d35ad699865a"></span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N4FontaSERK4Font" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4FontaSERR4Font">
+<span id="_CPPv3N4FontaSERR4Font"></span><span id="_CPPv2N4FontaSERR4Font"></span><span id="Font::assign-operator__FontRR"></span><span class="target" id="classFont_1a7d9477ff1097693798718a6e70ebc4ac"></span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N4FontaSERR4Font" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font9GetFamilyEv">
+<span id="_CPPv3NK4Font9GetFamilyEv"></span><span id="_CPPv2NK4Font9GetFamilyEv"></span><span id="Font::GetFamilyC"></span><span class="target" id="classFont_1a5902c81a8ee43041223f1d7a280f10a3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetFamily</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font9GetFamilyEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>font family </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font7GetSizeEv">
+<span id="_CPPv3NK4Font7GetSizeEv"></span><span id="_CPPv2NK4Font7GetSizeEv"></span><span id="Font::GetSizeC"></span><span class="target" id="classFont_1a8723815bdeee0d7afb5c9e54a4a9dc32"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>font size (in pixels) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font8GetColorEv">
+<span id="_CPPv3NK4Font8GetColorEv"></span><span id="_CPPv2NK4Font8GetColorEv"></span><span id="Font::GetColorC"></span><span class="target" id="classFont_1a05e820892664117a4408fa23a3e82ffc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetColor</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font8GetColorEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>font color </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font12GetLineColorEv">
+<span id="_CPPv3NK4Font12GetLineColorEv"></span><span id="_CPPv2NK4Font12GetLineColorEv"></span><span id="Font::GetLineColorC"></span><span class="target" id="classFont_1ab76f37128724612a774d821364563e06"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetLineColor</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font12GetLineColorEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>color of lines through text (underline or strikethrough) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font6IsBoldEv">
+<span id="_CPPv3NK4Font6IsBoldEv"></span><span id="_CPPv2NK4Font6IsBoldEv"></span><span id="Font::IsBoldC"></span><span class="target" id="classFont_1a1b5461ad1072a8ee898bf5e210018a77"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsBold</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font6IsBoldEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean indicating whether font is bold </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font8IsItalicEv">
+<span id="_CPPv3NK4Font8IsItalicEv"></span><span id="_CPPv2NK4Font8IsItalicEv"></span><span id="Font::IsItalicC"></span><span class="target" id="classFont_1ae7c53c83c595833e210f73f8d6730a3d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsItalic</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font8IsItalicEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean indicating whether font is italic </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font11IsSmallcapsEv">
+<span id="_CPPv3NK4Font11IsSmallcapsEv"></span><span id="_CPPv2NK4Font11IsSmallcapsEv"></span><span id="Font::IsSmallcapsC"></span><span class="target" id="classFont_1a1a48704945aacdd7cfc7ad8a39129f8a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsSmallcaps</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font11IsSmallcapsEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean indicating whether font is in small caps </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font12IsUnderlinedEv">
+<span id="_CPPv3NK4Font12IsUnderlinedEv"></span><span id="_CPPv2NK4Font12IsUnderlinedEv"></span><span id="Font::IsUnderlinedC"></span><span class="target" id="classFont_1a1c79c2cbfc59db9392befbc69477064e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsUnderlined</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font12IsUnderlinedEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean indicating whether font is underlined </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font11IsOverlinedEv">
+<span id="_CPPv3NK4Font11IsOverlinedEv"></span><span id="_CPPv2NK4Font11IsOverlinedEv"></span><span id="Font::IsOverlinedC"></span><span class="target" id="classFont_1ad8d6e05c95622899d081d328b396ec2f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsOverlined</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font11IsOverlinedEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean indicating whether font is overlined </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font15IsStrikethroughEv">
+<span id="_CPPv3NK4Font15IsStrikethroughEv"></span><span id="_CPPv2NK4Font15IsStrikethroughEv"></span><span id="Font::IsStrikethroughC"></span><span class="target" id="classFont_1aba1d42bfacafd5ae5a1bf2971673e758"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsStrikethrough</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font15IsStrikethroughEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean indicating whether font is strikethrough </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font10IsWavyLineEv">
+<span id="_CPPv3NK4Font10IsWavyLineEv"></span><span id="_CPPv2NK4Font10IsWavyLineEv"></span><span id="Font::IsWavyLineC"></span><span class="target" id="classFont_1a96ac16b0beb77e9b59c2c0400f7ae117"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsWavyLine</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font10IsWavyLineEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean indicating whether font is wavy line </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font7HasLineEv">
+<span id="_CPPv3NK4Font7HasLineEv"></span><span id="_CPPv2NK4Font7HasLineEv"></span><span id="Font::HasLineC"></span><span class="target" id="classFont_1a324b95e439d137911dbaeb87dee74dc6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasLine</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font7HasLineEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean indicating whether font has any kind of line (underline, overline, or strikethrough) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font9SetFamilyERKNSt6stringE">
+<span id="_CPPv3N4Font9SetFamilyERKNSt6stringE"></span><span id="_CPPv2N4Font9SetFamilyERKNSt6stringE"></span><span id="Font::SetFamily__ssCR"></span><span class="target" id="classFont_1ad2325be0a208cf0707e4dd94598437e2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetFamily</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_family</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font9SetFamilyERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets font family to specified value </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>reference to this font for easy chaining </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font7SetSizeEi">
+<span id="_CPPv3N4Font7SetSizeEi"></span><span id="_CPPv2N4Font7SetSizeEi"></span><span id="Font::SetSize__i"></span><span class="target" id="classFont_1af450a07bee4a4faa0e4671bf67e4ad23"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetSize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font7SetSizeEi" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets font size to specified value </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>reference to this font for easy chaining </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font8SetColorERKNSt6stringE">
+<span id="_CPPv3N4Font8SetColorERKNSt6stringE"></span><span id="_CPPv2N4Font8SetColorERKNSt6stringE"></span><span id="Font::SetColor__ssCR"></span><span class="target" id="classFont_1af645c7cfad67824251b45c2a51d26973"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetColor</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_color</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font8SetColorERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets font color to specified value </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>reference to this font for easy chaining </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font12SetLineColorERKNSt6stringE">
+<span id="_CPPv3N4Font12SetLineColorERKNSt6stringE"></span><span id="_CPPv2N4Font12SetLineColorERKNSt6stringE"></span><span id="Font::SetLineColor__ssCR"></span><span class="target" id="classFont_1a82a3d0348e3d8158094b8ee0d3460399"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetLineColor</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_color</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font12SetLineColorERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets color of any lines through, under, or over this font </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>reference to this font for easy chaining </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font7SetBoldEb">
+<span id="_CPPv3N4Font7SetBoldEb"></span><span id="_CPPv2N4Font7SetBoldEb"></span><span id="Font::SetBold__b"></span><span class="target" id="classFont_1ad8887bf188ba54abf38a87827e28eb4b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetBold</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font7SetBoldEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets whether font is bold </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>reference to this font for easy chaining </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font9SetItalicEb">
+<span id="_CPPv3N4Font9SetItalicEb"></span><span id="_CPPv2N4Font9SetItalicEb"></span><span id="Font::SetItalic__b"></span><span class="target" id="classFont_1aba62e9538586bab26ee4c013b1df0810"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetItalic</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font9SetItalicEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets whether font is italic </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>reference to this font for easy chaining </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font12SetSmallcapsEb">
+<span id="_CPPv3N4Font12SetSmallcapsEb"></span><span id="_CPPv2N4Font12SetSmallcapsEb"></span><span id="Font::SetSmallcaps__b"></span><span class="target" id="classFont_1a0dd6fb1f243116f6121cbd10c20d84fc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetSmallcaps</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font12SetSmallcapsEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets whether font is small caps </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>reference to this font for easy chaining </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font13SetUnderlinedEb">
+<span id="_CPPv3N4Font13SetUnderlinedEb"></span><span id="_CPPv2N4Font13SetUnderlinedEb"></span><span id="Font::SetUnderlined__b"></span><span class="target" id="classFont_1a056261116ec589158e11860785f38faf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetUnderlined</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font13SetUnderlinedEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets whether font is underlined </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>reference to this font for easy chaining </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font12SetOverlinedEb">
+<span id="_CPPv3N4Font12SetOverlinedEb"></span><span id="_CPPv2N4Font12SetOverlinedEb"></span><span id="Font::SetOverlined__b"></span><span class="target" id="classFont_1adfc99e630c0b6bd55ec1a1d1b759c62f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetOverlined</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font12SetOverlinedEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets whether font is overlined </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>reference to this font for easy chaining </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font16SetStrikethroughEb">
+<span id="_CPPv3N4Font16SetStrikethroughEb"></span><span id="_CPPv2N4Font16SetStrikethroughEb"></span><span id="Font::SetStrikethrough__b"></span><span class="target" id="classFont_1a4552fd4f8efb1c99c78e30d8af466e4c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetStrikethrough</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font16SetStrikethroughEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets whether font is strikethrough-ed </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>reference to this font for easy chaining </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font11SetWavyLineEb">
+<span id="_CPPv3N4Font11SetWavyLineEb"></span><span id="_CPPv2N4Font11SetWavyLineEb"></span><span id="Font::SetWavyLine__b"></span><span class="target" id="classFont_1a49b182ebd1cafd0e121e7f68d035b6b4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetWavyLine</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font11SetWavyLineEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets whether font is wavy line </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>reference to this font for easy chaining </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font11ConfigStyleER5Style">
+<span id="_CPPv3NK4Font11ConfigStyleER5Style"></span><span id="_CPPv2NK4Font11ConfigStyleER5Style"></span><span id="Font::ConfigStyle__StyleRC"></span><span class="target" id="classFont_1abeb349730e53c431d2195809e6d66cd1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ConfigStyle</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Style.html#_CPPv45Style" title="Style"><span class="n"><span class="pre">Style</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">style</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font11ConfigStyleER5Style" title="Link to this definition"></a><br /></dt>
+<dd><p>Take a Style object an fill it out based on this font information. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Font7AsStyleEv">
+<span id="_CPPv3NK4Font7AsStyleEv"></span><span id="_CPPv2NK4Font7AsStyleEv"></span><span id="Font::AsStyleC"></span><span class="target" id="classFont_1a83d909f4eebcdc2b88ef6c8877d1277a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="Style.html#_CPPv45Style" title="Style"><span class="n"><span class="pre">Style</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsStyle</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Font7AsStyleEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a style object filled out according to this font information </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font12GetHTMLStartEv">
+<span id="_CPPv3N4Font12GetHTMLStartEv"></span><span id="_CPPv2N4Font12GetHTMLStartEv"></span><span id="Font::GetHTMLStart"></span><span class="target" id="classFont_1a899c17a72294cc701dcaccb85135ca0c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetHTMLStart</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font12GetHTMLStartEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a string containing the html necessary to open a span element using this font. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font10GetHTMLEndEv">
+<span id="_CPPv3N4Font10GetHTMLEndEv"></span><span id="_CPPv2N4Font10GetHTMLEndEv"></span><span id="Font::GetHTMLEnd"></span><span class="target" id="classFont_1a35cc476e0c7b46ae4622b3887ed01790"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetHTMLEnd</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Font10GetHTMLEndEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a string containing the html necessary to close a span element created by <code class="docutils literal notranslate"><span class="pre">GetHTMLStart()</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4FonteqERK4Font">
+<span id="_CPPv3NK4FonteqERK4Font"></span><span id="_CPPv2NK4FonteqERK4Font"></span><span id="Font::eq-operator__FontCRC"></span><span class="target" id="classFont_1a178bb39c967d5857dfb2713fa41acfcb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4FonteqERK4Font" title="Link to this definition"></a><br /></dt>
+<dd><p>Fonts will evaluate to equal if all of their properties are the same. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4FontneERK4Font">
+<span id="_CPPv3NK4FontneERK4Font"></span><span id="_CPPv2NK4FontneERK4Font"></span><span id="Font::neq-operator__FontCRC"></span><span class="target" id="classFont_1aa69cf33f4f9bb0a31f6a581aca5467d7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Font" title="Font"><span class="n"><span class="pre">Font</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4FontneERK4Font" title="Link to this definition"></a><br /></dt>
+<dd><p>Fonts will evaluate to equal if all of their properties are the same. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font6familyE">
+<span id="_CPPv3N4Font6familyE"></span><span id="_CPPv2N4Font6familyE"></span><span id="Font::family__ss"></span><span class="target" id="classFont_1ac5bb5dc37d2eaba52558efc92f5d1800"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">family</span></span></span><a class="headerlink" href="#_CPPv4N4Font6familyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Font family to use. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font4sizeE">
+<span id="_CPPv3N4Font4sizeE"></span><span id="_CPPv2N4Font4sizeE"></span><span id="Font::size__i"></span><span class="target" id="classFont_1aad7fe43db0254eccdbdaa2bf4884a140"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><a class="headerlink" href="#_CPPv4N4Font4sizeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Font size (in px) to use. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font5colorE">
+<span id="_CPPv3N4Font5colorE"></span><span id="_CPPv2N4Font5colorE"></span><span id="Font::color__ss"></span><span class="target" id="classFont_1aec0dffbc1d8f2b5d54a1215182b99e72"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">color</span></span></span><a class="headerlink" href="#_CPPv4N4Font5colorE" title="Link to this definition"></a><br /></dt>
+<dd><p>Font color. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font10line_colorE">
+<span id="_CPPv3N4Font10line_colorE"></span><span id="_CPPv2N4Font10line_colorE"></span><span id="Font::line_color__ss"></span><span class="target" id="classFont_1af69e1dbf1efc2fa7a80079da618bbbb9"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">line_color</span></span></span><a class="headerlink" href="#_CPPv4N4Font10line_colorE" title="Link to this definition"></a><br /></dt>
+<dd><p>Color of lines through the text (underline, linethrough, etc.) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font7is_boldE">
+<span id="_CPPv3N4Font7is_boldE"></span><span id="_CPPv2N4Font7is_boldE"></span><span id="Font::is_bold__b"></span><span class="target" id="classFont_1a450b0a597ed44f11b7d073fb348c6bcb"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_bold</span></span></span><a class="headerlink" href="#_CPPv4N4Font7is_boldE" title="Link to this definition"></a><br /></dt>
+<dd><p>Is this font bold? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font9is_italicE">
+<span id="_CPPv3N4Font9is_italicE"></span><span id="_CPPv2N4Font9is_italicE"></span><span id="Font::is_italic__b"></span><span class="target" id="classFont_1a098585bed4e6896685ec818abbd17af1"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_italic</span></span></span><a class="headerlink" href="#_CPPv4N4Font9is_italicE" title="Link to this definition"></a><br /></dt>
+<dd><p>Is this font italic? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font12is_smallcapsE">
+<span id="_CPPv3N4Font12is_smallcapsE"></span><span id="_CPPv2N4Font12is_smallcapsE"></span><span id="Font::is_smallcaps__b"></span><span class="target" id="classFont_1a5dfb0dbf049a2eac193c7161d7b82d6f"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_smallcaps</span></span></span><a class="headerlink" href="#_CPPv4N4Font12is_smallcapsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Should this text be in small caps? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font13is_underlinedE">
+<span id="_CPPv3N4Font13is_underlinedE"></span><span id="_CPPv2N4Font13is_underlinedE"></span><span id="Font::is_underlined__b"></span><span class="target" id="classFont_1afed51de00010277f036769fa114533a3"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_underlined</span></span></span><a class="headerlink" href="#_CPPv4N4Font13is_underlinedE" title="Link to this definition"></a><br /></dt>
+<dd><p>Should this text be underlined? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font12is_overlinedE">
+<span id="_CPPv3N4Font12is_overlinedE"></span><span id="_CPPv2N4Font12is_overlinedE"></span><span id="Font::is_overlined__b"></span><span class="target" id="classFont_1a07a439c744818cef4bc95b9f0f1cc474"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_overlined</span></span></span><a class="headerlink" href="#_CPPv4N4Font12is_overlinedE" title="Link to this definition"></a><br /></dt>
+<dd><p>Should this text have a line above it? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font14is_linethroughE">
+<span id="_CPPv3N4Font14is_linethroughE"></span><span id="_CPPv2N4Font14is_linethroughE"></span><span id="Font::is_linethrough__b"></span><span class="target" id="classFont_1aa94296005ed721391502facaa9b4ee33"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_linethrough</span></span></span><a class="headerlink" href="#_CPPv4N4Font14is_linethroughE" title="Link to this definition"></a><br /></dt>
+<dd><p>Should this text have a line through it? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Font12is_wavy_lineE">
+<span id="_CPPv3N4Font12is_wavy_lineE"></span><span id="_CPPv2N4Font12is_wavy_lineE"></span><span id="Font::is_wavy_line__b"></span><span class="target" id="classFont_1afa0a34bbd5199fff6b6553c9f0a3a977"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_wavy_line</span></span></span><a class="headerlink" href="#_CPPv4N4Font12is_wavy_lineE" title="Link to this definition"></a><br /></dt>
+<dd><p>Should lines be made wavy? </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="FileInput.html" class="btn btn-neutral float-left" title="FileInput.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Image.html" class="btn btn-neutral float-right" title="Image.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

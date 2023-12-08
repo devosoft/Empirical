@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FileInput.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/web/api/FileInput.b600c589-e714-4e8d-82b6-2eb468434e09.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Font.hpp" href="Font.html" />
+    <link rel="prev" title="Element.hpp" href="Element.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../web.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Animate.html">Animate.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Attributes.html">Attributes.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Button.html">Button.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Canvas.html">Canvas.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasAction.html">CanvasAction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasShape.html">CanvasShape.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Div.html">Div.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DocuExtras.html">DocuExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Document.html">Document.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Element.html">Element.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">FileInput.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49FileInput"><code class="docutils literal notranslate"><span class="pre">FileInput</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Font.html">Font.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Image.html">Image.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Input.html">Input.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="JSWrap.html">JSWrap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="KeypressManager.html">KeypressManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Listeners.html">Listeners.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NodeDomShim.html">NodeDomShim.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RawImage.html">RawImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Selector.html">Selector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style.html">Style.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Table.html">Table.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Text.html">Text.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextArea.html">TextArea.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextFeed.html">TextFeed.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tween.html">Tween.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UrlParams.html">UrlParams.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Widget.html">Widget.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WidgetExtras.html">WidgetExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="canvas_utils.html">canvas_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="color_map.html">color_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html">commands.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emfunctions.html">emfunctions.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="events.html">events.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="init.html">init.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="js_utils.html">js_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="web.html">web.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../web.html">Web Tools (for use with Emscripten)</a></li>
+      <li class="breadcrumb-item active">FileInput.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fileinput-hpp">
+<h1>FileInput.hpp<a class="headerlink" href="#fileinput-hpp" title="Link to this heading"></a></h1>
+<p>Specs for the FileInput widget (click on to upload a file) </p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Setup FileInput to work outside of web mode as well. </p>
+</dd></dl>
+
+</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv49FileInput">
+<span id="_CPPv39FileInput"></span><span id="_CPPv29FileInput"></span><span id="FileInput"></span><span class="target" id="classFileInput"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FileInput</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">WidgetFacet</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv49FileInput" title="FileInput"><span class="n"><span class="pre">FileInput</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv49FileInput" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;FileInput.hpp&gt;</em></div>
+<p>FileInput will convert the file to a std::string and pass the result to a designated function.</p>
+<p>To create a new file input, you must pass it a void function that takes a const std::string &amp; as its only argument. When a file is loaded, the specified function is called and the body of the file is passed in as the string. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N9FileInput9INFO_TYPEE">
+<span id="_CPPv3N9FileInput9INFO_TYPEE"></span><span id="_CPPv2N9FileInput9INFO_TYPEE"></span><span class="target" id="classFileInput_1a4a22e3b0f1dbab5d8579d4f2a441807e"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">INFO_TYPE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">FileInputInfo</span></span><a class="headerlink" href="#_CPPv4N9FileInput9INFO_TYPEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9FileInput9FileInputERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE">
+<span id="_CPPv3N9FileInput9FileInputERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE"></span><span id="_CPPv2N9FileInput9FileInputERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE"></span><span class="target" id="classFileInput_1a5ee77dd0d403955a773a3962aaff3eff"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FileInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_cb</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9FileInput9FileInputERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Create a new Fileinput; supply the function to call with the file contents as a string (and optionally the HTML identifier to be used). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9FileInput9FileInputERKNSt8functionIFvRK4FileEEERKNSt6stringE">
+<span id="_CPPv3N9FileInput9FileInputERKNSt8functionIFvRK4FileEEERKNSt6stringE"></span><span id="_CPPv2N9FileInput9FileInputERKNSt8functionIFvRK4FileEEERKNSt6stringE"></span><span class="target" id="classFileInput_1a80dd1bcedb7211d4210511c869d38b58"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FileInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../io/api/File.html#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cb</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&amp;</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9FileInput9FileInputERKNSt8functionIFvRK4FileEEERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Create a new FileInput; supply the function to call with the file contents as a File object (and optionally the HTML identifier to be used). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9FileInput9FileInputERK9FileInput">
+<span id="_CPPv3N9FileInput9FileInputERK9FileInput"></span><span id="_CPPv2N9FileInput9FileInputERK9FileInput"></span><span id="FileInput::FileInput__FileInputCR"></span><span class="target" id="classFileInput_1a69e5c8584fe52d5aa396e04a948bf8cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FileInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9FileInput9FileInputERK9FileInput" title="FileInput::FileInput"><span class="n"><span class="pre">FileInput</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9FileInput9FileInputERK9FileInput" title="Link to this definition"></a><br /></dt>
+<dd><p>Load a pre-existing FileInput object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9FileInput9FileInputERK6Widget">
+<span id="_CPPv3N9FileInput9FileInputERK6Widget"></span><span id="_CPPv2N9FileInput9FileInputERK6Widget"></span><span id="FileInput::FileInput__WidgetCR"></span><span class="target" id="classFileInput_1a89df4e37d6b89ef4ddcb0ddc7a979e5d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FileInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9FileInput9FileInputERK6Widget" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9FileInputD0Ev">
+<span id="_CPPv3N9FileInputD0Ev"></span><span id="_CPPv2N9FileInputD0Ev"></span><span id="FileInput::~FileInput"></span><span class="target" id="classFileInput_1ae600817c19d478449f97882d9b7db18d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~FileInput</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9FileInputD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9FileInput8CallbackERKNSt8functionIFvRKNSt6stringEEEE">
+<span id="_CPPv3N9FileInput8CallbackERKNSt8functionIFvRKNSt6stringEEEE"></span><span id="_CPPv2N9FileInput8CallbackERKNSt8functionIFvRKNSt6stringEEEE"></span><span class="target" id="classFileInput_1a069c56582a87a23c0d4dfddf5a218d2b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49FileInput" title="FileInput"><span class="n"><span class="pre">FileInput</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Callback</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_cb</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9FileInput8CallbackERKNSt8functionIFvRKNSt6stringEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Change the callback function to use when a new file is loaded. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9FileInput9AutofocusEb">
+<span id="_CPPv3N9FileInput9AutofocusEb"></span><span id="_CPPv2N9FileInput9AutofocusEb"></span><span id="FileInput::Autofocus__b"></span><span class="target" id="classFileInput_1aee8872265ea3fadfbd09daa468075015"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49FileInput" title="FileInput"><span class="n"><span class="pre">FileInput</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Autofocus</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_af</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9FileInput9AutofocusEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Set this FileInput object to have autofocus (or not) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9FileInput8DisabledEb">
+<span id="_CPPv3N9FileInput8DisabledEb"></span><span id="_CPPv2N9FileInput8DisabledEb"></span><span id="FileInput::Disabled__b"></span><span class="target" id="classFileInput_1aa16506efe9e8cf2a49e5e6bea487dc43"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49FileInput" title="FileInput"><span class="n"><span class="pre">FileInput</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Disabled</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_dis</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9FileInput8DisabledEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Set this FileInput object to be disabled (or renable it.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9FileInput12HasAutofocusEv">
+<span id="_CPPv3NK9FileInput12HasAutofocusEv"></span><span id="_CPPv2NK9FileInput12HasAutofocusEv"></span><span id="FileInput::HasAutofocusC"></span><span class="target" id="classFileInput_1a5f93c1f601de1fbd648ef807530735ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasAutofocus</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9FileInput12HasAutofocusEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if this object currently has autofocus. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9FileInput10IsDisabledEv">
+<span id="_CPPv3NK9FileInput10IsDisabledEv"></span><span id="_CPPv2NK9FileInput10IsDisabledEv"></span><span id="FileInput::IsDisabledC"></span><span class="target" id="classFileInput_1aa7b3cce5025e7a5437df8a3456e8b4c1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsDisabled</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9FileInput10IsDisabledEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if this object is currently disabled. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9FileInput4InfoEv">
+<span id="_CPPv3N9FileInput4InfoEv"></span><span id="_CPPv2N9FileInput4InfoEv"></span><span id="FileInput::Info"></span><span class="target" id="classFileInput_1a788449d328820bc9839e07defc05682a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">FileInputInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Info</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9FileInput4InfoEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9FileInput4InfoEv">
+<span id="_CPPv3NK9FileInput4InfoEv"></span><span id="_CPPv2NK9FileInput4InfoEv"></span><span id="FileInput::InfoC"></span><span class="target" id="classFileInput_1a74a8eb216ce7c8ca02ca7023eea89a25"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">FileInputInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Info</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9FileInput4InfoEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9FileInput9FileInputEP13FileInputInfo">
+<span id="_CPPv3N9FileInput9FileInputEP13FileInputInfo"></span><span id="_CPPv2N9FileInput9FileInputEP13FileInputInfo"></span><span id="FileInput::FileInput__FileInputInfoP"></span><span class="target" id="classFileInput_1a54f992b8588dd5afba1d0f4cdc56be82"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FileInput</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FileInputInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in_info</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9FileInput9FileInputEP13FileInputInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-friends">Friends</p>
+<dl>
+<dt class="sig sig-object cpp">
+<em class="property"><span class="pre">friend</span> <span class="pre">class</span></em> <span class="pre">FileInputInfo</span></dt>
+</dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Element.html" class="btn btn-neutral float-left" title="Element.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Font.html" class="btn btn-neutral float-right" title="Font.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

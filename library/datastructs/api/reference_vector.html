@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reference_vector.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/datastructs/api/reference_vector.1e1c0c10-0887-4daa-aab4-f0869159b9ed.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="set_utils.hpp" href="set_utils.html" />
+    <link rel="prev" title="ra_set.hpp" href="ra_set.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../datastructs.html">Data structures</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../datastructs.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BloomFilter.html">BloomFilter.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Bool.html">Bool.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Cache.html">Cache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DynamicString.html">DynamicString.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Graph.html">Graph.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="IndexMap.html">IndexMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="IndexSet.html">IndexSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="QueueCache.html">QueueCache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallFifoMap.html">SmallFifoMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallVector.html">SmallVector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StringMap.html">StringMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TimeQueue.html">TimeQueue.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypeMap.html">TypeMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UnorderedIndexMap.html">UnorderedIndexMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graph_utils.html">graph_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hash_utils.html">hash_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="map_utils.html">map_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_map.html">ra_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_set.html">ra_set.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">reference_vector.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E16reference_vector"><code class="docutils literal notranslate"><span class="pre">reference_vector</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="set_utils.html">set_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_utils.html">span_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_struct.html">tuple_struct.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_utils.html">tuple_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="valsort_map.html">valsort_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector_utils.html">vector_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../datastructs.html">Data structures</a></li>
+      <li class="breadcrumb-item active">reference_vector.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="reference-vector-hpp">
+<h1>reference_vector.hpp<a class="headerlink" href="#reference-vector-hpp" title="Link to this heading"></a></h1>
+<p>A version of vector that holds only references to objects. Be careful! </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA </p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E16reference_vector">
+<span id="_CPPv3I0E16reference_vector"></span><span id="_CPPv2I0E16reference_vector"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classreference__vector"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reference_vector</span></span></span><a class="headerlink" href="#_CPPv4I0E16reference_vector" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;reference_vector.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector16reference_vectorEv">
+<span id="_CPPv3N16reference_vector16reference_vectorEv"></span><span id="_CPPv2N16reference_vector16reference_vectorEv"></span><span id="reference_vector::reference_vector"></span><span class="target" id="classreference__vector_1ab3fc9cf0b28e9d0efd0acf41d20f220d"></span><span class="sig-name descname"><span class="n"><span class="pre">reference_vector</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N16reference_vector16reference_vectorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector16reference_vectorERK16reference_vector">
+<span id="_CPPv3N16reference_vector16reference_vectorERK16reference_vector"></span><span id="_CPPv2N16reference_vector16reference_vectorERK16reference_vector"></span><span id="reference_vector::reference_vector__reference_vectorCR"></span><span class="target" id="classreference__vector_1aadd4f129db4efc58f3a7d837f30305ac"></span><span class="sig-name descname"><span class="n"><span class="pre">reference_vector</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector16reference_vectorERK16reference_vector" title="reference_vector::reference_vector"><span class="n"><span class="pre">reference_vector</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N16reference_vector16reference_vectorERK16reference_vector" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector16reference_vectorERR16reference_vector">
+<span id="_CPPv3N16reference_vector16reference_vectorERR16reference_vector"></span><span id="_CPPv2N16reference_vector16reference_vectorERR16reference_vector"></span><span id="reference_vector::reference_vector__reference_vectorRR"></span><span class="target" id="classreference__vector_1a75c1547125312c405c2e4cbcb33c058e"></span><span class="sig-name descname"><span class="n"><span class="pre">reference_vector</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16reference_vector16reference_vectorERR16reference_vector" title="reference_vector::reference_vector"><span class="n"><span class="pre">reference_vector</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N16reference_vector16reference_vectorERR16reference_vector" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vectorD0Ev">
+<span id="_CPPv3N16reference_vectorD0Ev"></span><span id="_CPPv2N16reference_vectorD0Ev"></span><span id="reference_vector::~reference_vector"></span><span class="target" id="classreference__vector_1a4a930559d2f2a616ad3a01ea48069e17"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~reference_vector</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16reference_vectorD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vectoraSERK16reference_vector">
+<span id="_CPPv3N16reference_vectoraSERK16reference_vector"></span><span id="_CPPv2N16reference_vectoraSERK16reference_vector"></span><span id="reference_vector::assign-operator__reference_vectorCR"></span><span class="target" id="classreference__vector_1ae5abb363263851399d1fa75c131688d9"></span><a class="reference internal" href="#_CPPv4N16reference_vector6this_tE" title="reference_vector::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E16reference_vector" title="reference_vector"><span class="n"><span class="pre">reference_vector</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N16reference_vectoraSERK16reference_vector" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vectoraSERR16reference_vector">
+<span id="_CPPv3N16reference_vectoraSERR16reference_vector"></span><span id="_CPPv2N16reference_vectoraSERR16reference_vector"></span><span id="reference_vector::assign-operator__reference_vectorRR"></span><span class="target" id="classreference__vector_1af476dc1179d2fa99730d0469cdf99913"></span><a class="reference internal" href="#_CPPv4N16reference_vector6this_tE" title="reference_vector::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E16reference_vector" title="reference_vector"><span class="n"><span class="pre">reference_vector</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N16reference_vectoraSERR16reference_vector" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vector4sizeEv">
+<span id="_CPPv3NK16reference_vector4sizeEv"></span><span id="_CPPv2NK16reference_vector4sizeEv"></span><span id="reference_vector::sizeC"></span><span class="target" id="classreference__vector_1abccdd6dc655461322ef3f32f056b6e9c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vector4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector6resizeE6size_t">
+<span id="_CPPv3N16reference_vector6resizeE6size_t"></span><span id="_CPPv2N16reference_vector6resizeE6size_t"></span><span id="reference_vector::resize__s"></span><span class="target" id="classreference__vector_1a20d64cdd27e9f449a58c83c922da6e2f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16reference_vector6resizeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vectorixE6size_t">
+<span id="_CPPv3N16reference_vectorixE6size_t"></span><span id="_CPPv2N16reference_vectorixE6size_t"></span><span id="reference_vector::subscript-operator__s"></span><span class="target" id="classreference__vector_1acf0b7176bbf765e8fd667fd889b82c77"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E16reference_vector" title="reference_vector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16reference_vectorixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vectorixE6size_t">
+<span id="_CPPv3NK16reference_vectorixE6size_t"></span><span id="_CPPv2NK16reference_vectorixE6size_t"></span><span id="reference_vector::subscript-operator__sC"></span><span class="target" id="classreference__vector_1a81f8ce9b016b40df1d8576a10043e756"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E16reference_vector" title="reference_vector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vectorixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector9push_backER1T">
+<span id="_CPPv3N16reference_vector9push_backER1T"></span><span id="_CPPv2N16reference_vector9push_backER1T"></span><span id="reference_vector::push_back__TR"></span><span class="target" id="classreference__vector_1a51e5ae611cb37cfd0f6d7f1738a35222"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">push_back</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E16reference_vector" title="reference_vector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16reference_vector9push_backER1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector5beginEv">
+<span id="_CPPv3N16reference_vector5beginEv"></span><span id="_CPPv2N16reference_vector5beginEv"></span><span id="reference_vector::begin"></span><span class="target" id="classreference__vector_1a85bbd06f28f0eb4704484d587fd650c2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16reference_vector5beginEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vector5beginEv">
+<span id="_CPPv3NK16reference_vector5beginEv"></span><span id="_CPPv2NK16reference_vector5beginEv"></span><span id="reference_vector::beginC"></span><span class="target" id="classreference__vector_1acc924f24a72fe4f045df96e07bf4bbb6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vector5beginEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector3endEv">
+<span id="_CPPv3N16reference_vector3endEv"></span><span id="_CPPv2N16reference_vector3endEv"></span><span id="reference_vector::end"></span><span class="target" id="classreference__vector_1adce8dc41bc1ce445369f0c85fc3aeff5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16reference_vector3endEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vector3endEv">
+<span id="_CPPv3NK16reference_vector3endEv"></span><span id="_CPPv2NK16reference_vector3endEv"></span><span id="reference_vector::endC"></span><span class="target" id="classreference__vector_1aa849a3cf1c681f52773bc4d23b9d32f3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vector3endEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector6this_tE">
+<span id="_CPPv3N16reference_vector6this_tE"></span><span id="_CPPv2N16reference_vector6this_tE"></span><span class="target" id="classreference__vector_1ad6bd73dcb6fd4a2fc09eced75396f88c"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E16reference_vector" title="reference_vector"><span class="n"><span class="pre">reference_vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E16reference_vector" title="reference_vector::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N16reference_vector6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector5vec_tE">
+<span id="_CPPv3N16reference_vector5vec_tE"></span><span id="_CPPv2N16reference_vector5vec_tE"></span><span class="target" id="classreference__vector_1af58adfbe16699965020ec6684e1093ff"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vec_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E16reference_vector" title="reference_vector::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N16reference_vector5vec_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector10iterator_tE">
+<span id="_CPPv3N16reference_vector10iterator_tE"></span><span id="_CPPv2N16reference_vector10iterator_tE"></span><span class="target" id="classreference__vector_1ad8f4bb015e69898a6f1a6aa2319d8061"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iterator_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><a class="headerlink" href="#_CPPv4N16reference_vector10iterator_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector4valsE">
+<span id="_CPPv3N16reference_vector4valsE"></span><span id="_CPPv2N16reference_vector4valsE"></span><span id="reference_vector::vals__vec_t"></span><span class="target" id="classreference__vector_1acb886fd8063a8c9e0aead37109a240f5"></span><a class="reference internal" href="#_CPPv4N16reference_vector5vec_tE" title="reference_vector::vec_t"><span class="n"><span class="pre">vec_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vals</span></span></span><a class="headerlink" href="#_CPPv4N16reference_vector4valsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector8IteratorE">
+<span id="_CPPv3N16reference_vector8IteratorE"></span><span id="_CPPv2N16reference_vector8IteratorE"></span><span id="reference_vector::Iterator"></span><span class="target" id="classreference__vector_1_1Iterator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Iterator</span></span></span><a class="headerlink" href="#_CPPv4N16reference_vector8IteratorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector8Iterator8IteratorER6this_t6size_t">
+<span id="_CPPv3N16reference_vector8Iterator8IteratorER6this_t6size_t"></span><span id="_CPPv2N16reference_vector8Iterator8IteratorER6this_t6size_t"></span><span id="reference_vector::Iterator::Iterator__this_tR.s"></span><span class="target" id="classreference__vector_1_1Iterator_1a7edd10dad8a9b56ed1cbdf5aa7ecabe8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Iterator</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N16reference_vector6this_tE" title="reference_vector::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16reference_vector8Iterator8IteratorER6this_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector8Iterator8IteratorERKN5vec_t8iteratorE">
+<span id="_CPPv3N16reference_vector8Iterator8IteratorERKN5vec_t8iteratorE"></span><span id="_CPPv2N16reference_vector8Iterator8IteratorERKN5vec_t8iteratorE"></span><span id="reference_vector::Iterator::Iterator__vec_t::iteratorCR"></span><span class="target" id="classreference__vector_1_1Iterator_1a5bc18ee3ab82734ac378b1559c789c7e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Iterator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector5vec_tE" title="reference_vector::vec_t"><span class="n"><span class="pre">vec_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">iterator</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_it</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16reference_vector8Iterator8IteratorERKN5vec_t8iteratorE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector8Iterator8IteratorERK8Iterator">
+<span id="_CPPv3N16reference_vector8Iterator8IteratorERK8Iterator"></span><span id="_CPPv2N16reference_vector8Iterator8IteratorERK8Iterator"></span><span id="reference_vector::Iterator::Iterator__IteratorCR"></span><span class="target" id="classreference__vector_1_1Iterator_1acc351e3fe07efad019d02c967e9a6eaf"></span><span class="sig-name descname"><span class="n"><span class="pre">Iterator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8Iterator8IteratorERK8Iterator" title="reference_vector::Iterator::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N16reference_vector8Iterator8IteratorERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector8IteratoraSERK8Iterator">
+<span id="_CPPv3N16reference_vector8IteratoraSERK8Iterator"></span><span id="_CPPv2N16reference_vector8IteratoraSERK8Iterator"></span><span id="reference_vector::Iterator::assign-operator__IteratorCR"></span><span class="target" id="classreference__vector_1_1Iterator_1a7b6d3e4fc1d93fc75fccd68a1cab83b0"></span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N16reference_vector8IteratoraSERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector8IteratorppEv">
+<span id="_CPPv3N16reference_vector8IteratorppEv"></span><span id="_CPPv2N16reference_vector8IteratorppEv"></span><span id="reference_vector::Iterator::inc-operator"></span><span class="target" id="classreference__vector_1_1Iterator_1a8405894b10bd84903fdff6015aefe8a8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">++</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16reference_vector8IteratorppEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector8IteratormmEv">
+<span id="_CPPv3N16reference_vector8IteratormmEv"></span><span id="_CPPv2N16reference_vector8IteratormmEv"></span><span id="reference_vector::Iterator::dec-operator"></span><span class="target" id="classreference__vector_1_1Iterator_1a0c39f399ac3dfe7a1e0c4513845a6bb1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">--</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16reference_vector8IteratormmEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vector8IteratoreqERK8Iterator">
+<span id="_CPPv3NK16reference_vector8IteratoreqERK8Iterator"></span><span id="_CPPv2NK16reference_vector8IteratoreqERK8Iterator"></span><span id="reference_vector::Iterator::eq-operator__IteratorCRC"></span><span class="target" id="classreference__vector_1_1Iterator_1a237e9be9a06d3782b41953c7e23d353f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vector8IteratoreqERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd><p>Iterator comparisons. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vector8IteratorneERK8Iterator">
+<span id="_CPPv3NK16reference_vector8IteratorneERK8Iterator"></span><span id="_CPPv2NK16reference_vector8IteratorneERK8Iterator"></span><span id="reference_vector::Iterator::neq-operator__IteratorCRC"></span><span class="target" id="classreference__vector_1_1Iterator_1a2654f9d0fde74ca1ab8947afcb439721"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vector8IteratorneERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vector8IteratorltERK8Iterator">
+<span id="_CPPv3NK16reference_vector8IteratorltERK8Iterator"></span><span id="_CPPv2NK16reference_vector8IteratorltERK8Iterator"></span><span id="reference_vector::Iterator::lt-operator__IteratorCRC"></span><span class="target" id="classreference__vector_1_1Iterator_1a7d2ecb9c4483645921bd8425f26de396"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vector8IteratorltERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vector8IteratorleERK8Iterator">
+<span id="_CPPv3NK16reference_vector8IteratorleERK8Iterator"></span><span id="_CPPv2NK16reference_vector8IteratorleERK8Iterator"></span><span id="reference_vector::Iterator::lte-operator__IteratorCRC"></span><span class="target" id="classreference__vector_1_1Iterator_1a379fd630e9301d7aef4b0f914724d7cf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vector8IteratorleERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vector8IteratorgtERK8Iterator">
+<span id="_CPPv3NK16reference_vector8IteratorgtERK8Iterator"></span><span id="_CPPv2NK16reference_vector8IteratorgtERK8Iterator"></span><span id="reference_vector::Iterator::gt-operator__IteratorCRC"></span><span class="target" id="classreference__vector_1_1Iterator_1a76ac28e36e56744ad7290756d75c7d37"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vector8IteratorgtERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vector8IteratorgeERK8Iterator">
+<span id="_CPPv3NK16reference_vector8IteratorgeERK8Iterator"></span><span id="_CPPv2NK16reference_vector8IteratorgeERK8Iterator"></span><span id="reference_vector::Iterator::gte-operator__IteratorCRC"></span><span class="target" id="classreference__vector_1_1Iterator_1ad54d4713ab55deb991609bbb6e51e2c0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vector8IteratorgeERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector8IteratormlEv">
+<span id="_CPPv3N16reference_vector8IteratormlEv"></span><span id="_CPPv2N16reference_vector8IteratormlEv"></span><span id="reference_vector::Iterator::mul-operator"></span><span class="target" id="classreference__vector_1_1Iterator_1ad5107fded77c7479a18c64c3474deea9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E16reference_vector" title="reference_vector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">*</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16reference_vector8IteratormlEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a reference to the element pointed to by this iterator; may advance iterator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vector8IteratormlEv">
+<span id="_CPPv3NK16reference_vector8IteratormlEv"></span><span id="_CPPv2NK16reference_vector8IteratormlEv"></span><span id="reference_vector::Iterator::mul-operatorC"></span><span class="target" id="classreference__vector_1_1Iterator_1a99fa64b570f1f8ef568f94dc698e4df9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E16reference_vector" title="reference_vector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">*</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vector8IteratormlEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a const reference to the element pointed to by this iterator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vector8IteratorcvbEv">
+<span id="_CPPv3NK16reference_vector8IteratorcvbEv"></span><span id="_CPPv2NK16reference_vector8IteratorcvbEv"></span><span id="reference_vector::Iterator::castto-b-operatorC"></span><span class="target" id="classreference__vector_1_1Iterator_1a41b3aa538cdc71f699236f6d2b8c56bb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vector8IteratorcvbEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Is this iterator pointing to a valid position in the vector? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector8Iterator5beginEv">
+<span id="_CPPv3N16reference_vector8Iterator5beginEv"></span><span id="_CPPv2N16reference_vector8Iterator5beginEv"></span><span id="reference_vector::Iterator::begin"></span><span class="target" id="classreference__vector_1_1Iterator_1a6fc968515325c81658dacfbc7a1b6958"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16reference_vector8Iterator5beginEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return an iterator pointing to the first position in the vector. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vector8Iterator5beginEv">
+<span id="_CPPv3NK16reference_vector8Iterator5beginEv"></span><span id="_CPPv2NK16reference_vector8Iterator5beginEv"></span><span id="reference_vector::Iterator::beginC"></span><span class="target" id="classreference__vector_1_1Iterator_1a9933b653b34061c8f074951b031060df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vector8Iterator5beginEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a const iterator pointing to the first position in the vector. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector8Iterator3endEv">
+<span id="_CPPv3N16reference_vector8Iterator3endEv"></span><span id="_CPPv2N16reference_vector8Iterator3endEv"></span><span id="reference_vector::Iterator::end"></span><span class="target" id="classreference__vector_1_1Iterator_1a13823aac6754f5d5e440eadf216b0b0f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16reference_vector8Iterator3endEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return an iterator pointing to just past the end of the vector. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16reference_vector8Iterator3endEv">
+<span id="_CPPv3NK16reference_vector8Iterator3endEv"></span><span id="_CPPv2NK16reference_vector8Iterator3endEv"></span><span id="reference_vector::Iterator::endC"></span><span class="target" id="classreference__vector_1_1Iterator_1a0b18091af7fb9b9374e9b2f08e2d23ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16reference_vector8IteratorE" title="reference_vector::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16reference_vector8Iterator3endEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a const iterator pointing to just past the end of the vector. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16reference_vector8Iterator2itE">
+<span id="_CPPv3N16reference_vector8Iterator2itE"></span><span id="_CPPv2N16reference_vector8Iterator2itE"></span><span id="reference_vector::Iterator::it__vec_t::iterator"></span><span class="target" id="classreference__vector_1_1Iterator_1abe65bd56329ee5f77f2958997a1f2aa8"></span><a class="reference internal" href="#_CPPv4N16reference_vector5vec_tE" title="reference_vector::vec_t"><span class="n"><span class="pre">vec_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">iterator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">it</span></span></span><a class="headerlink" href="#_CPPv4N16reference_vector8Iterator2itE" title="Link to this definition"></a><br /></dt>
+<dd><p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Add a const interator, and probably a reverse iterator. </p>
+</dd></dl>
+
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ra_set.html" class="btn btn-neutral float-left" title="ra_set.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="set_utils.html" class="btn btn-neutral float-right" title="set_utils.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

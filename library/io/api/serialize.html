@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>serialize.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/io/api/serialize.8b516bf1-d37c-4e3f-a30e-a41298949231.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="serialize_macros.hpp" href="serialize_macros.html" />
+    <link rel="prev" title="ascii_utils.hpp" href="ascii_utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../io.html">IO</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../io.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ContiguousStream.html">ContiguousStream.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="File.html">File.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="MemoryIStream.html">MemoryIStream.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NullStream.html">NullStream.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StreamManager.html">StreamManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ascii_utils.html">ascii_utils.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">serialize.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49serialize"><code class="docutils literal notranslate"><span class="pre">serialize</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="serialize_macros.html">serialize_macros.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../io.html">IO</a></li>
+      <li class="breadcrumb-item active">serialize.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="serialize-hpp">
+<h1>serialize.hpp<a class="headerlink" href="#serialize-hpp" title="Link to this heading"></a></h1>
+<p>Tools to save and load data from classes. </p>
+<p>
+All of the important information about a class is stored in a DataPod, which can be used to restore the class at a later time.</p>
+<p>Why is this better than other serialization techniques?<ol class="arabic simple">
+<li><p>Only one line of code is added to a custom class to make it serializable.</p></li>
+<li><p>Serialized objects do not need a default constructor (a DataPod constructor is added)</p></li>
+<li><p>Serialized objects can be const since they get rebuilt during construction.</p></li>
+<li><p>Synergistic interactions with other EMP classes, such as config and tuple_struct</p></li>
+</ol>
+</p>
+<p>In order to setup a target class to be able to be serialized into a pod, you must add a macro to include the needed functionality. For a basic class, use:</p>
+<p>EMP_SETUP_DATAPOD(ClassName, var1, var2, …)</p>
+<p>Where ClassName is the target class’ name and var1, var2, etc are the names of the member variables that also need to be stored. Note that member variables can be either built-in types or custom types that have also had DataPods setup in them.</p>
+<p>If the target class is a derived class, you must use either:</p>
+<p>EMP_SETUP_DATAPOD_D(ClassName, BassClassName, var1, var2, …)</p>
+<p>-or-</p>
+<p>EMP_SETUP_DATAPOD_D2(ClassName, BassClass1Name, BaseClass2Name, var1, var2, …)</p>
+<p>…depending on how many base classes it was derived from (currently max 2).</p>
+<p>Note also that this macro must either go in the public section of the target class definition, or the target class must be made a friend to the serialize::DataPod class.</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Build custom load/store function for more STL objects (especially containers) </p>
+<p>To deal with pointers we should recurse, but keep map to new pointer locations. </p>
+<p>Setup a more robust method for dealing with arbitrary strings so we don’t have to worry about collisions in streams (JSon format??) </p>
+<p>Setup a (compressed) binary save format in DataPods in addition to JSon. </p>
+<p>Setup promised synergistic interactions with config and tuple_struct to auto store and load without any additional effort on the part of the library user. </p>
+</dd></dl>
+
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA</p>
+</div>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv49serialize">
+<span id="_CPPv39serialize"></span><span id="_CPPv29serialize"></span><span id="serialize"></span><span class="target" id="namespaceserialize"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">serialize</span></span></span><a class="headerlink" href="#_CPPv49serialize" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN9serialize8StoreVarERN1T20emp_load_return_typeER7DataPodRK1Tb">
+<span id="_CPPv3I0EN9serialize8StoreVarER7DataPodRK1Tb"></span><span id="_CPPv2I0EN9serialize8StoreVarER7DataPodRK1Tb"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespaceserialize_1a0cc2028498e3215a9723b8a5b6d5fa5f"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StoreVar</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9serialize7DataPodE" title="serialize::DataPod"><span class="n"><span class="pre">DataPod</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pod</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN9serialize8StoreVarERN1T20emp_load_return_typeER7DataPodRK1Tb" title="serialize::StoreVar::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">var</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN9serialize8StoreVarERN1T20emp_load_return_typeER7DataPodRK1Tb" title="serialize::StoreVar::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">emp_load_return_type</span></span><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4I0EN9serialize8StoreVarERN1T20emp_load_return_typeER7DataPodRK1Tb" title="Link to this definition"></a><br /></dt>
+<dd><p>StoreVar() takes a DataPod and a variable and stores that variable to the pod. The third argument (bool vs. int) will receive a bool, and thus bool versions are preferred in the case of a tie. Specialized versions of this function can be included elsewhere, as needed, and should take a bool as the third argument. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN9serialize8StoreVarEvR7DataPodRK6vectorI1TEb">
+<span id="_CPPv3I0EN9serialize8StoreVarER7DataPodRK6vectorI1TEb"></span><span id="_CPPv2I0EN9serialize8StoreVarER7DataPodRK6vectorI1TEb"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespaceserialize_1a109540240f041b0d61cd35de0fd736e9"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StoreVar</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9serialize7DataPodE" title="serialize::DataPod"><span class="n"><span class="pre">DataPod</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pod</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN9serialize8StoreVarEvR7DataPodRK6vectorI1TEb" title="serialize::StoreVar::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">var</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN9serialize8StoreVarEvR7DataPodRK6vectorI1TEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN9serialize8StoreVarEvR7DataPodRK1Ti">
+<span id="_CPPv3I0EN9serialize8StoreVarER7DataPodRK1Ti"></span><span id="_CPPv2I0EN9serialize8StoreVarER7DataPodRK1Ti"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespaceserialize_1a6a47f2e158440d764a201e280e517153"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StoreVar</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9serialize7DataPodE" title="serialize::DataPod"><span class="n"><span class="pre">DataPod</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pod</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN9serialize8StoreVarEvR7DataPodRK1Ti" title="serialize::StoreVar::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">var</span></span>, <span class="kt"><span class="pre">int</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN9serialize8StoreVarEvR7DataPodRK1Ti" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN9serialize9SetupLoadERN1T20emp_load_return_typeER7DataPodP1Tb">
+<span id="_CPPv3I0EN9serialize9SetupLoadER7DataPodP1Tb"></span><span id="_CPPv2I0EN9serialize9SetupLoadER7DataPodP1Tb"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespaceserialize_1a195b0725415f8bc67d18fe8ea49f71f4"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetupLoad</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9serialize7DataPodE" title="serialize::DataPod"><span class="n"><span class="pre">DataPod</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pod</span></span>, <a class="reference internal" href="#_CPPv4I0EN9serialize9SetupLoadERN1T20emp_load_return_typeER7DataPodP1Tb" title="serialize::SetupLoad::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">*</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN9serialize9SetupLoadERN1T20emp_load_return_typeER7DataPodP1Tb" title="serialize::SetupLoad::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">emp_load_return_type</span></span><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4I0EN9serialize9SetupLoadERN1T20emp_load_return_typeER7DataPodP1Tb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN9serialize9SetupLoadE1TR7DataPodPK1Ti">
+<span id="_CPPv3I0EN9serialize9SetupLoadER7DataPodPK1Ti"></span><span id="_CPPv2I0EN9serialize9SetupLoadER7DataPodPK1Ti"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespaceserialize_1a543d002ef31fa12410edd1fe8cf8b00c"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetupLoad</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9serialize7DataPodE" title="serialize::DataPod"><span class="n"><span class="pre">DataPod</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pod</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN9serialize9SetupLoadE1TR7DataPodPK1Ti" title="serialize::SetupLoad::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">*</span></span>, <span class="kt"><span class="pre">int</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN9serialize9SetupLoadE1TR7DataPodPK1Ti" title="serialize::SetupLoad::T"><span class="n"><span class="pre">T</span></span></a><a class="headerlink" href="#_CPPv4I0EN9serialize9SetupLoadE1TR7DataPodPK1Ti" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize9SetupLoadER7DataPodPNSt6stringEb">
+<span id="_CPPv3N9serialize9SetupLoadER7DataPodPNSt6stringEb"></span><span id="_CPPv2N9serialize9SetupLoadER7DataPodPNSt6stringEb"></span><span id="serialize::SetupLoad__DataPodR.ssP.b"></span><span class="target" id="namespaceserialize_1a2ccc42a137a3a5e96c056b700701fc45"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetupLoad</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9serialize7DataPodE" title="serialize::DataPod"><span class="n"><span class="pre">DataPod</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pod</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">*</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9serialize9SetupLoadER7DataPodPNSt6stringEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN9serialize9SetupLoadE6vectorI1TER7DataPodP6vectorI1TEb">
+<span id="_CPPv3I0EN9serialize9SetupLoadER7DataPodP6vectorI1TEb"></span><span id="_CPPv2I0EN9serialize9SetupLoadER7DataPodP6vectorI1TEb"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespaceserialize_1adb12b61c14c23fb3c46c4064c83c7eff"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN9serialize9SetupLoadE6vectorI1TER7DataPodP6vectorI1TEb" title="serialize::SetupLoad::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetupLoad</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9serialize7DataPodE" title="serialize::DataPod"><span class="n"><span class="pre">DataPod</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pod</span></span>, <a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN9serialize9SetupLoadE6vectorI1TER7DataPodP6vectorI1TEb" title="serialize::SetupLoad::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">*</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN9serialize9SetupLoadE6vectorI1TER7DataPodP6vectorI1TEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN9serialize5StoreEvR7DataPodDpR9ARG_TYPES">
+<span id="_CPPv3IDpEN9serialize5StoreER7DataPodDpR9ARG_TYPES"></span><span id="_CPPv2IDpEN9serialize5StoreER7DataPodDpR9ARG_TYPES"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARG_TYPES</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespaceserialize_1a95bbb78eba7eb1fedfe2d0a67c391998"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Store</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9serialize7DataPodE" title="serialize::DataPod"><span class="n"><span class="pre">DataPod</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pod</span></span>, <a class="reference internal" href="#_CPPv4IDpEN9serialize5StoreEvR7DataPodDpR9ARG_TYPES" title="serialize::Store::ARG_TYPES"><span class="n"><span class="pre">ARG_TYPES</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN9serialize5StoreEvR7DataPodDpR9ARG_TYPES" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPodE">
+<span id="_CPPv3N9serialize7DataPodE"></span><span id="_CPPv2N9serialize7DataPodE"></span><span id="serialize::DataPod"></span><span class="target" id="classserialize_1_1DataPod"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DataPod</span></span></span><a class="headerlink" href="#_CPPv4N9serialize7DataPodE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;serialize.hpp&gt;</em></div>
+<p>A DataPod managed information about another class for serialization. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPod7DataPodERNSt7ostreamERNSt7istreamE">
+<span id="_CPPv3N9serialize7DataPod7DataPodERNSt7ostreamERNSt7istreamE"></span><span id="_CPPv2N9serialize7DataPod7DataPodERNSt7ostreamERNSt7istreamE"></span><span id="serialize::DataPod::DataPod__osR.isR"></span><span class="target" id="classserialize_1_1DataPod_1a2448cb35618373a0becfb93df53b8618"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DataPod</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_os</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_is</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9serialize7DataPod7DataPodERNSt7ostreamERNSt7istreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPod7DataPodERNSt8iostreamE">
+<span id="_CPPv3N9serialize7DataPod7DataPodERNSt8iostreamE"></span><span id="_CPPv2N9serialize7DataPod7DataPodERNSt8iostreamE"></span><span id="serialize::DataPod::DataPod__iosR"></span><span class="target" id="classserialize_1_1DataPod_1a7d3527ed6020ba0b338dfc31449dc0b0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DataPod</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">iostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_ios</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9serialize7DataPod7DataPodERNSt8iostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPod7DataPodERR7DataPod">
+<span id="_CPPv3N9serialize7DataPod7DataPodERR7DataPod"></span><span id="_CPPv2N9serialize7DataPod7DataPodERR7DataPod"></span><span id="serialize::DataPod::DataPod__DataPodRR"></span><span class="target" id="classserialize_1_1DataPod_1a933cbec70f85a92866e48aa1b7b97433"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DataPod</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9serialize7DataPod7DataPodERR7DataPod" title="serialize::DataPod::DataPod"><span class="n"><span class="pre">DataPod</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rhs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9serialize7DataPod7DataPodERR7DataPod" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPodaSERR7DataPod">
+<span id="_CPPv3N9serialize7DataPodaSERR7DataPod"></span><span id="_CPPv2N9serialize7DataPodaSERR7DataPod"></span><span id="serialize::DataPod::assign-operator__DataPodRR"></span><span class="target" id="classserialize_1_1DataPod_1ab25c2416aad6e47e27b5181703b25c68"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9serialize7DataPodE" title="serialize::DataPod"><span class="n"><span class="pre">DataPod</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9serialize7DataPodE" title="serialize::DataPod"><span class="n"><span class="pre">DataPod</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rhs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9serialize7DataPodaSERR7DataPod" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPod7DataPodEv">
+<span id="_CPPv3N9serialize7DataPod7DataPodEv"></span><span id="_CPPv2N9serialize7DataPod7DataPodEv"></span><span id="serialize::DataPod::DataPod"></span><span class="target" id="classserialize_1_1DataPod_1a7023bb07a34a09cb3e5e471aa0870fd9"></span><span class="sig-name descname"><span class="n"><span class="pre">DataPod</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N9serialize7DataPod7DataPodEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPod7DataPodERK7DataPod">
+<span id="_CPPv3N9serialize7DataPod7DataPodERK7DataPod"></span><span id="_CPPv2N9serialize7DataPod7DataPodERK7DataPod"></span><span id="serialize::DataPod::DataPod__DataPodCR"></span><span class="target" id="classserialize_1_1DataPod_1a1eeedcb967761a5f2857cd260c03576f"></span><span class="sig-name descname"><span class="n"><span class="pre">DataPod</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9serialize7DataPod7DataPodERK7DataPod" title="serialize::DataPod::DataPod"><span class="n"><span class="pre">DataPod</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N9serialize7DataPod7DataPodERK7DataPod" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPodD0Ev">
+<span id="_CPPv3N9serialize7DataPodD0Ev"></span><span id="_CPPv2N9serialize7DataPodD0Ev"></span><span id="serialize::DataPod::~DataPod"></span><span class="target" id="classserialize_1_1DataPod_1a0a572f7ae10fb435a409f9f8e8736c23"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~DataPod</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9serialize7DataPodD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPod7OStreamEv">
+<span id="_CPPv3N9serialize7DataPod7OStreamEv"></span><span id="_CPPv2N9serialize7DataPod7OStreamEv"></span><span id="serialize::DataPod::OStream"></span><span class="target" id="classserialize_1_1DataPod_1a29a23b692ea6cc8cf32bac7c5d33c524"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">OStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9serialize7DataPod7OStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPod7IStreamEv">
+<span id="_CPPv3N9serialize7DataPod7IStreamEv"></span><span id="_CPPv2N9serialize7DataPod7IStreamEv"></span><span id="serialize::DataPod::IStream"></span><span class="target" id="classserialize_1_1DataPod_1a40a7a06dde087d0f86d0ff968b597268"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">IStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9serialize7DataPod7IStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPod9ClearDataEv">
+<span id="_CPPv3N9serialize7DataPod9ClearDataEv"></span><span id="_CPPv2N9serialize7DataPod9ClearDataEv"></span><span id="serialize::DataPod::ClearData"></span><span class="target" id="classserialize_1_1DataPod_1a547261070bf61c8b2ae0a242b060e38e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClearData</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9serialize7DataPod9ClearDataEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPod2osE">
+<span id="_CPPv3N9serialize7DataPod2osE"></span><span id="_CPPv2N9serialize7DataPod2osE"></span><span id="serialize::DataPod::os__Ptr:os:"></span><span class="target" id="classserialize_1_1DataPod_1a0d8bbe8507f43ee1165baa9a90e00076"></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N9serialize7DataPod2osE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPod2isE">
+<span id="_CPPv3N9serialize7DataPod2isE"></span><span id="_CPPv2N9serialize7DataPod2isE"></span><span id="serialize::DataPod::is__Ptr:is:"></span><span class="target" id="classserialize_1_1DataPod_1a8047372f5eb638e30d1f673473a8677b"></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N9serialize7DataPod2isE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPod6own_osE">
+<span id="_CPPv3N9serialize7DataPod6own_osE"></span><span id="_CPPv2N9serialize7DataPod6own_osE"></span><span id="serialize::DataPod::own_os__b"></span><span class="target" id="classserialize_1_1DataPod_1af03f1a6724cabbe638a850f421364479"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">own_os</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N9serialize7DataPod6own_osE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9serialize7DataPod6own_isE">
+<span id="_CPPv3N9serialize7DataPod6own_isE"></span><span id="_CPPv2N9serialize7DataPod6own_isE"></span><span id="serialize::DataPod::own_is__b"></span><span class="target" id="classserialize_1_1DataPod_1a7d950155898b173e227b680dc69d29dd"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">own_is</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N9serialize7DataPod6own_isE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ascii_utils.html" class="btn btn-neutral float-left" title="ascii_utils.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="serialize_macros.html" class="btn btn-neutral float-right" title="serialize_macros.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

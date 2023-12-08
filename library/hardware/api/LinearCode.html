@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinearCode.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/hardware/api/LinearCode.5f3c1356-a7f9-4ea0-95d1-63d4356c94dd.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="VirtualCPU.hpp" href="VirtualCPU.html" />
+    <link rel="prev" title="InstLib.hpp" href="InstLib.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../hardware.html">Hardware</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../hardware.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AvidaCPU_InstLib.html">AvidaCPU_InstLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AvidaGP.html">AvidaGP.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BitSorter.html">BitSorter.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="EventDrivenGP.html">EventDrivenGP.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="EventLib.html">EventLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Genome.html">Genome.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="InstLib.html">InstLib.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">LinearCode.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_6size_t0E11Instruction"><code class="docutils literal notranslate"><span class="pre">Instruction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_6size_t0E10LinearCode"><code class="docutils literal notranslate"><span class="pre">LinearCode</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="VirtualCPU.html">VirtualCPU.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="VirtualCPU_InstLib.html">VirtualCPU_InstLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="signalgp_utils.html">signalgp_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../hardware.html">Hardware</a></li>
+      <li class="breadcrumb-item active">LinearCode.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="linearcode-hpp">
+<h1>LinearCode.hpp<a class="headerlink" href="#linearcode-hpp" title="Link to this heading"></a></h1>
+<p>A linear sequence of instructions. </p>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_t0E11Instruction">
+<span id="_CPPv3I_6size_t0E11Instruction"></span><span id="_CPPv2I_6size_t0E11Instruction"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_COUNT</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_TYPE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structInstruction"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Instruction</span></span></span><a class="headerlink" href="#_CPPv4I_6size_t0E11Instruction" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;LinearCode.hpp&gt;</em></div>
+<p>A single instruction in a linear genome. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11Instruction6args_tE">
+<span id="_CPPv3N11Instruction6args_tE"></span><span id="_CPPv2N11Instruction6args_tE"></span><span class="target" id="structInstruction_1ae4eadaeda8829c5defa0f8d9d3f2d52e"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">args_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t0E11Instruction" title="Instruction::ARG_TYPE"><span class="n"><span class="pre">ARG_TYPE</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E11Instruction" title="Instruction::ARG_COUNT"><span class="n"><span class="pre">ARG_COUNT</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N11Instruction6args_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Instruction11InstructionE6size_tRK6args_t">
+<span id="_CPPv3N11Instruction11InstructionE6size_tRK6args_t"></span><span id="_CPPv2N11Instruction11InstructionE6size_tRK6args_t"></span><span id="Instruction::Instruction__s.args_tCR"></span><span class="target" id="structInstruction_1a6a0b10b2585a381637a0e976b3ac00f9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Instruction</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11Instruction6args_tE" title="Instruction::args_t"><span class="n"><span class="pre">args_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_args</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Instruction11InstructionE6size_tRK6args_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Instruction11InstructionERK11Instruction">
+<span id="_CPPv3N11Instruction11InstructionERK11Instruction"></span><span id="_CPPv2N11Instruction11InstructionERK11Instruction"></span><span id="Instruction::Instruction__InstructionCR"></span><span class="target" id="structInstruction_1ad492862841b7beca14cc49e2de31adcb"></span><span class="sig-name descname"><span class="n"><span class="pre">Instruction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11Instruction11InstructionERK11Instruction" title="Instruction::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11Instruction11InstructionERK11Instruction" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Instruction11InstructionERR11Instruction">
+<span id="_CPPv3N11Instruction11InstructionERR11Instruction"></span><span id="_CPPv2N11Instruction11InstructionERR11Instruction"></span><span id="Instruction::Instruction__InstructionRR"></span><span class="target" id="structInstruction_1af9ff644e3f28ec8b820cfc75cfe155db"></span><span class="sig-name descname"><span class="n"><span class="pre">Instruction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N11Instruction11InstructionERR11Instruction" title="Instruction::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11Instruction11InstructionERR11Instruction" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11InstructionaSERK11Instruction">
+<span id="_CPPv3N11InstructionaSERK11Instruction"></span><span id="_CPPv2N11InstructionaSERK11Instruction"></span><span id="Instruction::assign-operator__InstructionCR"></span><span class="target" id="structInstruction_1ac73869d5b7ba52649a06fa2157441ea6"></span><a class="reference internal" href="#_CPPv4I_6size_t0E11Instruction" title="Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E11Instruction" title="Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11InstructionaSERK11Instruction" title="Link to this definition"></a><br /></dt>
+<dd><p>Copy operator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11InstructionaSERR11Instruction">
+<span id="_CPPv3N11InstructionaSERR11Instruction"></span><span id="_CPPv2N11InstructionaSERR11Instruction"></span><span id="Instruction::assign-operator__InstructionRR"></span><span class="target" id="structInstruction_1a07c993baf3834739ab210e1594b2a3cc"></span><a class="reference internal" href="#_CPPv4I_6size_t0E11Instruction" title="Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E11Instruction" title="Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11InstructionaSERR11Instruction" title="Link to this definition"></a><br /></dt>
+<dd><p>Move operator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11InstructionltERK11Instruction">
+<span id="_CPPv3NK11InstructionltERK11Instruction"></span><span id="_CPPv2NK11InstructionltERK11Instruction"></span><span id="Instruction::lt-operator__InstructionCRC"></span><span class="target" id="structInstruction_1acaef3e5a80187a94e1e7c51061eed0b3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E11Instruction" title="Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11InstructionltERK11Instruction" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if this instruction is less than another. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Instruction3SetE6size_tRK6args_t">
+<span id="_CPPv3N11Instruction3SetE6size_tRK6args_t"></span><span id="_CPPv2N11Instruction3SetE6size_tRK6args_t"></span><span id="Instruction::Set__s.args_tCR"></span><span class="target" id="structInstruction_1ad2a35b18220c8021e5df23338babf472"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11Instruction6args_tE" title="Instruction::args_t"><span class="n"><span class="pre">args_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Instruction3SetE6size_tRK6args_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Explicitly set the instruction type and specific arguments for this instruction. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11InstructioneqERK11Instruction">
+<span id="_CPPv3NK11InstructioneqERK11Instruction"></span><span id="_CPPv2NK11InstructioneqERK11Instruction"></span><span id="Instruction::eq-operator__InstructionCRC"></span><span class="target" id="structInstruction_1a9bf38466aa3f1cc4a2b3dd277552b28f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E11Instruction" title="Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11InstructioneqERK11Instruction" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if this instruction is identical to another. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Instruction2idE">
+<span id="_CPPv3N11Instruction2idE"></span><span id="_CPPv2N11Instruction2idE"></span><span id="Instruction::id__s"></span><span class="target" id="structInstruction_1a7eeb22c12044e9fbc9b1a355a508d93e"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id</span></span></span><a class="headerlink" href="#_CPPv4N11Instruction2idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Unique value identifying which instruction this is. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Instruction4argsE">
+<span id="_CPPv3N11Instruction4argsE"></span><span id="_CPPv2N11Instruction4argsE"></span><span id="Instruction::args__args_t"></span><span class="target" id="structInstruction_1a44c67407662046e62957737852d8a953"></span><a class="reference internal" href="#_CPPv4N11Instruction6args_tE" title="Instruction::args_t"><span class="n"><span class="pre">args_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">args</span></span></span><a class="headerlink" href="#_CPPv4N11Instruction4argsE" title="Link to this definition"></a><br /></dt>
+<dd><p>A set of arguments defining the specific behavior of this instruction. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_t0E10LinearCode">
+<span id="_CPPv3I_6size_t0E10LinearCode"></span><span id="_CPPv2I_6size_t0E10LinearCode"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_COUNT</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_TYPE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classLinearCode"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LinearCode</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t0E11Instruction" title="Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I_6size_t0E10LinearCode" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;LinearCode.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10LinearCode7AddInstE6size_tRK5arrayI8ARG_TYPE9ARG_COUNTE">
+<span id="_CPPv3N10LinearCode7AddInstE6size_tRK5arrayI8ARG_TYPE9ARG_COUNTE"></span><span id="_CPPv2N10LinearCode7AddInstE6size_tRK5arrayI8ARG_TYPE9ARG_COUNTE"></span><span id="LinearCode::AddInst__s.array:ARG_TYPE.ARG_COUNT:CR"></span><span class="target" id="classLinearCode_1a53af414799f602c11e8bf0646d335a6b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddInst</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t0E10LinearCode" title="LinearCode::ARG_TYPE"><span class="n"><span class="pre">ARG_TYPE</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E10LinearCode" title="LinearCode::ARG_COUNT"><span class="n"><span class="pre">ARG_COUNT</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_args</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10LinearCode7AddInstE6size_tRK5arrayI8ARG_TYPE9ARG_COUNTE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="InstLib.html" class="btn btn-neutral float-left" title="InstLib.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="VirtualCPU.html" class="btn btn-neutral float-right" title="VirtualCPU.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

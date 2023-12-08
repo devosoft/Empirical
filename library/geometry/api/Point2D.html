@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Point2D.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/geometry/api/Point2D.4445fe47-af65-4575-baae-e4ed6515a196.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Surface.hpp" href="Surface.html" />
+    <link rel="prev" title="Physics2D.hpp" href="Physics2D.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../geometry.html">Geometry</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../geometry.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Angle2D.html">Angle2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Body2D.html">Body2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Circle2D.html">Circle2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Physics2D.html">Physics2D.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Point2D.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv45Point"><code class="docutils literal notranslate"><span class="pre">Point</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Surface.html">Surface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Surface2D.html">Surface2D.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../geometry.html">Geometry</a></li>
+      <li class="breadcrumb-item active">Point2D.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="point2d-hpp">
+<h1>Point2D.hpp<a class="headerlink" href="#point2d-hpp" title="Link to this heading"></a></h1>
+<p>A simple class to track value pairs of any kind, optimized for points in 2D Space. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For maximal efficiency, prefer SquareMagnitude() and SquareDistance() over Magnitude() and Distance() as the latter require a square-root. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv45Point">
+<span id="_CPPv35Point"></span><span id="_CPPv25Point"></span><span class="target" id="Point2D_8hpp_1ad902349a5bcb1e04b85f04979d7de16f"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Point</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv45Point" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E7Point2D">
+<span id="_CPPv3I0E7Point2D"></span><span id="_CPPv2I0E7Point2D"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TYPE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classPoint2D"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Point2D</span></span></span><a class="headerlink" href="#_CPPv4I0E7Point2D" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Point2D.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D7Point2DEv">
+<span id="_CPPv3N7Point2D7Point2DEv"></span><span id="_CPPv2N7Point2D7Point2DEv"></span><span id="Point2D::Point2DCE"></span><span class="target" id="classPoint2D_1a972a94549dfbb22973df72e1e11b038b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Point2D</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D7Point2DEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D7Point2DERK7Point2D">
+<span id="_CPPv3N7Point2D7Point2DERK7Point2D"></span><span id="_CPPv2N7Point2D7Point2DERK7Point2D"></span><span id="Point2D::Point2D__Point2DCRCE"></span><span class="target" id="classPoint2D_1aa80f2dd8bca0961c13061e8f62e71c28"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Point2D</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Point2D7Point2DERK7Point2D" title="Point2D::Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D7Point2DERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D7Point2DE4TYPE4TYPE">
+<span id="_CPPv3N7Point2D7Point2DE4TYPE4TYPE"></span><span id="_CPPv2N7Point2D7Point2DE4TYPE4TYPE"></span><span id="Point2D::Point2D__TYPE.TYPECE"></span><span class="target" id="classPoint2D_1a423964f43c312d68e5fcef8c544c25ec"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Point2D</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_x</span></span>, <a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D7Point2DE4TYPE4TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D7Point2DERK7Point2D4TYPE">
+<span id="_CPPv3N7Point2D7Point2DERK7Point2D4TYPE"></span><span id="_CPPv2N7Point2D7Point2DERK7Point2D4TYPE"></span><span id="Point2D::Point2D__Point2DCR.TYPECE"></span><span class="target" id="classPoint2D_1af34f598991caab0938d1fcfdd8828289"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Point2D</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Point2D7Point2DERK7Point2D4TYPE" title="Point2D::Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span>, <a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">new_magnitude</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D7Point2DERK7Point2D4TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2DaSERK7Point2D">
+<span id="_CPPv3N7Point2DaSERK7Point2D"></span><span id="_CPPv2N7Point2DaSERK7Point2D"></span><span id="Point2D::assign-operator__Point2DCR"></span><span class="target" id="classPoint2D_1a6f4764209c22ab236b57985cdd6f017e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2DaSERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2DeqERK7Point2D">
+<span id="_CPPv3NK7Point2DeqERK7Point2D"></span><span id="_CPPv2NK7Point2DeqERK7Point2D"></span><span id="Point2D::eq-operator__Point2DCRCCE"></span><span class="target" id="classPoint2D_1ac54c8d01ec49e173bd68293f69929359"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2DeqERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2DneERK7Point2D">
+<span id="_CPPv3NK7Point2DneERK7Point2D"></span><span id="_CPPv2NK7Point2DneERK7Point2D"></span><span id="Point2D::neq-operator__Point2DCRCCE"></span><span class="target" id="classPoint2D_1a960cd245b3d0184b43ebce2ae1f5a6bd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2DneERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2DleERK7Point2D">
+<span id="_CPPv3NK7Point2DleERK7Point2D"></span><span id="_CPPv2NK7Point2DleERK7Point2D"></span><span id="Point2D::lte-operator__Point2DCRCCE"></span><span class="target" id="classPoint2D_1a3ae6ccb355fd47121d87834bdc9add96"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2DleERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2DgeERK7Point2D">
+<span id="_CPPv3NK7Point2DgeERK7Point2D"></span><span id="_CPPv2NK7Point2DgeERK7Point2D"></span><span id="Point2D::gte-operator__Point2DCRCCE"></span><span class="target" id="classPoint2D_1a763a493c37da7ad6e551c109317d9ffb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2DgeERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D4GetXEv">
+<span id="_CPPv3NK7Point2D4GetXEv"></span><span id="_CPPv2NK7Point2D4GetXEv"></span><span id="Point2D::GetXCCE"></span><span class="target" id="classPoint2D_1a34add386c33765c4d41010eb6286ed79"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetX</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D4GetXEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D4GetYEv">
+<span id="_CPPv3NK7Point2D4GetYEv"></span><span id="_CPPv2NK7Point2D4GetYEv"></span><span id="Point2D::GetYCCE"></span><span class="target" id="classPoint2D_1ac36d6756c1e06525c0799f64fe4be556"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetY</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D4GetYEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D4SetXE4TYPE">
+<span id="_CPPv3N7Point2D4SetXE4TYPE"></span><span id="_CPPv2N7Point2D4SetXE4TYPE"></span><span id="Point2D::SetX__TYPE"></span><span class="target" id="classPoint2D_1af3442aa838ec8ba223a448294e045782"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetX</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D4SetXE4TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D4SetYE4TYPE">
+<span id="_CPPv3N7Point2D4SetYE4TYPE"></span><span id="_CPPv2N7Point2D4SetYE4TYPE"></span><span id="Point2D::SetY__TYPE"></span><span class="target" id="classPoint2D_1a4d2559df1cfc4e42cb4cd5e858cbd6ee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetY</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D4SetYE4TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D3SetE4TYPE4TYPE">
+<span id="_CPPv3N7Point2D3SetE4TYPE4TYPE"></span><span id="_CPPv2N7Point2D3SetE4TYPE4TYPE"></span><span id="Point2D::Set__TYPE.TYPE"></span><span class="target" id="classPoint2D_1a27dee87daf5c18d7abf139a42c2f246c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_x</span></span>, <a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D3SetE4TYPE4TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D15SquareMagnitudeEv">
+<span id="_CPPv3NK7Point2D15SquareMagnitudeEv"></span><span id="_CPPv2NK7Point2D15SquareMagnitudeEv"></span><span id="Point2D::SquareMagnitudeCCE"></span><span class="target" id="classPoint2D_1abf56e2158f28f66d4f233c6d35d4799b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SquareMagnitude</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D15SquareMagnitudeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D9MagnitudeEv">
+<span id="_CPPv3NK7Point2D9MagnitudeEv"></span><span id="_CPPv2NK7Point2D9MagnitudeEv"></span><span id="Point2D::MagnitudeCCE"></span><span class="target" id="classPoint2D_1ad691359423096470da7d5452ec75231f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Magnitude</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D9MagnitudeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D8AtOriginEv">
+<span id="_CPPv3NK7Point2D8AtOriginEv"></span><span id="_CPPv2NK7Point2D8AtOriginEv"></span><span id="Point2D::AtOriginCCE"></span><span class="target" id="classPoint2D_1ac7c97b28fba770390a41726c96e62057"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AtOrigin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D8AtOriginEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D7NonZeroEv">
+<span id="_CPPv3NK7Point2D7NonZeroEv"></span><span id="_CPPv2NK7Point2D7NonZeroEv"></span><span id="Point2D::NonZeroCCE"></span><span class="target" id="classPoint2D_1a8a97ac40ee95fb08f5c48c2c6b45e77b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NonZero</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D7NonZeroEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D11GetMidpointERK7Point2D">
+<span id="_CPPv3NK7Point2D11GetMidpointERK7Point2D"></span><span id="_CPPv2NK7Point2D11GetMidpointERK7Point2D"></span><span id="Point2D::GetMidpoint__Point2DCRCCE"></span><span class="target" id="classPoint2D_1ab66c17217051f5dd34a32a494bfa69a3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetMidpoint</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">p2</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D11GetMidpointERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D8GetRot90Ev">
+<span id="_CPPv3NK7Point2D8GetRot90Ev"></span><span id="_CPPv2NK7Point2D8GetRot90Ev"></span><span id="Point2D::GetRot90CCE"></span><span class="target" id="classPoint2D_1a0732d3d9affdbd80bd828ce41cd409f7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRot90</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D8GetRot90Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D9GetRot180Ev">
+<span id="_CPPv3NK7Point2D9GetRot180Ev"></span><span id="_CPPv2NK7Point2D9GetRot180Ev"></span><span id="Point2D::GetRot180CCE"></span><span class="target" id="classPoint2D_1a806603a3b344496f7335b5ebf30d9a68"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRot180</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D9GetRot180Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D9GetRot270Ev">
+<span id="_CPPv3NK7Point2D9GetRot270Ev"></span><span id="_CPPv2NK7Point2D9GetRot270Ev"></span><span id="Point2D::GetRot270CCE"></span><span class="target" id="classPoint2D_1a19bc6386f1051820f19c319c5401e1ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRot270</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D9GetRot270Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D9GetOffsetE4TYPE4TYPE">
+<span id="_CPPv3NK7Point2D9GetOffsetE4TYPE4TYPE"></span><span id="_CPPv2NK7Point2D9GetOffsetE4TYPE4TYPE"></span><span id="Point2D::GetOffset__TYPE.TYPECCE"></span><span class="target" id="classPoint2D_1aa1db01fb1d883d9a372220c8be19e526"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetOffset</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">off_x</span></span>, <a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">off_y</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D9GetOffsetE4TYPE4TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2DplERK7Point2D">
+<span id="_CPPv3NK7Point2DplERK7Point2D"></span><span id="_CPPv2NK7Point2DplERK7Point2D"></span><span id="Point2D::add-operator__Point2DCRCCE"></span><span class="target" id="classPoint2D_1a1805a2827db1a1eccd61db2a71f2d93d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">+</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2DplERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2DmiERK7Point2D">
+<span id="_CPPv3NK7Point2DmiERK7Point2D"></span><span id="_CPPv2NK7Point2DmiERK7Point2D"></span><span id="Point2D::sub-operator__Point2DCRCCE"></span><span class="target" id="classPoint2D_1a518668067a170d2d257426d38686f3dd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">-</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2DmiERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2DmlEd">
+<span id="_CPPv3NK7Point2DmlEd"></span><span id="_CPPv2NK7Point2DmlEd"></span><span id="Point2D::mul-operator__doubleCCE"></span><span class="target" id="classPoint2D_1a6be6fc1214ad2ed56dbe95b1ec88ddf6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">*</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mult</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2DmlEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2DdvEd">
+<span id="_CPPv3NK7Point2DdvEd"></span><span id="_CPPv2NK7Point2DdvEd"></span><span id="Point2D::div-operator__doubleCCE"></span><span class="target" id="classPoint2D_1a2f5ee0e90acf64fdf3f51626e6bedf49"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">/</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">div</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2DdvEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2DmlEi">
+<span id="_CPPv3NK7Point2DmlEi"></span><span id="_CPPv2NK7Point2DmlEi"></span><span id="Point2D::mul-operator__iCCE"></span><span class="target" id="classPoint2D_1ae803005bde29ecb83268d257dad826fd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">*</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mult</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2DmlEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2DdvEi">
+<span id="_CPPv3NK7Point2DdvEi"></span><span id="_CPPv2NK7Point2DdvEi"></span><span id="Point2D::div-operator__iCCE"></span><span class="target" id="classPoint2D_1a6a13fe10734ccb02873780f501970f37"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">/</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">div</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2DdvEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2DmiEv">
+<span id="_CPPv3NK7Point2DmiEv"></span><span id="_CPPv2NK7Point2DmiEv"></span><span id="Point2D::sub-operatorCCE"></span><span class="target" id="classPoint2D_1aecd62313c288512c68388da024c5d9e5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">-</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2DmiEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D3AbsEv">
+<span id="_CPPv3NK7Point2D3AbsEv"></span><span id="_CPPv2NK7Point2D3AbsEv"></span><span id="Point2D::AbsCCE"></span><span class="target" id="classPoint2D_1ae7e1b377e417861f05c4aed225f08ecd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Abs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D3AbsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D9TranslateE4TYPE4TYPE">
+<span id="_CPPv3N7Point2D9TranslateE4TYPE4TYPE"></span><span id="_CPPv2N7Point2D9TranslateE4TYPE4TYPE"></span><span id="Point2D::Translate__TYPE.TYPE"></span><span class="target" id="classPoint2D_1a45408e0b7d9509c63e138cd7c8b5a4a4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Translate</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">shift_x</span></span>, <a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">shift_y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D9TranslateE4TYPE4TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D10TranslateXE4TYPE">
+<span id="_CPPv3N7Point2D10TranslateXE4TYPE"></span><span id="_CPPv2N7Point2D10TranslateXE4TYPE"></span><span id="Point2D::TranslateX__TYPE"></span><span class="target" id="classPoint2D_1a85fcaf94a68373c8d2c13d9d724d866b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">TranslateX</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">shift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D10TranslateXE4TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D10TranslateYE4TYPE">
+<span id="_CPPv3N7Point2D10TranslateYE4TYPE"></span><span id="_CPPv2N7Point2D10TranslateYE4TYPE"></span><span id="Point2D::TranslateY__TYPE"></span><span class="target" id="classPoint2D_1a863e6e7fd6ec7b277299ea769da8a852"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">TranslateY</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">shift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D10TranslateYE4TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D5ScaleEd">
+<span id="_CPPv3N7Point2D5ScaleEd"></span><span id="_CPPv2N7Point2D5ScaleEd"></span><span id="Point2D::Scale__double"></span><span class="target" id="classPoint2D_1a5f062e5f5bd19f62623f78969f8020fe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Scale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">scale</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D5ScaleEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D5ScaleEdd">
+<span id="_CPPv3N7Point2D5ScaleEdd"></span><span id="_CPPv2N7Point2D5ScaleEdd"></span><span id="Point2D::Scale__double.double"></span><span class="target" id="classPoint2D_1acd02d516f127e35c79784798043c1cce"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Scale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">scale_x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">scale_y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D5ScaleEdd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D8ToOriginEv">
+<span id="_CPPv3N7Point2D8ToOriginEv"></span><span id="_CPPv2N7Point2D8ToOriginEv"></span><span id="Point2D::ToOrigin"></span><span class="target" id="classPoint2D_1a42a10ea3ab42a61c5993f1e52e86fd61"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">ToOrigin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D8ToOriginEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D7NegateXEv">
+<span id="_CPPv3N7Point2D7NegateXEv"></span><span id="_CPPv2N7Point2D7NegateXEv"></span><span id="Point2D::NegateX"></span><span class="target" id="classPoint2D_1afeb432d4fdc7f2a6f45869aa883de2d4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">NegateX</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D7NegateXEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D7NegateYEv">
+<span id="_CPPv3N7Point2D7NegateYEv"></span><span id="_CPPv2N7Point2D7NegateYEv"></span><span id="Point2D::NegateY"></span><span class="target" id="classPoint2D_1a90b2996657b764b6fffbca8aa5d68712"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">NegateY</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D7NegateYEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D3ModERK7Point2D">
+<span id="_CPPv3N7Point2D3ModERK7Point2D"></span><span id="_CPPv2N7Point2D3ModERK7Point2D"></span><span id="Point2D::Mod__Point2DCR"></span><span class="target" id="classPoint2D_1a6b3164f45f3124c9397a73cd419e12a3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Mod</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">limits</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D3ModERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2DpLERK7Point2D">
+<span id="_CPPv3N7Point2DpLERK7Point2D"></span><span id="_CPPv2N7Point2DpLERK7Point2D"></span><span id="Point2D::add-assign-operator__Point2DCR"></span><span class="target" id="classPoint2D_1a75a6fb690c7434cd5432e37da93edc6e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">+=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2DpLERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2DmIERK7Point2D">
+<span id="_CPPv3N7Point2DmIERK7Point2D"></span><span id="_CPPv2N7Point2DmIERK7Point2D"></span><span id="Point2D::sub-assign-operator__Point2DCR"></span><span class="target" id="classPoint2D_1a4cf3bc00b52c4616c1f07421749ab8a1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">-=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2DmIERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2DmLEd">
+<span id="_CPPv3N7Point2DmLEd"></span><span id="_CPPv2N7Point2DmLEd"></span><span id="Point2D::mul-assign-operator__double"></span><span class="target" id="classPoint2D_1ab33d8ace0a97da156418d43513f2447a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">*=</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mult</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2DmLEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2DdVEd">
+<span id="_CPPv3N7Point2DdVEd"></span><span id="_CPPv2N7Point2DdVEd"></span><span id="Point2D::div-assign-operator__double"></span><span class="target" id="classPoint2D_1a2153372e55fde3ea43a33d7ba08c0476"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">/=</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2DdVEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2DmLEi">
+<span id="_CPPv3N7Point2DmLEi"></span><span id="_CPPv2N7Point2DmLEi"></span><span id="Point2D::mul-assign-operator__i"></span><span class="target" id="classPoint2D_1ae821a9e151a713c13d306641768ae83a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">*=</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mult</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2DmLEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2DdVEi">
+<span id="_CPPv3N7Point2DdVEi"></span><span id="_CPPv2N7Point2DdVEi"></span><span id="Point2D::div-assign-operator__i"></span><span class="target" id="classPoint2D_1a868b23b02413d60ab7d455f67c5a5800"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">/=</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2DdVEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D5Rot90Ev">
+<span id="_CPPv3N7Point2D5Rot90Ev"></span><span id="_CPPv2N7Point2D5Rot90Ev"></span><span id="Point2D::Rot90"></span><span class="target" id="classPoint2D_1a80ed0597fc8b1ff2490c4ac41bcaac78"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Rot90</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D5Rot90Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D6Rot180Ev">
+<span id="_CPPv3N7Point2D6Rot180Ev"></span><span id="_CPPv2N7Point2D6Rot180Ev"></span><span id="Point2D::Rot180"></span><span class="target" id="classPoint2D_1a388f1ad79561bea4853459c49a930af4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Rot180</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D6Rot180Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D6Rot270Ev">
+<span id="_CPPv3N7Point2D6Rot270Ev"></span><span id="_CPPv2N7Point2D6Rot270Ev"></span><span id="Point2D::Rot270"></span><span class="target" id="classPoint2D_1ac91fa92ed3a7c8294da02b7a32cc4b5b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Rot270</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Point2D6Rot270Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D14SquareDistanceERK7Point2D">
+<span id="_CPPv3NK7Point2D14SquareDistanceERK7Point2D"></span><span id="_CPPv2NK7Point2D14SquareDistanceERK7Point2D"></span><span id="Point2D::SquareDistance__Point2DCRC"></span><span class="target" id="classPoint2D_1a9a40345a412f9d28634d12ac60f24f91"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SquareDistance</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D14SquareDistanceERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Point2D8DistanceERK7Point2D">
+<span id="_CPPv3NK7Point2D8DistanceERK7Point2D"></span><span id="_CPPv2NK7Point2D8DistanceERK7Point2D"></span><span id="Point2D::Distance__Point2DCRC"></span><span class="target" id="classPoint2D_1a9f2082dc47556fa63b60cd890438fee0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Distance</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D"><span class="n"><span class="pre">Point2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Point2D8DistanceERK7Point2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D1xE">
+<span id="_CPPv3N7Point2D1xE"></span><span id="_CPPv2N7Point2D1xE"></span><span id="Point2D::x__TYPE"></span><span class="target" id="classPoint2D_1a4b2052703fd1c87882b1bfcfefbb4fb0"></span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">x</span></span></span><a class="headerlink" href="#_CPPv4N7Point2D1xE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Point2D1yE">
+<span id="_CPPv3N7Point2D1yE"></span><span id="_CPPv2N7Point2D1yE"></span><span id="Point2D::y__TYPE"></span><span class="target" id="classPoint2D_1a4fe2ce14df7269ae3f49acc87825d2b2"></span><a class="reference internal" href="#_CPPv4I0E7Point2D" title="Point2D::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">y</span></span></span><a class="headerlink" href="#_CPPv4N7Point2D1yE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Physics2D.html" class="btn btn-neutral float-left" title="Physics2D.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Surface.html" class="btn btn-neutral float-right" title="Surface.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

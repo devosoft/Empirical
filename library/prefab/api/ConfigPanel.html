@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConfigPanel.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/prefab/api/ConfigPanel.0f7f8144-e025-4304-b6e0-a6b8ce049b57.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="FontAwesomeIcon.hpp" href="FontAwesomeIcon.html" />
+    <link rel="prev" title="CommentBox.hpp" href="CommentBox.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../prefab.html">Prefab</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../prefab.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Card.html">Card.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CodeBlock.html">CodeBlock.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Collapse.html">Collapse.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CommentBox.html">CommentBox.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ConfigPanel.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411ConfigPanel"><code class="docutils literal notranslate"><span class="pre">ConfigPanel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="FontAwesomeIcon.html">FontAwesomeIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LoadingIcon.html">LoadingIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LoadingModal.html">LoadingModal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Modal.html">Modal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ReadoutPanel.html">ReadoutPanel.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ToggleSwitch.html">ToggleSwitch.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ValueBox.html">ValueBox.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../prefab.html">Prefab</a></li>
+      <li class="breadcrumb-item active">ConfigPanel.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="configpanel-hpp">
+<h1>ConfigPanel.hpp<a class="headerlink" href="#configpanel-hpp" title="Link to this heading"></a></h1>
+<p>Interfaces with config objects to provide UI configuration. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv411ConfigPanel">
+<span id="_CPPv311ConfigPanel"></span><span id="_CPPv211ConfigPanel"></span><span id="ConfigPanel"></span><span class="target" id="classConfigPanel"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ConfigPanel</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><a class="headerlink" href="#_CPPv411ConfigPanel" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ConfigPanel.hpp&gt;</em></div>
+<p>Use the ConfigPanel class to easily add a dynamic configuration panel to your web app. Users can interact with the config panel by updating values.</p>
+<p>The ConfigPanel is constructed using sub-components. Groups of settings are placed in Cards, and individual settings are represented by ValueControls. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11ConfigPanel15on_change_fun_tE">
+<span id="_CPPv3N11ConfigPanel15on_change_fun_tE"></span><span id="_CPPv2N11ConfigPanel15on_change_fun_tE"></span><span class="target" id="classConfigPanel_1a08b403bdd34a2e2b2dfc557a6ab05f10"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">on_change_fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ConfigPanelInfo</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">on_change_fun_t</span></span><a class="headerlink" href="#_CPPv4N11ConfigPanel15on_change_fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11ConfigPanel11ConfigPanelER6ConfigbRKNSt6stringE">
+<span id="_CPPv3N11ConfigPanel11ConfigPanelER6ConfigbRKNSt6stringE"></span><span id="_CPPv2N11ConfigPanel11ConfigPanelER6ConfigbRKNSt6stringE"></span><span id="ConfigPanel::ConfigPanel__ConfigR.b.ssCR"></span><span class="target" id="classConfigPanel_1aeda2ad71d93d79633f1161552b3acc53"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ConfigPanel</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../config/api/config.html#_CPPv46Config" title="Config"><span class="n"><span class="pre">Config</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">config</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">open</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">div_name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11ConfigPanel11ConfigPanelER6ConfigbRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – config object used to construct this panel </p></li>
+<li><p><strong>open</strong> – Should card for displaying this config default to being open? </p></li>
+<li><p><strong>div_name</strong> – Name to use for html div id for this panel </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11ConfigPanel14SetOnChangeFunERK15on_change_fun_t">
+<span id="_CPPv3N11ConfigPanel14SetOnChangeFunERK15on_change_fun_t"></span><span id="_CPPv2N11ConfigPanel14SetOnChangeFunERK15on_change_fun_t"></span><span id="ConfigPanel::SetOnChangeFun__on_change_fun_tCR"></span><span class="target" id="classConfigPanel_1aa7732724d52028e81bf0de54cd31728b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetOnChangeFun</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11ConfigPanel15on_change_fun_tE" title="ConfigPanel::on_change_fun_t"><span class="n"><span class="pre">on_change_fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11ConfigPanel14SetOnChangeFunERK15on_change_fun_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets on-update callback for a ConfigPanel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fun</strong> – callback function handle </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11ConfigPanel8SetRangeERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N11ConfigPanel8SetRangeERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N11ConfigPanel8SetRangeERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="ConfigPanel::SetRange__ssCR.ssCR.ssCR.ssCR"></span><span class="target" id="classConfigPanel_1aa506ebe5e14224bba3c6cbd16963e81b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRange</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">min</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">max</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;DEFAULT&quot;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">step</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;DEFAULT&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11ConfigPanel8SetRangeERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets the range of a slider for a numeric setting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>setting</strong> – the numeric config value which will have its range slider updated </p></li>
+<li><p><strong>min</strong> – minimum value of the slider for this config value (use “DEFAULT” to leave unchanged) </p></li>
+<li><p><strong>max</strong> – maximum value of the slider for this config value (use “DEFAULT” to leave unchanged) </p></li>
+<li><p><strong>step</strong> – step size of the slider for this config value (use “DEFAULT” to leave unchanged) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11ConfigPanel13ExcludeConfigERKNSt6stringE">
+<span id="_CPPv3N11ConfigPanel13ExcludeConfigERKNSt6stringE"></span><span id="_CPPv2N11ConfigPanel13ExcludeConfigERKNSt6stringE"></span><span id="ConfigPanel::ExcludeConfig__ssCR"></span><span class="target" id="classConfigPanel_1a7e0079086527fd378e19cda74a6a0618"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExcludeConfig</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11ConfigPanel13ExcludeConfigERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Excludes a setting or group of settings, recommend using ExcludeSetting or ExcludeGroup instead</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Deprecated:</span></em></dt>
+<dd><p>renamed to ExcludeSetting </p>
+</dd></dl>
+
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>setting</strong> – The name of a single setting that should not be displayed in the config panel </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11ConfigPanel14ExcludeSettingERKNSt6stringE">
+<span id="_CPPv3N11ConfigPanel14ExcludeSettingERKNSt6stringE"></span><span id="_CPPv2N11ConfigPanel14ExcludeSettingERKNSt6stringE"></span><span id="ConfigPanel::ExcludeSetting__ssCR"></span><span class="target" id="classConfigPanel_1adc3415cc0952e7a8274f9dc1da3dd9e1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExcludeSetting</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11ConfigPanel14ExcludeSettingERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Excludes a specific setting from the config panel</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>setting</strong> – name of the setting that should not be displayed in the config panel </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11ConfigPanel12ExcludeGroupERKNSt6stringE">
+<span id="_CPPv3N11ConfigPanel12ExcludeGroupERKNSt6stringE"></span><span id="_CPPv2N11ConfigPanel12ExcludeGroupERKNSt6stringE"></span><span id="ConfigPanel::ExcludeGroup__ssCR"></span><span class="target" id="classConfigPanel_1a1f8aaa273f26698370c24b3c855c40f6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExcludeGroup</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting_group</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11ConfigPanel12ExcludeGroupERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Excludes an entire group of settings from the config panel</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>setting_group</strong> – name of the group that should not be displayed in the config panel </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11ConfigPanel5SetupER6ConfigbRKNSt6stringE">
+<span id="_CPPv3N11ConfigPanel5SetupER6ConfigbRKNSt6stringE"></span><span id="_CPPv2N11ConfigPanel5SetupER6ConfigbRKNSt6stringE"></span><span id="ConfigPanel::Setup__ConfigR.b.ssCR"></span><span class="target" id="classConfigPanel_1afbe856976fdf1df1e69e1c3562e94cb2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Setup</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../config/api/config.html#_CPPv46Config" title="Config"><span class="n"><span class="pre">Config</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">config</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">open</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id_prefix</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11ConfigPanel5SetupER6ConfigbRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Arranges config panel based configuration pass to constructor <dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Deprecated:</span></em></dt>
+<dd><p>No longer necessary for config panel to function. This function was a work around to fix a bug. </p>
+</dd></dl>
+
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – the config object used to create this panel </p></li>
+<li><p><strong>open</strong> – should the card for the panel start open? </p></li>
+<li><p><strong>id_prefix</strong> – string appended to id for each setting (unused) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11ConfigPanel17GetConfigPanelDivEv">
+<span id="_CPPv3N11ConfigPanel17GetConfigPanelDivEv"></span><span id="_CPPv2N11ConfigPanel17GetConfigPanelDivEv"></span><span id="ConfigPanel::GetConfigPanelDiv"></span><span class="target" id="classConfigPanel_1a541c3d2e303935fba6626ab7a2f442de"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetConfigPanelDiv</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11ConfigPanel17GetConfigPanelDivEv" title="Link to this definition"></a><br /></dt>
+<dd><p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Deprecated:</span></em></dt>
+<dd><p>Can directly stream this component </p>
+</dd></dl>
+
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Div containing the entire config panel </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11ConfigPanel9INFO_TYPEE">
+<span id="_CPPv3N11ConfigPanel9INFO_TYPEE"></span><span id="_CPPv2N11ConfigPanel9INFO_TYPEE"></span><span class="target" id="classConfigPanel_1aca0eab9a3002d938906ffbfd7b249f39"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">INFO_TYPE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ConfigPanelInfo</span></span><a class="headerlink" href="#_CPPv4N11ConfigPanel9INFO_TYPEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Type of shared pointer shared among instances of ConfigPanel representing the same conceptual DOM element. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11ConfigPanel4InfoEv">
+<span id="_CPPv3N11ConfigPanel4InfoEv"></span><span id="_CPPv2N11ConfigPanel4InfoEv"></span><span id="ConfigPanel::Info"></span><span class="target" id="classConfigPanel_1a3ecfd4e350d63d72908d8519d914e531"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11ConfigPanel9INFO_TYPEE" title="ConfigPanel::INFO_TYPE"><span class="n"><span class="pre">INFO_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Info</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11ConfigPanel4InfoEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get shared info pointer, cast to ConfigPanel-specific type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cast pointer </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11ConfigPanel4InfoEv">
+<span id="_CPPv3NK11ConfigPanel4InfoEv"></span><span id="_CPPv2NK11ConfigPanel4InfoEv"></span><span id="ConfigPanel::InfoC"></span><span class="target" id="classConfigPanel_1a6743c6ebdc9ee004ec45bed5aa518a05"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11ConfigPanel9INFO_TYPEE" title="ConfigPanel::INFO_TYPE"><span class="n"><span class="pre">INFO_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Info</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11ConfigPanel4InfoEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get shared info pointer, cast to const ConfigPanel-specific type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cast pointer </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11ConfigPanel14GetOnChangeFunEv">
+<span id="_CPPv3N11ConfigPanel14GetOnChangeFunEv"></span><span id="_CPPv2N11ConfigPanel14GetOnChangeFunEv"></span><span id="ConfigPanel::GetOnChangeFun"></span><span class="target" id="classConfigPanel_1a693dacabcf62f4f66c32b57ceba20110"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11ConfigPanel15on_change_fun_tE" title="ConfigPanel::on_change_fun_t"><span class="n"><span class="pre">on_change_fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetOnChangeFun</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11ConfigPanel14GetOnChangeFunEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get current on-update callback.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>current callback function handle </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-static-attributes">Private Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11ConfigPanel13numeric_typesE">
+<span id="_CPPv3N11ConfigPanel13numeric_typesE"></span><span id="_CPPv2N11ConfigPanel13numeric_typesE"></span><span id="ConfigPanel::numeric_types__std::set:ss:"></span><span class="target" id="classConfigPanel_1ab57d2edb477e66d9c19a40ec64b91e9b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">numeric_types</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="s"><span class="pre">&quot;int&quot;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;double&quot;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;float&quot;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;uint32_t&quot;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;uint64_t&quot;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;size_t&quot;</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N11ConfigPanel13numeric_typesE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="CommentBox.html" class="btn btn-neutral float-left" title="CommentBox.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="FontAwesomeIcon.html" class="btn btn-neutral float-right" title="FontAwesomeIcon.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

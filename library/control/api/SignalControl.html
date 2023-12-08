@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SignalControl.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/control/api/SignalControl.0373e613-5070-4dd5-a1cc-37d88cbdbb4a.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="SignalManager.hpp" href="SignalManager.html" />
+    <link rel="prev" title="Signal.hpp" href="Signal.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../control.html">Control</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../control.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Action.html">Action.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ActionManager.html">ActionManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Signal.html">Signal.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">SignalControl.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413SignalControl"><code class="docutils literal notranslate"><span class="pre">SignalControl</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="SignalManager.html">SignalManager.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../control.html">Control</a></li>
+      <li class="breadcrumb-item active">SignalControl.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="signalcontrol-hpp">
+<h1>SignalControl.hpp<a class="headerlink" href="#signalcontrol-hpp" title="Link to this heading"></a></h1>
+<p>The SignalControl class manages all of the signals and actions, linking them together upon request (by name, base class, or derived class). </p>
+<p>Developer notes:<ul class="simple">
+<li><p>Right now SignalControl can only link to signals that it creates. Ideally, external signals should also be able to be added to it. The question is, how should this be done?<ul>
+<li><p>They could be copied. But should we copy existing actions? How do we provide keys?</p></li>
+<li><p>They could use a smart pointer style, so only deleted with final version (slow down?) </p></li>
+</ul>
+</p></li>
+</ul>
+</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv413SignalControl">
+<span id="_CPPv313SignalControl"></span><span id="_CPPv213SignalControl"></span><span id="SignalControl"></span><span class="target" id="classSignalControl"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SignalControl</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">SignalControl_Base</span></span><a class="headerlink" href="#_CPPv413SignalControl" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;SignalControl.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SignalControl13SignalControlEv">
+<span id="_CPPv3N13SignalControl13SignalControlEv"></span><span id="_CPPv2N13SignalControl13SignalControlEv"></span><span id="SignalControl::SignalControl"></span><span class="target" id="classSignalControl_1a636347f023a56942fa1df034e6a85cd8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SignalControl</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SignalControl13SignalControlEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SignalControlD0Ev">
+<span id="_CPPv3N13SignalControlD0Ev"></span><span id="_CPPv2N13SignalControlD0Ev"></span><span id="SignalControl::~SignalControl"></span><span class="target" id="classSignalControl_1a9986f122bf94e87453a59c9aa84c980c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~SignalControl</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SignalControlD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SignalControl13GetNumActionsEv">
+<span id="_CPPv3NK13SignalControl13GetNumActionsEv"></span><span id="_CPPv2NK13SignalControl13GetNumActionsEv"></span><span id="SignalControl::GetNumActionsC"></span><span class="target" id="classSignalControl_1acd10b6ecc8170980c0059d7f9fe380a8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumActions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SignalControl13GetNumActionsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SignalControl13GetNumSignalsEv">
+<span id="_CPPv3NK13SignalControl13GetNumSignalsEv"></span><span id="_CPPv2NK13SignalControl13GetNumSignalsEv"></span><span id="SignalControl::GetNumSignalsC"></span><span class="target" id="classSignalControl_1a8d11438d87b0fe68084bfb3281e4b4ad"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumSignals</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SignalControl13GetNumSignalsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SignalControl9GetActionERKNSt6stringE">
+<span id="_CPPv3NK13SignalControl9GetActionERKNSt6stringE"></span><span id="_CPPv2NK13SignalControl9GetActionERKNSt6stringE"></span><span id="SignalControl::GetAction__ssCRC"></span><span class="target" id="classSignalControl_1a9f25a14f7d38097375b5e5e826cea352"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Action.html#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SignalControl9GetActionERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SignalControl9GetSignalERKNSt6stringE">
+<span id="_CPPv3NK13SignalControl9GetSignalERKNSt6stringE"></span><span id="_CPPv2NK13SignalControl9GetSignalERKNSt6stringE"></span><span id="SignalControl::GetSignal__ssCRC"></span><span class="target" id="classSignalControl_1a06ca224d576b48854fd72f2e30250d51"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Signal.html#_CPPv410SignalBase" title="SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetSignal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SignalControl9GetSignalERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SignalControl16GetActionManagerEv">
+<span id="_CPPv3N13SignalControl16GetActionManagerEv"></span><span id="_CPPv2N13SignalControl16GetActionManagerEv"></span><span id="SignalControl::GetActionManager"></span><span class="target" id="classSignalControl_1a9cb3842035a4b88211f3578652fc17b5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="ActionManager.html#_CPPv413ActionManager" title="ActionManager"><span class="n"><span class="pre">ActionManager</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetActionManager</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SignalControl16GetActionManagerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SignalControl16GetSignalManagerEv">
+<span id="_CPPv3N13SignalControl16GetSignalManagerEv"></span><span id="_CPPv2N13SignalControl16GetSignalManagerEv"></span><span id="SignalControl::GetSignalManager"></span><span class="target" id="classSignalControl_1af19a90fff5727e9848331749f1b8fde8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="SignalManager.html#_CPPv413SignalManager" title="SignalManager"><span class="n"><span class="pre">SignalManager</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetSignalManager</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N13SignalControl16GetSignalManagerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN13SignalControl9AddActionERDaDpRR2Ts">
+<span id="_CPPv3IDpEN13SignalControl9AddActionEDpRR2Ts"></span><span id="_CPPv2IDpEN13SignalControl9AddActionEDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignalControl_1abc6bca8e5c55aa073501efee853784ff"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN13SignalControl9AddActionERDaDpRR2Ts" title="SignalControl::AddAction::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">act</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN13SignalControl9AddActionERDaDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN13SignalControl9AddSignalERDaRKNSt6stringE">
+<span id="_CPPv3IDpEN13SignalControl9AddSignalERKNSt6stringE"></span><span id="_CPPv2IDpEN13SignalControl9AddSignalERKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignalControl_1aa6c3a5c6dcb5e22f60e4dd1bf49b1897"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddSignal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN13SignalControl9AddSignalERDaRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN13SignalControl9AddSignalERDaR6SignalIFvDp4ARGSEE">
+<span id="_CPPv3IDpEN13SignalControl9AddSignalER6SignalIFvDp4ARGSEE"></span><span id="_CPPv2IDpEN13SignalControl9AddSignalER6SignalIFvDp4ARGSEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignalControl_1a1d7a6f5884f695998643798c53fb7a76"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddSignal</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Signal.html#_CPPv4IDpE6Signal" title="Signal"><span class="n"><span class="pre">Signal</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpEN13SignalControl9AddSignalERDaR6SignalIFvDp4ARGSEE" title="SignalControl::AddSignal::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">signal</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN13SignalControl9AddSignalERDaR6SignalIFvDp4ARGSEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN13SignalControl4LinkEDaR10SignalBaseRKNSt8functionIFvDp4ARGSEEE">
+<span id="_CPPv3IDpEN13SignalControl4LinkER10SignalBaseRKNSt8functionIFvDp4ARGSEEE"></span><span id="_CPPv2IDpEN13SignalControl4LinkER10SignalBaseRKNSt8functionIFvDp4ARGSEEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignalControl_1a47711a9b2e653e7a145a4c0a096029d9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Link</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Signal.html#_CPPv410SignalBase" title="SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpEN13SignalControl4LinkEDaR10SignalBaseRKNSt8functionIFvDp4ARGSEEE" title="SignalControl::Link::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN13SignalControl4LinkEDaR10SignalBaseRKNSt8functionIFvDp4ARGSEEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13SignalControl4LinkEDaRKNSt6stringERR1A">
+<span id="_CPPv3I0EN13SignalControl4LinkERKNSt6stringERR1A"></span><span id="_CPPv2I0EN13SignalControl4LinkERKNSt6stringERR1A"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">A</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignalControl_1a2064ada27facfc2539e6de960d7f6250"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Link</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span>, <a class="reference internal" href="#_CPPv4I0EN13SignalControl4LinkEDaRKNSt6stringERR1A" title="SignalControl::Link::A"><span class="n"><span class="pre">A</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13SignalControl4LinkEDaRKNSt6stringERR1A" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SignalControl4LinkER10SignalBaseRKNSt6stringE">
+<span id="_CPPv3N13SignalControl4LinkER10SignalBaseRKNSt6stringE"></span><span id="_CPPv2N13SignalControl4LinkER10SignalBaseRKNSt6stringE"></span><span id="SignalControl::Link__SignalBaseR.ssCR"></span><span class="target" id="classSignalControl_1a2ebbf103dc159ac6e9fb0f674fd3361a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Link</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Signal.html#_CPPv410SignalBase" title="SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SignalControl4LinkER10SignalBaseRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SignalControl4LinkER10SignalBaseR10ActionBase">
+<span id="_CPPv3N13SignalControl4LinkER10SignalBaseR10ActionBase"></span><span id="_CPPv2N13SignalControl4LinkER10SignalBaseR10ActionBase"></span><span id="SignalControl::Link__SignalBaseR.ActionBaseR"></span><span class="target" id="classSignalControl_1ae601bd1ea74253dbb1c8e597539f5aec"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Link</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Signal.html#_CPPv410SignalBase" title="SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span>, <a class="reference internal" href="Action.html#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SignalControl4LinkER10SignalBaseR10ActionBase" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN13SignalControl7TriggerEvRKNSt6stringEDpRR4ARGS">
+<span id="_CPPv3IDpEN13SignalControl7TriggerERKNSt6stringEDpRR4ARGS"></span><span id="_CPPv2IDpEN13SignalControl7TriggerERKNSt6stringEDpRR4ARGS"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignalControl_1ab3a2f580ef7dbfea7e7803a8cc49ac1b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Trigger</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="#_CPPv4IDpEN13SignalControl7TriggerEvRKNSt6stringEDpRR4ARGS" title="SignalControl::Trigger::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN13SignalControl7TriggerEvRKNSt6stringEDpRR4ARGS" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SignalControl15NotifyConstructEP10SignalBase">
+<span id="_CPPv3N13SignalControl15NotifyConstructEP10SignalBase"></span><span id="_CPPv2N13SignalControl15NotifyConstructEP10SignalBase"></span><span id="SignalControl::NotifyConstruct__SignalBaseP"></span><span class="target" id="classSignalControl_1a1fca7706c0615caf403868e27d128ead"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NotifyConstruct</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Signal.html#_CPPv410SignalBase" title="SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">sig_ptr</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N13SignalControl15NotifyConstructEP10SignalBase" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SignalControl10PrintNamesERNSt7ostreamE">
+<span id="_CPPv3N13SignalControl10PrintNamesERNSt7ostreamE"></span><span id="_CPPv2N13SignalControl10PrintNamesERNSt7ostreamE"></span><span id="SignalControl::PrintNames__osR"></span><span class="target" id="classSignalControl_1a4e39586c106da672cb51376a87f018ab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintNames</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SignalControl10PrintNamesERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SignalControl8action_mE">
+<span id="_CPPv3N13SignalControl8action_mE"></span><span id="_CPPv2N13SignalControl8action_mE"></span><span id="SignalControl::action_m__ActionManager"></span><span class="target" id="classSignalControl_1a9efdfa36404047fd101ce5238a13ca4b"></span><a class="reference internal" href="ActionManager.html#_CPPv413ActionManager" title="ActionManager"><span class="n"><span class="pre">ActionManager</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">action_m</span></span></span><a class="headerlink" href="#_CPPv4N13SignalControl8action_mE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SignalControl8signal_mE">
+<span id="_CPPv3N13SignalControl8signal_mE"></span><span id="_CPPv2N13SignalControl8signal_mE"></span><span id="SignalControl::signal_m__SignalManager"></span><span class="target" id="classSignalControl_1a4b2d021d43f2c948b4c255ee3cb615f9"></span><a class="reference internal" href="SignalManager.html#_CPPv413SignalManager" title="SignalManager"><span class="n"><span class="pre">SignalManager</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">signal_m</span></span></span><a class="headerlink" href="#_CPPv4N13SignalControl8signal_mE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SignalControl12id_to_signalE">
+<span id="_CPPv3N13SignalControl12id_to_signalE"></span><span id="_CPPv2N13SignalControl12id_to_signalE"></span><span id="SignalControl::id_to_signal__std::unordered_map:uint32_t.SignalBaseP:"></span><span class="target" id="classSignalControl_1a1ea5c4941ad7bbbd4059216570325e01"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">uint32_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="Signal.html#_CPPv410SignalBase" title="SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id_to_signal</span></span></span><a class="headerlink" href="#_CPPv4N13SignalControl12id_to_signalE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Signal.html" class="btn btn-neutral float-left" title="Signal.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SignalManager.html" class="btn btn-neutral float-right" title="SignalManager.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

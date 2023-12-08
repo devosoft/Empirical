@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>stats.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/math/api/stats.b99898bf-5575-4469-972b-63d157923748.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Meta" href="../../meta/meta.html" />
+    <link rel="prev" title="spatial_stats.hpp" href="spatial_stats.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../math.html">Math</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../math.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="CombinedBinomialDistribution.html">CombinedBinomialDistribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Distribution.html">Distribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DistributionSet.html">DistributionSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Fraction.html">Fraction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Random.html">Random.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Range.html">Range.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RangeSet.html">RangeSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="combos.html">combos.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="constants.html">constants.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="distances.html">distances.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="info_theory.html">info_theory.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="math.html">math.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="random_utils.html">random_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sequence_utils.html">sequence_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spatial_stats.html">spatial_stats.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">stats.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E3SumN15remove_ptr_typeIN1C10value_typeEE4typeER1C"><code class="docutils literal notranslate"><span class="pre">Sum()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00E16SumScalarResultsDaR1CRR3FUN"><code class="docutils literal notranslate"><span class="pre">SumScalarResults()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E14ShannonEntropydR1C"><code class="docutils literal notranslate"><span class="pre">ShannonEntropy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E4Mean12sfinae_decoyIdN1C10value_typeEER1C"><code class="docutils literal notranslate"><span class="pre">Mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E6Median12sfinae_decoyIdN1C10value_typeEE1C"><code class="docutils literal notranslate"><span class="pre">Median()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E8VarianceDaR1C"><code class="docutils literal notranslate"><span class="pre">Variance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E17StandardDeviation12sfinae_decoyIdN1C10value_typeEER1C"><code class="docutils literal notranslate"><span class="pre">StandardDeviation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E13StandardError12sfinae_decoyIdN1C10value_typeEER1C"><code class="docutils literal notranslate"><span class="pre">StandardError()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E11UniqueCountNSt9enable_ifIXntN11is_ptr_typeIN1C10value_typeEE5valueEEiE4typeER1C"><code class="docutils literal notranslate"><span class="pre">UniqueCount()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I000E9MaxResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"><code class="docutils literal notranslate"><span class="pre">MaxResult()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I000E9MinResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"><code class="docutils literal notranslate"><span class="pre">MinResult()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I000E10MeanResultNSt9enable_ifINSt9is_scalarI8RET_TYPEE5valueEdE4typeERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"><code class="docutils literal notranslate"><span class="pre">MeanResult()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I000E13ApplyFunction6vectorI8RET_TYPEERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"><code class="docutils literal notranslate"><span class="pre">ApplyFunction()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../math.html">Math</a></li>
+      <li class="breadcrumb-item active">stats.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="stats-hpp">
+<h1>stats.hpp<a class="headerlink" href="#stats-hpp" title="Link to this heading"></a></h1>
+<p>Functions for calculating various statistics about an ensemble. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E3SumN15remove_ptr_typeIN1C10value_typeEE4typeER1C">
+<span id="_CPPv3I0E3SumR1C"></span><span id="_CPPv2I0E3SumR1C"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="stats_8hpp_1a2335c0dd94cb091a55d370cdfcd02378"></span><a class="reference internal" href="../../meta/api/type_traits.html#_CPPv4I0E15remove_ptr_type" title="remove_ptr_type"><span class="n"><span class="pre">remove_ptr_type</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3SumN15remove_ptr_typeIN1C10value_typeEE4typeER1C" title="Sum::C"><span class="n"><span class="pre">C</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value_type</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sum</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E3SumN15remove_ptr_typeIN1C10value_typeEE4typeER1C" title="Sum::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">elements</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E3SumN15remove_ptr_typeIN1C10value_typeEE4typeER1C" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate sum of the values in a container; if pointers to scalars, convert to scalar type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00E16SumScalarResultsDaR1CRR3FUN">
+<span id="_CPPv3I00E16SumScalarResultsR1CRR3FUN"></span><span id="_CPPv2I00E16SumScalarResultsR1CRR3FUN"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FUN</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="stats_8hpp_1af9527f9533152c895950c145a071a957"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SumScalarResults</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00E16SumScalarResultsDaR1CRR3FUN" title="SumScalarResults::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">elements</span></span>, <a class="reference internal" href="#_CPPv4I00E16SumScalarResultsDaR1CRR3FUN" title="SumScalarResults::FUN"><span class="n"><span class="pre">FUN</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00E16SumScalarResultsDaR1CRR3FUN" title="Link to this definition"></a><br /></dt>
+<dd><p>Sum the RESULTS of scalar values in a container; if pointers to scalars, convert to scalar type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E14ShannonEntropydR1C">
+<span id="_CPPv3I0E14ShannonEntropyR1C"></span><span id="_CPPv2I0E14ShannonEntropyR1C"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="stats_8hpp_1a2a878401a96b1cb97804c5f5d99d0d40"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShannonEntropy</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E14ShannonEntropydR1C" title="ShannonEntropy::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">elements</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E14ShannonEntropydR1C" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate Shannon Entropy of the members of the container passed. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E4Mean12sfinae_decoyIdN1C10value_typeEER1C">
+<span id="_CPPv3I0E4MeanR1C"></span><span id="_CPPv2I0E4MeanR1C"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="stats_8hpp_1aaddf75b2570b9b76bcc1c2f8b1ae7cb2"></span><a class="reference internal" href="../../meta/api/meta.html#_CPPv4I00E12sfinae_decoy" title="sfinae_decoy"><span class="n"><span class="pre">sfinae_decoy</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E4Mean12sfinae_decoyIdN1C10value_typeEER1C" title="Mean::C"><span class="n"><span class="pre">C</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value_type</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mean</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E4Mean12sfinae_decoyIdN1C10value_typeEER1C" title="Mean::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">elements</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E4Mean12sfinae_decoyIdN1C10value_typeEER1C" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate the mean of the values in a container If values are pointers, they will be automatically de-referenced Values must be numeric. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E6Median12sfinae_decoyIdN1C10value_typeEE1C">
+<span id="_CPPv3I0E6Median1C"></span><span id="_CPPv2I0E6Median1C"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="stats_8hpp_1a5329660baa46acc2c19779f77a90717c"></span><a class="reference internal" href="../../meta/api/meta.html#_CPPv4I00E12sfinae_decoy" title="sfinae_decoy"><span class="n"><span class="pre">sfinae_decoy</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E6Median12sfinae_decoyIdN1C10value_typeEE1C" title="Median::C"><span class="n"><span class="pre">C</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value_type</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Median</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E6Median12sfinae_decoyIdN1C10value_typeEE1C" title="Median::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">elements</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E6Median12sfinae_decoyIdN1C10value_typeEE1C" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E8VarianceDaR1C">
+<span id="_CPPv3I0E8VarianceR1C"></span><span id="_CPPv2I0E8VarianceR1C"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="stats_8hpp_1a17b7f82c100d057ce3871cbe623f4fbf"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Variance</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E8VarianceDaR1C" title="Variance::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">elements</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E8VarianceDaR1C" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate variance of the members of the container passed Only works on containers with a scalar member type </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E17StandardDeviation12sfinae_decoyIdN1C10value_typeEER1C">
+<span id="_CPPv3I0E17StandardDeviationR1C"></span><span id="_CPPv2I0E17StandardDeviationR1C"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="stats_8hpp_1a7745484f6480a90bcfb3aae07595da06"></span><a class="reference internal" href="../../meta/api/meta.html#_CPPv4I00E12sfinae_decoy" title="sfinae_decoy"><span class="n"><span class="pre">sfinae_decoy</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E17StandardDeviation12sfinae_decoyIdN1C10value_typeEER1C" title="StandardDeviation::C"><span class="n"><span class="pre">C</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value_type</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StandardDeviation</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E17StandardDeviation12sfinae_decoyIdN1C10value_typeEER1C" title="StandardDeviation::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">elements</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E17StandardDeviation12sfinae_decoyIdN1C10value_typeEER1C" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate the standard deviation of the values in a container If values are pointers, they will be automatically de-referenced Values must be numeric. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E13StandardError12sfinae_decoyIdN1C10value_typeEER1C">
+<span id="_CPPv3I0E13StandardErrorR1C"></span><span id="_CPPv2I0E13StandardErrorR1C"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="stats_8hpp_1a9f96ca17fabc416fa2d74dc48609a29b"></span><a class="reference internal" href="../../meta/api/meta.html#_CPPv4I00E12sfinae_decoy" title="sfinae_decoy"><span class="n"><span class="pre">sfinae_decoy</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E13StandardError12sfinae_decoyIdN1C10value_typeEER1C" title="StandardError::C"><span class="n"><span class="pre">C</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value_type</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StandardError</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E13StandardError12sfinae_decoyIdN1C10value_typeEER1C" title="StandardError::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">elements</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E13StandardError12sfinae_decoyIdN1C10value_typeEER1C" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate the standard error of the values in a container If values are pointers, they will be automatically de-referenced Values must be numeric. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E11UniqueCountNSt9enable_ifIXntN11is_ptr_typeIN1C10value_typeEE5valueEEiE4typeER1C">
+<span id="_CPPv3I0E11UniqueCountR1C"></span><span id="_CPPv2I0E11UniqueCountR1C"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="stats_8hpp_1a1b29bc8e23ad18f2c620e1ad05285d23"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if</span></span><span class="p"><span class="pre">&lt;</span></span><span class="o"><span class="pre">!</span></span><a class="reference internal" href="../../meta/api/type_traits.html#_CPPv4I0E11is_ptr_type" title="is_ptr_type"><span class="n"><span class="pre">is_ptr_type</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E11UniqueCountNSt9enable_ifIXntN11is_ptr_typeIN1C10value_typeEE5valueEEiE4typeER1C" title="UniqueCount::C"><span class="n"><span class="pre">C</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value_type</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UniqueCount</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E11UniqueCountNSt9enable_ifIXntN11is_ptr_typeIN1C10value_typeEE5valueEEiE4typeER1C" title="UniqueCount::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">elements</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E11UniqueCountNSt9enable_ifIXntN11is_ptr_typeIN1C10value_typeEE5valueEEiE4typeER1C" title="Link to this definition"></a><br /></dt>
+<dd><p>Count the number of unique elements in a container. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I000E9MaxResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C">
+<span id="_CPPv3I000E9MaxResultRNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"></span><span id="_CPPv2I000E9MaxResultRNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RET_TYPE</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="stats_8hpp_1a471275595b10ff4004e306f8b1c99374"></span><a class="reference internal" href="#_CPPv4I000E9MaxResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="MaxResult::RET_TYPE"><span class="n"><span class="pre">RET_TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaxResult</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000E9MaxResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="MaxResult::RET_TYPE"><span class="n"><span class="pre">RET_TYPE</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I000E9MaxResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="MaxResult::ARG_TYPE"><span class="n"><span class="pre">ARG_TYPE</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span>, <a class="reference internal" href="#_CPPv4I000E9MaxResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="MaxResult::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">elements</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I000E9MaxResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="Link to this definition"></a><br /></dt>
+<dd><p>Run the provided function on every member of a container and return the MAXIMUM result. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I000E9MinResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C">
+<span id="_CPPv3I000E9MinResultRNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"></span><span id="_CPPv2I000E9MinResultRNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RET_TYPE</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="stats_8hpp_1a3940dab91227be97620f448ab9a24361"></span><a class="reference internal" href="#_CPPv4I000E9MinResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="MinResult::RET_TYPE"><span class="n"><span class="pre">RET_TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MinResult</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000E9MinResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="MinResult::RET_TYPE"><span class="n"><span class="pre">RET_TYPE</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I000E9MinResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="MinResult::ARG_TYPE"><span class="n"><span class="pre">ARG_TYPE</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span>, <a class="reference internal" href="#_CPPv4I000E9MinResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="MinResult::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">elements</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I000E9MinResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="Link to this definition"></a><br /></dt>
+<dd><p>Run the provided function on every member of a container and return the MINIMUM result. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I000E10MeanResultNSt9enable_ifINSt9is_scalarI8RET_TYPEE5valueEdE4typeERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C">
+<span id="_CPPv3I000E10MeanResultRNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"></span><span id="_CPPv2I000E10MeanResultRNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RET_TYPE</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="stats_8hpp_1a192a527002cae8a7beab20cd860efdf1"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_scalar</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000E10MeanResultNSt9enable_ifINSt9is_scalarI8RET_TYPEE5valueEdE4typeERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="MeanResult::RET_TYPE"><span class="n"><span class="pre">RET_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MeanResult</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000E10MeanResultNSt9enable_ifINSt9is_scalarI8RET_TYPEE5valueEdE4typeERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="MeanResult::RET_TYPE"><span class="n"><span class="pre">RET_TYPE</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I000E10MeanResultNSt9enable_ifINSt9is_scalarI8RET_TYPEE5valueEdE4typeERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="MeanResult::ARG_TYPE"><span class="n"><span class="pre">ARG_TYPE</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span>, <a class="reference internal" href="#_CPPv4I000E10MeanResultNSt9enable_ifINSt9is_scalarI8RET_TYPEE5valueEdE4typeERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="MeanResult::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">elements</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I000E10MeanResultNSt9enable_ifINSt9is_scalarI8RET_TYPEE5valueEdE4typeERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="Link to this definition"></a><br /></dt>
+<dd><p>Run the provided function on every member of a container and return the AVERAGE result. Function must return a scalar (i.e. numeric) type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I000E13ApplyFunction6vectorI8RET_TYPEERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C">
+<span id="_CPPv3I000E13ApplyFunctionRNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"></span><span id="_CPPv2I000E13ApplyFunctionRNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RET_TYPE</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="stats_8hpp_1a5d281e9336fad564b0e97c329500320e"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000E13ApplyFunction6vectorI8RET_TYPEERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="ApplyFunction::RET_TYPE"><span class="n"><span class="pre">RET_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ApplyFunction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000E13ApplyFunction6vectorI8RET_TYPEERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="ApplyFunction::RET_TYPE"><span class="n"><span class="pre">RET_TYPE</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I000E13ApplyFunction6vectorI8RET_TYPEERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="ApplyFunction::ARG_TYPE"><span class="n"><span class="pre">ARG_TYPE</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span>, <a class="reference internal" href="#_CPPv4I000E13ApplyFunction6vectorI8RET_TYPEERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="ApplyFunction::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">elements</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I000E13ApplyFunction6vectorI8RET_TYPEERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C" title="Link to this definition"></a><br /></dt>
+<dd><p>Run the provided function on every member of a container and return a vector of ALL results. </p>
+</dd></dl>
+
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="spatial_stats.html" class="btn btn-neutral float-left" title="spatial_stats.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../meta/meta.html" class="btn btn-neutral float-right" title="Meta" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dataset.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../../_static/tippy/library/web/d3/api/dataset.d9ec7f71-4100-4a01-8b81-88b78a07b045.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="histogram.hpp" href="histogram.html" />
+    <link rel="prev" title="d3_init.hpp" href="d3_init.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../d3.html">D3 Wrapper</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../d3-intro.html">Using Empirica’s D3.js Wrapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../d3-contents.html">D3 Wrapper API</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../d3.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../web.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../web.html">Web Tools (for use with Emscripten)</a></li>
+          <li class="breadcrumb-item"><a href="../d3.html">D3 Wrapper</a></li>
+      <li class="breadcrumb-item active">dataset.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dataset-hpp">
+<h1>dataset.hpp<a class="headerlink" href="#dataset-hpp" title="Link to this heading"></a></h1>
+<p>Tools to maintain data in D3. </p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv42D3">
+<span id="_CPPv32D3"></span><span id="_CPPv22D3"></span><span id="D3"></span><span class="target" id="namespaceD3"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">D3</span></span></span><br /></dt>
+<dd><dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310CSVDatasetE">
+<span id="_CPPv3N2D310CSVDatasetE"></span><span id="_CPPv2N2D310CSVDatasetE"></span><span id="D3::CSVDataset"></span><span class="target" id="classD3_1_1CSVDataset"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CSVDataset</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D37DatasetE" title="D3::Dataset"><span class="n"><span class="pre">Dataset</span></span></a><a class="headerlink" href="#_CPPv4N2D310CSVDatasetE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;dataset.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310CSVDataset10CSVDatasetEv">
+<span id="_CPPv3N2D310CSVDataset10CSVDatasetEv"></span><span id="_CPPv2N2D310CSVDataset10CSVDatasetEv"></span><span id="D3::CSVDataset::CSVDataset"></span><span class="target" id="classD3_1_1CSVDataset_1af90c27b2544a182720173b13ea69cf33"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CSVDataset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D310CSVDataset10CSVDatasetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310CSVDataset10CSVDatasetEi">
+<span id="_CPPv3N2D310CSVDataset10CSVDatasetEi"></span><span id="_CPPv2N2D310CSVDataset10CSVDatasetEi"></span><span id="D3::CSVDataset::CSVDataset__i"></span><span class="target" id="classD3_1_1CSVDataset_1a5df0f3e3fae74a08f58ad3f30c10a3f6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CSVDataset</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D310CSVDataset10CSVDatasetEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310CSVDataset16LoadDataFromFileENSt6stringENSt6stringEb">
+<span id="_CPPv3N2D310CSVDataset16LoadDataFromFileENSt6stringENSt6stringEb"></span><span id="_CPPv2N2D310CSVDataset16LoadDataFromFileENSt6stringENSt6stringEb"></span><span id="D3::CSVDataset::LoadDataFromFile__ss.ss.b"></span><span class="target" id="classD3_1_1CSVDataset_1afab49b7b77ea7b952f33244d616edcee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LoadDataFromFile</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">location</span></span>, <a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">callback</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">header</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D310CSVDataset16LoadDataFromFileENSt6stringENSt6stringEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310CSVDataset5ParseENSt6stringENSt6stringE">
+<span id="_CPPv3N2D310CSVDataset5ParseENSt6stringENSt6stringE"></span><span id="_CPPv2N2D310CSVDataset5ParseENSt6stringENSt6stringE"></span><span id="D3::CSVDataset::Parse__ss.ss"></span><span class="target" id="classD3_1_1CSVDataset_1a36ef70801546817bd2ee245e41b44c8e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Parse</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">contents</span></span>, <a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">accessor</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D310CSVDataset5ParseENSt6stringENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310CSVDataset9ParseRowsENSt6stringENSt6stringE">
+<span id="_CPPv3N2D310CSVDataset9ParseRowsENSt6stringENSt6stringE"></span><span id="_CPPv2N2D310CSVDataset9ParseRowsENSt6stringENSt6stringE"></span><span id="D3::CSVDataset::ParseRows__ss.ss"></span><span class="target" id="classD3_1_1CSVDataset_1a9ec84443ebfb4133e8c2d2da46465ad2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ParseRows</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">contents</span></span>, <a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">accessor</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D310CSVDataset9ParseRowsENSt6stringENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_NSt6size_tE0EN2D310CSVDataset10GetLastRowEvR5arrayI1T1NE">
+<span id="_CPPv3I_NSt6size_tE0EN2D310CSVDataset10GetLastRowER5arrayI1T1NE"></span><span id="_CPPv2I_NSt6size_tE0EN2D310CSVDataset10GetLastRowER5arrayI1T1NE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">N</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1CSVDataset_1aa1242a336e9b74e2fcb726393a98d326"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetLastRow</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tE0EN2D310CSVDataset10GetLastRowEvR5arrayI1T1NE" title="D3::CSVDataset::GetLastRow::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_NSt6size_tE0EN2D310CSVDataset10GetLastRowEvR5arrayI1T1NE" title="D3::CSVDataset::GetLastRow::N"><span class="n"><span class="pre">N</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tE0EN2D310CSVDataset10GetLastRowEvR5arrayI1T1NE" title="Link to this definition"></a><br /></dt>
+<dd><p>Put the last row of the array into arr. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37DatasetE">
+<span id="_CPPv3N2D37DatasetE"></span><span id="_CPPv2N2D37DatasetE"></span><span id="D3::Dataset"></span><span class="target" id="classD3_1_1Dataset"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Dataset</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="d3_init.html#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><a class="headerlink" href="#_CPPv4N2D37DatasetE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;dataset.hpp&gt;</em></div>
+<p>Subclassed by D3::CSVDataset, D3::JSONDataset</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37Dataset7DatasetEv">
+<span id="_CPPv3N2D37Dataset7DatasetEv"></span><span id="_CPPv2N2D37Dataset7DatasetEv"></span><span id="D3::Dataset::Dataset"></span><span class="target" id="classD3_1_1Dataset_1a3b7a976d50bd21a7f98b076163f3d47d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Dataset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D37Dataset7DatasetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37Dataset7DatasetEi">
+<span id="_CPPv3N2D37Dataset7DatasetEi"></span><span id="_CPPv2N2D37Dataset7DatasetEi"></span><span id="D3::Dataset::Dataset__i"></span><span class="target" id="classD3_1_1Dataset_1a26c31670a18e263e2188a2b7cb9359af"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Dataset</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D37Dataset7DatasetEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37Dataset15CaptureIncomingEv">
+<span id="_CPPv3N2D37Dataset15CaptureIncomingEv"></span><span id="_CPPv2N2D37Dataset15CaptureIncomingEv"></span><span id="D3::Dataset::CaptureIncoming"></span><span class="target" id="classD3_1_1Dataset_1a25e9d79e90e98540c7e49a981f1839df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CaptureIncoming</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D37Dataset15CaptureIncomingEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D37Dataset3MinE12sfinae_decoyIdDTadN1TclEEE1T">
+<span id="_CPPv3I0EN2D37Dataset3MinE1T"></span><span id="_CPPv2I0EN2D37Dataset3MinE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1Dataset_1a26f0ed11de3a4ea98d8109ed57a04150"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../../meta/api/meta.html#_CPPv4I00E12sfinae_decoy" title="sfinae_decoy"><span class="n"><span class="pre">sfinae_decoy</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><span class="o"><span class="pre">&amp;</span></span><a class="reference internal" href="#_CPPv4I0EN2D37Dataset3MinE12sfinae_decoyIdDTadN1TclEEE1T" title="D3::Dataset::Min::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">::</span></span><span class="k"><span class="pre">operator</span></span><span class="sig-name descname"><span class="pre">()</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Min</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D37Dataset3MinE12sfinae_decoyIdDTadN1TclEEE1T" title="D3::Dataset::Min::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">comp</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D37Dataset3MinE12sfinae_decoyIdDTadN1TclEEE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D37Dataset3MaxE12sfinae_decoyIdDTadN1TclEEE1T">
+<span id="_CPPv3I0EN2D37Dataset3MaxE1T"></span><span id="_CPPv2I0EN2D37Dataset3MaxE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1Dataset_1addc606b25d7b3138d8f5b423005e4686"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../../meta/api/meta.html#_CPPv4I00E12sfinae_decoy" title="sfinae_decoy"><span class="n"><span class="pre">sfinae_decoy</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><span class="o"><span class="pre">&amp;</span></span><a class="reference internal" href="#_CPPv4I0EN2D37Dataset3MaxE12sfinae_decoyIdDTadN1TclEEE1T" title="D3::Dataset::Max::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">::</span></span><span class="k"><span class="pre">operator</span></span><span class="sig-name descname"><span class="pre">()</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Max</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D37Dataset3MaxE12sfinae_decoyIdDTadN1TclEEE1T" title="D3::Dataset::Max::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">comp</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D37Dataset3MaxE12sfinae_decoyIdDTadN1TclEEE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311JSONDatasetE">
+<span id="_CPPv3N2D311JSONDatasetE"></span><span id="_CPPv2N2D311JSONDatasetE"></span><span id="D3::JSONDataset"></span><span class="target" id="classD3_1_1JSONDataset"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">JSONDataset</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D37DatasetE" title="D3::Dataset"><span class="n"><span class="pre">Dataset</span></span></a><a class="headerlink" href="#_CPPv4N2D311JSONDatasetE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;dataset.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311JSONDataset11JSONDatasetEi">
+<span id="_CPPv3N2D311JSONDataset11JSONDatasetEi"></span><span id="_CPPv2N2D311JSONDataset11JSONDatasetEi"></span><span id="D3::JSONDataset::JSONDataset__i"></span><span class="target" id="classD3_1_1JSONDataset_1afe244f3072c5c016ce68070494da35df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">JSONDataset</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D311JSONDataset11JSONDatasetEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311JSONDataset11JSONDatasetEv">
+<span id="_CPPv3N2D311JSONDataset11JSONDatasetEv"></span><span id="_CPPv2N2D311JSONDataset11JSONDatasetEv"></span><span id="D3::JSONDataset::JSONDataset"></span><span class="target" id="classD3_1_1JSONDataset_1ad24cd8df6a06ee9ac5e8a18a224c1dbc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">JSONDataset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D311JSONDataset11JSONDatasetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311JSONDataset16LoadDataFromFileENSt6stringE">
+<span id="_CPPv3N2D311JSONDataset16LoadDataFromFileENSt6stringE"></span><span id="_CPPv2N2D311JSONDataset16LoadDataFromFileENSt6stringE"></span><span id="D3::JSONDataset::LoadDataFromFile__ss"></span><span class="target" id="classD3_1_1JSONDataset_1a934bdd4403c39e66cdd615d8748d1851"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LoadDataFromFile</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">filename</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D311JSONDataset16LoadDataFromFileENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D311JSONDataset16LoadDataFromFileEvNSt6stringENSt8functionIFv9DATA_TYPEEEE">
+<span id="_CPPv3I0EN2D311JSONDataset16LoadDataFromFileENSt6stringENSt8functionIFv9DATA_TYPEEEE"></span><span id="_CPPv2I0EN2D311JSONDataset16LoadDataFromFileENSt6stringENSt8functionIFv9DATA_TYPEEEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DATA_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1JSONDataset_1afc65de84c87d77937c7bc65b0cd58311"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LoadDataFromFile</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">filename</span></span>, <a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0EN2D311JSONDataset16LoadDataFromFileEvNSt6stringENSt8functionIFv9DATA_TYPEEEE" title="D3::JSONDataset::LoadDataFromFile::DATA_TYPE"><span class="n"><span class="pre">DATA_TYPE</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D311JSONDataset16LoadDataFromFileEvNSt6stringENSt8functionIFv9DATA_TYPEEEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311JSONDataset16LoadDataFromFileENSt6stringENSt8functionIFvvEEE">
+<span id="_CPPv3N2D311JSONDataset16LoadDataFromFileENSt6stringENSt8functionIFvvEEE"></span><span id="_CPPv2N2D311JSONDataset16LoadDataFromFileENSt6stringENSt8functionIFvvEEE"></span><span class="target" id="classD3_1_1JSONDataset_1aee8e5bcb3c5e5554180eaa60a4582ad0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LoadDataFromFile</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">filename</span></span>, <a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D311JSONDataset16LoadDataFromFileENSt6stringENSt8functionIFvvEEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311JSONDataset6AppendENSt6stringE">
+<span id="_CPPv3N2D311JSONDataset6AppendENSt6stringE"></span><span id="_CPPv2N2D311JSONDataset6AppendENSt6stringE"></span><span id="D3::JSONDataset::Append__ss"></span><span class="target" id="classD3_1_1JSONDataset_1a5445ed925d0ce84c232610ea6c6fd669"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Append</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">json</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D311JSONDataset6AppendENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311JSONDataset12AppendNestedENSt6stringE">
+<span id="_CPPv3N2D311JSONDataset12AppendNestedENSt6stringE"></span><span id="_CPPv2N2D311JSONDataset12AppendNestedENSt6stringE"></span><span id="D3::JSONDataset::AppendNested__ss"></span><span class="target" id="classD3_1_1JSONDataset_1ac8e65936b3a8888bbf5ae70dd59c0067"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AppendNested</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">json</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D311JSONDataset12AppendNestedENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311JSONDataset20AppendNestedFromListENSt6stringER8JSObject">
+<span id="_CPPv3N2D311JSONDataset20AppendNestedFromListENSt6stringER8JSObject"></span><span id="_CPPv2N2D311JSONDataset20AppendNestedFromListENSt6stringER8JSObject"></span><span id="D3::JSONDataset::AppendNestedFromList__ss.JSObjectR"></span><span class="target" id="classD3_1_1JSONDataset_1ae015134ac5ed58fb2f7131ca6389d3a7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AppendNestedFromList</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">json</span></span>, <a class="reference internal" href="d3_init.html#_CPPv4N2D38JSObjectE" title="D3::JSObject"><span class="n"><span class="pre">JSObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">options</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D311JSONDataset20AppendNestedFromListENSt6stringER8JSObject" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311JSONDataset15FindInHierarchyE">
+<span id="_CPPv3N2D311JSONDataset15FindInHierarchyE"></span><span id="_CPPv2N2D311JSONDataset15FindInHierarchyE"></span><span id="D3::JSONDataset::FindInHierarchy__JSFunction"></span><span class="target" id="classD3_1_1JSONDataset_1a38ba610a0c8ab8e59efa6e042c33892b"></span><a class="reference internal" href="d3_init.html#_CPPv4N2D310JSFunctionE" title="D3::JSFunction"><span class="n"><span class="pre">JSFunction</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindInHierarchy</span></span></span><a class="headerlink" href="#_CPPv4N2D311JSONDataset15FindInHierarchyE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="d3_init.html" class="btn btn-neutral float-left" title="d3_init.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="histogram.html" class="btn btn-neutral float-right" title="histogram.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

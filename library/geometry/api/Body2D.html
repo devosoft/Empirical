@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Body2D.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/geometry/api/Body2D.563dc98d-5dbb-4907-a855-3dc9dde68060.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Circle2D.hpp" href="Circle2D.html" />
+    <link rel="prev" title="Angle2D.hpp" href="Angle2D.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../geometry.html">Geometry</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../geometry.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Angle2D.html">Angle2D.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Body2D.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411Body2D_Base"><code class="docutils literal notranslate"><span class="pre">Body2D_Base</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412CircleBody2D"><code class="docutils literal notranslate"><span class="pre">CircleBody2D</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Circle2D.html">Circle2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Physics2D.html">Physics2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Point2D.html">Point2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Surface.html">Surface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Surface2D.html">Surface2D.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../geometry.html">Geometry</a></li>
+      <li class="breadcrumb-item active">Body2D.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="body2d-hpp">
+<h1>Body2D.hpp<a class="headerlink" href="#body2d-hpp" title="Link to this heading"></a></h1>
+<p>This file defines classes to represent bodies that exist on a 2D surface. </p>
+<p>Each class should be able to:<ul class="simple">
+<li><p>Maintain a pointer to information about the full organism associated with this body.</p></li>
+<li><p>provide a circular perimeter of the body (for phase1 of collision detection)</p></li>
+<li><p>Provide body an anchor point and center point of the body (typically the same)</p></li>
+</ul>
+</p>
+<p>Currently, the only type of body we have is:</p>
+<p>CircleBody2D - One individual circular object in the 2D world.</p>
+<p>Development notes:<ul class="simple">
+<li><p>If we are going to have a lot of links, we may want a better data structure than vector. </p></li>
+</ul>
+</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv411Body2D_Base">
+<span id="_CPPv311Body2D_Base"></span><span id="_CPPv211Body2D_Base"></span><span id="Body2D_Base"></span><span class="target" id="classBody2D__Base"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Body2D_Base</span></span></span><a class="headerlink" href="#_CPPv411Body2D_Base" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Body2D.hpp&gt;</em></div>
+<p>Subclassed by CircleBody2D</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base11Body2D_BaseEv">
+<span id="_CPPv3N11Body2D_Base11Body2D_BaseEv"></span><span id="_CPPv2N11Body2D_Base11Body2D_BaseEv"></span><span id="Body2D_Base::Body2D_Base"></span><span class="target" id="classBody2D__Base_1a2f2caf15178e8bb0e9404df3730d7491"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Body2D_Base</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base11Body2D_BaseEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_BaseD0Ev">
+<span id="_CPPv3N11Body2D_BaseD0Ev"></span><span id="_CPPv2N11Body2D_BaseD0Ev"></span><span id="Body2D_Base::~Body2D_Base"></span><span class="target" id="classBody2D__Base_1a93aa14455564d6bcd03af405193adb84"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Body2D_Base</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_BaseD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11Body2D_Base12GetBirthTimeEv">
+<span id="_CPPv3NK11Body2D_Base12GetBirthTimeEv"></span><span id="_CPPv2NK11Body2D_Base12GetBirthTimeEv"></span><span id="Body2D_Base::GetBirthTimeC"></span><span class="target" id="classBody2D__Base_1a2213b575f2327548243c18acd1cfab77"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBirthTime</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11Body2D_Base12GetBirthTimeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11Body2D_Base14GetOrientationEv">
+<span id="_CPPv3NK11Body2D_Base14GetOrientationEv"></span><span id="_CPPv2NK11Body2D_Base14GetOrientationEv"></span><span id="Body2D_Base::GetOrientationC"></span><span class="target" id="classBody2D__Base_1a5aa0a9df5c196c21bd6e1af27b631447"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Angle2D.html#_CPPv45Angle" title="Angle"><span class="n"><span class="pre">Angle</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetOrientation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11Body2D_Base14GetOrientationEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11Body2D_Base11GetVelocityEv">
+<span id="_CPPv3NK11Body2D_Base11GetVelocityEv"></span><span id="_CPPv2NK11Body2D_Base11GetVelocityEv"></span><span id="Body2D_Base::GetVelocityC"></span><span class="target" id="classBody2D__Base_1a66eb985b089df9f587afcc9984a75a6e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetVelocity</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11Body2D_Base11GetVelocityEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11Body2D_Base7GetMassEv">
+<span id="_CPPv3NK11Body2D_Base7GetMassEv"></span><span id="_CPPv2NK11Body2D_Base7GetMassEv"></span><span id="Body2D_Base::GetMassC"></span><span class="target" id="classBody2D__Base_1ac92772354187b2ba78a707facb0db57a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetMass</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11Body2D_Base7GetMassEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11Body2D_Base10GetColorIDEv">
+<span id="_CPPv3NK11Body2D_Base10GetColorIDEv"></span><span id="_CPPv2NK11Body2D_Base10GetColorIDEv"></span><span id="Body2D_Base::GetColorIDC"></span><span class="target" id="classBody2D__Base_1a4ee4934251c3088947a1356c2756a696"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetColorID</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11Body2D_Base10GetColorIDEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11Body2D_Base13IsReproducingEv">
+<span id="_CPPv3NK11Body2D_Base13IsReproducingEv"></span><span id="_CPPv2NK11Body2D_Base13IsReproducingEv"></span><span id="Body2D_Base::IsReproducingC"></span><span class="target" id="classBody2D__Base_1a3637a7fa51261967e1a4d2784bf5f312"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsReproducing</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11Body2D_Base13IsReproducingEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11Body2D_Base13GetReproCountEv">
+<span id="_CPPv3NK11Body2D_Base13GetReproCountEv"></span><span id="_CPPv2NK11Body2D_Base13GetReproCountEv"></span><span id="Body2D_Base::GetReproCountC"></span><span class="target" id="classBody2D__Base_1a1665cc85cc1037a136d1a1b237524ba4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetReproCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11Body2D_Base13GetReproCountEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11Body2D_Base8GetShiftEv">
+<span id="_CPPv3NK11Body2D_Base8GetShiftEv"></span><span id="_CPPv2NK11Body2D_Base8GetShiftEv"></span><span id="Body2D_Base::GetShiftC"></span><span class="target" id="classBody2D__Base_1adcb6b04e4480a0e1cf51c1c4e7f22b04"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetShift</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11Body2D_Base8GetShiftEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11Body2D_Base11GetPressureEv">
+<span id="_CPPv3NK11Body2D_Base11GetPressureEv"></span><span id="_CPPv2NK11Body2D_Base11GetPressureEv"></span><span id="Body2D_Base::GetPressureC"></span><span class="target" id="classBody2D__Base_1ae0e31915a549527142c4a7065fc0b71b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPressure</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11Body2D_Base11GetPressureEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11Body2D_Base17GetDetachOnDivideEv">
+<span id="_CPPv3NK11Body2D_Base17GetDetachOnDivideEv"></span><span id="_CPPv2NK11Body2D_Base17GetDetachOnDivideEv"></span><span id="Body2D_Base::GetDetachOnDivideC"></span><span class="target" id="classBody2D__Base_1ad36c3b2942d99b07514e3e5886f80558"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetDetachOnDivide</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11Body2D_Base17GetDetachOnDivideEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base12SetBirthTimeEd">
+<span id="_CPPv3N11Body2D_Base12SetBirthTimeEd"></span><span id="_CPPv2N11Body2D_Base12SetBirthTimeEd"></span><span id="Body2D_Base::SetBirthTime__double"></span><span class="target" id="classBody2D__Base_1ac2643ec532db7b3ed890509b96e39968"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetBirthTime</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base12SetBirthTimeEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base14SetOrientationE5Angle">
+<span id="_CPPv3N11Body2D_Base14SetOrientationE5Angle"></span><span id="_CPPv2N11Body2D_Base14SetOrientationE5Angle"></span><span id="Body2D_Base::SetOrientation__Angle"></span><span class="target" id="classBody2D__Base_1ae7289daa8a3162db75346661cfbb4742"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetOrientation</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Angle2D.html#_CPPv45Angle" title="Angle"><span class="n"><span class="pre">Angle</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base14SetOrientationE5Angle" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base11SetVelocityE5Point">
+<span id="_CPPv3N11Body2D_Base11SetVelocityE5Point"></span><span id="_CPPv2N11Body2D_Base11SetVelocityE5Point"></span><span id="Body2D_Base::SetVelocity__Point"></span><span class="target" id="classBody2D__Base_1a778c8efe01173f9e2198daf4425815da"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetVelocity</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base11SetVelocityE5Point" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base7SetMassEd">
+<span id="_CPPv3N11Body2D_Base7SetMassEd"></span><span id="_CPPv2N11Body2D_Base7SetMassEd"></span><span id="Body2D_Base::SetMass__double"></span><span class="target" id="classBody2D__Base_1a62c9d3cb9cb716c24d90e7c3b29b9ca3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetMass</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base7SetMassEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base10SetColorIDE8uint32_t">
+<span id="_CPPv3N11Body2D_Base10SetColorIDE8uint32_t"></span><span id="_CPPv2N11Body2D_Base10SetColorIDE8uint32_t"></span><span id="Body2D_Base::SetColorID__uint32_t"></span><span class="target" id="classBody2D__Base_1a470c5d827918cea499a6e658fa16a343"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetColorID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base10SetColorIDE8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8TurnLeftEi">
+<span id="_CPPv3N11Body2D_Base8TurnLeftEi"></span><span id="_CPPv2N11Body2D_Base8TurnLeftEi"></span><span id="Body2D_Base::TurnLeft__i"></span><span class="target" id="classBody2D__Base_1ad5705f00894f21a7d0759a737fc4653f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TurnLeft</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base8TurnLeftEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base9TurnRightEi">
+<span id="_CPPv3N11Body2D_Base9TurnRightEi"></span><span id="_CPPv2N11Body2D_Base9TurnRightEi"></span><span id="Body2D_Base::TurnRight__i"></span><span class="target" id="classBody2D__Base_1ab1befe4da3a8538d987c5d9ed67265f2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TurnRight</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base9TurnRightEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base13RotateDegreesEd">
+<span id="_CPPv3N11Body2D_Base13RotateDegreesEd"></span><span id="_CPPv2N11Body2D_Base13RotateDegreesEd"></span><span id="Body2D_Base::RotateDegrees__double"></span><span class="target" id="classBody2D__Base_1a118c8c7e7cc1b7a53f75cbad03d8a63a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RotateDegrees</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">degrees</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base13RotateDegreesEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8IncSpeedERK5Point">
+<span id="_CPPv3N11Body2D_Base8IncSpeedERK5Point"></span><span id="_CPPv2N11Body2D_Base8IncSpeedERK5Point"></span><span id="Body2D_Base::IncSpeed__PointCR"></span><span class="target" id="classBody2D__Base_1a019c380689ab91fdba9440f3f49c9325"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IncSpeed</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">offset</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base8IncSpeedERK5Point" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8IncSpeedEv">
+<span id="_CPPv3N11Body2D_Base8IncSpeedEv"></span><span id="_CPPv2N11Body2D_Base8IncSpeedEv"></span><span id="Body2D_Base::IncSpeed"></span><span class="target" id="classBody2D__Base_1aec1017aecafa0320a485a20b93ee9cab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IncSpeed</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base8IncSpeedEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8DecSpeedEv">
+<span id="_CPPv3N11Body2D_Base8DecSpeedEv"></span><span id="_CPPv2N11Body2D_Base8DecSpeedEv"></span><span id="Body2D_Base::DecSpeed"></span><span class="target" id="classBody2D__Base_1a8d2893a81a67724480cffeb6a54d8140"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecSpeed</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base8DecSpeedEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base11SetVelocityEdd">
+<span id="_CPPv3N11Body2D_Base11SetVelocityEdd"></span><span id="_CPPv2N11Body2D_Base11SetVelocityEdd"></span><span id="Body2D_Base::SetVelocity__double.double"></span><span class="target" id="classBody2D__Base_1ad5f34489f2b4c84d58cdef96345ee93c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetVelocity</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base11SetVelocityEdd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8AddShiftERK5Point">
+<span id="_CPPv3N11Body2D_Base8AddShiftERK5Point"></span><span id="_CPPv2N11Body2D_Base8AddShiftERK5Point"></span><span id="Body2D_Base::AddShift__PointCR"></span><span class="target" id="classBody2D__Base_1a33c6c697f8711ced87ee6c9058971700"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddShift</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base8AddShiftERK5Point" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base17SetDetachOnDivideEb">
+<span id="_CPPv3N11Body2D_Base17SetDetachOnDivideEb"></span><span id="_CPPv2N11Body2D_Base17SetDetachOnDivideEb"></span><span id="Body2D_Base::SetDetachOnDivide__b"></span><span class="target" id="classBody2D__Base_1a651007f883727ebdb43d0e9ac2991370"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetDetachOnDivide</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base17SetDetachOnDivideEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-types">Protected Types</p>
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base9LINK_TYPEE">
+<span id="_CPPv3N11Body2D_Base9LINK_TYPEE"></span><span id="_CPPv2N11Body2D_Base9LINK_TYPEE"></span><span class="target" id="classBody2D__Base_1aab0ba76932239d0176a8b978eec0d3b8"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LINK_TYPE</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base9LINK_TYPEE" title="Link to this definition"></a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base9LINK_TYPE7DEFAULTE">
+<span id="_CPPv3N11Body2D_Base9LINK_TYPE7DEFAULTE"></span><span id="_CPPv2N11Body2D_Base9LINK_TYPE7DEFAULTE"></span><span class="target" id="classBody2D__Base_1aab0ba76932239d0176a8b978eec0d3b8a5b39c8b553c821e7cddc6da64b5bd2ee"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DEFAULT</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base9LINK_TYPE7DEFAULTE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base9LINK_TYPE12REPRODUCTIONE">
+<span id="_CPPv3N11Body2D_Base9LINK_TYPE12REPRODUCTIONE"></span><span id="_CPPv2N11Body2D_Base9LINK_TYPE12REPRODUCTIONE"></span><span class="target" id="classBody2D__Base_1aab0ba76932239d0176a8b978eec0d3b8a60aa4b56c252ece63c332244dd342c62"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">REPRODUCTION</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base9LINK_TYPE12REPRODUCTIONE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base9LINK_TYPE6ATTACKE">
+<span id="_CPPv3N11Body2D_Base9LINK_TYPE6ATTACKE"></span><span id="_CPPv2N11Body2D_Base9LINK_TYPE6ATTACKE"></span><span class="target" id="classBody2D__Base_1aab0ba76932239d0176a8b978eec0d3b8ac6ddd0f72ff2fd344693b9ca8d483871"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ATTACK</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base9LINK_TYPE6ATTACKE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base9LINK_TYPE8PARASITEE">
+<span id="_CPPv3N11Body2D_Base9LINK_TYPE8PARASITEE"></span><span id="_CPPv2N11Body2D_Base9LINK_TYPE8PARASITEE"></span><span class="target" id="classBody2D__Base_1aab0ba76932239d0176a8b978eec0d3b8ad963edb082d820371725e44e2ec8ebd6"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PARASITE</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base9LINK_TYPE8PARASITEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base9LINK_TYPE9MULTICELLE">
+<span id="_CPPv3N11Body2D_Base9LINK_TYPE9MULTICELLE"></span><span id="_CPPv2N11Body2D_Base9LINK_TYPE9MULTICELLE"></span><span class="target" id="classBody2D__Base_1aab0ba76932239d0176a8b978eec0d3b8a35950e4f49221584d5f6e774cc5edb6c"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MULTICELL</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base9LINK_TYPE9MULTICELLE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base10birth_timeE">
+<span id="_CPPv3N11Body2D_Base10birth_timeE"></span><span id="_CPPv2N11Body2D_Base10birth_timeE"></span><span id="Body2D_Base::birth_time__double"></span><span class="target" id="classBody2D__Base_1ab26d4d4b3cb12bcf06734a8ea4b68507"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">birth_time</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base10birth_timeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base11orientationE">
+<span id="_CPPv3N11Body2D_Base11orientationE"></span><span id="_CPPv2N11Body2D_Base11orientationE"></span><span id="Body2D_Base::orientation__Angle"></span><span class="target" id="classBody2D__Base_1ae079932f7afa6b2e1682806b520cda05"></span><a class="reference internal" href="Angle2D.html#_CPPv45Angle" title="Angle"><span class="n"><span class="pre">Angle</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">orientation</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base11orientationE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8velocityE">
+<span id="_CPPv3N11Body2D_Base8velocityE"></span><span id="_CPPv2N11Body2D_Base8velocityE"></span><span id="Body2D_Base::velocity__Point"></span><span class="target" id="classBody2D__Base_1a5ac4571c1582e7dd3ddcfdd122592266"></span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">velocity</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base8velocityE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base4massE">
+<span id="_CPPv3N11Body2D_Base4massE"></span><span id="_CPPv2N11Body2D_Base4massE"></span><span id="Body2D_Base::mass__double"></span><span class="target" id="classBody2D__Base_1a2b1be9b788ebc3c353a4cc4c8ad5d835"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mass</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base4massE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8color_idE">
+<span id="_CPPv3N11Body2D_Base8color_idE"></span><span id="_CPPv2N11Body2D_Base8color_idE"></span><span id="Body2D_Base::color_id__uint32_t"></span><span class="target" id="classBody2D__Base_1a57c3a5811e4f6174fb15faeea55e5aec"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">color_id</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base8color_idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base11repro_countE">
+<span id="_CPPv3N11Body2D_Base11repro_countE"></span><span id="_CPPv2N11Body2D_Base11repro_countE"></span><span id="Body2D_Base::repro_count__i"></span><span class="target" id="classBody2D__Base_1aabca320729135f201be4f579563eaa22"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">repro_count</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base11repro_countE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base5shiftE">
+<span id="_CPPv3N11Body2D_Base5shiftE"></span><span id="_CPPv2N11Body2D_Base5shiftE"></span><span id="Body2D_Base::shift__Point"></span><span class="target" id="classBody2D__Base_1a8e28f25d2534eaba1804bd54c36f0b34"></span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shift</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base5shiftE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base9cum_shiftE">
+<span id="_CPPv3N11Body2D_Base9cum_shiftE"></span><span id="_CPPv2N11Body2D_Base9cum_shiftE"></span><span id="Body2D_Base::cum_shift__Point"></span><span class="target" id="classBody2D__Base_1a626f62550a3cd0ac1712eea0cc3fc63e"></span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cum_shift</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base9cum_shiftE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base15total_abs_shiftE">
+<span id="_CPPv3N11Body2D_Base15total_abs_shiftE"></span><span id="_CPPv2N11Body2D_Base15total_abs_shiftE"></span><span id="Body2D_Base::total_abs_shift__Point"></span><span class="target" id="classBody2D__Base_1a10ea5c49a074981a874de922142cbad0"></span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">total_abs_shift</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base15total_abs_shiftE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8pressureE">
+<span id="_CPPv3N11Body2D_Base8pressureE"></span><span id="_CPPv2N11Body2D_Base8pressureE"></span><span id="Body2D_Base::pressure__double"></span><span class="target" id="classBody2D__Base_1aaf7880b03fa0cfd5b3179de6f18caaae"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pressure</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base8pressureE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base16detach_on_divideE">
+<span id="_CPPv3N11Body2D_Base16detach_on_divideE"></span><span id="_CPPv2N11Body2D_Base16detach_on_divideE"></span><span id="Body2D_Base::detach_on_divide__b"></span><span class="target" id="classBody2D__Base_1a57dba6e096f5aaab664c7c309ec124f3"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">detach_on_divide</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base16detach_on_divideE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN11Body2D_Base8BodyLinkE">
+<span id="_CPPv3I0EN11Body2D_Base8BodyLinkE"></span><span id="_CPPv2I0EN11Body2D_Base8BodyLinkE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BODY_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structBody2D__Base_1_1BodyLink"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BodyLink</span></span></span><a class="headerlink" href="#_CPPv4I0EN11Body2D_Base8BodyLinkE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Body2D.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8BodyLink8BodyLinkEv">
+<span id="_CPPv3N11Body2D_Base8BodyLink8BodyLinkEv"></span><span id="_CPPv2N11Body2D_Base8BodyLink8BodyLinkEv"></span><span id="Body2D_Base::BodyLink::BodyLink"></span><span class="target" id="structBody2D__Base_1_1BodyLink_1a5532467f086603dfd1d57044dc866214"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BodyLink</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base8BodyLink8BodyLinkEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8BodyLink8BodyLinkE9LINK_TYPE3PtrI9BODY_TYPEE3PtrI9BODY_TYPEEdd">
+<span id="_CPPv3N11Body2D_Base8BodyLink8BodyLinkE9LINK_TYPE3PtrI9BODY_TYPEE3PtrI9BODY_TYPEEdd"></span><span id="_CPPv2N11Body2D_Base8BodyLink8BodyLinkE9LINK_TYPE3PtrI9BODY_TYPEE3PtrI9BODY_TYPEEdd"></span><span id="Body2D_Base::BodyLink::BodyLink__LINK_TYPE.Ptr:BODY_TYPE:.Ptr:BODY_TYPE:.double.double"></span><span class="target" id="structBody2D__Base_1_1BodyLink_1ac01e1d769035a80fcac586516f798ab2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BodyLink</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N11Body2D_Base9LINK_TYPEE" title="Body2D_Base::LINK_TYPE"><span class="n"><span class="pre">LINK_TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span>, <a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN11Body2D_Base8BodyLinkE" title="Body2D_Base::BodyLink::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_frm</span></span>, <a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN11Body2D_Base8BodyLinkE" title="Body2D_Base::BodyLink::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_to</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cur</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base8BodyLink8BodyLinkE9LINK_TYPE3PtrI9BODY_TYPEE3PtrI9BODY_TYPEEdd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8BodyLink8BodyLinkERK8BodyLink">
+<span id="_CPPv3N11Body2D_Base8BodyLink8BodyLinkERK8BodyLink"></span><span id="_CPPv2N11Body2D_Base8BodyLink8BodyLinkERK8BodyLink"></span><span id="Body2D_Base::BodyLink::BodyLink__BodyLinkCR"></span><span class="target" id="structBody2D__Base_1_1BodyLink_1a29772ce56c284830269d9d7b03a10e60"></span><span class="sig-name descname"><span class="n"><span class="pre">BodyLink</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11Body2D_Base8BodyLink8BodyLinkERK8BodyLink" title="Body2D_Base::BodyLink::BodyLink"><span class="n"><span class="pre">BodyLink</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base8BodyLink8BodyLinkERK8BodyLink" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8BodyLinkD0Ev">
+<span id="_CPPv3N11Body2D_Base8BodyLinkD0Ev"></span><span id="_CPPv2N11Body2D_Base8BodyLinkD0Ev"></span><span id="Body2D_Base::BodyLink::~BodyLink"></span><span class="target" id="structBody2D__Base_1_1BodyLink_1abd8294c423431884e3af4f726858b714"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~BodyLink</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11Body2D_Base8BodyLinkD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8BodyLink4typeE">
+<span id="_CPPv3N11Body2D_Base8BodyLink4typeE"></span><span id="_CPPv2N11Body2D_Base8BodyLink4typeE"></span><span id="Body2D_Base::BodyLink::type__LINK_TYPE"></span><span class="target" id="structBody2D__Base_1_1BodyLink_1a3c2e3ece96df189543acf96e2fdf7024"></span><a class="reference internal" href="#_CPPv4N11Body2D_Base9LINK_TYPEE" title="Body2D_Base::LINK_TYPE"><span class="n"><span class="pre">LINK_TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base8BodyLink4typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8BodyLink4fromE">
+<span id="_CPPv3N11Body2D_Base8BodyLink4fromE"></span><span id="_CPPv2N11Body2D_Base8BodyLink4fromE"></span><span id="Body2D_Base::BodyLink::from__Ptr:BODY_TYPE:"></span><span class="target" id="structBody2D__Base_1_1BodyLink_1ae91df3e44bba78fbb656c8235e0d299a"></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN11Body2D_Base8BodyLinkE" title="Body2D_Base::BodyLink::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">from</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base8BodyLink4fromE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8BodyLink2toE">
+<span id="_CPPv3N11Body2D_Base8BodyLink2toE"></span><span id="_CPPv2N11Body2D_Base8BodyLink2toE"></span><span id="Body2D_Base::BodyLink::to__Ptr:BODY_TYPE:"></span><span class="target" id="structBody2D__Base_1_1BodyLink_1ab7d174e773d677c8e9c465b2d0ac672e"></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN11Body2D_Base8BodyLinkE" title="Body2D_Base::BodyLink::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">to</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base8BodyLink2toE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8BodyLink8cur_distE">
+<span id="_CPPv3N11Body2D_Base8BodyLink8cur_distE"></span><span id="_CPPv2N11Body2D_Base8BodyLink8cur_distE"></span><span id="Body2D_Base::BodyLink::cur_dist__double"></span><span class="target" id="structBody2D__Base_1_1BodyLink_1add3d8eef79d5f375c32956606352d5af"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cur_dist</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base8BodyLink8cur_distE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11Body2D_Base8BodyLink11target_distE">
+<span id="_CPPv3N11Body2D_Base8BodyLink11target_distE"></span><span id="_CPPv2N11Body2D_Base8BodyLink11target_distE"></span><span id="Body2D_Base::BodyLink::target_dist__double"></span><span class="target" id="structBody2D__Base_1_1BodyLink_1a51c62412bd27e94a565f2513618f96c5"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">target_dist</span></span></span><a class="headerlink" href="#_CPPv4N11Body2D_Base8BodyLink11target_distE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv412CircleBody2D">
+<span id="_CPPv312CircleBody2D"></span><span id="_CPPv212CircleBody2D"></span><span id="CircleBody2D"></span><span class="target" id="classCircleBody2D"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CircleBody2D</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411Body2D_Base" title="Body2D_Base"><span class="n"><span class="pre">Body2D_Base</span></span></a><a class="headerlink" href="#_CPPv412CircleBody2D" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Body2D.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D12CircleBody2DEv">
+<span id="_CPPv3N12CircleBody2D12CircleBody2DEv"></span><span id="_CPPv2N12CircleBody2D12CircleBody2DEv"></span><span id="CircleBody2D::CircleBody2D"></span><span class="target" id="classCircleBody2D_1a9cf80b23aa00b34be86714579cd8bac1"></span><span class="sig-name descname"><span class="n"><span class="pre">CircleBody2D</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N12CircleBody2D12CircleBody2DEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D12CircleBody2DERK8Circle2DIdE">
+<span id="_CPPv3N12CircleBody2D12CircleBody2DERK8Circle2DIdE"></span><span id="_CPPv2N12CircleBody2D12CircleBody2DERK8Circle2DIdE"></span><span id="CircleBody2D::CircleBody2D__Circle2D:double:CR"></span><span class="target" id="classCircleBody2D_1a86c81d4e7ff184f10f38f8dd6485f250"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CircleBody2D</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Circle2D.html#_CPPv4I0E8Circle2D" title="Circle2D"><span class="n"><span class="pre">Circle2D</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D12CircleBody2DERK8Circle2DIdE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2DD0Ev">
+<span id="_CPPv3N12CircleBody2DD0Ev"></span><span id="_CPPv2N12CircleBody2DD0Ev"></span><span id="CircleBody2D::~CircleBody2D"></span><span class="target" id="classCircleBody2D_1a4d10303adb8bf82a0fff93e46f15d251"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~CircleBody2D</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2DD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12CircleBody2D12GetPerimeterEv">
+<span id="_CPPv3NK12CircleBody2D12GetPerimeterEv"></span><span id="_CPPv2NK12CircleBody2D12GetPerimeterEv"></span><span id="CircleBody2D::GetPerimeterC"></span><span class="target" id="classCircleBody2D_1a8827b29535e93c83afbbf1db1ea88d6c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Circle2D.html#_CPPv4I0E8Circle2D" title="Circle2D"><span class="n"><span class="pre">Circle2D</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetPerimeter</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12CircleBody2D12GetPerimeterEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12CircleBody2D11GetPositionEv">
+<span id="_CPPv3NK12CircleBody2D11GetPositionEv"></span><span id="_CPPv2NK12CircleBody2D11GetPositionEv"></span><span id="CircleBody2D::GetPositionC"></span><span class="target" id="classCircleBody2D_1a50b5c5c01d88629e1676939460ff6571"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetPosition</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12CircleBody2D11GetPositionEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12CircleBody2D9GetCenterEv">
+<span id="_CPPv3NK12CircleBody2D9GetCenterEv"></span><span id="_CPPv2NK12CircleBody2D9GetCenterEv"></span><span id="CircleBody2D::GetCenterC"></span><span class="target" id="classCircleBody2D_1a16821743114d6f536bdde9833ac23d91"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetCenter</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12CircleBody2D9GetCenterEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12CircleBody2D9GetRadiusEv">
+<span id="_CPPv3NK12CircleBody2D9GetRadiusEv"></span><span id="_CPPv2NK12CircleBody2D9GetRadiusEv"></span><span id="CircleBody2D::GetRadiusC"></span><span class="target" id="classCircleBody2D_1a14ad1c3dd0ddcbd6510403c83bea7c1c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRadius</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12CircleBody2D9GetRadiusEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12CircleBody2D15GetTargetRadiusEv">
+<span id="_CPPv3NK12CircleBody2D15GetTargetRadiusEv"></span><span id="_CPPv2NK12CircleBody2D15GetTargetRadiusEv"></span><span id="CircleBody2D::GetTargetRadiusC"></span><span class="target" id="classCircleBody2D_1a1c3e39c7585187ca861ececc092c494f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTargetRadius</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12CircleBody2D15GetTargetRadiusEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D11SetPositionERK5Point">
+<span id="_CPPv3N12CircleBody2D11SetPositionERK5Point"></span><span id="_CPPv2N12CircleBody2D11SetPositionERK5Point"></span><span id="CircleBody2D::SetPosition__PointCR"></span><span class="target" id="classCircleBody2D_1ad1883e6a512a4de823c66d40a5cdf260"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetPosition</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D11SetPositionERK5Point" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D9SetRadiusEd">
+<span id="_CPPv3N12CircleBody2D9SetRadiusEd"></span><span id="_CPPv2N12CircleBody2D9SetRadiusEd"></span><span id="CircleBody2D::SetRadius__double"></span><span class="target" id="classCircleBody2D_1a26b9721c1f91b95ed0622650768b0a32"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRadius</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D9SetRadiusEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D15SetTargetRadiusEd">
+<span id="_CPPv3N12CircleBody2D15SetTargetRadiusEd"></span><span id="_CPPv2N12CircleBody2D15SetTargetRadiusEd"></span><span id="CircleBody2D::SetTargetRadius__double"></span><span class="target" id="classCircleBody2D_1af3881e2aa7bd1e9df6ccdfc22ab1a834"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetTargetRadius</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D15SetTargetRadiusEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D9TranslateERK5Point">
+<span id="_CPPv3N12CircleBody2D9TranslateERK5Point"></span><span id="_CPPv2N12CircleBody2D9TranslateERK5Point"></span><span id="CircleBody2D::Translate__PointCR"></span><span class="target" id="classCircleBody2D_1a9c98ddd70495819adb7e50182ccbbbc6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Translate</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D9TranslateERK5Point" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12CircleBody2D12IsLinkedFromERK12CircleBody2D">
+<span id="_CPPv3NK12CircleBody2D12IsLinkedFromERK12CircleBody2D"></span><span id="_CPPv2NK12CircleBody2D12IsLinkedFromERK12CircleBody2D"></span><span id="CircleBody2D::IsLinkedFrom__CircleBody2DCRC"></span><span class="target" id="classCircleBody2D_1a5b5115427e0677be1fcca81973e131fc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsLinkedFrom</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">link_org</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12CircleBody2D12IsLinkedFromERK12CircleBody2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12CircleBody2D10IsLinkedToERK12CircleBody2D">
+<span id="_CPPv3NK12CircleBody2D10IsLinkedToERK12CircleBody2D"></span><span id="_CPPv2NK12CircleBody2D10IsLinkedToERK12CircleBody2D"></span><span id="CircleBody2D::IsLinkedTo__CircleBody2DCRC"></span><span class="target" id="classCircleBody2D_1a58111db86bf483d0aede29837442d8ba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsLinkedTo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">link_org</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12CircleBody2D10IsLinkedToERK12CircleBody2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12CircleBody2D8IsLinkedERK12CircleBody2D">
+<span id="_CPPv3NK12CircleBody2D8IsLinkedERK12CircleBody2D"></span><span id="_CPPv2NK12CircleBody2D8IsLinkedERK12CircleBody2D"></span><span id="CircleBody2D::IsLinked__CircleBody2DCRC"></span><span class="target" id="classCircleBody2D_1a291b422e005b9fbd22e942b7795d4dc3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsLinked</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">link_org</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12CircleBody2D8IsLinkedERK12CircleBody2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12CircleBody2D12GetLinkCountEv">
+<span id="_CPPv3NK12CircleBody2D12GetLinkCountEv"></span><span id="_CPPv2NK12CircleBody2D12GetLinkCountEv"></span><span id="CircleBody2D::GetLinkCountC"></span><span class="target" id="classCircleBody2D_1a212fac2014f0521298449d80d9597ad2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetLinkCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12CircleBody2D12GetLinkCountEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D7AddLinkE9LINK_TYPER12CircleBody2Ddd">
+<span id="_CPPv3N12CircleBody2D7AddLinkE9LINK_TYPER12CircleBody2Ddd"></span><span id="_CPPv2N12CircleBody2D7AddLinkE9LINK_TYPER12CircleBody2Ddd"></span><span id="CircleBody2D::AddLink__LINK_TYPE.CircleBody2DR.double.double"></span><span class="target" id="classCircleBody2D_1a7457ed5266d4604a91b73ed1d21a3f47"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddLink</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">LINK_TYPE</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">link_org</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cur_dist</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target_dist</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D7AddLinkE9LINK_TYPER12CircleBody2Ddd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D10RemoveLinkE3PtrI8BodyLinkI12CircleBody2DEE">
+<span id="_CPPv3N12CircleBody2D10RemoveLinkE3PtrI8BodyLinkI12CircleBody2DEE"></span><span id="_CPPv2N12CircleBody2D10RemoveLinkE3PtrI8BodyLinkI12CircleBody2DEE"></span><span id="CircleBody2D::RemoveLink__Ptr:BodyLink:CircleBody2D::"></span><span class="target" id="classCircleBody2D_1a2a63520caf68b85bfe5221327119c936"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RemoveLink</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">BodyLink</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">link</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D10RemoveLinkE3PtrI8BodyLinkI12CircleBody2DEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12CircleBody2D8FindLinkERK12CircleBody2D">
+<span id="_CPPv3NK12CircleBody2D8FindLinkERK12CircleBody2D"></span><span id="_CPPv2NK12CircleBody2D8FindLinkERK12CircleBody2D"></span><span id="CircleBody2D::FindLink__CircleBody2DCRC"></span><span class="target" id="classCircleBody2D_1a6eadf1d35270b2e87fc847945c478a6e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">BodyLink</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">FindLink</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">link_org</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12CircleBody2D8FindLinkERK12CircleBody2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D8FindLinkER12CircleBody2D">
+<span id="_CPPv3N12CircleBody2D8FindLinkER12CircleBody2D"></span><span id="_CPPv2N12CircleBody2D8FindLinkER12CircleBody2D"></span><span id="CircleBody2D::FindLink__CircleBody2DR"></span><span class="target" id="classCircleBody2D_1ad625d507e05f83db7a87fc913800e960"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">BodyLink</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">FindLink</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">link_org</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D8FindLinkER12CircleBody2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12CircleBody2D11GetLinkDistERK12CircleBody2D">
+<span id="_CPPv3NK12CircleBody2D11GetLinkDistERK12CircleBody2D"></span><span id="_CPPv2NK12CircleBody2D11GetLinkDistERK12CircleBody2D"></span><span id="CircleBody2D::GetLinkDist__CircleBody2DCRC"></span><span class="target" id="classCircleBody2D_1a12595c4fdc560f550eefa01f803a73f7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetLinkDist</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">link_org</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12CircleBody2D11GetLinkDistERK12CircleBody2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12CircleBody2D17GetTargetLinkDistERK12CircleBody2D">
+<span id="_CPPv3NK12CircleBody2D17GetTargetLinkDistERK12CircleBody2D"></span><span id="_CPPv2NK12CircleBody2D17GetTargetLinkDistERK12CircleBody2D"></span><span id="CircleBody2D::GetTargetLinkDist__CircleBody2DCRC"></span><span class="target" id="classCircleBody2D_1aec70bcc85c746f626fb304da340e2461"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTargetLinkDist</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">link_org</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12CircleBody2D17GetTargetLinkDistERK12CircleBody2D" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D13ShiftLinkDistER12CircleBody2Dd">
+<span id="_CPPv3N12CircleBody2D13ShiftLinkDistER12CircleBody2Dd"></span><span id="_CPPv2N12CircleBody2D13ShiftLinkDistER12CircleBody2Dd"></span><span id="CircleBody2D::ShiftLinkDist__CircleBody2DR.double"></span><span class="target" id="classCircleBody2D_1ac6078119ebfeba9e46f6d63085dcc80b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShiftLinkDist</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">link_org</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">change</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D13ShiftLinkDistER12CircleBody2Dd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D14BuildOffspringE5Point">
+<span id="_CPPv3N12CircleBody2D14BuildOffspringE5Point"></span><span id="_CPPv2N12CircleBody2D14BuildOffspringE5Point"></span><span id="CircleBody2D::BuildOffspring__Point"></span><span class="target" id="classCircleBody2D_1a183cf9753d871afb88eb512604d7baf6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BuildOffspring</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">offset</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D14BuildOffspringE5Point" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D10BodyUpdateEd">
+<span id="_CPPv3N12CircleBody2D10BodyUpdateEd"></span><span id="_CPPv2N12CircleBody2D10BodyUpdateEd"></span><span id="CircleBody2D::BodyUpdate__double"></span><span class="target" id="classCircleBody2D_1afd194ad79e001c35fadfc75808837715"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BodyUpdate</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">change_factor</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D10BodyUpdateEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D11ProcessStepEd">
+<span id="_CPPv3N12CircleBody2D11ProcessStepEd"></span><span id="_CPPv2N12CircleBody2D11ProcessStepEd"></span><span id="CircleBody2D::ProcessStep__double"></span><span class="target" id="classCircleBody2D_1a056880cbd07bad6d8059142bedbe8cc8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ProcessStep</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">friction</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D11ProcessStepEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D16FinalizePositionERK5Point">
+<span id="_CPPv3N12CircleBody2D16FinalizePositionERK5Point"></span><span id="_CPPv2N12CircleBody2D16FinalizePositionERK5Point"></span><span id="CircleBody2D::FinalizePosition__PointCR"></span><span class="target" id="classCircleBody2D_1abbe21efb4987a52aec231c9bea81589b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FinalizePosition</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">max_coords</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D16FinalizePositionERK5Point" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D2OKEv">
+<span id="_CPPv3N12CircleBody2D2OKEv"></span><span id="_CPPv2N12CircleBody2D2OKEv"></span><span id="CircleBody2D::OK"></span><span class="target" id="classCircleBody2D_1a96a69719c4c1a3d3a6e87ec97cd024f9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OK</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12CircleBody2D2OKEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D9perimeterE">
+<span id="_CPPv3N12CircleBody2D9perimeterE"></span><span id="_CPPv2N12CircleBody2D9perimeterE"></span><span id="CircleBody2D::perimeter__Circle2D:double:"></span><span class="target" id="classCircleBody2D_1a0afff405a5f702c13e17e2ffc76369c6"></span><a class="reference internal" href="Circle2D.html#_CPPv4I0E8Circle2D" title="Circle2D"><span class="n"><span class="pre">Circle2D</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">perimeter</span></span></span><a class="headerlink" href="#_CPPv4N12CircleBody2D9perimeterE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D13target_radiusE">
+<span id="_CPPv3N12CircleBody2D13target_radiusE"></span><span id="_CPPv2N12CircleBody2D13target_radiusE"></span><span id="CircleBody2D::target_radius__double"></span><span class="target" id="classCircleBody2D_1a37fe0b5393f32656a37e00fe034e72c4"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">target_radius</span></span></span><a class="headerlink" href="#_CPPv4N12CircleBody2D13target_radiusE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D10from_linksE">
+<span id="_CPPv3N12CircleBody2D10from_linksE"></span><span id="_CPPv2N12CircleBody2D10from_linksE"></span><span id="CircleBody2D::from_links__vector:Ptr:BodyLink:CircleBody2D:::"></span><span class="target" id="classCircleBody2D_1a0c64637e0ee67230c57462e1d16be367"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">BodyLink</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">from_links</span></span></span><a class="headerlink" href="#_CPPv4N12CircleBody2D10from_linksE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12CircleBody2D8to_linksE">
+<span id="_CPPv3N12CircleBody2D8to_linksE"></span><span id="_CPPv2N12CircleBody2D8to_linksE"></span><span id="CircleBody2D::to_links__vector:Ptr:BodyLink:CircleBody2D:::"></span><span class="target" id="classCircleBody2D_1af7a81f276d7a534463dc9043dc22cca2"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">BodyLink</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv412CircleBody2D" title="CircleBody2D"><span class="n"><span class="pre">CircleBody2D</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">to_links</span></span></span><a class="headerlink" href="#_CPPv4N12CircleBody2D8to_linksE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Angle2D.html" class="btn btn-neutral float-left" title="Angle2D.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Circle2D.html" class="btn btn-neutral float-right" title="Circle2D.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

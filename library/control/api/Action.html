@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Action.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/control/api/Action.12ee715c-a4d7-4931-b972-44f678d894c3.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="ActionManager.hpp" href="ActionManager.html" />
+    <link rel="prev" title="Control" href="../control.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../control.html">Control</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../control.html#api">API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Action.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE11make_actionDaRKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">make_action()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410ActionBase"><code class="docutils literal notranslate"><span class="pre">ActionBase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_6size_tE10ActionSize"><code class="docutils literal notranslate"><span class="pre">ActionSize</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE6Action"><code class="docutils literal notranslate"><span class="pre">Action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE6ActionIFvDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">Action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">Action</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ActionManager.html">ActionManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Signal.html">Signal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SignalControl.html">SignalControl.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SignalManager.html">SignalManager.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../control.html">Control</a></li>
+      <li class="breadcrumb-item active">Action.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="action-hpp">
+<h1>Action.hpp<a class="headerlink" href="#action-hpp" title="Link to this heading"></a></h1>
+<p>A mechanism to abstract functions from their underlying type and provide run-time names. </p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Create an ActionDefaults class that can take fewer args than expected and fill in rest. </p>
+<p>Allow for named arguments to facilitate interpreted functions. </p>
+</dd></dl>
+
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: Beta</p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE11make_actionDaRKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE">
+<span id="_CPPv3I0DpE11make_actionRKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE"></span><span id="_CPPv2I0DpE11make_actionRKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RETURN</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="Action_8hpp_1a3eef464f29ed5e26000b23161229d3b5"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">make_action</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE11make_actionDaRKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE" title="make_action::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE11make_actionDaRKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE" title="make_action::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE11make_actionDaRKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Build an action object using this function. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv410ActionBase">
+<span id="_CPPv310ActionBase"></span><span id="_CPPv210ActionBase"></span><span id="ActionBase"></span><span class="target" id="classActionBase"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActionBase</span></span></span><a class="headerlink" href="#_CPPv410ActionBase" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Action.hpp&gt;</em></div>
+<p>BaseActions abstract functions and allow for signals to be setup at runtime; they can be called with types specified in the call.</p>
+<p>Actions can be a bit heavyweight, but can easily be converted to std::function objects. </p>
+<p>Subclassed by ActionSize&lt; ARG_COUNT &gt;, ActionSize&lt; sizeof…(ARGS)&gt;</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10ActionBaseD0Ev">
+<span id="_CPPv3N10ActionBaseD0Ev"></span><span id="_CPPv2N10ActionBaseD0Ev"></span><span id="ActionBase::~ActionBase"></span><span class="target" id="classActionBase_1a0590cea4f9742e3ce57f4a5cf3c9f55b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~ActionBase</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10ActionBaseD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10ActionBase7GetNameEv">
+<span id="_CPPv3NK10ActionBase7GetNameEv"></span><span id="_CPPv2NK10ActionBase7GetNameEv"></span><span id="ActionBase::GetNameC"></span><span class="target" id="classActionBase_1a0bee0e659709ca97e83b02de635b6c54"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetName</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10ActionBase7GetNameEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the name of this action. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10ActionBase11GetArgCountEv">
+<span id="_CPPv3NK10ActionBase11GetArgCountEv"></span><span id="_CPPv2NK10ActionBase11GetArgCountEv"></span><span id="ActionBase::GetArgCountC"></span><span class="target" id="classActionBase_1add7e8667c4e1ca8fbf6bb2553a1bfe89"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetArgCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK10ActionBase11GetArgCountEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get number of arguments this action takes. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10ActionBase5CloneEv">
+<span id="_CPPv3NK10ActionBase5CloneEv"></span><span id="_CPPv2NK10ActionBase5CloneEv"></span><span id="ActionBase::CloneC"></span><span class="target" id="classActionBase_1a7ce69cdc859080ef23ed12b35f8de080"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Clone</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK10ActionBase5CloneEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Clone() will produce a pointer to a full copy of an Action, going through derived version. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10ActionBase10ActionBaseERKNSt6stringE">
+<span id="_CPPv3N10ActionBase10ActionBaseERKNSt6stringE"></span><span id="_CPPv2N10ActionBase10ActionBaseERKNSt6stringE"></span><span id="ActionBase::ActionBase__ssCR"></span><span class="target" id="classActionBase_1a130d858ac0766f0e4bfa28e32c72e3ca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActionBase</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10ActionBase10ActionBaseERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10ActionBase10ActionBaseERK10ActionBase">
+<span id="_CPPv3N10ActionBase10ActionBaseERK10ActionBase"></span><span id="_CPPv2N10ActionBase10ActionBaseERK10ActionBase"></span><span id="ActionBase::ActionBase__ActionBaseCR"></span><span class="target" id="classActionBase_1aef8eec8b19e5c85a4dec3df029d7feb2"></span><span class="sig-name descname"><span class="n"><span class="pre">ActionBase</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10ActionBase10ActionBaseERK10ActionBase" title="ActionBase::ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N10ActionBase10ActionBaseERK10ActionBase" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10ActionBase10ActionBaseERR10ActionBase">
+<span id="_CPPv3N10ActionBase10ActionBaseERR10ActionBase"></span><span id="_CPPv2N10ActionBase10ActionBaseERR10ActionBase"></span><span id="ActionBase::ActionBase__ActionBaseRR"></span><span class="target" id="classActionBase_1af2666ad779989ff62020156fa2677a0f"></span><span class="sig-name descname"><span class="n"><span class="pre">ActionBase</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N10ActionBase10ActionBaseERR10ActionBase" title="ActionBase::ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N10ActionBase10ActionBaseERR10ActionBase" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10ActionBaseaSERK10ActionBase">
+<span id="_CPPv3N10ActionBaseaSERK10ActionBase"></span><span id="_CPPv2N10ActionBaseaSERK10ActionBase"></span><span id="ActionBase::assign-operator__ActionBaseCR"></span><span class="target" id="classActionBase_1aeb67473dde118cb2e5776fddb934bf12"></span><a class="reference internal" href="#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N10ActionBaseaSERK10ActionBase" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10ActionBaseaSERR10ActionBase">
+<span id="_CPPv3N10ActionBaseaSERR10ActionBase"></span><span id="_CPPv2N10ActionBaseaSERR10ActionBase"></span><span id="ActionBase::assign-operator__ActionBaseRR"></span><span class="target" id="classActionBase_1ab8201187042493e4cc2bafef1cb1919b"></span><a class="reference internal" href="#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N10ActionBaseaSERR10ActionBase" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10ActionBase4nameE">
+<span id="_CPPv3N10ActionBase4nameE"></span><span id="_CPPv2N10ActionBase4nameE"></span><span id="ActionBase::name__ss"></span><span class="target" id="classActionBase_1a152b0281f9a7e2c438b99e9d5b70a87e"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><a class="headerlink" href="#_CPPv4N10ActionBase4nameE" title="Link to this definition"></a><br /></dt>
+<dd><p>A unique name for this action so it can be called at runtime. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_tE10ActionSize">
+<span id="_CPPv3I_6size_tE10ActionSize"></span><span id="_CPPv2I_6size_tE10ActionSize"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_COUNT</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classActionSize"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActionSize</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><a class="headerlink" href="#_CPPv4I_6size_tE10ActionSize" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Action.hpp&gt;</em></div>
+<p>ActionSize is a second layer of abstract actions that know the number of arguments used at compile time to facilitate easy type-checking. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10ActionSize11GetArgCountEv">
+<span id="_CPPv3NK10ActionSize11GetArgCountEv"></span><span id="_CPPv2NK10ActionSize11GetArgCountEv"></span><span id="ActionSize::GetArgCountC"></span><span class="target" id="classActionSize_1afb17cd704c3c01fe31204a5781100395"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetArgCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10ActionSize11GetArgCountEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get number of arguments this action takes. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10ActionSize10ActionSizeERKNSt6stringE">
+<span id="_CPPv3N10ActionSize10ActionSizeERKNSt6stringE"></span><span id="_CPPv2N10ActionSize10ActionSizeERKNSt6stringE"></span><span id="ActionSize::ActionSize__ssCR"></span><span class="target" id="classActionSize_1add9775788553d75f38f8d387be897551"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActionSize</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10ActionSize10ActionSizeERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE6Action">
+<span id="_CPPv3IDpE6Action"></span><span id="_CPPv2IDpE6Action"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classAction"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Action</span></span></span><a class="headerlink" href="#_CPPv4IDpE6Action" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Action.hpp&gt;</em></div>
+<p>The declaration for Action has any template types; the only defined specializations require a function type to be specified (with void and non-void return type variants.) </p>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE6ActionIFvDp4ARGSEE">
+<span id="_CPPv3IDpE6ActionIFvDp4ARGSEE"></span><span id="_CPPv2IDpE6ActionIFvDp4ARGSEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classAction_3_01void_07ARGS_8_8_8_08_4"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Action</span></span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE6ActionIFvDp4ARGSEE" title="Action&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_tE10ActionSize" title="ActionSize"><span class="n"><span class="pre">ActionSize</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">sizeof</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE6ActionIFvDp4ARGSEE" title="Action&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IDpE6ActionIFvDp4ARGSEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Action.hpp&gt;</em></div>
+<p>This Action class specialization takes a function with a void return type and builds it off of the action base classes. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIFvDp4ARGSEE6this_tE">
+<span id="_CPPv3N6ActionIFvDp4ARGSEE6this_tE"></span><span id="_CPPv2N6ActionIFvDp4ARGSEE6this_tE"></span><span class="target" id="classAction_3_01void_07ARGS_8_8_8_08_4_1ae13665e70e3c4ce37e16460b4bff30fb"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ActionIFvDp4ARGSEE6ActionERKNSt8functionIFvDp4ARGSEEERKNSt6stringE" title="Action&lt;void(ARGS...)&gt;::Action"><span class="n"><span class="pre">Action</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE6ActionIFvDp4ARGSEE" title="Action&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6ActionIFvDp4ARGSEE6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIFvDp4ARGSEE8parent_tE">
+<span id="_CPPv3N6ActionIFvDp4ARGSEE8parent_tE"></span><span id="_CPPv2N6ActionIFvDp4ARGSEE8parent_tE"></span><span class="target" id="classAction_3_01void_07ARGS_8_8_8_08_4_1a2e98dbe3f606d2c5d4b7472bc8919270"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">parent_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_tE10ActionSize" title="ActionSize"><span class="n"><span class="pre">ActionSize</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">sizeof</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE6ActionIFvDp4ARGSEE" title="Action&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6ActionIFvDp4ARGSEE8parent_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIFvDp4ARGSEE6ActionERKNSt8functionIFvDp4ARGSEEERKNSt6stringE">
+<span id="_CPPv3N6ActionIFvDp4ARGSEE6ActionERKNSt8functionIFvDp4ARGSEEERKNSt6stringE"></span><span id="_CPPv2N6ActionIFvDp4ARGSEE6ActionERKNSt8functionIFvDp4ARGSEEERKNSt6stringE"></span><span class="target" id="classAction_3_01void_07ARGS_8_8_8_08_4_1aa389c9490608e0436af9caf76491b804"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Action</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE6ActionIFvDp4ARGSEE" title="Action&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6ActionIFvDp4ARGSEE6ActionERKNSt8functionIFvDp4ARGSEEERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN6ActionIFvDp4ARGSEE6ActionERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE">
+<span id="_CPPv3I0EN6ActionIFvDp4ARGSEE6ActionERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE"></span><span id="_CPPv2I0EN6ActionIFvDp4ARGSEE6ActionERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RETURN</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classAction_3_01void_07ARGS_8_8_8_08_4_1a80da2ba2885337e85f24017e8415f61c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Action</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN6ActionIFvDp4ARGSEE6ActionERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE" title="Action&lt;void(ARGS...)&gt;::Action::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE6ActionIFvDp4ARGSEE" title="Action&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN6ActionIFvDp4ARGSEE6ActionERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIFvDp4ARGSEE6ActionERK6this_t">
+<span id="_CPPv3N6ActionIFvDp4ARGSEE6ActionERK6this_t"></span><span id="_CPPv2N6ActionIFvDp4ARGSEE6ActionERK6this_t"></span><span class="target" id="classAction_3_01void_07ARGS_8_8_8_08_4_1a8338094b99a594d723c110f21440c42e"></span><span class="sig-name descname"><span class="n"><span class="pre">Action</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ActionIFvDp4ARGSEE6this_tE" title="Action&lt;void(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6ActionIFvDp4ARGSEE6ActionERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIFvDp4ARGSEE6ActionERR6this_t">
+<span id="_CPPv3N6ActionIFvDp4ARGSEE6ActionERR6this_t"></span><span id="_CPPv2N6ActionIFvDp4ARGSEE6ActionERR6this_t"></span><span class="target" id="classAction_3_01void_07ARGS_8_8_8_08_4_1a3104bb4019969a4dedeec564a7e82e20"></span><span class="sig-name descname"><span class="n"><span class="pre">Action</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6ActionIFvDp4ARGSEE6this_tE" title="Action&lt;void(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6ActionIFvDp4ARGSEE6ActionERR6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIFvDp4ARGSEEaSERK6this_t">
+<span id="_CPPv3N6ActionIFvDp4ARGSEEaSERK6this_t"></span><span id="_CPPv2N6ActionIFvDp4ARGSEEaSERK6this_t"></span><span class="target" id="classAction_3_01void_07ARGS_8_8_8_08_4_1a4002e7173e69f2bede7bc32caa5132da"></span><a class="reference internal" href="#_CPPv4N6ActionIFvDp4ARGSEE6this_tE" title="Action&lt;void(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ActionIFvDp4ARGSEE6this_tE" title="Action&lt;void(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6ActionIFvDp4ARGSEEaSERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIFvDp4ARGSEEaSERR6this_t">
+<span id="_CPPv3N6ActionIFvDp4ARGSEEaSERR6this_t"></span><span id="_CPPv2N6ActionIFvDp4ARGSEEaSERR6this_t"></span><span class="target" id="classAction_3_01void_07ARGS_8_8_8_08_4_1a3e76df7e7d631e1ce3dd3e3e01d4b150"></span><a class="reference internal" href="#_CPPv4N6ActionIFvDp4ARGSEE6this_tE" title="Action&lt;void(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6ActionIFvDp4ARGSEE6this_tE" title="Action&lt;void(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6ActionIFvDp4ARGSEEaSERR6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6ActionIFvDp4ARGSEE6GetFunEv">
+<span id="_CPPv3NK6ActionIFvDp4ARGSEE6GetFunEv"></span><span id="_CPPv2NK6ActionIFvDp4ARGSEE6GetFunEv"></span><span class="target" id="classAction_3_01void_07ARGS_8_8_8_08_4_1ad56090cb49e94ef66cf5a78bea244d4f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE6ActionIFvDp4ARGSEE" title="Action&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetFun</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6ActionIFvDp4ARGSEE6GetFunEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIFvDp4ARGSEE4CallEDpRR4ARGS">
+<span id="_CPPv3N6ActionIFvDp4ARGSEE4CallEDpRR4ARGS"></span><span id="_CPPv2N6ActionIFvDp4ARGSEE4CallEDpRR4ARGS"></span><span class="target" id="classAction_3_01void_07ARGS_8_8_8_08_4_1a42a3fd48e581064ddecef168dedd08ea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Call</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpE6ActionIFvDp4ARGSEE" title="Action&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6ActionIFvDp4ARGSEE4CallEDpRR4ARGS" title="Link to this definition"></a><br /></dt>
+<dd><p>Call the function associated with this action. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6ActionIFvDp4ARGSEE5CloneEv">
+<span id="_CPPv3NK6ActionIFvDp4ARGSEE5CloneEv"></span><span id="_CPPv2NK6ActionIFvDp4ARGSEE5CloneEv"></span><span class="target" id="classAction_3_01void_07ARGS_8_8_8_08_4_1a433cf1b4a823c1612859a3b802adbede"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ActionIFvDp4ARGSEE6this_tE" title="Action&lt;void(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Clone</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6ActionIFvDp4ARGSEE5CloneEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a copy of this Action. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIFvDp4ARGSEE3funE">
+<span id="_CPPv3N6ActionIFvDp4ARGSEE3funE"></span><span id="_CPPv2N6ActionIFvDp4ARGSEE3funE"></span><span class="target" id="classAction_3_01void_07ARGS_8_8_8_08_4_1adaa0222619dbba1dc17ea762c11d31aa"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE6ActionIFvDp4ARGSEE" title="Action&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun</span></span></span><a class="headerlink" href="#_CPPv4N6ActionIFvDp4ARGSEE3funE" title="Link to this definition"></a><br /></dt>
+<dd><p>The specific function associated with this action. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE">
+<span id="_CPPv3I0DpE6ActionIF6RETURNDp4ARGSEE"></span><span id="_CPPv2I0DpE6ActionIF6RETURNDp4ARGSEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RETURN</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classAction_3_01RETURN_07ARGS_8_8_8_08_4"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Action</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE" title="Action&lt;RETURN(ARGS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE" title="Action&lt;RETURN(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_tE10ActionSize" title="ActionSize"><span class="n"><span class="pre">ActionSize</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">sizeof</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE" title="Action&lt;RETURN(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Action.hpp&gt;</em></div>
+<p>This Action class specialization takes a function with any non-void return type and builds it off of the action base classes. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIF6RETURNDp4ARGSEE5fun_tE">
+<span id="_CPPv3N6ActionIF6RETURNDp4ARGSEE5fun_tE"></span><span id="_CPPv2N6ActionIF6RETURNDp4ARGSEE5fun_tE"></span><span class="target" id="classAction_3_01RETURN_07ARGS_8_8_8_08_4_1a87423c9b97bbe37582e505363076d5f5"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE" title="Action&lt;RETURN(ARGS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE" title="Action&lt;RETURN(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIF6RETURNDp4ARGSEE6this_tE">
+<span id="_CPPv3N6ActionIF6RETURNDp4ARGSEE6this_tE"></span><span id="_CPPv2N6ActionIF6RETURNDp4ARGSEE6this_tE"></span><span class="target" id="classAction_3_01RETURN_07ARGS_8_8_8_08_4_1a716edc1e06539f5094c5efa9291d90cc"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE6ActionERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE" title="Action&lt;RETURN(ARGS...)&gt;::Action"><span class="n"><span class="pre">Action</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE5fun_tE" title="Action&lt;RETURN(ARGS...)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIF6RETURNDp4ARGSEE8parent_tE">
+<span id="_CPPv3N6ActionIF6RETURNDp4ARGSEE8parent_tE"></span><span id="_CPPv2N6ActionIF6RETURNDp4ARGSEE8parent_tE"></span><span class="target" id="classAction_3_01RETURN_07ARGS_8_8_8_08_4_1a57ff544c89ec2a2b65d7653779a6c48e"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">parent_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_tE10ActionSize" title="ActionSize"><span class="n"><span class="pre">ActionSize</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">sizeof</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE" title="Action&lt;RETURN(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE8parent_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIF6RETURNDp4ARGSEE6ActionERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE">
+<span id="_CPPv3N6ActionIF6RETURNDp4ARGSEE6ActionERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE"></span><span id="_CPPv2N6ActionIF6RETURNDp4ARGSEE6ActionERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE"></span><span class="target" id="classAction_3_01RETURN_07ARGS_8_8_8_08_4_1a528f37d4c3f25920313bf70cc8ee2d9d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Action</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE" title="Action&lt;RETURN(ARGS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE" title="Action&lt;RETURN(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE6ActionERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIF6RETURNDp4ARGSEE6ActionERK6this_t">
+<span id="_CPPv3N6ActionIF6RETURNDp4ARGSEE6ActionERK6this_t"></span><span id="_CPPv2N6ActionIF6RETURNDp4ARGSEE6ActionERK6this_t"></span><span class="target" id="classAction_3_01RETURN_07ARGS_8_8_8_08_4_1a4584bacd44d2ac69f8e966f67bc4d4ee"></span><span class="sig-name descname"><span class="n"><span class="pre">Action</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE6this_tE" title="Action&lt;RETURN(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE6ActionERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIF6RETURNDp4ARGSEE6ActionERR6this_t">
+<span id="_CPPv3N6ActionIF6RETURNDp4ARGSEE6ActionERR6this_t"></span><span id="_CPPv2N6ActionIF6RETURNDp4ARGSEE6ActionERR6this_t"></span><span class="target" id="classAction_3_01RETURN_07ARGS_8_8_8_08_4_1a32aea8c3fc5bf79ccc0fdf0c88ceaf06"></span><span class="sig-name descname"><span class="n"><span class="pre">Action</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE6this_tE" title="Action&lt;RETURN(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE6ActionERR6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIF6RETURNDp4ARGSEEaSERK6this_t">
+<span id="_CPPv3N6ActionIF6RETURNDp4ARGSEEaSERK6this_t"></span><span id="_CPPv2N6ActionIF6RETURNDp4ARGSEEaSERK6this_t"></span><span class="target" id="classAction_3_01RETURN_07ARGS_8_8_8_08_4_1a072e5b7870eec0bc454b574a529cb516"></span><a class="reference internal" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE6this_tE" title="Action&lt;RETURN(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE6this_tE" title="Action&lt;RETURN(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEEaSERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIF6RETURNDp4ARGSEEaSERR6this_t">
+<span id="_CPPv3N6ActionIF6RETURNDp4ARGSEEaSERR6this_t"></span><span id="_CPPv2N6ActionIF6RETURNDp4ARGSEEaSERR6this_t"></span><span class="target" id="classAction_3_01RETURN_07ARGS_8_8_8_08_4_1aba5485de784b8cac491f8cb10e056ad6"></span><a class="reference internal" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE6this_tE" title="Action&lt;RETURN(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE6this_tE" title="Action&lt;RETURN(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEEaSERR6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6ActionIF6RETURNDp4ARGSEE6GetFunEv">
+<span id="_CPPv3NK6ActionIF6RETURNDp4ARGSEE6GetFunEv"></span><span id="_CPPv2NK6ActionIF6RETURNDp4ARGSEE6GetFunEv"></span><span class="target" id="classAction_3_01RETURN_07ARGS_8_8_8_08_4_1a4bdb13adcbe6c6b7e0e88f88c9b3aa45"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE5fun_tE" title="Action&lt;RETURN(ARGS...)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetFun</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6ActionIF6RETURNDp4ARGSEE6GetFunEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIF6RETURNDp4ARGSEE4CallEDpRR4ARGS">
+<span id="_CPPv3N6ActionIF6RETURNDp4ARGSEE4CallEDpRR4ARGS"></span><span id="_CPPv2N6ActionIF6RETURNDp4ARGSEE4CallEDpRR4ARGS"></span><span class="target" id="classAction_3_01RETURN_07ARGS_8_8_8_08_4_1a463de8403eeb385887d33c75b5ee5964"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE" title="Action&lt;RETURN(ARGS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Call</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE" title="Action&lt;RETURN(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE4CallEDpRR4ARGS" title="Link to this definition"></a><br /></dt>
+<dd><p>Call the function associated with this action. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6ActionIF6RETURNDp4ARGSEE5CloneEv">
+<span id="_CPPv3NK6ActionIF6RETURNDp4ARGSEE5CloneEv"></span><span id="_CPPv2NK6ActionIF6RETURNDp4ARGSEE5CloneEv"></span><span class="target" id="classAction_3_01RETURN_07ARGS_8_8_8_08_4_1a54f1a212db578feb7724d89f9c2341f4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE6this_tE" title="Action&lt;RETURN(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Clone</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6ActionIF6RETURNDp4ARGSEE5CloneEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a copy of this Action. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6ActionIF6RETURNDp4ARGSEE3funE">
+<span id="_CPPv3N6ActionIF6RETURNDp4ARGSEE3funE"></span><span id="_CPPv2N6ActionIF6RETURNDp4ARGSEE3funE"></span><span class="target" id="classAction_3_01RETURN_07ARGS_8_8_8_08_4_1a1f057f530c7e715ba8f787d253d3fda7"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE" title="Action&lt;RETURN(ARGS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE" title="Action&lt;RETURN(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun</span></span></span><a class="headerlink" href="#_CPPv4N6ActionIF6RETURNDp4ARGSEE3funE" title="Link to this definition"></a><br /></dt>
+<dd><p>The specific function associated with this action. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../control.html" class="btn btn-neutral float-left" title="Control" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ActionManager.html" class="btn btn-neutral float-right" title="ActionManager.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

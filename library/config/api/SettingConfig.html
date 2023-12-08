@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SettingConfig.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/config/api/SettingConfig.518dcc56-16c1-43ed-a5e5-204f5bc604bf.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="command_line.hpp" href="command_line.html" />
+    <link rel="prev" title="SettingCombos.hpp" href="SettingCombos.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../config.html">Config</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../config.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ArgManager.html">ArgManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ConfigManager.html">ConfigManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FlagManager.html">FlagManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SettingCombos.html">SettingCombos.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">SettingConfig.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413SettingConfig"><code class="docutils literal notranslate"><span class="pre">SettingConfig</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="command_line.html">command_line.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html">config.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="config_utils.html">config_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="config_web_interface.html">config_web_interface.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../config.html">Config</a></li>
+      <li class="breadcrumb-item active">SettingConfig.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="settingconfig-hpp">
+<h1>SettingConfig.hpp<a class="headerlink" href="#settingconfig-hpp" title="Link to this heading"></a></h1>
+<p>A tool for collecting settings, including from files and the command line. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: DEPRECATED! </p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv413SettingConfig">
+<span id="_CPPv313SettingConfig"></span><span id="_CPPv213SettingConfig"></span><span id="SettingConfig"></span><span class="target" id="classSettingConfig"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SettingConfig</span></span></span><a class="headerlink" href="#_CPPv413SettingConfig" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;SettingConfig.hpp&gt;</em></div>
+<p>Class to take a set of value for each “setting” and then step through all combinations of those values for a factorial analysis. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig13SettingConfigEv">
+<span id="_CPPv3N13SettingConfig13SettingConfigEv"></span><span id="_CPPv2N13SettingConfig13SettingConfigEv"></span><span id="SettingConfig::SettingConfig"></span><span class="target" id="classSettingConfig_1ad9c49b27405e797c4ddb3462e36c1342"></span><span class="sig-name descname"><span class="n"><span class="pre">SettingConfig</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13SettingConfig13SettingConfigEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfigD0Ev">
+<span id="_CPPv3N13SettingConfigD0Ev"></span><span id="_CPPv2N13SettingConfigD0Ev"></span><span id="SettingConfig::~SettingConfig"></span><span class="target" id="classSettingConfig_1af19af407ea74f0280793de2f61cf9957"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~SettingConfig</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfigD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig10GetExeNameEv">
+<span id="_CPPv3NK13SettingConfig10GetExeNameEv"></span><span id="_CPPv2NK13SettingConfig10GetExeNameEv"></span><span id="SettingConfig::GetExeNameC"></span><span class="target" id="classSettingConfig_1a656382f63e89838b3339d96a9ab845d7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetExeName</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig10GetExeNameEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig10GetComboIDEv">
+<span id="_CPPv3NK13SettingConfig10GetComboIDEv"></span><span id="_CPPv2NK13SettingConfig10GetComboIDEv"></span><span id="SettingConfig::GetComboIDC"></span><span class="target" id="classSettingConfig_1a47251041c5778a9db79c02c66ab4b5f0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetComboID</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig10GetComboIDEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig13GetUnusedArgsEv">
+<span id="_CPPv3NK13SettingConfig13GetUnusedArgsEv"></span><span id="_CPPv2NK13SettingConfig13GetUnusedArgsEv"></span><span id="SettingConfig::GetUnusedArgsC"></span><span class="target" id="classSettingConfig_1a000385d72e0dcaf02f4f6e5095412342"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetUnusedArgs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig13GetUnusedArgsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig9GetErrorsEv">
+<span id="_CPPv3NK13SettingConfig9GetErrorsEv"></span><span id="_CPPv2NK13SettingConfig9GetErrorsEv"></span><span id="SettingConfig::GetErrorsC"></span><span class="target" id="classSettingConfig_1a9f45afd80fb74cffe338971ac19b5525"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetErrors</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig9GetErrorsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig13HasUnusedArgsEv">
+<span id="_CPPv3NK13SettingConfig13HasUnusedArgsEv"></span><span id="_CPPv2NK13SettingConfig13HasUnusedArgsEv"></span><span id="SettingConfig::HasUnusedArgsC"></span><span class="target" id="classSettingConfig_1a809e5e4bf1283a161c70cdb42d22af37"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasUnusedArgs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig13HasUnusedArgsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig9HasErrorsEv">
+<span id="_CPPv3NK13SettingConfig9HasErrorsEv"></span><span id="_CPPv2NK13SettingConfig9HasErrorsEv"></span><span id="SettingConfig::HasErrorsC"></span><span class="target" id="classSettingConfig_1add4b6a3089ededd295e131327dc87527"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasErrors</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig9HasErrorsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK13SettingConfig8GetValueERK1TRKNSt6stringE">
+<span id="_CPPv3I0ENK13SettingConfig8GetValueERKNSt6stringE"></span><span id="_CPPv2I0ENK13SettingConfig8GetValueERKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSettingConfig_1a2853858ec73e8bec53656e2a66929423"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK13SettingConfig8GetValueERK1TRKNSt6stringE" title="SettingConfig::GetValue::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetValue</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK13SettingConfig8GetValueERK1TRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the current value of a specified setting. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK13SettingConfig8MaxValueE1TRKNSt6stringE">
+<span id="_CPPv3I0ENK13SettingConfig8MaxValueERKNSt6stringE"></span><span id="_CPPv2I0ENK13SettingConfig8MaxValueERKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSettingConfig_1aa253744d0ce25389347e6f65714c5cd9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK13SettingConfig8MaxValueE1TRKNSt6stringE" title="SettingConfig::MaxValue::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaxValue</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK13SettingConfig8MaxValueE1TRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Scan through all values and return the maximum. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13SettingConfig10AddSettingER1TRKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE">
+<span id="_CPPv3I0EN13SettingConfig10AddSettingERKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE"></span><span id="_CPPv2I0EN13SettingConfig10AddSettingERKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSettingConfig_1a86bc4102981059994f290942e9d694b5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN13SettingConfig10AddSettingER1TRKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE" title="SettingConfig::AddSetting::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddSetting</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">option_flag</span></span>, <a class="reference internal" href="#_CPPv4I0EN13SettingConfig10AddSettingER1TRKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE" title="SettingConfig::AddSetting::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">var</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">args_label</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;Value&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13SettingConfig10AddSettingER1TRKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new setting of a specified type. Returns the (initially empty) vector of values to allow easy setting. Example: config.AddSetting(“num_runs”) = 200; </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13SettingConfig15AddComboSettingER6vectorI1TERKNSt6stringERKNSt6stringEKc">
+<span id="_CPPv3I0EN13SettingConfig15AddComboSettingERKNSt6stringERKNSt6stringEKc"></span><span id="_CPPv2I0EN13SettingConfig15AddComboSettingERKNSt6stringERKNSt6stringEKc"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSettingConfig_1ae28983891096971456986615cfa9bd51"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN13SettingConfig15AddComboSettingER6vectorI1TERKNSt6stringERKNSt6stringEKc" title="SettingConfig::AddComboSetting::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddComboSetting</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">option_flag</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="sc"><span class="pre">'\0'</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13SettingConfig15AddComboSettingER6vectorI1TERKNSt6stringERKNSt6stringEKc" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new setting of a specified type. Returns the (initially empty) vector of values to allow easy setting. Example: config.AddComboSetting(“pop_size”) = { 100,200,400,800 }; </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13SettingConfig15AddComboSettingER6vectorI1TERKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE">
+<span id="_CPPv3I0EN13SettingConfig15AddComboSettingERKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE"></span><span id="_CPPv2I0EN13SettingConfig15AddComboSettingERKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSettingConfig_1ae23c801730fd69983e056bb9f4d1fbcc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN13SettingConfig15AddComboSettingER6vectorI1TERKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE" title="SettingConfig::AddComboSetting::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddComboSetting</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">option_flag</span></span>, <a class="reference internal" href="#_CPPv4I0EN13SettingConfig15AddComboSettingER6vectorI1TERKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE" title="SettingConfig::AddComboSetting::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">var</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">args_label</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;Values...&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13SettingConfig15AddComboSettingER6vectorI1TERKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>A setting can also be linked to a value that is kept up-to-date. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig9AddActionERKNSt6stringERKNSt6stringEKcNSt8functionIFvvEEE">
+<span id="_CPPv3N13SettingConfig9AddActionERKNSt6stringERKNSt6stringEKcNSt8functionIFvvEEE"></span><span id="_CPPv2N13SettingConfig9AddActionERKNSt6stringERKNSt6stringEKcNSt8functionIFvvEEE"></span><span class="target" id="classSettingConfig_1a2c5ae8f194c0f4d201cd035f6233b8ed"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">flag</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig9AddActionERKNSt6stringERKNSt6stringEKcNSt8functionIFvvEEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13SettingConfig11ComboValuesER6vectorI1TERKNSt6stringE">
+<span id="_CPPv3I0EN13SettingConfig11ComboValuesERKNSt6stringE"></span><span id="_CPPv2I0EN13SettingConfig11ComboValuesERKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSettingConfig_1a791b52a833f51f97549d1affb779fe8f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN13SettingConfig11ComboValuesER6vectorI1TERKNSt6stringE" title="SettingConfig::ComboValues::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">ComboValues</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13SettingConfig11ComboValuesER6vectorI1TERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Access ALL values for a specified setting, to be modified freely. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11ResetCombosEv">
+<span id="_CPPv3N13SettingConfig11ResetCombosEv"></span><span id="_CPPv2N13SettingConfig11ResetCombosEv"></span><span id="SettingConfig::ResetCombos"></span><span class="target" id="classSettingConfig_1a157ff05eaf78da173e8cbb7f3885ccbf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResetCombos</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig11ResetCombosEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Start over stepping through all combinations of parameter values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13SettingConfig13AddComboValueEvRKNSt6stringERR1T">
+<span id="_CPPv3I0EN13SettingConfig13AddComboValueERKNSt6stringERR1T"></span><span id="_CPPv2I0EN13SettingConfig13AddComboValueERKNSt6stringERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSettingConfig_1a5988f6d139055fcb955b1c913935af32"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddComboValue</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="#_CPPv4I0EN13SettingConfig13AddComboValueEvRKNSt6stringERR1T" title="SettingConfig::AddComboValue::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13SettingConfig13AddComboValueEvRKNSt6stringERR1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a single new value to the specified setting. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpEN13SettingConfig14SetComboValuesEvRKNSt6stringERR2T1DpRR2Ts">
+<span id="_CPPv3I0DpEN13SettingConfig14SetComboValuesERKNSt6stringERR2T1DpRR2Ts"></span><span id="_CPPv2I0DpEN13SettingConfig14SetComboValuesERKNSt6stringERR2T1DpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSettingConfig_1aad545f591a06ba6dacf77d097f45cfb7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetComboValues</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="#_CPPv4I0DpEN13SettingConfig14SetComboValuesEvRKNSt6stringERR2T1DpRR2Ts" title="SettingConfig::SetComboValues::T1"><span class="n"><span class="pre">T1</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val1</span></span>, <a class="reference internal" href="#_CPPv4I0DpEN13SettingConfig14SetComboValuesEvRKNSt6stringERR2T1DpRR2Ts" title="SettingConfig::SetComboValues::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN13SettingConfig14SetComboValuesEvRKNSt6stringERR2T1DpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Set all values for the specified setting. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11CountCombosEv">
+<span id="_CPPv3N13SettingConfig11CountCombosEv"></span><span id="_CPPv2N13SettingConfig11CountCombosEv"></span><span id="SettingConfig::CountCombos"></span><span class="target" id="classSettingConfig_1afeb78afdadf442f4f7311dc0b5d5c95b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountCombos</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig11CountCombosEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine how many unique combinations there currently are. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig9NextComboEv">
+<span id="_CPPv3N13SettingConfig9NextComboEv"></span><span id="_CPPv2N13SettingConfig9NextComboEv"></span><span id="SettingConfig::NextCombo"></span><span class="target" id="classSettingConfig_1af0e01c1ffb6d1e0f18b179b638bec834"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NextCombo</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig9NextComboEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the next combination of settings to be active. Return true if successful or false if we ran through all combinations and reset. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig17GetSettingHeadersERKNSt6stringE">
+<span id="_CPPv3N13SettingConfig17GetSettingHeadersERKNSt6stringE"></span><span id="_CPPv2N13SettingConfig17GetSettingHeadersERKNSt6stringE"></span><span id="SettingConfig::GetSettingHeaders__ssCR"></span><span class="target" id="classSettingConfig_1a34e9a9d2653572a120d22f8d8985240e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSettingHeaders</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">separator</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;,&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig17GetSettingHeadersERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the set of headers used for the CSV file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig11CurSettingsERKNSt6stringE">
+<span id="_CPPv3NK13SettingConfig11CurSettingsERKNSt6stringE"></span><span id="_CPPv2NK13SettingConfig11CurSettingsERKNSt6stringE"></span><span id="SettingConfig::CurSettings__ssCRC"></span><span class="target" id="classSettingConfig_1ab77b5b387b3ecf11b73d34574c1851ca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CurSettings</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">separator</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;,&quot;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig11CurSettingsERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert all of the current values into a comma-separated string. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig15GetComboHeadersERKNSt6stringE">
+<span id="_CPPv3N13SettingConfig15GetComboHeadersERKNSt6stringE"></span><span id="_CPPv2N13SettingConfig15GetComboHeadersERKNSt6stringE"></span><span id="SettingConfig::GetComboHeaders__ssCR"></span><span class="target" id="classSettingConfig_1aa6f55358296e806804697a9b34e31ee5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetComboHeaders</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">separator</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;,&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig15GetComboHeadersERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the set of headers used for the CSV file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig14CurComboStringERKNSt6stringEbb">
+<span id="_CPPv3NK13SettingConfig14CurComboStringERKNSt6stringEbb"></span><span id="_CPPv2NK13SettingConfig14CurComboStringERKNSt6stringEbb"></span><span id="SettingConfig::CurComboString__ssCR.b.bC"></span><span class="target" id="classSettingConfig_1a5a64f8be9df0a6fc4800dd0895455705"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CurComboString</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">separator</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;,&quot;</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_labels</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">multi_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig14CurComboStringERKNSt6stringEbb" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert all of the current values into a comma-separated string. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>separator</strong> – Delimiter separating values in string </p></li>
+<li><p><strong>use_labels</strong> – Print name with each value? </p></li>
+<li><p><strong>multi_only</strong> – Only print values that can change? </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig15FindOptionMatchERKNSt6stringE">
+<span id="_CPPv3N13SettingConfig15FindOptionMatchERKNSt6stringE"></span><span id="_CPPv2N13SettingConfig15FindOptionMatchERKNSt6stringE"></span><span id="SettingConfig::FindOptionMatch__ssCR"></span><span class="target" id="classSettingConfig_1a66b0e2f748a9d6d3e2a86cd034c76577"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N13SettingConfig11SettingBaseE" title="SettingConfig::SettingBase"><span class="n"><span class="pre">SettingBase</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindOptionMatch</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">option_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig15FindOptionMatchERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Scan through all settings for a match option and return ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig13FindFlagMatchEKc">
+<span id="_CPPv3N13SettingConfig13FindFlagMatchEKc"></span><span id="_CPPv2N13SettingConfig13FindFlagMatchEKc"></span><span id="SettingConfig::FindFlagMatch__cC"></span><span class="target" id="classSettingConfig_1ac27a8ba0d019677b5d71d56c41495e16"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N13SettingConfig11SettingBaseE" title="SettingConfig::SettingBase"><span class="n"><span class="pre">SettingBase</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindFlagMatch</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">symbol</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig13FindFlagMatchEKc" title="Link to this definition"></a><br /></dt>
+<dd><p>Scan through all settings for a match option and return ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig14ProcessOptionsERK6vectorINSt6stringEE">
+<span id="_CPPv3N13SettingConfig14ProcessOptionsERK6vectorINSt6stringEE"></span><span id="_CPPv2N13SettingConfig14ProcessOptionsERK6vectorINSt6stringEE"></span><span id="SettingConfig::ProcessOptions__vector:ss:CR"></span><span class="target" id="classSettingConfig_1a6f74ce2f5755a04c0b507fb45a656cf4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ProcessOptions</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig14ProcessOptionsERK6vectorINSt6stringEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Take an input set of config options, process them, and track set of unprocessed ones. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig14ProcessOptionsEiA_Pc">
+<span id="_CPPv3N13SettingConfig14ProcessOptionsEiA_Pc"></span><span id="_CPPv2N13SettingConfig14ProcessOptionsEiA_Pc"></span><span id="SettingConfig::ProcessOptions__i.cPA"></span><span class="target" id="classSettingConfig_1a81c5111cefc4a16f5b9ee335e4b88db2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ProcessOptions</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">argc</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">argv</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig14ProcessOptionsEiA_Pc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpENK13SettingConfig9PrintHelpEvDpRK2Ts">
+<span id="_CPPv3IDpENK13SettingConfig9PrintHelpEDpRK2Ts"></span><span id="_CPPv2IDpENK13SettingConfig9PrintHelpEDpRK2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSettingConfig_1a24140ccce009fcb7ce2601b57d41760f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintHelp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpENK13SettingConfig9PrintHelpEvDpRK2Ts" title="SettingConfig::PrintHelp::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">examples</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4IDpENK13SettingConfig9PrintHelpEvDpRK2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig8exe_nameE">
+<span id="_CPPv3N13SettingConfig8exe_nameE"></span><span id="_CPPv2N13SettingConfig8exe_nameE"></span><span id="SettingConfig::exe_name__ss"></span><span class="target" id="classSettingConfig_1a605fe28a2374020cc68591efdb4f9561"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">exe_name</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><a class="headerlink" href="#_CPPv4N13SettingConfig8exe_nameE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11setting_mapE">
+<span id="_CPPv3N13SettingConfig11setting_mapE"></span><span id="_CPPv2N13SettingConfig11setting_mapE"></span><span id="SettingConfig::setting_map__std::map:ss.Ptr:SettingBase::"></span><span class="target" id="classSettingConfig_1a7bf1f9d9efbfb99fe315b4a56dccc4fd"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N13SettingConfig11SettingBaseE" title="SettingConfig::SettingBase"><span class="n"><span class="pre">SettingBase</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setting_map</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig11setting_mapE" title="Link to this definition"></a><br /></dt>
+<dd><p>All settings by name. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig10action_mapE">
+<span id="_CPPv3N13SettingConfig10action_mapE"></span><span id="_CPPv2N13SettingConfig10action_mapE"></span><span id="SettingConfig::action_map__std::map:ss.ActionFlag:"></span><span class="target" id="classSettingConfig_1a96bd9bd2b74f449eb43157059bb59670"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13SettingConfig10ActionFlagE" title="SettingConfig::ActionFlag"><span class="n"><span class="pre">ActionFlag</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">action_map</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig10action_mapE" title="Link to this definition"></a><br /></dt>
+<dd><p>Action flags. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig14combo_settingsE">
+<span id="_CPPv3N13SettingConfig14combo_settingsE"></span><span id="_CPPv2N13SettingConfig14combo_settingsE"></span><span id="SettingConfig::combo_settings__vector:Ptr:SettingBase::"></span><span class="target" id="classSettingConfig_1a70add965519d66e108256895127dd706"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N13SettingConfig11SettingBaseE" title="SettingConfig::SettingBase"><span class="n"><span class="pre">SettingBase</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">combo_settings</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig14combo_settingsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Multi-value settings (in order) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig9cur_comboE">
+<span id="_CPPv3N13SettingConfig9cur_comboE"></span><span id="_CPPv2N13SettingConfig9cur_comboE"></span><span id="SettingConfig::cur_combo__vector:s:"></span><span class="target" id="classSettingConfig_1a59e5122a1fbeae0c12e63544cd7c4697"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cur_combo</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig9cur_comboE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which combo settings are we currently using? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig8combo_idE">
+<span id="_CPPv3N13SettingConfig8combo_idE"></span><span id="_CPPv2N13SettingConfig8combo_idE"></span><span id="SettingConfig::combo_id__s"></span><span class="target" id="classSettingConfig_1a814d60a053978bf6679dd95c08d78bc7"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">combo_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N13SettingConfig8combo_idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Unique value indicating which combination we are on. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11unused_argsE">
+<span id="_CPPv3N13SettingConfig11unused_argsE"></span><span id="_CPPv2N13SettingConfig11unused_argsE"></span><span id="SettingConfig::unused_args__vector:ss:"></span><span class="target" id="classSettingConfig_1aa38fb47338b69fcc2943abb9c53dbb02"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">unused_args</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig11unused_argsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig6errorsE">
+<span id="_CPPv3N13SettingConfig6errorsE"></span><span id="_CPPv2N13SettingConfig6errorsE"></span><span id="SettingConfig::errors__ss"></span><span class="target" id="classSettingConfig_1a0a66b27347326a313843e35d66383886"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">errors</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig6errorsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig10ActionFlagE">
+<span id="_CPPv3N13SettingConfig10ActionFlagE"></span><span id="_CPPv2N13SettingConfig10ActionFlagE"></span><span id="SettingConfig::ActionFlag"></span><span class="target" id="structSettingConfig_1_1ActionFlag"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActionFlag</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig10ActionFlagE" title="Link to this definition"></a><br /></dt>
+<dd><p>A setting that is just a flag with an action function to run if it’s called. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig10ActionFlag4nameE">
+<span id="_CPPv3N13SettingConfig10ActionFlag4nameE"></span><span id="_CPPv2N13SettingConfig10ActionFlag4nameE"></span><span id="SettingConfig::ActionFlag::name__ss"></span><span class="target" id="structSettingConfig_1_1ActionFlag_1a80caa578a67b654165dc760b5251881d"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig10ActionFlag4nameE" title="Link to this definition"></a><br /></dt>
+<dd><p>Name for this flag. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig10ActionFlag4descE">
+<span id="_CPPv3N13SettingConfig10ActionFlag4descE"></span><span id="_CPPv2N13SettingConfig10ActionFlag4descE"></span><span id="SettingConfig::ActionFlag::desc__ss"></span><span class="target" id="structSettingConfig_1_1ActionFlag_1a7d38e5826eada9293a3558f554a549f4"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">desc</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig10ActionFlag4descE" title="Link to this definition"></a><br /></dt>
+<dd><p>Description of flag. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig10ActionFlag4flagE">
+<span id="_CPPv3N13SettingConfig10ActionFlag4flagE"></span><span id="_CPPv2N13SettingConfig10ActionFlag4flagE"></span><span id="SettingConfig::ActionFlag::flag__c"></span><span class="target" id="structSettingConfig_1_1ActionFlag_1a31cd71800506755483d2030848dcbfe8"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">flag</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig10ActionFlag4flagE" title="Link to this definition"></a><br /></dt>
+<dd><p>Command-line flag (‘\0’ for none) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig10ActionFlag3funE">
+<span id="_CPPv3N13SettingConfig10ActionFlag3funE"></span><span id="_CPPv2N13SettingConfig10ActionFlag3funE"></span><span class="target" id="structSettingConfig_1_1ActionFlag_1a310f96e7c12466cbb8d267a62147a941"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig10ActionFlag3funE" title="Link to this definition"></a><br /></dt>
+<dd><p>Function to be called if flag is set. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13SettingConfig16ComboSettingInfoE">
+<span id="_CPPv3I0EN13SettingConfig16ComboSettingInfoE"></span><span id="_CPPv2I0EN13SettingConfig16ComboSettingInfoE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structSettingConfig_1_1ComboSettingInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ComboSettingInfo</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413SettingConfig" title="SettingConfig"><span class="n"><span class="pre">SettingConfig</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N13SettingConfig11SettingBaseE" title="SettingConfig::SettingBase"><span class="n"><span class="pre">SettingBase</span></span></a><a class="headerlink" href="#_CPPv4I0EN13SettingConfig16ComboSettingInfoE" title="Link to this definition"></a><br /></dt>
+<dd><p>Allow a single setting to have multiple values specified that should be stepped through. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig16ComboSettingInfo16ComboSettingInfoERKNSt6stringERKNSt6stringEKcRKNSt6stringE3PtrI1TE">
+<span id="_CPPv3N13SettingConfig16ComboSettingInfo16ComboSettingInfoERKNSt6stringERKNSt6stringEKcRKNSt6stringE3PtrI1TE"></span><span id="_CPPv2N13SettingConfig16ComboSettingInfo16ComboSettingInfoERKNSt6stringERKNSt6stringEKcRKNSt6stringE3PtrI1TE"></span><span id="SettingConfig::ComboSettingInfo::ComboSettingInfo__ssCR.ssCR.cC.ssCR.Ptr:T:"></span><span class="target" id="structSettingConfig_1_1ComboSettingInfo_1a2d0336fff72dd772bc00b2b5b8f1fb27"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ComboSettingInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_desc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_flag</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_args</span></span>, <a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN13SettingConfig16ComboSettingInfoE" title="SettingConfig::ComboSettingInfo::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_var</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig16ComboSettingInfo16ComboSettingInfoERKNSt6stringERKNSt6stringEKcRKNSt6stringE3PtrI1TE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_name</strong> – Unique name for this setting. </p></li>
+<li><p><strong>_desc</strong> – Description of this setting (for help) </p></li>
+<li><p><strong>_flag</strong> – Char flag for easy access (e.g., “-h”) </p></li>
+<li><p><strong>_args</strong> – Label for option arguments (for help) </p></li>
+<li><p><strong>_var</strong> – Pointer to variable to set (optional) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig16ComboSettingInfo7GetSizeEv">
+<span id="_CPPv3NK13SettingConfig16ComboSettingInfo7GetSizeEv"></span><span id="_CPPv2NK13SettingConfig16ComboSettingInfo7GetSizeEv"></span><span id="SettingConfig::ComboSettingInfo::GetSizeC"></span><span class="target" id="structSettingConfig_1_1ComboSettingInfo_1a5f0d4ff8434fd4f0174da353430047cc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig16ComboSettingInfo7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig16ComboSettingInfo8AsStringEv">
+<span id="_CPPv3NK13SettingConfig16ComboSettingInfo8AsStringEv"></span><span id="_CPPv2NK13SettingConfig16ComboSettingInfo8AsStringEv"></span><span id="SettingConfig::ComboSettingInfo::AsStringC"></span><span class="target" id="structSettingConfig_1_1ComboSettingInfo_1a29b268d29f11a548f6673d0597c3d840"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig16ComboSettingInfo8AsStringEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig16ComboSettingInfo8AsStringE6size_t">
+<span id="_CPPv3NK13SettingConfig16ComboSettingInfo8AsStringE6size_t"></span><span id="_CPPv2NK13SettingConfig16ComboSettingInfo8AsStringE6size_t"></span><span id="SettingConfig::ComboSettingInfo::AsString__sC"></span><span class="target" id="structSettingConfig_1_1ComboSettingInfo_1acb128fae241913d2d83351ce083f3afd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsString</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig16ComboSettingInfo8AsStringE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig16ComboSettingInfo10FromStringERKNSt11string_viewE">
+<span id="_CPPv3N13SettingConfig16ComboSettingInfo10FromStringERKNSt11string_viewE"></span><span id="_CPPv2N13SettingConfig16ComboSettingInfo10FromStringERKNSt11string_viewE"></span><span id="SettingConfig::ComboSettingInfo::FromString__std::string_viewCR"></span><span class="target" id="structSettingConfig_1_1ComboSettingInfo_1aa9712c08b72315f360ab09cf2464906e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FromString</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string_view</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">input</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N13SettingConfig16ComboSettingInfo10FromStringERKNSt11string_viewE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig16ComboSettingInfo10SetValueIDE6size_t">
+<span id="_CPPv3N13SettingConfig16ComboSettingInfo10SetValueIDE6size_t"></span><span id="_CPPv2N13SettingConfig16ComboSettingInfo10SetValueIDE6size_t"></span><span id="SettingConfig::ComboSettingInfo::SetValueID__s"></span><span class="target" id="structSettingConfig_1_1ComboSettingInfo_1aaf24d9307e40d8a5e692db2f4c10b436"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetValueID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N13SettingConfig16ComboSettingInfo10SetValueIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig16ComboSettingInfo14IsComboSettingEv">
+<span id="_CPPv3N13SettingConfig16ComboSettingInfo14IsComboSettingEv"></span><span id="_CPPv2N13SettingConfig16ComboSettingInfo14IsComboSettingEv"></span><span id="SettingConfig::ComboSettingInfo::IsComboSetting"></span><span class="target" id="structSettingConfig_1_1ComboSettingInfo_1ac2f6542bdfee011f5489dfb094bbea17"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsComboSetting</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N13SettingConfig16ComboSettingInfo14IsComboSettingEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig16ComboSettingInfo5GetIDEv">
+<span id="_CPPv3NK13SettingConfig16ComboSettingInfo5GetIDEv"></span><span id="_CPPv2NK13SettingConfig16ComboSettingInfo5GetIDEv"></span><span id="SettingConfig::ComboSettingInfo::GetIDC"></span><span class="target" id="structSettingConfig_1_1ComboSettingInfo_1a26222e85409b40860d3e333c4165e197"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetID</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig16ComboSettingInfo5GetIDEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig16ComboSettingInfo6valuesE">
+<span id="_CPPv3N13SettingConfig16ComboSettingInfo6valuesE"></span><span id="_CPPv2N13SettingConfig16ComboSettingInfo6valuesE"></span><span id="SettingConfig::ComboSettingInfo::values__vector:T:"></span><span class="target" id="structSettingConfig_1_1ComboSettingInfo_1a719b5d5ba48c31d18248ea48ec5635b5"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN13SettingConfig16ComboSettingInfoE" title="SettingConfig::ComboSettingInfo::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">values</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig16ComboSettingInfo6valuesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set of values to use for this setting. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig16ComboSettingInfo7var_ptrE">
+<span id="_CPPv3N13SettingConfig16ComboSettingInfo7var_ptrE"></span><span id="_CPPv2N13SettingConfig16ComboSettingInfo7var_ptrE"></span><span id="SettingConfig::ComboSettingInfo::var_ptr__Ptr:T:"></span><span class="target" id="structSettingConfig_1_1ComboSettingInfo_1a70900f4b1aaee3d375822177493872ff"></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN13SettingConfig16ComboSettingInfoE" title="SettingConfig::ComboSettingInfo::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">var_ptr</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13SettingConfig16ComboSettingInfo7var_ptrE" title="Link to this definition"></a><br /></dt>
+<dd><p>Pointer to variable to set as combos change. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig16ComboSettingInfo2idE">
+<span id="_CPPv3N13SettingConfig16ComboSettingInfo2idE"></span><span id="_CPPv2N13SettingConfig16ComboSettingInfo2idE"></span><span id="SettingConfig::ComboSettingInfo::id__s"></span><span class="target" id="structSettingConfig_1_1ComboSettingInfo_1a3975d543e10f50dc7b47119df55f04f7"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig16ComboSettingInfo2idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Unique ID/position for this setting. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11SettingBaseE">
+<span id="_CPPv3N13SettingConfig11SettingBaseE"></span><span id="_CPPv2N13SettingConfig11SettingBaseE"></span><span id="SettingConfig::SettingBase"></span><span class="target" id="structSettingConfig_1_1SettingBase"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SettingBase</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig11SettingBaseE" title="Link to this definition"></a><br /></dt>
+<dd><p>Base class to describe information about a single setting. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11SettingBase11SettingBaseERKNSt6stringERKNSt6stringEKcRKNSt6stringE">
+<span id="_CPPv3N13SettingConfig11SettingBase11SettingBaseERKNSt6stringERKNSt6stringEKcRKNSt6stringE"></span><span id="_CPPv2N13SettingConfig11SettingBase11SettingBaseERKNSt6stringERKNSt6stringEKcRKNSt6stringE"></span><span id="SettingConfig::SettingBase::SettingBase__ssCR.ssCR.cC.ssCR"></span><span class="target" id="structSettingConfig_1_1SettingBase_1a205ae50ac0cc6a0c87829b6650769d97"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SettingBase</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_desc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_flag</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_args_label</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig11SettingBase11SettingBaseERKNSt6stringERKNSt6stringEKcRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11SettingBaseD0Ev">
+<span id="_CPPv3N13SettingConfig11SettingBaseD0Ev"></span><span id="_CPPv2N13SettingConfig11SettingBaseD0Ev"></span><span id="SettingConfig::SettingBase::~SettingBase"></span><span class="target" id="structSettingConfig_1_1SettingBase_1a5bb39cd1d283311748fc3d22ee3dbd37"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~SettingBase</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig11SettingBaseD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig11SettingBase7GetSizeEv">
+<span id="_CPPv3NK13SettingConfig11SettingBase7GetSizeEv"></span><span id="_CPPv2NK13SettingConfig11SettingBase7GetSizeEv"></span><span id="SettingConfig::SettingBase::GetSizeC"></span><span class="target" id="structSettingConfig_1_1SettingBase_1aeb0a1d021b1fe334bb4ce3aa6ce7993d"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig11SettingBase7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many values are available? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig11SettingBase8AsStringEv">
+<span id="_CPPv3NK13SettingConfig11SettingBase8AsStringEv"></span><span id="_CPPv2NK13SettingConfig11SettingBase8AsStringEv"></span><span id="SettingConfig::SettingBase::AsStringC"></span><span class="target" id="structSettingConfig_1_1SettingBase_1a1c3cfb3dcdb90981c7a560fd0584c06b"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig11SettingBase8AsStringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>All values, as a single string. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig11SettingBase8AsStringE6size_t">
+<span id="_CPPv3NK13SettingConfig11SettingBase8AsStringE6size_t"></span><span id="_CPPv2NK13SettingConfig11SettingBase8AsStringE6size_t"></span><span id="SettingConfig::SettingBase::AsString__sC"></span><span class="target" id="structSettingConfig_1_1SettingBase_1a8dc0c0003f7b95aa2b84b5c498500e98"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsString</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig11SettingBase8AsStringE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>A specified value as a string. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11SettingBase10FromStringERKNSt11string_viewE">
+<span id="_CPPv3N13SettingConfig11SettingBase10FromStringERKNSt11string_viewE"></span><span id="_CPPv2N13SettingConfig11SettingBase10FromStringERKNSt11string_viewE"></span><span id="SettingConfig::SettingBase::FromString__std::string_viewCR"></span><span class="target" id="structSettingConfig_1_1SettingBase_1a56d5ec870d9cd82368af127592c0a127"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FromString</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string_view</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N13SettingConfig11SettingBase10FromStringERKNSt11string_viewE" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert string to set of settings. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig11SettingBase13IsOptionMatchERKNSt6stringE">
+<span id="_CPPv3NK13SettingConfig11SettingBase13IsOptionMatchERKNSt6stringE"></span><span id="_CPPv2NK13SettingConfig11SettingBase13IsOptionMatchERKNSt6stringE"></span><span id="SettingConfig::SettingBase::IsOptionMatch__ssCRC"></span><span class="target" id="structSettingConfig_1_1SettingBase_1aff8bf364830474f83bd21ee81bd42eef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsOptionMatch</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">test_option</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig11SettingBase13IsOptionMatchERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig11SettingBase11IsFlagMatchEKc">
+<span id="_CPPv3NK13SettingConfig11SettingBase11IsFlagMatchEKc"></span><span id="_CPPv2NK13SettingConfig11SettingBase11IsFlagMatchEKc"></span><span id="SettingConfig::SettingBase::IsFlagMatch__cCC"></span><span class="target" id="structSettingConfig_1_1SettingBase_1aa1803479e05e521b73e13c133a2f8ce7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsFlagMatch</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_flag</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig11SettingBase11IsFlagMatchEKc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11SettingBase4nameE">
+<span id="_CPPv3N13SettingConfig11SettingBase4nameE"></span><span id="_CPPv2N13SettingConfig11SettingBase4nameE"></span><span id="SettingConfig::SettingBase::name__ss"></span><span class="target" id="structSettingConfig_1_1SettingBase_1a615c3dfedf4ad87d6710b638e40e66a1"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig11SettingBase4nameE" title="Link to this definition"></a><br /></dt>
+<dd><p>Name for this setting. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11SettingBase4descE">
+<span id="_CPPv3N13SettingConfig11SettingBase4descE"></span><span id="_CPPv2N13SettingConfig11SettingBase4descE"></span><span id="SettingConfig::SettingBase::desc__ss"></span><span class="target" id="structSettingConfig_1_1SettingBase_1a807d0df5a753a914f707a7ac134fac5a"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">desc</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig11SettingBase4descE" title="Link to this definition"></a><br /></dt>
+<dd><p>Description of setting. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11SettingBase4flagE">
+<span id="_CPPv3N13SettingConfig11SettingBase4flagE"></span><span id="_CPPv2N13SettingConfig11SettingBase4flagE"></span><span id="SettingConfig::SettingBase::flag__c"></span><span class="target" id="structSettingConfig_1_1SettingBase_1ad64d68e9a26505865284f5c876e83898"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">flag</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig11SettingBase4flagE" title="Link to this definition"></a><br /></dt>
+<dd><p>Command-line flag (‘\0’ for none) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11SettingBase6optionE">
+<span id="_CPPv3N13SettingConfig11SettingBase6optionE"></span><span id="_CPPv2N13SettingConfig11SettingBase6optionE"></span><span id="SettingConfig::SettingBase::option__ss"></span><span class="target" id="structSettingConfig_1_1SettingBase_1ab8a360c86297328639d77a99bcad88bd"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">option</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig11SettingBase6optionE" title="Link to this definition"></a><br /></dt>
+<dd><p>Command-line longer option. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11SettingBase10args_labelE">
+<span id="_CPPv3N13SettingConfig11SettingBase10args_labelE"></span><span id="_CPPv2N13SettingConfig11SettingBase10args_labelE"></span><span id="SettingConfig::SettingBase::args_label__ss"></span><span class="target" id="structSettingConfig_1_1SettingBase_1a1c3f3759aff104af8165033ade787df6"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">args_label</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig11SettingBase10args_labelE" title="Link to this definition"></a><br /></dt>
+<dd><p>Label for option arguments (used in &amp;#8212;help) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13SettingConfig11SettingInfoE">
+<span id="_CPPv3I0EN13SettingConfig11SettingInfoE"></span><span id="_CPPv2I0EN13SettingConfig11SettingInfoE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structSettingConfig_1_1SettingInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SettingInfo</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413SettingConfig" title="SettingConfig"><span class="n"><span class="pre">SettingConfig</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N13SettingConfig11SettingBaseE" title="SettingConfig::SettingBase"><span class="n"><span class="pre">SettingBase</span></span></a><a class="headerlink" href="#_CPPv4I0EN13SettingConfig11SettingInfoE" title="Link to this definition"></a><br /></dt>
+<dd><p>Full details about a single setting, including type information and values. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11SettingInfo11SettingInfoERKNSt6stringERKNSt6stringEKcRKNSt6stringE3PtrI1TE">
+<span id="_CPPv3N13SettingConfig11SettingInfo11SettingInfoERKNSt6stringERKNSt6stringEKcRKNSt6stringE3PtrI1TE"></span><span id="_CPPv2N13SettingConfig11SettingInfo11SettingInfoERKNSt6stringERKNSt6stringEKcRKNSt6stringE3PtrI1TE"></span><span id="SettingConfig::SettingInfo::SettingInfo__ssCR.ssCR.cC.ssCR.Ptr:T:"></span><span class="target" id="structSettingConfig_1_1SettingInfo_1a3b4f324e3cc5fa97e89c8e8c7996537d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SettingInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_desc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_flag</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_arg</span></span>, <a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN13SettingConfig11SettingInfoE" title="SettingConfig::SettingInfo::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_var</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SettingConfig11SettingInfo11SettingInfoERKNSt6stringERKNSt6stringEKcRKNSt6stringE3PtrI1TE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_name</strong> – Unique name for this setting. </p></li>
+<li><p><strong>_desc</strong> – Description of this setting (for help) </p></li>
+<li><p><strong>_flag</strong> – Single char flag for easy access (e.g., “-h”) </p></li>
+<li><p><strong>_arg</strong> – Label for option argument (for help) </p></li>
+<li><p><strong>_var</strong> – Pointer to variable to set (optional) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig11SettingInfo7GetSizeEv">
+<span id="_CPPv3NK13SettingConfig11SettingInfo7GetSizeEv"></span><span id="_CPPv2NK13SettingConfig11SettingInfo7GetSizeEv"></span><span id="SettingConfig::SettingInfo::GetSizeC"></span><span class="target" id="structSettingConfig_1_1SettingInfo_1a5bf15a2114162ba6ba0dce5fdad8252b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig11SettingInfo7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig11SettingInfo8AsStringEv">
+<span id="_CPPv3NK13SettingConfig11SettingInfo8AsStringEv"></span><span id="_CPPv2NK13SettingConfig11SettingInfo8AsStringEv"></span><span id="SettingConfig::SettingInfo::AsStringC"></span><span class="target" id="structSettingConfig_1_1SettingInfo_1a906277233a8db3aa68f3cdc7602f9ff6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig11SettingInfo8AsStringEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SettingConfig11SettingInfo8AsStringE6size_t">
+<span id="_CPPv3NK13SettingConfig11SettingInfo8AsStringE6size_t"></span><span id="_CPPv2NK13SettingConfig11SettingInfo8AsStringE6size_t"></span><span id="SettingConfig::SettingInfo::AsString__sC"></span><span class="target" id="structSettingConfig_1_1SettingInfo_1a8bb59f8bda14d9937b0952923925f25f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsString</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK13SettingConfig11SettingInfo8AsStringE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11SettingInfo10FromStringERKNSt11string_viewE">
+<span id="_CPPv3N13SettingConfig11SettingInfo10FromStringERKNSt11string_viewE"></span><span id="_CPPv2N13SettingConfig11SettingInfo10FromStringERKNSt11string_viewE"></span><span id="SettingConfig::SettingInfo::FromString__std::string_viewCR"></span><span class="target" id="structSettingConfig_1_1SettingInfo_1a20d6ddf062992c7506080c88284ea1fa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FromString</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string_view</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">input</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N13SettingConfig11SettingInfo10FromStringERKNSt11string_viewE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11SettingInfo5valueE">
+<span id="_CPPv3N13SettingConfig11SettingInfo5valueE"></span><span id="_CPPv2N13SettingConfig11SettingInfo5valueE"></span><span id="SettingConfig::SettingInfo::value__T"></span><span class="target" id="structSettingConfig_1_1SettingInfo_1a08ad9df0c85b5e0f75ecf6cc77ba6968"></span><a class="reference internal" href="#_CPPv4I0EN13SettingConfig11SettingInfoE" title="SettingConfig::SettingInfo::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value</span></span></span><a class="headerlink" href="#_CPPv4N13SettingConfig11SettingInfo5valueE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SettingConfig11SettingInfo7var_ptrE">
+<span id="_CPPv3N13SettingConfig11SettingInfo7var_ptrE"></span><span id="_CPPv2N13SettingConfig11SettingInfo7var_ptrE"></span><span id="SettingConfig::SettingInfo::var_ptr__Ptr:T:"></span><span class="target" id="structSettingConfig_1_1SettingInfo_1a61b618a3826d8726d338754387992b0e"></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN13SettingConfig11SettingInfoE" title="SettingConfig::SettingInfo::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">var_ptr</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13SettingConfig11SettingInfo7var_ptrE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="SettingCombos.html" class="btn btn-neutral float-left" title="SettingCombos.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="command_line.html" class="btn btn-neutral float-right" title="command_line.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

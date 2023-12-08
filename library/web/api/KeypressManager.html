@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KeypressManager.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/web/api/KeypressManager.69a8ac38-959d-442c-b172-224968b4eef7.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Listeners.hpp" href="Listeners.html" />
+    <link rel="prev" title="JSWrap.hpp" href="JSWrap.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../web.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Animate.html">Animate.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Attributes.html">Attributes.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Button.html">Button.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Canvas.html">Canvas.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasAction.html">CanvasAction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasShape.html">CanvasShape.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Div.html">Div.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DocuExtras.html">DocuExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Document.html">Document.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Element.html">Element.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FileInput.html">FileInput.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Font.html">Font.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Image.html">Image.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Input.html">Input.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="JSWrap.html">JSWrap.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">KeypressManager.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415KeypressManager"><code class="docutils literal notranslate"><span class="pre">KeypressManager</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Listeners.html">Listeners.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NodeDomShim.html">NodeDomShim.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RawImage.html">RawImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Selector.html">Selector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style.html">Style.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Table.html">Table.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Text.html">Text.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextArea.html">TextArea.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextFeed.html">TextFeed.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tween.html">Tween.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UrlParams.html">UrlParams.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Widget.html">Widget.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WidgetExtras.html">WidgetExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="canvas_utils.html">canvas_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="color_map.html">color_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html">commands.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emfunctions.html">emfunctions.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="events.html">events.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="init.html">init.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="js_utils.html">js_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="web.html">web.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../web.html">Web Tools (for use with Emscripten)</a></li>
+      <li class="breadcrumb-item active">KeypressManager.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="keypressmanager-hpp">
+<h1>KeypressManager.hpp<a class="headerlink" href="#keypressmanager-hpp" title="Link to this heading"></a></h1>
+<p>KeypressManager is a tracker for keypresses in HTML5 pages. </p>
+<p>When a KeypressManager is created, it can be given functions to run in response to different types of key presses via overloaded version of the AddKeydownCallback method. Each of these accepts an order parameter that is optional and, if provided, will indicate the order in which tests should be performed to resolve a keypress. If order is not provided, tests will occur in the order that they were given to the manager.</p>
+<p>The specific versions of AddKeydownCallback are:</p>
+<p>void AddKeydownCallback(std::function&lt;bool(const KeyboardEvent &amp;)&gt; cb_fun, int order=-1)</p>
+<p>Link a function to the KeypressManager that is called for any unresolved keypress. The function must take in an KeyboardEvent (which includes information about the specific key pressed as well as any modifiers such as SHIFT or CTRL) and it must return a boolean value indicating whether it has resolved the keypress.</p>
+<p>void AddKeydownCallback(char key, std::function&lt;void()&gt; cb_fun, int order=-1)</p>
+<p>Link a specific key to a target function to be called when that key is pressed. The function my return a void and take no arguments.</p>
+<p>void AddKeydownCallback(const std::string &amp; key_set, std::function&lt;void()&gt; cb_fun, int order=-1)</p>
+<p>Same as the previous method, but will respond to any of the keys in the provided string.</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Technically we should make sure to remove the event listener in the destructor. This would require us to keep track of the function that it is calling so that we can pass it back in to trigger the removal. </p>
+</dd></dl>
+
+</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv415KeypressManager">
+<span id="_CPPv315KeypressManager"></span><span id="_CPPv215KeypressManager"></span><span id="KeypressManager"></span><span class="target" id="classKeypressManager"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KeypressManager</span></span></span><a class="headerlink" href="#_CPPv415KeypressManager" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;KeypressManager.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15KeypressManager15KeypressManagerEv">
+<span id="_CPPv3N15KeypressManager15KeypressManagerEv"></span><span id="_CPPv2N15KeypressManager15KeypressManagerEv"></span><span id="KeypressManager::KeypressManager"></span><span class="target" id="classKeypressManager_1a9945a725e3b477166b9f9c3c1717808d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KeypressManager</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15KeypressManager15KeypressManagerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15KeypressManagerD0Ev">
+<span id="_CPPv3N15KeypressManagerD0Ev"></span><span id="_CPPv2N15KeypressManagerD0Ev"></span><span id="KeypressManager::~KeypressManager"></span><span class="target" id="classKeypressManager_1a0aa40ad4288612db1e8c0389c84615a0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~KeypressManager</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15KeypressManagerD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK15KeypressManager11GetFunCountEv">
+<span id="_CPPv3NK15KeypressManager11GetFunCountEv"></span><span id="_CPPv2NK15KeypressManager11GetFunCountEv"></span><span id="KeypressManager::GetFunCountC"></span><span class="target" id="classKeypressManager_1a7fbb5295a46fb56225a87be929c83ca8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetFunCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK15KeypressManager11GetFunCountEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK15KeypressManager12GetNextOrderEv">
+<span id="_CPPv3NK15KeypressManager12GetNextOrderEv"></span><span id="_CPPv2NK15KeypressManager12GetNextOrderEv"></span><span id="KeypressManager::GetNextOrderC"></span><span class="target" id="classKeypressManager_1a692e4189d619577886ec4f9769a0f86d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNextOrder</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK15KeypressManager12GetNextOrderEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15KeypressManager18AddKeydownCallbackENSt8functionIFbRK13KeyboardEventEEEi">
+<span id="_CPPv3N15KeypressManager18AddKeydownCallbackENSt8functionIFbRK13KeyboardEventEEEi"></span><span id="_CPPv2N15KeypressManager18AddKeydownCallbackENSt8functionIFbRK13KeyboardEventEEEi"></span><span class="target" id="classKeypressManager_1aa8a6f69313c6d49ac299fa37de6e6bf3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddKeydownCallback</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="events.html#_CPPv413KeyboardEvent" title="KeyboardEvent"><span class="n"><span class="pre">KeyboardEvent</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cb_fun</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">order</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15KeypressManager18AddKeydownCallbackENSt8functionIFbRK13KeyboardEventEEEi" title="Link to this definition"></a><br /></dt>
+<dd><p>Link a function to the KeypressManager that is called for any unresolved keypress. The function must take in an KeyboardEvent (which includes information about the specific key pressed as well as any modifiers such as SHIFT or CTRL) and it must return a boolean value indicating whether it has resolved the keypress. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15KeypressManager18AddKeydownCallbackEcNSt8functionIFvvEEEi">
+<span id="_CPPv3N15KeypressManager18AddKeydownCallbackEcNSt8functionIFvvEEEi"></span><span id="_CPPv2N15KeypressManager18AddKeydownCallbackEcNSt8functionIFvvEEEi"></span><span class="target" id="classKeypressManager_1ad04525c8b355da2901a9ca9f58612360"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddKeydownCallback</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cb_fun</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">order</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15KeypressManager18AddKeydownCallbackEcNSt8functionIFvvEEEi" title="Link to this definition"></a><br /></dt>
+<dd><p>Link a specific key to a target function to be called when that key is pressed. The function my return a void and take no arguments. Specify keys as lowercase characters. To sepcify uppercase, you’ll need to monitor fo rthe shift modifier associated with a KeypressEvent. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15KeypressManager18AddKeydownCallbackERKNSt6stringERKNSt8functionIFvvEEEi">
+<span id="_CPPv3N15KeypressManager18AddKeydownCallbackERKNSt6stringERKNSt8functionIFvvEEEi"></span><span id="_CPPv2N15KeypressManager18AddKeydownCallbackERKNSt6stringERKNSt8functionIFvvEEEi"></span><span class="target" id="classKeypressManager_1a33579e98a042c6b18cab97b60e691081"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddKeydownCallback</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">key_set</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cb_fun</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">order</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15KeypressManager18AddKeydownCallbackERKNSt6stringERKNSt8functionIFvvEEEi" title="Link to this definition"></a><br /></dt>
+<dd><p>Provide a whole set of keys that should all trigger the same function, including an ordering for priority. Specify keys as lowercase characters. To sepcify uppercase, you’ll need to monitor fo rthe shift modifier associated with a KeypressEvent. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15KeypressManager18AddKeydownCallbackERKNSt6stringERKNSt8functionIFvvEEE">
+<span id="_CPPv3N15KeypressManager18AddKeydownCallbackERKNSt6stringERKNSt8functionIFvvEEE"></span><span id="_CPPv2N15KeypressManager18AddKeydownCallbackERKNSt6stringERKNSt8functionIFvvEEE"></span><span class="target" id="classKeypressManager_1aeb6fc210962198219ce7229487892d68"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddKeydownCallback</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">key_set</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cb_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15KeypressManager18AddKeydownCallbackERKNSt6stringERKNSt8functionIFvvEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Provide a whole set of keys that should all trigger the same function; use default ordering. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15KeypressManager10DoCallbackERK13KeyboardEvent">
+<span id="_CPPv3N15KeypressManager10DoCallbackERK13KeyboardEvent"></span><span id="_CPPv2N15KeypressManager10DoCallbackERK13KeyboardEvent"></span><span id="KeypressManager::DoCallback__KeyboardEventCR"></span><span class="target" id="classKeypressManager_1ac37ab742b6e3acfe31b8cebc5d98e24b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoCallback</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="events.html#_CPPv413KeyboardEvent" title="KeyboardEvent"><span class="n"><span class="pre">KeyboardEvent</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">evt_info</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15KeypressManager10DoCallbackERK13KeyboardEvent" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15KeypressManager7fun_mapE">
+<span id="_CPPv3N15KeypressManager7fun_mapE"></span><span id="_CPPv2N15KeypressManager7fun_mapE"></span><span class="target" id="classKeypressManager_1ab0ceb71187120c095b604a860e5795ee"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="events.html#_CPPv413KeyboardEvent" title="KeyboardEvent"><span class="n"><span class="pre">KeyboardEvent</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_map</span></span></span><a class="headerlink" href="#_CPPv4N15KeypressManager7fun_mapE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15KeypressManager10next_orderE">
+<span id="_CPPv3N15KeypressManager10next_orderE"></span><span id="_CPPv2N15KeypressManager10next_orderE"></span><span id="KeypressManager::next_order__i"></span><span class="target" id="classKeypressManager_1afff429bca642de3331ce06df21efb6a0"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">next_order</span></span></span><a class="headerlink" href="#_CPPv4N15KeypressManager10next_orderE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15KeypressManager11callback_idE">
+<span id="_CPPv3N15KeypressManager11callback_idE"></span><span id="_CPPv2N15KeypressManager11callback_idE"></span><span id="KeypressManager::callback_id__uint32_t"></span><span class="target" id="classKeypressManager_1ad49b4d8bec363fb5b28ae25bc5b33eee"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">callback_id</span></span></span><a class="headerlink" href="#_CPPv4N15KeypressManager11callback_idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="JSWrap.html" class="btn btn-neutral float-left" title="JSWrap.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Listeners.html" class="btn btn-neutral float-right" title="Listeners.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

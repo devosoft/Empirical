@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>char_utils.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/tools/api/char_utils.08df5156-346e-4547-a16a-cef69055785f.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="hash_namify.hpp" href="hash_namify.html" />
+    <link rel="prev" title="attrs.hpp" href="attrs.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tools.html">Other Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../tools.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="MemoryFactory.html">MemoryFactory.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SolveState.html">SolveState.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StaticString.html">StaticString.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="String.html">String.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypeTracker.html">TypeTracker.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="attrs.html">attrs.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">char_utils.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv47CharSet"><code class="docutils literal notranslate"><span class="pre">CharSet</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412CharSetRangecc"><code class="docutils literal notranslate"><span class="pre">CharSetRange()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv417WhitespaceCharSetv"><code class="docutils literal notranslate"><span class="pre">WhitespaceCharSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412UpperCharSetv"><code class="docutils literal notranslate"><span class="pre">UpperCharSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412LowerCharSetv"><code class="docutils literal notranslate"><span class="pre">LowerCharSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413LetterCharSetv"><code class="docutils literal notranslate"><span class="pre">LetterCharSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412DigitCharSetv"><code class="docutils literal notranslate"><span class="pre">DigitCharSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv419AlphanumericCharSetv"><code class="docutils literal notranslate"><span class="pre">AlphanumericCharSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49IDCharSetv"><code class="docutils literal notranslate"><span class="pre">IDCharSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv418PunctuationCharSetv"><code class="docutils literal notranslate"><span class="pre">PunctuationCharSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv417EscapeCodeCharSetv"><code class="docutils literal notranslate"><span class="pre">EscapeCodeCharSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413is_whitespacec"><code class="docutils literal notranslate"><span class="pre">is_whitespace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415is_upper_letterc"><code class="docutils literal notranslate"><span class="pre">is_upper_letter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415is_lower_letterc"><code class="docutils literal notranslate"><span class="pre">is_lower_letter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49is_letterc"><code class="docutils literal notranslate"><span class="pre">is_letter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv48is_digitc"><code class="docutils literal notranslate"><span class="pre">is_digit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415is_alphanumericc"><code class="docutils literal notranslate"><span class="pre">is_alphanumeric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49is_idcharc"><code class="docutils literal notranslate"><span class="pre">is_idchar()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414is_punctuationc"><code class="docutils literal notranslate"><span class="pre">is_punctuation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414is_escape_codec"><code class="docutils literal notranslate"><span class="pre">is_escape_code()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49is_one_ofcRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">is_one_of()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv48is_validc"><code class="docutils literal notranslate"><span class="pre">is_valid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE8is_validbcNSt8functionIFbcEEEDp4FUNS"><code class="docutils literal notranslate"><span class="pre">is_valid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412ToEscapeCharc"><code class="docutils literal notranslate"><span class="pre">ToEscapeChar()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase"><code class="docutils literal notranslate"><span class="pre">CharSetBase</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="hash_namify.html">hash_namify.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="keyname_utils.html">keyname_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="string_utils.html">string_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timing.html">timing.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unique.html">unique.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="value_utils.html">value_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tools.html">Other Tools</a></li>
+      <li class="breadcrumb-item active">char_utils.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="char-utils-hpp">
+<h1>char_utils.hpp<a class="headerlink" href="#char-utils-hpp" title="Link to this heading"></a></h1>
+<p>Simple functions and tools to manipulate individual characters. </p>
+<p>
+Available Class CharSet - A collection of characters for use in other functions.</p>
+<p>Available Functions bool is_whitespace(char test_char) bool is_upper_letter(char test_char) bool is_lower_letter(char test_char) bool is_letter(char test_char) bool is_digit(char test_char) bool is_alphanumeric(char test_char) bool is_idchar(char test_char) bool is_one_of(char test_char, const std::string &amp; char_set) bool is_valid(char test_char ) bool is_valid(char test_char, std::function&lt;bool(char)&gt; fun1, FUNS… funs)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA</p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv47CharSet">
+<span id="_CPPv37CharSet"></span><span id="_CPPv27CharSet"></span><span class="target" id="char__utils_8hpp_1af0361e9ffdb173bc1b6e16faf490989c"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CharSet</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase"><span class="n"><span class="pre">CharSetBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv47CharSet" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412CharSetRangecc">
+<span id="_CPPv312CharSetRangecc"></span><span id="_CPPv212CharSetRangecc"></span><span id="CharSetRange__c.c"></span><span class="target" id="char__utils_8hpp_1af5fd5fa224124f135a65d787050c4c15"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47CharSet" title="CharSet"><span class="n"><span class="pre">CharSet</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CharSetRange</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c1</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412CharSetRangecc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417WhitespaceCharSetv">
+<span id="_CPPv317WhitespaceCharSetv"></span><span id="_CPPv217WhitespaceCharSetv"></span><span id="WhitespaceCharSet"></span><span class="target" id="char__utils_8hpp_1aba425798febeb788777dc902bdf09bdc"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47CharSet" title="CharSet"><span class="n"><span class="pre">CharSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">WhitespaceCharSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417WhitespaceCharSetv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412UpperCharSetv">
+<span id="_CPPv312UpperCharSetv"></span><span id="_CPPv212UpperCharSetv"></span><span id="UpperCharSet"></span><span class="target" id="char__utils_8hpp_1a17316bf5cbfa32052369ecf863526c71"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47CharSet" title="CharSet"><span class="n"><span class="pre">CharSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">UpperCharSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412UpperCharSetv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412LowerCharSetv">
+<span id="_CPPv312LowerCharSetv"></span><span id="_CPPv212LowerCharSetv"></span><span id="LowerCharSet"></span><span class="target" id="char__utils_8hpp_1a09431166d4a12b8c10c3a3f2b4d9ec15"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47CharSet" title="CharSet"><span class="n"><span class="pre">CharSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">LowerCharSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412LowerCharSetv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413LetterCharSetv">
+<span id="_CPPv313LetterCharSetv"></span><span id="_CPPv213LetterCharSetv"></span><span id="LetterCharSet"></span><span class="target" id="char__utils_8hpp_1af52abca9355118eeb22f8d8969f79370"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47CharSet" title="CharSet"><span class="n"><span class="pre">CharSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">LetterCharSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413LetterCharSetv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412DigitCharSetv">
+<span id="_CPPv312DigitCharSetv"></span><span id="_CPPv212DigitCharSetv"></span><span id="DigitCharSet"></span><span class="target" id="char__utils_8hpp_1ad1ca5d96c5dfd1530dadc1cac96c4db4"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47CharSet" title="CharSet"><span class="n"><span class="pre">CharSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">DigitCharSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412DigitCharSetv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419AlphanumericCharSetv">
+<span id="_CPPv319AlphanumericCharSetv"></span><span id="_CPPv219AlphanumericCharSetv"></span><span id="AlphanumericCharSet"></span><span class="target" id="char__utils_8hpp_1a4a96547e898cdf1a21f0d0081f7a4c6f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47CharSet" title="CharSet"><span class="n"><span class="pre">CharSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AlphanumericCharSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419AlphanumericCharSetv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49IDCharSetv">
+<span id="_CPPv39IDCharSetv"></span><span id="_CPPv29IDCharSetv"></span><span id="IDCharSet"></span><span class="target" id="char__utils_8hpp_1aa14277ca39d25a85d313905dfab0956f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47CharSet" title="CharSet"><span class="n"><span class="pre">CharSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">IDCharSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49IDCharSetv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418PunctuationCharSetv">
+<span id="_CPPv318PunctuationCharSetv"></span><span id="_CPPv218PunctuationCharSetv"></span><span id="PunctuationCharSet"></span><span class="target" id="char__utils_8hpp_1a10091f7bae0a3646b35c080174564c66"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47CharSet" title="CharSet"><span class="n"><span class="pre">CharSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">PunctuationCharSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418PunctuationCharSetv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417EscapeCodeCharSetv">
+<span id="_CPPv317EscapeCodeCharSetv"></span><span id="_CPPv217EscapeCodeCharSetv"></span><span id="EscapeCodeCharSet"></span><span class="target" id="char__utils_8hpp_1a2a2e5976caae3747cf30b535a1df7347"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47CharSet" title="CharSet"><span class="n"><span class="pre">CharSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">EscapeCodeCharSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417EscapeCodeCharSetv" title="Link to this definition"></a><br /></dt>
+<dd><p>Which characters can come after a backslash in a string? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413is_whitespacec">
+<span id="_CPPv313is_whitespacec"></span><span id="_CPPv213is_whitespacec"></span><span id="is_whitespace__c"></span><span class="target" id="char__utils_8hpp_1ab836c9bab8dcaeb8737b34d573af321e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_whitespace</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_char</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413is_whitespacec" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415is_upper_letterc">
+<span id="_CPPv315is_upper_letterc"></span><span id="_CPPv215is_upper_letterc"></span><span id="is_upper_letter__c"></span><span class="target" id="char__utils_8hpp_1a36fbaa0a2e01ff7d14665ca0a9c7ad95"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_upper_letter</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_char</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415is_upper_letterc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415is_lower_letterc">
+<span id="_CPPv315is_lower_letterc"></span><span id="_CPPv215is_lower_letterc"></span><span id="is_lower_letter__c"></span><span class="target" id="char__utils_8hpp_1a3c41f8f3c4af4cd92b7ff43d64e52713"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_lower_letter</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_char</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415is_lower_letterc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49is_letterc">
+<span id="_CPPv39is_letterc"></span><span id="_CPPv29is_letterc"></span><span id="is_letter__c"></span><span class="target" id="char__utils_8hpp_1a3b9de46afc2d638d6e26736bfb03a3cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_letter</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_char</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49is_letterc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48is_digitc">
+<span id="_CPPv38is_digitc"></span><span id="_CPPv28is_digitc"></span><span id="is_digit__c"></span><span class="target" id="char__utils_8hpp_1a2249fed59567c115278ccde87c97a55f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_digit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_char</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48is_digitc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415is_alphanumericc">
+<span id="_CPPv315is_alphanumericc"></span><span id="_CPPv215is_alphanumericc"></span><span id="is_alphanumeric__c"></span><span class="target" id="char__utils_8hpp_1a5474b5f9c469c5dc416b83bf3abc2588"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_alphanumeric</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_char</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415is_alphanumericc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49is_idcharc">
+<span id="_CPPv39is_idcharc"></span><span id="_CPPv29is_idcharc"></span><span id="is_idchar__c"></span><span class="target" id="char__utils_8hpp_1a7e9f847834ea14af51933d5b5e4d47c0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_idchar</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_char</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49is_idcharc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414is_punctuationc">
+<span id="_CPPv314is_punctuationc"></span><span id="_CPPv214is_punctuationc"></span><span id="is_punctuation__c"></span><span class="target" id="char__utils_8hpp_1aaaf056c9db199cdd81dfe7958272e2d6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_punctuation</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_char</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414is_punctuationc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414is_escape_codec">
+<span id="_CPPv314is_escape_codec"></span><span id="_CPPv214is_escape_codec"></span><span id="is_escape_code__c"></span><span class="target" id="char__utils_8hpp_1a2ca90516957a0558c3dd1232594314fd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_escape_code</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_char</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414is_escape_codec" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49is_one_ofcRKNSt6stringE">
+<span id="_CPPv39is_one_ofcRKNSt6stringE"></span><span id="_CPPv29is_one_ofcRKNSt6stringE"></span><span id="is_one_of__c.ssCR"></span><span class="target" id="char__utils_8hpp_1aec7c524146de76e9ff27c9ed68cd0948"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_one_of</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_char</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">char_set</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49is_one_ofcRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if a character is in a set of characters (represented as a string) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48is_validc">
+<span id="_CPPv38is_validc"></span><span id="_CPPv28is_validc"></span><span id="is_valid__c"></span><span class="target" id="char__utils_8hpp_1a9955f9ef92f6d37d8a0a2668723bf428"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_valid</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48is_validc" title="Link to this definition"></a><br /></dt>
+<dd><p>If no functions are provided to is_valid(), always return false as base case. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE8is_validbcNSt8functionIFbcEEEDp4FUNS">
+<span id="_CPPv3IDpE8is_validcNSt8functionIFbcEEEDp4FUNS"></span><span id="_CPPv2IDpE8is_validcNSt8functionIFbcEEEDp4FUNS"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">FUNS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="char__utils_8hpp_1a24e2f7be6e7c5221b3fd2f0f01b50bac"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_valid</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_char</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fun1</span></span>, <a class="reference internal" href="#_CPPv4IDpE8is_validbcNSt8functionIFbcEEEDp4FUNS" title="is_valid::FUNS"><span class="n"><span class="pre">FUNS</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">funs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpE8is_validbcNSt8functionIFbcEEEDp4FUNS" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if a character passes any of the test functions provided. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412ToEscapeCharc">
+<span id="_CPPv312ToEscapeCharc"></span><span id="_CPPv212ToEscapeCharc"></span><span id="ToEscapeChar__c"></span><span class="target" id="char__utils_8hpp_1a61269e9a336f073e5293c55c6f3fff91"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToEscapeChar</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ToEscapeCharc" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert a char after a backslash to its escaped version. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0_6size_tE11CharSetBase">
+<span id="_CPPv3I0_6size_tE11CharSetBase"></span><span id="_CPPv2I0_6size_tE11CharSetBase"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CHAR_T</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_CHAR</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">128</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCharSetBase"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CharSetBase</span></span></span><a class="headerlink" href="#_CPPv4I0_6size_tE11CharSetBase" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;char_utils.hpp&gt;</em></div>
+<p>A char_set is a fast true/false lookup table to identify which ASCII chars are in a set. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase11CharSetBaseEv">
+<span id="_CPPv3N11CharSetBase11CharSetBaseEv"></span><span id="_CPPv2N11CharSetBase11CharSetBaseEv"></span><span id="CharSetBase::CharSetBase"></span><span class="target" id="classCharSetBase_1abda0bad57fdc90027370e71948064874"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CharSetBase</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBase11CharSetBaseEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase11CharSetBaseE6CHAR_T">
+<span id="_CPPv3N11CharSetBase11CharSetBaseE6CHAR_T"></span><span id="_CPPv2N11CharSetBase11CharSetBaseE6CHAR_T"></span><span id="CharSetBase::CharSetBase__CHAR_T"></span><span class="target" id="classCharSetBase_1a9ee081a76bb10133342b65ee9dc988dd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CharSetBase</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBase11CharSetBaseE6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase11CharSetBaseERKNSt6stringE">
+<span id="_CPPv3N11CharSetBase11CharSetBaseERKNSt6stringE"></span><span id="_CPPv2N11CharSetBase11CharSetBaseERKNSt6stringE"></span><span id="CharSetBase::CharSetBase__ssCR"></span><span class="target" id="classCharSetBase_1a8a12469176b0c99358770abfd133eb4f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CharSetBase</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_chars</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBase11CharSetBaseERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase11CharSetBaseEPKc">
+<span id="_CPPv3N11CharSetBase11CharSetBaseEPKc"></span><span id="_CPPv2N11CharSetBase11CharSetBaseEPKc"></span><span id="CharSetBase::CharSetBase__cCP"></span><span class="target" id="classCharSetBase_1a2642496dc5f13cfe4f6adc7fa57b6ad5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CharSetBase</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in_chars</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBase11CharSetBaseEPKc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase11CharSetBaseERK6this_t">
+<span id="_CPPv3N11CharSetBase11CharSetBaseERK6this_t"></span><span id="_CPPv2N11CharSetBase11CharSetBaseERK6this_t"></span><span id="CharSetBase::CharSetBase__this_tCR"></span><span class="target" id="classCharSetBase_1a2cd42e8de28c4c5a6e8c725b077172c1"></span><span class="sig-name descname"><span class="n"><span class="pre">CharSetBase</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase6this_tE" title="CharSetBase::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11CharSetBase11CharSetBaseERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBaseaSERK6this_t">
+<span id="_CPPv3N11CharSetBaseaSERK6this_t"></span><span id="_CPPv2N11CharSetBaseaSERK6this_t"></span><span id="CharSetBase::assign-operator__this_tCR"></span><span class="target" id="classCharSetBase_1a8e247eceeee3b3958ef9367f94406531"></span><a class="reference internal" href="#_CPPv4N11CharSetBase6this_tE" title="CharSetBase::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase6this_tE" title="CharSetBase::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11CharSetBaseaSERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBaseaSEc">
+<span id="_CPPv3N11CharSetBaseaSEc"></span><span id="_CPPv2N11CharSetBaseaSEc"></span><span id="CharSetBase::assign-operator__c"></span><span class="target" id="classCharSetBase_1a77d64500d13e8d09fdc4cd9348724939"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase6this_tE" title="CharSetBase::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBaseaSEc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBaseaSERKNSt6stringE">
+<span id="_CPPv3N11CharSetBaseaSERKNSt6stringE"></span><span id="_CPPv2N11CharSetBaseaSERKNSt6stringE"></span><span id="CharSetBase::assign-operator__ssCR"></span><span class="target" id="classCharSetBase_1a8d57d00476883350ab1acb67db633f23"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase6this_tE" title="CharSetBase::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_chars</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBaseaSERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase5ResetEv">
+<span id="_CPPv3N11CharSetBase5ResetEv"></span><span id="_CPPv2N11CharSetBase5ResetEv"></span><span id="CharSetBase::Reset"></span><span class="target" id="classCharSetBase_1ae00e8f1d52ffd3e837bd99d8dd167f1f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase"><span class="n"><span class="pre">CharSetBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Reset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBase5ResetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase10GetMaxCharEv">
+<span id="_CPPv3NK11CharSetBase10GetMaxCharEv"></span><span id="_CPPv2NK11CharSetBase10GetMaxCharEv"></span><span id="CharSetBase::GetMaxCharC"></span><span class="target" id="classCharSetBase_1a86ac8193d28efe04d71b22faae713d83"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetMaxChar</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase10GetMaxCharEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase3HasE6CHAR_T">
+<span id="_CPPv3NK11CharSetBase3HasE6CHAR_T"></span><span id="_CPPv2NK11CharSetBase3HasE6CHAR_T"></span><span id="CharSetBase::Has__CHAR_TC"></span><span class="target" id="classCharSetBase_1ad2cea4d4af876fff8189d29eafb1052f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase3HasE6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase3HasERKNSt6stringE">
+<span id="_CPPv3NK11CharSetBase3HasERKNSt6stringE"></span><span id="_CPPv2NK11CharSetBase3HasERKNSt6stringE"></span><span id="CharSetBase::Has__ssCRC"></span><span class="target" id="classCharSetBase_1a01237124bf3818759e251a35f249f090"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">str</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase3HasERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase6HasAnyERKNSt6stringE">
+<span id="_CPPv3NK11CharSetBase6HasAnyERKNSt6stringE"></span><span id="_CPPv2NK11CharSetBase6HasAnyERKNSt6stringE"></span><span id="CharSetBase::HasAny__ssCRC"></span><span class="target" id="classCharSetBase_1a3638030bb83cda6914133955b1af5d70"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasAny</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">str</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase6HasAnyERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase7HasOnlyERKNSt6stringE">
+<span id="_CPPv3NK11CharSetBase7HasOnlyERKNSt6stringE"></span><span id="_CPPv2NK11CharSetBase7HasOnlyERKNSt6stringE"></span><span id="CharSetBase::HasOnly__ssCRC"></span><span class="target" id="classCharSetBase_1a8c3c4a14508f37dddb6d2b0ad0194bb2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasOnly</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">str</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase7HasOnlyERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase5HasAtERKNSt6stringE6size_t">
+<span id="_CPPv3NK11CharSetBase5HasAtERKNSt6stringE6size_t"></span><span id="_CPPv2NK11CharSetBase5HasAtERKNSt6stringE6size_t"></span><span id="CharSetBase::HasAt__ssCR.sC"></span><span class="target" id="classCharSetBase_1ab456c3858a6f7779f4a6b9ccaf626318"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasAt</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">str</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase5HasAtERKNSt6stringE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase6FindInERKNSt6stringE6size_t">
+<span id="_CPPv3NK11CharSetBase6FindInERKNSt6stringE6size_t"></span><span id="_CPPv2NK11CharSetBase6FindInERKNSt6stringE6size_t"></span><span id="CharSetBase::FindIn__ssCR.sC"></span><span class="target" id="classCharSetBase_1a089b773ea25e6b2e0d857afa50bde2bc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindIn</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">str</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase6FindInERKNSt6stringE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBaseixE6CHAR_T">
+<span id="_CPPv3NK11CharSetBaseixE6CHAR_T"></span><span id="_CPPv2NK11CharSetBaseixE6CHAR_T"></span><span id="CharSetBase::subscript-operator__CHAR_TC"></span><span class="target" id="classCharSetBase_1a1cf2597eb66d50126b199bb247441909"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBaseixE6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase7GetSizeEv">
+<span id="_CPPv3NK11CharSetBase7GetSizeEv"></span><span id="_CPPv2NK11CharSetBase7GetSizeEv"></span><span id="CharSetBase::GetSizeC"></span><span class="target" id="classCharSetBase_1ac4e2020707aa405a37d8b49f50d52fd7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Count up the number of characters in the set. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase3SetE6CHAR_T">
+<span id="_CPPv3N11CharSetBase3SetE6CHAR_T"></span><span id="_CPPv2N11CharSetBase3SetE6CHAR_T"></span><span id="CharSetBase::Set__CHAR_T"></span><span class="target" id="classCharSetBase_1a187d05385a6aa1db64dfc9a735a6c426"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase"><span class="n"><span class="pre">CharSetBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::MAX_CHAR"><span class="n"><span class="pre">MAX_CHAR</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBase3SetE6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase5ClearE6CHAR_T">
+<span id="_CPPv3N11CharSetBase5ClearE6CHAR_T"></span><span id="_CPPv2N11CharSetBase5ClearE6CHAR_T"></span><span id="CharSetBase::Clear__CHAR_T"></span><span class="target" id="classCharSetBase_1adf0d44dbebff90d639253306cb66bf3d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase"><span class="n"><span class="pre">CharSetBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::MAX_CHAR"><span class="n"><span class="pre">MAX_CHAR</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBase5ClearE6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase8SetRangeE6CHAR_T6CHAR_T">
+<span id="_CPPv3N11CharSetBase8SetRangeE6CHAR_T6CHAR_T"></span><span id="_CPPv2N11CharSetBase8SetRangeE6CHAR_T6CHAR_T"></span><span id="CharSetBase::SetRange__CHAR_T.CHAR_T"></span><span class="target" id="classCharSetBase_1afe240281323a2ed1325a5e6f3a44bda3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase"><span class="n"><span class="pre">CharSetBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::MAX_CHAR"><span class="n"><span class="pre">MAX_CHAR</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetRange</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">c1</span></span>, <a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">c2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBase8SetRangeE6CHAR_T6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd><p>Set a range of characters INCLUSIVE of c1 and c2. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase10ClearRangeE6CHAR_T6CHAR_T">
+<span id="_CPPv3N11CharSetBase10ClearRangeE6CHAR_T6CHAR_T"></span><span id="_CPPv2N11CharSetBase10ClearRangeE6CHAR_T6CHAR_T"></span><span id="CharSetBase::ClearRange__CHAR_T.CHAR_T"></span><span class="target" id="classCharSetBase_1a167aed9df9b0ec2310b2639056dc7138"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase"><span class="n"><span class="pre">CharSetBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::MAX_CHAR"><span class="n"><span class="pre">MAX_CHAR</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">ClearRange</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">c1</span></span>, <a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">c2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBase10ClearRangeE6CHAR_T6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBaseplERK6this_t">
+<span id="_CPPv3NK11CharSetBaseplERK6this_t"></span><span id="_CPPv2NK11CharSetBaseplERK6this_t"></span><span id="CharSetBase::add-operator__this_tCRC"></span><span class="target" id="classCharSetBase_1aabf454c2c158b2ee1d6ae9ea394bd644"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase"><span class="n"><span class="pre">CharSetBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::MAX_CHAR"><span class="n"><span class="pre">MAX_CHAR</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">+</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase6this_tE" title="CharSetBase::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBaseplERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBasentEv">
+<span id="_CPPv3NK11CharSetBasentEv"></span><span id="_CPPv2NK11CharSetBasentEv"></span><span id="CharSetBase::not-operatorC"></span><span class="target" id="classCharSetBase_1ae905c52a7ba68c8cc946e14040eb28d4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase"><span class="n"><span class="pre">CharSetBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::MAX_CHAR"><span class="n"><span class="pre">MAX_CHAR</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBasentEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase5beginEv">
+<span id="_CPPv3NK11CharSetBase5beginEv"></span><span id="_CPPv2NK11CharSetBase5beginEv"></span><span id="CharSetBase::beginC"></span><span class="target" id="classCharSetBase_1a3b9c0c4038e4f03a59cb1ad033fc72a1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase10iterator_tE" title="CharSetBase::iterator_t"><span class="n"><span class="pre">iterator_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase5beginEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase3endEv">
+<span id="_CPPv3NK11CharSetBase3endEv"></span><span id="_CPPv2NK11CharSetBase3endEv"></span><span id="CharSetBase::endC"></span><span class="target" id="classCharSetBase_1a0e1d8b54b54cf84c1d6f2ff5fc2776aa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase10iterator_tE" title="CharSetBase::iterator_t"><span class="n"><span class="pre">iterator_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase3endEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase12CountMatchesERKNSt6stringE">
+<span id="_CPPv3NK11CharSetBase12CountMatchesERKNSt6stringE"></span><span id="_CPPv2NK11CharSetBase12CountMatchesERKNSt6stringE"></span><span id="CharSetBase::CountMatches__ssCRC"></span><span class="target" id="classCharSetBase_1a19d032b891fec1ff485bfc32568ca8cb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountMatches</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">str</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase12CountMatchesERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Count the number of matches that occur in a string. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase12CountMatchesERKNSt6stringE6size_t6size_t">
+<span id="_CPPv3NK11CharSetBase12CountMatchesERKNSt6stringE6size_t6size_t"></span><span id="_CPPv2NK11CharSetBase12CountMatchesERKNSt6stringE6size_t6size_t"></span><span id="CharSetBase::CountMatches__ssCR.s.sC"></span><span class="target" id="classCharSetBase_1aa1eadb9ab4b5b20bea5008d86545d075"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountMatches</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">str</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase12CountMatchesERKNSt6stringE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Count the number of matches that occur in a sub-string. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase17CountFrontMatchesERKNSt6stringE6size_t">
+<span id="_CPPv3NK11CharSetBase17CountFrontMatchesERKNSt6stringE6size_t"></span><span id="_CPPv2NK11CharSetBase17CountFrontMatchesERKNSt6stringE6size_t"></span><span id="CharSetBase::CountFrontMatches__ssCR.sC"></span><span class="target" id="classCharSetBase_1ae67d9f0847b59b798ceaf499d0cd6ce2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountFrontMatches</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">str</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase17CountFrontMatchesERKNSt6stringE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Count the number of matches that occur at the beginning of a string. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase16CountBackMatchesERKNSt6stringE">
+<span id="_CPPv3NK11CharSetBase16CountBackMatchesERKNSt6stringE"></span><span id="_CPPv2NK11CharSetBase16CountBackMatchesERKNSt6stringE"></span><span id="CharSetBase::CountBackMatches__ssCRC"></span><span class="target" id="classCharSetBase_1a6e20dadba870234193e9872d06835a69"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountBackMatches</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">str</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase16CountBackMatchesERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase8AsStringEv">
+<span id="_CPPv3NK11CharSetBase8AsStringEv"></span><span id="_CPPv2NK11CharSetBase8AsStringEv"></span><span id="CharSetBase::AsStringC"></span><span class="target" id="classCharSetBase_1a96aa2bba26f0063e48f22120b75fb1de"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase8AsStringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert this set of characters into a regex-style character set. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase6this_tE">
+<span id="_CPPv3N11CharSetBase6this_tE"></span><span id="_CPPv2N11CharSetBase6this_tE"></span><span class="target" id="classCharSetBase_1a657497a2330333def4d20b30bb9222d2"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase"><span class="n"><span class="pre">CharSetBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::MAX_CHAR"><span class="n"><span class="pre">MAX_CHAR</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N11CharSetBase6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase10char_set_tE">
+<span id="_CPPv3N11CharSetBase10char_set_tE"></span><span id="_CPPv2N11CharSetBase10char_set_tE"></span><span class="target" id="classCharSetBase_1a0cf94f1937cbb03a08bfdb06972eda04"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">char_set_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::MAX_CHAR"><span class="n"><span class="pre">MAX_CHAR</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N11CharSetBase10char_set_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase8char_setE">
+<span id="_CPPv3N11CharSetBase8char_setE"></span><span id="_CPPv2N11CharSetBase8char_setE"></span><span id="CharSetBase::char_set__char_set_t"></span><span class="target" id="classCharSetBase_1a7f44d6714ede3fdc156933c155ccd8fc"></span><a class="reference internal" href="#_CPPv4N11CharSetBase10char_set_tE" title="CharSetBase::char_set_t"><span class="n"><span class="pre">char_set_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">char_set</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N11CharSetBase8char_setE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase10iterator_tE">
+<span id="_CPPv3N11CharSetBase10iterator_tE"></span><span id="_CPPv2N11CharSetBase10iterator_tE"></span><span id="CharSetBase::iterator_t"></span><span class="target" id="classCharSetBase_1_1iterator__t"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iterator_t</span></span></span><a class="headerlink" href="#_CPPv4N11CharSetBase10iterator_tE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;char_utils.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase10iterator_t10iterator_tE3PtrIK6this_tE6size_t">
+<span id="_CPPv3N11CharSetBase10iterator_t10iterator_tE3PtrIK6this_tE6size_t"></span><span id="_CPPv2N11CharSetBase10iterator_t10iterator_tE3PtrIK6this_tE6size_t"></span><span id="CharSetBase::iterator_t::iterator_t__Ptr:this_tC:.s"></span><span class="target" id="classCharSetBase_1_1iterator__t_1a5ff660b2591491f721eebfcbf235b7f5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iterator_t</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase6this_tE" title="CharSetBase::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBase10iterator_t10iterator_tE3PtrIK6this_tE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase10iterator_t10iterator_tERK10iterator_t">
+<span id="_CPPv3N11CharSetBase10iterator_t10iterator_tERK10iterator_t"></span><span id="_CPPv2N11CharSetBase10iterator_t10iterator_tERK10iterator_t"></span><span id="CharSetBase::iterator_t::iterator_t__iterator_tCR"></span><span class="target" id="classCharSetBase_1_1iterator__t_1a8acdcaa8c98d7023514aa2d2db65c7f6"></span><span class="sig-name descname"><span class="n"><span class="pre">iterator_t</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase10iterator_t10iterator_tERK10iterator_t" title="CharSetBase::iterator_t::iterator_t"><span class="n"><span class="pre">iterator_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11CharSetBase10iterator_t10iterator_tERK10iterator_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase10iterator_taSERK10iterator_t">
+<span id="_CPPv3N11CharSetBase10iterator_taSERK10iterator_t"></span><span id="_CPPv2N11CharSetBase10iterator_taSERK10iterator_t"></span><span id="CharSetBase::iterator_t::assign-operator__iterator_tCR"></span><span class="target" id="classCharSetBase_1_1iterator__t_1a0fb796cc019ea895d08ba5cf7433ea64"></span><a class="reference internal" href="#_CPPv4N11CharSetBase10iterator_tE" title="CharSetBase::iterator_t"><span class="n"><span class="pre">iterator_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase10iterator_tE" title="CharSetBase::iterator_t"><span class="n"><span class="pre">iterator_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11CharSetBase10iterator_taSERK10iterator_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase10iterator_t9MakeValidEv">
+<span id="_CPPv3N11CharSetBase10iterator_t9MakeValidEv"></span><span id="_CPPv2N11CharSetBase10iterator_t9MakeValidEv"></span><span id="CharSetBase::iterator_t::MakeValid"></span><span class="target" id="classCharSetBase_1_1iterator__t_1a0977de31c10dee6e4670ae70580bb069"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase10iterator_tE" title="CharSetBase::iterator_t"><span class="n"><span class="pre">iterator_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">MakeValid</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBase10iterator_t9MakeValidEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase10iterator_teqERK10iterator_t">
+<span id="_CPPv3NK11CharSetBase10iterator_teqERK10iterator_t"></span><span id="_CPPv2NK11CharSetBase10iterator_teqERK10iterator_t"></span><span id="CharSetBase::iterator_t::eq-operator__iterator_tCRC"></span><span class="target" id="classCharSetBase_1_1iterator__t_1a931069c2019ddbcf8b21a195cb1a7cd7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase10iterator_tE" title="CharSetBase::iterator_t"><span class="n"><span class="pre">iterator_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase10iterator_teqERK10iterator_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase10iterator_tneERK10iterator_t">
+<span id="_CPPv3NK11CharSetBase10iterator_tneERK10iterator_t"></span><span id="_CPPv2NK11CharSetBase10iterator_tneERK10iterator_t"></span><span id="CharSetBase::iterator_t::neq-operator__iterator_tCRC"></span><span class="target" id="classCharSetBase_1_1iterator__t_1a33d999f7826ef2a1de70c980828a5e5a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase10iterator_tE" title="CharSetBase::iterator_t"><span class="n"><span class="pre">iterator_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase10iterator_tneERK10iterator_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase10iterator_tltERK10iterator_t">
+<span id="_CPPv3NK11CharSetBase10iterator_tltERK10iterator_t"></span><span id="_CPPv2NK11CharSetBase10iterator_tltERK10iterator_t"></span><span id="CharSetBase::iterator_t::lt-operator__iterator_tCRC"></span><span class="target" id="classCharSetBase_1_1iterator__t_1a6b74dd3ecdf0c9158b7b340f94711752"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase10iterator_tE" title="CharSetBase::iterator_t"><span class="n"><span class="pre">iterator_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase10iterator_tltERK10iterator_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase10iterator_tgtERK10iterator_t">
+<span id="_CPPv3NK11CharSetBase10iterator_tgtERK10iterator_t"></span><span id="_CPPv2NK11CharSetBase10iterator_tgtERK10iterator_t"></span><span id="CharSetBase::iterator_t::gt-operator__iterator_tCRC"></span><span class="target" id="classCharSetBase_1_1iterator__t_1a853c1649d29871188bbd2a8e4c152bb1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase10iterator_tE" title="CharSetBase::iterator_t"><span class="n"><span class="pre">iterator_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase10iterator_tgtERK10iterator_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase10iterator_tleERK10iterator_t">
+<span id="_CPPv3NK11CharSetBase10iterator_tleERK10iterator_t"></span><span id="_CPPv2NK11CharSetBase10iterator_tleERK10iterator_t"></span><span id="CharSetBase::iterator_t::lte-operator__iterator_tCRC"></span><span class="target" id="classCharSetBase_1_1iterator__t_1a82cdd6eeaa11becb1c380f85595f47cb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase10iterator_tE" title="CharSetBase::iterator_t"><span class="n"><span class="pre">iterator_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase10iterator_tleERK10iterator_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase10iterator_tgeERK10iterator_t">
+<span id="_CPPv3NK11CharSetBase10iterator_tgeERK10iterator_t"></span><span id="_CPPv2NK11CharSetBase10iterator_tgeERK10iterator_t"></span><span id="CharSetBase::iterator_t::gte-operator__iterator_tCRC"></span><span class="target" id="classCharSetBase_1_1iterator__t_1aa3f40a2acd369789b44681bdae3b58e7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase10iterator_tE" title="CharSetBase::iterator_t"><span class="n"><span class="pre">iterator_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase10iterator_tgeERK10iterator_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11CharSetBase10iterator_tmlEv">
+<span id="_CPPv3NK11CharSetBase10iterator_tmlEv"></span><span id="_CPPv2NK11CharSetBase10iterator_tmlEv"></span><span id="CharSetBase::iterator_t::mul-operatorC"></span><span class="target" id="classCharSetBase_1_1iterator__t_1a9e7329a712d1da9b7ead76742b5210c5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tE11CharSetBase" title="CharSetBase::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">*</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11CharSetBase10iterator_tmlEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase10iterator_tppEv">
+<span id="_CPPv3N11CharSetBase10iterator_tppEv"></span><span id="_CPPv2N11CharSetBase10iterator_tppEv"></span><span id="CharSetBase::iterator_t::inc-operator"></span><span class="target" id="classCharSetBase_1_1iterator__t_1af2f3c4c13354bc2f6a152f6a16fbe63c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase10iterator_tE" title="CharSetBase::iterator_t"><span class="n"><span class="pre">iterator_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">++</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11CharSetBase10iterator_tppEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase10iterator_t3ptrE">
+<span id="_CPPv3N11CharSetBase10iterator_t3ptrE"></span><span id="_CPPv2N11CharSetBase10iterator_t3ptrE"></span><span id="CharSetBase::iterator_t::ptr__Ptr:this_tC:"></span><span class="target" id="classCharSetBase_1_1iterator__t_1ad9945d661777d6955a97f2b8afb499af"></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11CharSetBase6this_tE" title="CharSetBase::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ptr</span></span></span><a class="headerlink" href="#_CPPv4N11CharSetBase10iterator_t3ptrE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11CharSetBase10iterator_t5indexE">
+<span id="_CPPv3N11CharSetBase10iterator_t5indexE"></span><span id="_CPPv2N11CharSetBase10iterator_t5indexE"></span><span id="CharSetBase::iterator_t::index__s"></span><span class="target" id="classCharSetBase_1_1iterator__t_1a101fc47ed84e85c97dc73c29dc48ad82"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">index</span></span></span><a class="headerlink" href="#_CPPv4N11CharSetBase10iterator_t5indexE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="attrs.html" class="btn btn-neutral float-left" title="attrs.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="hash_namify.html" class="btn btn-neutral float-right" title="hash_namify.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

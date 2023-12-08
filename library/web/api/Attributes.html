@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attributes.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/web/api/Attributes.f900bc25-8e86-4707-8ec8-3a25db2c6783.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Button.hpp" href="Button.html" />
+    <link rel="prev" title="Animate.hpp" href="Animate.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../web.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Animate.html">Animate.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Attributes.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410Attributes"><code class="docutils literal notranslate"><span class="pre">Attributes</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Button.html">Button.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Canvas.html">Canvas.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasAction.html">CanvasAction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasShape.html">CanvasShape.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Div.html">Div.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DocuExtras.html">DocuExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Document.html">Document.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Element.html">Element.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FileInput.html">FileInput.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Font.html">Font.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Image.html">Image.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Input.html">Input.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="JSWrap.html">JSWrap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="KeypressManager.html">KeypressManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Listeners.html">Listeners.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NodeDomShim.html">NodeDomShim.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RawImage.html">RawImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Selector.html">Selector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style.html">Style.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Table.html">Table.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Text.html">Text.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextArea.html">TextArea.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextFeed.html">TextFeed.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tween.html">Tween.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UrlParams.html">UrlParams.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Widget.html">Widget.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WidgetExtras.html">WidgetExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="canvas_utils.html">canvas_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="color_map.html">color_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html">commands.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emfunctions.html">emfunctions.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="events.html">events.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="init.html">init.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="js_utils.html">js_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="web.html">web.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../web.html">Web Tools (for use with Emscripten)</a></li>
+      <li class="breadcrumb-item active">Attributes.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="attributes-hpp">
+<h1>Attributes.hpp<a class="headerlink" href="#attributes-hpp" title="Link to this heading"></a></h1>
+<p>An Attributes class for tracking non-style features about HTML objects. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv410Attributes">
+<span id="_CPPv310Attributes"></span><span id="_CPPv210Attributes"></span><span id="Attributes"></span><span class="target" id="classAttributes"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Attributes</span></span></span><a class="headerlink" href="#_CPPv410Attributes" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Attributes.hpp&gt;</em></div>
+<p>Maintains a map of attribute names to values for use in JavaScript Closely related to Style.h, which is for CSS-values. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10Attributes10AttributesEv">
+<span id="_CPPv3N10Attributes10AttributesEv"></span><span id="_CPPv2N10Attributes10AttributesEv"></span><span id="Attributes::Attributes"></span><span class="target" id="classAttributes_1a81480f8fb5fa048f2f7b52f7fa9fd64e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Attributes</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10Attributes10AttributesEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10Attributes10AttributesERK10Attributes">
+<span id="_CPPv3N10Attributes10AttributesERK10Attributes"></span><span id="_CPPv2N10Attributes10AttributesERK10Attributes"></span><span id="Attributes::Attributes__AttributesCR"></span><span class="target" id="classAttributes_1ad47b8a2b5ea3e6ec03f28fee68595bbb"></span><span class="sig-name descname"><span class="n"><span class="pre">Attributes</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10Attributes10AttributesERK10Attributes" title="Attributes::Attributes"><span class="n"><span class="pre">Attributes</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N10Attributes10AttributesERK10Attributes" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10AttributesaSERK10Attributes">
+<span id="_CPPv3N10AttributesaSERK10Attributes"></span><span id="_CPPv2N10AttributesaSERK10Attributes"></span><span id="Attributes::assign-operator__AttributesCR"></span><span class="target" id="classAttributes_1ac07530916241657511b658259f1f150e"></span><a class="reference internal" href="#_CPPv410Attributes" title="Attributes"><span class="n"><span class="pre">Attributes</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410Attributes" title="Attributes"><span class="n"><span class="pre">Attributes</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N10AttributesaSERK10Attributes" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10Attributes7GetSizeEv">
+<span id="_CPPv3NK10Attributes7GetSizeEv"></span><span id="_CPPv2NK10Attributes7GetSizeEv"></span><span id="Attributes::GetSizeC"></span><span class="target" id="classAttributes_1a20b7c86a033b53d031ef568948796319"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10Attributes7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a count of the number of attributes that have been set. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10Attributes5DoSetERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N10Attributes5DoSetERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N10Attributes5DoSetERKNSt6stringERKNSt6stringE"></span><span id="Attributes::DoSet__ssCR.ssCR"></span><span class="target" id="classAttributes_1aefc3a1647c88d81109282b5ab904471d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410Attributes" title="Attributes"><span class="n"><span class="pre">Attributes</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">DoSet</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_set</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10Attributes5DoSetERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the specified setting to the specified value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10Attributes9DoAddAttrEKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N10Attributes9DoAddAttrEKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N10Attributes9DoAddAttrEKNSt6stringERKNSt6stringE"></span><span id="Attributes::DoAddAttr__ssC.ssCR"></span><span class="target" id="classAttributes_1ac97e06f8c2e0ef5877ee99b67038ab5a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410Attributes" title="Attributes"><span class="n"><span class="pre">Attributes</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">DoAddAttr</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_attr</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10Attributes9DoAddAttrEKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Append a new value to an existing attribute </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_attr</strong> – attribute name </p></li>
+<li><p><strong>in_val</strong> – attribute value to be added </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10Attributes12GetAttrValueERKNSt6stringE">
+<span id="_CPPv3N10Attributes12GetAttrValueERKNSt6stringE"></span><span id="_CPPv2N10Attributes12GetAttrValueERKNSt6stringE"></span><span id="Attributes::GetAttrValue__ssCR"></span><span class="target" id="classAttributes_1a0773df3ea8e0866bc6e8adfd28021011"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetAttrValue</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_set</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10Attributes12GetAttrValueERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN10Attributes3SetER10AttributesRKNSt6stringE8SET_TYPE">
+<span id="_CPPv3I0EN10Attributes3SetERKNSt6stringE8SET_TYPE"></span><span id="_CPPv2I0EN10Attributes3SetERKNSt6stringE8SET_TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SET_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classAttributes_1a7fd8b33efd969348886bf79c2cb5aa2f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410Attributes" title="Attributes"><span class="n"><span class="pre">Attributes</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span>, <a class="reference internal" href="#_CPPv4I0EN10Attributes3SetER10AttributesRKNSt6stringE8SET_TYPE" title="Attributes::Set::SET_TYPE"><span class="n"><span class="pre">SET_TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN10Attributes3SetER10AttributesRKNSt6stringE8SET_TYPE" title="Link to this definition"></a><br /></dt>
+<dd><p>Record that attribute “a” is set to value “v” (converted to string) and return this object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10Attributes6InsertERK10Attributes">
+<span id="_CPPv3N10Attributes6InsertERK10Attributes"></span><span id="_CPPv2N10Attributes6InsertERK10Attributes"></span><span id="Attributes::Insert__AttributesCR"></span><span class="target" id="classAttributes_1ace395b2fa9cb8ee9286bbb212301d22a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410Attributes" title="Attributes"><span class="n"><span class="pre">Attributes</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Insert</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410Attributes" title="Attributes"><span class="n"><span class="pre">Attributes</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_attr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10Attributes6InsertERK10Attributes" title="Link to this definition"></a><br /></dt>
+<dd><p>Set all values from in_attr here as well. Return this object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10Attributes3HasERKNSt6stringE">
+<span id="_CPPv3NK10Attributes3HasERKNSt6stringE"></span><span id="_CPPv2NK10Attributes3HasERKNSt6stringE"></span><span id="Attributes::Has__ssCRC"></span><span class="target" id="classAttributes_1ae1f0d1fec67fd3ea250a5c85099fe119"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10Attributes3HasERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Return true/false based on whether “setting” has been given a value in this Attributes obj. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10Attributes3GetERKNSt6stringE">
+<span id="_CPPv3NK10Attributes3GetERKNSt6stringE"></span><span id="_CPPv2NK10Attributes3GetERKNSt6stringE"></span><span id="Attributes::Get__ssCRC"></span><span class="target" id="classAttributes_1aa9f57e4f95418d5d639927c2d05ba25c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10Attributes3GetERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the (string) value of “setting” that has been recorded in this Attributes obj. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10Attributes6GetMapEv">
+<span id="_CPPv3NK10Attributes6GetMapEv"></span><span id="_CPPv2NK10Attributes6GetMapEv"></span><span id="Attributes::GetMapC"></span><span class="target" id="classAttributes_1a6c3e9a256a21d0ec60b72fa52af647bf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10Attributes6GetMapEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10Attributes6RemoveERKNSt6stringE">
+<span id="_CPPv3N10Attributes6RemoveERKNSt6stringE"></span><span id="_CPPv2N10Attributes6RemoveERKNSt6stringE"></span><span id="Attributes::Remove__ssCR"></span><span class="target" id="classAttributes_1ab908cc86aa791642621b18da782b924a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Remove</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10Attributes6RemoveERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10Attributes5ClearEv">
+<span id="_CPPv3N10Attributes5ClearEv"></span><span id="_CPPv2N10Attributes5ClearEv"></span><span id="Attributes::Clear"></span><span class="target" id="classAttributes_1a8339f7a1e1a4cd37a64066f0767b777e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10Attributes5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove all setting values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10Attributes5ApplyERKNSt6stringE">
+<span id="_CPPv3N10Attributes5ApplyERKNSt6stringE"></span><span id="_CPPv2N10Attributes5ApplyERKNSt6stringE"></span><span id="Attributes::Apply__ssCR"></span><span class="target" id="classAttributes_1aabbd243c999012b37b82d48f451ce3e9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Apply</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">widget_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10Attributes5ApplyERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply ALL of the Attribute’s settings to dom element “widget_id”. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10Attributes5ApplyERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N10Attributes5ApplyERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N10Attributes5ApplyERKNSt6stringERKNSt6stringE"></span><span id="Attributes::Apply__ssCR.ssCR"></span><span class="target" id="classAttributes_1aaae38786042d0266cd88858619aec4f6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Apply</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">widget_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10Attributes5ApplyERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply only a SPECIFIC attributes setting from the setting library to widget_id. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10AttributescvbEv">
+<span id="_CPPv3NK10AttributescvbEv"></span><span id="_CPPv2NK10AttributescvbEv"></span><span id="Attributes::castto-b-operatorC"></span><span class="target" id="classAttributes_1a843bd2e236ead4c3c00278e482e16493"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10AttributescvbEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert to true if there are any setting, false otherwise. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10Attributes5ApplyERKNSt6stringERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N10Attributes5ApplyERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N10Attributes5ApplyERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="Attributes::Apply__ssCR.ssCR.ssCR"></span><span class="target" id="classAttributes_1af0df7d782011ec533fccd24f780a9208"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Apply</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">widget_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10Attributes5ApplyERKNSt6stringERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply onlay a SPECIFIC attributes setting with a specifid value! </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10Attributes8settingsE">
+<span id="_CPPv3N10Attributes8settingsE"></span><span id="_CPPv2N10Attributes8settingsE"></span><span id="Attributes::settings__std::map:ss.ss:"></span><span class="target" id="classAttributes_1a41d958e8edbc17e487359307cf8abbb3"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">settings</span></span></span><a class="headerlink" href="#_CPPv4N10Attributes8settingsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Animate.html" class="btn btn-neutral float-left" title="Animate.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Button.html" class="btn btn-neutral float-right" title="Button.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trait.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/data/api/Trait.591facfb-4296-4a28-a2fb-c4f068611c94.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="VarMap.hpp" href="VarMap.html" />
+    <link rel="prev" title="SimpleParser.hpp" href="SimpleParser.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../data.html">Data Collection and Recording Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../data.html#data-tools-api">Data Tools API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AnnotatedType.html">AnnotatedType.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataFile.html">DataFile.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataInterface.html">DataInterface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataLayout.html">DataLayout.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataLog.html">DataLog.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataManager.html">DataManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataMap.html">DataMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataNode.html">DataNode.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Datum.html">Datum.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="MemoryImage.html">MemoryImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SimpleParser.html">SimpleParser.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Trait.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00E5Trait"><code class="docutils literal notranslate"><span class="pre">Trait</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E9BaseTrait"><code class="docutils literal notranslate"><span class="pre">BaseTrait</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E8TraitSet"><code class="docutils literal notranslate"><span class="pre">TraitSet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="VarMap.html">VarMap.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../data.html">Data Collection and Recording Tools</a></li>
+      <li class="breadcrumb-item active">Trait.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="trait-hpp">
+<h1>Trait.hpp<a class="headerlink" href="#trait-hpp" title="Link to this heading"></a></h1>
+<p>Directly measure a target quality about a type of object. </p>
+<p>These objects are able to measure a specific trait on another object. They (will eventually) interface smoothly with DataNodes for data collection. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I00E5Trait">
+<span id="_CPPv3I00E5Trait"></span><span id="_CPPv2I00E5Trait"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TARGET_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VALUE_T</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classTrait"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Trait</span></span></span><a class="headerlink" href="#_CPPv4I00E5Trait" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Trait.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait6this_tE">
+<span id="_CPPv3N5Trait6this_tE"></span><span id="_CPPv2N5Trait6this_tE"></span><span class="target" id="classTrait_1ade427f7fe04db691e0723fa6b366b8b6"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait::TARGET_T"><span class="n"><span class="pre">TARGET_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait::VALUE_T"><span class="n"><span class="pre">VALUE_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N5Trait6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait8target_tE">
+<span id="_CPPv3N5Trait8target_tE"></span><span id="_CPPv2N5Trait8target_tE"></span><span class="target" id="classTrait_1aa7bcf5ab4ab8802366d31e3247d4ee7b"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">target_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait::TARGET_T"><span class="n"><span class="pre">TARGET_T</span></span></a><a class="headerlink" href="#_CPPv4N5Trait8target_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait7value_tE">
+<span id="_CPPv3N5Trait7value_tE"></span><span id="_CPPv2N5Trait7value_tE"></span><span class="target" id="classTrait_1ad23168cc345e89c8171b67d3c1fe1958"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait::VALUE_T"><span class="n"><span class="pre">VALUE_T</span></span></a><a class="headerlink" href="#_CPPv4N5Trait7value_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait5fun_tE">
+<span id="_CPPv3N5Trait5fun_tE"></span><span id="_CPPv2N5Trait5fun_tE"></span><span class="target" id="classTrait_1a7b3a2606aa5a28ce2a6b7d0926db01fd"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N5Trait8target_tE" title="Trait::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N5Trait5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait7range_tE">
+<span id="_CPPv3N5Trait7range_tE"></span><span id="_CPPv2N5Trait7range_tE"></span><span class="target" id="classTrait_1ad790b06cf194d7f87561ded71cf05cd5"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">range_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../math/api/Range.html#_CPPv4I0_bE5Range" title="Range"><span class="n"><span class="pre">Range</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N5Trait7range_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait5TraitERKNSt6stringERK5fun_t">
+<span id="_CPPv3N5Trait5TraitERKNSt6stringERK5fun_t"></span><span id="_CPPv2N5Trait5TraitERKNSt6stringERK5fun_t"></span><span id="Trait::Trait__ssCR.fun_tCR"></span><span class="target" id="classTrait_1aba47e9da130f1ad4f35cded28de4d0fb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Trait</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_n</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait5fun_tE" title="Trait::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Trait5TraitERKNSt6stringERK5fun_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait5TraitERKNSt6stringERK5fun_t7value_t7value_t">
+<span id="_CPPv3N5Trait5TraitERKNSt6stringERK5fun_t7value_t7value_t"></span><span id="_CPPv2N5Trait5TraitERKNSt6stringERK5fun_t7value_t7value_t"></span><span id="Trait::Trait__ssCR.fun_tCR.value_t.value_t"></span><span class="target" id="classTrait_1ab79d95a901ef62546c647a635549f233"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Trait</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_n</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait5fun_tE" title="Trait::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span>, <a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Trait5TraitERKNSt6stringERK5fun_t7value_t7value_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait5TraitERKNSt6stringERK5fun_tRK7range_t">
+<span id="_CPPv3N5Trait5TraitERKNSt6stringERK5fun_tRK7range_t"></span><span id="_CPPv2N5Trait5TraitERKNSt6stringERK5fun_tRK7range_t"></span><span id="Trait::Trait__ssCR.fun_tCR.range_tCR"></span><span class="target" id="classTrait_1a960245f7585b6259aa37b73326cf752d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Trait</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_n</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait5fun_tE" title="Trait::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait7range_tE" title="Trait::range_t"><span class="n"><span class="pre">range_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_r</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Trait5TraitERKNSt6stringERK5fun_tRK7range_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait5TraitERK5Trait">
+<span id="_CPPv3N5Trait5TraitERK5Trait"></span><span id="_CPPv2N5Trait5TraitERK5Trait"></span><span id="Trait::Trait__TraitCR"></span><span class="target" id="classTrait_1a7493809d9f0065f9572f2483ccbbc807"></span><span class="sig-name descname"><span class="n"><span class="pre">Trait</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait5TraitERK5Trait" title="Trait::Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5Trait5TraitERK5Trait" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait5TraitERR5Trait">
+<span id="_CPPv3N5Trait5TraitERR5Trait"></span><span id="_CPPv2N5Trait5TraitERR5Trait"></span><span id="Trait::Trait__TraitRR"></span><span class="target" id="classTrait_1ad0f577d89c0b6128eff4b694845104dc"></span><span class="sig-name descname"><span class="n"><span class="pre">Trait</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait5TraitERR5Trait" title="Trait::Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5Trait5TraitERR5Trait" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5TraitaSERK5Trait">
+<span id="_CPPv3N5TraitaSERK5Trait"></span><span id="_CPPv2N5TraitaSERK5Trait"></span><span id="Trait::assign-operator__TraitCR"></span><span class="target" id="classTrait_1a5a27c34d6bdae85f2168bb8f80111ebf"></span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5TraitaSERK5Trait" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5TraitaSERR5Trait">
+<span id="_CPPv3N5TraitaSERR5Trait"></span><span id="_CPPv2N5TraitaSERR5Trait"></span><span id="Trait::assign-operator__TraitRR"></span><span class="target" id="classTrait_1ad542085d6755ef51de1714622533456e"></span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5TraitaSERR5Trait" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Trait7GetNameEv">
+<span id="_CPPv3NK5Trait7GetNameEv"></span><span id="_CPPv2NK5Trait7GetNameEv"></span><span id="Trait::GetNameC"></span><span class="target" id="classTrait_1a29cd978d8c076f5b5d12c0fc96f5e83a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetName</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Trait7GetNameEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Trait7GetDescEv">
+<span id="_CPPv3NK5Trait7GetDescEv"></span><span id="_CPPv2NK5Trait7GetDescEv"></span><span id="Trait::GetDescC"></span><span class="target" id="classTrait_1aeb38982c0b452d52b8ca6524f42093fa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetDesc</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Trait7GetDescEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Trait6GetFunEv">
+<span id="_CPPv3NK5Trait6GetFunEv"></span><span id="_CPPv2NK5Trait6GetFunEv"></span><span id="Trait::GetFunC"></span><span class="target" id="classTrait_1a61a671e0e0dcd6ac9d62555a31274dc8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait5fun_tE" title="Trait::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetFun</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Trait6GetFunEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Trait8GetRangeEv">
+<span id="_CPPv3NK5Trait8GetRangeEv"></span><span id="_CPPv2NK5Trait8GetRangeEv"></span><span id="Trait::GetRangeC"></span><span class="target" id="classTrait_1a8dba8c12a0372cecc9ac4796b9fc81e9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait7range_tE" title="Trait::range_t"><span class="n"><span class="pre">range_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetRange</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Trait8GetRangeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait7SetNameERKNSt6stringE">
+<span id="_CPPv3N5Trait7SetNameERKNSt6stringE"></span><span id="_CPPv2N5Trait7SetNameERKNSt6stringE"></span><span id="Trait::SetName__ssCR"></span><span class="target" id="classTrait_1ae9e41a51965de7050d26be838c702948"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetName</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Trait7SetNameERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait7SetDescERKNSt6stringE">
+<span id="_CPPv3N5Trait7SetDescERKNSt6stringE"></span><span id="_CPPv2N5Trait7SetDescERKNSt6stringE"></span><span id="Trait::SetDesc__ssCR"></span><span class="target" id="classTrait_1a806002c6365e625a2cb2df03a3bd9a8d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetDesc</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Trait7SetDescERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait6SetFunERK5fun_t">
+<span id="_CPPv3N5Trait6SetFunERK5fun_t"></span><span id="_CPPv2N5Trait6SetFunERK5fun_t"></span><span id="Trait::SetFun__fun_tCR"></span><span class="target" id="classTrait_1a5c253952f63f66d99569c2581d3f4652"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetFun</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait5fun_tE" title="Trait::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Trait6SetFunERK5fun_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait8SetRangeERK7range_t">
+<span id="_CPPv3N5Trait8SetRangeERK7range_t"></span><span id="_CPPv2N5Trait8SetRangeERK7range_t"></span><span id="Trait::SetRange__range_tCR"></span><span class="target" id="classTrait_1aef3f59a75cb09cd90f47402a6d85921e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRange</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait7range_tE" title="Trait::range_t"><span class="n"><span class="pre">range_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Trait8SetRangeERK7range_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait8SetRangeE7value_t7value_t">
+<span id="_CPPv3N5Trait8SetRangeE7value_t7value_t"></span><span id="_CPPv2N5Trait8SetRangeE7value_t7value_t"></span><span id="Trait::SetRange__value_t.value_t"></span><span class="target" id="classTrait_1a33f2da1e253de4db75422d0ad7ee9611"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRange</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Trait8SetRangeE7value_t7value_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait6SetMinE7value_t">
+<span id="_CPPv3N5Trait6SetMinE7value_t"></span><span id="_CPPv2N5Trait6SetMinE7value_t"></span><span id="Trait::SetMin__value_t"></span><span class="target" id="classTrait_1ae93c564026318688a585bb371c44a873"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetMin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Trait6SetMinE7value_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait6SetMaxE7value_t">
+<span id="_CPPv3N5Trait6SetMaxE7value_t"></span><span id="_CPPv2N5Trait6SetMaxE7value_t"></span><span id="Trait::SetMax__value_t"></span><span class="target" id="classTrait_1ab8a00812e22550eb35bff055712bf2dd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetMax</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Trait6SetMaxE7value_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Trait4EvalER8target_t">
+<span id="_CPPv3NK5Trait4EvalER8target_t"></span><span id="_CPPv2NK5Trait4EvalER8target_t"></span><span id="Trait::Eval__target_tRC"></span><span class="target" id="classTrait_1a879792ba3ede628cb3eff63656476b04"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Eval</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait8target_tE" title="Trait::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Trait4EvalER8target_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Trait9EvalLimitER8target_t">
+<span id="_CPPv3NK5Trait9EvalLimitER8target_t"></span><span id="_CPPv2NK5Trait9EvalLimitER8target_t"></span><span id="Trait::EvalLimit__target_tRC"></span><span class="target" id="classTrait_1a5946c6ab2731632e5b71b176fd9e3374"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalLimit</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait8target_tE" title="Trait::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Trait9EvalLimitER8target_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Trait10EvalStringER8target_t">
+<span id="_CPPv3NK5Trait10EvalStringER8target_t"></span><span id="_CPPv2NK5Trait10EvalStringER8target_t"></span><span id="Trait::EvalString__target_tRC"></span><span class="target" id="classTrait_1a1fe1e0f90fe767fc834e4339dbd2b0b8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalString</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait8target_tE" title="Trait::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Trait10EvalStringER8target_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Trait9EvalValueER8target_t">
+<span id="_CPPv3NK5Trait9EvalValueER8target_t"></span><span id="_CPPv2NK5Trait9EvalValueER8target_t"></span><span id="Trait::EvalValue__target_tRC"></span><span class="target" id="classTrait_1aa21fafc98310bd68b817c16c5ddaffca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalValue</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait8target_tE" title="Trait::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Trait9EvalValueER8target_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Trait7EvalBinER8target_t6size_t">
+<span id="_CPPv3NK5Trait7EvalBinER8target_t6size_t"></span><span id="_CPPv2NK5Trait7EvalBinER8target_t6size_t"></span><span id="Trait::EvalBin__target_tR.sC"></span><span class="target" id="classTrait_1af0bdbe48087edeb579344c62c6fe5339"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalBin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait8target_tE" title="Trait::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bins</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Trait7EvalBinER8target_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Trait5CloneEv">
+<span id="_CPPv3NK5Trait5CloneEv"></span><span id="_CPPv2NK5Trait5CloneEv"></span><span id="Trait::CloneC"></span><span class="target" id="classTrait_1a152fa174a6f296f770582a7e00ad5ea8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9BaseTrait" title="BaseTrait"><span class="n"><span class="pre">BaseTrait</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait::TARGET_T"><span class="n"><span class="pre">TARGET_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clone</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Trait5CloneEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait4nameE">
+<span id="_CPPv3N5Trait4nameE"></span><span id="_CPPv2N5Trait4nameE"></span><span id="Trait::name__ss"></span><span class="target" id="classTrait_1a950eedc9f2291c0e9ff130dbe892fcf8"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><a class="headerlink" href="#_CPPv4N5Trait4nameE" title="Link to this definition"></a><br /></dt>
+<dd><p>Unique name for this trait. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait4descE">
+<span id="_CPPv3N5Trait4descE"></span><span id="_CPPv2N5Trait4descE"></span><span id="Trait::desc__ss"></span><span class="target" id="classTrait_1ae59249bcc87953f07f6875b1017f35df"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">desc</span></span></span><a class="headerlink" href="#_CPPv4N5Trait4descE" title="Link to this definition"></a><br /></dt>
+<dd><p>Full description explaining this trait. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait3funE">
+<span id="_CPPv3N5Trait3funE"></span><span id="_CPPv2N5Trait3funE"></span><span id="Trait::fun__fun_t"></span><span class="target" id="classTrait_1a8cc2bffd3f1b0e0ee7bbbbfbcb49c40f"></span><a class="reference internal" href="#_CPPv4N5Trait5fun_tE" title="Trait::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun</span></span></span><a class="headerlink" href="#_CPPv4N5Trait3funE" title="Link to this definition"></a><br /></dt>
+<dd><p>Function to retrieve trait value from target. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Trait5rangeE">
+<span id="_CPPv3N5Trait5rangeE"></span><span id="_CPPv2N5Trait5rangeE"></span><span id="Trait::range__range_t"></span><span class="target" id="classTrait_1aba335e177054a1dd18585f8acad80d6e"></span><a class="reference internal" href="#_CPPv4N5Trait7range_tE" title="Trait::range_t"><span class="n"><span class="pre">range_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">range</span></span></span><a class="headerlink" href="#_CPPv4N5Trait5rangeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Limits on legal values (defaults to extremes) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E9BaseTrait">
+<span id="_CPPv3I0E9BaseTrait"></span><span id="_CPPv2I0E9BaseTrait"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TARGET_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classBaseTrait"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BaseTrait</span></span></span><a class="headerlink" href="#_CPPv4I0E9BaseTrait" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Trait.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BaseTraitD0Ev">
+<span id="_CPPv3N9BaseTraitD0Ev"></span><span id="_CPPv2N9BaseTraitD0Ev"></span><span id="BaseTrait::~BaseTrait"></span><span class="target" id="classBaseTrait_1a7f7a4f1920e270d758f6ada9cda76d9a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~BaseTrait</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseTraitD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BaseTrait10EvalStringER8TARGET_T">
+<span id="_CPPv3NK9BaseTrait10EvalStringER8TARGET_T"></span><span id="_CPPv2NK9BaseTrait10EvalStringER8TARGET_T"></span><span id="BaseTrait::EvalString__TARGET_TRC"></span><span class="target" id="classBaseTrait_1ab0466942b805d15cdf22accd1d27ddb2"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalString</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E9BaseTrait" title="BaseTrait::TARGET_T"><span class="n"><span class="pre">TARGET_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK9BaseTrait10EvalStringER8TARGET_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BaseTrait9EvalValueER8TARGET_T">
+<span id="_CPPv3NK9BaseTrait9EvalValueER8TARGET_T"></span><span id="_CPPv2NK9BaseTrait9EvalValueER8TARGET_T"></span><span id="BaseTrait::EvalValue__TARGET_TRC"></span><span class="target" id="classBaseTrait_1af279ba4398c23bab7af68e4452b9d9e6"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalValue</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E9BaseTrait" title="BaseTrait::TARGET_T"><span class="n"><span class="pre">TARGET_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK9BaseTrait9EvalValueER8TARGET_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BaseTrait7EvalBinER8TARGET_T6size_t">
+<span id="_CPPv3NK9BaseTrait7EvalBinER8TARGET_T6size_t"></span><span id="_CPPv2NK9BaseTrait7EvalBinER8TARGET_T6size_t"></span><span id="BaseTrait::EvalBin__TARGET_TR.sC"></span><span class="target" id="classBaseTrait_1a5b585c71fe9268c4e89da70d91fc41b1"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalBin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E9BaseTrait" title="BaseTrait::TARGET_T"><span class="n"><span class="pre">TARGET_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bins</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK9BaseTrait7EvalBinER8TARGET_T6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BaseTrait5CloneEv">
+<span id="_CPPv3NK9BaseTrait5CloneEv"></span><span id="_CPPv2NK9BaseTrait5CloneEv"></span><span id="BaseTrait::CloneC"></span><span class="target" id="classBaseTrait_1a62470634c5557a019ab19a733702c329"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9BaseTrait" title="BaseTrait"><span class="n"><span class="pre">BaseTrait</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9BaseTrait" title="BaseTrait::TARGET_T"><span class="n"><span class="pre">TARGET_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clone</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK9BaseTrait5CloneEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN9BaseTrait6IsTypeEbv">
+<span id="_CPPv3I0EN9BaseTrait6IsTypeEv"></span><span id="_CPPv2I0EN9BaseTrait6IsTypeEv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VALUE_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classBaseTrait_1ae9d6ebf1800d74547d1b747ab7a2e241"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsType</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN9BaseTrait6IsTypeEbv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TARGET_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VALUE_T</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classTrait"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Trait</span></span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Trait.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1ade427f7fe04db691e0723fa6b366b8b6"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait::TARGET_T"><span class="n"><span class="pre">TARGET_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait::VALUE_T"><span class="n"><span class="pre">VALUE_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1aa7bcf5ab4ab8802366d31e3247d4ee7b"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">target_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait::TARGET_T"><span class="n"><span class="pre">TARGET_T</span></span></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1ad23168cc345e89c8171b67d3c1fe1958"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait::VALUE_T"><span class="n"><span class="pre">VALUE_T</span></span></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a7b3a2606aa5a28ce2a6b7d0926db01fd"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N5Trait8target_tE" title="Trait::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1ad790b06cf194d7f87561ded71cf05cd5"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">range_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../math/api/Range.html#_CPPv4I0_bE5Range" title="Range"><span class="n"><span class="pre">Range</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1aba47e9da130f1ad4f35cded28de4d0fb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Trait</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_n</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait5fun_tE" title="Trait::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1ab79d95a901ef62546c647a635549f233"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Trait</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_n</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait5fun_tE" title="Trait::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span>, <a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a960245f7585b6259aa37b73326cf752d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Trait</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_n</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait5fun_tE" title="Trait::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait7range_tE" title="Trait::range_t"><span class="n"><span class="pre">range_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_r</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a7493809d9f0065f9572f2483ccbbc807"></span><span class="sig-name descname"><span class="n"><span class="pre">Trait</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait5TraitERK5Trait" title="Trait::Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1ad0f577d89c0b6128eff4b694845104dc"></span><span class="sig-name descname"><span class="n"><span class="pre">Trait</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait5TraitERR5Trait" title="Trait::Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a5a27c34d6bdae85f2168bb8f80111ebf"></span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1ad542085d6755ef51de1714622533456e"></span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait"><span class="n"><span class="pre">Trait</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a29cd978d8c076f5b5d12c0fc96f5e83a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetName</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1aeb38982c0b452d52b8ca6524f42093fa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetDesc</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a61a671e0e0dcd6ac9d62555a31274dc8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait5fun_tE" title="Trait::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetFun</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a8dba8c12a0372cecc9ac4796b9fc81e9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait7range_tE" title="Trait::range_t"><span class="n"><span class="pre">range_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetRange</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1ae9e41a51965de7050d26be838c702948"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetName</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a806002c6365e625a2cb2df03a3bd9a8d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetDesc</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a5c253952f63f66d99569c2581d3f4652"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetFun</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait5fun_tE" title="Trait::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1aef3f59a75cb09cd90f47402a6d85921e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRange</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait7range_tE" title="Trait::range_t"><span class="n"><span class="pre">range_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a33f2da1e253de4db75422d0ad7ee9611"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRange</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1ae93c564026318688a585bb371c44a873"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetMin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1ab8a00812e22550eb35bff055712bf2dd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetMax</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a879792ba3ede628cb3eff63656476b04"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Eval</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait8target_tE" title="Trait::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a5946c6ab2731632e5b71b176fd9e3374"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Trait7value_tE" title="Trait::value_t"><span class="n"><span class="pre">value_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalLimit</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait8target_tE" title="Trait::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a1fe1e0f90fe767fc834e4339dbd2b0b8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalString</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait8target_tE" title="Trait::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1aa21fafc98310bd68b817c16c5ddaffca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalValue</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait8target_tE" title="Trait::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1af0bdbe48087edeb579344c62c6fe5339"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalBin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Trait8target_tE" title="Trait::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bins</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a152fa174a6f296f770582a7e00ad5ea8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9BaseTrait" title="BaseTrait"><span class="n"><span class="pre">BaseTrait</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00E5Trait" title="Trait::TARGET_T"><span class="n"><span class="pre">TARGET_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clone</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a950eedc9f2291c0e9ff130dbe892fcf8"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><br /></dt>
+<dd><p>Unique name for this trait. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1ae59249bcc87953f07f6875b1017f35df"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">desc</span></span></span><br /></dt>
+<dd><p>Full description explaining this trait. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1a8cc2bffd3f1b0e0ee7bbbbfbcb49c40f"></span><a class="reference internal" href="#_CPPv4N5Trait5fun_tE" title="Trait::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun</span></span></span><br /></dt>
+<dd><p>Function to retrieve trait value from target. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="classTrait_1aba335e177054a1dd18585f8acad80d6e"></span><a class="reference internal" href="#_CPPv4N5Trait7range_tE" title="Trait::range_t"><span class="n"><span class="pre">range_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">range</span></span></span><br /></dt>
+<dd><p>Limits on legal values (defaults to extremes) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E8TraitSet">
+<span id="_CPPv3I0E8TraitSet"></span><span id="_CPPv2I0E8TraitSet"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TARGET_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classTraitSet"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TraitSet</span></span></span><a class="headerlink" href="#_CPPv4I0E8TraitSet" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Trait.hpp&gt;</em></div>
+<p>A TraitSet houses a collection of traits and can trigger them to all be evaluated at once. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N8TraitSet8target_tE">
+<span id="_CPPv3N8TraitSet8target_tE"></span><span id="_CPPv2N8TraitSet8target_tE"></span><span class="target" id="classTraitSet_1a51475cf8440b1b8ffd664e5478cb269e"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">target_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E8TraitSet" title="TraitSet::TARGET_T"><span class="n"><span class="pre">TARGET_T</span></span></a><a class="headerlink" href="#_CPPv4N8TraitSet8target_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N8TraitSet7trait_tE">
+<span id="_CPPv3N8TraitSet7trait_tE"></span><span id="_CPPv2N8TraitSet7trait_tE"></span><span class="target" id="classTraitSet_1a7dc0c39858f837c017a1f73c9328f675"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">trait_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E9BaseTrait" title="BaseTrait"><span class="n"><span class="pre">BaseTrait</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8TraitSet8target_tE" title="TraitSet::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N8TraitSet7trait_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8TraitSet8TraitSetEv">
+<span id="_CPPv3N8TraitSet8TraitSetEv"></span><span id="_CPPv2N8TraitSet8TraitSetEv"></span><span id="TraitSet::TraitSet"></span><span class="target" id="classTraitSet_1a1652947e4aa42144a96e8e14f1245d4d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TraitSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8TraitSet8TraitSetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8TraitSet8TraitSetERR8TraitSet">
+<span id="_CPPv3N8TraitSet8TraitSetERR8TraitSet"></span><span id="_CPPv2N8TraitSet8TraitSetERR8TraitSet"></span><span id="TraitSet::TraitSet__TraitSetRR"></span><span class="target" id="classTraitSet_1ae421c24bab431295881fca7aa7808c79"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TraitSet</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8TraitSet8TraitSetERR8TraitSet" title="TraitSet::TraitSet"><span class="n"><span class="pre">TraitSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8TraitSet8TraitSetERR8TraitSet" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8TraitSet8TraitSetERK8TraitSet">
+<span id="_CPPv3N8TraitSet8TraitSetERK8TraitSet"></span><span id="_CPPv2N8TraitSet8TraitSetERK8TraitSet"></span><span id="TraitSet::TraitSet__TraitSetCR"></span><span class="target" id="classTraitSet_1a6063f0ba84005f22138f039215a438fa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TraitSet</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8TraitSet8TraitSetERK8TraitSet" title="TraitSet::TraitSet"><span class="n"><span class="pre">TraitSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8TraitSet8TraitSetERK8TraitSet" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8TraitSetD0Ev">
+<span id="_CPPv3N8TraitSetD0Ev"></span><span id="_CPPv2N8TraitSetD0Ev"></span><span id="TraitSet::~TraitSet"></span><span class="target" id="classTraitSet_1a1bc28dbcd8574bd46bb5e79b02c72b9d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~TraitSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8TraitSetD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8TraitSetaSERR8TraitSet">
+<span id="_CPPv3N8TraitSetaSERR8TraitSet"></span><span id="_CPPv2N8TraitSetaSERR8TraitSet"></span><span id="TraitSet::assign-operator__TraitSetRR"></span><span class="target" id="classTraitSet_1ac4f9ed53afeacb74a59c8802f4bd7734"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E8TraitSet" title="TraitSet"><span class="n"><span class="pre">TraitSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E8TraitSet" title="TraitSet"><span class="n"><span class="pre">TraitSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8TraitSetaSERR8TraitSet" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8TraitSetaSERK8TraitSet">
+<span id="_CPPv3N8TraitSetaSERK8TraitSet"></span><span id="_CPPv2N8TraitSetaSERK8TraitSet"></span><span id="TraitSet::assign-operator__TraitSetCR"></span><span class="target" id="classTraitSet_1a65fff5194c7dc76efde1a4c6785a6e40"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E8TraitSet" title="TraitSet"><span class="n"><span class="pre">TraitSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E8TraitSet" title="TraitSet"><span class="n"><span class="pre">TraitSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8TraitSetaSERK8TraitSet" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8TraitSetixE6size_t">
+<span id="_CPPv3N8TraitSetixE6size_t"></span><span id="_CPPv2N8TraitSetixE6size_t"></span><span id="TraitSet::subscript-operator__s"></span><span class="target" id="classTraitSet_1aa79639fa8204598b7cb2a40288fc8eb2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8TraitSet7trait_tE" title="TraitSet::trait_t"><span class="n"><span class="pre">trait_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8TraitSetixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8TraitSetixE6size_t">
+<span id="_CPPv3NK8TraitSetixE6size_t"></span><span id="_CPPv2NK8TraitSetixE6size_t"></span><span id="TraitSet::subscript-operator__sC"></span><span class="target" id="classTraitSet_1ae279087d870af5860ef3d2d5227538c4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8TraitSet7trait_tE" title="TraitSet::trait_t"><span class="n"><span class="pre">trait_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8TraitSetixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8TraitSet7GetSizeEv">
+<span id="_CPPv3NK8TraitSet7GetSizeEv"></span><span id="_CPPv2NK8TraitSet7GetSizeEv"></span><span id="TraitSet::GetSizeC"></span><span class="target" id="classTraitSet_1a20d2ea5ebb26f6b9edc83a296f467d5c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8TraitSet7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8TraitSet5ClearEv">
+<span id="_CPPv3N8TraitSet5ClearEv"></span><span id="_CPPv2N8TraitSet5ClearEv"></span><span id="TraitSet::Clear"></span><span class="target" id="classTraitSet_1afbcadf1a524029099a0610cfd1758553"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8TraitSet5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8TraitSet4FindERKNSt6stringE">
+<span id="_CPPv3NK8TraitSet4FindERKNSt6stringE"></span><span id="_CPPv2NK8TraitSet4FindERKNSt6stringE"></span><span id="TraitSet::Find__ssCRC"></span><span class="target" id="classTraitSet_1af2d720d59ac61fcc8898a5d59ce60861"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Find</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8TraitSet4FindERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8TraitSet3HasERKNSt6stringE">
+<span id="_CPPv3NK8TraitSet3HasERKNSt6stringE"></span><span id="_CPPv2NK8TraitSet3HasERKNSt6stringE"></span><span id="TraitSet::Has__ssCRC"></span><span class="target" id="classTraitSet_1a497a8528b4ecb26d9731e4019eed9548"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8TraitSet3HasERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpEN8TraitSet8AddTraitEvRKNSt6stringERKNSt8functionIF7VALUE_TR8target_tEEEDpRR5EXTRA">
+<span id="_CPPv3I0DpEN8TraitSet8AddTraitERKNSt6stringERKNSt8functionIF7VALUE_TR8target_tEEEDpRR5EXTRA"></span><span id="_CPPv2I0DpEN8TraitSet8AddTraitERKNSt6stringERKNSt8functionIF7VALUE_TR8target_tEEEDpRR5EXTRA"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VALUE_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">EXTRA</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classTraitSet_1a84fca77593fa99e1f085307ec12a7f50"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddTrait</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpEN8TraitSet8AddTraitEvRKNSt6stringERKNSt8functionIF7VALUE_TR8target_tEEEDpRR5EXTRA" title="TraitSet::AddTrait::VALUE_T"><span class="n"><span class="pre">VALUE_T</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N8TraitSet8target_tE" title="TraitSet::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span>, <a class="reference internal" href="#_CPPv4I0DpEN8TraitSet8AddTraitEvRKNSt6stringERKNSt8functionIF7VALUE_TR8target_tEEEDpRR5EXTRA" title="TraitSet::AddTrait::EXTRA"><span class="n"><span class="pre">EXTRA</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">extra</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN8TraitSet8AddTraitEvRKNSt6stringERKNSt8functionIF7VALUE_TR8target_tEEEDpRR5EXTRA" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8TraitSet10EvalStringE6size_tR8target_t">
+<span id="_CPPv3NK8TraitSet10EvalStringE6size_tR8target_t"></span><span id="_CPPv2NK8TraitSet10EvalStringE6size_tR8target_t"></span><span id="TraitSet::EvalString__s.target_tRC"></span><span class="target" id="classTraitSet_1a4718742975f94dc839fc4074d37cb845"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalString</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <a class="reference internal" href="#_CPPv4N8TraitSet8target_tE" title="TraitSet::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8TraitSet10EvalStringE6size_tR8target_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8TraitSet9EvalValueE6size_tR8target_t">
+<span id="_CPPv3NK8TraitSet9EvalValueE6size_tR8target_t"></span><span id="_CPPv2NK8TraitSet9EvalValueE6size_tR8target_t"></span><span id="TraitSet::EvalValue__s.target_tRC"></span><span class="target" id="classTraitSet_1ad57a6f1aac26b497b11aa718f5991ae3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalValue</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <a class="reference internal" href="#_CPPv4N8TraitSet8target_tE" title="TraitSet::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8TraitSet9EvalValueE6size_tR8target_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8TraitSet11EvalStringsER8target_t">
+<span id="_CPPv3NK8TraitSet11EvalStringsER8target_t"></span><span id="_CPPv2NK8TraitSet11EvalStringsER8target_t"></span><span id="TraitSet::EvalStrings__target_tRC"></span><span class="target" id="classTraitSet_1a65d9c2e4211823deeafa4ede9d86ebb4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalStrings</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8TraitSet8target_tE" title="TraitSet::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8TraitSet11EvalStringsER8target_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8TraitSet10EvalValuesER8target_t">
+<span id="_CPPv3NK8TraitSet10EvalValuesER8target_t"></span><span id="_CPPv2NK8TraitSet10EvalValuesER8target_t"></span><span id="TraitSet::EvalValues__target_tRC"></span><span class="target" id="classTraitSet_1a3a0de3e4ae5af953826672b975ec8947"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalValues</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8TraitSet8target_tE" title="TraitSet::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8TraitSet10EvalValuesER8target_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8TraitSet7EvalBinER8target_t6vectorI6size_tE">
+<span id="_CPPv3NK8TraitSet7EvalBinER8target_t6vectorI6size_tE"></span><span id="_CPPv2NK8TraitSet7EvalBinER8target_t6vectorI6size_tE"></span><span id="TraitSet::EvalBin__target_tR.vector:s:C"></span><span class="target" id="classTraitSet_1ac22eba8b96a5b6e2bd6de1ae3a6e0211"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvalBin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8TraitSet8target_tE" title="TraitSet::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span>, <a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bin_counts</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8TraitSet7EvalBinER8target_t6vectorI6size_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8TraitSet11CalcOffsetsER8target_tR8target_t">
+<span id="_CPPv3NK8TraitSet11CalcOffsetsER8target_tR8target_t"></span><span id="_CPPv2NK8TraitSet11CalcOffsetsER8target_tR8target_t"></span><span id="TraitSet::CalcOffsets__target_tR.target_tRC"></span><span class="target" id="classTraitSet_1a5b620b749194ddc884353348f2a20353"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CalcOffsets</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8TraitSet8target_tE" title="TraitSet::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target1</span></span>, <a class="reference internal" href="#_CPPv4N8TraitSet8target_tE" title="TraitSet::target_t"><span class="n"><span class="pre">target_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target2</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8TraitSet11CalcOffsetsER8target_tR8target_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8TraitSet6traitsE">
+<span id="_CPPv3N8TraitSet6traitsE"></span><span id="_CPPv2N8TraitSet6traitsE"></span><span id="TraitSet::traits__vector:Ptr:trait_t::"></span><span class="target" id="classTraitSet_1a8a127571e71cd3a6786bd5b7e2ab1cdd"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8TraitSet7trait_tE" title="TraitSet::trait_t"><span class="n"><span class="pre">trait_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">traits</span></span></span><a class="headerlink" href="#_CPPv4N8TraitSet6traitsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="SimpleParser.html" class="btn btn-neutral float-left" title="SimpleParser.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="VarMap.html" class="btn btn-neutral float-right" title="VarMap.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

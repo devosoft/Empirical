@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MatchBin.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/matching/api/MatchBin.01e89574-5bed-49d2-bee2-f6791fc2a3fc.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="MatchDepository.hpp" href="MatchDepository.html" />
+    <link rel="prev" title="Matching" href="../matching.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../matching.html">Matching</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../matching.html#api">API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">MatchBin.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0000E8MatchBin"><code class="docutils literal notranslate"><span class="pre">MatchBin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I000E13MatchBinState"><code class="docutils literal notranslate"><span class="pre">MatchBinState</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv46cereal"><code class="docutils literal notranslate"><span class="pre">cereal</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="MatchDepository.html">MatchDepository.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="matchbin_metrics.html">matchbin_metrics.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="matchbin_regulators.html">matchbin_regulators.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="matchbin_selectors.html">matchbin_selectors.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="matchbin_utils.html">matchbin_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../matching.html">Matching</a></li>
+      <li class="breadcrumb-item active">MatchBin.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="matchbin-hpp">
+<h1>MatchBin.hpp<a class="headerlink" href="#matchbin-hpp" title="Link to this heading"></a></h1>
+<p>A container that supports flexible tag-based lookup. . </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0000E8MatchBin">
+<span id="_CPPv3I0000E8MatchBin"></span><span id="_CPPv2I0000E8MatchBin"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Val</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Metric</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Selector</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Regulator</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classMatchBin"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MatchBin</span></span></span><a class="headerlink" href="#_CPPv4I0000E8MatchBin" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;MatchBin.hpp&gt;</em></div>
+<p>A data container that allows lookup by tag similarity. It can be templated on different tag types and is configurable on construction for (1) the distance metric used to compute similarity between tags and (2) the selector that is used to select which matches to return. Regulation functionality is also provided, allowing dynamically adjustment of match strength to a particular item (i.e., making all matches stronger/weaker). A unique identifier is generated upon tag/item placement in the container. This unique identifier can be used to view or edit the stored items and their corresponding tags. Tag-based lookups return a list of matched unique identifiers. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin6base_tE">
+<span id="_CPPv3N8MatchBin6base_tE"></span><span id="_CPPv2N8MatchBin6base_tE"></span><span class="target" id="classMatchBin_1af558e73b8ca4576886e8857705f5ca09"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">base_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin"><span class="n"><span class="pre">BaseMatchBin</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Metric"><span class="n"><span class="pre">Metric</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">query_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Metric"><span class="n"><span class="pre">Metric</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">tag_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N8MatchBin6base_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin7query_tE">
+<span id="_CPPv3N8MatchBin7query_tE"></span><span id="_CPPv2N8MatchBin7query_tE"></span><span class="target" id="classMatchBin_1ae991ac4354becd16ca91123e7e4c6a8f"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">query_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin6base_tE" title="MatchBin::base_t"><span class="n"><span class="pre">base_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">query_t</span></span><a class="headerlink" href="#_CPPv4N8MatchBin7query_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin5tag_tE">
+<span id="_CPPv3N8MatchBin5tag_tE"></span><span id="_CPPv2N8MatchBin5tag_tE"></span><span class="target" id="classMatchBin_1aa5536001a4ef6c7186c52b189d04dd28"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin6base_tE" title="MatchBin::base_t"><span class="n"><span class="pre">base_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">tag_t</span></span><a class="headerlink" href="#_CPPv4N8MatchBin5tag_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin5uid_tE">
+<span id="_CPPv3N8MatchBin5uid_tE"></span><span id="_CPPv2N8MatchBin5uid_tE"></span><span class="target" id="classMatchBin_1a5a2dbbfdd045ec8eb92b1ab9f0f67570"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uid_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin6base_tE" title="MatchBin::base_t"><span class="n"><span class="pre">base_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uid_t</span></span><a class="headerlink" href="#_CPPv4N8MatchBin5uid_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin7state_tE">
+<span id="_CPPv3N8MatchBin7state_tE"></span><span id="_CPPv2N8MatchBin7state_tE"></span><span class="target" id="classMatchBin_1a875e51ea2d265d9dd9ef1fe09bda1095"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">state_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin6base_tE" title="MatchBin::base_t"><span class="n"><span class="pre">base_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">state_t</span></span><a class="headerlink" href="#_CPPv4N8MatchBin7state_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin8MatchBinEv">
+<span id="_CPPv3N8MatchBin8MatchBinEv"></span><span id="_CPPv2N8MatchBin8MatchBinEv"></span><span id="MatchBin::MatchBin"></span><span class="target" id="classMatchBin_1a8c69f8b65e726aa112c7728bc7671855"></span><span class="sig-name descname"><span class="n"><span class="pre">MatchBin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N8MatchBin8MatchBinEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin8MatchBinER6Random">
+<span id="_CPPv3N8MatchBin8MatchBinER6Random"></span><span id="_CPPv2N8MatchBin8MatchBinER6Random"></span><span id="MatchBin::MatchBin__RandomR"></span><span class="target" id="classMatchBin_1adbb9797ed5ba752b2abc699d8ab60cd3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MatchBin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rand</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8MatchBin8MatchBinER6Random" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin8MatchBinERK8MatchBin">
+<span id="_CPPv3N8MatchBin8MatchBinERK8MatchBin"></span><span id="_CPPv2N8MatchBin8MatchBinERK8MatchBin"></span><span id="MatchBin::MatchBin__MatchBinCR"></span><span class="target" id="classMatchBin_1add97f66b654b681c577459d857fa8c13"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MatchBin</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin8MatchBinERK8MatchBin" title="MatchBin::MatchBin"><span class="n"><span class="pre">MatchBin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8MatchBin8MatchBinERK8MatchBin" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin8MatchBinERR8MatchBin">
+<span id="_CPPv3N8MatchBin8MatchBinERR8MatchBin"></span><span id="_CPPv2N8MatchBin8MatchBinERR8MatchBin"></span><span id="MatchBin::MatchBin__MatchBinRR"></span><span class="target" id="classMatchBin_1a66eb56e4c85ac039d10e5fe1c4885b2b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MatchBin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8MatchBin8MatchBinERR8MatchBin" title="MatchBin::MatchBin"><span class="n"><span class="pre">MatchBin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8MatchBin8MatchBinERR8MatchBin" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBinaSERK8MatchBin">
+<span id="_CPPv3N8MatchBinaSERK8MatchBin"></span><span id="_CPPv2N8MatchBinaSERK8MatchBin"></span><span id="MatchBin::assign-operator__MatchBinCR"></span><span class="target" id="classMatchBin_1a65483d91ea07e5180e0f4215054d3d45"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin"><span class="n"><span class="pre">MatchBin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin"><span class="n"><span class="pre">MatchBin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8MatchBinaSERK8MatchBin" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBinaSERR8MatchBin">
+<span id="_CPPv3N8MatchBinaSERR8MatchBin"></span><span id="_CPPv2N8MatchBinaSERR8MatchBin"></span><span id="MatchBin::assign-operator__MatchBinRR"></span><span class="target" id="classMatchBin_1af10a34fd625bc07d8f745253be91636d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin"><span class="n"><span class="pre">MatchBin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin"><span class="n"><span class="pre">MatchBin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8MatchBinaSERR8MatchBin" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin5MatchERK7query_t6size_t">
+<span id="_CPPv3N8MatchBin5MatchERK7query_t6size_t"></span><span id="_CPPv2N8MatchBin5MatchERK7query_t6size_t"></span><span id="MatchBin::Match__query_tCR.s"></span><span class="target" id="classMatchBin_1a6c36a3dd88ec5022e971d0537a16d682"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Match</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin7query_tE" title="MatchBin::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">query</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">numeric_limits</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">max</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin5MatchERK7query_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Compare a query tag to all stored tags using the distance metric function and return a vector of unique IDs chosen by the selector function. Calling with n = std::numeric_limits&lt;size_t&gt;::max() means delegate choice for how many values to return to the Selector. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin8MatchRawERK7query_t6size_t">
+<span id="_CPPv3N8MatchBin8MatchRawERK7query_t6size_t"></span><span id="_CPPv2N8MatchBin8MatchRawERK7query_t6size_t"></span><span id="MatchBin::MatchRaw__query_tCR.s"></span><span class="target" id="classMatchBin_1af9b3866a47334833acd3c959a6425499"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MatchRaw</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin7query_tE" title="MatchBin::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">query</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">numeric_limits</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">max</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin8MatchRawERK7query_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Compare a query tag to all stored tags using the distance metric function and return a vector of unique IDs chosen by the selector function. Ignore regulators. Calling with n = std::numeric_limits&lt;size_t&gt;::max() means delegate choice for how many values to return to the Selector. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin3PutERK3ValRK5tag_t">
+<span id="_CPPv3N8MatchBin3PutERK3ValRK5tag_t"></span><span id="_CPPv2N8MatchBin3PutERK3ValRK5tag_t"></span><span id="MatchBin::Put__ValCR.tag_tCR"></span><span class="target" id="classMatchBin_1aeda7fd4804d027493d182748bd690d35"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Put</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5tag_tE" title="MatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin3PutERK3ValRK5tag_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Put an item and associated tag in the container. Returns the uid for that entry. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin3SetERK3ValRK5tag_tK5uid_t">
+<span id="_CPPv3N8MatchBin3SetERK3ValRK5tag_tK5uid_t"></span><span id="_CPPv2N8MatchBin3SetERK3ValRK5tag_tK5uid_t"></span><span id="MatchBin::Set__ValCR.tag_tCR.uid_tC"></span><span class="target" id="classMatchBin_1a0a67bb9bdf3430e6c40bf409c060e7eb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5tag_tE" title="MatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin3SetERK3ValRK5tag_tK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Put with a manually-chosen UID. (Caller is responsible for ensuring UID is unique or calling Delete beforehand.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin6DeleteEK5uid_t">
+<span id="_CPPv3N8MatchBin6DeleteEK5uid_t"></span><span id="_CPPv2N8MatchBin6DeleteEK5uid_t"></span><span id="MatchBin::Delete__uid_tC"></span><span class="target" id="classMatchBin_1a9eb615dfedab9e407ca745216fd8374b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Delete</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin6DeleteEK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Delete an item and its associated tag. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin5ClearEv">
+<span id="_CPPv3N8MatchBin5ClearEv"></span><span id="_CPPv2N8MatchBin5ClearEv"></span><span id="MatchBin::Clear"></span><span class="target" id="classMatchBin_1ad139f6d3e83353fe7f6ad9f367640d6f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Clear all items and tags. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin10ClearCacheEv">
+<span id="_CPPv3N8MatchBin10ClearCacheEv"></span><span id="_CPPv2N8MatchBin10ClearCacheEv"></span><span id="MatchBin::ClearCache"></span><span class="target" id="classMatchBin_1a8bf4583499925469a6365f278320f93d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClearCache</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin10ClearCacheEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset the Selector caches. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin15ActivateCachingEv">
+<span id="_CPPv3N8MatchBin15ActivateCachingEv"></span><span id="_CPPv2N8MatchBin15ActivateCachingEv"></span><span id="MatchBin::ActivateCaching"></span><span class="target" id="classMatchBin_1ae8c03503751b58292cb1385612b70e13"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActivateCaching</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin15ActivateCachingEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Attempt to activate result caching. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true if caching activated </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin17DeactivateCachingEv">
+<span id="_CPPv3N8MatchBin17DeactivateCachingEv"></span><span id="_CPPv2N8MatchBin17DeactivateCachingEv"></span><span id="MatchBin::DeactivateCaching"></span><span class="target" id="classMatchBin_1a54918debc29b95552f744a2743ad7c07"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DeactivateCaching</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin17DeactivateCachingEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin6GetValEK5uid_t">
+<span id="_CPPv3N8MatchBin6GetValEK5uid_t"></span><span id="_CPPv2N8MatchBin6GetValEK5uid_t"></span><span id="MatchBin::GetVal__uid_tC"></span><span class="target" id="classMatchBin_1a172471e8cb428e3715c14396695c4a2d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetVal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin6GetValEK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Access a reference single stored value by uid. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8MatchBin6GetTagEK5uid_t">
+<span id="_CPPv3NK8MatchBin6GetTagEK5uid_t"></span><span id="_CPPv2NK8MatchBin6GetTagEK5uid_t"></span><span id="MatchBin::GetTag__uid_tCC"></span><span class="target" id="classMatchBin_1ae3eee92f9d4fb4c8d2e464199aaea4ca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5tag_tE" title="MatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetTag</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK8MatchBin6GetTagEK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Access a const reference to a single stored tag by uid. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin6SetTagEK5uid_tK5tag_t">
+<span id="_CPPv3N8MatchBin6SetTagEK5uid_tK5tag_t"></span><span id="_CPPv2N8MatchBin6SetTagEK5uid_tK5tag_t"></span><span id="MatchBin::SetTag__uid_tC.tag_tC"></span><span class="target" id="classMatchBin_1a403b1e1a2f1f04735d1710cbe872aeb6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetTag</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5tag_tE" title="MatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">tag</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin6SetTagEK5uid_tK5tag_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Change the tag at a given uid and clear the cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin7GetValsERK6vectorI5uid_tE">
+<span id="_CPPv3N8MatchBin7GetValsERK6vectorI5uid_tE"></span><span id="_CPPv2N8MatchBin7GetValsERK6vectorI5uid_tE"></span><span id="MatchBin::GetVals__vector:uid_t:CR"></span><span class="target" id="classMatchBin_1a3aa9bbde6567bc8ccb312df0968c06fc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetVals</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">uids</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin7GetValsERK6vectorI5uid_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a vector of values corresponding to a vector of uids. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin7GetTagsERK6vectorI5uid_tE">
+<span id="_CPPv3N8MatchBin7GetTagsERK6vectorI5uid_tE"></span><span id="_CPPv2N8MatchBin7GetTagsERK6vectorI5uid_tE"></span><span id="MatchBin::GetTags__vector:uid_t:CR"></span><span class="target" id="classMatchBin_1a5c69cf1c1cd9c1929ab9c2dc0b95f253"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin5tag_tE" title="MatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTags</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">uids</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin7GetTagsERK6vectorI5uid_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a vector of tags corresponding to a vector of uids. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8MatchBin4SizeEv">
+<span id="_CPPv3NK8MatchBin4SizeEv"></span><span id="_CPPv2NK8MatchBin4SizeEv"></span><span id="MatchBin::SizeC"></span><span class="target" id="classMatchBin_1a59ebb65f5b83a64332f95e031e4e4de0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK8MatchBin4SizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the number of items stored in the container. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin12AdjRegulatorEK5uid_tRKN9Regulator5adj_tE">
+<span id="_CPPv3N8MatchBin12AdjRegulatorEK5uid_tRKN9Regulator5adj_tE"></span><span id="_CPPv2N8MatchBin12AdjRegulatorEK5uid_tRKN9Regulator5adj_tE"></span><span id="MatchBin::AdjRegulator__uid_tC.Regulator::adj_tCR"></span><span class="target" id="classMatchBin_1a85998b2484bf5f1a5d5844e5c1502c41"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdjRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">adj_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">amt</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin12AdjRegulatorEK5uid_tRKN9Regulator5adj_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Adjust an item’s regulator value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin12SetRegulatorEK5uid_tRKN9Regulator5set_tE">
+<span id="_CPPv3N8MatchBin12SetRegulatorEK5uid_tRKN9Regulator5set_tE"></span><span id="_CPPv2N8MatchBin12SetRegulatorEK5uid_tRKN9Regulator5set_tE"></span><span id="MatchBin::SetRegulator__uid_tC.Regulator::set_tCR"></span><span class="target" id="classMatchBin_1a73ba4e99119ac0178066c218e9c3ecd3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">set</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin12SetRegulatorEK5uid_tRKN9Regulator5set_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set an item’s regulator value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin12SetRegulatorEK5uid_tRK9Regulator">
+<span id="_CPPv3N8MatchBin12SetRegulatorEK5uid_tRK9Regulator"></span><span id="_CPPv2N8MatchBin12SetRegulatorEK5uid_tRK9Regulator"></span><span id="MatchBin::SetRegulator__uid_tC.RegulatorCR"></span><span class="target" id="classMatchBin_1ae7675ee77e3e33f044f21846a3c3b912"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">set</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin12SetRegulatorEK5uid_tRK9Regulator" title="Link to this definition"></a><br /></dt>
+<dd><p>Set an item’s regulator value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8MatchBin13ViewRegulatorEK5uid_t">
+<span id="_CPPv3NK8MatchBin13ViewRegulatorEK5uid_t"></span><span id="_CPPv2NK8MatchBin13ViewRegulatorEK5uid_t"></span><span id="MatchBin::ViewRegulator__uid_tCC"></span><span class="target" id="classMatchBin_1ac5dabf0e30cc5edacb391d6374ae25f3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">view_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">ViewRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK8MatchBin13ViewRegulatorEK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd><p>View an item’s regulator value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin12GetRegulatorEK5uid_t">
+<span id="_CPPv3N8MatchBin12GetRegulatorEK5uid_t"></span><span id="_CPPv2N8MatchBin12GetRegulatorEK5uid_t"></span><span id="MatchBin::GetRegulator__uid_tC"></span><span class="target" id="classMatchBin_1a11367d6cfeff349143a161617ee057bd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin12GetRegulatorEK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a regulator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin14DecayRegulatorEK5uid_tKi">
+<span id="_CPPv3N8MatchBin14DecayRegulatorEK5uid_tKi"></span><span id="_CPPv2N8MatchBin14DecayRegulatorEK5uid_tKi"></span><span id="MatchBin::DecayRegulator__uid_tC.iC"></span><span class="target" id="classMatchBin_1a6e44571eb4a418a8c226a9dc01237fd3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecayRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin14DecayRegulatorEK5uid_tKi" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply decay to a regulator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin15DecayRegulatorsEKi">
+<span id="_CPPv3N8MatchBin15DecayRegulatorsEKi"></span><span id="_CPPv2N8MatchBin15DecayRegulatorsEKi"></span><span id="MatchBin::DecayRegulators__iC"></span><span class="target" id="classMatchBin_1a832052e5b345a163bc4dad995b92ddd2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecayRegulators</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin15DecayRegulatorsEKi" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply decay to all regulators. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin17ImprintRegulatorsERK12BaseMatchBinI3Val7query_t5tag_t9RegulatorE">
+<span id="_CPPv3N8MatchBin17ImprintRegulatorsERK12BaseMatchBinI3Val7query_t5tag_t9RegulatorE"></span><span id="_CPPv2N8MatchBin17ImprintRegulatorsERK12BaseMatchBinI3Val7query_t5tag_t9RegulatorE"></span><span id="MatchBin::ImprintRegulators__BaseMatchBin:Val.query_t.tag_t.Regulator:CR"></span><span class="target" id="classMatchBin_1a2d8e61b4069021974281f367f4f06e62"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ImprintRegulators</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin"><span class="n"><span class="pre">BaseMatchBin</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin7query_tE" title="MatchBin::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5tag_tE" title="MatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin17ImprintRegulatorsERK12BaseMatchBinI3Val7query_t5tag_t9RegulatorE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set up regulators to match target MatchBin </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>target</strong> – MatchBin to match </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin17ImprintRegulatorsERK7state_t">
+<span id="_CPPv3N8MatchBin17ImprintRegulatorsERK7state_t"></span><span id="_CPPv2N8MatchBin17ImprintRegulatorsERK7state_t"></span><span id="MatchBin::ImprintRegulators__state_tCR"></span><span class="target" id="classMatchBin_1a66978ff41fd8d7c12061804dc45c9f27"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ImprintRegulators</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin7state_tE" title="MatchBin::state_t"><span class="n"><span class="pre">state_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N8MatchBin17ImprintRegulatorsERK7state_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set up regulators to match target state </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>target</strong> – State to match </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8MatchBin8ViewUIDsEv">
+<span id="_CPPv3NK8MatchBin8ViewUIDsEv"></span><span id="_CPPv2NK8MatchBin8ViewUIDsEv"></span><span id="MatchBin::ViewUIDsC"></span><span class="target" id="classMatchBin_1a9ed164a265b0387da1e92d7df08be907"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ViewUIDs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK8MatchBin8ViewUIDsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>View UIDs associated with this MatchBin. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8MatchBin4nameEv">
+<span id="_CPPv3NK8MatchBin4nameEv"></span><span id="_CPPv2NK8MatchBin4nameEv"></span><span id="MatchBin::nameC"></span><span class="target" id="classMatchBin_1a689711b4a5b76bed71443979316829f2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK8MatchBin4nameEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get selector, metric name. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8MatchBin8GetStateEv">
+<span id="_CPPv3NK8MatchBin8GetStateEv"></span><span id="_CPPv2NK8MatchBin8GetStateEv"></span><span id="MatchBin::GetStateC"></span><span class="target" id="classMatchBin_1a5c0897dae38624853aeab267cb75a9e8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin7state_tE" title="MatchBin::state_t"><span class="n"><span class="pre">state_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetState</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK8MatchBin8GetStateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Extract MatchBin state. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin8SetStateERK7state_t">
+<span id="_CPPv3N8MatchBin8SetStateERK7state_t"></span><span id="_CPPv2N8MatchBin8SetStateERK7state_t"></span><span id="MatchBin::SetState__state_tCR"></span><span class="target" id="classMatchBin_1a519e880d2bcb6959f31013a861238edb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetState</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin7state_tE" title="MatchBin::state_t"><span class="n"><span class="pre">state_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">state_</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8MatchBin8SetStateERK7state_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Load MatchBin state. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin21GetRegulatedCacheSizeEv">
+<span id="_CPPv3N8MatchBin21GetRegulatedCacheSizeEv"></span><span id="_CPPv2N8MatchBin21GetRegulatedCacheSizeEv"></span><span id="MatchBin::GetRegulatedCacheSize"></span><span class="target" id="classMatchBin_1a58f74a1abfcc45a50ca8d804dbab5707"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRegulatedCacheSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8MatchBin21GetRegulatedCacheSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns size of regulated cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin15GetRawCacheSizeEv">
+<span id="_CPPv3N8MatchBin15GetRawCacheSizeEv"></span><span id="_CPPv2N8MatchBin15GetRawCacheSizeEv"></span><span id="MatchBin::GetRawCacheSize"></span><span class="target" id="classMatchBin_1aaef9cb7a9f1186817e3dc8e47dde6ea7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRawCacheSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8MatchBin15GetRawCacheSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns size of raw cache. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin5stateE">
+<span id="_CPPv3N8MatchBin5stateE"></span><span id="_CPPv2N8MatchBin5stateE"></span><span id="MatchBin::state__state_t"></span><span class="target" id="classMatchBin_1afba6604b8857d09dcd02915003301a44"></span><a class="reference internal" href="#_CPPv4N8MatchBin7state_tE" title="MatchBin::state_t"><span class="n"><span class="pre">state_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">state</span></span></span><a class="headerlink" href="#_CPPv4N8MatchBin5stateE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin11uid_stepperE">
+<span id="_CPPv3N8MatchBin11uid_stepperE"></span><span id="_CPPv2N8MatchBin11uid_stepperE"></span><span id="MatchBin::uid_stepper__uid_t"></span><span class="target" id="classMatchBin_1a63ca21dcfbe62aca2b159c6540184867"></span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uid_stepper</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N8MatchBin11uid_stepperE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin5cacheE">
+<span id="_CPPv3N8MatchBin5cacheE"></span><span id="_CPPv2N8MatchBin5cacheE"></span><span id="MatchBin::cache__internal::MatchBinCache:query_t.Selector:"></span><span class="target" id="classMatchBin_1a64ab07446750d300832eedc39771f82d"></span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatchBinCache</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin7query_tE" title="MatchBin::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Selector"><span class="n"><span class="pre">Selector</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cache</span></span></span><a class="headerlink" href="#_CPPv4N8MatchBin5cacheE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8MatchBin8selectorE">
+<span id="_CPPv3N8MatchBin8selectorE"></span><span id="_CPPv2N8MatchBin8selectorE"></span><span id="MatchBin::selector__Selector"></span><span class="target" id="classMatchBin_1afc295bb13292e4267ea9325481613ea5"></span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Selector"><span class="n"><span class="pre">Selector</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">selector</span></span></span><a class="headerlink" href="#_CPPv4N8MatchBin8selectorE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I000E13MatchBinState">
+<span id="_CPPv3I000E13MatchBinState"></span><span id="_CPPv2I000E13MatchBinState"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Val</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Tag</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Regulator</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structMatchBinState"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MatchBinState</span></span></span><a class="headerlink" href="#_CPPv4I000E13MatchBinState" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;MatchBin.hpp&gt;</em></div>
+<p>Internal state packet for MatchBin. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13MatchBinState5tag_tE">
+<span id="_CPPv3N13MatchBinState5tag_tE"></span><span id="_CPPv2N13MatchBinState5tag_tE"></span><span class="target" id="structMatchBinState_1a5acab346b860fa22a4eca4f4716e61a1"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000E13MatchBinState" title="MatchBinState::Tag"><span class="n"><span class="pre">Tag</span></span></a><a class="headerlink" href="#_CPPv4N13MatchBinState5tag_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13MatchBinState5uid_tE">
+<span id="_CPPv3N13MatchBinState5uid_tE"></span><span id="_CPPv2N13MatchBinState5uid_tE"></span><span class="target" id="structMatchBinState_1a9519acbcbc9316827ada56ae33413808"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uid_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><a class="headerlink" href="#_CPPv4N13MatchBinState5uid_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13MatchBinState4dataE">
+<span id="_CPPv3N13MatchBinState4dataE"></span><span id="_CPPv2N13MatchBinState4dataE"></span><span id="MatchBinState::data__robin_hood::unordered_flat_map:uid_t.entry:"></span><span class="target" id="structMatchBinState_1acfe534dc024333aad6144ee034135358"></span><span class="n"><span class="pre">robin_hood</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_flat_map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N13MatchBinState5uid_tE" title="MatchBinState::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13MatchBinState5entryE" title="MatchBinState::entry"><span class="n"><span class="pre">entry</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><a class="headerlink" href="#_CPPv4N13MatchBinState4dataE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N13MatchBinState5entryE">
+<span id="_CPPv3N13MatchBinState5entryE"></span><span id="_CPPv2N13MatchBinState5entryE"></span><span id="MatchBinState::entry"></span><span class="target" id="structMatchBinState_1_1entry"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">entry</span></span></span><a class="headerlink" href="#_CPPv4N13MatchBinState5entryE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;MatchBin.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13MatchBinState5entry9serializeEvR7Archive">
+<span id="_CPPv3I0EN13MatchBinState5entry9serializeER7Archive"></span><span id="_CPPv2I0EN13MatchBinState5entry9serializeER7Archive"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Archive</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structMatchBinState_1_1entry_1a9b57f922ffe2f6fe35abdb258cf438ab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">serialize</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN13MatchBinState5entry9serializeEvR7Archive" title="MatchBinState::entry::serialize::Archive"><span class="n"><span class="pre">Archive</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ar</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13MatchBinState5entry9serializeEvR7Archive" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13MatchBinState5entry3valE">
+<span id="_CPPv3N13MatchBinState5entry3valE"></span><span id="_CPPv2N13MatchBinState5entry3valE"></span><span id="MatchBinState::entry::val__Val"></span><span class="target" id="structMatchBinState_1_1entry_1abcaabed4457778771a9044e513e341b4"></span><a class="reference internal" href="#_CPPv4I000E13MatchBinState" title="MatchBinState::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">val</span></span></span><a class="headerlink" href="#_CPPv4N13MatchBinState5entry3valE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13MatchBinState5entry9regulatorE">
+<span id="_CPPv3N13MatchBinState5entry9regulatorE"></span><span id="_CPPv2N13MatchBinState5entry9regulatorE"></span><span id="MatchBinState::entry::regulator__Regulator"></span><span class="target" id="structMatchBinState_1_1entry_1a5e6296a3439a41e917e7410572706a13"></span><a class="reference internal" href="#_CPPv4I000E13MatchBinState" title="MatchBinState::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">regulator</span></span></span><a class="headerlink" href="#_CPPv4N13MatchBinState5entry9regulatorE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13MatchBinState5entry3tagE">
+<span id="_CPPv3N13MatchBinState5entry3tagE"></span><span id="_CPPv2N13MatchBinState5entry3tagE"></span><span id="MatchBinState::entry::tag__Tag"></span><span class="target" id="structMatchBinState_1_1entry_1afb650b4f07eac24fb608654f60cdde2e"></span><a class="reference internal" href="#_CPPv4I000E13MatchBinState" title="MatchBinState::Tag"><span class="n"><span class="pre">Tag</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag</span></span></span><a class="headerlink" href="#_CPPv4N13MatchBinState5entry3tagE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0000E12BaseMatchBin">
+<span id="_CPPv3I0000E12BaseMatchBin"></span><span id="_CPPv2I0000E12BaseMatchBin"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Val</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Query</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Tag</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Regulator</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classBaseMatchBin"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BaseMatchBin</span></span></span><a class="headerlink" href="#_CPPv4I0000E12BaseMatchBin" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;MatchBin.hpp&gt;</em></div>
+<p>Abstract base class for MatchBin. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin7query_tE">
+<span id="_CPPv3N12BaseMatchBin7query_tE"></span><span id="_CPPv2N12BaseMatchBin7query_tE"></span><span class="target" id="classBaseMatchBin_1ada89f23865e99db7a7d78172e771c083"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">query_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin::Query"><span class="n"><span class="pre">Query</span></span></a><a class="headerlink" href="#_CPPv4N12BaseMatchBin7query_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin5tag_tE">
+<span id="_CPPv3N12BaseMatchBin5tag_tE"></span><span id="_CPPv2N12BaseMatchBin5tag_tE"></span><span class="target" id="classBaseMatchBin_1a584add980fa54d9577c2107194a873f9"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin::Tag"><span class="n"><span class="pre">Tag</span></span></a><a class="headerlink" href="#_CPPv4N12BaseMatchBin5tag_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin5uid_tE">
+<span id="_CPPv3N12BaseMatchBin5uid_tE"></span><span id="_CPPv2N12BaseMatchBin5uid_tE"></span><span class="target" id="classBaseMatchBin_1a55d5d504f0a588925d81c1b3ef86c7d1"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uid_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin5uid_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin7state_tE">
+<span id="_CPPv3N12BaseMatchBin7state_tE"></span><span id="_CPPv2N12BaseMatchBin7state_tE"></span><span class="target" id="classBaseMatchBin_1afbd339acb19f717d4a7a70a4744f8073"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">state_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000E13MatchBinState" title="MatchBinState"><span class="n"><span class="pre">MatchBinState</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5tag_tE" title="BaseMatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin7state_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBinD0Ev">
+<span id="_CPPv3N12BaseMatchBinD0Ev"></span><span id="_CPPv2N12BaseMatchBinD0Ev"></span><span id="BaseMatchBin::~BaseMatchBin"></span><span class="target" id="classBaseMatchBin_1ac5d48933fd9715f9f72c2847fcd5e138"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~BaseMatchBin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12BaseMatchBinD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin5MatchERK7query_t6size_t">
+<span id="_CPPv3N12BaseMatchBin5MatchERK7query_t6size_t"></span><span id="_CPPv2N12BaseMatchBin5MatchERK7query_t6size_t"></span><span id="BaseMatchBin::Match__query_tCR.s"></span><span class="target" id="classBaseMatchBin_1adeb49b34c22d2fd4690a2814695c325b"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Match</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin7query_tE" title="BaseMatchBin::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">query</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin5MatchERK7query_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin8MatchRawERK7query_t6size_t">
+<span id="_CPPv3N12BaseMatchBin8MatchRawERK7query_t6size_t"></span><span id="_CPPv2N12BaseMatchBin8MatchRawERK7query_t6size_t"></span><span id="BaseMatchBin::MatchRaw__query_tCR.s"></span><span class="target" id="classBaseMatchBin_1a142bf29e3162461eb6c03fbb8b67e906"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MatchRaw</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin7query_tE" title="BaseMatchBin::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">query</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin8MatchRawERK7query_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin3PutERK3ValRK5tag_t">
+<span id="_CPPv3N12BaseMatchBin3PutERK3ValRK5tag_t"></span><span id="_CPPv2N12BaseMatchBin3PutERK3ValRK5tag_t"></span><span id="BaseMatchBin::Put__ValCR.tag_tCR"></span><span class="target" id="classBaseMatchBin_1a95a2726e623b398606c34b565d7b1f57"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Put</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5tag_tE" title="BaseMatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin3PutERK3ValRK5tag_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin3SetERK3ValRK5tag_tK5uid_t">
+<span id="_CPPv3N12BaseMatchBin3SetERK3ValRK5tag_tK5uid_t"></span><span id="_CPPv2N12BaseMatchBin3SetERK3ValRK5tag_tK5uid_t"></span><span id="BaseMatchBin::Set__ValCR.tag_tCR.uid_tC"></span><span class="target" id="classBaseMatchBin_1a0a760a345e15cd758fb3ec50cceb392c"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5tag_tE" title="BaseMatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin3SetERK3ValRK5tag_tK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin6DeleteEK5uid_t">
+<span id="_CPPv3N12BaseMatchBin6DeleteEK5uid_t"></span><span id="_CPPv2N12BaseMatchBin6DeleteEK5uid_t"></span><span id="BaseMatchBin::Delete__uid_tC"></span><span class="target" id="classBaseMatchBin_1a0546f5c77898e62b87955e550a460cc9"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Delete</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin6DeleteEK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin5ClearEv">
+<span id="_CPPv3N12BaseMatchBin5ClearEv"></span><span id="_CPPv2N12BaseMatchBin5ClearEv"></span><span id="BaseMatchBin::Clear"></span><span class="target" id="classBaseMatchBin_1ab279947efa7b8b1b7e22e939fe92ed61"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin10ClearCacheEv">
+<span id="_CPPv3N12BaseMatchBin10ClearCacheEv"></span><span id="_CPPv2N12BaseMatchBin10ClearCacheEv"></span><span id="BaseMatchBin::ClearCache"></span><span class="target" id="classBaseMatchBin_1a5263eb8537a4e34595812f8223cb3495"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClearCache</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin10ClearCacheEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin15ActivateCachingEv">
+<span id="_CPPv3N12BaseMatchBin15ActivateCachingEv"></span><span id="_CPPv2N12BaseMatchBin15ActivateCachingEv"></span><span id="BaseMatchBin::ActivateCaching"></span><span class="target" id="classBaseMatchBin_1a5f2e84d7a2f15902f322d01d6832810c"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActivateCaching</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin15ActivateCachingEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin17DeactivateCachingEv">
+<span id="_CPPv3N12BaseMatchBin17DeactivateCachingEv"></span><span id="_CPPv2N12BaseMatchBin17DeactivateCachingEv"></span><span id="BaseMatchBin::DeactivateCaching"></span><span class="target" id="classBaseMatchBin_1a700d11593cb39020d3c3a3007bbdeaba"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DeactivateCaching</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin17DeactivateCachingEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin6GetValEK5uid_t">
+<span id="_CPPv3N12BaseMatchBin6GetValEK5uid_t"></span><span id="_CPPv2N12BaseMatchBin6GetValEK5uid_t"></span><span id="BaseMatchBin::GetVal__uid_tC"></span><span class="target" id="classBaseMatchBin_1a85c8540543979d22cabbbaadc80c8fc7"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetVal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin6GetValEK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12BaseMatchBin6GetTagEK5uid_t">
+<span id="_CPPv3NK12BaseMatchBin6GetTagEK5uid_t"></span><span id="_CPPv2NK12BaseMatchBin6GetTagEK5uid_t"></span><span id="BaseMatchBin::GetTag__uid_tCC"></span><span class="target" id="classBaseMatchBin_1aa66c212e405a8c164cd7a429bc110f2c"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5tag_tE" title="BaseMatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetTag</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK12BaseMatchBin6GetTagEK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin6SetTagEK5uid_t5tag_t">
+<span id="_CPPv3N12BaseMatchBin6SetTagEK5uid_t5tag_t"></span><span id="_CPPv2N12BaseMatchBin6SetTagEK5uid_t5tag_t"></span><span id="BaseMatchBin::SetTag__uid_tC.tag_t"></span><span class="target" id="classBaseMatchBin_1aedc842716d674fe522f12fc250f2e4b7"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetTag</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <a class="reference internal" href="#_CPPv4N12BaseMatchBin5tag_tE" title="BaseMatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">tag</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin6SetTagEK5uid_t5tag_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin7GetValsERK6vectorI5uid_tE">
+<span id="_CPPv3N12BaseMatchBin7GetValsERK6vectorI5uid_tE"></span><span id="_CPPv2N12BaseMatchBin7GetValsERK6vectorI5uid_tE"></span><span id="BaseMatchBin::GetVals__vector:uid_t:CR"></span><span class="target" id="classBaseMatchBin_1aad9744068dca957b21626c2763732e38"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetVals</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">uids</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin7GetValsERK6vectorI5uid_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin7GetTagsERK6vectorI5uid_tE">
+<span id="_CPPv3N12BaseMatchBin7GetTagsERK6vectorI5uid_tE"></span><span id="_CPPv2N12BaseMatchBin7GetTagsERK6vectorI5uid_tE"></span><span id="BaseMatchBin::GetTags__vector:uid_t:CR"></span><span class="target" id="classBaseMatchBin_1a93847e73553ef8999b1c6f131c9778e9"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5tag_tE" title="BaseMatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTags</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">uids</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin7GetTagsERK6vectorI5uid_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12BaseMatchBin4SizeEv">
+<span id="_CPPv3NK12BaseMatchBin4SizeEv"></span><span id="_CPPv2NK12BaseMatchBin4SizeEv"></span><span id="BaseMatchBin::SizeC"></span><span class="target" id="classBaseMatchBin_1a33d9cf36adca7290a9492853840fe7df"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK12BaseMatchBin4SizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin14DecayRegulatorEK5uid_tKi">
+<span id="_CPPv3N12BaseMatchBin14DecayRegulatorEK5uid_tKi"></span><span id="_CPPv2N12BaseMatchBin14DecayRegulatorEK5uid_tKi"></span><span id="BaseMatchBin::DecayRegulator__uid_tC.iC"></span><span class="target" id="classBaseMatchBin_1ac64101af56277ec4d1689cc54a83ca90"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecayRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin14DecayRegulatorEK5uid_tKi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin15DecayRegulatorsEKi">
+<span id="_CPPv3N12BaseMatchBin15DecayRegulatorsEKi"></span><span id="_CPPv2N12BaseMatchBin15DecayRegulatorsEKi"></span><span id="BaseMatchBin::DecayRegulators__iC"></span><span class="target" id="classBaseMatchBin_1a95f7a93849f1b398ff7fa90b4ca10c5f"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecayRegulators</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin15DecayRegulatorsEKi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin12AdjRegulatorEK5uid_tRKN9Regulator5adj_tE">
+<span id="_CPPv3N12BaseMatchBin12AdjRegulatorEK5uid_tRKN9Regulator5adj_tE"></span><span id="_CPPv2N12BaseMatchBin12AdjRegulatorEK5uid_tRKN9Regulator5adj_tE"></span><span id="BaseMatchBin::AdjRegulator__uid_tC.Regulator::adj_tCR"></span><span class="target" id="classBaseMatchBin_1a272fb59d6f1eadb9dff3f046c313d51c"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdjRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">adj_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">amt</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin12AdjRegulatorEK5uid_tRKN9Regulator5adj_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin12SetRegulatorEK5uid_tRKN9Regulator5set_tE">
+<span id="_CPPv3N12BaseMatchBin12SetRegulatorEK5uid_tRKN9Regulator5set_tE"></span><span id="_CPPv2N12BaseMatchBin12SetRegulatorEK5uid_tRKN9Regulator5set_tE"></span><span id="BaseMatchBin::SetRegulator__uid_tC.Regulator::set_tCR"></span><span class="target" id="classBaseMatchBin_1aeeb35dad97e44936d7cc1d0b220f26d0"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">set</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin12SetRegulatorEK5uid_tRKN9Regulator5set_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin12SetRegulatorEK5uid_tRK9Regulator">
+<span id="_CPPv3N12BaseMatchBin12SetRegulatorEK5uid_tRK9Regulator"></span><span id="_CPPv2N12BaseMatchBin12SetRegulatorEK5uid_tRK9Regulator"></span><span id="BaseMatchBin::SetRegulator__uid_tC.RegulatorCR"></span><span class="target" id="classBaseMatchBin_1aaa5315bec51549230483fda0301f7305"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">set</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin12SetRegulatorEK5uid_tRK9Regulator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin12GetRegulatorEK5uid_t">
+<span id="_CPPv3N12BaseMatchBin12GetRegulatorEK5uid_t"></span><span id="_CPPv2N12BaseMatchBin12GetRegulatorEK5uid_t"></span><span id="BaseMatchBin::GetRegulator__uid_tC"></span><span class="target" id="classBaseMatchBin_1a4e398d2d3260c3b227f9d1f242fee78f"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin12GetRegulatorEK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12BaseMatchBin13ViewRegulatorEK5uid_t">
+<span id="_CPPv3NK12BaseMatchBin13ViewRegulatorEK5uid_t"></span><span id="_CPPv2NK12BaseMatchBin13ViewRegulatorEK5uid_t"></span><span id="BaseMatchBin::ViewRegulator__uid_tCC"></span><span class="target" id="classBaseMatchBin_1a3965e510b19ff5ff1c6eb34c88757ed0"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">view_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">ViewRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK12BaseMatchBin13ViewRegulatorEK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12BaseMatchBin8GetStateEv">
+<span id="_CPPv3NK12BaseMatchBin8GetStateEv"></span><span id="_CPPv2NK12BaseMatchBin8GetStateEv"></span><span id="BaseMatchBin::GetStateC"></span><span class="target" id="classBaseMatchBin_1a70243a5785179d3967c424a10e5ab7b9"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12BaseMatchBin7state_tE" title="BaseMatchBin::state_t"><span class="n"><span class="pre">state_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetState</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK12BaseMatchBin8GetStateEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin17ImprintRegulatorsERK12BaseMatchBin">
+<span id="_CPPv3N12BaseMatchBin17ImprintRegulatorsERK12BaseMatchBin"></span><span id="_CPPv2N12BaseMatchBin17ImprintRegulatorsERK12BaseMatchBin"></span><span id="BaseMatchBin::ImprintRegulators__BaseMatchBinCR"></span><span class="target" id="classBaseMatchBin_1adf2de4911296ddffb1e0c7179169b183"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ImprintRegulators</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin"><span class="n"><span class="pre">BaseMatchBin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin17ImprintRegulatorsERK12BaseMatchBin" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12BaseMatchBin17ImprintRegulatorsERKN12BaseMatchBin7state_tE">
+<span id="_CPPv3N12BaseMatchBin17ImprintRegulatorsERKN12BaseMatchBin7state_tE"></span><span id="_CPPv2N12BaseMatchBin17ImprintRegulatorsERKN12BaseMatchBin7state_tE"></span><span id="BaseMatchBin::ImprintRegulators__BaseMatchBin::state_tCR"></span><span class="target" id="classBaseMatchBin_1a3811997b1ec27b31ebeedc4d5e58fa4f"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ImprintRegulators</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin"><span class="n"><span class="pre">BaseMatchBin</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N12BaseMatchBin7state_tE" title="BaseMatchBin::state_t"><span class="n"><span class="pre">state_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12BaseMatchBin17ImprintRegulatorsERKN12BaseMatchBin7state_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12BaseMatchBin4nameEv">
+<span id="_CPPv3NK12BaseMatchBin4nameEv"></span><span id="_CPPv2NK12BaseMatchBin4nameEv"></span><span id="BaseMatchBin::nameC"></span><span class="target" id="classBaseMatchBin_1abb238f73b7151b2713e1669d8408dbc0"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK12BaseMatchBin4nameEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12BaseMatchBin8ViewUIDsEv">
+<span id="_CPPv3NK12BaseMatchBin8ViewUIDsEv"></span><span id="_CPPv2NK12BaseMatchBin8ViewUIDsEv"></span><span id="BaseMatchBin::ViewUIDsC"></span><span class="target" id="classBaseMatchBin_1aec5aefc023edcf25cd752326b9b16fda"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12BaseMatchBin5uid_tE" title="BaseMatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ViewUIDs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK12BaseMatchBin8ViewUIDsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Val</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Metric</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Selector</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Regulator</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classMatchBin"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MatchBin</span></span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;MatchBin.hpp&gt;</em></div>
+<p>A data container that allows lookup by tag similarity. It can be templated on different tag types and is configurable on construction for (1) the distance metric used to compute similarity between tags and (2) the selector that is used to select which matches to return. Regulation functionality is also provided, allowing dynamically adjustment of match strength to a particular item (i.e., making all matches stronger/weaker). A unique identifier is generated upon tag/item placement in the container. This unique identifier can be used to view or edit the stored items and their corresponding tags. Tag-based lookups return a list of matched unique identifiers. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1af558e73b8ca4576886e8857705f5ca09"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">base_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin"><span class="n"><span class="pre">BaseMatchBin</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Metric"><span class="n"><span class="pre">Metric</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">query_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Metric"><span class="n"><span class="pre">Metric</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">tag_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1ae991ac4354becd16ca91123e7e4c6a8f"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">query_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin6base_tE" title="MatchBin::base_t"><span class="n"><span class="pre">base_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">query_t</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1aa5536001a4ef6c7186c52b189d04dd28"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin6base_tE" title="MatchBin::base_t"><span class="n"><span class="pre">base_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">tag_t</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a5a2dbbfdd045ec8eb92b1ab9f0f67570"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uid_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin6base_tE" title="MatchBin::base_t"><span class="n"><span class="pre">base_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uid_t</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a875e51ea2d265d9dd9ef1fe09bda1095"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">state_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin6base_tE" title="MatchBin::base_t"><span class="n"><span class="pre">base_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">state_t</span></span><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a8c69f8b65e726aa112c7728bc7671855"></span><span class="sig-name descname"><span class="n"><span class="pre">MatchBin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1adbb9797ed5ba752b2abc699d8ab60cd3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MatchBin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rand</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1add97f66b654b681c577459d857fa8c13"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MatchBin</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin8MatchBinERK8MatchBin" title="MatchBin::MatchBin"><span class="n"><span class="pre">MatchBin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a66eb56e4c85ac039d10e5fe1c4885b2b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MatchBin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8MatchBin8MatchBinERR8MatchBin" title="MatchBin::MatchBin"><span class="n"><span class="pre">MatchBin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a65483d91ea07e5180e0f4215054d3d45"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin"><span class="n"><span class="pre">MatchBin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin"><span class="n"><span class="pre">MatchBin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1af10a34fd625bc07d8f745253be91636d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin"><span class="n"><span class="pre">MatchBin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin"><span class="n"><span class="pre">MatchBin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a6c36a3dd88ec5022e971d0537a16d682"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Match</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin7query_tE" title="MatchBin::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">query</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">numeric_limits</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">max</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Compare a query tag to all stored tags using the distance metric function and return a vector of unique IDs chosen by the selector function. Calling with n = std::numeric_limits&lt;size_t&gt;::max() means delegate choice for how many values to return to the Selector. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1af9b3866a47334833acd3c959a6425499"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MatchRaw</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin7query_tE" title="MatchBin::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">query</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">numeric_limits</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">max</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Compare a query tag to all stored tags using the distance metric function and return a vector of unique IDs chosen by the selector function. Ignore regulators. Calling with n = std::numeric_limits&lt;size_t&gt;::max() means delegate choice for how many values to return to the Selector. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1aeda7fd4804d027493d182748bd690d35"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Put</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5tag_tE" title="MatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Put an item and associated tag in the container. Returns the uid for that entry. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a0a67bb9bdf3430e6c40bf409c060e7eb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5tag_tE" title="MatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Put with a manually-chosen UID. (Caller is responsible for ensuring UID is unique or calling Delete beforehand.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a9eb615dfedab9e407ca745216fd8374b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Delete</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Delete an item and its associated tag. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1ad139f6d3e83353fe7f6ad9f367640d6f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Clear all items and tags. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a8bf4583499925469a6365f278320f93d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClearCache</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Reset the Selector caches. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1ae8c03503751b58292cb1385612b70e13"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActivateCaching</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Attempt to activate result caching. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true if caching activated </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a54918debc29b95552f744a2743ad7c07"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DeactivateCaching</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a172471e8cb428e3715c14396695c4a2d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetVal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Access a reference single stored value by uid. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1ae3eee92f9d4fb4c8d2e464199aaea4ca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5tag_tE" title="MatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetTag</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Access a const reference to a single stored tag by uid. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a403b1e1a2f1f04735d1710cbe872aeb6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetTag</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5tag_tE" title="MatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">tag</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Change the tag at a given uid and clear the cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a3aa9bbde6567bc8ccb312df0968c06fc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetVals</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">uids</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Generate a vector of values corresponding to a vector of uids. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a5c69cf1c1cd9c1929ab9c2dc0b95f253"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin5tag_tE" title="MatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTags</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">uids</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Generate a vector of tags corresponding to a vector of uids. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a59ebb65f5b83a64332f95e031e4e4de0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Get the number of items stored in the container. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a85998b2484bf5f1a5d5844e5c1502c41"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdjRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">adj_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">amt</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Adjust an item’s regulator value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a73ba4e99119ac0178066c218e9c3ecd3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">set</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Set an item’s regulator value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1ae7675ee77e3e33f044f21846a3c3b912"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">set</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Set an item’s regulator value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1ac5dabf0e30cc5edacb391d6374ae25f3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">view_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">ViewRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>View an item’s regulator value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a11367d6cfeff349143a161617ee057bd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Get a regulator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a6e44571eb4a418a8c226a9dc01237fd3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecayRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Apply decay to a regulator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a832052e5b345a163bc4dad995b92ddd2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecayRegulators</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Apply decay to all regulators. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a2d8e61b4069021974281f367f4f06e62"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ImprintRegulators</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E12BaseMatchBin" title="BaseMatchBin"><span class="n"><span class="pre">BaseMatchBin</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Val"><span class="n"><span class="pre">Val</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin7query_tE" title="MatchBin::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin5tag_tE" title="MatchBin::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Set up regulators to match target MatchBin </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>target</strong> – MatchBin to match </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a66978ff41fd8d7c12061804dc45c9f27"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ImprintRegulators</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin7state_tE" title="MatchBin::state_t"><span class="n"><span class="pre">state_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Set up regulators to match target state </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>target</strong> – State to match </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a9ed164a265b0387da1e92d7df08be907"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ViewUIDs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>View UIDs associated with this MatchBin. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a689711b4a5b76bed71443979316829f2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Get selector, metric name. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a5c0897dae38624853aeab267cb75a9e8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin7state_tE" title="MatchBin::state_t"><span class="n"><span class="pre">state_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetState</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Extract MatchBin state. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a519e880d2bcb6959f31013a861238edb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetState</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8MatchBin7state_tE" title="MatchBin::state_t"><span class="n"><span class="pre">state_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">state_</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Load MatchBin state. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a58f74a1abfcc45a50ca8d804dbab5707"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRegulatedCacheSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Returns size of regulated cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1aaef9cb7a9f1186817e3dc8e47dde6ea7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRawCacheSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Returns size of raw cache. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1afba6604b8857d09dcd02915003301a44"></span><a class="reference internal" href="#_CPPv4N8MatchBin7state_tE" title="MatchBin::state_t"><span class="n"><span class="pre">state_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">state</span></span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a63ca21dcfbe62aca2b159c6540184867"></span><a class="reference internal" href="#_CPPv4N8MatchBin5uid_tE" title="MatchBin::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uid_stepper</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1a64ab07446750d300832eedc39771f82d"></span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatchBinCache</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8MatchBin7query_tE" title="MatchBin::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Selector"><span class="n"><span class="pre">Selector</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cache</span></span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="classMatchBin_1afc295bb13292e4267ea9325481613ea5"></span><a class="reference internal" href="#_CPPv4I0000E8MatchBin" title="MatchBin::Selector"><span class="n"><span class="pre">Selector</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">selector</span></span></span><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv46cereal">
+<span id="_CPPv36cereal"></span><span id="_CPPv26cereal"></span><span id="cereal"></span><span class="target" id="namespacecereal"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cereal</span></span></span><a class="headerlink" href="#_CPPv46cereal" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN6cereal4saveEvR7ArchiveRKN10robin_hood18unordered_flat_mapI6size_t1TEE">
+<span id="_CPPv3I00EN6cereal4saveER7ArchiveRKN10robin_hood18unordered_flat_mapI6size_t1TEE"></span><span id="_CPPv2I00EN6cereal4saveER7ArchiveRKN10robin_hood18unordered_flat_mapI6size_t1TEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Archive</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacecereal_1a80cdd149b1ccea48ce71be1818276d48"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">save</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN6cereal4saveEvR7ArchiveRKN10robin_hood18unordered_flat_mapI6size_t1TEE" title="cereal::save::Archive"><span class="n"><span class="pre">Archive</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">archive</span></span>, <span class="n"><span class="pre">robin_hood</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_flat_map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN6cereal4saveEvR7ArchiveRKN10robin_hood18unordered_flat_mapI6size_t1TEE" title="cereal::save::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">m</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN6cereal4saveEvR7ArchiveRKN10robin_hood18unordered_flat_mapI6size_t1TEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN6cereal4loadEvR7ArchiveRN10robin_hood18unordered_flat_mapI6size_t1TEE">
+<span id="_CPPv3I00EN6cereal4loadER7ArchiveRN10robin_hood18unordered_flat_mapI6size_t1TEE"></span><span id="_CPPv2I00EN6cereal4loadER7ArchiveRN10robin_hood18unordered_flat_mapI6size_t1TEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Archive</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacecereal_1abe36f9bf94f231648b9716da49f88744"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">load</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN6cereal4loadEvR7ArchiveRN10robin_hood18unordered_flat_mapI6size_t1TEE" title="cereal::load::Archive"><span class="n"><span class="pre">Archive</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">archive</span></span>, <span class="n"><span class="pre">robin_hood</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_flat_map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN6cereal4loadEvR7ArchiveRN10robin_hood18unordered_flat_mapI6size_t1TEE" title="cereal::load::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">m</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN6cereal4loadEvR7ArchiveRN10robin_hood18unordered_flat_mapI6size_t1TEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../matching.html" class="btn btn-neutral float-left" title="Matching" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="MatchDepository.html" class="btn btn-neutral float-right" title="MatchDepository.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

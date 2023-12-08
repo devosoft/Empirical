@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/text/text.aef2de15-22be-4efe-a2ad-7244af2a9f1c.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="EmphaticEncoding.hpp" href="api/EmphaticEncoding.html" />
+    <link rel="prev" title="unit_tests.hpp" href="../testing/api/unit_tests.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Text</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/EmphaticEncoding.html">EmphaticEncoding.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/HTMLEncoding.html">HTMLEncoding.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html">Text.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html">TextEncoding.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Text</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="text">
+<h1>Text<a class="headerlink" href="#text" title="Link to this heading"></a></h1>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/EmphaticEncoding.html">EmphaticEncoding.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/EmphaticEncoding.html#_CPPv412EmphaticText"><code class="docutils literal notranslate"><span class="pre">EmphaticText</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/EmphaticEncoding.html#_CPPv4IDpE16MakeEmphaticText4TextDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">MakeEmphaticText()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/EmphaticEncoding.html#_CPPv416EmphaticEncoding"><code class="docutils literal notranslate"><span class="pre">EmphaticEncoding</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/EmphaticEncoding.html#_CPPv4N16EmphaticEncoding16EmphaticEncodingEv"><code class="docutils literal notranslate"><span class="pre">EmphaticEncoding::EmphaticEncoding()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/EmphaticEncoding.html#_CPPv4N16EmphaticEncodingD0Ev"><code class="docutils literal notranslate"><span class="pre">EmphaticEncoding::~EmphaticEncoding()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/EmphaticEncoding.html#_CPPv4NK16EmphaticEncoding7GetNameEv"><code class="docutils literal notranslate"><span class="pre">EmphaticEncoding::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/EmphaticEncoding.html#_CPPv4NK16EmphaticEncoding5CloneEv"><code class="docutils literal notranslate"><span class="pre">EmphaticEncoding::Clone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/EmphaticEncoding.html#_CPPv4N16EmphaticEncoding9SetupTagsEv"><code class="docutils literal notranslate"><span class="pre">EmphaticEncoding::SetupTags()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/HTMLEncoding.html">HTMLEncoding.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/HTMLEncoding.html#_CPPv48HTMLText"><code class="docutils literal notranslate"><span class="pre">HTMLText</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/HTMLEncoding.html#_CPPv4IDpE12MakeHTMLText4TextDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">MakeHTMLText()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/HTMLEncoding.html#_CPPv412HTMLEncoding"><code class="docutils literal notranslate"><span class="pre">HTMLEncoding</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/HTMLEncoding.html#_CPPv4N12HTMLEncoding12HTMLEncodingEv"><code class="docutils literal notranslate"><span class="pre">HTMLEncoding::HTMLEncoding()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/HTMLEncoding.html#_CPPv4N12HTMLEncodingD0Ev"><code class="docutils literal notranslate"><span class="pre">HTMLEncoding::~HTMLEncoding()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/HTMLEncoding.html#_CPPv4NK12HTMLEncoding7GetNameEv"><code class="docutils literal notranslate"><span class="pre">HTMLEncoding::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/HTMLEncoding.html#_CPPv4NK12HTMLEncoding5CloneEv"><code class="docutils literal notranslate"><span class="pre">HTMLEncoding::Clone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/HTMLEncoding.html#_CPPv4N12HTMLEncoding9SetupTagsEv"><code class="docutils literal notranslate"><span class="pre">HTMLEncoding::SetupTags()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Text.html">Text.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Text.html#_CPPv422TextEncoding_Interface"><code class="docutils literal notranslate"><span class="pre">TextEncoding_Interface</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N22TextEncoding_InterfaceD0Ev"><code class="docutils literal notranslate"><span class="pre">TextEncoding_Interface::~TextEncoding_Interface()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK22TextEncoding_Interface7GetNameEv"><code class="docutils literal notranslate"><span class="pre">TextEncoding_Interface::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N22TextEncoding_Interface6AppendER4TextRK6String"><code class="docutils literal notranslate"><span class="pre">TextEncoding_Interface::Append()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK22TextEncoding_Interface6EncodeERK4Text"><code class="docutils literal notranslate"><span class="pre">TextEncoding_Interface::Encode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK22TextEncoding_Interface5CloneEv"><code class="docutils literal notranslate"><span class="pre">TextEncoding_Interface::Clone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK22TextEncoding_Interface10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">TextEncoding_Interface::PrintDebug()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Text.html#_CPPv417TextEncoding_None"><code class="docutils literal notranslate"><span class="pre">TextEncoding_None</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N17TextEncoding_None17TextEncoding_NoneEv"><code class="docutils literal notranslate"><span class="pre">TextEncoding_None::TextEncoding_None()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK17TextEncoding_None7GetNameEv"><code class="docutils literal notranslate"><span class="pre">TextEncoding_None::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N17TextEncoding_None6AppendER4TextRK6String"><code class="docutils literal notranslate"><span class="pre">TextEncoding_None::Append()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK17TextEncoding_None6EncodeERK4Text"><code class="docutils literal notranslate"><span class="pre">TextEncoding_None::Encode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK17TextEncoding_None5CloneEv"><code class="docutils literal notranslate"><span class="pre">TextEncoding_None::Clone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK17TextEncoding_None10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">TextEncoding_None::PrintDebug()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Text.html#_CPPv44Text"><code class="docutils literal notranslate"><span class="pre">Text</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text4TextEv"><code class="docutils literal notranslate"><span class="pre">Text::Text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text4TextERK4Text"><code class="docutils literal notranslate"><span class="pre">Text::Text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4IDpEN4Text4TextEDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Text::Text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4TextD0Ev"><code class="docutils literal notranslate"><span class="pre">Text::~Text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4TextaSERK4Text"><code class="docutils literal notranslate"><span class="pre">Text::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4TextaSERR4Text"><code class="docutils literal notranslate"><span class="pre">Text::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4I0EN4TextaSER4TextRK1T"><code class="docutils literal notranslate"><span class="pre">Text::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">Text::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text7GetTextEv"><code class="docutils literal notranslate"><span class="pre">Text::GetText()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text8GetStyleERK6String"><code class="docutils literal notranslate"><span class="pre">Text::GetStyle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4TextcvRK6StringEv"><code class="docutils literal notranslate"><span class="pre">Text::operator</span> <span class="pre">const</span> <span class="pre">String&amp;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text11HasEncodingERK6String"><code class="docutils literal notranslate"><span class="pre">Text::HasEncoding()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text15GetEncodingNameEv"><code class="docutils literal notranslate"><span class="pre">Text::GetEncodingName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text11SetEncodingERK6String"><code class="docutils literal notranslate"><span class="pre">Text::SetEncoding()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4I0DpEN4Text11AddEncodingE6StringDpRR8EXTRA_Ts"><code class="docutils literal notranslate"><span class="pre">Text::AddEncoding()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text14RemoveEncodingERK6String"><code class="docutils literal notranslate"><span class="pre">Text::RemoveEncoding()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4I0DpEN4Text16ActivateEncodingE6StringRK6StringDpRR8EXTRA_Ts"><code class="docutils literal notranslate"><span class="pre">Text::ActivateEncoding()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4I0DpEN4Text6AppendER4TextRR1TDpRR8EXTRA_Ts"><code class="docutils literal notranslate"><span class="pre">Text::Append()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4I00EN4Text8AppendAsER4TextRK6StringRR4IN_T"><code class="docutils literal notranslate"><span class="pre">Text::AppendAs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4I0EN4Text10Append_RawER4TextRR1T"><code class="docutils literal notranslate"><span class="pre">Text::Append_Raw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4I0EN4TextlsER4TextRR1T"><code class="docutils literal notranslate"><span class="pre">Text::operator&lt;&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4I0EN4TextpLER4TextRR1T"><code class="docutils literal notranslate"><span class="pre">Text::operator+=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text6EncodeEv"><code class="docutils literal notranslate"><span class="pre">Text::Encode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text6ResizeE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Resize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text7GetCharE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::GetChar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text3SetE6size_tc"><code class="docutils literal notranslate"><span class="pre">Text::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4I_bEN4Text3SetER4Text6size_t11TextCharRefI8IS_CONSTE"><code class="docutils literal notranslate"><span class="pre">Text::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4TextixE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4TextixE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text4sizeEv"><code class="docutils literal notranslate"><span class="pre">Text::size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text6resizeE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::resize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4IDpEN4Text6assignER4TextDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Text::assign()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text5frontEv"><code class="docutils literal notranslate"><span class="pre">Text::front()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text5frontEv"><code class="docutils literal notranslate"><span class="pre">Text::front()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text4backEv"><code class="docutils literal notranslate"><span class="pre">Text::back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text4backEv"><code class="docutils literal notranslate"><span class="pre">Text::back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text5emptyEv"><code class="docutils literal notranslate"><span class="pre">Text::empty()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4IDpENK4Text11starts_withEbDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Text::starts_with()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4IDpENK4Text9ends_withEbDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Text::ends_with()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4IDpENK4Text4findE6size_tDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Text::find()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4IDpENK4Text5rfindE6size_tDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Text::rfind()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4IDpENK4Text13find_first_ofE6size_tDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Text::find_first_of()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4IDpENK4Text17find_first_not_ofE6size_tDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Text::find_first_not_of()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4IDpENK4Text12find_last_ofE6size_tDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Text::find_last_of()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4IDpENK4Text16find_last_not_ofE6size_tDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Text::find_last_not_of()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text8SetStyleE6String"><code class="docutils literal notranslate"><span class="pre">Text::SetStyle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text4BoldEv"><code class="docutils literal notranslate"><span class="pre">Text::Bold()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text4CodeEv"><code class="docutils literal notranslate"><span class="pre">Text::Code()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text6ItalicEv"><code class="docutils literal notranslate"><span class="pre">Text::Italic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text6StrikeEv"><code class="docutils literal notranslate"><span class="pre">Text::Strike()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9SubscriptEv"><code class="docutils literal notranslate"><span class="pre">Text::Subscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text11SuperscriptEv"><code class="docutils literal notranslate"><span class="pre">Text::Superscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9UnderlineEv"><code class="docutils literal notranslate"><span class="pre">Text::Underline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text8SetStyleE6String6size_t"><code class="docutils literal notranslate"><span class="pre">Text::SetStyle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text4BoldE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Bold()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text4CodeE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Code()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text6ItalicE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Italic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text6StrikeE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Strike()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9SubscriptE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Subscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text11SuperscriptE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Superscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9UnderlineE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Underline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text8SetStyleE6String6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::SetStyle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text4BoldE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Bold()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text4CodeE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Code()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text6ItalicE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Italic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text6StrikeE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Strike()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9SubscriptE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Subscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text11SuperscriptE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Superscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9UnderlineE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Underline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text9GetStylesE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::GetStyles()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text8HasStyleERK6String"><code class="docutils literal notranslate"><span class="pre">Text::HasStyle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text7HasBoldEv"><code class="docutils literal notranslate"><span class="pre">Text::HasBold()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text7HasCodeEv"><code class="docutils literal notranslate"><span class="pre">Text::HasCode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text9HasItalicEv"><code class="docutils literal notranslate"><span class="pre">Text::HasItalic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text9HasStrikeEv"><code class="docutils literal notranslate"><span class="pre">Text::HasStrike()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text12HasSubscriptEv"><code class="docutils literal notranslate"><span class="pre">Text::HasSubscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text14HasSuperscriptEv"><code class="docutils literal notranslate"><span class="pre">Text::HasSuperscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text12HasUnderlineEv"><code class="docutils literal notranslate"><span class="pre">Text::HasUnderline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text8HasStyleERK6String6size_t"><code class="docutils literal notranslate"><span class="pre">Text::HasStyle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text7HasBoldE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::HasBold()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text7HasCodeE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::HasCode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text9HasItalicE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::HasItalic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text9HasStrikeE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::HasStrike()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text12HasSubscriptE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::HasSubscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text14HasSuperscriptE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::HasSuperscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4NK4Text12HasUnderlineE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::HasUnderline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text5ClearEv"><code class="docutils literal notranslate"><span class="pre">Text::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text5ClearE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text5ClearERK6String"><code class="docutils literal notranslate"><span class="pre">Text::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9ClearBoldEv"><code class="docutils literal notranslate"><span class="pre">Text::ClearBold()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9ClearCodeEv"><code class="docutils literal notranslate"><span class="pre">Text::ClearCode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text11ClearItalicEv"><code class="docutils literal notranslate"><span class="pre">Text::ClearItalic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text11ClearStrikeEv"><code class="docutils literal notranslate"><span class="pre">Text::ClearStrike()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text14ClearSubscriptEv"><code class="docutils literal notranslate"><span class="pre">Text::ClearSubscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text16ClearSuperscriptEv"><code class="docutils literal notranslate"><span class="pre">Text::ClearSuperscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text14ClearUnderlineEv"><code class="docutils literal notranslate"><span class="pre">Text::ClearUnderline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text5ClearERK6String6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9ClearBoldE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearBold()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9ClearCodeE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearCode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text11ClearItalicE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearItalic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text11ClearStrikeE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearStrike()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text14ClearSubscriptE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearSubscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text16ClearSuperscriptE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearSuperscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text14ClearUnderlineE6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearUnderline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text5ClearERK6String6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9ClearBoldE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearBold()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9ClearCodeE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearCode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text11ClearItalicE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearItalic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text11ClearStrikeE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearStrike()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text14ClearSubscriptE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearSubscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text16ClearSuperscriptE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearSuperscript()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text14ClearUnderlineE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Text::ClearUnderline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text13ToDebugStringEv"><code class="docutils literal notranslate"><span class="pre">Text::ToDebugString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Text::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text14encoding_ptr_tE"><code class="docutils literal notranslate"><span class="pre">Text::encoding_ptr_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text7CleanupEv"><code class="docutils literal notranslate"><span class="pre">Text::Cleanup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text14CloneEncodingsERK4Text"><code class="docutils literal notranslate"><span class="pre">Text::CloneEncodings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text4textE"><code class="docutils literal notranslate"><span class="pre">Text::text</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9style_mapE"><code class="docutils literal notranslate"><span class="pre">Text::style_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text12encoding_ptrE"><code class="docutils literal notranslate"><span class="pre">Text::encoding_ptr</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Text.html#_CPPv4N4Text9encodingsE"><code class="docutils literal notranslate"><span class="pre">Text::encodings</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/TextEncoding.html">TextEncoding.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/TextEncoding.html#_CPPv4I0DpE15MakeEncodedText4TextDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">MakeEncodedText()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/TextEncoding.html#_CPPv412TextEncoding"><code class="docutils literal notranslate"><span class="pre">TextEncoding</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding12TextEncodingEv"><code class="docutils literal notranslate"><span class="pre">TextEncoding::TextEncoding()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncodingD0Ev"><code class="docutils literal notranslate"><span class="pre">TextEncoding::~TextEncoding()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding5ResetEv"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding6AppendER4TextRK6String"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Append()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4NK12TextEncoding6EncodeERK4Text"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Encode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4NK12TextEncoding10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding8GetTagIDERK6StringRK6String"><code class="docutils literal notranslate"><span class="pre">TextEncoding::GetTagID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding8GetTagIDERK6String"><code class="docutils literal notranslate"><span class="pre">TextEncoding::GetTagID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding8GetStyleERK6String"><code class="docutils literal notranslate"><span class="pre">TextEncoding::GetStyle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding14SetupStyleTagsE6String6String6String"><code class="docutils literal notranslate"><span class="pre">TextEncoding::SetupStyleTags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding15SetupReplaceTagE6Stringc6String"><code class="docutils literal notranslate"><span class="pre">TextEncoding::SetupReplaceTag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding12GetStyleDescERK5StyleRK3TagRK6String"><code class="docutils literal notranslate"><span class="pre">TextEncoding::GetStyleDesc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding14Append_RawTextER4TextRK6String"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Append_RawText()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding10Append_TagER4TextiRK6String"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Append_Tag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding10SetupLexerEv"><code class="docutils literal notranslate"><span class="pre">TextEncoding::SetupLexer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4NK12TextEncoding11_EncodeCharERK4TextR6StringK6size_t"><code class="docutils literal notranslate"><span class="pre">TextEncoding::_EncodeChar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4NK12TextEncoding9_EncodeToERK4TextR6StringR6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">TextEncoding::_EncodeTo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4NK12TextEncoding13AddOutputTagsERK4TextRNSt3mapI6size_t6StringEE6String6String6String"><code class="docutils literal notranslate"><span class="pre">TextEncoding::AddOutputTags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding7tag_setE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::tag_set</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding9style_setE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::style_set</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding17pattern_to_tag_idE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::pattern_to_tag_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding15token_to_tag_idE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::token_to_tag_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding16name_to_style_idE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::name_to_style_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding9char_tagsE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::char_tags</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding5lexerE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::lexer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding10text_tokenE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::text_token</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding13active_stylesE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::active_styles</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding5StyleE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Style</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding5Style4nameE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Style::name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding5Style2idE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Style::id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding5Style12open_tag_idsE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Style::open_tag_ids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding5Style13close_tag_idsE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Style::close_tag_ids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding5Style15replace_tag_idsE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Style::replace_tag_ids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding5Style13make_open_tagE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Style::make_open_tag</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding5Style14make_close_tagE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Style::make_close_tag</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding10StyleEntryE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::StyleEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding10StyleEntry8style_idE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::StyleEntry::style_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding10StyleEntry9full_infoE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::StyleEntry::full_info</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding3TagE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Tag</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding3Tag4nameE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Tag::name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding3Tag7patternE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Tag::pattern</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding3Tag2idE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Tag::id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding3Tag8token_idE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Tag::token_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding3Tag14start_style_idE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Tag::start_style_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding3Tag14get_style_argsE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Tag::get_style_args</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding3Tag13end_style_idsE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Tag::end_style_ids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding3Tag9multi_endE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Tag::multi_end</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding3Tag12replace_charE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Tag::replace_char</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding3Tag16replace_style_idE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Tag::replace_style_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TextEncoding.html#_CPPv4N12TextEncoding3Tag12out_encodingE"><code class="docutils literal notranslate"><span class="pre">TextEncoding::Tag::out_encoding</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../testing/api/unit_tests.html" class="btn btn-neutral float-left" title="unit_tests.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/EmphaticEncoding.html" class="btn btn-neutral float-right" title="EmphaticEncoding.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

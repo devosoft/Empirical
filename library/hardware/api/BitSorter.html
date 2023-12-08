@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BitSorter.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/hardware/api/BitSorter.8e7b4609-7e87-4cae-a0cb-3b545f7d6cf3.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="EventDrivenGP.hpp" href="EventDrivenGP.html" />
+    <link rel="prev" title="AvidaGP.hpp" href="AvidaGP.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../hardware.html">Hardware</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../hardware.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AvidaCPU_InstLib.html">AvidaCPU_InstLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AvidaGP.html">AvidaGP.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">BitSorter.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49BitSorter"><code class="docutils literal notranslate"><span class="pre">BitSorter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="EventDrivenGP.html">EventDrivenGP.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="EventLib.html">EventLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Genome.html">Genome.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="InstLib.html">InstLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LinearCode.html">LinearCode.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="VirtualCPU.html">VirtualCPU.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="VirtualCPU_InstLib.html">VirtualCPU_InstLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="signalgp_utils.html">signalgp_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../hardware.html">Hardware</a></li>
+      <li class="breadcrumb-item active">BitSorter.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bitsorter-hpp">
+<h1>BitSorter.hpp<a class="headerlink" href="#bitsorter-hpp" title="Link to this heading"></a></h1>
+<p>A quick series of comparisons intended for sorting bits. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv49BitSorter">
+<span id="_CPPv39BitSorter"></span><span id="_CPPv29BitSorter"></span><span id="BitSorter"></span><span class="target" id="classBitSorter"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BitSorter</span></span></span><a class="headerlink" href="#_CPPv49BitSorter" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;BitSorter.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter6bits_tE">
+<span id="_CPPv3N9BitSorter6bits_tE"></span><span id="_CPPv2N9BitSorter6bits_tE"></span><span class="target" id="classBitSorter_1a528168118e664ed47b1eb835a64cbb00"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bits_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><a class="headerlink" href="#_CPPv4N9BitSorter6bits_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Type used to represent pairs if positions as bit masks. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter9BitSorterEv">
+<span id="_CPPv3N9BitSorter9BitSorterEv"></span><span id="_CPPv2N9BitSorter9BitSorterEv"></span><span id="BitSorter::BitSorter"></span><span class="target" id="classBitSorter_1a10176dac6f06e234c88442c17ac13066"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BitSorter</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitSorter9BitSorterEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter9BitSorterERK9BitSorter">
+<span id="_CPPv3N9BitSorter9BitSorterERK9BitSorter"></span><span id="_CPPv2N9BitSorter9BitSorterERK9BitSorter"></span><span id="BitSorter::BitSorter__BitSorterCR"></span><span class="target" id="classBitSorter_1a7c89c80da1b67ba35f0d49af0cdd70df"></span><span class="sig-name descname"><span class="n"><span class="pre">BitSorter</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9BitSorter9BitSorterERK9BitSorter" title="BitSorter::BitSorter"><span class="n"><span class="pre">BitSorter</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N9BitSorter9BitSorterERK9BitSorter" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter9BitSorterERR9BitSorter">
+<span id="_CPPv3N9BitSorter9BitSorterERR9BitSorter"></span><span id="_CPPv2N9BitSorter9BitSorterERR9BitSorter"></span><span id="BitSorter::BitSorter__BitSorterRR"></span><span class="target" id="classBitSorter_1a4bd95cbbd9c185cf6c066e25162f0a29"></span><span class="sig-name descname"><span class="n"><span class="pre">BitSorter</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9BitSorter9BitSorterERR9BitSorter" title="BitSorter::BitSorter"><span class="n"><span class="pre">BitSorter</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N9BitSorter9BitSorterERR9BitSorter" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorterD0Ev">
+<span id="_CPPv3N9BitSorterD0Ev"></span><span id="_CPPv2N9BitSorterD0Ev"></span><span id="BitSorter::~BitSorter"></span><span class="target" id="classBitSorter_1a14ec99363e9c05454a0e7fcf3f06995d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~BitSorter</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitSorterD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorteraSERK9BitSorter">
+<span id="_CPPv3N9BitSorteraSERK9BitSorter"></span><span id="_CPPv2N9BitSorteraSERK9BitSorter"></span><span id="BitSorter::assign-operator__BitSorterCR"></span><span class="target" id="classBitSorter_1a45a3b69b8c4ea8e01494bcb3b4424527"></span><a class="reference internal" href="#_CPPv49BitSorter" title="BitSorter"><span class="n"><span class="pre">BitSorter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49BitSorter" title="BitSorter"><span class="n"><span class="pre">BitSorter</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N9BitSorteraSERK9BitSorter" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorteraSERR9BitSorter">
+<span id="_CPPv3N9BitSorteraSERR9BitSorter"></span><span id="_CPPv2N9BitSorteraSERR9BitSorter"></span><span id="BitSorter::assign-operator__BitSorterRR"></span><span class="target" id="classBitSorter_1a072464e93d9c2e3d2cd014ac49a28436"></span><a class="reference internal" href="#_CPPv49BitSorter" title="BitSorter"><span class="n"><span class="pre">BitSorter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49BitSorter" title="BitSorter"><span class="n"><span class="pre">BitSorter</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N9BitSorteraSERR9BitSorter" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitSorterneERK9BitSorter">
+<span id="_CPPv3NK9BitSorterneERK9BitSorter"></span><span id="_CPPv2NK9BitSorterneERK9BitSorter"></span><span id="BitSorter::neq-operator__BitSorterCRC"></span><span class="target" id="classBitSorter_1af41a7a1ccdebb4ae14add6b7d4b004e9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49BitSorter" title="BitSorter"><span class="n"><span class="pre">BitSorter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitSorterneERK9BitSorter" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitSorterltERK9BitSorter">
+<span id="_CPPv3NK9BitSorterltERK9BitSorter"></span><span id="_CPPv2NK9BitSorterltERK9BitSorter"></span><span id="BitSorter::lt-operator__BitSorterCRC"></span><span class="target" id="classBitSorter_1a60a2c350a66b8c295be060492efae6ee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49BitSorter" title="BitSorter"><span class="n"><span class="pre">BitSorter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitSorterltERK9BitSorter" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitSorter7GetSizeEv">
+<span id="_CPPv3NK9BitSorter7GetSizeEv"></span><span id="_CPPv2NK9BitSorter7GetSizeEv"></span><span id="BitSorter::GetSizeC"></span><span class="target" id="classBitSorter_1ab70399bee637d7c63e1bd9d22d0194cb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitSorter7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many comparators are in this sorting network. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitSorter4sizeEv">
+<span id="_CPPv3NK9BitSorter4sizeEv"></span><span id="_CPPv2NK9BitSorter4sizeEv"></span><span id="BitSorter::sizeC"></span><span class="target" id="classBitSorter_1a8add588bf6260108760903bd8f2a2d6f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitSorter4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter13GetComparatorE6size_t">
+<span id="_CPPv3N9BitSorter13GetComparatorE6size_t"></span><span id="_CPPv2N9BitSorter13GetComparatorE6size_t"></span><span id="BitSorter::GetComparator__s"></span><span class="target" id="classBitSorter_1ad3b008f768012867f6a820430d4c0b32"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetComparator</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitSorter13GetComparatorE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorterixE6size_t">
+<span id="_CPPv3N9BitSorterixE6size_t"></span><span id="_CPPv2N9BitSorterixE6size_t"></span><span id="BitSorter::subscript-operator__s"></span><span class="target" id="classBitSorter_1a5283e370196942cf8f00814748c7c415"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9BitSorter6bits_tE" title="BitSorter::bits_t"><span class="n"><span class="pre">bits_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitSorterixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter7GetBitsE6size_t">
+<span id="_CPPv3N9BitSorter7GetBitsE6size_t"></span><span id="_CPPv2N9BitSorter7GetBitsE6size_t"></span><span id="BitSorter::GetBits__s"></span><span class="target" id="classBitSorter_1a5b665ef4f7a46860a63a958ed5fee644"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9BitSorter6bits_tE" title="BitSorter::bits_t"><span class="n"><span class="pre">bits_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBits</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitSorter7GetBitsE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter5ClearEv">
+<span id="_CPPv3N9BitSorter5ClearEv"></span><span id="_CPPv2N9BitSorter5ClearEv"></span><span id="BitSorter::Clear"></span><span class="target" id="classBitSorter_1a32d6b6f90c075a88b45f8fdd89ea99a8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitSorter5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitSorter9CalcDepthE6size_tR6vectorI6size_tE">
+<span id="_CPPv3NK9BitSorter9CalcDepthE6size_tR6vectorI6size_tE"></span><span id="_CPPv2NK9BitSorter9CalcDepthE6size_tR6vectorI6size_tE"></span><span id="BitSorter::CalcDepth__s.vector:s:RC"></span><span class="target" id="classBitSorter_1a57906410db746fd604480e4ebb4688fa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CalcDepth</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bits</span></span>, <a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">depth_vals</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitSorter9CalcDepthE6size_tR6vectorI6size_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>If this network is compressed as far as possible, what will the max depth of each position be? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitSorter9CalcDepthE6size_t">
+<span id="_CPPv3NK9BitSorter9CalcDepthE6size_t"></span><span id="_CPPv2NK9BitSorter9CalcDepthE6size_t"></span><span id="BitSorter::CalcDepth__sC"></span><span class="target" id="classBitSorter_1afb34330fd258daefc74b749f6568f5da"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CalcDepth</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bits</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">16</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitSorter9CalcDepthE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Return only the highest overall depth of the sorting network. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter10AddCompareE6size_t6size_t">
+<span id="_CPPv3N9BitSorter10AddCompareE6size_t6size_t"></span><span id="_CPPv2N9BitSorter10AddCompareE6size_t6size_t"></span><span id="BitSorter::AddCompare__s.s"></span><span class="target" id="classBitSorter_1a977d371e71f50c1a3d5c67938c89db2f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddCompare</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id1</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitSorter10AddCompareE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Push a new comparator onto the back of the list. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter11EditCompareE6size_t6size_t6size_t">
+<span id="_CPPv3N9BitSorter11EditCompareE6size_t6size_t6size_t"></span><span id="_CPPv2N9BitSorter11EditCompareE6size_t6size_t6size_t"></span><span id="BitSorter::EditCompare__s.s.s"></span><span class="target" id="classBitSorter_1aa6c5d456d94f4cef15ec01eaf9720475"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EditCompare</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id1</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitSorter11EditCompareE6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Change the positions compared in a specified comparator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter13InsertCompareE6size_t6size_t6size_t">
+<span id="_CPPv3N9BitSorter13InsertCompareE6size_t6size_t6size_t"></span><span id="_CPPv2N9BitSorter13InsertCompareE6size_t6size_t6size_t"></span><span id="BitSorter::InsertCompare__s.s.s"></span><span class="target" id="classBitSorter_1ad31d50d4216aa48dba0d44246c274cea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InsertCompare</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id1</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitSorter13InsertCompareE6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Insert a new comparator at the specified position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter13RemoveCompareE6size_t">
+<span id="_CPPv3N9BitSorter13RemoveCompareE6size_t"></span><span id="_CPPv2N9BitSorter13RemoveCompareE6size_t"></span><span id="BitSorter::RemoveCompare__s"></span><span class="target" id="classBitSorter_1a56607bff28039c3fe888efa08c1f50e6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RemoveCompare</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitSorter13RemoveCompareE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove the comparator at the specified position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitSorter4SortE6bits_t">
+<span id="_CPPv3NK9BitSorter4SortE6bits_t"></span><span id="_CPPv2NK9BitSorter4SortE6bits_t"></span><span id="BitSorter::Sort__bits_tC"></span><span class="target" id="classBitSorter_1a0d40f127218cbe82621dce0ba96c10f2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9BitSorter6bits_tE" title="BitSorter::bits_t"><span class="n"><span class="pre">bits_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sort</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9BitSorter6bits_tE" title="BitSorter::bits_t"><span class="n"><span class="pre">bits_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">values</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitSorter4SortE6bits_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Run a specific set of bit values through the series of comparators in this sorting network. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitSorter12TestSortableE6bits_t">
+<span id="_CPPv3NK9BitSorter12TestSortableE6bits_t"></span><span id="_CPPv2NK9BitSorter12TestSortableE6bits_t"></span><span id="BitSorter::TestSortable__bits_tC"></span><span class="target" id="classBitSorter_1a7874738666a14865e9f081e9c7f7ea82"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TestSortable</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9BitSorter6bits_tE" title="BitSorter::bits_t"><span class="n"><span class="pre">bits_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">values</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitSorter12TestSortableE6bits_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if a particular input bit pattern will be sorted correctly by this network. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitSorter13CountSortableE6size_t">
+<span id="_CPPv3NK9BitSorter13CountSortableE6size_t"></span><span id="_CPPv2NK9BitSorter13CountSortableE6size_t"></span><span id="BitSorter::CountSortable__sC"></span><span class="target" id="classBitSorter_1af3ba577ee879950735b78bb3520af1fb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountSortable</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bits</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">16</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitSorter13CountSortableE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Try all possible bit sequences (with the specified number of bits) and count how many this sorting network fully sorts. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitSorter8AsStringEv">
+<span id="_CPPv3NK9BitSorter8AsStringEv"></span><span id="_CPPv2NK9BitSorter8AsStringEv"></span><span id="BitSorter::AsStringC"></span><span class="target" id="classBitSorter_1ace3c986f3fb4aa336ba70bac9c0b490f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitSorter8AsStringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Describe this sorting network in a string, listing all comparators in order. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter10RunCompareE6bits_t6bits_t">
+<span id="_CPPv3N9BitSorter10RunCompareE6bits_t6bits_t"></span><span id="_CPPv2N9BitSorter10RunCompareE6bits_t6bits_t"></span><span id="BitSorter::RunCompare__bits_t.bits_t"></span><span class="target" id="classBitSorter_1a8a150793f4c9d32e1066853b0686bd07"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9BitSorter6bits_tE" title="BitSorter::bits_t"><span class="n"><span class="pre">bits_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RunCompare</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9BitSorter6bits_tE" title="BitSorter::bits_t"><span class="n"><span class="pre">bits_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">values</span></span>, <a class="reference internal" href="#_CPPv4N9BitSorter6bits_tE" title="BitSorter::bits_t"><span class="n"><span class="pre">bits_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">comparator</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitSorter10RunCompareE6bits_t6bits_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Run a specific set of bit values through a single comparator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter8ToStringE6bits_t6size_t">
+<span id="_CPPv3N9BitSorter8ToStringE6bits_t6size_t"></span><span id="_CPPv2N9BitSorter8ToStringE6bits_t6size_t"></span><span id="BitSorter::ToString__bits_t.s"></span><span class="target" id="classBitSorter_1a1aa7ba114855ad9a7add52fc25067873"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToString</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9BitSorter6bits_tE" title="BitSorter::bits_t"><span class="n"><span class="pre">bits_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">values</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bits</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">16</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitSorter8ToStringE6bits_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert a specified set of values to an std::string of 0’s and 1’s. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitSorter11compare_setE">
+<span id="_CPPv3N9BitSorter11compare_setE"></span><span id="_CPPv2N9BitSorter11compare_setE"></span><span id="BitSorter::compare_set__vector:bits_t:"></span><span class="target" id="classBitSorter_1aaf9af6ffa382c257641fc4e67ccb4a7c"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N9BitSorter6bits_tE" title="BitSorter::bits_t"><span class="n"><span class="pre">bits_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compare_set</span></span></span><a class="headerlink" href="#_CPPv4N9BitSorter11compare_setE" title="Link to this definition"></a><br /></dt>
+<dd><p>Comparators, in order (pairs of 1’s in bitstring) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="AvidaGP.html" class="btn btn-neutral float-left" title="AvidaGP.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="EventDrivenGP.html" class="btn btn-neutral float-right" title="EventDrivenGP.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

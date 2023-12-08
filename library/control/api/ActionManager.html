@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ActionManager.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/control/api/ActionManager.f777a162-2a6e-49c0-a757-31337c824707.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Signal.hpp" href="Signal.html" />
+    <link rel="prev" title="Action.hpp" href="Action.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../control.html">Control</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../control.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Action.html">Action.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ActionManager.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413ActionManager"><code class="docutils literal notranslate"><span class="pre">ActionManager</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Signal.html">Signal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SignalControl.html">SignalControl.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SignalManager.html">SignalManager.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../control.html">Control</a></li>
+      <li class="breadcrumb-item active">ActionManager.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="actionmanager-hpp">
+<h1>ActionManager.hpp<a class="headerlink" href="#actionmanager-hpp" title="Link to this heading"></a></h1>
+<p>ActionManager collects sets of Actions to be looked up or manipulated later. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: Beta </p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv413ActionManager">
+<span id="_CPPv313ActionManager"></span><span id="_CPPv213ActionManager"></span><span id="ActionManager"></span><span class="target" id="classActionManager"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActionManager</span></span></span><a class="headerlink" href="#_CPPv413ActionManager" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ActionManager.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13ActionManager13ActionManagerEv">
+<span id="_CPPv3N13ActionManager13ActionManagerEv"></span><span id="_CPPv2N13ActionManager13ActionManagerEv"></span><span id="ActionManager::ActionManager"></span><span class="target" id="classActionManager_1a7d0c405d568795fba0c51f411e77b821"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActionManager</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13ActionManager13ActionManagerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13ActionManager13ActionManagerERR13ActionManager">
+<span id="_CPPv3N13ActionManager13ActionManagerERR13ActionManager"></span><span id="_CPPv2N13ActionManager13ActionManagerERR13ActionManager"></span><span id="ActionManager::ActionManager__ActionManagerRR"></span><span class="target" id="classActionManager_1a6e70631d2fd8b8b27a854d628d0ca996"></span><span class="sig-name descname"><span class="n"><span class="pre">ActionManager</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13ActionManager13ActionManagerERR13ActionManager" title="ActionManager::ActionManager"><span class="n"><span class="pre">ActionManager</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13ActionManager13ActionManagerERR13ActionManager" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13ActionManager13ActionManagerERK13ActionManager">
+<span id="_CPPv3N13ActionManager13ActionManagerERK13ActionManager"></span><span id="_CPPv2N13ActionManager13ActionManagerERK13ActionManager"></span><span id="ActionManager::ActionManager__ActionManagerCR"></span><span class="target" id="classActionManager_1af2446029a94c46f075777c4a7b8f175d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActionManager</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13ActionManager13ActionManagerERK13ActionManager" title="ActionManager::ActionManager"><span class="n"><span class="pre">ActionManager</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13ActionManager13ActionManagerERK13ActionManager" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13ActionManagerD0Ev">
+<span id="_CPPv3N13ActionManagerD0Ev"></span><span id="_CPPv2N13ActionManagerD0Ev"></span><span id="ActionManager::~ActionManager"></span><span class="target" id="classActionManager_1ac80d3d645622551a98db65a649abe079"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~ActionManager</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13ActionManagerD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13ActionManager9GetNextIDEv">
+<span id="_CPPv3NK13ActionManager9GetNextIDEv"></span><span id="_CPPv2NK13ActionManager9GetNextIDEv"></span><span id="ActionManager::GetNextIDC"></span><span class="target" id="classActionManager_1a174404879fd3f83dbe758fce6461ba96"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNextID</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13ActionManager9GetNextIDEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the ID to be used for the next new function. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13ActionManager7GetSizeEv">
+<span id="_CPPv3NK13ActionManager7GetSizeEv"></span><span id="_CPPv2NK13ActionManager7GetSizeEv"></span><span id="ActionManager::GetSizeC"></span><span class="target" id="classActionManager_1acaebcf0e69329426a88b7cc21079b489"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13ActionManager7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many actions are in this manager? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13ActionManagerixERKNSt6stringE">
+<span id="_CPPv3N13ActionManagerixERKNSt6stringE"></span><span id="_CPPv2N13ActionManagerixERKNSt6stringE"></span><span id="ActionManager::subscript-operator__ssCR"></span><span class="target" id="classActionManager_1af22c3ac17ef8ac850bbaaee558cddd3f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="Action.html#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13ActionManagerixERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Look up an action with the specified name. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13ActionManagerixERKNSt6stringE">
+<span id="_CPPv3NK13ActionManagerixERKNSt6stringE"></span><span id="_CPPv2NK13ActionManagerixERKNSt6stringE"></span><span id="ActionManager::subscript-operator__ssCRC"></span><span class="target" id="classActionManager_1a11541636cd5740957bc4f45a73230f2b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Action.html#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13ActionManagerixERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Look up an action with the specified name (const version) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpEN13ActionManager3AddERDaRKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE">
+<span id="_CPPv3I0DpEN13ActionManager3AddERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE"></span><span id="_CPPv2I0DpEN13ActionManager3AddERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RETURN</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classActionManager_1a86c70c327ee2b579966df142e364c463"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Add</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpEN13ActionManager3AddERDaRKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE" title="ActionManager::Add::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpEN13ActionManager3AddERDaRKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE" title="ActionManager::Add::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN13ActionManager3AddERDaRKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a functon to this manager with a pre-specified name. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpEN13ActionManager3AddERDaRKNSt8functionIF6RETURNDp4ARGSEEE">
+<span id="_CPPv3I0DpEN13ActionManager3AddERKNSt8functionIF6RETURNDp4ARGSEEE"></span><span id="_CPPv2I0DpEN13ActionManager3AddERKNSt8functionIF6RETURNDp4ARGSEEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RETURN</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classActionManager_1a969977ee9dab525433e5974397b7f989"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Add</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpEN13ActionManager3AddERDaRKNSt8functionIF6RETURNDp4ARGSEEE" title="ActionManager::Add::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpEN13ActionManager3AddERDaRKNSt8functionIF6RETURNDp4ARGSEEE" title="ActionManager::Add::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN13ActionManager3AddERDaRKNSt8functionIF6RETURNDp4ARGSEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a function to this manager with an auto-generated name. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13ActionManager3AddERK10ActionBase">
+<span id="_CPPv3N13ActionManager3AddERK10ActionBase"></span><span id="_CPPv2N13ActionManager3AddERK10ActionBase"></span><span id="ActionManager::Add__ActionBaseCR"></span><span class="target" id="classActionManager_1ac3d3db5f4d947f287c46acfed04ace11"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Add</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Action.html#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">action</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13ActionManager3AddERK10ActionBase" title="Link to this definition"></a><br /></dt>
+<dd><p>Add an action to this manager. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13ActionManager10PrintNamesERNSt7ostreamE">
+<span id="_CPPv3N13ActionManager10PrintNamesERNSt7ostreamE"></span><span id="_CPPv2N13ActionManager10PrintNamesERNSt7ostreamE"></span><span id="ActionManager::PrintNames__osR"></span><span class="target" id="classActionManager_1a28cf02e4da1d28a1635ae1ba743cc482"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintNames</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13ActionManager10PrintNamesERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Print out the name of all actions maintained by this manager. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13ActionManager10action_mapE">
+<span id="_CPPv3N13ActionManager10action_mapE"></span><span id="_CPPv2N13ActionManager10action_mapE"></span><span id="ActionManager::action_map__std::unordered_map:ss.ActionBaseP:"></span><span class="target" id="classActionManager_1a4861efe5f8af2ddc1757c1ddf5b25d2b"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="Action.html#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">action_map</span></span></span><a class="headerlink" href="#_CPPv4N13ActionManager10action_mapE" title="Link to this definition"></a><br /></dt>
+<dd><p>A set of all actions handled by manager. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13ActionManager7next_idE">
+<span id="_CPPv3N13ActionManager7next_idE"></span><span id="_CPPv2N13ActionManager7next_idE"></span><span id="ActionManager::next_id__i"></span><span class="target" id="classActionManager_1ae0d7d79a9e3657539ea59838603af65d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">next_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N13ActionManager7next_idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Unique ID for next new function. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13ActionManager6prefixE">
+<span id="_CPPv3N13ActionManager6prefixE"></span><span id="_CPPv2N13ActionManager6prefixE"></span><span id="ActionManager::prefix__ss"></span><span class="target" id="classActionManager_1a54e80178c716ce8354f7237d630b6dfd"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">prefix</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;emp_action_&quot;</span></span><a class="headerlink" href="#_CPPv4N13ActionManager6prefixE" title="Link to this definition"></a><br /></dt>
+<dd><p>Prefix for function names to keep unique. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Action.html" class="btn btn-neutral float-left" title="Action.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Signal.html" class="btn btn-neutral float-right" title="Signal.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

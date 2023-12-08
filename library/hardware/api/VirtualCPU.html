@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VirtualCPU.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/hardware/api/VirtualCPU.4aa5b3b3-8211-4a6f-a27c-fd4790149bf1.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="VirtualCPU_InstLib.hpp" href="VirtualCPU_InstLib.html" />
+    <link rel="prev" title="LinearCode.hpp" href="LinearCode.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../hardware.html">Hardware</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../hardware.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AvidaCPU_InstLib.html">AvidaCPU_InstLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AvidaGP.html">AvidaGP.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BitSorter.html">BitSorter.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="EventDrivenGP.html">EventDrivenGP.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="EventLib.html">EventLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Genome.html">Genome.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="InstLib.html">InstLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LinearCode.html">LinearCode.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">VirtualCPU.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv43emp"><code class="docutils literal notranslate"><span class="pre">emp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="VirtualCPU_InstLib.html">VirtualCPU_InstLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="signalgp_utils.html">signalgp_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../hardware.html">Hardware</a></li>
+      <li class="breadcrumb-item active">VirtualCPU.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="virtualcpu-hpp">
+<h1>VirtualCPU.hpp<a class="headerlink" href="#virtualcpu-hpp" title="Link to this heading"></a></h1>
+<p>A simple virtual CPU styled after the original and extended Avidian architectures. &#64;TODO. </p>
+<p><ul class="simple">
+<li><p>Expanded heads?</p></li>
+<li><p>expanded_nop_args useful?</p></li>
+<li><p>Consider changing default return value for search functions</p></li>
+<li><p>Consider switching to (or adding an optional mode) where nops are only curated as-needed instead of all at once </p></li>
+</ul>
+</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv43emp">
+<span id="_CPPv33emp"></span><span id="_CPPv23emp"></span><span id="emp"></span><span class="target" id="namespaceemp"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">emp</span></span></span><a class="headerlink" href="#_CPPv43emp" title="Link to this definition"></a><br /></dt>
+<dd><dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN3emp10VirtualCPUE">
+<span id="_CPPv3I0EN3emp10VirtualCPUE"></span><span id="_CPPv2I0EN3emp10VirtualCPUE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DERIVED</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classemp_1_1VirtualCPU"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VirtualCPU</span></span></span><a class="headerlink" href="#_CPPv4I0EN3emp10VirtualCPUE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;VirtualCPU.hpp&gt;</em></div>
+<p>A simple virtual CPU styled after those seen in Avida. </p>
+<p>This class represents a single virtual CPU following a genome of assembly-level instructions. By default, each CPU features four heads, two stacks, multiple registers, and a circular genome. Both the original and extended architectures are supported. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU9derived_tE">
+<span id="_CPPv3N3emp10VirtualCPU9derived_tE"></span><span id="_CPPv2N3emp10VirtualCPU9derived_tE"></span><span class="target" id="classemp_1_1VirtualCPU_1a14ca7314b38a392c1ab27369c4859e07"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">derived_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN3emp10VirtualCPUE" title="emp::VirtualCPU::DERIVED"><span class="n"><span class="pre">DERIVED</span></span></a><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU9derived_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU6data_tE">
+<span id="_CPPv3N3emp10VirtualCPU6data_tE"></span><span id="_CPPv2N3emp10VirtualCPU6data_tE"></span><span class="target" id="classemp_1_1VirtualCPU_1a1eebec2a21b27857a1d68d3cc6c49541"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">data_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU6data_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU6inst_tE">
+<span id="_CPPv3N3emp10VirtualCPU6inst_tE"></span><span id="_CPPv2N3emp10VirtualCPU6inst_tE"></span><span class="target" id="classemp_1_1VirtualCPU_1a51a688a50f18d725c7889335bcc5f5c6"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">inst_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11InstructionE" title="emp::VirtualCPU::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU6inst_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU10inst_lib_tE">
+<span id="_CPPv3N3emp10VirtualCPU10inst_lib_tE"></span><span id="_CPPv2N3emp10VirtualCPU10inst_lib_tE"></span><span class="target" id="classemp_1_1VirtualCPU_1a866633eea918eea25fcc702272cbdd38"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">inst_lib_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="VirtualCPU_InstLib.html#_CPPv4I00_6size_tE18VirtualCPU_InstLib" title="VirtualCPU_InstLib"><span class="n"><span class="pre">VirtualCPU_InstLib</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU9derived_tE" title="emp::VirtualCPU::derived_t"><span class="n"><span class="pre">derived_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6data_tE" title="emp::VirtualCPU::data_t"><span class="n"><span class="pre">data_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU10inst_lib_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU8genome_tE">
+<span id="_CPPv3N3emp10VirtualCPU8genome_tE"></span><span id="_CPPv2N3emp10VirtualCPU8genome_tE"></span><span class="target" id="classemp_1_1VirtualCPU_1a87fd0c7cdd1e71fe8a0242e3d421a5ff"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">genome_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="Genome.html#_CPPv4I000E6Genome" title="Genome"><span class="n"><span class="pre">Genome</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11InstructionE" title="emp::VirtualCPU::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU10inst_lib_tE" title="emp::VirtualCPU::inst_lib_t"><span class="n"><span class="pre">inst_lib_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU8genome_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU9nop_vec_tE">
+<span id="_CPPv3N3emp10VirtualCPU9nop_vec_tE"></span><span id="_CPPv2N3emp10VirtualCPU9nop_vec_tE"></span><span class="target" id="classemp_1_1VirtualCPU_1a9de36f5e4b954a9fa18f1d7823dd975d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nop_vec_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU9nop_vec_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU7stack_tE">
+<span id="_CPPv3N3emp10VirtualCPU7stack_tE"></span><span id="_CPPv2N3emp10VirtualCPU7stack_tE"></span><span class="target" id="classemp_1_1VirtualCPU_1a3abe50dd6dec424db10a4712fed59cc0"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stack_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6data_tE" title="emp::VirtualCPU::data_t"><span class="n"><span class="pre">data_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU7stack_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU10VirtualCPUERK8genome_t">
+<span id="_CPPv3N3emp10VirtualCPU10VirtualCPUERK8genome_t"></span><span id="_CPPv2N3emp10VirtualCPU10VirtualCPUERK8genome_t"></span><span id="emp::VirtualCPU::VirtualCPU__genome_tCR"></span><span class="target" id="classemp_1_1VirtualCPU_1a51cd9b867c8b1e9cf3f2252548e715e9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VirtualCPU</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU8genome_tE" title="emp::VirtualCPU::genome_t"><span class="n"><span class="pre">genome_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_genome</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU10VirtualCPUERK8genome_t" title="Link to this definition"></a><br /></dt>
+<dd><p>CONSTRUCTORS / DESTRUCTOR Create a new VirtualCPU with the same genome (and thus instruction library) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU10VirtualCPUEv">
+<span id="_CPPv3N3emp10VirtualCPU10VirtualCPUEv"></span><span id="_CPPv2N3emp10VirtualCPU10VirtualCPUEv"></span><span id="emp::VirtualCPU::VirtualCPU"></span><span class="target" id="classemp_1_1VirtualCPU_1a425c7b0432f6224439f1f19ad45a7fe1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VirtualCPU</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU10VirtualCPUEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Create a default VirtualCPU (no genome sequence, default instruction set) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU10VirtualCPUERK10VirtualCPU">
+<span id="_CPPv3N3emp10VirtualCPU10VirtualCPUERK10VirtualCPU"></span><span id="_CPPv2N3emp10VirtualCPU10VirtualCPUERK10VirtualCPU"></span><span id="emp::VirtualCPU::VirtualCPU__VirtualCPUCR"></span><span class="target" id="classemp_1_1VirtualCPU_1ac7a1d7734b3aa1ab3cf4f0203e2fe93f"></span><span class="sig-name descname"><span class="n"><span class="pre">VirtualCPU</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU10VirtualCPUERK10VirtualCPU" title="emp::VirtualCPU::VirtualCPU"><span class="n"><span class="pre">VirtualCPU</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU10VirtualCPUERK10VirtualCPU" title="Link to this definition"></a><br /></dt>
+<dd><p>Create a perfect copy of passed VirtualCPU. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU10VirtualCPUERR10VirtualCPU">
+<span id="_CPPv3N3emp10VirtualCPU10VirtualCPUERR10VirtualCPU"></span><span id="_CPPv2N3emp10VirtualCPU10VirtualCPUERR10VirtualCPU"></span><span id="emp::VirtualCPU::VirtualCPU__VirtualCPURR"></span><span class="target" id="classemp_1_1VirtualCPU_1ae08b7325a45e01c846d4a06529d9a123"></span><span class="sig-name descname"><span class="n"><span class="pre">VirtualCPU</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU10VirtualCPUERR10VirtualCPU" title="emp::VirtualCPU::VirtualCPU"><span class="n"><span class="pre">VirtualCPU</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU10VirtualCPUERR10VirtualCPU" title="Link to this definition"></a><br /></dt>
+<dd><p>Default move constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPUD0Ev">
+<span id="_CPPv3N3emp10VirtualCPUD0Ev"></span><span id="_CPPv2N3emp10VirtualCPUD0Ev"></span><span id="emp::VirtualCPU::~VirtualCPU"></span><span class="target" id="classemp_1_1VirtualCPU_1a6f8c23f29e2b560a3b7d310107b76f88"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~VirtualCPU</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPUD0Ev" title="Link to this definition"></a><br /></dt>
+<dd><p>Default destructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU13GetGenomeSizeEv">
+<span id="_CPPv3NK3emp10VirtualCPU13GetGenomeSizeEv"></span><span id="_CPPv2NK3emp10VirtualCPU13GetGenomeSizeEv"></span><span id="emp::VirtualCPU::GetGenomeSizeC"></span><span class="target" id="classemp_1_1VirtualCPU_1aa7a7b8b30fb78fc1d5687610e55e69c7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetGenomeSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU13GetGenomeSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>GETTERS Return size of original genome </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU20GetWorkingGenomeSizeEv">
+<span id="_CPPv3NK3emp10VirtualCPU20GetWorkingGenomeSizeEv"></span><span id="_CPPv2NK3emp10VirtualCPU20GetWorkingGenomeSizeEv"></span><span id="emp::VirtualCPU::GetWorkingGenomeSizeC"></span><span class="target" id="classemp_1_1VirtualCPU_1a3f7516529283917e68a07c1362931608"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetWorkingGenomeSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU20GetWorkingGenomeSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return size of working genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU10GetNumRegsEv">
+<span id="_CPPv3NK3emp10VirtualCPU10GetNumRegsEv"></span><span id="_CPPv2NK3emp10VirtualCPU10GetNumRegsEv"></span><span id="emp::VirtualCPU::GetNumRegsC"></span><span class="target" id="classemp_1_1VirtualCPU_1a11e14c1b2be905f905d0fc8e046d2c32"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumRegs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU10GetNumRegsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the number of registers in the CPU. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU10GetNumNopsEv">
+<span id="_CPPv3NK3emp10VirtualCPU10GetNumNopsEv"></span><span id="_CPPv2NK3emp10VirtualCPU10GetNumNopsEv"></span><span id="emp::VirtualCPU::GetNumNopsC"></span><span class="target" id="classemp_1_1VirtualCPU_1a6d6d2ee43c4555da6d80f368554e4fcf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumNops</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU10GetNumNopsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the number of NOP instructions found in the CPU’s instruction library. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU10GetOutputsEv">
+<span id="_CPPv3NK3emp10VirtualCPU10GetOutputsEv"></span><span id="_CPPv2NK3emp10VirtualCPU10GetOutputsEv"></span><span id="emp::VirtualCPU::GetOutputsC"></span><span class="target" id="classemp_1_1VirtualCPU_1a6c5fb59f72f161a87e5a842839b2293a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6data_tE" title="emp::VirtualCPU::data_t"><span class="n"><span class="pre">data_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetOutputs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU10GetOutputsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the outputs of the CPU. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU10GetInstLibEv">
+<span id="_CPPv3NK3emp10VirtualCPU10GetInstLibEv"></span><span id="_CPPv2NK3emp10VirtualCPU10GetInstLibEv"></span><span id="emp::VirtualCPU::GetInstLibC"></span><span class="target" id="classemp_1_1VirtualCPU_1a2ee5973ab459a5a5bc4a2d467d497cf6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU10inst_lib_tE" title="emp::VirtualCPU::inst_lib_t"><span class="n"><span class="pre">inst_lib_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetInstLib</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU10GetInstLibEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a pointer to the CPU’s instruction library. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU19GetNumInstsExecutedEv">
+<span id="_CPPv3NK3emp10VirtualCPU19GetNumInstsExecutedEv"></span><span id="_CPPv2NK3emp10VirtualCPU19GetNumInstsExecutedEv"></span><span id="emp::VirtualCPU::GetNumInstsExecutedC"></span><span class="target" id="classemp_1_1VirtualCPU_1a0ad5508169513a7c1f6fc515559db373"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumInstsExecuted</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU19GetNumInstsExecutedEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the number of instructions that have been executed. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU17GetNumInstsCopiedEv">
+<span id="_CPPv3NK3emp10VirtualCPU17GetNumInstsCopiedEv"></span><span id="_CPPv2NK3emp10VirtualCPU17GetNumInstsCopiedEv"></span><span id="emp::VirtualCPU::GetNumInstsCopiedC"></span><span class="target" id="classemp_1_1VirtualCPU_1a22a60953572d157fef59856d5502a370"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumInstsCopied</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU17GetNumInstsCopiedEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the number of instructions that have been copied. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU9SetInputsERK6vectorI6data_tE">
+<span id="_CPPv3N3emp10VirtualCPU9SetInputsERK6vectorI6data_tE"></span><span id="_CPPv2N3emp10VirtualCPU9SetInputsERK6vectorI6data_tE"></span><span id="emp::VirtualCPU::SetInputs__vector:data_t:CR"></span><span class="target" id="classemp_1_1VirtualCPU_1a923b30cec2d75c8447cee81ff88386ca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetInputs</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6data_tE" title="emp::VirtualCPU::data_t"><span class="n"><span class="pre">data_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU9SetInputsERK6vectorI6data_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>SETTERS Copies passed vector into input map </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU4LoadERNSt7istreamE">
+<span id="_CPPv3N3emp10VirtualCPU4LoadERNSt7istreamE"></span><span id="_CPPv2N3emp10VirtualCPU4LoadERNSt7istreamE"></span><span id="emp::VirtualCPU::Load__isR"></span><span class="target" id="classemp_1_1VirtualCPU_1a41020d4e9e7d0a451343bcf67218cc04"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Load</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">input</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU4LoadERNSt7istreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>GENOME &amp; INSTRUCTION MANIPULATION Load instructions from input stream </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU4LoadERKNSt6stringE">
+<span id="_CPPv3N3emp10VirtualCPU4LoadERKNSt6stringE"></span><span id="_CPPv2N3emp10VirtualCPU4LoadERKNSt6stringE"></span><span id="emp::VirtualCPU::Load__ssCR"></span><span class="target" id="classemp_1_1VirtualCPU_1aebaad11621a1263bca00a824bddb2871"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Load</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">filename</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU4LoadERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Load instructions from file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU13LoadFromCharsERKNSt6stringE">
+<span id="_CPPv3N3emp10VirtualCPU13LoadFromCharsERKNSt6stringE"></span><span id="_CPPv2N3emp10VirtualCPU13LoadFromCharsERKNSt6stringE"></span><span id="emp::VirtualCPU::LoadFromChars__ssCR"></span><span class="target" id="classemp_1_1VirtualCPU_1a6c065ef7eaff5d8eaea306e82184ad7d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LoadFromChars</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">new_genome</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU13LoadFromCharsERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Load genome from a string of characters. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU8PushInstE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU8PushInstE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU8PushInstE6size_t"></span><span id="emp::VirtualCPU::PushInst__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a1a32d1052326f91e64d18145b60fbbec"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PushInst</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU8PushInstE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new instruction to the end of the genome, by index in the instruction library. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU8PushInstEi">
+<span id="_CPPv3N3emp10VirtualCPU8PushInstEi"></span><span id="_CPPv2N3emp10VirtualCPU8PushInstEi"></span><span id="emp::VirtualCPU::PushInst__i"></span><span class="target" id="classemp_1_1VirtualCPU_1af4103dbeb336c92deaa193d1870ae153"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PushInst</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU8PushInstEi" title="Link to this definition"></a><br /></dt>
+<dd><p>Redirect literal ints to PushInst(size_t) overload. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU8PushInstEc">
+<span id="_CPPv3N3emp10VirtualCPU8PushInstEc"></span><span id="_CPPv2N3emp10VirtualCPU8PushInstEc"></span><span id="emp::VirtualCPU::PushInst__c"></span><span class="target" id="classemp_1_1VirtualCPU_1ad770b7167a5738d7375f8a4c32cd4b1e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PushInst</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU8PushInstEc" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new instruction to the end of the genome, by the instruction’s symbol/char. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU8PushInstERKNSt6stringE">
+<span id="_CPPv3N3emp10VirtualCPU8PushInstERKNSt6stringE"></span><span id="_CPPv2N3emp10VirtualCPU8PushInstERKNSt6stringE"></span><span id="emp::VirtualCPU::PushInst__ssCR"></span><span class="target" id="classemp_1_1VirtualCPU_1a4bc267cedcf1a641a83a7999e0956375"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PushInst</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU8PushInstERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new instruction to the end of the genome, by name. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU8PushInstERK6inst_t">
+<span id="_CPPv3N3emp10VirtualCPU8PushInstERK6inst_t"></span><span id="_CPPv2N3emp10VirtualCPU8PushInstERK6inst_t"></span><span id="emp::VirtualCPU::PushInst__inst_tCR"></span><span class="target" id="classemp_1_1VirtualCPU_1a6899a6876eb65ce1ee6a191cac188ec4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PushInst</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6inst_tE" title="emp::VirtualCPU::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU8PushInstERK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a specified new instruction to the end of the genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU8PushInstERK6inst_t6size_t">
+<span id="_CPPv3N3emp10VirtualCPU8PushInstERK6inst_t6size_t"></span><span id="_CPPv2N3emp10VirtualCPU8PushInstERK6inst_t6size_t"></span><span id="emp::VirtualCPU::PushInst__inst_tCR.s"></span><span class="target" id="classemp_1_1VirtualCPU_1a715d5bd5936685ba28f6c91cc5f79b8e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PushInst</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6inst_tE" title="emp::VirtualCPU::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU8PushInstERK6inst_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Add multiple copies of a specified instruction to the end of the genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU14GetDefaultInstEv">
+<span id="_CPPv3NK3emp10VirtualCPU14GetDefaultInstEv"></span><span id="_CPPv2NK3emp10VirtualCPU14GetDefaultInstEv"></span><span id="emp::VirtualCPU::GetDefaultInstC"></span><span class="target" id="classemp_1_1VirtualCPU_1a0e73d9a4bb8b7c4ff39157f1d83134dc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6inst_tE" title="emp::VirtualCPU::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetDefaultInst</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU14GetDefaultInstEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the first instruction in the instruction library. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU15PushDefaultInstE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU15PushDefaultInstE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU15PushDefaultInstE6size_t"></span><span id="emp::VirtualCPU::PushDefaultInst__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a85713b182491f6741d1306836afaaabc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PushDefaultInst</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU15PushDefaultInstE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Add one or more default instructions to the end of the genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU13GetRandomInstER6Random">
+<span id="_CPPv3N3emp10VirtualCPU13GetRandomInstER6Random"></span><span id="_CPPv2N3emp10VirtualCPU13GetRandomInstER6Random"></span><span id="emp::VirtualCPU::GetRandomInst__RandomR"></span><span class="target" id="classemp_1_1VirtualCPU_1a1c6176ad0ca4363e07e695e2b9170c01"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6inst_tE" title="emp::VirtualCPU::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRandomInst</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rand</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU13GetRandomInstER6Random" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a random instruction from the instruction library. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU7SetInstE6size_tRK6inst_t">
+<span id="_CPPv3N3emp10VirtualCPU7SetInstE6size_tRK6inst_t"></span><span id="_CPPv2N3emp10VirtualCPU7SetInstE6size_tRK6inst_t"></span><span id="emp::VirtualCPU::SetInst__s.inst_tCR"></span><span class="target" id="classemp_1_1VirtualCPU_1adcd57dee7010e340651e8f39d8fd7daf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetInst</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6inst_tE" title="emp::VirtualCPU::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU7SetInstE6size_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Overwrite the instruction at the given genome index with passed instruction. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU13RandomizeInstE6size_tR6Random">
+<span id="_CPPv3N3emp10VirtualCPU13RandomizeInstE6size_tR6Random"></span><span id="_CPPv2N3emp10VirtualCPU13RandomizeInstE6size_tR6Random"></span><span id="emp::VirtualCPU::RandomizeInst__s.RandomR"></span><span class="target" id="classemp_1_1VirtualCPU_1aa9ca80d16dc4565d1369fa73a1da3724"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandomizeInst</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rand</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU13RandomizeInstE6size_tR6Random" title="Link to this definition"></a><br /></dt>
+<dd><p>Overwrite the instruction at the given genome index with a random instruction. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU14PushRandomInstER6RandomK6size_t">
+<span id="_CPPv3N3emp10VirtualCPU14PushRandomInstER6RandomK6size_t"></span><span id="_CPPv2N3emp10VirtualCPU14PushRandomInstER6RandomK6size_t"></span><span id="emp::VirtualCPU::PushRandomInst__RandomR.sC"></span><span class="target" id="classemp_1_1VirtualCPU_1a878b6f6ddbb8857a5a9f0e1afcf8e8bf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PushRandomInst</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU14PushRandomInstER6RandomK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a random instruction from the instruction library to the end of the genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU10InsertInstERK6inst_tK6size_t">
+<span id="_CPPv3N3emp10VirtualCPU10InsertInstERK6inst_tK6size_t"></span><span id="_CPPv2N3emp10VirtualCPU10InsertInstERK6inst_tK6size_t"></span><span id="emp::VirtualCPU::InsertInst__inst_tCR.sC"></span><span class="target" id="classemp_1_1VirtualCPU_1ab2cf1453131dae69000fc4db879f1031"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InsertInst</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6inst_tE" title="emp::VirtualCPU::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU10InsertInstERK6inst_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Insert the given instruction at the specified genome position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU16InsertRandomInstEK6size_tR6Random">
+<span id="_CPPv3N3emp10VirtualCPU16InsertRandomInstEK6size_tR6Random"></span><span id="_CPPv2N3emp10VirtualCPU16InsertRandomInstEK6size_tR6Random"></span><span id="emp::VirtualCPU::InsertRandomInst__sC.RandomR"></span><span class="target" id="classemp_1_1VirtualCPU_1ad1fedb3c444d3afda469a47036a81a7d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InsertRandomInst</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">idx</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU16InsertRandomInstEK6size_tR6Random" title="Link to this definition"></a><br /></dt>
+<dd><p>Inserts a random instruction at the given genome position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU10RemoveInstEK6size_t">
+<span id="_CPPv3N3emp10VirtualCPU10RemoveInstEK6size_t"></span><span id="_CPPv2N3emp10VirtualCPU10RemoveInstEK6size_t"></span><span id="emp::VirtualCPU::RemoveInst__sC"></span><span class="target" id="classemp_1_1VirtualCPU_1a0619c91c95b7bea575b2bc1bead95cc5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RemoveInst</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU10RemoveInstEK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove the instruction at the specified genome position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU16IncreaseCooldownE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU16IncreaseCooldownE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU16IncreaseCooldownE6size_t"></span><span id="emp::VirtualCPU::IncreaseCooldown__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a2cb48ae6ca0d87ed41927cdb13faa7fa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IncreaseCooldown</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU16IncreaseCooldownE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Increase the cooldown by some value, so instructions cannot be processed for longer. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU16DecreaseCooldownE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU16DecreaseCooldownE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU16DecreaseCooldownE6size_t"></span><span id="emp::VirtualCPU::DecreaseCooldown__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a8ef6ed661f2647071d72398c6b130bcc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecreaseCooldown</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU16DecreaseCooldownE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Decrease the cooldown by some value, so instructions can be processed sooner. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU13ResetCooldownEv">
+<span id="_CPPv3N3emp10VirtualCPU13ResetCooldownEv"></span><span id="_CPPv2N3emp10VirtualCPU13ResetCooldownEv"></span><span id="emp::VirtualCPU::ResetCooldown"></span><span class="target" id="classemp_1_1VirtualCPU_1a5e5c8ffb5f982bb9789a8ac811aab3fc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResetCooldown</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU13ResetCooldownEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset the cooldown timer. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU9AdvanceIPE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU9AdvanceIPE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU9AdvanceIPE6size_t"></span><span id="emp::VirtualCPU::AdvanceIP__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a847a7fdcbab39fc5876914d971f56cc4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdvanceIP</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU9AdvanceIPE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Advance the instruction pointer so many steps and wrap around the end of the genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU9AdvanceRHE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU9AdvanceRHE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU9AdvanceRHE6size_t"></span><span id="emp::VirtualCPU::AdvanceRH__s"></span><span class="target" id="classemp_1_1VirtualCPU_1aa35e24ef6b88cf9a2831a11749037bb4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdvanceRH</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU9AdvanceRHE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Advance the read head so many steps and wrap around the end of the genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU9AdvanceWHE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU9AdvanceWHE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU9AdvanceWHE6size_t"></span><span id="emp::VirtualCPU::AdvanceWH__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a54cae60f55f138df0974d4e7d994adb9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdvanceWH</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU9AdvanceWHE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Advance the write head so many steps and wrap around the end of the genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU9AdvanceFHE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU9AdvanceFHE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU9AdvanceFHE6size_t"></span><span id="emp::VirtualCPU::AdvanceFH__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a520118075a291a8b103fdf35343ba8c1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdvanceFH</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU9AdvanceFHE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Advance the flow head so many steps and wrap around the end of the genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU5SetIPE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU5SetIPE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU5SetIPE6size_t"></span><span id="emp::VirtualCPU::SetIP__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a905824571b7c6031efb8e714a763c1b5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetIP</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU5SetIPE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the instruction pointer to the genome index, wrap around the end of the genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU5SetRHE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU5SetRHE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU5SetRHE6size_t"></span><span id="emp::VirtualCPU::SetRH__s"></span><span class="target" id="classemp_1_1VirtualCPU_1ac7b187875d96dcdd9b3720e08eba2e9f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRH</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU5SetRHE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the read head to the genome index, wrap around the end of the genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU5SetWHE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU5SetWHE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU5SetWHE6size_t"></span><span id="emp::VirtualCPU::SetWH__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a3403d082d270487456d9e976b7f3a1bd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetWH</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU5SetWHE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the write head to the genome index, wrap around the end of the genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU5SetFHE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU5SetFHE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU5SetFHE6size_t"></span><span id="emp::VirtualCPU::SetFH__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a679619e4311ca7d17649d625838603e7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetFH</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU5SetFHE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the flow head to the genome index, wrap around the end of the genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU15ResetModdedHeadE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU15ResetModdedHeadE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU15ResetModdedHeadE6size_t"></span><span id="emp::VirtualCPU::ResetModdedHead__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a1de54ce3e206f2690a700b20d1d61284"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResetModdedHead</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">head_idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU15ResetModdedHeadE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the specified head (which can wrap) to the beginning of the genome,. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU13SetModdedHeadE6size_t6size_t">
+<span id="_CPPv3N3emp10VirtualCPU13SetModdedHeadE6size_t6size_t"></span><span id="_CPPv2N3emp10VirtualCPU13SetModdedHeadE6size_t6size_t"></span><span id="emp::VirtualCPU::SetModdedHead__s.s"></span><span class="target" id="classemp_1_1VirtualCPU_1ad801e74107e9430c3b23e99e33197b93"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetModdedHead</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">head_idx</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU13SetModdedHeadE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the specified head (which can wrap) to the given genome position, wrap around the end of the genome </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU17AdvanceModdedHeadE6size_t6size_t">
+<span id="_CPPv3N3emp10VirtualCPU17AdvanceModdedHeadE6size_t6size_t"></span><span id="_CPPv2N3emp10VirtualCPU17AdvanceModdedHeadE6size_t6size_t"></span><span id="emp::VirtualCPU::AdvanceModdedHead__s.s"></span><span class="target" id="classemp_1_1VirtualCPU_1a869c9f911bf50fb91a09fcfb4b4c15b1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdvanceModdedHead</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">head_idx</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU17AdvanceModdedHeadE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Advance the specified head (which can wrap) the given number of instructions, wrap around the end of the genome </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU13GetModdedHeadE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU13GetModdedHeadE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU13GetModdedHeadE6size_t"></span><span id="emp::VirtualCPU::GetModdedHead__s"></span><span class="target" id="classemp_1_1VirtualCPU_1ade7b71aa400de190d949b5008068ea47"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetModdedHead</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">head_idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU13GetModdedHeadE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the head POSITION of the specified head (can wrap) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU10InitializeEv">
+<span id="_CPPv3N3emp10VirtualCPU10InitializeEv"></span><span id="_CPPv2N3emp10VirtualCPU10InitializeEv"></span><span id="emp::VirtualCPU::Initialize"></span><span class="target" id="classemp_1_1VirtualCPU_1a209d98993dd63c9e0862b5ef07b8d3be"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Initialize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU10InitializeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>HARDWARE MANIPULATION Initializes the CPU by counting the number of NOP instructions in the instruction library and expanding the number of registers to match </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU10ResetHeadsEv">
+<span id="_CPPv3N3emp10VirtualCPU10ResetHeadsEv"></span><span id="_CPPv2N3emp10VirtualCPU10ResetHeadsEv"></span><span id="emp::VirtualCPU::ResetHeads"></span><span class="target" id="classemp_1_1VirtualCPU_1aeae9ff6fc7d737d0558fd74a14787b77"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResetHeads</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU10ResetHeadsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset all heads. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU7ResetIOEv">
+<span id="_CPPv3N3emp10VirtualCPU7ResetIOEv"></span><span id="_CPPv2N3emp10VirtualCPU7ResetIOEv"></span><span id="emp::VirtualCPU::ResetIO"></span><span class="target" id="classemp_1_1VirtualCPU_1a3309b3f02663c1c391b3d40499e32441"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResetIO</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU7ResetIOEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset all inputs and outputs. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11ResetMemoryEv">
+<span id="_CPPv3N3emp10VirtualCPU11ResetMemoryEv"></span><span id="_CPPv2N3emp10VirtualCPU11ResetMemoryEv"></span><span id="emp::VirtualCPU::ResetMemory"></span><span class="target" id="classemp_1_1VirtualCPU_1a17900ff1666d1dc6152e2bf95022a300"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResetMemory</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11ResetMemoryEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset all memory/data. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU16ResetBookkeepingEv">
+<span id="_CPPv3N3emp10VirtualCPU16ResetBookkeepingEv"></span><span id="_CPPv2N3emp10VirtualCPU16ResetBookkeepingEv"></span><span id="emp::VirtualCPU::ResetBookkeeping"></span><span class="target" id="classemp_1_1VirtualCPU_1ae0f7e7da79bf723e03e7409a36d29ea2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResetBookkeeping</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU16ResetBookkeepingEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset all bookkeeping variables. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU18ResetWorkingGenomeEv">
+<span id="_CPPv3N3emp10VirtualCPU18ResetWorkingGenomeEv"></span><span id="_CPPv2N3emp10VirtualCPU18ResetWorkingGenomeEv"></span><span id="emp::VirtualCPU::ResetWorkingGenome"></span><span class="target" id="classemp_1_1VirtualCPU_1a882b9c62c8b15efdd96baf0ef84aac70"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResetWorkingGenome</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU18ResetWorkingGenomeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset the working genome back to the original genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU13ResetHardwareEv">
+<span id="_CPPv3N3emp10VirtualCPU13ResetHardwareEv"></span><span id="_CPPv2N3emp10VirtualCPU13ResetHardwareEv"></span><span id="emp::VirtualCPU::ResetHardware"></span><span class="target" id="classemp_1_1VirtualCPU_1a43b996a95d493acf7aa20ed68bf87c90"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResetHardware</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU13ResetHardwareEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset just the CPU hardware, but keep the original genome. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11ClearGenomeEv">
+<span id="_CPPv3N3emp10VirtualCPU11ClearGenomeEv"></span><span id="_CPPv2N3emp10VirtualCPU11ClearGenomeEv"></span><span id="emp::VirtualCPU::ClearGenome"></span><span class="target" id="classemp_1_1VirtualCPU_1adc001cf8226952024869e246d3d320b9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClearGenome</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11ClearGenomeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Clear the main genome of the organism and reset all hardware. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU10CurateNopsEv">
+<span id="_CPPv3N3emp10VirtualCPU10CurateNopsEv"></span><span id="_CPPv2N3emp10VirtualCPU10CurateNopsEv"></span><span id="emp::VirtualCPU::CurateNops"></span><span class="target" id="classemp_1_1VirtualCPU_1a3bf3466347aa1d7c44cc8119631edf8a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CurateNops</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU10CurateNopsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Compile NOP instructions in genome into useful nop vectors for each instruction, and records the position of all LABEL instructions </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU9CountNopsEv">
+<span id="_CPPv3N3emp10VirtualCPU9CountNopsEv"></span><span id="_CPPv2N3emp10VirtualCPU9CountNopsEv"></span><span id="emp::VirtualCPU::CountNops"></span><span class="target" id="classemp_1_1VirtualCPU_1a5a67e68c627e381be4accfcd04f03778"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountNops</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU9CountNopsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine the number of sequential NOP instructions in the instruction library</p>
+<p>Starts at NopA and continues from there. Any missing instructions force count to stop. Last possible NOP instruction is NopW, as NopX is a special case in Avida. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU15ExpandRegistersEv">
+<span id="_CPPv3N3emp10VirtualCPU15ExpandRegistersEv"></span><span id="_CPPv2N3emp10VirtualCPU15ExpandRegistersEv"></span><span id="emp::VirtualCPU::ExpandRegisters"></span><span class="target" id="classemp_1_1VirtualCPU_1a35e29b783fe2af6083738cfe1864077b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExpandRegisters</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU15ExpandRegistersEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Expand the CPU’s registers to match the number of NOP instructions in the instruction library </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU16GetComplementNopE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU16GetComplementNopE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU16GetComplementNopE6size_t"></span><span id="emp::VirtualCPU::GetComplementNop__s"></span><span class="target" id="classemp_1_1VirtualCPU_1ac14fe73b97ffddaa5c14cdba061d1d7f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetComplementNop</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU16GetComplementNopE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>NOP SEQUENCE METHODS For a given NOP instruction (as an index), return its complement index </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU24GetComplementNopSequenceERK9nop_vec_t">
+<span id="_CPPv3N3emp10VirtualCPU24GetComplementNopSequenceERK9nop_vec_t"></span><span id="_CPPv2N3emp10VirtualCPU24GetComplementNopSequenceERK9nop_vec_t"></span><span id="emp::VirtualCPU::GetComplementNopSequence__nop_vec_tCR"></span><span class="target" id="classemp_1_1VirtualCPU_1aef6b71a7da4a544da19b6909f9d7e8cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU9nop_vec_tE" title="emp::VirtualCPU::nop_vec_t"><span class="n"><span class="pre">nop_vec_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetComplementNopSequence</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU9nop_vec_tE" title="emp::VirtualCPU::nop_vec_t"><span class="n"><span class="pre">nop_vec_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nop_vec</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU24GetComplementNopSequenceERK9nop_vec_t" title="Link to this definition"></a><br /></dt>
+<dd><p>For a vector of NOP instructions (as indices), return a vector of complement indices in the same order </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU19CompareNopSequencesERK9nop_vec_tRK9nop_vec_t">
+<span id="_CPPv3N3emp10VirtualCPU19CompareNopSequencesERK9nop_vec_tRK9nop_vec_t"></span><span id="_CPPv2N3emp10VirtualCPU19CompareNopSequencesERK9nop_vec_tRK9nop_vec_t"></span><span id="emp::VirtualCPU::CompareNopSequences__nop_vec_tCR.nop_vec_tCR"></span><span class="target" id="classemp_1_1VirtualCPU_1a2dfc86bfe2379b22643520b5a2671a76"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompareNopSequences</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU9nop_vec_tE" title="emp::VirtualCPU::nop_vec_t"><span class="n"><span class="pre">nop_vec_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">search_vec</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU9nop_vec_tE" title="emp::VirtualCPU::nop_vec_t"><span class="n"><span class="pre">nop_vec_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">compare_vec</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU19CompareNopSequencesERK9nop_vec_tRK9nop_vec_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Check if a vector of NOP instructions is the same as the START of another vector. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU17CheckIfLastCopiedERK9nop_vec_t">
+<span id="_CPPv3N3emp10VirtualCPU17CheckIfLastCopiedERK9nop_vec_t"></span><span id="_CPPv2N3emp10VirtualCPU17CheckIfLastCopiedERK9nop_vec_t"></span><span id="emp::VirtualCPU::CheckIfLastCopied__nop_vec_tCR"></span><span class="target" id="classemp_1_1VirtualCPU_1a2316d1f7eb649993ff85af2d40ed08d9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CheckIfLastCopied</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU9nop_vec_tE" title="emp::VirtualCPU::nop_vec_t"><span class="n"><span class="pre">nop_vec_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">label</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU17CheckIfLastCopiedERK9nop_vec_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Check if the given vector of NOP instructions (as indices) were the last instructions to be copied by the CPU </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU17FindLabel_ReverseEb">
+<span id="_CPPv3N3emp10VirtualCPU17FindLabel_ReverseEb"></span><span id="_CPPv2N3emp10VirtualCPU17FindLabel_ReverseEb"></span><span id="emp::VirtualCPU::FindLabel_Reverse__b"></span><span class="target" id="classemp_1_1VirtualCPU_1ade3550c7d00f2c28bf95dd5faa08e646"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindLabel_Reverse</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_local</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU17FindLabel_ReverseEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Search up the genome (backward) for a sequence of NOP instructions following a LABEL instruction that match the NOP sequence following the current instruction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>start_local</strong> – If true, search from instruction pointer. If false, search from start of the genome </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU9FindLabelEbb">
+<span id="_CPPv3N3emp10VirtualCPU9FindLabelEbb"></span><span id="_CPPv2N3emp10VirtualCPU9FindLabelEbb"></span><span id="emp::VirtualCPU::FindLabel__b.b"></span><span class="target" id="classemp_1_1VirtualCPU_1a998c933acd6678429dd7774c44c054d6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindLabel</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_local</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">reverse</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU9FindLabelEbb" title="Link to this definition"></a><br /></dt>
+<dd><p>Search the genome for a sequence of NOP instructions following a LABEL instruction that match the NOP sequence following the current instruction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_local</strong> – If true, search from instruction pointer. If false, search from start of the genome </p></li>
+<li><p><strong>reverse</strong> – If true, traverse the genome backward. If false, traverse forward </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU23FindNopSequence_ReverseERK9nop_vec_t6size_t">
+<span id="_CPPv3N3emp10VirtualCPU23FindNopSequence_ReverseERK9nop_vec_t6size_t"></span><span id="_CPPv2N3emp10VirtualCPU23FindNopSequence_ReverseERK9nop_vec_t6size_t"></span><span id="emp::VirtualCPU::FindNopSequence_Reverse__nop_vec_tCR.s"></span><span class="target" id="classemp_1_1VirtualCPU_1a49505ac90552efea610bdd1efd33b1c3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindNopSequence_Reverse</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU9nop_vec_tE" title="emp::VirtualCPU::nop_vec_t"><span class="n"><span class="pre">nop_vec_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">search_vec</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU23FindNopSequence_ReverseERK9nop_vec_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Search up the genome (backward) for a sequence of NOP instructions that match the given NOP sequence</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>search_vec</strong> – The sequence of NOP instructions to search for </p></li>
+<li><p><strong>start_idx</strong> – Position in the genome to start the search </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU23FindNopSequence_ReverseERK9nop_vec_tb">
+<span id="_CPPv3N3emp10VirtualCPU23FindNopSequence_ReverseERK9nop_vec_tb"></span><span id="_CPPv2N3emp10VirtualCPU23FindNopSequence_ReverseERK9nop_vec_tb"></span><span id="emp::VirtualCPU::FindNopSequence_Reverse__nop_vec_tCR.b"></span><span class="target" id="classemp_1_1VirtualCPU_1aae426fd270757a43793eda5b3df52d59"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindNopSequence_Reverse</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU9nop_vec_tE" title="emp::VirtualCPU::nop_vec_t"><span class="n"><span class="pre">nop_vec_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">search_vec</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_local</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU23FindNopSequence_ReverseERK9nop_vec_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Search up the genome (backward) for a sequence of NOP instructions that match the given NOP sequence</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>search_vec</strong> – The sequence of NOP instructions to search for </p></li>
+<li><p><strong>start_local</strong> – If true, search from instruction pointer. If false, search from start of the genome </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU23FindNopSequence_ReverseEb">
+<span id="_CPPv3N3emp10VirtualCPU23FindNopSequence_ReverseEb"></span><span id="_CPPv2N3emp10VirtualCPU23FindNopSequence_ReverseEb"></span><span id="emp::VirtualCPU::FindNopSequence_Reverse__b"></span><span class="target" id="classemp_1_1VirtualCPU_1a6f7ddf8535d01550007eae72205f167c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindNopSequence_Reverse</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_local</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU23FindNopSequence_ReverseEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Search up the genome (backward) for a sequence of NOP instructions that match the NOP sequence following the current instruction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>start_local</strong> – If true, search from instruction pointer. If false, search from start of the genome </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU15FindNopSequenceERK9nop_vec_t6size_tb">
+<span id="_CPPv3N3emp10VirtualCPU15FindNopSequenceERK9nop_vec_t6size_tb"></span><span id="_CPPv2N3emp10VirtualCPU15FindNopSequenceERK9nop_vec_t6size_tb"></span><span id="emp::VirtualCPU::FindNopSequence__nop_vec_tCR.s.b"></span><span class="target" id="classemp_1_1VirtualCPU_1a65ea81895d63758d9a7b3304afae57bd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindNopSequence</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU9nop_vec_tE" title="emp::VirtualCPU::nop_vec_t"><span class="n"><span class="pre">nop_vec_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">search_vec</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_idx</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">reverse</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU15FindNopSequenceERK9nop_vec_t6size_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Search the genome for a sequence of NOP instructions that match the given NOP sequence</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>search_vec</strong> – The sequence of NOP instructions to search for </p></li>
+<li><p><strong>start_idx</strong> – Position in the genome to start the search </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU15FindNopSequenceERK9nop_vec_tbb">
+<span id="_CPPv3N3emp10VirtualCPU15FindNopSequenceERK9nop_vec_tbb"></span><span id="_CPPv2N3emp10VirtualCPU15FindNopSequenceERK9nop_vec_tbb"></span><span id="emp::VirtualCPU::FindNopSequence__nop_vec_tCR.b.b"></span><span class="target" id="classemp_1_1VirtualCPU_1ab10a5b8f05857d199f8e47ff315d2197"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindNopSequence</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU9nop_vec_tE" title="emp::VirtualCPU::nop_vec_t"><span class="n"><span class="pre">nop_vec_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">search_vec</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_local</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">reverse</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU15FindNopSequenceERK9nop_vec_tbb" title="Link to this definition"></a><br /></dt>
+<dd><p>Search the genome for a sequence of NOP instructions that match the given NOP sequence</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>search_vec</strong> – The sequence of NOP instructions to search for </p></li>
+<li><p><strong>start_local</strong> – If true, search from instruction pointer. If false, search from start of the genome </p></li>
+<li><p><strong>reverse</strong> – If true, traverse the genome backward. If false, traverse forward </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU15FindNopSequenceEbb">
+<span id="_CPPv3N3emp10VirtualCPU15FindNopSequenceEbb"></span><span id="_CPPv2N3emp10VirtualCPU15FindNopSequenceEbb"></span><span id="emp::VirtualCPU::FindNopSequence__b.b"></span><span class="target" id="classemp_1_1VirtualCPU_1a218ff47580663dfc97bfe36f48945ed7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindNopSequence</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_local</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">reverse</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU15FindNopSequenceEbb" title="Link to this definition"></a><br /></dt>
+<dd><p>Search up the genome (backward) for a sequence of NOP instructions that match the NOP sequence following the current instruction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_local</strong> – If true, search from instruction pointer. If false, search from start of the genome </p></li>
+<li><p><strong>reverse</strong> – If true, traverse the genome backward. If false, traverse forward </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU9StackPushE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU9StackPushE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU9StackPushE6size_t"></span><span id="emp::VirtualCPU::StackPush__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a36e785ea7fc550e54ff507fd42929a7c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StackPush</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">reg_idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU9StackPushE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>STACK MANIPULATION Push the value in the specified register on top of the active stack </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU8StackPopE6size_t">
+<span id="_CPPv3N3emp10VirtualCPU8StackPopE6size_t"></span><span id="_CPPv2N3emp10VirtualCPU8StackPopE6size_t"></span><span id="emp::VirtualCPU::StackPop__s"></span><span class="target" id="classemp_1_1VirtualCPU_1ae41158d0c5d047096983f4ec529f8ac4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StackPop</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">reg_idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU8StackPopE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove the value from the top of the active stack and store it in the specified register </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU9StackSwapEv">
+<span id="_CPPv3N3emp10VirtualCPU9StackSwapEv"></span><span id="_CPPv2N3emp10VirtualCPU9StackSwapEv"></span><span id="emp::VirtualCPU::StackSwap"></span><span class="target" id="classemp_1_1VirtualCPU_1abfaf509364545f42948e8fb73711b107"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StackSwap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU9StackSwapEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Swap which stack is active. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11GetStackValE6size_t6size_t">
+<span id="_CPPv3N3emp10VirtualCPU11GetStackValE6size_t6size_t"></span><span id="_CPPv2N3emp10VirtualCPU11GetStackValE6size_t6size_t"></span><span id="emp::VirtualCPU::GetStackVal__s.s"></span><span class="target" id="classemp_1_1VirtualCPU_1a4214d9473f40094ef1fd7b20ad3b2a7b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6data_tE" title="emp::VirtualCPU::data_t"><span class="n"><span class="pre">data_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetStackVal</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stack_idx</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val_idx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11GetStackValE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Fetch the nth value of the specified stack. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU13SingleProcessEb">
+<span id="_CPPv3N3emp10VirtualCPU13SingleProcessEb"></span><span id="_CPPv2N3emp10VirtualCPU13SingleProcessEb"></span><span id="emp::VirtualCPU::SingleProcess__b"></span><span class="target" id="classemp_1_1VirtualCPU_1ad6e7ac55d51a24e4ebac0739e6cae2a4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SingleProcess</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">verbose</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU13SingleProcessEb" title="Link to this definition"></a><br /></dt>
+<dd><p>PROCESSING Process the next instruction pointed to be the instruction pointer </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU7ProcessE6size_tb">
+<span id="_CPPv3N3emp10VirtualCPU7ProcessE6size_tb"></span><span id="_CPPv2N3emp10VirtualCPU7ProcessE6size_tb"></span><span id="emp::VirtualCPU::Process__s.b"></span><span class="target" id="classemp_1_1VirtualCPU_1a2d2152e69d1798d04d1174504a4e83ac"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Process</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_inst</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">verbose</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU7ProcessE6size_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Process the next SERIES of instructions, directed by the instruction pointer. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU22GetWorkingGenomeStringEv">
+<span id="_CPPv3NK3emp10VirtualCPU22GetWorkingGenomeStringEv"></span><span id="_CPPv2NK3emp10VirtualCPU22GetWorkingGenomeStringEv"></span><span id="emp::VirtualCPU::GetWorkingGenomeStringC"></span><span class="target" id="classemp_1_1VirtualCPU_1a918d4a7d85a2d42192739395014801d5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetWorkingGenomeString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU22GetWorkingGenomeStringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>STATE -&gt; STRING FUNCTIONS Return the working genome in string form.</p>
+<p>Each instruction is represented by a single character, dictated by the instruction’s ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU15GetGenomeStringEv">
+<span id="_CPPv3NK3emp10VirtualCPU15GetGenomeStringEv"></span><span id="_CPPv2NK3emp10VirtualCPU15GetGenomeStringEv"></span><span id="emp::VirtualCPU::GetGenomeStringC"></span><span class="target" id="classemp_1_1VirtualCPU_1a135bd910448bb0c50bc4d415e6eda8a9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetGenomeString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU15GetGenomeStringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the original genome in string form.</p>
+<p>Each instruction is represented by a single character, dictated by the instruction’s ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU18GetRawGenomeStringEv">
+<span id="_CPPv3NK3emp10VirtualCPU18GetRawGenomeStringEv"></span><span id="_CPPv2NK3emp10VirtualCPU18GetRawGenomeStringEv"></span><span id="emp::VirtualCPU::GetRawGenomeStringC"></span><span class="target" id="classemp_1_1VirtualCPU_1a673acbb9a1d4a37e4d6d5a313b23c5d3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRawGenomeString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU18GetRawGenomeStringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the original genome in string form, without the genome length.</p>
+<p>Each instruction is represented by a single character, dictated by the instruction’s ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU12PrintDetailsERNSt7ostreamE">
+<span id="_CPPv3N3emp10VirtualCPU12PrintDetailsERNSt7ostreamE"></span><span id="_CPPv2N3emp10VirtualCPU12PrintDetailsERNSt7ostreamE"></span><span id="emp::VirtualCPU::PrintDetails__osR"></span><span class="target" id="classemp_1_1VirtualCPU_1a5f71cada53dc77e2004d5b6038ae5554"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintDetails</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU12PrintDetailsERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Output the state of the CPU’s heads and registers to the specified output stream. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU16are_nops_countedE">
+<span id="_CPPv3N3emp10VirtualCPU16are_nops_countedE"></span><span id="_CPPv2N3emp10VirtualCPU16are_nops_countedE"></span><span id="emp::VirtualCPU::are_nops_counted__b"></span><span class="target" id="classemp_1_1VirtualCPU_1a0dbc646b506b728c56ed72e20a88b19f"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">are_nops_counted</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU16are_nops_countedE" title="Link to this definition"></a><br /></dt>
+<dd><p>in the CPU’s library have been counted </p>
+<p>Flag detailing if the number of NOP instructions </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU17are_regs_expandedE">
+<span id="_CPPv3N3emp10VirtualCPU17are_regs_expandedE"></span><span id="_CPPv2N3emp10VirtualCPU17are_regs_expandedE"></span><span id="emp::VirtualCPU::are_regs_expanded__b"></span><span class="target" id="classemp_1_1VirtualCPU_1a4848031b88e6e896c497043a739b5511"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">are_regs_expanded</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU17are_regs_expandedE" title="Link to this definition"></a><br /></dt>
+<dd><p>Flag signaling if the number of registers have been expanded to accommodate the number of NOP instructions in the library </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU17nops_need_curatedE">
+<span id="_CPPv3N3emp10VirtualCPU17nops_need_curatedE"></span><span id="_CPPv2N3emp10VirtualCPU17nops_need_curatedE"></span><span id="emp::VirtualCPU::nops_need_curated__b"></span><span class="target" id="classemp_1_1VirtualCPU_1ac5f3a2d9e8b2b5660dc2650b8c9787a0"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nops_need_curated</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU17nops_need_curatedE" title="Link to this definition"></a><br /></dt>
+<dd><p>Flag signaling that NOP instructions need curated. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU17expanded_nop_argsE">
+<span id="_CPPv3N3emp10VirtualCPU17expanded_nop_argsE"></span><span id="_CPPv2N3emp10VirtualCPU17expanded_nop_argsE"></span><span id="emp::VirtualCPU::expanded_nop_args__b"></span><span class="target" id="classemp_1_1VirtualCPU_1a146f82afd6d5ad8d3012fb014b72644b"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">expanded_nop_args</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU17expanded_nop_argsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Flag signaling that CPU is used the expanded. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU4regsE">
+<span id="_CPPv3N3emp10VirtualCPU4regsE"></span><span id="_CPPv2N3emp10VirtualCPU4regsE"></span><span id="emp::VirtualCPU::regs__vector:data_t:"></span><span class="target" id="classemp_1_1VirtualCPU_1a38eda1c82f285e1534b7712b79546a7d"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6data_tE" title="emp::VirtualCPU::data_t"><span class="n"><span class="pre">data_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">regs</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU4regsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Vector of registers. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU6inputsE">
+<span id="_CPPv3N3emp10VirtualCPU6inputsE"></span><span id="_CPPv2N3emp10VirtualCPU6inputsE"></span><span id="emp::VirtualCPU::inputs__std::unordered_map:i.data_t:"></span><span class="target" id="classemp_1_1VirtualCPU_1a3d0e0d1643b97d2ae565edfd86d35f6d"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6data_tE" title="emp::VirtualCPU::data_t"><span class="n"><span class="pre">data_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">inputs</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU6inputsE" title="Link to this definition"></a><br /></dt>
+<dd><p>(position -&gt; value) </p>
+<p>Map of all available inputs </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU7outputsE">
+<span id="_CPPv3N3emp10VirtualCPU7outputsE"></span><span id="_CPPv2N3emp10VirtualCPU7outputsE"></span><span id="emp::VirtualCPU::outputs__std::unordered_map:i.data_t:"></span><span class="target" id="classemp_1_1VirtualCPU_1a91245f93fd1ceea1cb39799c6590233e"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU6data_tE" title="emp::VirtualCPU::data_t"><span class="n"><span class="pre">data_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">outputs</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU7outputsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Map of all outputs (position -&gt; value) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU6stacksE">
+<span id="_CPPv3N3emp10VirtualCPU6stacksE"></span><span id="_CPPv2N3emp10VirtualCPU6stacksE"></span><span id="emp::VirtualCPU::stacks__array:stack_t.NUM_STACKS:"></span><span class="target" id="classemp_1_1VirtualCPU_1abaaa3c48ef990486239205ddcd449b61"></span><a class="reference internal" href="../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU7stack_tE" title="emp::VirtualCPU::stack_t"><span class="n"><span class="pre">stack_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU10NUM_STACKSE" title="emp::VirtualCPU::NUM_STACKS"><span class="n"><span class="pre">NUM_STACKS</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stacks</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU6stacksE" title="Link to this definition"></a><br /></dt>
+<dd><p>Array of stacks for this CPU. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU8inst_ptrE">
+<span id="_CPPv3N3emp10VirtualCPU8inst_ptrE"></span><span id="_CPPv2N3emp10VirtualCPU8inst_ptrE"></span><span id="emp::VirtualCPU::inst_ptr__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a83b59895955fa2f9a607acf1655940bc"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">inst_ptr</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU8inst_ptrE" title="Link to this definition"></a><br /></dt>
+<dd><p>instruction to be executed </p>
+<p>Instruction pointer, signifies next </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU9flow_headE">
+<span id="_CPPv3N3emp10VirtualCPU9flow_headE"></span><span id="_CPPv2N3emp10VirtualCPU9flow_headE"></span><span id="emp::VirtualCPU::flow_head__s"></span><span class="target" id="classemp_1_1VirtualCPU_1ae80e117d19283ad88c0b96d1fd267744"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">flow_head</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU9flow_headE" title="Link to this definition"></a><br /></dt>
+<dd><p>values </p>
+<p>Flow head, used for moving heads and </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU9read_headE">
+<span id="_CPPv3N3emp10VirtualCPU9read_headE"></span><span id="_CPPv2N3emp10VirtualCPU9read_headE"></span><span id="emp::VirtualCPU::read_head__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a46019ef6ecb8b397692e1a840da27d09"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">read_head</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU9read_headE" title="Link to this definition"></a><br /></dt>
+<dd><p>copy next </p>
+<p>Read head, signals what instruction to </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU10write_headE">
+<span id="_CPPv3N3emp10VirtualCPU10write_headE"></span><span id="_CPPv2N3emp10VirtualCPU10write_headE"></span><span id="emp::VirtualCPU::write_head__s"></span><span class="target" id="classemp_1_1VirtualCPU_1ad38e31054cb80e925e8b4c9bf6be7aee"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">write_head</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU10write_headE" title="Link to this definition"></a><br /></dt>
+<dd><p>instruction </p>
+<p>Write head, signals where to copy next </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU14cooldown_timerE">
+<span id="_CPPv3N3emp10VirtualCPU14cooldown_timerE"></span><span id="_CPPv2N3emp10VirtualCPU14cooldown_timerE"></span><span id="emp::VirtualCPU::cooldown_timer__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a4d836b1086d050f3e0da14057e5da30d"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cooldown_timer</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU14cooldown_timerE" title="Link to this definition"></a><br /></dt>
+<dd><p>Decrease this value instead ///// HELPER CONSTRUCTS. </p>
+<p>Do not process inst if value &gt; 0. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU10nop_id_mapE">
+<span id="_CPPv3N3emp10VirtualCPU10nop_id_mapE"></span><span id="_CPPv2N3emp10VirtualCPU10nop_id_mapE"></span><span id="emp::VirtualCPU::nop_id_map__unordered_map:s.s:"></span><span class="target" id="classemp_1_1VirtualCPU_1ad447a874dc41e61a1412b21ff498e626"></span><a class="reference internal" href="../../base/api/unordered_map.html#_CPPv4I00DpE13unordered_map" title="unordered_map"><span class="n"><span class="pre">unordered_map</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nop_id_map</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU10nop_id_mapE" title="Link to this definition"></a><br /></dt>
+<dd><p>NOP inst id -&gt; Nop index (e.g., NopA -&gt; 0, NopB -&gt; 1, NopE -&gt; 5) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU13label_idx_vecE">
+<span id="_CPPv3N3emp10VirtualCPU13label_idx_vecE"></span><span id="_CPPv2N3emp10VirtualCPU13label_idx_vecE"></span><span id="emp::VirtualCPU::label_idx_vec__vector:s:"></span><span class="target" id="classemp_1_1VirtualCPU_1af796a98fdeae87b9e75c0df8f52b3b94"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">label_idx_vec</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU13label_idx_vecE" title="Link to this definition"></a><br /></dt>
+<dd><p>Vector of LABEL instructions indices in genome ///// GENOME. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU6genomeE">
+<span id="_CPPv3N3emp10VirtualCPU6genomeE"></span><span id="_CPPv2N3emp10VirtualCPU6genomeE"></span><span id="emp::VirtualCPU::genome__genome_t"></span><span class="target" id="classemp_1_1VirtualCPU_1a81c9dbf55bbb2355b2dbfa97cfa4e5f2"></span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU8genome_tE" title="emp::VirtualCPU::genome_t"><span class="n"><span class="pre">genome_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">genome</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU6genomeE" title="Link to this definition"></a><br /></dt>
+<dd><p>that should not change in any way </p>
+<p>Preserved copy of genome from organism creation/birth </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU14genome_workingE">
+<span id="_CPPv3N3emp10VirtualCPU14genome_workingE"></span><span id="_CPPv2N3emp10VirtualCPU14genome_workingE"></span><span id="emp::VirtualCPU::genome_working__genome_t"></span><span class="target" id="classemp_1_1VirtualCPU_1adf79373e6e6c30f1a6ecad83bed71ed7"></span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU8genome_tE" title="emp::VirtualCPU::genome_t"><span class="n"><span class="pre">genome_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">genome_working</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU14genome_workingE" title="Link to this definition"></a><br /></dt>
+<dd><p>Working copy of genome that can mutate, resize, and change ///// BOOKKEEPING. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU16active_stack_idxE">
+<span id="_CPPv3N3emp10VirtualCPU16active_stack_idxE"></span><span id="_CPPv2N3emp10VirtualCPU16active_stack_idxE"></span><span id="emp::VirtualCPU::active_stack_idx__s"></span><span class="target" id="classemp_1_1VirtualCPU_1aca604704a9e832f077dbe1ad6ee0c66e"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">active_stack_idx</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU16active_stack_idxE" title="Link to this definition"></a><br /></dt>
+<dd><p>Index of CPU’s active stack. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU18copied_inst_id_vecE">
+<span id="_CPPv3N3emp10VirtualCPU18copied_inst_id_vecE"></span><span id="_CPPv2N3emp10VirtualCPU18copied_inst_id_vecE"></span><span id="emp::VirtualCPU::copied_inst_id_vec__vector:s:"></span><span class="target" id="classemp_1_1VirtualCPU_1a6243aad5a58cda7be34b5603873c3c48"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">copied_inst_id_vec</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU18copied_inst_id_vecE" title="Link to this definition"></a><br /></dt>
+<dd><p>Vector of instructions that have been copied </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU18num_insts_executedE">
+<span id="_CPPv3N3emp10VirtualCPU18num_insts_executedE"></span><span id="_CPPv2N3emp10VirtualCPU18num_insts_executedE"></span><span id="emp::VirtualCPU::num_insts_executed__s"></span><span class="target" id="classemp_1_1VirtualCPU_1aef86ce29c902fe31fc129bcc7268b8fe"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_insts_executed</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU18num_insts_executedE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of instructions that have been executed. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU10NUM_STACKSE">
+<span id="_CPPv3N3emp10VirtualCPU10NUM_STACKSE"></span><span id="_CPPv2N3emp10VirtualCPU10NUM_STACKSE"></span><span id="emp::VirtualCPU::NUM_STACKS__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a1d59a87a534e5eac37a60cb5581e8dc3"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NUM_STACKS</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU10NUM_STACKSE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of stacks in this CPU (currently 2) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU8MAX_NOPSE">
+<span id="_CPPv3N3emp10VirtualCPU8MAX_NOPSE"></span><span id="_CPPv2N3emp10VirtualCPU8MAX_NOPSE"></span><span id="emp::VirtualCPU::MAX_NOPS__s"></span><span class="target" id="classemp_1_1VirtualCPU_1adbcacb436ceb0fc036fae5edfced4551"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_NOPS</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">23</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU8MAX_NOPSE" title="Link to this definition"></a><br /></dt>
+<dd><p>Maximum number of nop instructions supported. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU8num_regsE">
+<span id="_CPPv3N3emp10VirtualCPU8num_regsE"></span><span id="_CPPv2N3emp10VirtualCPU8num_regsE"></span><span id="emp::VirtualCPU::num_regs__s"></span><span class="target" id="classemp_1_1VirtualCPU_1af258c7051de9618ddf9110ebda0a5bb5"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_regs</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU8num_regsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of registers found in this CPU. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU8num_nopsE">
+<span id="_CPPv3N3emp10VirtualCPU8num_nopsE"></span><span id="_CPPv2N3emp10VirtualCPU8num_nopsE"></span><span id="emp::VirtualCPU::num_nops__s"></span><span class="target" id="classemp_1_1VirtualCPU_1a5cd60118f36fdd60a4b3cf535451c21c"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_nops</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU8num_nopsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of NOP instructions found in this CPU’s library. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11InstructionE">
+<span id="_CPPv3N3emp10VirtualCPU11InstructionE"></span><span id="_CPPv2N3emp10VirtualCPU11InstructionE"></span><span id="emp::VirtualCPU::Instruction"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Instruction</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">InstructionBase</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11InstructionE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;VirtualCPU.hpp&gt;</em></div>
+<p>Representation of a single instruction in the CPU’s genome. </p>
+<p>Only contains the necessary information for which instruction is being represented as well as any data it needs in the genome. Does NOT contain the actual logic of the instruction, nor the name. These are handled by the instruction library itself. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11Instruction11InstructionEv">
+<span id="_CPPv3N3emp10VirtualCPU11Instruction11InstructionEv"></span><span id="_CPPv2N3emp10VirtualCPU11Instruction11InstructionEv"></span><span id="emp::VirtualCPU::Instruction::Instruction"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1a1adbf44728a265b8b39292b525fddb94"></span><span class="sig-name descname"><span class="n"><span class="pre">Instruction</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11Instruction11InstructionEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11Instruction11InstructionE6size_t6size_t6vectorI6size_tE">
+<span id="_CPPv3N3emp10VirtualCPU11Instruction11InstructionE6size_t6size_t6vectorI6size_tE"></span><span id="_CPPv2N3emp10VirtualCPU11Instruction11InstructionE6size_t6size_t6vectorI6size_tE"></span><span id="emp::VirtualCPU::Instruction::Instruction__s.s.vector:s:"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1aaaafe8cadc03cd2e513b27dcaea8e22e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Instruction</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_idx</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_nop_vec</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11Instruction11InstructionE6size_t6size_t6vectorI6size_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11Instruction11InstructionERK11Instruction">
+<span id="_CPPv3N3emp10VirtualCPU11Instruction11InstructionERK11Instruction"></span><span id="_CPPv2N3emp10VirtualCPU11Instruction11InstructionERK11Instruction"></span><span id="emp::VirtualCPU::Instruction::Instruction__InstructionCR"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1a648a2fef4b40dda7e8925e48b9134b06"></span><span class="sig-name descname"><span class="n"><span class="pre">Instruction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11Instruction11InstructionERK11Instruction" title="emp::VirtualCPU::Instruction::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11Instruction11InstructionERK11Instruction" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11Instruction11InstructionERR11Instruction">
+<span id="_CPPv3N3emp10VirtualCPU11Instruction11InstructionERR11Instruction"></span><span id="_CPPv2N3emp10VirtualCPU11Instruction11InstructionERR11Instruction"></span><span id="emp::VirtualCPU::Instruction::Instruction__InstructionRR"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1afd00ca1af892a7ba33bcaa3b5b4a39c4"></span><span class="sig-name descname"><span class="n"><span class="pre">Instruction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11Instruction11InstructionERR11Instruction" title="emp::VirtualCPU::Instruction::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11Instruction11InstructionERR11Instruction" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11InstructionaSERK11Instruction">
+<span id="_CPPv3N3emp10VirtualCPU11InstructionaSERK11Instruction"></span><span id="_CPPv2N3emp10VirtualCPU11InstructionaSERK11Instruction"></span><span id="emp::VirtualCPU::Instruction::assign-operator__InstructionCR"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1afec9eccc0544c8f8440591492a159927"></span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11InstructionE" title="emp::VirtualCPU::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11InstructionE" title="emp::VirtualCPU::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11InstructionaSERK11Instruction" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11InstructionaSERR11Instruction">
+<span id="_CPPv3N3emp10VirtualCPU11InstructionaSERR11Instruction"></span><span id="_CPPv2N3emp10VirtualCPU11InstructionaSERR11Instruction"></span><span id="emp::VirtualCPU::Instruction::assign-operator__InstructionRR"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1a7b97aebc705954c1a61bf73c1d9486ef"></span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11InstructionE" title="emp::VirtualCPU::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11InstructionE" title="emp::VirtualCPU::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11InstructionaSERR11Instruction" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU11InstructionltERK11Instruction">
+<span id="_CPPv3NK3emp10VirtualCPU11InstructionltERK11Instruction"></span><span id="_CPPv2NK3emp10VirtualCPU11InstructionltERK11Instruction"></span><span id="emp::VirtualCPU::Instruction::lt-operator__InstructionCRC"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1a7cf97267aa7427dc657116e4d0f72c23"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11InstructionE" title="emp::VirtualCPU::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU11InstructionltERK11Instruction" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU11InstructioneqERK11Instruction">
+<span id="_CPPv3NK3emp10VirtualCPU11InstructioneqERK11Instruction"></span><span id="_CPPv2NK3emp10VirtualCPU11InstructioneqERK11Instruction"></span><span id="emp::VirtualCPU::Instruction::eq-operator__InstructionCRC"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1a8fc8a4fc3f39fbbfb07160a335427f12"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11InstructionE" title="emp::VirtualCPU::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU11InstructioneqERK11Instruction" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU11InstructionneERK11Instruction">
+<span id="_CPPv3NK3emp10VirtualCPU11InstructionneERK11Instruction"></span><span id="_CPPv2NK3emp10VirtualCPU11InstructionneERK11Instruction"></span><span id="emp::VirtualCPU::Instruction::neq-operator__InstructionCRC"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1a04baba3b37d746248362763b0e9fc634"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11InstructionE" title="emp::VirtualCPU::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU11InstructionneERK11Instruction" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU11InstructiongtERK11Instruction">
+<span id="_CPPv3NK3emp10VirtualCPU11InstructiongtERK11Instruction"></span><span id="_CPPv2NK3emp10VirtualCPU11InstructiongtERK11Instruction"></span><span id="emp::VirtualCPU::Instruction::gt-operator__InstructionCRC"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1abdb4e2774b4e9c928548d061f6bcbceb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11InstructionE" title="emp::VirtualCPU::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU11InstructiongtERK11Instruction" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU11InstructiongeERK11Instruction">
+<span id="_CPPv3NK3emp10VirtualCPU11InstructiongeERK11Instruction"></span><span id="_CPPv2NK3emp10VirtualCPU11InstructiongeERK11Instruction"></span><span id="emp::VirtualCPU::Instruction::gte-operator__InstructionCRC"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1a8e7bb943f5ef27da78817f41182a351f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11InstructionE" title="emp::VirtualCPU::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU11InstructiongeERK11Instruction" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU11InstructionleERK11Instruction">
+<span id="_CPPv3NK3emp10VirtualCPU11InstructionleERK11Instruction"></span><span id="_CPPv2NK3emp10VirtualCPU11InstructionleERK11Instruction"></span><span id="emp::VirtualCPU::Instruction::lte-operator__InstructionCRC"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1af3dbba4a4b9348e89a048a42862b29e3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3emp10VirtualCPU11InstructionE" title="emp::VirtualCPU::Instruction"><span class="n"><span class="pre">Instruction</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU11InstructionleERK11Instruction" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11Instruction3SetE6size_t6size_t6vectorI6size_tE">
+<span id="_CPPv3N3emp10VirtualCPU11Instruction3SetE6size_t6size_t6vectorI6size_tE"></span><span id="_CPPv2N3emp10VirtualCPU11Instruction3SetE6size_t6size_t6vectorI6size_tE"></span><span id="emp::VirtualCPU::Instruction::Set__s.s.vector:s:"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1afde7b1a2cf245403c7fa19949de4aa78"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_idx</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_id</span></span>, <a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_nop_vec</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11Instruction3SetE6size_t6size_t6vectorI6size_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3emp10VirtualCPU11Instruction8GetIndexEv">
+<span id="_CPPv3NK3emp10VirtualCPU11Instruction8GetIndexEv"></span><span id="_CPPv2NK3emp10VirtualCPU11Instruction8GetIndexEv"></span><span id="emp::VirtualCPU::Instruction::GetIndexC"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1a3d4a87294fc294b9090eb39e659e15d1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetIndex</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK3emp10VirtualCPU11Instruction8GetIndexEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11Instruction3idxE">
+<span id="_CPPv3N3emp10VirtualCPU11Instruction3idxE"></span><span id="_CPPv2N3emp10VirtualCPU11Instruction3idxE"></span><span id="emp::VirtualCPU::Instruction::idx__s"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1ad088f3c845f23d274b39c954f314a281"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">idx</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11Instruction3idxE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11Instruction2idE">
+<span id="_CPPv3N3emp10VirtualCPU11Instruction2idE"></span><span id="_CPPv2N3emp10VirtualCPU11Instruction2idE"></span><span id="emp::VirtualCPU::Instruction::id__s"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1a34e719eec78f71467ce5d6575092c016"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11Instruction2idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Index of the instruction in the instruction library. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11Instruction7nop_vecE">
+<span id="_CPPv3N3emp10VirtualCPU11Instruction7nop_vecE"></span><span id="_CPPv2N3emp10VirtualCPU11Instruction7nop_vecE"></span><span id="emp::VirtualCPU::Instruction::nop_vec__vector:s:"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1ad58ee00f1eaf3970f956e1dcc4aa4e69"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nop_vec</span></span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11Instruction7nop_vecE" title="Link to this definition"></a><br /></dt>
+<dd><p>Identifier for the instruction that gives the user flexibility over the instruction (e.g., what symbol it should use in a string representation) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11Instruction17has_been_executedE">
+<span id="_CPPv3N3emp10VirtualCPU11Instruction17has_been_executedE"></span><span id="_CPPv2N3emp10VirtualCPU11Instruction17has_been_executedE"></span><span id="emp::VirtualCPU::Instruction::has_been_executed__b"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1ac6ff58ddbfc9d6b398f766acbfbe99db"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">has_been_executed</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11Instruction17has_been_executedE" title="Link to this definition"></a><br /></dt>
+<dd><p>instructions following this instruction in the genome </p>
+<p>Representation of the contiguous sequence of NOP </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3emp10VirtualCPU11Instruction15has_been_copiedE">
+<span id="_CPPv3N3emp10VirtualCPU11Instruction15has_been_copiedE"></span><span id="_CPPv2N3emp10VirtualCPU11Instruction15has_been_copiedE"></span><span id="emp::VirtualCPU::Instruction::has_been_copied__b"></span><span class="target" id="structemp_1_1VirtualCPU_1_1Instruction_1a4d2afab8a5f5179f7a5f49e14a9947c9"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">has_been_copied</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3emp10VirtualCPU11Instruction15has_been_copiedE" title="Link to this definition"></a><br /></dt>
+<dd><p>Has this instruction been executed? </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="LinearCode.html" class="btn btn-neutral float-left" title="LinearCode.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="VirtualCPU_InstLib.html" class="btn btn-neutral float-right" title="VirtualCPU_InstLib.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

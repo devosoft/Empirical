@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>graph_utils.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/datastructs/api/graph_utils.033e92c0-da66-43a1-8ca1-71b536ba14ca.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="hash_utils.hpp" href="hash_utils.html" />
+    <link rel="prev" title="UnorderedIndexMap.hpp" href="UnorderedIndexMap.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../datastructs.html">Data structures</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../datastructs.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BloomFilter.html">BloomFilter.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Bool.html">Bool.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Cache.html">Cache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DynamicString.html">DynamicString.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Graph.html">Graph.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="IndexMap.html">IndexMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="IndexSet.html">IndexSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="QueueCache.html">QueueCache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallFifoMap.html">SmallFifoMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallVector.html">SmallVector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StringMap.html">StringMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TimeQueue.html">TimeQueue.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypeMap.html">TypeMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UnorderedIndexMap.html">UnorderedIndexMap.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">graph_utils.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413shuffle_graphRK5GraphR6Random"><code class="docutils literal notranslate"><span class="pre">shuffle_graph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416build_graph_ring6size_tR6Random"><code class="docutils literal notranslate"><span class="pre">build_graph_ring()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416build_graph_tree6size_tR6Random"><code class="docutils literal notranslate"><span class="pre">build_graph_tree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv418build_graph_random6size_t6size_tR6Randomb"><code class="docutils literal notranslate"><span class="pre">build_graph_random()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416build_graph_grid6size_t6size_tR6Randomd"><code class="docutils literal notranslate"><span class="pre">build_graph_grid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv422build_graph_clique_set6size_t6size_tR6Randomd"><code class="docutils literal notranslate"><span class="pre">build_graph_clique_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415build_graph_dag6size_t6size_tR6Randomb"><code class="docutils literal notranslate"><span class="pre">build_graph_dag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv425build_weighted_graph_tree6size_t6size_t6size_tR6Random"><code class="docutils literal notranslate"><span class="pre">build_weighted_graph_tree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv427build_weighted_graph_random6size_t6size_t6size_t6size_tR6Randomb"><code class="docutils literal notranslate"><span class="pre">build_weighted_graph_random()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414load_graph_symRNSt7istreamEb"><code class="docutils literal notranslate"><span class="pre">load_graph_sym()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414load_graph_symNSt6stringEb"><code class="docutils literal notranslate"><span class="pre">load_graph_sym()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416load_graph_tableRNSt7istreamE"><code class="docutils literal notranslate"><span class="pre">load_graph_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416load_graph_tableNSt6stringE"><code class="docutils literal notranslate"><span class="pre">load_graph_table()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="hash_utils.html">hash_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="map_utils.html">map_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_map.html">ra_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_set.html">ra_set.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference_vector.html">reference_vector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="set_utils.html">set_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_utils.html">span_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_struct.html">tuple_struct.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_utils.html">tuple_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="valsort_map.html">valsort_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector_utils.html">vector_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../datastructs.html">Data structures</a></li>
+      <li class="breadcrumb-item active">graph_utils.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="graph-utils-hpp">
+<h1>graph_utils.hpp<a class="headerlink" href="#graph-utils-hpp" title="Link to this heading"></a></h1>
+<p>This file provides a number of tools for manipulating graphs. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413shuffle_graphRK5GraphR6Random">
+<span id="_CPPv313shuffle_graphRK5GraphR6Random"></span><span id="_CPPv213shuffle_graphRK5GraphR6Random"></span><span id="shuffle_graph__GraphCR.RandomR"></span><span class="target" id="graph__utils_8hpp_1a50b8c91aa25ace652c02352981c96394"></span><a class="reference internal" href="Graph.html#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shuffle_graph</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Graph.html#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_graph</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413shuffle_graphRK5GraphR6Random" title="Link to this definition"></a><br /></dt>
+<dd><p>Take an existing graph, and build a new one that is isomorphic to it, but with randomized vertex IDs. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416build_graph_ring6size_tR6Random">
+<span id="_CPPv316build_graph_ring6size_tR6Random"></span><span id="_CPPv216build_graph_ring6size_tR6Random"></span><span id="build_graph_ring__s.RandomR"></span><span class="target" id="graph__utils_8hpp_1a5fa52fdb419e3b99dba2716f061b46d5"></span><a class="reference internal" href="Graph.html#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build_graph_ring</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">v_count</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416build_graph_ring6size_tR6Random" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a graph where all vertics are degree two and form a single ring. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416build_graph_tree6size_tR6Random">
+<span id="_CPPv316build_graph_tree6size_tR6Random"></span><span id="_CPPv216build_graph_tree6size_tR6Random"></span><span id="build_graph_tree__s.RandomR"></span><span class="target" id="graph__utils_8hpp_1a2cf638418a66250cfe7d73e54611f1d9"></span><a class="reference internal" href="Graph.html#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build_graph_tree</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">v_count</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416build_graph_tree6size_tR6Random" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a random tree graph (new vertices are repeatedly attached to a random position in a tree as it is constructed.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418build_graph_random6size_t6size_tR6Randomb">
+<span id="_CPPv318build_graph_random6size_t6size_tR6Randomb"></span><span id="_CPPv218build_graph_random6size_t6size_tR6Randomb"></span><span id="build_graph_random__s.s.RandomR.b"></span><span class="target" id="graph__utils_8hpp_1a106cd2288f6c9bcca668737270423289"></span><a class="reference internal" href="Graph.html#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build_graph_random</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">v_count</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">e_count</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418build_graph_random6size_t6size_tR6Randomb" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a random, graph with the specified number of vertices and edges. If connected is set, start by building a tree. Then connect random (unconnected) pairs of vertices until the proper number of edges are included. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416build_graph_grid6size_t6size_tR6Randomd">
+<span id="_CPPv316build_graph_grid6size_t6size_tR6Randomd"></span><span id="_CPPv216build_graph_grid6size_t6size_tR6Randomd"></span><span id="build_graph_grid__s.s.RandomR.double"></span><span class="target" id="graph__utils_8hpp_1af048fc2d965ecf8e1661b7d8035385e8"></span><a class="reference internal" href="Graph.html#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build_graph_grid</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">width</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">height</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">prob_use</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416build_graph_grid6size_t6size_tR6Randomd" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a graph with width x height vertices setup into a grid structure. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422build_graph_clique_set6size_t6size_tR6Randomd">
+<span id="_CPPv322build_graph_clique_set6size_t6size_tR6Randomd"></span><span id="_CPPv222build_graph_clique_set6size_t6size_tR6Randomd"></span><span id="build_graph_clique_set__s.s.RandomR.double"></span><span class="target" id="graph__utils_8hpp_1ad9a0b182bfc05519644c82f198f5f34d"></span><a class="reference internal" href="Graph.html#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build_graph_clique_set</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">clique_size</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">clique_count</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">extra_prob</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.5</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422build_graph_clique_set6size_t6size_tR6Randomd" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a set of cliques (such that one member of each can be part of an independent set) and then links them together </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415build_graph_dag6size_t6size_tR6Randomb">
+<span id="_CPPv315build_graph_dag6size_t6size_tR6Randomb"></span><span id="_CPPv215build_graph_dag6size_t6size_tR6Randomb"></span><span id="build_graph_dag__s.s.RandomR.b"></span><span class="target" id="graph__utils_8hpp_1aa6418dfc15940c8acea806cfa71ec298"></span><a class="reference internal" href="Graph.html#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build_graph_dag</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">v_count</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">e_count</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415build_graph_dag6size_t6size_tR6Randomb" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a random, graph with the specified number of vertices and edges. If connected is set, start by building a tree. Then connect random (unconnected) pairs of vertices until the proper number of edges are included. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv425build_weighted_graph_tree6size_t6size_t6size_tR6Random">
+<span id="_CPPv325build_weighted_graph_tree6size_t6size_t6size_tR6Random"></span><span id="_CPPv225build_weighted_graph_tree6size_t6size_t6size_tR6Random"></span><span id="build_weighted_graph_tree__s.s.s.RandomR"></span><span class="target" id="graph__utils_8hpp_1a55df2803a637ce5c3f62edfe3dd25b00"></span><a class="reference internal" href="Graph.html#_CPPv413WeightedGraph" title="WeightedGraph"><span class="n"><span class="pre">WeightedGraph</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build_weighted_graph_tree</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">v_count</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_weight</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_weight</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425build_weighted_graph_tree6size_t6size_t6size_tR6Random" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a random WEIGHTED tree graph (new vertices are repeatedly attached to a random position in a tree as it is constructed.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv427build_weighted_graph_random6size_t6size_t6size_t6size_tR6Randomb">
+<span id="_CPPv327build_weighted_graph_random6size_t6size_t6size_t6size_tR6Randomb"></span><span id="_CPPv227build_weighted_graph_random6size_t6size_t6size_t6size_tR6Randomb"></span><span id="build_weighted_graph_random__s.s.s.s.RandomR.b"></span><span class="target" id="graph__utils_8hpp_1aefe33643a71e9c23219ef56d94852a2a"></span><a class="reference internal" href="Graph.html#_CPPv413WeightedGraph" title="WeightedGraph"><span class="n"><span class="pre">WeightedGraph</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build_weighted_graph_random</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">v_count</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">e_count</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_weight</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_weight</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427build_weighted_graph_random6size_t6size_t6size_t6size_tR6Randomb" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a random, WEIGHTED graph with the specified number of vertices, edges, and range of edge weights. If connected is set, start by building a tree. Then connect random (unconnected) pairs of vertices until the proper number of edges are included. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414load_graph_symRNSt7istreamEb">
+<span id="_CPPv314load_graph_symRNSt7istreamEb"></span><span id="_CPPv214load_graph_symRNSt7istreamEb"></span><span id="load_graph_sym__isR.b"></span><span class="target" id="graph__utils_8hpp_1a282e90abe69399b3c27c2a36b01c42ec"></span><a class="reference internal" href="Graph.html#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">load_graph_sym</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">is</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sub1</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414load_graph_symRNSt7istreamEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Helper function for loading symmetric graphs from an input stream. sub1 indicates that verticies are numbered 1 to N instead of 0 to N-1. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414load_graph_symNSt6stringEb">
+<span id="_CPPv314load_graph_symNSt6stringEb"></span><span id="_CPPv214load_graph_symNSt6stringEb"></span><span id="load_graph_sym__ss.b"></span><span class="target" id="graph__utils_8hpp_1a4afcf11cf8bd25b90511f8fb90431dfc"></span><a class="reference internal" href="Graph.html#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">load_graph_sym</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">filename</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sub1</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414load_graph_symNSt6stringEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Load a graph with a specified filename. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416load_graph_tableRNSt7istreamE">
+<span id="_CPPv316load_graph_tableRNSt7istreamE"></span><span id="_CPPv216load_graph_tableRNSt7istreamE"></span><span id="load_graph_table__isR"></span><span class="target" id="graph__utils_8hpp_1a473acf770b8a95b5a611e35e9af7d69f"></span><a class="reference internal" href="Graph.html#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">load_graph_table</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">is</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416load_graph_tableRNSt7istreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Load a graph from a connection matrix. Format: Number of vertices followed by v^2 0’s or 1’s Example: “3 0 1 0 1 0 0 0 0 1” </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416load_graph_tableNSt6stringE">
+<span id="_CPPv316load_graph_tableNSt6stringE"></span><span id="_CPPv216load_graph_tableNSt6stringE"></span><span id="load_graph_table__ss"></span><span class="target" id="graph__utils_8hpp_1a94ba68b330de5e151df726d00a9067c8"></span><a class="reference internal" href="Graph.html#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">load_graph_table</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">filename</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416load_graph_tableNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Load a graph from a connection matrix in a file by the specified name. </p>
+</dd></dl>
+
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="UnorderedIndexMap.html" class="btn btn-neutral float-left" title="UnorderedIndexMap.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="hash_utils.html" class="btn btn-neutral float-right" title="hash_utils.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

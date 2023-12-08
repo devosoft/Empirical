@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DataMap.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/data/api/DataMap.0c1869f0-20a9-49a2-9d6d-457c4b989468.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="DataNode.hpp" href="DataNode.html" />
+    <link rel="prev" title="DataManager.hpp" href="DataManager.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../data.html">Data Collection and Recording Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../data.html#data-tools-api">Data Tools API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AnnotatedType.html">AnnotatedType.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataFile.html">DataFile.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataInterface.html">DataInterface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataLayout.html">DataLayout.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataLog.html">DataLog.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataManager.html">DataManager.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">DataMap.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv47DataMap"><code class="docutils literal notranslate"><span class="pre">DataMap</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="DataNode.html">DataNode.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Datum.html">Datum.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="MemoryImage.html">MemoryImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SimpleParser.html">SimpleParser.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Trait.html">Trait.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="VarMap.html">VarMap.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../data.html">Data Collection and Recording Tools</a></li>
+      <li class="breadcrumb-item active">DataMap.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="datamap-hpp">
+<h1>DataMap.hpp<a class="headerlink" href="#datamap-hpp" title="Link to this heading"></a></h1>
+<p>A DataMap links names to arbitrary object types. </p>
+<p>
+A DataMap links data names to arbitrary object types. Each data map is composed of a MemoryImage (that holds a set of values) and a DataLayout (that maps names and other info to those values.)</p>
+<p>AddVar&lt;type&gt;(“name”, value, [“desc”], [“notes”]) Includes a new data entry into the DataMap and returns its uniquq ID.</p>
+<p>Get&lt;type&gt;(“name”) - retrieve a reference to a value in the DataMap slowly. Get&lt;type&gt;(ID) - retrieve a reference more quickly. GetID(“name”) - convert a name into a unique ID. Set(name|id, value) - change a value in the DataMap (you may also use Get() followed by an assignment.)</p>
+<p>New data entries can be added to a DataMap, but never removed (for efficiency purposes). When a DataMap is copied, all data entries are also copied (relatively fast). As long as a DataMaps layout doesn’t change, all copied maps will share the same layout (fast).</p>
+<p>A layout can also be locked with LockLayout(), which will throw an error if there is an attempt to modify that layout again. A lock can be checked with IsLocked().</p>
+<p>Specialty versions of Get and Set exist if you don’t want to use templates for simple types. They are GetValue(*), SetValue(*), GetString(*), and SetString(*). Values are all represented as doubles.</p>
+<p>DEVELOPER NOTES:<ul class="simple">
+<li><p>Each entry can have a one-byte control block immediately proceeding it in memory. Each bit would be associated with additional information about the entry. Options include:<ol class="arabic simple">
+<li><p>The memory is a POINTER not an instance. This would allow entries to behave like references, potentially eliminating the need to copy larger data structures into the memory image.</p></li>
+<li><p>The entry has a non-trivial (or user-provided) COPY/MOVE CONSTRUCTOR or DESTRUCTOR</p></li>
+<li><p>The entry has a function to call for a Get instead of a value in memory. The space reserved is used for the function pointer (incompatible with bit 1…)</p></li>
+<li><p>The entry has a function to call when it is set. Effectively this can implement SIGNAL monitoring it that should be notified whenever it changes. The signal itself would need to be stored elsewhere (presumably in the memory image, but possibly in the layout.)</p></li>
+<li><p>The memory is a LOG of values, not a single value. This allows for quick identification of when something special needs to be done. 6-8. Limited type information (7 types that can be handled more effectively?)</p></li>
+</ol>
+</p></li>
+<li><p>We should be able to keep a series of values, not just a single one. This can be done with a series of new functions: AddLog() instead of AddVar() when new variable is created. Get() should still work for latest value. Ideally keep latest in first position. Change non-const Get() to GetRef() which cannot be used for a log. Add GetAve() function for logs as well as GetLog() for the full series (as std::span?).</p></li>
+<li><p>Settings for all entries should have more information on how they are dealt with, such as if they should be included in output and how. Perhaps a system of tags for dynamic use?</p></li>
+<li><p>After everything else is working, build a LocalDataMap&lt;size_t&gt; that locks in the size at compile time, providing more localized memory. Otherwise DataMap as a whole can be built on a templated class that takes an IMAGE_T as an argument.</p></li>
+<li><p>Default values should be saved in the layout allowing any MemoryImage to be easily reset to factory settings.</p></li>
+<li><p>A user should be able to override copy constructors (though probably not move constructors or destructors?). Then the copy process can be more customizable, for example having some settings return to the default value or be further processed. It’s also possible to have multiple types of copies, so if we indicate a “Copy birth” we get the above, but if we indicate a “Copy clone” or “Copy inject” we do something different. We also probably need to allow for multiple parents…</p></li>
+<li><p>An OptimizeLayout() function that can reorder entries so that they are somehow more sensible? Does DataMap need to worry about memory alignment?</p></li>
+<li><p>A MemoryImage factory to speed up allocation and deallocation if we’re using the same size images repeatedly.</p></li>
+<li><p>Some way of grouping memory across DataMaps so that a particular entry for many maps has all of its instances consecutive in memory? This seems really tricky to pull off, but if we can do it, the improvement in cache performance could be dramatic.</p></li>
+<li><p>Rename DataLayout and MemoryImage to DataMap_Layout and DataMap_Memory? </p></li>
+</ul>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA</p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv47DataMap">
+<span id="_CPPv37DataMap"></span><span id="_CPPv27DataMap"></span><span id="DataMap"></span><span class="target" id="classDataMap"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DataMap</span></span></span><a class="headerlink" href="#_CPPv47DataMap" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;DataMap.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMap8key_typeE">
+<span id="_CPPv3N7DataMap8key_typeE"></span><span id="_CPPv2N7DataMap8key_typeE"></span><span class="target" id="classDataMap_1a67edb57e3fecdcb3c3884f9cc3f2127a"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">key_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><a class="headerlink" href="#_CPPv4N7DataMap8key_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMap7DataMapEv">
+<span id="_CPPv3N7DataMap7DataMapEv"></span><span id="_CPPv2N7DataMap7DataMapEv"></span><span id="DataMap::DataMap"></span><span class="target" id="classDataMap_1ab4df4e0b32fa09b8aac4b501f057ffc3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DataMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataMap7DataMapEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMap7DataMapERK7DataMap">
+<span id="_CPPv3N7DataMap7DataMapERK7DataMap"></span><span id="_CPPv2N7DataMap7DataMapERK7DataMap"></span><span id="DataMap::DataMap__DataMapCR"></span><span class="target" id="classDataMap_1a3b42723637e220e5bf1a1167295f6102"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DataMap</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7DataMap7DataMapERK7DataMap" title="DataMap::DataMap"><span class="n"><span class="pre">DataMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataMap7DataMapERK7DataMap" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMap7DataMapERR7DataMap">
+<span id="_CPPv3N7DataMap7DataMapERR7DataMap"></span><span id="_CPPv2N7DataMap7DataMapERR7DataMap"></span><span id="DataMap::DataMap__DataMapRR"></span><span class="target" id="classDataMap_1a17560b63c35f40d4d36eb7d047e9f5e5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DataMap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N7DataMap7DataMapERR7DataMap" title="DataMap::DataMap"><span class="n"><span class="pre">DataMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataMap7DataMapERR7DataMap" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMapaSERK7DataMap">
+<span id="_CPPv3N7DataMapaSERK7DataMap"></span><span id="_CPPv2N7DataMapaSERK7DataMap"></span><span id="DataMap::assign-operator__DataMapCR"></span><span class="target" id="classDataMap_1af774ac301420a63d7b4be55d07c26abc"></span><a class="reference internal" href="#_CPPv47DataMap" title="DataMap"><span class="n"><span class="pre">DataMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47DataMap" title="DataMap"><span class="n"><span class="pre">DataMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataMapaSERK7DataMap" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMapD0Ev">
+<span id="_CPPv3N7DataMapD0Ev"></span><span id="_CPPv2N7DataMapD0Ev"></span><span id="DataMap::~DataMap"></span><span class="target" id="classDataMap_1ae71374fa685fd1a81ee28edba0dfe4c0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~DataMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataMapD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap7GetSizeEv">
+<span id="_CPPv3NK7DataMap7GetSizeEv"></span><span id="_CPPv2NK7DataMap7GetSizeEv"></span><span id="DataMap::GetSizeC"></span><span class="target" id="classDataMap_1abf63e7bb1429407e44ae8b7549d9072a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine how many Bytes large this image is. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap5GetIDERKNSt6stringE">
+<span id="_CPPv3NK7DataMap5GetIDERKNSt6stringE"></span><span id="_CPPv2NK7DataMap5GetIDERKNSt6stringE"></span><span id="DataMap::GetID__ssCRC"></span><span class="target" id="classDataMap_1a2b7a5169e39596779d83779231ae56b6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetID</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap5GetIDERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Translate a name into an ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap5HasIDE6size_t">
+<span id="_CPPv3NK7DataMap5HasIDE6size_t"></span><span id="_CPPv2NK7DataMap5HasIDE6size_t"></span><span id="DataMap::HasID__sC"></span><span class="target" id="classDataMap_1a663c26b6df56c6b4ee6a4b944f3945d2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap5HasIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if this map has a setting ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap7HasNameERKNSt6stringE">
+<span id="_CPPv3NK7DataMap7HasNameERKNSt6stringE"></span><span id="_CPPv2NK7DataMap7HasNameERKNSt6stringE"></span><span id="DataMap::HasName__ssCRC"></span><span class="target" id="classDataMap_1af5201542894c02be18c27fe9d3931871"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasName</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap7HasNameERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Test is this map has a variable by a given name. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK7DataMap6IsTypeEb6size_t">
+<span id="_CPPv3I0ENK7DataMap6IsTypeE6size_t"></span><span id="_CPPv2I0ENK7DataMap6IsTypeE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1a4cb11f6c2ee2b1cac71aa6eda8a4b76c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsType</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK7DataMap6IsTypeEb6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if a variable is of a given type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK7DataMap6IsTypeEbRKNSt6stringE">
+<span id="_CPPv3I0ENK7DataMap6IsTypeERKNSt6stringE"></span><span id="_CPPv2I0ENK7DataMap6IsTypeERKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1a0d289d975bd5c8a8d019f9bd65ce2c67"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsType</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK7DataMap6IsTypeEbRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpENK7DataMap3HasEbDpRR4ARGS">
+<span id="_CPPv3I0DpENK7DataMap3HasEDpRR4ARGS"></span><span id="_CPPv2I0DpENK7DataMap3HasEDpRR4ARGS"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1a86f411c02ccf736ebe4b30623621337f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpENK7DataMap3HasEbDpRR4ARGS" title="DataMap::Has::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0DpENK7DataMap3HasEbDpRR4ARGS" title="Link to this definition"></a><br /></dt>
+<dd><p>Verify settings. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7DataMap3GetER1T6size_t">
+<span id="_CPPv3I0EN7DataMap3GetE6size_t"></span><span id="_CPPv2I0EN7DataMap3GetE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1a04e622a86892ef8de697c89fe80e38ec"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN7DataMap3GetER1T6size_t" title="DataMap::Get::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7DataMap3GetER1T6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Retrieve a variable by its type and position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK7DataMap3GetERK1T6size_t">
+<span id="_CPPv3I0ENK7DataMap3GetE6size_t"></span><span id="_CPPv2I0ENK7DataMap3GetE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1a212111730c4eabeebdb1b337dfce8726"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK7DataMap3GetERK1T6size_t" title="DataMap::Get::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK7DataMap3GetERK1T6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Retrieve a const variable by its type and position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7DataMap3GetER1TRKNSt6stringE">
+<span id="_CPPv3I0EN7DataMap3GetERKNSt6stringE"></span><span id="_CPPv2I0EN7DataMap3GetERKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1ac60263e5861859b980cfb554a11b83f8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN7DataMap3GetER1TRKNSt6stringE" title="DataMap::Get::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7DataMap3GetER1TRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Retrieve a variable by its type and name. (Slower!) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK7DataMap3GetERK1TRKNSt6stringE">
+<span id="_CPPv3I0ENK7DataMap3GetERKNSt6stringE"></span><span id="_CPPv2I0ENK7DataMap3GetERKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1a506720e9d9a573c620e58d8f5a31d915"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK7DataMap3GetERK1TRKNSt6stringE" title="DataMap::Get::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK7DataMap3GetERK1TRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Retrieve a const variable by its type and name. (Slower!) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7DataMap3GetENSt4spanI1TEE6size_t6size_t">
+<span id="_CPPv3I0EN7DataMap3GetE6size_t6size_t"></span><span id="_CPPv2I0EN7DataMap3GetE6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1aa3870f852773fec9ae00ae95872f0e8e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">span</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN7DataMap3GetENSt4spanI1TEE6size_t6size_t" title="DataMap::Get::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7DataMap3GetENSt4spanI1TEE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK7DataMap3GetENSt4spanIK1TEE6size_t6size_t">
+<span id="_CPPv3I0ENK7DataMap3GetE6size_t6size_t"></span><span id="_CPPv2I0ENK7DataMap3GetE6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1a4a005bd207e8f0ad554c1bd872bcba08"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">span</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK7DataMap3GetENSt4spanIK1TEE6size_t6size_t" title="DataMap::Get::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK7DataMap3GetENSt4spanIK1TEE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7DataMap3GetENSt4spanI1TEERKNSt6stringE6size_t">
+<span id="_CPPv3I0EN7DataMap3GetERKNSt6stringE6size_t"></span><span id="_CPPv2I0EN7DataMap3GetERKNSt6stringE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1af990bb354b15fde1aaf445e9b9530262"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">span</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN7DataMap3GetENSt4spanI1TEERKNSt6stringE6size_t" title="DataMap::Get::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7DataMap3GetENSt4spanI1TEERKNSt6stringE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK7DataMap3GetENSt4spanIK1TEERKNSt6stringE6size_t">
+<span id="_CPPv3I0ENK7DataMap3GetERKNSt6stringE6size_t"></span><span id="_CPPv2I0ENK7DataMap3GetERKNSt6stringE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1ad51cd0e49c85f71b0f7b533c76df70d2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">span</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK7DataMap3GetENSt4spanIK1TEERKNSt6stringE6size_t" title="DataMap::Get::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK7DataMap3GetENSt4spanIK1TEERKNSt6stringE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7DataMap3SetER1T6size_tRK1T">
+<span id="_CPPv3I0EN7DataMap3SetE6size_tRK1T"></span><span id="_CPPv2I0EN7DataMap3SetE6size_tRK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1aed605890f468bf9a0acdcf070bed04cc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN7DataMap3SetER1T6size_tRK1T" title="DataMap::Set::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN7DataMap3SetER1T6size_tRK1T" title="DataMap::Set::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7DataMap3SetER1T6size_tRK1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Set a variable by ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7DataMap3SetER1TRKNSt6stringERK1T">
+<span id="_CPPv3I0EN7DataMap3SetERKNSt6stringERK1T"></span><span id="_CPPv2I0EN7DataMap3SetERKNSt6stringERK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1a6c1f1a04a91faece6d3b4988c376466e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN7DataMap3SetER1TRKNSt6stringERK1T" title="DataMap::Set::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN7DataMap3SetER1TRKNSt6stringERK1T" title="DataMap::Set::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7DataMap3SetER1TRKNSt6stringERK1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Set a variable by name. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap7GetTypeE6size_t">
+<span id="_CPPv3NK7DataMap7GetTypeE6size_t"></span><span id="_CPPv2NK7DataMap7GetTypeE6size_t"></span><span id="DataMap::GetType__sC"></span><span class="target" id="classDataMap_1a1c15a32829f193c512b9bc7632dd8dcd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../meta/api/TypeID.html#_CPPv46TypeID" title="TypeID"><span class="n"><span class="pre">TypeID</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetType</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap7GetTypeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Look up the type of a variable by ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap7GetTypeERKNSt6stringE">
+<span id="_CPPv3NK7DataMap7GetTypeERKNSt6stringE"></span><span id="_CPPv2NK7DataMap7GetTypeERKNSt6stringE"></span><span id="DataMap::GetType__ssCRC"></span><span class="target" id="classDataMap_1ae4e876bc102a85055e3496fa6e522939"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../meta/api/TypeID.html#_CPPv46TypeID" title="TypeID"><span class="n"><span class="pre">TypeID</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetType</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap7GetTypeERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Look up the type of a variable by name. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap9IsNumericE6size_t">
+<span id="_CPPv3NK7DataMap9IsNumericE6size_t"></span><span id="_CPPv2NK7DataMap9IsNumericE6size_t"></span><span id="DataMap::IsNumeric__sC"></span><span class="target" id="classDataMap_1a38acd4c8b7588d3509b7d8d51e12e0c2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsNumeric</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap9IsNumericE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap9IsNumericERKNSt6stringE">
+<span id="_CPPv3NK7DataMap9IsNumericERKNSt6stringE"></span><span id="_CPPv2NK7DataMap9IsNumericERKNSt6stringE"></span><span id="DataMap::IsNumeric__ssCRC"></span><span class="target" id="classDataMap_1a68d25f0be634fc491400cdca6b795b67"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsNumeric</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap9IsNumericERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap11GetAsDoubleE6size_t6TypeID">
+<span id="_CPPv3NK7DataMap11GetAsDoubleE6size_t6TypeID"></span><span id="_CPPv2NK7DataMap11GetAsDoubleE6size_t6TypeID"></span><span id="DataMap::GetAsDouble__s.TypeIDC"></span><span class="target" id="classDataMap_1a41eb0eb8c527c4c8a0c2df3843bded59"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetAsDouble</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <a class="reference internal" href="../../meta/api/TypeID.html#_CPPv46TypeID" title="TypeID"><span class="n"><span class="pre">TypeID</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">type_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap11GetAsDoubleE6size_t6TypeID" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the memory at the target position, assume it is the provided type, and convert the value found there to double. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap11GetAsDoubleE6size_t">
+<span id="_CPPv3NK7DataMap11GetAsDoubleE6size_t"></span><span id="_CPPv2NK7DataMap11GetAsDoubleE6size_t"></span><span id="DataMap::GetAsDouble__sC"></span><span class="target" id="classDataMap_1a73f9b002f672f38df468dc6c93b2a740"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetAsDouble</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap11GetAsDoubleE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the memory at the target position, lookup it’s type, and convert the value to double. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap11GetAsStringE6size_t6TypeID6size_t">
+<span id="_CPPv3NK7DataMap11GetAsStringE6size_t6TypeID6size_t"></span><span id="_CPPv2NK7DataMap11GetAsStringE6size_t6TypeID6size_t"></span><span id="DataMap::GetAsString__s.TypeID.sC"></span><span class="target" id="classDataMap_1ab452a30b54e595d186f9984e60563f31"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetAsString</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <a class="reference internal" href="../../meta/api/TypeID.html#_CPPv46TypeID" title="TypeID"><span class="n"><span class="pre">TypeID</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">type_id</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap11GetAsStringE6size_t6TypeID6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the memory at the target position, assume it is the provided type, and convert the value found there to string. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap11GetAsStringE6size_t">
+<span id="_CPPv3NK7DataMap11GetAsStringE6size_t"></span><span id="_CPPv2NK7DataMap11GetAsStringE6size_t"></span><span id="DataMap::GetAsString__sC"></span><span class="target" id="classDataMap_1a056884ba7e8a8f51bb0100854f7ca885"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetAsString</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap11GetAsStringE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the memory at the target position, lookup it’s type, and convert the value to string. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7DataMap6AddVarE6size_tRKNSt6stringERK1TRKNSt6stringERKNSt6stringE6size_t">
+<span id="_CPPv3I0EN7DataMap6AddVarERKNSt6stringERK1TRKNSt6stringERKNSt6stringE6size_t"></span><span id="_CPPv2I0EN7DataMap6AddVarERKNSt6stringERK1TRKNSt6stringERKNSt6stringE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1a5ae67c4b6b2285dac761168d6d0cc1d0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN7DataMap6AddVarE6size_tRKNSt6stringERK1TRKNSt6stringERKNSt6stringE6size_t" title="DataMap::AddVar::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">default_value</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">notes</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7DataMap6AddVarE6size_tRKNSt6stringERK1TRKNSt6stringERKNSt6stringE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new variable with a specified type, name and value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7DataMap6AddVarE6size_tRKNSt6stringE">
+<span id="_CPPv3I0EN7DataMap6AddVarERKNSt6stringE"></span><span id="_CPPv2I0EN7DataMap6AddVarERKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataMap_1a966a63e748a7c9c96ae9bb555bfdd33e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7DataMap6AddVarE6size_tRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new variable with just a specified type and name; must be able to default. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap9HasLayoutERK10DataLayout">
+<span id="_CPPv3NK7DataMap9HasLayoutERK10DataLayout"></span><span id="_CPPv2NK7DataMap9HasLayoutERK10DataLayout"></span><span id="DataMap::HasLayout__DataLayoutCRC"></span><span class="target" id="classDataMap_1a054191bbfaeafc4a40f032d527ae3007"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasLayout</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="DataLayout.html#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_layout</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap9HasLayoutERK10DataLayout" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if this DataMap uses the specified layout. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap9HasLayoutEv">
+<span id="_CPPv3NK7DataMap9HasLayoutEv"></span><span id="_CPPv2NK7DataMap9HasLayoutEv"></span><span id="DataMap::HasLayoutC"></span><span class="target" id="classDataMap_1a435f0e6b5605c39fa32571f6dc1d28b5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasLayout</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap9HasLayoutEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if this DataMap has ANY layout. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap10SameLayoutERK7DataMap">
+<span id="_CPPv3NK7DataMap10SameLayoutERK7DataMap"></span><span id="_CPPv2NK7DataMap10SameLayoutERK7DataMap"></span><span id="DataMap::SameLayout__DataMapCRC"></span><span class="target" id="classDataMap_1ac7aa24e53538cfe62df13fe20a5b54f1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SameLayout</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47DataMap" title="DataMap"><span class="n"><span class="pre">DataMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_dm</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap10SameLayoutERK7DataMap" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if this DataMap is using the identical layout as another DataMap. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMap9GetLayoutEv">
+<span id="_CPPv3N7DataMap9GetLayoutEv"></span><span id="_CPPv2N7DataMap9GetLayoutEv"></span><span id="DataMap::GetLayout"></span><span class="target" id="classDataMap_1a99f1ef0fae4ae5e44a3bdc2218f0c74f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="DataLayout.html#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetLayout</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataMap9GetLayoutEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the DataLayout so that it can be used elsewhere. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap9GetLayoutEv">
+<span id="_CPPv3NK7DataMap9GetLayoutEv"></span><span id="_CPPv2NK7DataMap9GetLayoutEv"></span><span id="DataMap::GetLayoutC"></span><span class="target" id="classDataMap_1ade082a4feb41d92405a55446facbb9f5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="DataLayout.html#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetLayout</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap9GetLayoutEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the DataLayout so that it can be used elsewhere. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataMap8IsLockedEv">
+<span id="_CPPv3NK7DataMap8IsLockedEv"></span><span id="_CPPv2NK7DataMap8IsLockedEv"></span><span id="DataMap::IsLockedC"></span><span class="target" id="classDataMap_1aa28347d5f290d71ec4dbd5dce72e0648"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsLocked</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataMap8IsLockedEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if this layout is locked (i.e., it cannot be changed.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMap10LockLayoutEv">
+<span id="_CPPv3N7DataMap10LockLayoutEv"></span><span id="_CPPv2N7DataMap10LockLayoutEv"></span><span id="DataMap::LockLayout"></span><span class="target" id="classDataMap_1ae2f8270d73edb7c2c1c8ae178d430821"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LockLayout</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataMap10LockLayoutEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Prevent this DataMap’s layout from having any additional changed made to it. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMap17MakeDatumAccessorERK10DataLayout6size_t">
+<span id="_CPPv3N7DataMap17MakeDatumAccessorERK10DataLayout6size_t"></span><span id="_CPPv2N7DataMap17MakeDatumAccessorERK10DataLayout6size_t"></span><span id="DataMap::MakeDatumAccessor__DataLayoutCR.s"></span><span class="target" id="classDataMap_1aba66b2b5151a27e1113b1bfcc84ae073"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47DataMap" title="DataMap"><span class="n"><span class="pre">DataMap</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MakeDatumAccessor</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="DataLayout.html#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">layout</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataMap17MakeDatumAccessorERK10DataLayout6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a function that takes in a data map and (efficiently) returns a Datum using the specified entry. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMap17MakeDatumAccessorERK10DataLayoutRKNSt6stringE">
+<span id="_CPPv3N7DataMap17MakeDatumAccessorERK10DataLayoutRKNSt6stringE"></span><span id="_CPPv2N7DataMap17MakeDatumAccessorERK10DataLayoutRKNSt6stringE"></span><span id="DataMap::MakeDatumAccessor__DataLayoutCR.ssCR"></span><span class="target" id="classDataMap_1a897d7d2191645f114ebcfefd34e051f3"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MakeDatumAccessor</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="DataLayout.html#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">layout</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataMap17MakeDatumAccessorERK10DataLayoutRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a function that takes in a data map and (efficiently) returns a Datum using the specified name. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMap7DataMapE3PtrI10DataLayoutE6size_t">
+<span id="_CPPv3N7DataMap7DataMapE3PtrI10DataLayoutE6size_t"></span><span id="_CPPv2N7DataMap7DataMapE3PtrI10DataLayoutE6size_t"></span><span id="DataMap::DataMap__Ptr:DataLayout:.s"></span><span class="target" id="classDataMap_1a292f1ddf4397a9aee29399faa565467b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DataMap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="DataLayout.html#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_layout_ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataMap7DataMapE3PtrI10DataLayoutE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMap16MakeLayoutUniqueEv">
+<span id="_CPPv3N7DataMap16MakeLayoutUniqueEv"></span><span id="_CPPv2N7DataMap16MakeLayoutUniqueEv"></span><span id="DataMap::MakeLayoutUnique"></span><span class="target" id="classDataMap_1a40f6954ed822db1fd20a82a326b34dfe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MakeLayoutUnique</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataMap16MakeLayoutUniqueEv" title="Link to this definition"></a><br /></dt>
+<dd><p>If the current layout is shared, make a copy of it. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMap6memoryE">
+<span id="_CPPv3N7DataMap6memoryE"></span><span id="_CPPv2N7DataMap6memoryE"></span><span id="DataMap::memory__MemoryImage"></span><span class="target" id="classDataMap_1a5833a8fbde7e1182cbb9858e58ba1570"></span><a class="reference internal" href="MemoryImage.html#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memory</span></span></span><a class="headerlink" href="#_CPPv4N7DataMap6memoryE" title="Link to this definition"></a><br /></dt>
+<dd><p>Memory contents for this Map. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataMap10layout_ptrE">
+<span id="_CPPv3N7DataMap10layout_ptrE"></span><span id="_CPPv2N7DataMap10layout_ptrE"></span><span id="DataMap::layout_ptr__Ptr:DataLayout:"></span><span class="target" id="classDataMap_1a3b694cf77d944b97fc3ab7c20f52576b"></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="DataLayout.html#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">layout_ptr</span></span></span><a class="headerlink" href="#_CPPv4N7DataMap10layout_ptrE" title="Link to this definition"></a><br /></dt>
+<dd><p>Layout we are using (shared across maps w/ same format) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="DataManager.html" class="btn btn-neutral float-left" title="DataManager.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="DataNode.html" class="btn btn-neutral float-right" title="DataNode.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

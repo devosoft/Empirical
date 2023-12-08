@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocuExtras.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/web/api/DocuExtras.a38425fe-ade2-4584-80b3-8debd30a13b1.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Document.hpp" href="Document.html" />
+    <link rel="prev" title="Div.hpp" href="Div.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../web.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Animate.html">Animate.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Attributes.html">Attributes.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Button.html">Button.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Canvas.html">Canvas.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasAction.html">CanvasAction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasShape.html">CanvasShape.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Div.html">Div.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">DocuExtras.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410DocuExtras"><code class="docutils literal notranslate"><span class="pre">DocuExtras</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Document.html">Document.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Element.html">Element.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FileInput.html">FileInput.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Font.html">Font.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Image.html">Image.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Input.html">Input.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="JSWrap.html">JSWrap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="KeypressManager.html">KeypressManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Listeners.html">Listeners.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NodeDomShim.html">NodeDomShim.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RawImage.html">RawImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Selector.html">Selector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style.html">Style.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Table.html">Table.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Text.html">Text.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextArea.html">TextArea.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextFeed.html">TextFeed.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tween.html">Tween.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UrlParams.html">UrlParams.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Widget.html">Widget.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WidgetExtras.html">WidgetExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="canvas_utils.html">canvas_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="color_map.html">color_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html">commands.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emfunctions.html">emfunctions.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="events.html">events.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="init.html">init.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="js_utils.html">js_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="web.html">web.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../web.html">Web Tools (for use with Emscripten)</a></li>
+      <li class="breadcrumb-item active">DocuExtras.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="docuextras-hpp">
+<h1>DocuExtras.hpp<a class="headerlink" href="#docuextras-hpp" title="Link to this heading"></a></h1>
+<p>Control the styling and attributes of an existing div without nuking the content inside it. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv410DocuExtras">
+<span id="_CPPv310DocuExtras"></span><span id="_CPPv210DocuExtras"></span><span id="DocuExtras"></span><span class="target" id="classDocuExtras"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DocuExtras</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">private</span></span><span class="w"> </span><a class="reference internal" href="Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><a class="headerlink" href="#_CPPv410DocuExtras" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;DocuExtras.hpp&gt;</em></div>
+<p>A widget to track a div in an HTML file, and all of its contents. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras10DocuExtrasERKNSt6stringE">
+<span id="_CPPv3N10DocuExtras10DocuExtrasERKNSt6stringE"></span><span id="_CPPv2N10DocuExtras10DocuExtrasERKNSt6stringE"></span><span id="DocuExtras::DocuExtras__ssCR"></span><span class="target" id="classDocuExtras_1afb150e1b8d3d928bc4535e2228110167"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DocuExtras</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DocuExtras10DocuExtrasERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras10DocuExtrasERK10DocuExtras">
+<span id="_CPPv3N10DocuExtras10DocuExtrasERK10DocuExtras"></span><span id="_CPPv2N10DocuExtras10DocuExtrasERK10DocuExtras"></span><span id="DocuExtras::DocuExtras__DocuExtrasCR"></span><span class="target" id="classDocuExtras_1af9c8f3aa3cfac5d9ebba5c675afbac4b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DocuExtras</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10DocuExtras10DocuExtrasERK10DocuExtras" title="DocuExtras::DocuExtras"><span class="n"><span class="pre">DocuExtras</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DocuExtras10DocuExtrasERK10DocuExtras" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtrasD0Ev">
+<span id="_CPPv3N10DocuExtrasD0Ev"></span><span id="_CPPv2N10DocuExtrasD0Ev"></span><span id="DocuExtras::~DocuExtras"></span><span class="target" id="classDocuExtras_1ad064c2251f2b11d6b15c8cbdb94ec776"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~DocuExtras</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DocuExtrasD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN10DocuExtras6SetCSSER10DocuExtrasRKNSt6stringE8SET_TYPE">
+<span id="_CPPv3I0EN10DocuExtras6SetCSSERKNSt6stringE8SET_TYPE"></span><span id="_CPPv2I0EN10DocuExtras6SetCSSERKNSt6stringE8SET_TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SET_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDocuExtras_1ae8f19f05a98836d29e7bab1efe0638d4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410DocuExtras" title="DocuExtras"><span class="n"><span class="pre">DocuExtras</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetCSS</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span>, <a class="reference internal" href="#_CPPv4I0EN10DocuExtras6SetCSSER10DocuExtrasRKNSt6stringE8SET_TYPE" title="DocuExtras::SetCSS::SET_TYPE"><span class="n"><span class="pre">SET_TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN10DocuExtras6SetCSSER10DocuExtrasRKNSt6stringE8SET_TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras6HasCSSERKNSt6stringE">
+<span id="_CPPv3N10DocuExtras6HasCSSERKNSt6stringE"></span><span id="_CPPv2N10DocuExtras6HasCSSERKNSt6stringE"></span><span id="DocuExtras::HasCSS__ssCR"></span><span class="target" id="classDocuExtras_1a1e67acd9e2e028ef70e4653efc6942e4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasCSS</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DocuExtras6HasCSSERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine is a CSS trait has been set on this Widget. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DocuExtras6GetCSSERKNSt6stringE">
+<span id="_CPPv3NK10DocuExtras6GetCSSERKNSt6stringE"></span><span id="_CPPv2NK10DocuExtras6GetCSSERKNSt6stringE"></span><span id="DocuExtras::GetCSS__ssCRC"></span><span class="target" id="classDocuExtras_1a68a66f2305a2140b7179036913d68233"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetCSS</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DocuExtras6GetCSSERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Retrieve a specific CSS trait associated with this Widget. Note: CSS-related options may be overridden in derived classes that have multiple styles. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras9RemoveCSSERKNSt6stringE">
+<span id="_CPPv3N10DocuExtras9RemoveCSSERKNSt6stringE"></span><span id="_CPPv2N10DocuExtras9RemoveCSSERKNSt6stringE"></span><span id="DocuExtras::RemoveCSS__ssCR"></span><span class="target" id="classDocuExtras_1aee28779e7406b4dfdf6b8f7e95808cda"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410DocuExtras" title="DocuExtras"><span class="n"><span class="pre">DocuExtras</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">RemoveCSS</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DocuExtras9RemoveCSSERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN10DocuExtras7SetAttrEvRKNSt6stringE8SET_TYPE">
+<span id="_CPPv3I0EN10DocuExtras7SetAttrERKNSt6stringE8SET_TYPE"></span><span id="_CPPv2I0EN10DocuExtras7SetAttrERKNSt6stringE8SET_TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SET_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDocuExtras_1ac3eb8a434cb02cdefa634e905cfdf8d4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetAttr</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span>, <a class="reference internal" href="#_CPPv4I0EN10DocuExtras7SetAttrEvRKNSt6stringE8SET_TYPE" title="DocuExtras::SetAttr::SET_TYPE"><span class="n"><span class="pre">SET_TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN10DocuExtras7SetAttrEvRKNSt6stringE8SET_TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras7HasAttrERKNSt6stringE">
+<span id="_CPPv3N10DocuExtras7HasAttrERKNSt6stringE"></span><span id="_CPPv2N10DocuExtras7HasAttrERKNSt6stringE"></span><span id="DocuExtras::HasAttr__ssCR"></span><span class="target" id="classDocuExtras_1a00e9e79209435136d1cafa85c3624b2f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasAttr</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DocuExtras7HasAttrERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine is an attribute has been set on this Widget. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DocuExtras7GetAttrERKNSt6stringE">
+<span id="_CPPv3NK10DocuExtras7GetAttrERKNSt6stringE"></span><span id="_CPPv2NK10DocuExtras7GetAttrERKNSt6stringE"></span><span id="DocuExtras::GetAttr__ssCRC"></span><span class="target" id="classDocuExtras_1a2690079454ef975c99dd5c10ce7f3c78"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetAttr</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DocuExtras7GetAttrERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Retrieve a specific attribute associated with this Widget. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras10RemoveAttrERKNSt6stringE">
+<span id="_CPPv3N10DocuExtras10RemoveAttrERKNSt6stringE"></span><span id="_CPPv2N10DocuExtras10RemoveAttrERKNSt6stringE"></span><span id="DocuExtras::RemoveAttr__ssCR"></span><span class="target" id="classDocuExtras_1a933d01d5ee54bb3e9004e199dc07830a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410DocuExtras" title="DocuExtras"><span class="n"><span class="pre">DocuExtras</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">RemoveAttr</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DocuExtras10RemoveAttrERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras5ClearEv">
+<span id="_CPPv3N10DocuExtras5ClearEv"></span><span id="_CPPv2N10DocuExtras5ClearEv"></span><span id="DocuExtras::Clear"></span><span class="target" id="classDocuExtras_1a6b2baa4fe4be9b46f96d6b870fae2ce9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410DocuExtras" title="DocuExtras"><span class="n"><span class="pre">DocuExtras</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DocuExtras5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Clear all of style, attributes, and listeners. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DocuExtrascvbEv">
+<span id="_CPPv3NK10DocuExtrascvbEv"></span><span id="_CPPv2NK10DocuExtrascvbEv"></span><span id="DocuExtras::castto-b-operatorC"></span><span class="target" id="classDocuExtras_1abf2984b2b5b7ea635d7d26f5c604c7df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DocuExtrascvbEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Have any details been set? </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras4InfoEv">
+<span id="_CPPv3N10DocuExtras4InfoEv"></span><span id="_CPPv2N10DocuExtras4InfoEv"></span><span id="DocuExtras::Info"></span><span class="target" id="classDocuExtras_1a84eaf351d9319ecaa5a5732427f9424a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10DocuExtras14DocuExtrasInfoE" title="DocuExtras::DocuExtrasInfo"><span class="n"><span class="pre">DocuExtrasInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Info</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DocuExtras4InfoEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DocuExtras4InfoEv">
+<span id="_CPPv3NK10DocuExtras4InfoEv"></span><span id="_CPPv2NK10DocuExtras4InfoEv"></span><span id="DocuExtras::InfoC"></span><span class="target" id="classDocuExtras_1a00cdf9571e54eb7ba4ae810f25aa75e7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10DocuExtras14DocuExtrasInfoE" title="DocuExtras::DocuExtrasInfo"><span class="n"><span class="pre">DocuExtrasInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Info</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DocuExtras4InfoEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras5ApplyEv">
+<span id="_CPPv3N10DocuExtras5ApplyEv"></span><span id="_CPPv2N10DocuExtras5ApplyEv"></span><span id="DocuExtras::Apply"></span><span class="target" id="classDocuExtras_1afa9076dae80a79926973c210ed72a061"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Apply</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DocuExtras5ApplyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply all HTML details associated with this widget. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras14DocuExtrasInfoE">
+<span id="_CPPv3N10DocuExtras14DocuExtrasInfoE"></span><span id="_CPPv2N10DocuExtras14DocuExtrasInfoE"></span><span id="DocuExtras::DocuExtrasInfo"></span><span class="target" id="classDocuExtras_1_1DocuExtrasInfo"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DocuExtrasInfo</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">WidgetInfo</span></span><a class="headerlink" href="#_CPPv4N10DocuExtras14DocuExtrasInfoE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;DocuExtras.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras14DocuExtrasInfo7GetTypeEv">
+<span id="_CPPv3N10DocuExtras14DocuExtrasInfo7GetTypeEv"></span><span id="_CPPv2N10DocuExtras14DocuExtrasInfo7GetTypeEv"></span><span id="DocuExtras::DocuExtrasInfo::GetType"></span><span class="target" id="classDocuExtras_1_1DocuExtrasInfo_1a8fc1e327c266991e5706aa6dfd7476a0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetType</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N10DocuExtras14DocuExtrasInfo7GetTypeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras14DocuExtrasInfo14DocuExtrasInfoERKNSt6stringE">
+<span id="_CPPv3N10DocuExtras14DocuExtrasInfo14DocuExtrasInfoERKNSt6stringE"></span><span id="_CPPv2N10DocuExtras14DocuExtrasInfo14DocuExtrasInfoERKNSt6stringE"></span><span id="DocuExtras::DocuExtrasInfo::DocuExtrasInfo__ssCR"></span><span class="target" id="classDocuExtras_1_1DocuExtrasInfo_1a2334e22d962ad81b83bbceba5bd7a9f4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DocuExtrasInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DocuExtras14DocuExtrasInfo14DocuExtrasInfoERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras14DocuExtrasInfo14DocuExtrasInfoERK14DocuExtrasInfo">
+<span id="_CPPv3N10DocuExtras14DocuExtrasInfo14DocuExtrasInfoERK14DocuExtrasInfo"></span><span id="_CPPv2N10DocuExtras14DocuExtrasInfo14DocuExtrasInfoERK14DocuExtrasInfo"></span><span id="DocuExtras::DocuExtrasInfo::DocuExtrasInfo__DocuExtrasInfoCR"></span><span class="target" id="classDocuExtras_1_1DocuExtrasInfo_1a75cb60f3ab0cc1b0fcbe0a3a776bd9c9"></span><span class="sig-name descname"><span class="n"><span class="pre">DocuExtrasInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10DocuExtras14DocuExtrasInfo14DocuExtrasInfoERK14DocuExtrasInfo" title="DocuExtras::DocuExtrasInfo::DocuExtrasInfo"><span class="n"><span class="pre">DocuExtrasInfo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N10DocuExtras14DocuExtrasInfo14DocuExtrasInfoERK14DocuExtrasInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras14DocuExtrasInfoaSERK14DocuExtrasInfo">
+<span id="_CPPv3N10DocuExtras14DocuExtrasInfoaSERK14DocuExtrasInfo"></span><span id="_CPPv2N10DocuExtras14DocuExtrasInfoaSERK14DocuExtrasInfo"></span><span id="DocuExtras::DocuExtrasInfo::assign-operator__DocuExtrasInfoCR"></span><span class="target" id="classDocuExtras_1_1DocuExtrasInfo_1a9ca9d8f123169136e6d21a043c0babac"></span><a class="reference internal" href="#_CPPv4N10DocuExtras14DocuExtrasInfoE" title="DocuExtras::DocuExtrasInfo"><span class="n"><span class="pre">DocuExtrasInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10DocuExtras14DocuExtrasInfoE" title="DocuExtras::DocuExtrasInfo"><span class="n"><span class="pre">DocuExtrasInfo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N10DocuExtras14DocuExtrasInfoaSERK14DocuExtrasInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras14DocuExtrasInfoD0Ev">
+<span id="_CPPv3N10DocuExtras14DocuExtrasInfoD0Ev"></span><span id="_CPPv2N10DocuExtras14DocuExtrasInfoD0Ev"></span><span id="DocuExtras::DocuExtrasInfo::~DocuExtrasInfo"></span><span class="target" id="classDocuExtras_1_1DocuExtrasInfo_1a8bfad4ed012487f0a5fd9ca3bea4efc5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~DocuExtrasInfo</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DocuExtras14DocuExtrasInfoD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras14DocuExtrasInfo7GetHTMLERNSt12stringstreamE">
+<span id="_CPPv3N10DocuExtras14DocuExtrasInfo7GetHTMLERNSt12stringstreamE"></span><span id="_CPPv2N10DocuExtras14DocuExtrasInfo7GetHTMLERNSt12stringstreamE"></span><span id="DocuExtras::DocuExtrasInfo::GetHTML__std::stringstreamR"></span><span class="target" id="classDocuExtras_1_1DocuExtrasInfo_1af4abb1c3f76506384c1ea2a1dae8a2af"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetHTML</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">stringstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">HTML</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N10DocuExtras14DocuExtrasInfo7GetHTMLERNSt12stringstreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DocuExtras14DocuExtrasInfo11GetTypeNameEv">
+<span id="_CPPv3NK10DocuExtras14DocuExtrasInfo11GetTypeNameEv"></span><span id="_CPPv2NK10DocuExtras14DocuExtrasInfo11GetTypeNameEv"></span><span id="DocuExtras::DocuExtrasInfo::GetTypeNameC"></span><span class="target" id="classDocuExtras_1_1DocuExtrasInfo_1a72648dec9eec29d58437320c3f12288e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTypeName</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK10DocuExtras14DocuExtrasInfo11GetTypeNameEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DocuExtras14DocuExtrasInfo5ClearEv">
+<span id="_CPPv3N10DocuExtras14DocuExtrasInfo5ClearEv"></span><span id="_CPPv2N10DocuExtras14DocuExtrasInfo5ClearEv"></span><span id="DocuExtras::DocuExtrasInfo::Clear"></span><span class="target" id="classDocuExtras_1_1DocuExtrasInfo_1ab6886d66c805a669058f444e3d9d3037"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DocuExtras14DocuExtrasInfo5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Div.html" class="btn btn-neutral float-left" title="Div.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Document.html" class="btn btn-neutral float-right" title="Document.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

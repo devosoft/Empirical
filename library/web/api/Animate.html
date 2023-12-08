@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animate.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/web/api/Animate.717a3944-ee57-4bde-87cb-f963013a08c8.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Attributes.hpp" href="Attributes.html" />
+    <link rel="prev" title="visualizations.hpp" href="../d3/api/visualizations.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../web.html#api">API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Animate.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv47Animate"><code class="docutils literal notranslate"><span class="pre">Animate</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Attributes.html">Attributes.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Button.html">Button.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Canvas.html">Canvas.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasAction.html">CanvasAction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasShape.html">CanvasShape.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Div.html">Div.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DocuExtras.html">DocuExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Document.html">Document.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Element.html">Element.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FileInput.html">FileInput.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Font.html">Font.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Image.html">Image.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Input.html">Input.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="JSWrap.html">JSWrap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="KeypressManager.html">KeypressManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Listeners.html">Listeners.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NodeDomShim.html">NodeDomShim.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RawImage.html">RawImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Selector.html">Selector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style.html">Style.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Table.html">Table.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Text.html">Text.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextArea.html">TextArea.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextFeed.html">TextFeed.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tween.html">Tween.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UrlParams.html">UrlParams.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Widget.html">Widget.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WidgetExtras.html">WidgetExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="canvas_utils.html">canvas_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="color_map.html">color_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html">commands.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emfunctions.html">emfunctions.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="events.html">events.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="init.html">init.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="js_utils.html">js_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="web.html">web.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../web.html">Web Tools (for use with Emscripten)</a></li>
+      <li class="breadcrumb-item active">Animate.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="animate-hpp">
+<h1>Animate.hpp<a class="headerlink" href="#animate-hpp" title="Link to this heading"></a></h1>
+<p>Manage animations on a web site. </p>
+<p>To build an animation, you must provide a function to be run repeatedly. When Start() is triggered, the function will be called 60 time per second (or as close as possible), until Stop() is caled. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv47Animate">
+<span id="_CPPv37Animate"></span><span id="_CPPv27Animate"></span><span id="Animate"></span><span class="target" id="classAnimate"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Animate</span></span></span><a class="headerlink" href="#_CPPv47Animate" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Animate.hpp&gt;</em></div>
+<p>An object that, when active, repeatedly calls a function as fast as possible, to a maximum of 60 frames per second. </p>
+<p>Parameters to the animation function can be:<ul class="simple">
+<li><p>double (representing time since the last frame)</p></li>
+<li><p>a const reference to the animation object itself</p></li>
+<li><p>nothing</p></li>
+</ul>
+</p>
+<p>Control methods: void Start() void Stop() void Step() void ToggleActive()</p>
+<p>Access methods: bool GetActive() const bool GetDoStep() const double GetStartTime() const double GetPrevTime() const double GetCurTime() const double GetStepTime() const double GetRunTime() const int GetFrameCount() const</p>
+<p>Config methods: void SetCallback(const std::function&lt;void(const Animate &amp;)&gt; &amp; fun) void SetCallback(const std::function&lt;void(double)&gt; &amp; fun) void SetCallback(const std::function&lt;void()&gt; &amp; fun)</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate7AnimateEv">
+<span id="_CPPv3N7Animate7AnimateEv"></span><span id="_CPPv2N7Animate7AnimateEv"></span><span id="Animate::Animate"></span><span class="target" id="classAnimate_1a97c18fd06acdcbb1eb4c54ab3eea1067"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Animate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Animate7AnimateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Setup an Animate object to call an anim_fun as fast as possible, at most 60 times a second. Call virtual function DoFrame() if no other functon is provided (which can be overridden if you derive a new class from Animate) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN7Animate7AnimateERK10anim_fun_tDpR7W_TYPES">
+<span id="_CPPv3IDpEN7Animate7AnimateERK10anim_fun_tDpR7W_TYPES"></span><span id="_CPPv2IDpEN7Animate7AnimateERK10anim_fun_tDpR7W_TYPES"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">W_TYPES</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classAnimate_1ac9a6d9325befa4c51c94e4db73e3d9d2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Animate</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Animate10anim_fun_tE" title="Animate::anim_fun_t"><span class="n"><span class="pre">anim_fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span>, <a class="reference internal" href="#_CPPv4IDpEN7Animate7AnimateERK10anim_fun_tDpR7W_TYPES" title="Animate::Animate::W_TYPES"><span class="n"><span class="pre">W_TYPES</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">targets</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN7Animate7AnimateERK10anim_fun_tDpR7W_TYPES" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct an Animate object with the function to run each animation step and zero or more UI elements that should be updated after each frame. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN7Animate7AnimateERKNSt8functionIFvdEEEDpR7W_TYPES">
+<span id="_CPPv3IDpEN7Animate7AnimateERKNSt8functionIFvdEEEDpR7W_TYPES"></span><span id="_CPPv2IDpEN7Animate7AnimateERKNSt8functionIFvdEEEDpR7W_TYPES"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">W_TYPES</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classAnimate_1ad4441634679aebb352912c6bb55d9b00"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Animate</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span>, <a class="reference internal" href="#_CPPv4IDpEN7Animate7AnimateERKNSt8functionIFvdEEEDpR7W_TYPES" title="Animate::Animate::W_TYPES"><span class="n"><span class="pre">W_TYPES</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">targets</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN7Animate7AnimateERKNSt8functionIFvdEEEDpR7W_TYPES" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN7Animate7AnimateERKNSt8functionIFvvEEEDpR7W_TYPES">
+<span id="_CPPv3IDpEN7Animate7AnimateERKNSt8functionIFvvEEEDpR7W_TYPES"></span><span id="_CPPv2IDpEN7Animate7AnimateERKNSt8functionIFvvEEEDpR7W_TYPES"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">W_TYPES</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classAnimate_1a6a079f10d87bd2be33d8f4bd5975b07f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Animate</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span>, <a class="reference internal" href="#_CPPv4IDpEN7Animate7AnimateERKNSt8functionIFvvEEEDpR7W_TYPES" title="Animate::Animate::W_TYPES"><span class="n"><span class="pre">W_TYPES</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">targets</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN7Animate7AnimateERKNSt8functionIFvvEEEDpR7W_TYPES" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7AnimateD0Ev">
+<span id="_CPPv3N7AnimateD0Ev"></span><span id="_CPPv2N7AnimateD0Ev"></span><span id="Animate::~Animate"></span><span class="target" id="classAnimate_1aba482860c3a7f04d82b1e40eb56dcc9c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Animate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7AnimateD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate7AnimateERK7Animate">
+<span id="_CPPv3N7Animate7AnimateERK7Animate"></span><span id="_CPPv2N7Animate7AnimateERK7Animate"></span><span id="Animate::Animate__AnimateCR"></span><span class="target" id="classAnimate_1af0813604f74cce90b644af14de360f95"></span><span class="sig-name descname"><span class="n"><span class="pre">Animate</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Animate7AnimateERK7Animate" title="Animate::Animate"><span class="n"><span class="pre">Animate</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N7Animate7AnimateERK7Animate" title="Link to this definition"></a><br /></dt>
+<dd><p>Do not copy animations directly. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7AnimateaSERK7Animate">
+<span id="_CPPv3N7AnimateaSERK7Animate"></span><span id="_CPPv2N7AnimateaSERK7Animate"></span><span id="Animate::assign-operator__AnimateCR"></span><span class="target" id="classAnimate_1a141e6b396cc19296af9afec4f4d1ac11"></span><a class="reference internal" href="#_CPPv47Animate" title="Animate"><span class="n"><span class="pre">Animate</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47Animate" title="Animate"><span class="n"><span class="pre">Animate</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N7AnimateaSERK7Animate" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate5StartEv">
+<span id="_CPPv3N7Animate5StartEv"></span><span id="_CPPv2N7Animate5StartEv"></span><span id="Animate::Start"></span><span class="target" id="classAnimate_1ac3f7b4b9f754418799e11a12b2f2ccfb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Start</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Animate5StartEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Start this animation running. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate4StopEv">
+<span id="_CPPv3N7Animate4StopEv"></span><span id="_CPPv2N7Animate4StopEv"></span><span id="Animate::Stop"></span><span class="target" id="classAnimate_1a5ac4a84057131a0aa438734c94dfe1db"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Stop</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Animate4StopEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Halt this animation for now. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate4StepEv">
+<span id="_CPPv3N7Animate4StepEv"></span><span id="_CPPv2N7Animate4StepEv"></span><span id="Animate::Step"></span><span class="target" id="classAnimate_1a33f704d5fc7b1d2d402b127244e63e4b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Step</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Animate4StepEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Take a single step in this animation. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate12ToggleActiveEv">
+<span id="_CPPv3N7Animate12ToggleActiveEv"></span><span id="_CPPv2N7Animate12ToggleActiveEv"></span><span id="Animate::ToggleActive"></span><span class="target" id="classAnimate_1a5248d72ab1016ea88f48921b1649b849"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToggleActive</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Animate12ToggleActiveEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Toggle whether this animation is running or paused. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Animate9GetActiveEv">
+<span id="_CPPv3NK7Animate9GetActiveEv"></span><span id="_CPPv2NK7Animate9GetActiveEv"></span><span id="Animate::GetActiveC"></span><span class="target" id="classAnimate_1ac8fe2ebdb5399809340859631c79c67e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetActive</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Animate9GetActiveEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if this animation is currently running. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Animate9GetDoStepEv">
+<span id="_CPPv3NK7Animate9GetDoStepEv"></span><span id="_CPPv2NK7Animate9GetDoStepEv"></span><span id="Animate::GetDoStepC"></span><span class="target" id="classAnimate_1a2dec876f8c554345774cb72be6bb2e4f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetDoStep</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Animate9GetDoStepEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if this animation is currently in the process of running a single step. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Animate12GetStartTimeEv">
+<span id="_CPPv3NK7Animate12GetStartTimeEv"></span><span id="_CPPv2NK7Animate12GetStartTimeEv"></span><span id="Animate::GetStartTimeC"></span><span class="target" id="classAnimate_1aa8583f7cd5df4875d1b77c333afc80ed"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetStartTime</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Animate12GetStartTimeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the time point that this animation started MOST RECENTLY. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Animate11GetPrevTimeEv">
+<span id="_CPPv3NK7Animate11GetPrevTimeEv"></span><span id="_CPPv2NK7Animate11GetPrevTimeEv"></span><span id="Animate::GetPrevTimeC"></span><span class="target" id="classAnimate_1aa9c1d74f2f4e7c473ddff3d8b91a4776"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPrevTime</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Animate11GetPrevTimeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine the time point when this animation last updated a frame. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Animate10GetCurTimeEv">
+<span id="_CPPv3NK7Animate10GetCurTimeEv"></span><span id="_CPPv2NK7Animate10GetCurTimeEv"></span><span id="Animate::GetCurTimeC"></span><span class="target" id="classAnimate_1a907a635ec776980958e3498732acfc92"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetCurTime</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Animate10GetCurTimeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the current time of the animation. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Animate11GetStepTimeEv">
+<span id="_CPPv3NK7Animate11GetStepTimeEv"></span><span id="_CPPv2NK7Animate11GetStepTimeEv"></span><span id="Animate::GetStepTimeC"></span><span class="target" id="classAnimate_1a55c9f4fabad1c09629164dd84176bca6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetStepTime</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Animate11GetStepTimeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine how long the last step between frames took. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Animate10GetRunTimeEv">
+<span id="_CPPv3NK7Animate10GetRunTimeEv"></span><span id="_CPPv2NK7Animate10GetRunTimeEv"></span><span id="Animate::GetRunTimeC"></span><span class="target" id="classAnimate_1a60b7f0b6a5b674d8a30812725260b274"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRunTime</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Animate10GetRunTimeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine the total amount of time that this animation has run. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Animate13GetFrameCountEv">
+<span id="_CPPv3NK7Animate13GetFrameCountEv"></span><span id="_CPPv2NK7Animate13GetFrameCountEv"></span><span id="Animate::GetFrameCountC"></span><span class="target" id="classAnimate_1a986bda8bf4963d266c812d07e0d36abd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetFrameCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Animate13GetFrameCountEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine how many total frames have existed thus far in this animation. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate11SetCallbackERK10anim_fun_t">
+<span id="_CPPv3N7Animate11SetCallbackERK10anim_fun_t"></span><span id="_CPPv2N7Animate11SetCallbackERK10anim_fun_t"></span><span id="Animate::SetCallback__anim_fun_tCR"></span><span class="target" id="classAnimate_1a172346dddc528749b3ceb168a297054c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetCallback</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Animate10anim_fun_tE" title="Animate::anim_fun_t"><span class="n"><span class="pre">anim_fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Animate11SetCallbackERK10anim_fun_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set a new function for this animation to call when running that takes a const reference to the Animation object as an argument. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate11SetCallbackERKNSt8functionIFvdEEE">
+<span id="_CPPv3N7Animate11SetCallbackERKNSt8functionIFvdEEE"></span><span id="_CPPv2N7Animate11SetCallbackERKNSt8functionIFvdEEE"></span><span class="target" id="classAnimate_1a696ca54a6676a1081efe3d0e145983b1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetCallback</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Animate11SetCallbackERKNSt8functionIFvdEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set a new function for this animation to call when running that takes the amount of time since the last frame (a double) as an argument. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate11SetCallbackERKNSt8functionIFvvEEE">
+<span id="_CPPv3N7Animate11SetCallbackERKNSt8functionIFvvEEE"></span><span id="_CPPv2N7Animate11SetCallbackERKNSt8functionIFvvEEE"></span><span class="target" id="classAnimate_1a8e79c22730b6b31a90f74a3ff22cb708"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetCallback</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Animate11SetCallbackERKNSt8functionIFvvEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set a new function for this animation to call when running that takes no arguments. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate15GetToggleButtonERKNSt6stringERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N7Animate15GetToggleButtonERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N7Animate15GetToggleButtonERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="Animate::GetToggleButton__ssCR.ssCR.ssCR"></span><span class="target" id="classAnimate_1ac2d3888e5b0d0e2cca3cc90de2b5d094"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="Button.html#_CPPv46Button" title="Button"><span class="n"><span class="pre">Button</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetToggleButton</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">but_name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">start_label</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;Start&quot;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stop_label</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;Stop&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Animate15GetToggleButtonERKNSt6stringERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a toggle button that will start/stop this animation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>but_name</strong> – The HTML identifier used for this button. </p></li>
+<li><p><strong>start_label</strong> – The name on the button when it will start the animation (default=”Start”) </p></li>
+<li><p><strong>stop_label</strong> – The name on the button when it will halt the animation (default=”Stop”) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate13GetStepButtonERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N7Animate13GetStepButtonERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N7Animate13GetStepButtonERKNSt6stringERKNSt6stringE"></span><span id="Animate::GetStepButton__ssCR.ssCR"></span><span class="target" id="classAnimate_1acdb57e597cab9d2c1776353ca516e659"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="Button.html#_CPPv46Button" title="Button"><span class="n"><span class="pre">Button</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetStepButton</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">but_name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">label</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;Step&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Animate13GetStepButtonERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a step button that will advance this animation one frame. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>but_name</strong> – The HTML identifier used for this button. </p></li>
+<li><p><strong>label</strong> – The name shown on the button. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-types">Protected Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate10anim_fun_tE">
+<span id="_CPPv3N7Animate10anim_fun_tE"></span><span id="_CPPv2N7Animate10anim_fun_tE"></span><span class="target" id="classAnimate_1a4d22b2addeb20db24f2eaee79b511b3b"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">anim_fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47Animate" title="Animate"><span class="n"><span class="pre">Animate</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N7Animate10anim_fun_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>The full version of the animate function takes a const reference to the animate object. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate7DoFrameEv">
+<span id="_CPPv3N7Animate7DoFrameEv"></span><span id="_CPPv2N7Animate7DoFrameEv"></span><span id="Animate::DoFrame"></span><span class="target" id="classAnimate_1a7dbda8727de1d30dc368fb00c9e049a6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoFrame</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Animate7DoFrameEv" title="Link to this definition"></a><br /></dt>
+<dd><p>DoFrame() is called by default if no animation function is provided. As such, an animation can be built by deriving a class from Animate and overriding this function. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate8anim_funE">
+<span id="_CPPv3N7Animate8anim_funE"></span><span id="_CPPv2N7Animate8anim_funE"></span><span id="Animate::anim_fun__anim_fun_t"></span><span class="target" id="classAnimate_1aa266716fde536eb7a4b4a56925eb792f"></span><a class="reference internal" href="#_CPPv4N7Animate10anim_fun_tE" title="Animate::anim_fun_t"><span class="n"><span class="pre">anim_fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">anim_fun</span></span></span><a class="headerlink" href="#_CPPv4N7Animate8anim_funE" title="Link to this definition"></a><br /></dt>
+<dd><p>Function to repeatedly run for animation. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate7targetsE">
+<span id="_CPPv3N7Animate7targetsE"></span><span id="_CPPv2N7Animate7targetsE"></span><span id="Animate::targets__vector:Widget:"></span><span class="target" id="classAnimate_1aac7b9d605f105c449452d573d878148f"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">targets</span></span></span><a class="headerlink" href="#_CPPv4N7Animate7targetsE" title="Link to this definition"></a><br /></dt>
+<dd><p>What widgets should be refreshed after each frame? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate6activeE">
+<span id="_CPPv3N7Animate6activeE"></span><span id="_CPPv2N7Animate6activeE"></span><span id="Animate::active__b"></span><span class="target" id="classAnimate_1a21d8e37427f1d51c00da316fee822f82"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">active</span></span></span><a class="headerlink" href="#_CPPv4N7Animate6activeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Is this animation currently running? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate7do_stepE">
+<span id="_CPPv3N7Animate7do_stepE"></span><span id="_CPPv2N7Animate7do_stepE"></span><span id="Animate::do_step__b"></span><span class="target" id="classAnimate_1ac911b38f46b17f67094f46047152bcd1"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">do_step</span></span></span><a class="headerlink" href="#_CPPv4N7Animate7do_stepE" title="Link to this definition"></a><br /></dt>
+<dd><p>Should this animation take just a single step? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate11callback_idE">
+<span id="_CPPv3N7Animate11callback_idE"></span><span id="_CPPv2N7Animate11callback_idE"></span><span id="Animate::callback_id__s"></span><span class="target" id="classAnimate_1a3b83ab67d8ba5f2ae2d50822db47432a"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">callback_id</span></span></span><a class="headerlink" href="#_CPPv4N7Animate11callback_idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Intenral ID for javascript to call back AdvanceFrame() </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate10start_timeE">
+<span id="_CPPv3N7Animate10start_timeE"></span><span id="_CPPv2N7Animate10start_timeE"></span><span id="Animate::start_time__double"></span><span class="target" id="classAnimate_1ad97d9ef85f7c263c514fb1c32055a86a"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">start_time</span></span></span><a class="headerlink" href="#_CPPv4N7Animate10start_timeE" title="Link to this definition"></a><br /></dt>
+<dd><p>At what time did this animation most recently start? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate9prev_timeE">
+<span id="_CPPv3N7Animate9prev_timeE"></span><span id="_CPPv2N7Animate9prev_timeE"></span><span id="Animate::prev_time__double"></span><span class="target" id="classAnimate_1a5b721e771a06cfc4eb930f3d6f1b7249"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">prev_time</span></span></span><a class="headerlink" href="#_CPPv4N7Animate9prev_timeE" title="Link to this definition"></a><br /></dt>
+<dd><p>What was the time point of the previous frame? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate8cur_timeE">
+<span id="_CPPv3N7Animate8cur_timeE"></span><span id="_CPPv2N7Animate8cur_timeE"></span><span id="Animate::cur_time__double"></span><span class="target" id="classAnimate_1a19844b86566972e53a1574a92a6d385b"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cur_time</span></span></span><a class="headerlink" href="#_CPPv4N7Animate8cur_timeE" title="Link to this definition"></a><br /></dt>
+<dd><p>What time did the current frame start? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate8run_timeE">
+<span id="_CPPv3N7Animate8run_timeE"></span><span id="_CPPv2N7Animate8run_timeE"></span><span id="Animate::run_time__double"></span><span class="target" id="classAnimate_1aed1ac970b9e323c61b107391463d354c"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">run_time</span></span></span><a class="headerlink" href="#_CPPv4N7Animate8run_timeE" title="Link to this definition"></a><br /></dt>
+<dd><p>How much run time has accumulated? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate11frame_countE">
+<span id="_CPPv3N7Animate11frame_countE"></span><span id="_CPPv2N7Animate11frame_countE"></span><span id="Animate::frame_count__i"></span><span class="target" id="classAnimate_1ae80fbce67f3b1612a1838955d63f76aa"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">frame_count</span></span></span><a class="headerlink" href="#_CPPv4N7Animate11frame_countE" title="Link to this definition"></a><br /></dt>
+<dd><p>How many animation frames have gone by? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate10toggle_butE">
+<span id="_CPPv3N7Animate10toggle_butE"></span><span id="_CPPv2N7Animate10toggle_butE"></span><span id="Animate::toggle_but__Button"></span><span class="target" id="classAnimate_1a15933b2704a8785c56f430717c41e534"></span><a class="reference internal" href="Button.html#_CPPv46Button" title="Button"><span class="n"><span class="pre">Button</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">toggle_but</span></span></span><a class="headerlink" href="#_CPPv4N7Animate10toggle_butE" title="Link to this definition"></a><br /></dt>
+<dd><p>A button to start/stop this animation. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Animate8step_butE">
+<span id="_CPPv3N7Animate8step_butE"></span><span id="_CPPv2N7Animate8step_butE"></span><span id="Animate::step_but__Button"></span><span class="target" id="classAnimate_1a0dbe2857e44e2c0e3dd08838dbf092d6"></span><a class="reference internal" href="Button.html#_CPPv46Button" title="Button"><span class="n"><span class="pre">Button</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">step_but</span></span></span><a class="headerlink" href="#_CPPv4N7Animate8step_butE" title="Link to this definition"></a><br /></dt>
+<dd><p>A button to advance this animation one step. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../d3/api/visualizations.html" class="btn btn-neutral float-left" title="visualizations.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Attributes.html" class="btn btn-neutral float-right" title="Attributes.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

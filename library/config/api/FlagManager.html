@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlagManager.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/config/api/FlagManager.daaef901-4ad4-4c67-863c-78360d3512da.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="SettingCombos.hpp" href="SettingCombos.html" />
+    <link rel="prev" title="ConfigManager.hpp" href="ConfigManager.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../config.html">Config</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../config.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ArgManager.html">ArgManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ConfigManager.html">ConfigManager.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">FlagManager.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411FlagManager"><code class="docutils literal notranslate"><span class="pre">FlagManager</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="SettingCombos.html">SettingCombos.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SettingConfig.html">SettingConfig.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="command_line.html">command_line.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html">config.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="config_utils.html">config_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="config_web_interface.html">config_web_interface.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../config.html">Config</a></li>
+      <li class="breadcrumb-item active">FlagManager.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="flagmanager-hpp">
+<h1>FlagManager.hpp<a class="headerlink" href="#flagmanager-hpp" title="Link to this heading"></a></h1>
+<p>This file contains tools for dealing with command-line flags (from argv and argc). </p>
+<p>
+The FlagManager class will take command line arguments (either in its constructor or with the AddFlags() function) and process them appropriately.</p>
+<p>For setup, the user must run AddOption with the function to call. Functions to call can take zero, one, or two Strings as arguments OR they can take a vector of Strings and the range of allowed arguments should be specified. When Process() is run, the appropriate function will be called on each and any invalid arguments will trigger an error.</p>
+<p>Flags are expected to begin with a ‘-’ and non-flags are expected to NOT begin with a ‘-‘.</p>
+<p>If a single dash is followed by multiple characters, each will be processed independently. So, “-abc” will be the same as “-a -b -c”.</p>
+<p>Extra command line arguments will be saves as a vector of strings called “extras” and must be processed manually. They can be retrieved with GetExtras().</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>: Make variable numbers of flag arguments work. </p>
+</dd></dl>
+
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA</p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv411FlagManager">
+<span id="_CPPv311FlagManager"></span><span id="_CPPv211FlagManager"></span><span id="FlagManager"></span><span class="target" id="classFlagManager"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FlagManager</span></span></span><a class="headerlink" href="#_CPPv411FlagManager" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;FlagManager.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager11FlagManagerEv">
+<span id="_CPPv3N11FlagManager11FlagManagerEv"></span><span id="_CPPv2N11FlagManager11FlagManagerEv"></span><span id="FlagManager::FlagManager"></span><span class="target" id="classFlagManager_1a72a09733e9097395b36206e6467b37d5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FlagManager</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManager11FlagManagerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager11FlagManagerEiA_Pc">
+<span id="_CPPv3N11FlagManager11FlagManagerEiA_Pc"></span><span id="_CPPv2N11FlagManager11FlagManagerEiA_Pc"></span><span id="FlagManager::FlagManager__i.cPA"></span><span class="target" id="classFlagManager_1a3a8e92903695973a48ad100170192dbf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FlagManager</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">argc</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">argv</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManager11FlagManagerEiA_Pc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManagerixE6size_t">
+<span id="_CPPv3N11FlagManagerixE6size_t"></span><span id="_CPPv2N11FlagManagerixE6size_t"></span><span id="FlagManager::subscript-operator__s"></span><span class="target" id="classFlagManager_1a3594b5fc2c44f95bbb9a35e5e46b4af6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManagerixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FlagManagerixE6size_t">
+<span id="_CPPv3NK11FlagManagerixE6size_t"></span><span id="_CPPv2NK11FlagManagerixE6size_t"></span><span id="FlagManager::subscript-operator__sC"></span><span class="target" id="classFlagManager_1a6fd58ef13c0f101209c67bafca634a0d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FlagManagerixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FlagManager9GetExtrasEv">
+<span id="_CPPv3NK11FlagManager9GetExtrasEv"></span><span id="_CPPv2NK11FlagManager9GetExtrasEv"></span><span id="FlagManager::GetExtrasC"></span><span class="target" id="classFlagManager_1a9a101a37862b1f2e65757508dde1dae3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetExtras</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FlagManager9GetExtrasEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FlagManager4FindE6String">
+<span id="_CPPv3NK11FlagManager4FindE6String"></span><span id="_CPPv2NK11FlagManager4FindE6String"></span><span id="FlagManager::Find__StringC"></span><span class="target" id="classFlagManager_1a114ca25c84e96589d15a24d3ff6cc6d5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Find</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pattern</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FlagManager4FindE6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FlagManager3HasE6String">
+<span id="_CPPv3NK11FlagManager3HasE6String"></span><span id="_CPPv2NK11FlagManager3HasE6String"></span><span id="FlagManager::Has__StringC"></span><span class="target" id="classFlagManager_1aa756da905da2cf54dafcbf1e71046c2e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pattern</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FlagManager3HasE6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager3UseE6String">
+<span id="_CPPv3N11FlagManager3UseE6String"></span><span id="_CPPv2N11FlagManager3UseE6String"></span><span id="FlagManager::Use__String"></span><span class="target" id="classFlagManager_1acdc74faf6be511bd2766d4205a65bc5b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Use</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pattern</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManager3UseE6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager9AddOptionE6String6String">
+<span id="_CPPv3N11FlagManager9AddOptionE6String6String"></span><span id="_CPPv2N11FlagManager9AddOptionE6String6String"></span><span id="FlagManager::AddOption__String.String"></span><span class="target" id="classFlagManager_1a675a69d21d1ec0eb36725df0de82ac4a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddOption</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManager9AddOptionE6String6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager9AddOptionE6StringNSt8functionIFvvEEE6String">
+<span id="_CPPv3N11FlagManager9AddOptionE6StringNSt8functionIFvvEEE6String"></span><span id="_CPPv2N11FlagManager9AddOptionE6StringNSt8functionIFvvEEE6String"></span><span class="target" id="classFlagManager_1afd74ee4dcafe5c5ffa6cdb355a10b18e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddOption</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fun</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManager9AddOptionE6StringNSt8functionIFvvEEE6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager9AddOptionE6StringNSt8functionIFv6StringEEE6String">
+<span id="_CPPv3N11FlagManager9AddOptionE6StringNSt8functionIFv6StringEEE6String"></span><span id="_CPPv2N11FlagManager9AddOptionE6StringNSt8functionIFv6StringEEE6String"></span><span class="target" id="classFlagManager_1ad5b321640016dda9affdd5490292d326"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddOption</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fun</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManager9AddOptionE6StringNSt8functionIFv6StringEEE6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager9AddOptionE6StringNSt8functionIFv6String6StringEEE6String">
+<span id="_CPPv3N11FlagManager9AddOptionE6StringNSt8functionIFv6String6StringEEE6String"></span><span id="_CPPv2N11FlagManager9AddOptionE6StringNSt8functionIFv6String6StringEEE6String"></span><span class="target" id="classFlagManager_1a42d4fcf2cfd139ff5d456e61e183f9dc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddOption</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fun</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManager9AddOptionE6StringNSt8functionIFv6String6StringEEE6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager9AddOptionE6StringNSt8functionIFvRK6vectorI6StringEEEE6size_t6size_t6String">
+<span id="_CPPv3N11FlagManager9AddOptionE6StringNSt8functionIFvRK6vectorI6StringEEEE6size_t6size_t6String"></span><span id="_CPPv2N11FlagManager9AddOptionE6StringNSt8functionIFvRK6vectorI6StringEEEE6size_t6size_t6String"></span><span class="target" id="classFlagManager_1a59cb2f1de948c56728275644a5374e21"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddOption</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fun</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_args</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_args</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11FlagManager4nposE" title="FlagManager::npos"><span class="n"><span class="pre">npos</span></span></a>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManager9AddOptionE6StringNSt8functionIFvRK6vectorI6StringEEEE6size_t6size_t6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN11FlagManager9AddOptionEvc6String5FUN_T6String">
+<span id="_CPPv3I0EN11FlagManager9AddOptionEc6String5FUN_T6String"></span><span id="_CPPv2I0EN11FlagManager9AddOptionEc6String5FUN_T6String"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FUN_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFlagManager_1aad1f562351543f8daa4b56d9c42c0427"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddOption</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">shortcut</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="#_CPPv4I0EN11FlagManager9AddOptionEvc6String5FUN_T6String" title="FlagManager::AddOption::FUN_T"><span class="n"><span class="pre">FUN_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">fun</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN11FlagManager9AddOptionEvc6String5FUN_T6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager8AddFlagsEiA_Pc">
+<span id="_CPPv3N11FlagManager8AddFlagsEiA_Pc"></span><span id="_CPPv2N11FlagManager8AddFlagsEiA_Pc"></span><span id="FlagManager::AddFlags__i.cPA"></span><span class="target" id="classFlagManager_1aedb7179a199d3351f3271666ec04f445"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddFlags</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">argc</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">argv</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManager8AddFlagsEiA_Pc" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager10ProcessArgE6String6size_t">
+<span id="_CPPv3N11FlagManager10ProcessArgE6String6size_t"></span><span id="_CPPv2N11FlagManager10ProcessArgE6String6size_t"></span><span id="FlagManager::ProcessArg__String.s"></span><span class="target" id="classFlagManager_1a0c2d1157a1c4e28f1f7c83865e3baa53"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ProcessArg</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cur_pos</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManager10ProcessArgE6String6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager10ProcessArgEc6size_t">
+<span id="_CPPv3N11FlagManager10ProcessArgEc6size_t"></span><span id="_CPPv2N11FlagManager10ProcessArgEc6size_t"></span><span id="FlagManager::ProcessArg__c.s"></span><span class="target" id="classFlagManager_1ad5dc544b19001070f6514a1a143f69e8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ProcessArg</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cur_pos</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManager10ProcessArgEc6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager14ProcessFlagSetE6String6size_t">
+<span id="_CPPv3N11FlagManager14ProcessFlagSetE6String6size_t"></span><span id="_CPPv2N11FlagManager14ProcessFlagSetE6String6size_t"></span><span id="FlagManager::ProcessFlagSet__String.s"></span><span class="target" id="classFlagManager_1ab874112a3ee70ce0bbf5abbe5d599756"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ProcessFlagSet</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cur_pos</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManager14ProcessFlagSetE6String6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager7ProcessEv">
+<span id="_CPPv3N11FlagManager7ProcessEv"></span><span id="_CPPv2N11FlagManager7ProcessEv"></span><span id="FlagManager::Process"></span><span class="target" id="classFlagManager_1a7ecc2cf787961bdc2d0d3bb633340ac6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Process</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FlagManager7ProcessEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FlagManager12PrintOptionsERNSt7ostreamE">
+<span id="_CPPv3NK11FlagManager12PrintOptionsERNSt7ostreamE"></span><span id="_CPPv2NK11FlagManager12PrintOptionsERNSt7ostreamE"></span><span id="FlagManager::PrintOptions__osRC"></span><span class="target" id="classFlagManager_1a1d054ebef5d2fc090acb76a269cc3bd7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintOptions</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FlagManager12PrintOptionsERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager4nposE">
+<span id="_CPPv3N11FlagManager4nposE"></span><span id="_CPPv2N11FlagManager4nposE"></span><span id="FlagManager::npos__s"></span><span class="target" id="classFlagManager_1a676ee30fdd992252cdd9b783e558ca8d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">npos</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">static_cast</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">(</span></span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N11FlagManager4nposE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager4argsE">
+<span id="_CPPv3N11FlagManager4argsE"></span><span id="_CPPv2N11FlagManager4argsE"></span><span id="FlagManager::args__vector:String:"></span><span class="target" id="classFlagManager_1ad38546b3188633629cf14d6ccc0e7860"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">args</span></span></span><a class="headerlink" href="#_CPPv4N11FlagManager4argsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager6extrasE">
+<span id="_CPPv3N11FlagManager6extrasE"></span><span id="_CPPv2N11FlagManager6extrasE"></span><span id="FlagManager::extras__vector:String:"></span><span class="target" id="classFlagManager_1a8ca1350a22375eafa95320fe5abd0e27"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">extras</span></span></span><a class="headerlink" href="#_CPPv4N11FlagManager6extrasE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager12flag_optionsE">
+<span id="_CPPv3N11FlagManager12flag_optionsE"></span><span id="_CPPv2N11FlagManager12flag_optionsE"></span><span id="FlagManager::flag_options__std::map:String.FlagInfo:"></span><span class="target" id="classFlagManager_1a737d8b0b546f9ac0d1fcd71e578eb9a5"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11FlagManager8FlagInfoE" title="FlagManager::FlagInfo"><span class="n"><span class="pre">FlagInfo</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">flag_options</span></span></span><a class="headerlink" href="#_CPPv4N11FlagManager12flag_optionsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager9shortcutsE">
+<span id="_CPPv3N11FlagManager9shortcutsE"></span><span id="_CPPv2N11FlagManager9shortcutsE"></span><span id="FlagManager::shortcuts__std::map:c.String:"></span><span class="target" id="classFlagManager_1aec05c2b507efb6cadfcfd8ce842f8b63"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shortcuts</span></span></span><a class="headerlink" href="#_CPPv4N11FlagManager9shortcutsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager8FlagInfoE">
+<span id="_CPPv3N11FlagManager8FlagInfoE"></span><span id="_CPPv2N11FlagManager8FlagInfoE"></span><span id="FlagManager::FlagInfo"></span><span class="target" id="structFlagManager_1_1FlagInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FlagInfo</span></span></span><a class="headerlink" href="#_CPPv4N11FlagManager8FlagInfoE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager8FlagInfo4descE">
+<span id="_CPPv3N11FlagManager8FlagInfo4descE"></span><span id="_CPPv2N11FlagManager8FlagInfo4descE"></span><span id="FlagManager::FlagInfo::desc__String"></span><span class="target" id="structFlagManager_1_1FlagInfo_1a61b814fb904faf31fedb42b01dc172e0"></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">desc</span></span></span><a class="headerlink" href="#_CPPv4N11FlagManager8FlagInfo4descE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager8FlagInfo8min_argsE">
+<span id="_CPPv3N11FlagManager8FlagInfo8min_argsE"></span><span id="_CPPv2N11FlagManager8FlagInfo8min_argsE"></span><span id="FlagManager::FlagInfo::min_args__s"></span><span class="target" id="structFlagManager_1_1FlagInfo_1aee36278aa00c69fe529b67eef8cb1b54"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">min_args</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N11FlagManager8FlagInfo8min_argsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager8FlagInfo8max_argsE">
+<span id="_CPPv3N11FlagManager8FlagInfo8max_argsE"></span><span id="_CPPv2N11FlagManager8FlagInfo8max_argsE"></span><span id="FlagManager::FlagInfo::max_args__s"></span><span class="target" id="structFlagManager_1_1FlagInfo_1a6fb15be6a5bd279bcb3ce9728bc421af"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_args</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N11FlagManager8FlagInfo8max_argsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager8FlagInfo3funE">
+<span id="_CPPv3N11FlagManager8FlagInfo3funE"></span><span id="_CPPv2N11FlagManager8FlagInfo3funE"></span><span class="target" id="structFlagManager_1_1FlagInfo_1ab870792bf6bd6d80b45bb16d0174a1f2"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun</span></span></span><a class="headerlink" href="#_CPPv4N11FlagManager8FlagInfo3funE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11FlagManager8FlagInfo8shortcutE">
+<span id="_CPPv3N11FlagManager8FlagInfo8shortcutE"></span><span id="_CPPv2N11FlagManager8FlagInfo8shortcutE"></span><span id="FlagManager::FlagInfo::shortcut__c"></span><span class="target" id="structFlagManager_1_1FlagInfo_1a44bc49978cc8ea9ba617a2bb80145ebe"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shortcut</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="sc"><span class="pre">'\0'</span></span><a class="headerlink" href="#_CPPv4N11FlagManager8FlagInfo8shortcutE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ConfigManager.html" class="btn btn-neutral float-left" title="ConfigManager.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SettingCombos.html" class="btn btn-neutral float-right" title="SettingCombos.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

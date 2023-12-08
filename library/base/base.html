@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>General Purpose Debugging Tools &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/base/base.428c4ef6-0ab5-485a-9370-bf4e93a5b77d.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="MapProxy.hpp" href="api/MapProxy.html" />
+    <link rel="prev" title="Data Tracking" href="../../QuickStartGuides/todos/X-TrackData.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">General Purpose Debugging Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#empirical-vectors-and-arrays">Empirical vectors and arrays</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#emp-vector-example">emp::vector Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#emp-array-example">emp::array Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#empirical-asserts">Empirical asserts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#empirical-warnings">Empirical Warnings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#empirical-pointers">Empirical pointers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html">MapProxy.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html">Ptr.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/always_assert.html">always_assert.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/always_assert_warning.html">always_assert_warning.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html">array.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/assert.html">assert.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/assert_warning.html">assert_warning.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/emscripten_assert.html">emscripten_assert.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/error.html">error.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/errors.html">errors.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html">map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html">notify.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/optional.html">optional.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html">unordered_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html">vector.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">General Purpose Debugging Tools</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="general-purpose-debugging-tools">
+<h1>General Purpose Debugging Tools<a class="headerlink" href="#general-purpose-debugging-tools" title="Link to this heading"></a></h1>
+<section id="empirical-vectors-and-arrays">
+<h2>Empirical vectors and arrays<a class="headerlink" href="#empirical-vectors-and-arrays" title="Link to this heading"></a></h2>
+<p>Empirical contains of intelligent versions of STL vectors and arrays
+that will warn you if you make common errors, but otherwise behave
+identically to the STL version. Most importantly, they will detect
+attempts to index to out-of-bounds locations and throw an error. These
+features are critical for writing code that will be compiled to
+Javascript with Emscripten, because Valgrind doesn’t run on Javascript.
+They also save a lot of debugging time when writing native C++ code.</p>
+<p>“But wait,” you might say, “surely all of these additional checks
+slow down your code!” This is true when you compile in debug mode (the
+default). However, when you compile with the -DNDEBUG flag, these
+objects are directly replaced with their STL equivalent, removing any
+slowdown. That way, you can get all the debugging benefits while you’re
+writing your program, but all the speed benefits when you’re actually
+using it.</p>
+<section id="emp-vector-example">
+<h3>emp::vector Example<a class="headerlink" href="#emp-vector-example" title="Link to this heading"></a></h3>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;Empirical/include/emp/base/vector.hpp&quot;</span>
+
+<span class="n">emp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">vec</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">});</span>
+<span class="c1">// You can treat this just like an std::vector&lt;int&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="emp-array-example">
+<h3>emp::array Example<a class="headerlink" href="#emp-array-example" title="Link to this heading"></a></h3>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;Empirical/include/emp/base/array.hpp&quot;</span>
+
+<span class="n">emp</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="n">array</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">});</span>
+<span class="c1">// You can treat this just like an std::array&lt;int, 3&gt;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="empirical-asserts">
+<h2>Empirical asserts<a class="headerlink" href="#empirical-asserts" title="Link to this heading"></a></h2>
+<p>These asserts function similarly to normal asserts, with a few important
+additional features:</p>
+<ul class="simple">
+<li><p>If compiled with Emscripten they will provide pop-up alerts when run in a web browser.</p></li>
+<li><p>emp_assert can take additional arguments. If the assert is triggered, those extra arguments will be evaluated and printed.</p></li>
+<li><p>if NDEBUG <strong>or</strong> EMP_NDEBUG is defined, the expression in emp_assert() is not evaluated.</p></li>
+<li><p>if EMP_TDEBUG is defined, emp_assert() goes into test mode and records failures, but does not abort. (useful for unit tests of asserts)</p></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;Empirical/include/emp/base/assert.hpp&quot;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<span class="n">emp_assert</span><span class="p">(</span><span class="n">a</span><span class="o">==</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>When compiled in debug mode (i.e. without the -DNDEBUG flag), this will
+trigger an assertion error and print the value of a.</p>
+<p>Empirical also has an emscripten-specific assert, which will only trigger an error when the code was compiled with Emscripten:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;Empirical/include/emp/base/emscripten_assert.hpp&quot;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<span class="c1">// If compiled in with emscripten in debug mode,</span>
+<span class="c1">// this will print a warning and the value of a</span>
+<span class="n">emp_emscripten_assert</span><span class="p">(</span><span class="n">a</span><span class="o">==</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If you want your assert to be triggered outside of debug mode, you can use <a class="reference internal" href="api/always_assert.html#c.emp_always_assert" title="emp_always_assert"><code class="xref c c-func docutils literal notranslate"><span class="pre">emp_always_assert()</span></code></a>.</p>
+</section>
+<section id="empirical-warnings">
+<h2>Empirical Warnings<a class="headerlink" href="#empirical-warnings" title="Link to this heading"></a></h2>
+<p>These work very similar to Empirical asserts, except they do not throw assertion errors. When compiled in debug mode, they will print a warning (and any desired additional information) on failure but program execution will continue. When compiled outside of debug mode they do nothing.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;Empirical/include/emp/base/assert_warning.hpp&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<span class="c1">// If compiled in debug mode, this will print a</span>
+<span class="c1">// warning and the value of a</span>
+<span class="n">emp_assert_warning</span><span class="p">(</span><span class="n">a</span><span class="o">==</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">);</span>
+
+<span class="c1">// This will get printed because no assertion</span>
+<span class="c1">// error will be triggered</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Still running!&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>If you want your warning to be triggered outside of debug mode, you can use <a class="reference internal" href="api/always_assert_warning.html#c.emp_always_assert_warning" title="emp_always_assert_warning"><code class="xref c c-func docutils literal notranslate"><span class="pre">emp_always_assert_warning()</span></code></a>.</p>
+</section>
+<section id="empirical-pointers">
+<h2>Empirical pointers<a class="headerlink" href="#empirical-pointers" title="Link to this heading"></a></h2>
+<p>Ptr objects behave as normal pointers under most conditions. However, if
+a program is compiled with <code class="docutils literal notranslate"><span class="pre">EMP_TRACK_MEM</span></code> set, then these pointers
+perform extra tests to ensure that they point to valid memory and that
+memory is freed before pointers are released.</p>
+<p>If you trip an assert, you can re-do the run a track a specific pointer
+by defining <code class="docutils literal notranslate"><span class="pre">EMP_ABORT_PTR_NEW</span></code> or <code class="docutils literal notranslate"><span class="pre">EMP_ABORT_PTR_DELETE</span></code> to the ID of
+the pointer in question. This will allow you to track the pointer more
+easily in a debugger.</p>
+<p>Example:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;Empirical/include/emp/base/Ptr.hpp&quot;</span>
+
+<span class="n">emp</span><span class="o">::</span><span class="n">Ptr</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">int_ptr</span><span class="p">;</span>
+<span class="n">int_ptr</span><span class="p">.</span><span class="n">New</span><span class="p">(</span><span class="mi">123456</span><span class="p">);</span><span class="w"> </span><span class="c1">// Store the value 123456 in int_ptr.</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;*int_ptr = &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="o">*</span><span class="n">int_ptr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="n">int_ptr</span><span class="p">.</span><span class="n">Delete</span><span class="p">();</span>
+</pre></div>
+</div>
+</section>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/MapProxy.html">MapProxy.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0E8MapProxy"><code class="docutils literal notranslate"><span class="pre">MapProxy</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxy8MapProxyER1Tb"><code class="docutils literal notranslate"><span class="pre">MapProxy::MapProxy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxy12emp_GetValueEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::emp_GetValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4NK8MapProxy12emp_GetValueEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::emp_GetValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4NK8MapProxy10emp_IsInitEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::emp_IsInit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxyaSER1TRR3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxypLER1TRR3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator+=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxymIER1TRR3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator-=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxymLER1TRR3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator*=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxydVER1TRR3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator/=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxyrMER1TRR3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator%=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxyaNER1TRR3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator&amp;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxyoRER1TRR3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator|=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxyeOER1TRR3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator^=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxylSER1TRR3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator&lt;&lt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxyrSER1TRR3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator&gt;&gt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxyppEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator++()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxymmEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator--()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxyppEi"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator++()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxymmEi"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator--()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4NK8MapProxyplEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator+()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4NK8MapProxymiEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator-()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4NK8MapProxyntEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator!()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4NK8MapProxycoEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator~()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxyplEDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator+()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxymiEDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator-()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxymlEDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxydvEDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator/()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxyrmEDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator%()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxyanEDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator&amp;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxyorEDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator|()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxyeoEDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator^()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxylsEDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator&lt;&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxyrsEDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator&gt;&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxyaaEDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator&amp;&amp;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxyooEDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator||()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxyeqEbRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator==()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxyneEbRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxyltEbRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxyleEbRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator&lt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxygtEbRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxygeEbRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator&gt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxyixERDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0ENK8MapProxyixERKDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxymlEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4NK8MapProxymlEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxyanEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator&amp;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxyptEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator-&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxypmERDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator-&gt;*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4IDpEN8MapProxyclEDaDpRR4R_Ts"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4IDpENK8MapProxyclEDaDpRR4R_Ts"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4I0EN8MapProxycmEDaRK3R_T"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator,()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4NK8MapProxy6IsNullEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::IsNull()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxy6DeleteEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::Delete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxy11DeleteArrayEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::DeleteArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxycvR1TEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator</span> <span class="pre">T&amp;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4NK8MapProxycvRK1TEv"><code class="docutils literal notranslate"><span class="pre">MapProxy::operator</span> <span class="pre">const</span> <span class="pre">T&amp;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxy5valueE"><code class="docutils literal notranslate"><span class="pre">MapProxy::value</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MapProxy.html#_CPPv4N8MapProxy7is_initE"><code class="docutils literal notranslate"><span class="pre">MapProxy::is_init</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Ptr.html">Ptr.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv49PtrStatus"><code class="docutils literal notranslate"><span class="pre">PtrStatus</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N9PtrStatus7DELETEDE"><code class="docutils literal notranslate"><span class="pre">PtrStatus::DELETED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N9PtrStatus6ACTIVEE"><code class="docutils literal notranslate"><span class="pre">PtrStatus::ACTIVE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N9PtrStatus5ARRAYE"><code class="docutils literal notranslate"><span class="pre">PtrStatus::ARRAY</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0E10FillMemoryv3PtrIhEK6size_t1T"><code class="docutils literal notranslate"><span class="pre">FillMemory()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0E18FillMemoryFunctionv3PtrIhEK6size_t1T"><code class="docutils literal notranslate"><span class="pre">FillMemoryFunction()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv411SetPtrDebugb"><code class="docutils literal notranslate"><span class="pre">SetPtrDebug()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv411GetPtrDebugv"><code class="docutils literal notranslate"><span class="pre">GetPtrDebug()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0ElsRNSt7ostreamERNSt7ostreamERK3PtrI1TE"><code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0DpErsRNSt7istreamERNSt7istreamER3PtrI1TE"><code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0E5ToPtr3PtrI1TEP1Tb"><code class="docutils literal notranslate"><span class="pre">ToPtr()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0E8TrackPtr3PtrI1TEP1Tb"><code class="docutils literal notranslate"><span class="pre">TrackPtr()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0DpE6NewPtr3PtrI1TEDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">NewPtr()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0E7CopyPtr3PtrI1TE3PtrI1TE"><code class="docutils literal notranslate"><span class="pre">CopyPtr()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0E8CopyPtrs6vectorI3PtrI1TEERK6vectorI3PtrI1TEE"><code class="docutils literal notranslate"><span class="pre">CopyPtrs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0E9ClonePtrs6vectorI3PtrI1TEERK6vectorI3PtrI1TEE"><code class="docutils literal notranslate"><span class="pre">ClonePtrs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0E11NewArrayPtr3PtrI1TE6size_t"><code class="docutils literal notranslate"><span class="pre">NewArrayPtr()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0E10CopyMemoryv3PtrI1TE3PtrI1TEK6size_t"><code class="docutils literal notranslate"><span class="pre">CopyMemory()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0E3Ptr"><code class="docutils literal notranslate"><span class="pre">Ptr</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N3Ptr12element_typeE"><code class="docutils literal notranslate"><span class="pre">Ptr::element_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N3Ptr3PtrEv"><code class="docutils literal notranslate"><span class="pre">Ptr::Ptr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N3Ptr3PtrERK3PtrI4TYPEE"><code class="docutils literal notranslate"><span class="pre">Ptr::Ptr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0EN3Ptr3PtrEP2T2b"><code class="docutils literal notranslate"><span class="pre">Ptr::Ptr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0EN3Ptr3PtrEP2T26size_tb"><code class="docutils literal notranslate"><span class="pre">Ptr::Ptr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0EN3Ptr3PtrE3PtrI2T2E"><code class="docutils literal notranslate"><span class="pre">Ptr::Ptr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N3Ptr3PtrENSt9nullptr_tE"><code class="docutils literal notranslate"><span class="pre">Ptr::Ptr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N3PtrD0Ev"><code class="docutils literal notranslate"><span class="pre">Ptr::~Ptr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3Ptr6IsNullEv"><code class="docutils literal notranslate"><span class="pre">Ptr::IsNull()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3Ptr3RawEv"><code class="docutils literal notranslate"><span class="pre">Ptr::Raw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3Ptr3RawE6size_t"><code class="docutils literal notranslate"><span class="pre">Ptr::Raw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0ENK3Ptr4CastE3PtrI2T2Ev"><code class="docutils literal notranslate"><span class="pre">Ptr::Cast()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0ENK3Ptr9ConstCastE3PtrI2T2Ev"><code class="docutils literal notranslate"><span class="pre">Ptr::ConstCast()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0ENK3Ptr11DynamicCastE3PtrI2T2Ev"><code class="docutils literal notranslate"><span class="pre">Ptr::DynamicCast()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0ENK3Ptr15ReinterpretCastE3PtrI2T2Ev"><code class="docutils literal notranslate"><span class="pre">Ptr::ReinterpretCast()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4IDpEN3Ptr3NewEvDpRR1T"><code class="docutils literal notranslate"><span class="pre">Ptr::New()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N3Ptr8NewArrayE6size_t"><code class="docutils literal notranslate"><span class="pre">Ptr::NewArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N3Ptr6DeleteEv"><code class="docutils literal notranslate"><span class="pre">Ptr::Delete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N3Ptr11DeleteArrayEv"><code class="docutils literal notranslate"><span class="pre">Ptr::DeleteArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3Ptr4HashEv"><code class="docutils literal notranslate"><span class="pre">Ptr::Hash()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NR3PtraSERK3PtrI4TYPEE"><code class="docutils literal notranslate"><span class="pre">Ptr::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0ENR3PtraSER3PtrI4TYPEEP2T2"><code class="docutils literal notranslate"><span class="pre">Ptr::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0ENR3PtraSER3PtrI4TYPEE3PtrI2T2E"><code class="docutils literal notranslate"><span class="pre">Ptr::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N3PtrcvP4TYPEEv"><code class="docutils literal notranslate"><span class="pre">Ptr::operator</span> <span class="pre">TYPE*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N3PtrcvbEv"><code class="docutils literal notranslate"><span class="pre">Ptr::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3PtrcvbEv"><code class="docutils literal notranslate"><span class="pre">Ptr::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0ENK3PtreqEbRK1T"><code class="docutils literal notranslate"><span class="pre">Ptr::operator==()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0ENK3PtrneEbRK1T"><code class="docutils literal notranslate"><span class="pre">Ptr::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0ENK3PtrltEbRK1T"><code class="docutils literal notranslate"><span class="pre">Ptr::operator&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0ENK3PtrgtEbRK1T"><code class="docutils literal notranslate"><span class="pre">Ptr::operator&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0ENK3PtrleEbRK1T"><code class="docutils literal notranslate"><span class="pre">Ptr::operator&lt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0ENK3PtrgeEbRK1T"><code class="docutils literal notranslate"><span class="pre">Ptr::operator&gt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3PtrplEi"><code class="docutils literal notranslate"><span class="pre">Ptr::operator+()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3PtrmiEi"><code class="docutils literal notranslate"><span class="pre">Ptr::operator-()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3PtrplE6size_t"><code class="docutils literal notranslate"><span class="pre">Ptr::operator+()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3PtrmiE6size_t"><code class="docutils literal notranslate"><span class="pre">Ptr::operator-()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0EN3Ptr18FillMemoryFunctionEvK6size_t1T"><code class="docutils literal notranslate"><span class="pre">Ptr::FillMemoryFunction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4I0EN3Ptr10FillMemoryEvK6size_t1T"><code class="docutils literal notranslate"><span class="pre">Ptr::FillMemory()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3Ptr13DebugGetCountEv"><code class="docutils literal notranslate"><span class="pre">Ptr::DebugGetCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3Ptr12DebugIsArrayEv"><code class="docutils literal notranslate"><span class="pre">Ptr::DebugIsArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3Ptr18DebugGetArrayBytesEv"><code class="docutils literal notranslate"><span class="pre">Ptr::DebugGetArrayBytes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3Ptr13DebugIsActiveEv"><code class="docutils literal notranslate"><span class="pre">Ptr::DebugIsActive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3Ptr2OKEv"><code class="docutils literal notranslate"><span class="pre">Ptr::OK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N3Ptr6hash_tE"><code class="docutils literal notranslate"><span class="pre">Ptr::hash_t</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Ptr.html#_CPPv4NK3Ptr6hash_tclERK3PtrI4TYPEE"><code class="docutils literal notranslate"><span class="pre">Ptr::hash_t::operator()()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv47PtrInfo"><code class="docutils literal notranslate"><span class="pre">PtrInfo</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7PtrInfo7PtrInfoEPKv"><code class="docutils literal notranslate"><span class="pre">PtrInfo::PtrInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7PtrInfo7PtrInfoEPKv6size_t"><code class="docutils literal notranslate"><span class="pre">PtrInfo::PtrInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7PtrInfo7PtrInfoERK7PtrInfo"><code class="docutils literal notranslate"><span class="pre">PtrInfo::PtrInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7PtrInfo7PtrInfoERR7PtrInfo"><code class="docutils literal notranslate"><span class="pre">PtrInfo::PtrInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NR7PtrInfoaSERK7PtrInfo"><code class="docutils literal notranslate"><span class="pre">PtrInfo::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NR7PtrInfoaSERR7PtrInfo"><code class="docutils literal notranslate"><span class="pre">PtrInfo::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7PtrInfoD0Ev"><code class="docutils literal notranslate"><span class="pre">PtrInfo::~PtrInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK7PtrInfo6GetPtrEv"><code class="docutils literal notranslate"><span class="pre">PtrInfo::GetPtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK7PtrInfo8GetCountEv"><code class="docutils literal notranslate"><span class="pre">PtrInfo::GetCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK7PtrInfo13GetArrayBytesEv"><code class="docutils literal notranslate"><span class="pre">PtrInfo::GetArrayBytes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK7PtrInfo8IsActiveEv"><code class="docutils literal notranslate"><span class="pre">PtrInfo::IsActive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK7PtrInfo7IsArrayEv"><code class="docutils literal notranslate"><span class="pre">PtrInfo::IsArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7PtrInfo8SetArrayE6size_t"><code class="docutils literal notranslate"><span class="pre">PtrInfo::SetArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7PtrInfo3IncEK6size_t"><code class="docutils literal notranslate"><span class="pre">PtrInfo::Inc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7PtrInfo3DecEK6size_t"><code class="docutils literal notranslate"><span class="pre">PtrInfo::Dec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7PtrInfo11MarkDeletedEv"><code class="docutils literal notranslate"><span class="pre">PtrInfo::MarkDeleted()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK7PtrInfo2OKEv"><code class="docutils literal notranslate"><span class="pre">PtrInfo::OK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7PtrInfo3ptrE"><code class="docutils literal notranslate"><span class="pre">PtrInfo::ptr</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7PtrInfo5countE"><code class="docutils literal notranslate"><span class="pre">PtrInfo::count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7PtrInfo6statusE"><code class="docutils literal notranslate"><span class="pre">PtrInfo::status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7PtrInfo11array_bytesE"><code class="docutils literal notranslate"><span class="pre">PtrInfo::array_bytes</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv410PtrTracker"><code class="docutils literal notranslate"><span class="pre">PtrTracker</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTrackerD0Ev"><code class="docutils literal notranslate"><span class="pre">PtrTracker::~PtrTracker()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker7GetInfoEPKv"><code class="docutils literal notranslate"><span class="pre">PtrTracker::GetInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker7GetInfoE6size_t"><code class="docutils literal notranslate"><span class="pre">PtrTracker::GetInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK10PtrTracker6HasPtrEPKv"><code class="docutils literal notranslate"><span class="pre">PtrTracker::HasPtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker8GetCurIDEPKv"><code class="docutils literal notranslate"><span class="pre">PtrTracker::GetCurID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK10PtrTracker9GetNumIDsEv"><code class="docutils literal notranslate"><span class="pre">PtrTracker::GetNumIDs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK10PtrTracker13GetArrayBytesE6size_t"><code class="docutils literal notranslate"><span class="pre">PtrTracker::GetArrayBytes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK10PtrTracker9IsDeletedE6size_t"><code class="docutils literal notranslate"><span class="pre">PtrTracker::IsDeleted()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker8IsActiveEPKv"><code class="docutils literal notranslate"><span class="pre">PtrTracker::IsActive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker10IsActiveIDE6size_t"><code class="docutils literal notranslate"><span class="pre">PtrTracker::IsActiveID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker9IsArrayIDE6size_t"><code class="docutils literal notranslate"><span class="pre">PtrTracker::IsArrayID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK10PtrTracker10GetIDCountE6size_t"><code class="docutils literal notranslate"><span class="pre">PtrTracker::GetIDCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker3NewEPKv"><code class="docutils literal notranslate"><span class="pre">PtrTracker::New()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker8NewArrayEPKv6size_t"><code class="docutils literal notranslate"><span class="pre">PtrTracker::NewArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker5IncIDE6size_t"><code class="docutils literal notranslate"><span class="pre">PtrTracker::IncID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker5DecIDE6size_t"><code class="docutils literal notranslate"><span class="pre">PtrTracker::DecID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker11MarkDeletedE6size_t"><code class="docutils literal notranslate"><span class="pre">PtrTracker::MarkDeleted()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker3GetEv"><code class="docutils literal notranslate"><span class="pre">PtrTracker::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker10PtrTrackerEv"><code class="docutils literal notranslate"><span class="pre">PtrTracker::PtrTracker()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker10PtrTrackerERK10PtrTracker"><code class="docutils literal notranslate"><span class="pre">PtrTracker::PtrTracker()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker10PtrTrackerERR10PtrTracker"><code class="docutils literal notranslate"><span class="pre">PtrTracker::PtrTracker()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTrackeraSERK10PtrTracker"><code class="docutils literal notranslate"><span class="pre">PtrTracker::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTrackeraSERR10PtrTracker"><code class="docutils literal notranslate"><span class="pre">PtrTracker::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker6ptr_idE"><code class="docutils literal notranslate"><span class="pre">PtrTracker::ptr_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker7id_infoE"><code class="docutils literal notranslate"><span class="pre">PtrTracker::id_info</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N10PtrTracker12UNTRACKED_IDE"><code class="docutils literal notranslate"><span class="pre">PtrTracker::UNTRACKED_ID</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4I0E7BasePtr"><code class="docutils literal notranslate"><span class="pre">BasePtr</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7BasePtr7BasePtrEP4TYPE"><code class="docutils literal notranslate"><span class="pre">BasePtr::BasePtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK7BasePtrmlEv"><code class="docutils literal notranslate"><span class="pre">BasePtr::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK7BasePtrptEv"><code class="docutils literal notranslate"><span class="pre">BasePtr::operator-&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4NK7BasePtrixE6size_t"><code class="docutils literal notranslate"><span class="pre">BasePtr::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7BasePtr3ptrE"><code class="docutils literal notranslate"><span class="pre">BasePtr::ptr</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4IE7BasePtrIvE"><code class="docutils literal notranslate"><span class="pre">BasePtr</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7BasePtrIvE7BasePtrEPv"><code class="docutils literal notranslate"><span class="pre">BasePtr::BasePtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7BasePtrIvE3ptrE"><code class="docutils literal notranslate"><span class="pre">BasePtr::ptr</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Ptr.html#_CPPv4IE7BasePtrIKvE"><code class="docutils literal notranslate"><span class="pre">BasePtr</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7BasePtrIKvE7BasePtrEPKv"><code class="docutils literal notranslate"><span class="pre">BasePtr::BasePtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Ptr.html#_CPPv4N7BasePtrIKvE3ptrE"><code class="docutils literal notranslate"><span class="pre">BasePtr::ptr</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/always_assert.html">always_assert.hpp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/always_assert_warning.html">always_assert_warning.hpp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/array.html">array.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/array.html#_CPPv4I0_6size_tE5array"><code class="docutils literal notranslate"><span class="pre">array</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array6this_tE"><code class="docutils literal notranslate"><span class="pre">array::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array8iteratorE"><code class="docutils literal notranslate"><span class="pre">array::iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array14const_iteratorE"><code class="docutils literal notranslate"><span class="pre">array::const_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array16reverse_iteratorE"><code class="docutils literal notranslate"><span class="pre">array::reverse_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array22const_reverse_iteratorE"><code class="docutils literal notranslate"><span class="pre">array::const_reverse_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array10value_typeE"><code class="docutils literal notranslate"><span class="pre">array::value_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array9size_typeE"><code class="docutils literal notranslate"><span class="pre">array::size_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array9referenceE"><code class="docutils literal notranslate"><span class="pre">array::reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array15const_referenceE"><code class="docutils literal notranslate"><span class="pre">array::const_reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5arraycvNSt5arrayI1T1NEEEv"><code class="docutils literal notranslate"><span class="pre">array::operator</span> <span class="pre">std::array&lt;T,</span> <span class="pre">N&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4NK5array4sizeEv"><code class="docutils literal notranslate"><span class="pre">array::size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array4dataEv"><code class="docutils literal notranslate"><span class="pre">array::data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4NK5array4dataEv"><code class="docutils literal notranslate"><span class="pre">array::data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array5beginEv"><code class="docutils literal notranslate"><span class="pre">array::begin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4NK5array5beginEv"><code class="docutils literal notranslate"><span class="pre">array::begin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array3endEv"><code class="docutils literal notranslate"><span class="pre">array::end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4NK5array3endEv"><code class="docutils literal notranslate"><span class="pre">array::end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5arrayixE6size_t"><code class="docutils literal notranslate"><span class="pre">array::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4NK5arrayixE6size_t"><code class="docutils literal notranslate"><span class="pre">array::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array4backEv"><code class="docutils literal notranslate"><span class="pre">array::back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4NK5array4backEv"><code class="docutils literal notranslate"><span class="pre">array::back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array5frontEv"><code class="docutils literal notranslate"><span class="pre">array::front()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4NK5array5frontEv"><code class="docutils literal notranslate"><span class="pre">array::front()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array4fillERK1T"><code class="docutils literal notranslate"><span class="pre">array::fill()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array6resizeE6size_t"><code class="docutils literal notranslate"><span class="pre">array::resize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array6resizeE6size_tRK1T"><code class="docutils literal notranslate"><span class="pre">array::resize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4IDpEN5array9push_backEvDpRR5PB_Ts"><code class="docutils literal notranslate"><span class="pre">array::push_back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array8pop_backEv"><code class="docutils literal notranslate"><span class="pre">array::pop_back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4IDpEN5array6insertE8iteratorDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">array::insert()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4IDpEN5array5eraseE8iteratorDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">array::erase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4IDpEN5array7emplaceE8iteratorDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">array::emplace()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4IDpEN5array12emplace_backEvDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">array::emplace_back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4I0EN5array9serializeEvR7Archive"><code class="docutils literal notranslate"><span class="pre">array::serialize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array5_dataE"><code class="docutils literal notranslate"><span class="pre">array::_data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N5array1NE"><code class="docutils literal notranslate"><span class="pre">array::N</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/array.html#_CPPv4I00E14array_iterator"><code class="docutils literal notranslate"><span class="pre">array_iterator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iterator6this_tE"><code class="docutils literal notranslate"><span class="pre">array_iterator::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iterator7array_tE"><code class="docutils literal notranslate"><span class="pre">array_iterator::array_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iterator17iterator_categoryE"><code class="docutils literal notranslate"><span class="pre">array_iterator::iterator_category</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iterator10value_typeE"><code class="docutils literal notranslate"><span class="pre">array_iterator::value_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iterator15difference_typeE"><code class="docutils literal notranslate"><span class="pre">array_iterator::difference_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iterator7pointerE"><code class="docutils literal notranslate"><span class="pre">array_iterator::pointer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iterator9referenceE"><code class="docutils literal notranslate"><span class="pre">array_iterator::reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iterator14array_iteratorEv"><code class="docutils literal notranslate"><span class="pre">array_iterator::array_iterator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iterator14array_iteratorE10ITERATOR_TPK7array_t"><code class="docutils literal notranslate"><span class="pre">array_iterator::array_iterator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iterator14array_iteratorERK6this_t"><code class="docutils literal notranslate"><span class="pre">array_iterator::array_iterator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iterator14array_iteratorERR6this_t"><code class="docutils literal notranslate"><span class="pre">array_iterator::array_iterator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratorD0Ev"><code class="docutils literal notranslate"><span class="pre">array_iterator::~array_iterator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4NK14array_iterator2OKEbb"><code class="docutils literal notranslate"><span class="pre">array_iterator::OK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratoraSERK6this_t"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratoraSERR6this_t"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratorcv10ITERATOR_TEv"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator</span> <span class="pre">ITERATOR_T()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4NK14array_iteratorcvK10ITERATOR_TEv"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator</span> <span class="pre">const</span> <span class="pre">ITERATOR_T()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratormlEv"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4NK14array_iteratormlEv"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratorptEv"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator-&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4NK14array_iteratorptEv"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator-&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratorppEv"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator++()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratorppEi"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator++()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratormmEv"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator--()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratormmEi"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator--()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratorplEi"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator+()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratormiEi"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator-()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratormiERK6this_t"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator-()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratorpLEi"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator+=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratormIEi"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator-=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iteratorixEi"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4NK14array_iteratorixEi"><code class="docutils literal notranslate"><span class="pre">array_iterator::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iterator2itE"><code class="docutils literal notranslate"><span class="pre">array_iterator::it</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array.html#_CPPv4N14array_iterator7arr_ptrE"><code class="docutils literal notranslate"><span class="pre">array_iterator::arr_ptr</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/array.html#_CPPv4I0_6size_tENSt10tuple_sizeI5arrayI1T1NEEE"><code class="docutils literal notranslate"><span class="pre">tuple_size</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/assert.html">assert.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/assert.html#_CPPv413is_debug_mode"><code class="docutils literal notranslate"><span class="pre">is_debug_mode</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/assert_warning.html">assert_warning.hpp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/emscripten_assert.html">emscripten_assert.hpp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/error.html">error.hpp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/errors.html">errors.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv414GetEmptyExceptv"><code class="docutils literal notranslate"><span class="pre">GetEmptyExcept()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv412GetExceptMapv"><code class="docutils literal notranslate"><span class="pre">GetExceptMap()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv413TriggerExceptRKNSt6stringERKNSt6stringEb"><code class="docutils literal notranslate"><span class="pre">TriggerExcept()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv49GetExceptRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">GetExcept()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv49PopExceptRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">PopExcept()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv412CountExceptsv"><code class="docutils literal notranslate"><span class="pre">CountExcepts()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv49HasExceptv"><code class="docutils literal notranslate"><span class="pre">HasExcept()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv49HasExceptRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">HasExcept()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv412ClearExceptsv"><code class="docutils literal notranslate"><span class="pre">ClearExcepts()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv411ClearExceptRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ClearExcept()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv4IDpE6NotifyvDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Notify()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv4IDpE13NotifyWarningvDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">NotifyWarning()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv4IDpE11NotifyErrorvDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">NotifyError()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv4IDpE14LibraryWarningvDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">LibraryWarning()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv4IDpE12LibraryErrorvDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">LibraryError()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv4IDpE13InternalErrorvDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">InternalError()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/errors.html#_CPPv410ExceptInfo"><code class="docutils literal notranslate"><span class="pre">ExceptInfo</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/errors.html#_CPPv4N10ExceptInfo2idE"><code class="docutils literal notranslate"><span class="pre">ExceptInfo::id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/errors.html#_CPPv4N10ExceptInfo4descE"><code class="docutils literal notranslate"><span class="pre">ExceptInfo::desc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/errors.html#_CPPv4N10ExceptInfo16default_to_errorE"><code class="docutils literal notranslate"><span class="pre">ExceptInfo::default_to_error</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/map.html">map.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/map.html#_CPPv4I00DpE3map"><code class="docutils literal notranslate"><span class="pre">map</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map8key_typeE"><code class="docutils literal notranslate"><span class="pre">map::key_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map11mapped_typeE"><code class="docutils literal notranslate"><span class="pre">map::mapped_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map10value_typeE"><code class="docutils literal notranslate"><span class="pre">map::value_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map11key_compareE"><code class="docutils literal notranslate"><span class="pre">map::key_compare</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map13value_compareE"><code class="docutils literal notranslate"><span class="pre">map::value_compare</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map14allocator_typeE"><code class="docutils literal notranslate"><span class="pre">map::allocator_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map9referenceE"><code class="docutils literal notranslate"><span class="pre">map::reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map15const_referenceE"><code class="docutils literal notranslate"><span class="pre">map::const_reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map7pointerE"><code class="docutils literal notranslate"><span class="pre">map::pointer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map13const_pointerE"><code class="docutils literal notranslate"><span class="pre">map::const_pointer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map8iteratorE"><code class="docutils literal notranslate"><span class="pre">map::iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map14const_iteratorE"><code class="docutils literal notranslate"><span class="pre">map::const_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map16reverse_iteratorE"><code class="docutils literal notranslate"><span class="pre">map::reverse_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map22const_reverse_iteratorE"><code class="docutils literal notranslate"><span class="pre">map::const_reverse_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map15difference_typeE"><code class="docutils literal notranslate"><span class="pre">map::difference_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map9size_typeE"><code class="docutils literal notranslate"><span class="pre">map::size_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map3mapERK11key_compareRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">map::map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map3mapERK14allocator_type"><code class="docutils literal notranslate"><span class="pre">map::map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4I0EN3map3mapE13InputIterator13InputIteratorRK11key_compareRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">map::map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map3mapERK6this_t"><code class="docutils literal notranslate"><span class="pre">map::map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map3mapERK6this_tRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">map::map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map3mapERR6this_t"><code class="docutils literal notranslate"><span class="pre">map::map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map3mapERR6this_tRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">map::map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map3mapENSt16initializer_listI10value_typeEERK11key_compareRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">map::map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3mapaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">map::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3mapaSERR6this_t"><code class="docutils literal notranslate"><span class="pre">map::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3mapixERK3Key"><code class="docutils literal notranslate"><span class="pre">map::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map6this_tE"><code class="docutils literal notranslate"><span class="pre">map::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map6base_tE"><code class="docutils literal notranslate"><span class="pre">map::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N3map7proxy_tE"><code class="docutils literal notranslate"><span class="pre">map::proxy_t</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/map.html#_CPPv4I00DpE8multimap"><code class="docutils literal notranslate"><span class="pre">multimap</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap8key_typeE"><code class="docutils literal notranslate"><span class="pre">multimap::key_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap11mapped_typeE"><code class="docutils literal notranslate"><span class="pre">multimap::mapped_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap10value_typeE"><code class="docutils literal notranslate"><span class="pre">multimap::value_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap11key_compareE"><code class="docutils literal notranslate"><span class="pre">multimap::key_compare</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap13value_compareE"><code class="docutils literal notranslate"><span class="pre">multimap::value_compare</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap14allocator_typeE"><code class="docutils literal notranslate"><span class="pre">multimap::allocator_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap9referenceE"><code class="docutils literal notranslate"><span class="pre">multimap::reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap15const_referenceE"><code class="docutils literal notranslate"><span class="pre">multimap::const_reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap7pointerE"><code class="docutils literal notranslate"><span class="pre">multimap::pointer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap13const_pointerE"><code class="docutils literal notranslate"><span class="pre">multimap::const_pointer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap8iteratorE"><code class="docutils literal notranslate"><span class="pre">multimap::iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap14const_iteratorE"><code class="docutils literal notranslate"><span class="pre">multimap::const_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap16reverse_iteratorE"><code class="docutils literal notranslate"><span class="pre">multimap::reverse_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap22const_reverse_iteratorE"><code class="docutils literal notranslate"><span class="pre">multimap::const_reverse_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap15difference_typeE"><code class="docutils literal notranslate"><span class="pre">multimap::difference_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap9size_typeE"><code class="docutils literal notranslate"><span class="pre">multimap::size_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap8multimapERK11key_compareRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">multimap::multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap8multimapERK14allocator_type"><code class="docutils literal notranslate"><span class="pre">multimap::multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4I0EN8multimap8multimapE13InputIterator13InputIteratorRK11key_compareRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">multimap::multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap8multimapERK6this_t"><code class="docutils literal notranslate"><span class="pre">multimap::multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap8multimapERK6this_tRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">multimap::multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap8multimapERR6this_t"><code class="docutils literal notranslate"><span class="pre">multimap::multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap8multimapERR6this_tRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">multimap::multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap8multimapENSt16initializer_listI10value_typeEERK11key_compareRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">multimap::multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimapaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">multimap::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimapaSERR6this_t"><code class="docutils literal notranslate"><span class="pre">multimap::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimapixERK3Key"><code class="docutils literal notranslate"><span class="pre">multimap::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap6this_tE"><code class="docutils literal notranslate"><span class="pre">multimap::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap6base_tE"><code class="docutils literal notranslate"><span class="pre">multimap::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/map.html#_CPPv4N8multimap7proxy_tE"><code class="docutils literal notranslate"><span class="pre">multimap::proxy_t</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/notify.html">notify.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/notify.html#_CPPv46notify"><code class="docutils literal notranslate"><span class="pre">notify</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify4id_tE"><code class="docutils literal notranslate"><span class="pre">notify::id_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify9message_tE"><code class="docutils literal notranslate"><span class="pre">notify::message_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify13except_data_tE"><code class="docutils literal notranslate"><span class="pre">notify::except_data_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify8id_arg_tE"><code class="docutils literal notranslate"><span class="pre">notify::id_arg_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify13message_arg_tE"><code class="docutils literal notranslate"><span class="pre">notify::message_arg_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10response_tE"><code class="docutils literal notranslate"><span class="pre">notify::response_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10exit_fun_tE"><code class="docutils literal notranslate"><span class="pre">notify::exit_fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify4TypeE"><code class="docutils literal notranslate"><span class="pre">notify::Type</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify4Type7MESSAGEE"><code class="docutils literal notranslate"><span class="pre">notify::Type::MESSAGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify4Type5DEBUGE"><code class="docutils literal notranslate"><span class="pre">notify::Type::DEBUG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify4Type7WARNINGE"><code class="docutils literal notranslate"><span class="pre">notify::Type::WARNING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify4Type5ERRORE"><code class="docutils literal notranslate"><span class="pre">notify::Type::ERROR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify4Type9EXCEPTIONE"><code class="docutils literal notranslate"><span class="pre">notify::Type::EXCEPTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify4Type9NUM_TYPESE"><code class="docutils literal notranslate"><span class="pre">notify::Type::NUM_TYPES</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify6TypeIDE4Type"><code class="docutils literal notranslate"><span class="pre">notify::TypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify11ColorTypeIDE4Type"><code class="docutils literal notranslate"><span class="pre">notify::ColorTypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify7GetDataEv"><code class="docutils literal notranslate"><span class="pre">notify::GetData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify15MessageHandlersEv"><code class="docutils literal notranslate"><span class="pre">notify::MessageHandlers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify13DebugHandlersEv"><code class="docutils literal notranslate"><span class="pre">notify::DebugHandlers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify15WarningHandlersEv"><code class="docutils literal notranslate"><span class="pre">notify::WarningHandlers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify13ErrorHandlersEv"><code class="docutils literal notranslate"><span class="pre">notify::ErrorHandlers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify14AddExitHandlerE10exit_fun_t"><code class="docutils literal notranslate"><span class="pre">notify::AddExitHandler()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify17ClearExitHandlersEv"><code class="docutils literal notranslate"><span class="pre">notify::ClearExitHandlers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify19ReplaceExitHandlersEv"><code class="docutils literal notranslate"><span class="pre">notify::ReplaceExitHandlers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4IDpEN6notify19ReplaceExitHandlersEv10exit_fun_tDp6FUN_Ts"><code class="docutils literal notranslate"><span class="pre">notify::ReplaceExitHandlers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify4ExitEi"><code class="docutils literal notranslate"><span class="pre">notify::Exit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4IDpEN6notify6NotifyEb4TypeDp2Ts"><code class="docutils literal notranslate"><span class="pre">notify::Notify()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify5PauseEv"><code class="docutils literal notranslate"><span class="pre">notify::Pause()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify7UnpauseEv"><code class="docutils literal notranslate"><span class="pre">notify::Unpause()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4IDpEN6notify7MessageEbDp2Ts"><code class="docutils literal notranslate"><span class="pre">notify::Message()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4IDpEN6notify5DebugEbDp2Ts"><code class="docutils literal notranslate"><span class="pre">notify::Debug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4IDpEN6notify7WarningEbDp2Ts"><code class="docutils literal notranslate"><span class="pre">notify::Warning()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4IDpEN6notify5ErrorEbDp2Ts"><code class="docutils literal notranslate"><span class="pre">notify::Error()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4IDpEN6notify11TestWarningEbbDp2Ts"><code class="docutils literal notranslate"><span class="pre">notify::TestWarning()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4IDpEN6notify9TestErrorEbbDp2Ts"><code class="docutils literal notranslate"><span class="pre">notify::TestError()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4I0EN6notify10AddHandlerER10HandlerSet8id_arg_t5FUN_T"><code class="docutils literal notranslate"><span class="pre">notify::AddHandler()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4I0EN6notify10AddHandlerER10HandlerSet5FUN_T"><code class="docutils literal notranslate"><span class="pre">notify::AddHandler()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify6IgnoreE8id_arg_t"><code class="docutils literal notranslate"><span class="pre">notify::Ignore()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10SetVerboseENSt6stringEb"><code class="docutils literal notranslate"><span class="pre">notify::SetVerbose()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4IDpEN6notify7VerboseEbRKNSt6stringEDp2Ts"><code class="docutils literal notranslate"><span class="pre">notify::Verbose()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify9ExceptionE8id_arg_t13message_arg_t13except_data_t"><code class="docutils literal notranslate"><span class="pre">notify::Exception()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify13GetExceptionsEv"><code class="docutils literal notranslate"><span class="pre">notify::GetExceptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify12GetExceptionE8id_arg_t"><code class="docutils literal notranslate"><span class="pre">notify::GetException()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify15CountExceptionsEv"><code class="docutils literal notranslate"><span class="pre">notify::CountExceptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify15CountExceptionsE8id_arg_t"><code class="docutils literal notranslate"><span class="pre">notify::CountExceptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify13HasExceptionsEv"><code class="docutils literal notranslate"><span class="pre">notify::HasExceptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify12HasExceptionE8id_arg_t"><code class="docutils literal notranslate"><span class="pre">notify::HasException()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify15ClearExceptionsEv"><code class="docutils literal notranslate"><span class="pre">notify::ClearExceptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify14ClearExceptionE8id_arg_t"><code class="docutils literal notranslate"><span class="pre">notify::ClearException()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify9num_typesE"><code class="docutils literal notranslate"><span class="pre">notify::num_types</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10ExceptInfoE"><code class="docutils literal notranslate"><span class="pre">notify::ExceptInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10ExceptInfo2idE"><code class="docutils literal notranslate"><span class="pre">notify::ExceptInfo::id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10ExceptInfo7messageE"><code class="docutils literal notranslate"><span class="pre">notify::ExceptInfo::message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10ExceptInfo4dataE"><code class="docutils literal notranslate"><span class="pre">notify::ExceptInfo::data</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSetE"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet10HandlerSetEv"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::HandlerSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet10HandlerSetERK10HandlerSet"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::HandlerSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet10HandlerSetERR10HandlerSet"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::HandlerSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSetD0Ev"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::~HandlerSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4NK6notify10HandlerSet13GetExitOnFailEv"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::GetExitOnFail()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet13SetExitOnFailEb"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::SetExitOnFail()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet7TriggerE8id_arg_t13message_arg_t13except_data_t"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::Trigger()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet7TriggerE8id_arg_t13message_arg_t"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::Trigger()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet7TriggerERK10ExceptInfo"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::Trigger()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet3AddE5fun_t"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::Add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet3AddE13fun_no_data_t"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::Add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet3AddE14fun_msg_only_t"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::Add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet5ClearEv"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::Clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet7ReplaceEv"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::Replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4IDpEN6notify10HandlerSet7ReplaceEv5fun_tDp6FUN_Ts"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::Replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet5fun_tE"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::fun_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet13fun_no_data_tE"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::fun_no_data_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet14fun_msg_only_tE"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::fun_msg_only_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet8handlersE"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::handlers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10HandlerSet12exit_on_failE"><code class="docutils literal notranslate"><span class="pre">notify::HandlerSet::exit_on_fail</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10NotifyDataE"><code class="docutils literal notranslate"><span class="pre">notify::NotifyData</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10NotifyData10GetHandlerE4Type"><code class="docutils literal notranslate"><span class="pre">notify::NotifyData::GetHandler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10NotifyData10NotifyDataEv"><code class="docutils literal notranslate"><span class="pre">notify::NotifyData::NotifyData()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10NotifyData11handler_mapE"><code class="docutils literal notranslate"><span class="pre">notify::NotifyData::handler_map</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10NotifyData11verbose_mapE"><code class="docutils literal notranslate"><span class="pre">notify::NotifyData::verbose_map</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10NotifyData9exit_funsE"><code class="docutils literal notranslate"><span class="pre">notify::NotifyData::exit_funs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10NotifyData12except_queueE"><code class="docutils literal notranslate"><span class="pre">notify::NotifyData::except_queue</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10NotifyData11pause_queueE"><code class="docutils literal notranslate"><span class="pre">notify::NotifyData::pause_queue</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10NotifyData17lethal_exceptionsE"><code class="docutils literal notranslate"><span class="pre">notify::NotifyData::lethal_exceptions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/notify.html#_CPPv4N6notify10NotifyData9is_pausedE"><code class="docutils literal notranslate"><span class="pre">notify::NotifyData::is_paused</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/optional.html">optional.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/optional.html#_CPPv4I0E13make_optional8optionalINSt7decay_tI1TEEERR1T"><code class="docutils literal notranslate"><span class="pre">make_optional()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/optional.html#_CPPv4I0DpE13make_optional8optionalI1TEDpRR4Args"><code class="docutils literal notranslate"><span class="pre">make_optional()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/optional.html#_CPPv4I00DpE13make_optional8optionalI1TENSt16initializer_listI4ElemEEDpRR4Args"><code class="docutils literal notranslate"><span class="pre">make_optional()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/optional.html#_CPPv4I0E8optional"><code class="docutils literal notranslate"><span class="pre">optional</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/optional.html#_CPPv4NK8optionalptEv"><code class="docutils literal notranslate"><span class="pre">optional::operator-&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/optional.html#_CPPv4N8optionalptEv"><code class="docutils literal notranslate"><span class="pre">optional::operator-&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/optional.html#_CPPv4NKR8optionalmlEv"><code class="docutils literal notranslate"><span class="pre">optional::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/optional.html#_CPPv4NR8optionalmlEv"><code class="docutils literal notranslate"><span class="pre">optional::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/optional.html#_CPPv4NO8optionalmlEv"><code class="docutils literal notranslate"><span class="pre">optional::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/optional.html#_CPPv4NKO8optionalmlEv"><code class="docutils literal notranslate"><span class="pre">optional::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/optional.html#_CPPv4N8optional8parent_tE"><code class="docutils literal notranslate"><span class="pre">optional::parent_t</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/unordered_map.html">unordered_map.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/unordered_map.html#_CPPv4I00DpE13unordered_map"><code class="docutils literal notranslate"><span class="pre">unordered_map</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map8key_typeE"><code class="docutils literal notranslate"><span class="pre">unordered_map::key_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map11mapped_typeE"><code class="docutils literal notranslate"><span class="pre">unordered_map::mapped_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map10value_typeE"><code class="docutils literal notranslate"><span class="pre">unordered_map::value_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map6hasherE"><code class="docutils literal notranslate"><span class="pre">unordered_map::hasher</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map9key_equalE"><code class="docutils literal notranslate"><span class="pre">unordered_map::key_equal</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map14allocator_typeE"><code class="docutils literal notranslate"><span class="pre">unordered_map::allocator_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map9referenceE"><code class="docutils literal notranslate"><span class="pre">unordered_map::reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map15const_referenceE"><code class="docutils literal notranslate"><span class="pre">unordered_map::const_reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map7pointerE"><code class="docutils literal notranslate"><span class="pre">unordered_map::pointer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13const_pointerE"><code class="docutils literal notranslate"><span class="pre">unordered_map::const_pointer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map8iteratorE"><code class="docutils literal notranslate"><span class="pre">unordered_map::iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map14const_iteratorE"><code class="docutils literal notranslate"><span class="pre">unordered_map::const_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map14local_iteratorE"><code class="docutils literal notranslate"><span class="pre">unordered_map::local_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map20const_local_iteratorE"><code class="docutils literal notranslate"><span class="pre">unordered_map::const_local_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map15difference_typeE"><code class="docutils literal notranslate"><span class="pre">unordered_map::difference_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map9size_typeE"><code class="docutils literal notranslate"><span class="pre">unordered_map::size_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13unordered_mapEv"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13unordered_mapE9size_typeRK6hasherRK9key_equalRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13unordered_mapERK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13unordered_mapE9size_typeRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13unordered_mapE9size_typeRK6hasherRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4I0EN13unordered_map13unordered_mapE13InputIterator13InputIterator"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4I0EN13unordered_map13unordered_mapE13InputIterator13InputIterator9size_typeRK6hasherRK9key_equalRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4I0EN13unordered_map13unordered_mapE13InputIterator13InputIterator9size_typeRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4I0EN13unordered_map13unordered_mapE13InputIterator13InputIterator9size_typeRK6hasherRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13unordered_mapERK13unordered_map"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13unordered_mapERK13unordered_mapRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13unordered_mapERR13unordered_map"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13unordered_mapERR13unordered_mapRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13unordered_mapENSt16initializer_listI10value_typeEE"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13unordered_mapENSt16initializer_listI10value_typeEE9size_typeRK6hasherRK9key_equalRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13unordered_mapENSt16initializer_listI10value_typeEE9size_typeRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map13unordered_mapENSt16initializer_listI10value_typeEE9size_typeRK6hasherRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_map::unordered_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_mapaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">unordered_map::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_mapaSERR6this_t"><code class="docutils literal notranslate"><span class="pre">unordered_map::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_mapixERK3Key"><code class="docutils literal notranslate"><span class="pre">unordered_map::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map6this_tE"><code class="docutils literal notranslate"><span class="pre">unordered_map::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map6base_tE"><code class="docutils literal notranslate"><span class="pre">unordered_map::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N13unordered_map7proxy_tE"><code class="docutils literal notranslate"><span class="pre">unordered_map::proxy_t</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/unordered_map.html#_CPPv4I00DpE18unordered_multimap"><code class="docutils literal notranslate"><span class="pre">unordered_multimap</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap8key_typeE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::key_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap11mapped_typeE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::mapped_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap10value_typeE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::value_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap6hasherE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::hasher</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap9key_equalE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::key_equal</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap14allocator_typeE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::allocator_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap9referenceE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap15const_referenceE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::const_reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap7pointerE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::pointer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap13const_pointerE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::const_pointer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap8iteratorE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap14const_iteratorE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::const_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap14local_iteratorE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::local_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap20const_local_iteratorE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::const_local_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap15difference_typeE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::difference_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap9size_typeE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::size_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap18unordered_multimapEv"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap18unordered_multimapE9size_typeRK6hasherRK9key_equalRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap18unordered_multimapERK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap18unordered_multimapE9size_typeRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap18unordered_multimapE9size_typeRK6hasherRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4I0EN18unordered_multimap18unordered_multimapE13InputIterator13InputIterator"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4I0EN18unordered_multimap18unordered_multimapE13InputIterator13InputIterator9size_typeRK6hasherRK9key_equalRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4I0EN18unordered_multimap18unordered_multimapE13InputIterator13InputIterator9size_typeRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4I0EN18unordered_multimap18unordered_multimapE13InputIterator13InputIterator9size_typeRK6hasherRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap18unordered_multimapERK18unordered_multimap"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap18unordered_multimapERK18unordered_multimapRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap18unordered_multimapERR18unordered_multimap"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap18unordered_multimapERR18unordered_multimapRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap18unordered_multimapENSt16initializer_listI10value_typeEE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap18unordered_multimapENSt16initializer_listI10value_typeEE9size_typeRK6hasherRK9key_equalRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap18unordered_multimapENSt16initializer_listI10value_typeEE9size_typeRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap18unordered_multimapENSt16initializer_listI10value_typeEE9size_typeRK6hasherRK14allocator_type"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::unordered_multimap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimapaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimapaSERR6this_t"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimapixERK3Key"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap6this_tE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap6base_tE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/unordered_map.html#_CPPv4N18unordered_multimap7proxy_tE"><code class="docutils literal notranslate"><span class="pre">unordered_multimap::proxy_t</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/vector.html">vector.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/vector.html#_CPPv4I0DpElsRNSt7ostreamERNSt7ostreamERK6vectorI1TDp2TsE"><code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/vector.html#_CPPv4I0DpErsRNSt7istreamERNSt7istreamER6vectorI1TDp2TsE"><code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/vector.html#_CPPv4I0DpE6vector"><code class="docutils literal notranslate"><span class="pre">vector</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector8iteratorE"><code class="docutils literal notranslate"><span class="pre">vector::iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector14const_iteratorE"><code class="docutils literal notranslate"><span class="pre">vector::const_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16reverse_iteratorE"><code class="docutils literal notranslate"><span class="pre">vector::reverse_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector22const_reverse_iteratorE"><code class="docutils literal notranslate"><span class="pre">vector::const_reverse_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector10value_typeE"><code class="docutils literal notranslate"><span class="pre">vector::value_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector9size_typeE"><code class="docutils literal notranslate"><span class="pre">vector::size_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector9referenceE"><code class="docutils literal notranslate"><span class="pre">vector::reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector15const_referenceE"><code class="docutils literal notranslate"><span class="pre">vector::const_reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector6vectorEv"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector6vectorERK6this_t"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector6vectorE6size_t"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector6vectorE6size_tRK1T"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector6vectorENSt16initializer_listI1TEE"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector6vectorERK6stdv_t"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4I0EN6vector6vectorE7InputIt7InputIt"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorD0Ev"><code class="docutils literal notranslate"><span class="pre">vector::~vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector4sizeEv"><code class="docutils literal notranslate"><span class="pre">vector::size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector5beginEv"><code class="docutils literal notranslate"><span class="pre">vector::begin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector5beginEv"><code class="docutils literal notranslate"><span class="pre">vector::begin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector3endEv"><code class="docutils literal notranslate"><span class="pre">vector::end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector3endEv"><code class="docutils literal notranslate"><span class="pre">vector::end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector6cbeginEv"><code class="docutils literal notranslate"><span class="pre">vector::cbegin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector4cendEv"><code class="docutils literal notranslate"><span class="pre">vector::cend()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector6rbeginEv"><code class="docutils literal notranslate"><span class="pre">vector::rbegin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector6rbeginEv"><code class="docutils literal notranslate"><span class="pre">vector::rbegin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector4rendEv"><code class="docutils literal notranslate"><span class="pre">vector::rend()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector4rendEv"><code class="docutils literal notranslate"><span class="pre">vector::rend()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector7crbeginEv"><code class="docutils literal notranslate"><span class="pre">vector::crbegin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector5crendEv"><code class="docutils literal notranslate"><span class="pre">vector::crend()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector6resizeE6size_t"><code class="docutils literal notranslate"><span class="pre">vector::resize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector6resizeE6size_tRK1T"><code class="docutils literal notranslate"><span class="pre">vector::resize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NR6vectoraSERK6this_t"><code class="docutils literal notranslate"><span class="pre">vector::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorixE6size_t"><code class="docutils literal notranslate"><span class="pre">vector::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vectorixE6size_t"><code class="docutils literal notranslate"><span class="pre">vector::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector4backEv"><code class="docutils literal notranslate"><span class="pre">vector::back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector4backEv"><code class="docutils literal notranslate"><span class="pre">vector::back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector5frontEv"><code class="docutils literal notranslate"><span class="pre">vector::front()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector5frontEv"><code class="docutils literal notranslate"><span class="pre">vector::front()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4IDpEN6vector9push_backEvDpRR5PB_Ts"><code class="docutils literal notranslate"><span class="pre">vector::push_back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector8pop_backEv"><code class="docutils literal notranslate"><span class="pre">vector::pop_back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4IDpEN6vector6insertE8iteratorDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">vector::insert()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4IDpEN6vector5eraseE8iteratorDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">vector::erase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4IDpEN6vector7emplaceE8iteratorDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">vector::emplace()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4IDpEN6vector12emplace_backEvDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">vector::emplace_back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector8revisionE"><code class="docutils literal notranslate"><span class="pre">vector::revision</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector6this_tE"><code class="docutils literal notranslate"><span class="pre">vector::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector6stdv_tE"><code class="docutils literal notranslate"><span class="pre">vector::stdv_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vector8MAX_SIZEE"><code class="docutils literal notranslate"><span class="pre">vector::MAX_SIZE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4I0EN6vector16iterator_wrapperE"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapper6this_tE"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::this_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapper9wrapped_tE"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::wrapped_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapper5vec_tE"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::vec_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapper16iterator_wrapperERK10ITERATOR_TPK5vec_t"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::iterator_wrapper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapper16iterator_wrapperERK6this_t"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::iterator_wrapper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapper16iterator_wrapperERR6this_t"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::iterator_wrapper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapper16iterator_wrapperEv"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::iterator_wrapper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapperD0Ev"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::~iterator_wrapper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector16iterator_wrapper2OKEbbNSt6stringE"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::OK()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4NR6vector16iterator_wrapperaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4NR6vector16iterator_wrapperaSERR6this_t"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrappercv10ITERATOR_TEv"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator</span> <span class="pre">ITERATOR_T()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector16iterator_wrappercvK10ITERATOR_TEv"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator</span> <span class="pre">const</span> <span class="pre">ITERATOR_T()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrappermlEv"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator*()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector16iterator_wrappermlEv"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator*()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapperptEv"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator-&gt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4NK6vector16iterator_wrapperptEv"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator-&gt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapperppEv"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator++()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapperppEi"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator++()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrappermmEv"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator--()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrappermmEi"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator--()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapperplEi"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator+()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrappermiEi"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator-()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrappermiERK6this_t"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator-()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapperpLEi"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator+=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrappermIEi"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator-=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapperixEi"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::operator[]()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapper5v_ptrE"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::v_ptr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapper8revisionE"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::revision</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapper9ErrorCodeEv"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::ErrorCode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/vector.html#_CPPv4N6vector16iterator_wrapper10ErrorStartEv"><code class="docutils literal notranslate"><span class="pre">vector::iterator_wrapper::ErrorStart()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/vector.html#_CPPv4I0E6vectorIbE"><code class="docutils literal notranslate"><span class="pre">vector</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE8iteratorE"><code class="docutils literal notranslate"><span class="pre">vector::iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE14const_iteratorE"><code class="docutils literal notranslate"><span class="pre">vector::const_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE10value_typeE"><code class="docutils literal notranslate"><span class="pre">vector::value_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE9size_typeE"><code class="docutils literal notranslate"><span class="pre">vector::size_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE9referenceE"><code class="docutils literal notranslate"><span class="pre">vector::reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE15const_referenceE"><code class="docutils literal notranslate"><span class="pre">vector::const_reference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE6vectorEv"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE6vectorERK6this_t"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE6vectorE6size_t"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE6vectorE6size_tb"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE6vectorENSt16initializer_listIbEE"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE6vectorERK6stdv_t"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4I0EN6vectorIbE6vectorE7InputIt7InputIt"><code class="docutils literal notranslate"><span class="pre">vector::vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE6resizeE6size_t"><code class="docutils literal notranslate"><span class="pre">vector::resize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE6resizeE6size_tb"><code class="docutils literal notranslate"><span class="pre">vector::resize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NR6vectorIbEaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">vector::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbEixE6size_t"><code class="docutils literal notranslate"><span class="pre">vector::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vectorIbEixE6size_t"><code class="docutils literal notranslate"><span class="pre">vector::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE4backEv"><code class="docutils literal notranslate"><span class="pre">vector::back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vectorIbE4backEv"><code class="docutils literal notranslate"><span class="pre">vector::back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE5frontEv"><code class="docutils literal notranslate"><span class="pre">vector::front()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4NK6vectorIbE5frontEv"><code class="docutils literal notranslate"><span class="pre">vector::front()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE8pop_backEv"><code class="docutils literal notranslate"><span class="pre">vector::pop_back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE6this_tE"><code class="docutils literal notranslate"><span class="pre">vector::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE6stdv_tE"><code class="docutils literal notranslate"><span class="pre">vector::stdv_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/vector.html#_CPPv4N6vectorIbE8MAX_SIZEE"><code class="docutils literal notranslate"><span class="pre">vector::MAX_SIZE</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../QuickStartGuides/todos/X-TrackData.html" class="btn btn-neutral float-left" title="Data Tracking" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/MapProxy.html" class="btn btn-neutral float-right" title="MapProxy.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

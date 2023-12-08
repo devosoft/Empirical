@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World_structure.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/evolve/api/World_structure.06ad6c8c-e7ed-483c-a9f1-bbc5d2879311.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Functional" href="../../functional/functional.html" />
+    <link rel="prev" title="World_select.hpp" href="World_select.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../evolve.html">Evolution tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../evolve.html#phylotracklib-systematics-manager">Phylotracklib (Systematics Manager)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../evolve.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="NK.html">NK.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NK-const.html">NK-const.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="OEE.html">OEE.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="OrgInterface.html">OrgInterface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Resource.html">Resource.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StateGrid.html">StateGrid.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Systematics.html">Systematics.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SystematicsAnalysis.html">SystematicsAnalysis.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World.html">World.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_iterator.html">World_iterator.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_output.html">World_output.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_reflect.html">World_reflect.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_select.html">World_select.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">World_structure.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E8SetPoolsvR5WorldI3ORGE6size_t6size_tb"><code class="docutils literal notranslate"><span class="pre">SetPools()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGE8TraitSetI3ORGERK6vectorI6size_tE"><code class="docutils literal notranslate"><span class="pre">SetMapElites()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGE8TraitSetI3ORGE"><code class="docutils literal notranslate"><span class="pre">SetMapElites()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGERK6vectorI6size_tE"><code class="docutils literal notranslate"><span class="pre">SetMapElites()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGE"><code class="docutils literal notranslate"><span class="pre">SetMapElites()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E16SetDiverseElitesvR5WorldI3ORGE8TraitSetI3ORGE6size_t"><code class="docutils literal notranslate"><span class="pre">SetDiverseElites()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E16SetDiverseElitesvR5WorldI3ORGE6size_t"><code class="docutils literal notranslate"><span class="pre">SetDiverseElites()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E5World"><code class="docutils literal notranslate"><span class="pre">World</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413WorldPosition"><code class="docutils literal notranslate"><span class="pre">WorldPosition</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E11WorldVector"><code class="docutils literal notranslate"><span class="pre">WorldVector</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E17World_MinDistInfo"><code class="docutils literal notranslate"><span class="pre">World_MinDistInfo</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../evolve.html">Evolution tools</a></li>
+      <li class="breadcrumb-item active">World_structure.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="world-structure-hpp">
+<h1>World_structure.hpp<a class="headerlink" href="#world-structure-hpp" title="Link to this heading"></a></h1>
+<p>Functions for popular world structure methods. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E8SetPoolsvR5WorldI3ORGE6size_t6size_tb">
+<span id="_CPPv3I0E8SetPoolsR5WorldI3ORGE6size_t6size_tb"></span><span id="_CPPv2I0E8SetPoolsR5WorldI3ORGE6size_t6size_tb"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__structure_8hpp_1a69193062e36c66dda8913f70c0c626d5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetPools</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E8SetPoolsvR5WorldI3ORGE6size_t6size_tb" title="SetPools::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_pools</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pool_size</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">synchronous_gen</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E8SetPoolsvR5WorldI3ORGE6size_t6size_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the population to be a set of pools that are individually well mixed, but with limited migration. Arguments are the number of pools, the size of each pool, and whether the generations should be synchronous (true) or not (false, default). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E12SetMapElitesvR5WorldI3ORGE8TraitSetI3ORGERK6vectorI6size_tE">
+<span id="_CPPv3I0E12SetMapElitesR5WorldI3ORGE8TraitSetI3ORGERK6vectorI6size_tE"></span><span id="_CPPv2I0E12SetMapElitesR5WorldI3ORGE8TraitSetI3ORGERK6vectorI6size_tE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__structure_8hpp_1a4027257f9eb9f02a8b0e51b354099ac9"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetMapElites</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGE8TraitSetI3ORGERK6vectorI6size_tE" title="SetMapElites::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <a class="reference internal" href="../../data/api/Trait.html#_CPPv4I0E8TraitSet" title="TraitSet"><span class="n"><span class="pre">TraitSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGE8TraitSetI3ORGERK6vectorI6size_tE" title="SetMapElites::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">traits</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">trait_counts</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGE8TraitSetI3ORGERK6vectorI6size_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the population to use a MapElites structure. This means that organism placement has two key components: 1: Organism position is based on their phenotypic traits. 2: Organisms must have a higher fitness than the current resident of a position to steal it.</p>
+<p>Note: Since organisms compete with their predecessors for space in the populations, synchronous generations do not make sense.</p>
+<p>This for version will setup a MAP-Elites world; traits to use an how many bins for each (trait counts) must be provided. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E12SetMapElitesvR5WorldI3ORGE8TraitSetI3ORGE">
+<span id="_CPPv3I0E12SetMapElitesR5WorldI3ORGE8TraitSetI3ORGE"></span><span id="_CPPv2I0E12SetMapElitesR5WorldI3ORGE8TraitSetI3ORGE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__structure_8hpp_1a8a1e223e756d35d91736d487f8116286"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetMapElites</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGE8TraitSetI3ORGE" title="SetMapElites::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <a class="reference internal" href="../../data/api/Trait.html#_CPPv4I0E8TraitSet" title="TraitSet"><span class="n"><span class="pre">TraitSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGE8TraitSetI3ORGE" title="SetMapElites::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">traits</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGE8TraitSetI3ORGE" title="Link to this definition"></a><br /></dt>
+<dd><p>Setup a MAP-Elites world, given the provided set of traits. Requires world to already have a size; that size is respected when deciding trait bins. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E12SetMapElitesvR5WorldI3ORGERK6vectorI6size_tE">
+<span id="_CPPv3I0E12SetMapElitesR5WorldI3ORGERK6vectorI6size_tE"></span><span id="_CPPv2I0E12SetMapElitesR5WorldI3ORGERK6vectorI6size_tE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__structure_8hpp_1a9142bb888208f975e04ec79960b0ffb2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetMapElites</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGERK6vectorI6size_tE" title="SetMapElites::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">trait_counts</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGERK6vectorI6size_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Setup a MAP-Elites world, given the provided trait counts (number of bins). Requires world to already have a phenotypes that those counts are applied to. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E12SetMapElitesvR5WorldI3ORGE">
+<span id="_CPPv3I0E12SetMapElitesR5WorldI3ORGE"></span><span id="_CPPv2I0E12SetMapElitesR5WorldI3ORGE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__structure_8hpp_1a9b3014a70b9d5a73ab91bf35b7748d4a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetMapElites</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGE" title="SetMapElites::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E12SetMapElitesvR5WorldI3ORGE" title="Link to this definition"></a><br /></dt>
+<dd><p>Setup a MAP-Elites world, given the provided worlds already has size AND set of phenotypes. Requires world to already have a size; that size is respected when deciding trait bins. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E16SetDiverseElitesvR5WorldI3ORGE8TraitSetI3ORGE6size_t">
+<span id="_CPPv3I0E16SetDiverseElitesR5WorldI3ORGE8TraitSetI3ORGE6size_t"></span><span id="_CPPv2I0E16SetDiverseElitesR5WorldI3ORGE8TraitSetI3ORGE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__structure_8hpp_1a2506f89afe072c87b5581555f85d1fb3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetDiverseElites</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E16SetDiverseElitesvR5WorldI3ORGE8TraitSetI3ORGE6size_t" title="SetDiverseElites::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <a class="reference internal" href="../../data/api/Trait.html#_CPPv4I0E8TraitSet" title="TraitSet"><span class="n"><span class="pre">TraitSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E16SetDiverseElitesvR5WorldI3ORGE8TraitSetI3ORGE6size_t" title="SetDiverseElites::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">traits</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">world_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E16SetDiverseElitesvR5WorldI3ORGE8TraitSetI3ORGE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>This first version will setup a Diverse-Elites world and specify traits to use. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E16SetDiverseElitesvR5WorldI3ORGE6size_t">
+<span id="_CPPv3I0E16SetDiverseElitesR5WorldI3ORGE6size_t"></span><span id="_CPPv2I0E16SetDiverseElitesR5WorldI3ORGE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__structure_8hpp_1abbf62d16041d32b7c0cde46a615bcb8d"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetDiverseElites</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E16SetDiverseElitesvR5WorldI3ORGE6size_t" title="SetDiverseElites::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">world_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E16SetDiverseElitesvR5WorldI3ORGE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Setup a Diverse-Elites world, given the provided world already has set of phenotypes. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E5World">
+<span id="_CPPv3I0E5World"></span><span id="_CPPv2I0E5World"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classWorld"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">World</span></span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;World_structure.hpp&gt;</em></div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv413WorldPosition">
+<span id="_CPPv313WorldPosition"></span><span id="_CPPv213WorldPosition"></span><span id="WorldPosition"></span><span class="target" id="classWorldPosition"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WorldPosition</span></span></span><a class="headerlink" href="#_CPPv413WorldPosition" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;World_structure.hpp&gt;</em></div>
+<p>A class to track positions in World. For the moment, the only informaiton beyond index is active (vs. next) population when using synchronous generations. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WorldPosition13WorldPositionEv">
+<span id="_CPPv3N13WorldPosition13WorldPositionEv"></span><span id="_CPPv2N13WorldPosition13WorldPositionEv"></span><span id="WorldPosition::WorldPosition"></span><span class="target" id="classWorldPosition_1ac85db09f51083bbf79de9eeec77fed4a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WorldPosition</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WorldPosition13WorldPositionEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WorldPosition13WorldPositionE6size_t6size_t">
+<span id="_CPPv3N13WorldPosition13WorldPositionE6size_t6size_t"></span><span id="_CPPv2N13WorldPosition13WorldPositionE6size_t6size_t"></span><span id="WorldPosition::WorldPosition__s.s"></span><span class="target" id="classWorldPosition_1ae2c0d50f0dd0681be98bbb2ccd293d82"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WorldPosition</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_id</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_pop_id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WorldPosition13WorldPositionE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WorldPosition13WorldPositionERK13WorldPosition">
+<span id="_CPPv3N13WorldPosition13WorldPositionERK13WorldPosition"></span><span id="_CPPv2N13WorldPosition13WorldPositionERK13WorldPosition"></span><span id="WorldPosition::WorldPosition__WorldPositionCR"></span><span class="target" id="classWorldPosition_1a887feecbae2289a080694320e073b49a"></span><span class="sig-name descname"><span class="n"><span class="pre">WorldPosition</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13WorldPosition13WorldPositionERK13WorldPosition" title="WorldPosition::WorldPosition"><span class="n"><span class="pre">WorldPosition</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13WorldPosition13WorldPositionERK13WorldPosition" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WorldPositionaSERK13WorldPosition">
+<span id="_CPPv3N13WorldPositionaSERK13WorldPosition"></span><span id="_CPPv2N13WorldPositionaSERK13WorldPosition"></span><span id="WorldPosition::assign-operator__WorldPositionCR"></span><span class="target" id="classWorldPosition_1a3ab9de9a1b2317a003b7b862c5ae8c48"></span><a class="reference internal" href="#_CPPv413WorldPosition" title="WorldPosition"><span class="n"><span class="pre">WorldPosition</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413WorldPosition" title="WorldPosition"><span class="n"><span class="pre">WorldPosition</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13WorldPositionaSERK13WorldPosition" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13WorldPosition8GetIndexEv">
+<span id="_CPPv3NK13WorldPosition8GetIndexEv"></span><span id="_CPPv2NK13WorldPosition8GetIndexEv"></span><span id="WorldPosition::GetIndexC"></span><span class="target" id="classWorldPosition_1a11960d36747f903dffd2774b8c8ca4b5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetIndex</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13WorldPosition8GetIndexEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13WorldPosition8GetPopIDEv">
+<span id="_CPPv3NK13WorldPosition8GetPopIDEv"></span><span id="_CPPv2NK13WorldPosition8GetPopIDEv"></span><span id="WorldPosition::GetPopIDC"></span><span class="target" id="classWorldPosition_1acdfa2f5e839ec226839c304a0d2dc7c6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPopID</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13WorldPosition8GetPopIDEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13WorldPosition8IsActiveEv">
+<span id="_CPPv3NK13WorldPosition8IsActiveEv"></span><span id="_CPPv2NK13WorldPosition8IsActiveEv"></span><span id="WorldPosition::IsActiveC"></span><span class="target" id="classWorldPosition_1a17c446ed2545d3f78226c4ec488ad07e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsActive</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13WorldPosition8IsActiveEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13WorldPosition7IsValidEv">
+<span id="_CPPv3NK13WorldPosition7IsValidEv"></span><span id="_CPPv2NK13WorldPosition7IsValidEv"></span><span id="WorldPosition::IsValidC"></span><span class="target" id="classWorldPosition_1ae72496b3796ec5e99acf4fbdf84db7de"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsValid</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13WorldPosition7IsValidEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WorldPosition9SetActiveEb">
+<span id="_CPPv3N13WorldPosition9SetActiveEb"></span><span id="_CPPv2N13WorldPosition9SetActiveEb"></span><span id="WorldPosition::SetActive__b"></span><span class="target" id="classWorldPosition_1a43c860fae6207904378fe9295a73fced"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413WorldPosition" title="WorldPosition"><span class="n"><span class="pre">WorldPosition</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetActive</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WorldPosition9SetActiveEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WorldPosition8SetPopIDE6size_t">
+<span id="_CPPv3N13WorldPosition8SetPopIDE6size_t"></span><span id="_CPPv2N13WorldPosition8SetPopIDE6size_t"></span><span id="WorldPosition::SetPopID__s"></span><span class="target" id="classWorldPosition_1adaeeec5de8af61c308e4a3f27556f62d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413WorldPosition" title="WorldPosition"><span class="n"><span class="pre">WorldPosition</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetPopID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WorldPosition8SetPopIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WorldPosition8SetIndexE6size_t">
+<span id="_CPPv3N13WorldPosition8SetIndexE6size_t"></span><span id="_CPPv2N13WorldPosition8SetIndexE6size_t"></span><span id="WorldPosition::SetIndex__s"></span><span class="target" id="classWorldPosition_1af66711d65b76cf64ce8f609f5b990f3d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413WorldPosition" title="WorldPosition"><span class="n"><span class="pre">WorldPosition</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetIndex</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WorldPosition8SetIndexE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WorldPosition11MarkInvalidEv">
+<span id="_CPPv3N13WorldPosition11MarkInvalidEv"></span><span id="_CPPv2N13WorldPosition11MarkInvalidEv"></span><span id="WorldPosition::MarkInvalid"></span><span class="target" id="classWorldPosition_1a28b2d6629aa4206f471b9fb8275982fa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413WorldPosition" title="WorldPosition"><span class="n"><span class="pre">WorldPosition</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">MarkInvalid</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WorldPosition11MarkInvalidEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13WorldPosition10invalid_idE">
+<span id="_CPPv3N13WorldPosition10invalid_idE"></span><span id="_CPPv2N13WorldPosition10invalid_idE"></span><span id="WorldPosition::invalid_id__s"></span><span class="target" id="classWorldPosition_1adf8fb3d6dde27d58d8a7448398506690"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">invalid_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">uint32_t</span></span><span class="p"><span class="pre">)</span></span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N13WorldPosition10invalid_idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13WorldPosition5indexE">
+<span id="_CPPv3N13WorldPosition5indexE"></span><span id="_CPPv2N13WorldPosition5indexE"></span><span id="WorldPosition::index__uint32_t"></span><span class="target" id="classWorldPosition_1aedd74d165b79bc5b6f31fa8a6df11507"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">index</span></span></span><a class="headerlink" href="#_CPPv4N13WorldPosition5indexE" title="Link to this definition"></a><br /></dt>
+<dd><p>Position of this organism in the population. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13WorldPosition6pop_idE">
+<span id="_CPPv3N13WorldPosition6pop_idE"></span><span id="_CPPv2N13WorldPosition6pop_idE"></span><span id="WorldPosition::pop_id__uint32_t"></span><span class="target" id="classWorldPosition_1af41e5121dad015a75aad35a0918bccce"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pop_id</span></span></span><a class="headerlink" href="#_CPPv4N13WorldPosition6pop_idE" title="Link to this definition"></a><br /></dt>
+<dd><p>ID of the population we are in; 0 is always the active population. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E11WorldVector">
+<span id="_CPPv3I0E11WorldVector"></span><span id="_CPPv2I0E11WorldVector"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classWorldVector"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WorldVector</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E11WorldVector" title="WorldVector::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0E11WorldVector" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;World_structure.hpp&gt;</em></div>
+<p>A vector that can be indexed with a WorldPosition. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11WorldVector6base_tE">
+<span id="_CPPv3N11WorldVector6base_tE"></span><span id="_CPPv2N11WorldVector6base_tE"></span><span class="target" id="classWorldVector_1aa454e7897716ecc38c70aad2271bd72e"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">base_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E11WorldVector" title="WorldVector::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N11WorldVector6base_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11WorldVector7IsValidE13WorldPosition">
+<span id="_CPPv3NK11WorldVector7IsValidE13WorldPosition"></span><span id="_CPPv2NK11WorldVector7IsValidE13WorldPosition"></span><span id="WorldVector::IsValid__WorldPositionC"></span><span class="target" id="classWorldVector_1aca21ea7eb81c5d4eccf8fad1cb01e3c9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsValid</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413WorldPosition" title="WorldPosition"><span class="n"><span class="pre">WorldPosition</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11WorldVector7IsValidE13WorldPosition" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if a position is currently valid. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11WorldVector9MakeValidE13WorldPosition">
+<span id="_CPPv3N11WorldVector9MakeValidE13WorldPosition"></span><span id="_CPPv2N11WorldVector9MakeValidE13WorldPosition"></span><span id="WorldVector::MakeValid__WorldPosition"></span><span class="target" id="classWorldVector_1a58ac445c5e19df14c5b444f7c2316e4f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MakeValid</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413WorldPosition" title="WorldPosition"><span class="n"><span class="pre">WorldPosition</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11WorldVector9MakeValidE13WorldPosition" title="Link to this definition"></a><br /></dt>
+<dd><p>Make sure position is valid; if not expand relevant vector. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11WorldVectorclE13WorldPosition">
+<span id="_CPPv3N11WorldVectorclE13WorldPosition"></span><span id="_CPPv2N11WorldVectorclE13WorldPosition"></span><span id="WorldVector::call-operator__WorldPosition"></span><span class="target" id="classWorldVector_1afb0a97c6b955d84e01b3198d5261fcb4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E11WorldVector" title="WorldVector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413WorldPosition" title="WorldPosition"><span class="n"><span class="pre">WorldPosition</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11WorldVectorclE13WorldPosition" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11WorldVectorclE13WorldPosition">
+<span id="_CPPv3NK11WorldVectorclE13WorldPosition"></span><span id="_CPPv2NK11WorldVectorclE13WorldPosition"></span><span id="WorldVector::call-operator__WorldPositionC"></span><span class="target" id="classWorldVector_1a0214a556f6ed5b4d8838df844a2f4d7e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E11WorldVector" title="WorldVector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413WorldPosition" title="WorldPosition"><span class="n"><span class="pre">WorldPosition</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11WorldVectorclE13WorldPosition" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0E17World_MinDistInfo">
+<span id="_CPPv3I0E17World_MinDistInfo"></span><span id="_CPPv2I0E17World_MinDistInfo"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structWorld__MinDistInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">World_MinDistInfo</span></span></span><a class="headerlink" href="#_CPPv4I0E17World_MinDistInfo" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;World_structure.hpp&gt;</em></div>
+<p>Build a class to track distances between organisms. </p>
+<p>DiverseElites is similar to MAP-Elites, but rather than merely keep the elites on a pre-defined grid, it merely tries to maintain maximal distance between elites in trait space. The main advantages to this technique are (1) It’s easy to build up an inital population that grows in diversity over time, and (2) You don’t need to predefine box sizes or even limits to trait values. Set the population to use a DiverseElites structure. This means that organism placement has two key components: 1: Organism position is in continuous space based on phenotypic traits. 2: When the population is full, nearby organisms must battle to keep their position.</p>
+<p>Note: Since organisms compete with their predecessors for space in the populations, synchronous generations do not make sense. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo17World_MinDistInfoER5WorldI3ORGERK8TraitSetI3ORGE">
+<span id="_CPPv3N17World_MinDistInfo17World_MinDistInfoER5WorldI3ORGERK8TraitSetI3ORGE"></span><span id="_CPPv2N17World_MinDistInfo17World_MinDistInfoER5WorldI3ORGERK8TraitSetI3ORGE"></span><span id="World_MinDistInfo::World_MinDistInfo__World:ORG:R.TraitSet:ORG:CR"></span><span class="target" id="structWorld__MinDistInfo_1a3bd4be1ee548e9f0b0a315cd8bb5b919"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">World_MinDistInfo</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E17World_MinDistInfo" title="World_MinDistInfo::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_world</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../data/api/Trait.html#_CPPv4I0E8TraitSet" title="TraitSet"><span class="n"><span class="pre">TraitSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E17World_MinDistInfo" title="World_MinDistInfo::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_traits</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo17World_MinDistInfoER5WorldI3ORGERK8TraitSetI3ORGE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo8CalcDistE6size_t6size_t">
+<span id="_CPPv3N17World_MinDistInfo8CalcDistE6size_t6size_t"></span><span id="_CPPv2N17World_MinDistInfo8CalcDistE6size_t6size_t"></span><span id="World_MinDistInfo::CalcDist__s.s"></span><span class="target" id="structWorld__MinDistInfo_1a74b6d25f8c9298c5ea0f90f50a6d1efb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CalcDist</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id1</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo8CalcDistE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo18Refresh_AgainstBinE6size_t6size_t">
+<span id="_CPPv3N17World_MinDistInfo18Refresh_AgainstBinE6size_t6size_t"></span><span id="_CPPv2N17World_MinDistInfo18Refresh_AgainstBinE6size_t6size_t"></span><span id="World_MinDistInfo::Refresh_AgainstBin__s.s"></span><span class="target" id="structWorld__MinDistInfo_1a3b476236092c9a3ff874a33295cbfca4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Refresh_AgainstBin</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">refresh_id</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target_bin</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo18Refresh_AgainstBinE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo7RefreshE6size_t6size_t">
+<span id="_CPPv3N17World_MinDistInfo7RefreshE6size_t6size_t"></span><span id="_CPPv2N17World_MinDistInfo7RefreshE6size_t6size_t"></span><span id="World_MinDistInfo::Refresh__s.s"></span><span class="target" id="structWorld__MinDistInfo_1ad30c36b51c26e52e45d348b36339be6a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Refresh</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">refresh_id</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo7RefreshE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo7CalcBinE6size_t">
+<span id="_CPPv3N17World_MinDistInfo7CalcBinE6size_t"></span><span id="_CPPv2N17World_MinDistInfo7CalcBinE6size_t"></span><span id="World_MinDistInfo::CalcBin__s"></span><span class="target" id="structWorld__MinDistInfo_1a8499fdf70edab100928242cacf620ec8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CalcBin</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo7CalcBinE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate which bin an organism should be in. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo9ResetBinsEv">
+<span id="_CPPv3N17World_MinDistInfo9ResetBinsEv"></span><span id="_CPPv2N17World_MinDistInfo9ResetBinsEv"></span><span id="World_MinDistInfo::ResetBins"></span><span class="target" id="structWorld__MinDistInfo_1ae0ea82b25c7df68561ba0d196b9ab916"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResetBins</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo9ResetBinsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset all of the bins in the multidimensional grid for nearest-neighbor analysis. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo5SetupEv">
+<span id="_CPPv3N17World_MinDistInfo5SetupEv"></span><span id="_CPPv2N17World_MinDistInfo5SetupEv"></span><span id="World_MinDistInfo::Setup"></span><span class="target" id="structWorld__MinDistInfo_1ad2a24a92ffabcc9de25c9c2c0b3687bc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Setup</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo5SetupEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo5ClearEv">
+<span id="_CPPv3N17World_MinDistInfo5ClearEv"></span><span id="_CPPv2N17World_MinDistInfo5ClearEv"></span><span id="World_MinDistInfo::Clear"></span><span class="target" id="structWorld__MinDistInfo_1a8ae23e660728b7975adae0dde9bf751b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo8FindKillEv">
+<span id="_CPPv3N17World_MinDistInfo8FindKillEv"></span><span id="_CPPv2N17World_MinDistInfo8FindKillEv"></span><span id="World_MinDistInfo::FindKill"></span><span class="target" id="structWorld__MinDistInfo_1af4f3dc4bbd2d75e6bf2217b2ab640fb3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindKill</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo8FindKillEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Find the best organism to kill in the population. In this case, find the two closest organisms and kill the one with the lower fitness. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo11GetBirthPosE6size_t">
+<span id="_CPPv3N17World_MinDistInfo11GetBirthPosE6size_t"></span><span id="_CPPv2N17World_MinDistInfo11GetBirthPosE6size_t"></span><span id="World_MinDistInfo::GetBirthPos__s"></span><span class="target" id="structWorld__MinDistInfo_1ab6d93b9e7cac809ab7e995e9c297876b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBirthPos</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">world_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo11GetBirthPosE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Return an empty world position. If none are available, return the position of an org to be killed. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo6UpdateE6size_t">
+<span id="_CPPv3N17World_MinDistInfo6UpdateE6size_t"></span><span id="_CPPv2N17World_MinDistInfo6UpdateE6size_t"></span><span id="World_MinDistInfo::Update__s"></span><span class="target" id="structWorld__MinDistInfo_1a298901f95cad37a4d10c5076d737357a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Update</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo6UpdateE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Assume a position has changed; refresh it AND everything that had it as a closest connection. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo2OKEv">
+<span id="_CPPv3N17World_MinDistInfo2OKEv"></span><span id="_CPPv2N17World_MinDistInfo2OKEv"></span><span id="World_MinDistInfo::OK"></span><span class="target" id="structWorld__MinDistInfo_1afed1aada819a341504657811beb64085"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OK</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo2OKEv" title="Link to this definition"></a><br /></dt>
+<dd><p>A debug function to make sure the internal state is all valid. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo10nearest_idE">
+<span id="_CPPv3N17World_MinDistInfo10nearest_idE"></span><span id="_CPPv2N17World_MinDistInfo10nearest_idE"></span><span id="World_MinDistInfo::nearest_id__vector:s:"></span><span class="target" id="structWorld__MinDistInfo_1acc00fee24df4c97dc3287f644250d467"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nearest_id</span></span></span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo10nearest_idE" title="Link to this definition"></a><br /></dt>
+<dd><p>For each individual, whom are they closest to? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo8distanceE">
+<span id="_CPPv3N17World_MinDistInfo8distanceE"></span><span id="_CPPv2N17World_MinDistInfo8distanceE"></span><span id="World_MinDistInfo::distance__vector:double:"></span><span class="target" id="structWorld__MinDistInfo_1a2f634b4b52c4649227d45406c971a2b4"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">distance</span></span></span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo8distanceE" title="Link to this definition"></a><br /></dt>
+<dd><p>And what is their distance? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo5worldE">
+<span id="_CPPv3N17World_MinDistInfo5worldE"></span><span id="_CPPv2N17World_MinDistInfo5worldE"></span><span id="World_MinDistInfo::world__World:ORG:R"></span><span class="target" id="structWorld__MinDistInfo_1a021c1a7b0d9808746e8cef6f135f062b"></span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E17World_MinDistInfo" title="World_MinDistInfo::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">world</span></span></span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo5worldE" title="Link to this definition"></a><br /></dt>
+<dd><p>World object being tracked. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo6traitsE">
+<span id="_CPPv3N17World_MinDistInfo6traitsE"></span><span id="_CPPv2N17World_MinDistInfo6traitsE"></span><span id="World_MinDistInfo::traits__TraitSet:ORG:"></span><span class="target" id="structWorld__MinDistInfo_1add34b5df33fe232b4dc1658b0cf3e6ff"></span><a class="reference internal" href="../../data/api/Trait.html#_CPPv4I0E8TraitSet" title="TraitSet"><span class="n"><span class="pre">TraitSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E17World_MinDistInfo" title="World_MinDistInfo::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">traits</span></span></span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo6traitsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Traits we are trying to spread. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo8min_valsE">
+<span id="_CPPv3N17World_MinDistInfo8min_valsE"></span><span id="_CPPv2N17World_MinDistInfo8min_valsE"></span><span id="World_MinDistInfo::min_vals__vector:double:"></span><span class="target" id="structWorld__MinDistInfo_1ab1dcb6ccd43ad866ad13328008b9c76a"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">min_vals</span></span></span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo8min_valsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Smallest value found for each trait. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo8max_valsE">
+<span id="_CPPv3N17World_MinDistInfo8max_valsE"></span><span id="_CPPv2N17World_MinDistInfo8max_valsE"></span><span id="World_MinDistInfo::max_vals__vector:double:"></span><span class="target" id="structWorld__MinDistInfo_1adf3ce324eb6b3edc55f4e217bf220eca"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_vals</span></span></span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo8max_valsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Largest value found for each trait. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo9bin_widthE">
+<span id="_CPPv3N17World_MinDistInfo9bin_widthE"></span><span id="_CPPv2N17World_MinDistInfo9bin_widthE"></span><span id="World_MinDistInfo::bin_width__vector:double:"></span><span class="target" id="structWorld__MinDistInfo_1a3e2a00b8c4f7ee6e9a085d5cbf8f8775"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bin_width</span></span></span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo9bin_widthE" title="Link to this definition"></a><br /></dt>
+<dd><p>Largest value found for each trait. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo8is_setupE">
+<span id="_CPPv3N17World_MinDistInfo8is_setupE"></span><span id="_CPPv2N17World_MinDistInfo8is_setupE"></span><span id="World_MinDistInfo::is_setup__b"></span><span class="target" id="structWorld__MinDistInfo_1a8251f6f580be83c46613c8be633fedb0"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_setup</span></span></span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo8is_setupE" title="Link to this definition"></a><br /></dt>
+<dd><p>Have we initialized the internal data stucture? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo14num_trait_binsE">
+<span id="_CPPv3N17World_MinDistInfo14num_trait_binsE"></span><span id="_CPPv2N17World_MinDistInfo14num_trait_binsE"></span><span id="World_MinDistInfo::num_trait_bins__s"></span><span class="target" id="structWorld__MinDistInfo_1abb64370f35d48c399a3cb83351dc4d54"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_trait_bins</span></span></span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo14num_trait_binsE" title="Link to this definition"></a><br /></dt>
+<dd><p>How many bins should we use for each trait? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo14num_total_binsE">
+<span id="_CPPv3N17World_MinDistInfo14num_total_binsE"></span><span id="_CPPv2N17World_MinDistInfo14num_total_binsE"></span><span id="World_MinDistInfo::num_total_bins__s"></span><span class="target" id="structWorld__MinDistInfo_1ab4a61b5a859d23cfc2d197a100ff8d8f"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_total_bins</span></span></span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo14num_total_binsE" title="Link to this definition"></a><br /></dt>
+<dd><p>How many bins are there overall? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo7bin_idsE">
+<span id="_CPPv3N17World_MinDistInfo7bin_idsE"></span><span id="_CPPv2N17World_MinDistInfo7bin_idsE"></span><span id="World_MinDistInfo::bin_ids__vector:std::set:s::"></span><span class="target" id="structWorld__MinDistInfo_1a223e2c467cb8bcd8aa376b1e2509d580"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bin_ids</span></span></span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo7bin_idsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which org ids fall into each bin? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo8org_binsE">
+<span id="_CPPv3N17World_MinDistInfo8org_binsE"></span><span id="_CPPv2N17World_MinDistInfo8org_binsE"></span><span id="World_MinDistInfo::org_bins__vector:s:"></span><span class="target" id="structWorld__MinDistInfo_1a2f66590d984f24f0b7b24385d4ea7b9b"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">org_bins</span></span></span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo8org_binsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which bin is each org currently in? </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17World_MinDistInfo7ID_NONEE">
+<span id="_CPPv3N17World_MinDistInfo7ID_NONEE"></span><span id="_CPPv2N17World_MinDistInfo7ID_NONEE"></span><span id="World_MinDistInfo::ID_NONE__s"></span><span class="target" id="structWorld__MinDistInfo_1ad961fa8ce64e4ad570f3943e6de83275"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ID_NONE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">)</span></span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N17World_MinDistInfo7ID_NONEE" title="Link to this definition"></a><br /></dt>
+<dd><p>ID for organism does not exist. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="World_select.html" class="btn btn-neutral float-left" title="World_select.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../functional/functional.html" class="btn btn-neutral float-right" title="Functional" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MemoryImage.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/data/api/MemoryImage.bbb772f1-2583-40ac-a4fc-291e60509173.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="SimpleParser.hpp" href="SimpleParser.html" />
+    <link rel="prev" title="Datum.hpp" href="Datum.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../data.html">Data Collection and Recording Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../data.html#data-tools-api">Data Tools API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AnnotatedType.html">AnnotatedType.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataFile.html">DataFile.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataInterface.html">DataInterface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataLayout.html">DataLayout.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataLog.html">DataLog.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataManager.html">DataManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataMap.html">DataMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataNode.html">DataNode.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Datum.html">Datum.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">MemoryImage.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411MemoryImage"><code class="docutils literal notranslate"><span class="pre">MemoryImage</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="SimpleParser.html">SimpleParser.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Trait.html">Trait.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="VarMap.html">VarMap.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../data.html">Data Collection and Recording Tools</a></li>
+      <li class="breadcrumb-item active">MemoryImage.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="memoryimage-hpp">
+<h1>MemoryImage.hpp<a class="headerlink" href="#memoryimage-hpp" title="Link to this heading"></a></h1>
+<p>A managed set of Bytes to store any kind of data. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA </p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv411MemoryImage">
+<span id="_CPPv311MemoryImage"></span><span id="_CPPv211MemoryImage"></span><span id="MemoryImage"></span><span class="target" id="classMemoryImage"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemoryImage</span></span></span><a class="headerlink" href="#_CPPv411MemoryImage" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;MemoryImage.hpp&gt;</em></div>
+<p>A helper class for DataMap; tracks a memory image (sequence of bytes). </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11MemoryImage11MemoryImageEv">
+<span id="_CPPv3N11MemoryImage11MemoryImageEv"></span><span id="_CPPv2N11MemoryImage11MemoryImageEv"></span><span id="MemoryImage::MemoryImage"></span><span class="target" id="classMemoryImage_1adec00d99a200ff5926a90f0b8b6a5d43"></span><span class="sig-name descname"><span class="n"><span class="pre">MemoryImage</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11MemoryImage11MemoryImageEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a default MemoryImage with no initial memory. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11MemoryImage11MemoryImageE6size_t">
+<span id="_CPPv3N11MemoryImage11MemoryImageE6size_t"></span><span id="_CPPv2N11MemoryImage11MemoryImageE6size_t"></span><span id="MemoryImage::MemoryImage__s"></span><span class="target" id="classMemoryImage_1a15df4471fb3fbcbec38f2f4811c4925f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemoryImage</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11MemoryImage11MemoryImageE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a memory image of a specific size (but uninitialized.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11MemoryImageD0Ev">
+<span id="_CPPv3N11MemoryImageD0Ev"></span><span id="_CPPv2N11MemoryImageD0Ev"></span><span id="MemoryImage::~MemoryImage"></span><span class="target" id="classMemoryImage_1a1afc2ae420afe871153fb5bbb51c054a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~MemoryImage</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11MemoryImageD0Ev" title="Link to this definition"></a><br /></dt>
+<dd><p>Destruct a MemoryImage. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11MemoryImage7GetSizeEv">
+<span id="_CPPv3NK11MemoryImage7GetSizeEv"></span><span id="_CPPv2NK11MemoryImage7GetSizeEv"></span><span id="MemoryImage::GetSizeC"></span><span class="target" id="classMemoryImage_1a3065d3688e8ed7b71fe31e3b911aa2a1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11MemoryImage7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11MemoryImage11GetInitSizeEv">
+<span id="_CPPv3NK11MemoryImage11GetInitSizeEv"></span><span id="_CPPv2NK11MemoryImage11GetInitSizeEv"></span><span id="MemoryImage::GetInitSizeC"></span><span class="target" id="classMemoryImage_1a9517a6e8a8ecd946df97d7faa674d5ee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetInitSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11MemoryImage11GetInitSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN11MemoryImage6GetPtrE3PtrI1TE6size_t">
+<span id="_CPPv3I0EN11MemoryImage6GetPtrE6size_t"></span><span id="_CPPv2I0EN11MemoryImage6GetPtrE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classMemoryImage_1a315ba9b1feb870449654184e870b84b8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN11MemoryImage6GetPtrE3PtrI1TE6size_t" title="MemoryImage::GetPtr::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPtr</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN11MemoryImage6GetPtrE3PtrI1TE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a typed pointer to a specific position in this image. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK11MemoryImage6GetPtrE3PtrIK1TE6size_t">
+<span id="_CPPv3I0ENK11MemoryImage6GetPtrE6size_t"></span><span id="_CPPv2I0ENK11MemoryImage6GetPtrE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classMemoryImage_1aba41dc33ce6df403e5b82ce2ec3f4c57"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK11MemoryImage6GetPtrE3PtrIK1TE6size_t" title="MemoryImage::GetPtr::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPtr</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK11MemoryImage6GetPtrE3PtrIK1TE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN11MemoryImage3GetER1T6size_t">
+<span id="_CPPv3I0EN11MemoryImage3GetE6size_t"></span><span id="_CPPv2I0EN11MemoryImage3GetE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classMemoryImage_1ad111419641ede1c85c9d80dfb98ca794"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN11MemoryImage3GetER1T6size_t" title="MemoryImage::Get::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN11MemoryImage3GetER1T6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get proper references to an object represented in this image. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK11MemoryImage3GetERK1T6size_t">
+<span id="_CPPv3I0ENK11MemoryImage3GetE6size_t"></span><span id="_CPPv2I0ENK11MemoryImage3GetE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classMemoryImage_1a8d39a099276df9e636c507e04edb6c7e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK11MemoryImage3GetERK1T6size_t" title="MemoryImage::Get::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK11MemoryImage3GetERK1T6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN11MemoryImage3GetENSt4spanI1TEE6size_t6size_t">
+<span id="_CPPv3I0EN11MemoryImage3GetE6size_t6size_t"></span><span id="_CPPv2I0EN11MemoryImage3GetE6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classMemoryImage_1a9335806e5e4102e786404104f17fec26"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">span</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN11MemoryImage3GetENSt4spanI1TEE6size_t6size_t" title="MemoryImage::Get::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN11MemoryImage3GetENSt4spanI1TEE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get proper spans to sets of same-type objects represented in this image. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK11MemoryImage3GetENSt4spanIK1TEE6size_t6size_t">
+<span id="_CPPv3I0ENK11MemoryImage3GetE6size_t6size_t"></span><span id="_CPPv2I0ENK11MemoryImage3GetE6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classMemoryImage_1a9f33c0e534adbef75ce19f89870e61a5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">span</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK11MemoryImage3GetENSt4spanIK1TEE6size_t6size_t" title="MemoryImage::Get::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK11MemoryImage3GetENSt4spanIK1TEE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11MemoryImage9RawResizeE6size_t">
+<span id="_CPPv3N11MemoryImage9RawResizeE6size_t"></span><span id="_CPPv2N11MemoryImage9RawResizeE6size_t"></span><span id="MemoryImage::RawResize__s"></span><span class="target" id="classMemoryImage_1a5ffc520d5840b130687f228419819ed0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RawResize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11MemoryImage9RawResizeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Change the size of this memory. Assume all cleanup and setup is done elsewhere. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11MemoryImage7RawCopyERK11MemoryImage">
+<span id="_CPPv3N11MemoryImage7RawCopyERK11MemoryImage"></span><span id="_CPPv2N11MemoryImage7RawCopyERK11MemoryImage"></span><span id="MemoryImage::RawCopy__MemoryImageCR"></span><span class="target" id="classMemoryImage_1a6604aca9066f8218dff37f0d4f74656e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RawCopy</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">from_memory</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11MemoryImage7RawCopyERK11MemoryImage" title="Link to this definition"></a><br /></dt>
+<dd><p>Copy all of the bytes directly from another memory image. Size manipulation must be done beforehand to ensure sufficient space is available. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11MemoryImage7RawMoveER11MemoryImage">
+<span id="_CPPv3N11MemoryImage7RawMoveER11MemoryImage"></span><span id="_CPPv2N11MemoryImage7RawMoveER11MemoryImage"></span><span id="MemoryImage::RawMove__MemoryImageR"></span><span class="target" id="classMemoryImage_1ad7098bfb00c2c3a9d99d5a42a95e4b23"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RawMove</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">from_memory</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11MemoryImage7RawMoveER11MemoryImage" title="Link to this definition"></a><br /></dt>
+<dd><p>Steal the memory from the image passed in. Current memory should have been cleaned up and set to null already. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpEN11MemoryImage9ConstructEv6size_tDpRR4ARGS">
+<span id="_CPPv3I0DpEN11MemoryImage9ConstructE6size_tDpRR4ARGS"></span><span id="_CPPv2I0DpEN11MemoryImage9ConstructE6size_tDpRR4ARGS"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classMemoryImage_1a531cfc8b319a426cb952ae5eb3a5d0fe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Construct</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <a class="reference internal" href="#_CPPv4I0DpEN11MemoryImage9ConstructEv6size_tDpRR4ARGS" title="MemoryImage::Construct::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN11MemoryImage9ConstructEv6size_tDpRR4ARGS" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a new object of the provided type at the memory position indicated. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN11MemoryImage8DestructEv6size_t">
+<span id="_CPPv3I0EN11MemoryImage8DestructE6size_t"></span><span id="_CPPv2I0EN11MemoryImage8DestructE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classMemoryImage_1ae5e6b948e0022268d2b77ed9bbe17928"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Destruct</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN11MemoryImage8DestructEv6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Destruct an object of provided type at memory position indicated; don’t release memory! </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN11MemoryImage7CopyObjEv6size_tRK11MemoryImage">
+<span id="_CPPv3I0EN11MemoryImage7CopyObjE6size_tRK11MemoryImage"></span><span id="_CPPv2I0EN11MemoryImage7CopyObjE6size_tRK11MemoryImage"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classMemoryImage_1ae577b0c0369a89366b3e68faab8e07ea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CopyObj</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">from_image</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN11MemoryImage7CopyObjEv6size_tRK11MemoryImage" title="Link to this definition"></a><br /></dt>
+<dd><p>Copy an object from another MemoryImage with an identical DataLayout. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN11MemoryImage7MoveObjEv6size_tR11MemoryImage">
+<span id="_CPPv3I0EN11MemoryImage7MoveObjE6size_tR11MemoryImage"></span><span id="_CPPv2I0EN11MemoryImage7MoveObjE6size_tR11MemoryImage"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classMemoryImage_1a0ff5ced5075769ba6fc2248fa9b1f5b9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MoveObj</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <a class="reference internal" href="#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">from_image</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN11MemoryImage7MoveObjEv6size_tR11MemoryImage" title="Link to this definition"></a><br /></dt>
+<dd><p>Move an object from another MemoryImage with an identical DataLayout. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11MemoryImage4FuzzEv">
+<span id="_CPPv3N11MemoryImage4FuzzEv"></span><span id="_CPPv2N11MemoryImage4FuzzEv"></span><span id="MemoryImage::Fuzz"></span><span class="target" id="classMemoryImage_1a6c70a8ea78ef9306c0b5a517ee4b05e0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Fuzz</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11MemoryImage4FuzzEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11MemoryImage5imageE">
+<span id="_CPPv3N11MemoryImage5imageE"></span><span id="_CPPv2N11MemoryImage5imageE"></span><span id="MemoryImage::image__Ptr:std::byte:"></span><span class="target" id="classMemoryImage_1abbccee9665add59dae11d391981eee75"></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">byte</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">image</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N11MemoryImage5imageE" title="Link to this definition"></a><br /></dt>
+<dd><p>Current memory image. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11MemoryImage4sizeE">
+<span id="_CPPv3N11MemoryImage4sizeE"></span><span id="_CPPv2N11MemoryImage4sizeE"></span><span id="MemoryImage::size__s"></span><span class="target" id="classMemoryImage_1a2356896c60f03625ef85fa0e6140ed6f"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N11MemoryImage4sizeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Size of current image. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11MemoryImage7init_toE">
+<span id="_CPPv3N11MemoryImage7init_toE"></span><span id="_CPPv2N11MemoryImage7init_toE"></span><span id="MemoryImage::init_to__s"></span><span class="target" id="classMemoryImage_1a97f37e23111beb21573433de25b88a93"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">init_to</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N11MemoryImage7init_toE" title="Link to this definition"></a><br /></dt>
+<dd><p>How far of the current image is initialized? </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-friends">Friends</p>
+<dl>
+<dt class="sig sig-object cpp">
+<em class="property"><span class="pre">friend</span> <span class="pre">class</span></em> <span class="pre">DataLayout</span></dt>
+</dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Datum.html" class="btn btn-neutral float-left" title="Datum.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SimpleParser.html" class="btn btn-neutral float-right" title="SimpleParser.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

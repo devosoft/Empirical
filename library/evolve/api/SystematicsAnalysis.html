@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SystematicsAnalysis.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/evolve/api/SystematicsAnalysis.22ec985e-f2ed-4282-94cb-ee506c2c87e7.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="World.hpp" href="World.html" />
+    <link rel="prev" title="Systematics.hpp" href="Systematics.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../evolve.html">Evolution tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../evolve.html#phylotracklib-systematics-manager">Phylotracklib (Systematics Manager)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../evolve.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="NK.html">NK.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NK-const.html">NK-const.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="OEE.html">OEE.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="OrgInterface.html">OrgInterface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Resource.html">Resource.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StateGrid.html">StateGrid.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Systematics.html">Systematics.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">SystematicsAnalysis.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E12FindDominant3PtrIN13systematics_t7taxon_tEER13systematics_t"><code class="docutils literal notranslate"><span class="pre">FindDominant()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E13LineageLengthi3PtrI7taxon_tE"><code class="docutils literal notranslate"><span class="pre">LineageLength()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E13CountMutStepsi3PtrI7taxon_tENSt6stringE"><code class="docutils literal notranslate"><span class="pre">CountMutSteps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E13CountMutStepsi3PtrI7taxon_tE6vectorINSt6stringEE"><code class="docutils literal notranslate"><span class="pre">CountMutSteps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E9CountMutsi3PtrI7taxon_tENSt6stringE"><code class="docutils literal notranslate"><span class="pre">CountMuts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E9CountMutsi3PtrI7taxon_tE6vectorINSt6stringEE"><code class="docutils literal notranslate"><span class="pre">CountMuts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E21CountDeleteriousStepsi3PtrI7taxon_tE"><code class="docutils literal notranslate"><span class="pre">CountDeleteriousSteps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E21CountPhenotypeChangesi3PtrI7taxon_tE"><code class="docutils literal notranslate"><span class="pre">CountPhenotypeChanges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E21CountUniquePhenotypesi3PtrI7taxon_tE"><code class="docutils literal notranslate"><span class="pre">CountUniquePhenotypes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="World.html">World.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_iterator.html">World_iterator.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_output.html">World_output.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_reflect.html">World_reflect.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_select.html">World_select.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_structure.html">World_structure.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../evolve.html">Evolution tools</a></li>
+      <li class="breadcrumb-item active">SystematicsAnalysis.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="systematicsanalysis-hpp">
+<h1>SystematicsAnalysis.hpp<a class="headerlink" href="#systematicsanalysis-hpp" title="Link to this heading"></a></h1>
+<p>TODO. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E12FindDominant3PtrIN13systematics_t7taxon_tEER13systematics_t">
+<span id="_CPPv3I0E12FindDominantR13systematics_t"></span><span id="_CPPv2I0E12FindDominantR13systematics_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">systematics_t</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="SystematicsAnalysis_8hpp_1a12d48d42b8ec94de67842865f1a6b285"></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E12FindDominant3PtrIN13systematics_t7taxon_tEER13systematics_t" title="FindDominant::systematics_t"><span class="n"><span class="pre">systematics_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">taxon_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindDominant</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E12FindDominant3PtrIN13systematics_t7taxon_tEER13systematics_t" title="FindDominant::systematics_t"><span class="n"><span class="pre">systematics_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E12FindDominant3PtrIN13systematics_t7taxon_tEER13systematics_t" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>systematics_t</strong> – The type of the systematics manager containing the phylogeny to analyze. </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>s</strong> – the systematics manager to search in. Must have more than 0 active taxa. </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the taxon with the highest fitness out of any active taxon in the given systematics manager. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E13LineageLengthi3PtrI7taxon_tE">
+<span id="_CPPv3I0E13LineageLength3PtrI7taxon_tE"></span><span id="_CPPv2I0E13LineageLength3PtrI7taxon_tE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">taxon_t</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="SystematicsAnalysis_8hpp_1ab0f3a05a067b8d1f2e998089f5325d37"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LineageLength</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E13LineageLengthi3PtrI7taxon_tE" title="LineageLength::taxon_t"><span class="n"><span class="pre">taxon_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">taxon</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E13LineageLengthi3PtrI7taxon_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the total number of ancestor taxa in <code class="docutils literal notranslate"><span class="pre">taxon</span></code> ‘s lineage. Requires that taxon is a member of a systematics manager that has ancestor storing turned on </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E13CountMutStepsi3PtrI7taxon_tENSt6stringE">
+<span id="_CPPv3I0E13CountMutSteps3PtrI7taxon_tENSt6stringE"></span><span id="_CPPv2I0E13CountMutSteps3PtrI7taxon_tENSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">taxon_t</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="SystematicsAnalysis_8hpp_1a15d491207663e7e4668a6de418163700"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountMutSteps</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E13CountMutStepsi3PtrI7taxon_tENSt6stringE" title="CountMutSteps::taxon_t"><span class="n"><span class="pre">taxon_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">taxon</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;substitution&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E13CountMutStepsi3PtrI7taxon_tENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the total number of times a mutation of type <code class="docutils literal notranslate"><span class="pre">type</span></code> occurred along <code class="docutils literal notranslate"><span class="pre">taxon</span></code> ‘s lineage. (Different from CountMuts in that CountMuts sums them whereas CountMutSteps would count two simultaneous mutations of the same type as one event) Assumes each taxon has a struct containing an unordered map with keys that are strings indicating types of mutations and keys that are numbers indicating the number of that type of mutation that occurred to make this taxon from the parent. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> – string corresponding to a type of mutation. Must be in the mut_counts dictionary (i.e. the dictionary passed in when datastruct::mut_landscape_info::RecordMutation was called) </p></li>
+<li><p><strong>taxon</strong> – a pointer to a taxon to count mutation steps for. Must have a DATA_TYPE that supports mutation tracking (e.g. mut_landscape_info) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E13CountMutStepsi3PtrI7taxon_tE6vectorINSt6stringEE">
+<span id="_CPPv3I0E13CountMutSteps3PtrI7taxon_tE6vectorINSt6stringEE"></span><span id="_CPPv2I0E13CountMutSteps3PtrI7taxon_tE6vectorINSt6stringEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">taxon_t</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="SystematicsAnalysis_8hpp_1a537c9b66f6af5f354d25533c2032d1db"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountMutSteps</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E13CountMutStepsi3PtrI7taxon_tE6vectorINSt6stringEE" title="CountMutSteps::taxon_t"><span class="n"><span class="pre">taxon_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">taxon</span></span>, <a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">types</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E13CountMutStepsi3PtrI7taxon_tE6vectorINSt6stringEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the total number of times a mutation of the types <code class="docutils literal notranslate"><span class="pre">types</span></code> that along the given taxon ‘s lineage. (Different from CountMuts in that CountMuts sums them whereas CountMutSteps would count two simultaneous mutations of the same type as one event) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E9CountMutsi3PtrI7taxon_tENSt6stringE">
+<span id="_CPPv3I0E9CountMuts3PtrI7taxon_tENSt6stringE"></span><span id="_CPPv2I0E9CountMuts3PtrI7taxon_tENSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">taxon_t</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="SystematicsAnalysis_8hpp_1a32d8631646acd940a5485650ac2dee29"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountMuts</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9CountMutsi3PtrI7taxon_tENSt6stringE" title="CountMuts::taxon_t"><span class="n"><span class="pre">taxon_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">taxon</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;substitution&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E9CountMutsi3PtrI7taxon_tENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the total number of mutations of type <code class="docutils literal notranslate"><span class="pre">type</span></code> that occurred along <code class="docutils literal notranslate"><span class="pre">taxon</span></code> ‘s lineage. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E9CountMutsi3PtrI7taxon_tE6vectorINSt6stringEE">
+<span id="_CPPv3I0E9CountMuts3PtrI7taxon_tE6vectorINSt6stringEE"></span><span id="_CPPv2I0E9CountMuts3PtrI7taxon_tE6vectorINSt6stringEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">taxon_t</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="SystematicsAnalysis_8hpp_1a63f229a36ee40ab66a786128bf374267"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountMuts</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9CountMutsi3PtrI7taxon_tE6vectorINSt6stringEE" title="CountMuts::taxon_t"><span class="n"><span class="pre">taxon_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">taxon</span></span>, <a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">types</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E9CountMutsi3PtrI7taxon_tE6vectorINSt6stringEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the total number of mutations of the types in <code class="docutils literal notranslate"><span class="pre">types</span></code> that occurred along the given taxon ‘s lineage. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E21CountDeleteriousStepsi3PtrI7taxon_tE">
+<span id="_CPPv3I0E21CountDeleteriousSteps3PtrI7taxon_tE"></span><span id="_CPPv2I0E21CountDeleteriousSteps3PtrI7taxon_tE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">taxon_t</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="SystematicsAnalysis_8hpp_1a2cd83134def9da5c1b3537e1b54ec23d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountDeleteriousSteps</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E21CountDeleteriousStepsi3PtrI7taxon_tE" title="CountDeleteriousSteps::taxon_t"><span class="n"><span class="pre">taxon_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">taxon</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E21CountDeleteriousStepsi3PtrI7taxon_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the total number of deleterious mutational steps that occurred along the given taxon’s lineage. (a change from parent to child taxon counts as a single step, regardless of the number of mutations that happened at that time point) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E21CountPhenotypeChangesi3PtrI7taxon_tE">
+<span id="_CPPv3I0E21CountPhenotypeChanges3PtrI7taxon_tE"></span><span id="_CPPv2I0E21CountPhenotypeChanges3PtrI7taxon_tE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">taxon_t</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="SystematicsAnalysis_8hpp_1a01ad5107674b760c925f161b9398ef3d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountPhenotypeChanges</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E21CountPhenotypeChangesi3PtrI7taxon_tE" title="CountPhenotypeChanges::taxon_t"><span class="n"><span class="pre">taxon_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">taxon</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E21CountPhenotypeChangesi3PtrI7taxon_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the total number of changes in phenotype that occurred along the given taxon’s lineage. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E21CountUniquePhenotypesi3PtrI7taxon_tE">
+<span id="_CPPv3I0E21CountUniquePhenotypes3PtrI7taxon_tE"></span><span id="_CPPv2I0E21CountUniquePhenotypes3PtrI7taxon_tE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">taxon_t</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="SystematicsAnalysis_8hpp_1acdc672e5c850cbe17fb44e78c82fc607"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountUniquePhenotypes</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E21CountUniquePhenotypesi3PtrI7taxon_tE" title="CountUniquePhenotypes::taxon_t"><span class="n"><span class="pre">taxon_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">taxon</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E21CountUniquePhenotypesi3PtrI7taxon_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the total number of unique phenotypes that occurred along the given taxon’s lineage. </p>
+</dd></dl>
+
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Systematics.html" class="btn btn-neutral float-left" title="Systematics.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="World.html" class="btn btn-neutral float-right" title="World.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

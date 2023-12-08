@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BitMatrix.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/bits/api/BitMatrix.df09cc55-e27f-4bce-a87e-cbde3d07246f.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="BitSet.hpp" href="BitSet.html" />
+    <link rel="prev" title="BitArray.hpp" href="BitArray.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../bits.html">Bits</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../bits.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BitArray.html">BitArray.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">BitMatrix.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix"><code class="docutils literal notranslate"><span class="pre">BitMatrix</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="BitSet.html">BitSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BitVector.html">BitVector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Bits.html">Bits.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Bits_Data.html">Bits_Data.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bitset_utils.html">bitset_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../bits.html">Bits</a></li>
+      <li class="breadcrumb-item active">BitMatrix.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bitmatrix-hpp">
+<h1>BitMatrix.hpp<a class="headerlink" href="#bitmatrix-hpp" title="Link to this heading"></a></h1>
+<p>A COL x ROW matrix of bits and provides easy indexing and manipulation. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA </p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_t_6size_tE9BitMatrix">
+<span id="_CPPv3I_6size_t_6size_tE9BitMatrix"></span><span id="_CPPv2I_6size_t_6size_tE9BitMatrix"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">COLS</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ROWS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classBitMatrix"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BitMatrix</span></span></span><a class="headerlink" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;BitMatrix.hpp&gt;</em></div>
+<p>A simple class to manage a COLS x ROWS matrix of bits.</p>
+<p>Bits are translated to a bitset with 0 in the upper left and moving through bits from left to right and top to bottom. For example, the indices in a 3x3 bit matrix would be organized as such:</p>
+<p>0 1 2 3 4 5 6 7 8 </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix9BitMatrixEv">
+<span id="_CPPv3N9BitMatrix9BitMatrixEv"></span><span id="_CPPv2N9BitMatrix9BitMatrixEv"></span><span id="BitMatrix::BitMatrix"></span><span class="target" id="classBitMatrix_1ada26fa79273ddce22a0ab18c2f9ac97a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BitMatrix</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix9BitMatrixEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix9BitMatrixERK6BitSetIXml4COLS4ROWSEE">
+<span id="_CPPv3N9BitMatrix9BitMatrixERK6BitSetIXml4COLS4ROWSEE"></span><span id="_CPPv2N9BitMatrix9BitMatrixERK6BitSetIXCOLS * ROWSEE"></span><span id="BitMatrix::BitMatrix__BitSet:COLS-*-ROWS:CR"></span><span class="target" id="classBitMatrix_1a5d5d14cf3ecfe042a2604cefdab1447e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BitMatrix</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Bits.html#_CPPv4I_6size_tE6BitSet" title="BitSet"><span class="n"><span class="pre">BitSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix::COLS"><span class="n"><span class="pre">COLS</span></span></a><span class="w"> </span><span class="o"><span class="pre">*</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix::ROWS"><span class="n"><span class="pre">ROWS</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_bits</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix9BitMatrixERK6BitSetIXml4COLS4ROWSEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix9BitMatrixERK9BitMatrix">
+<span id="_CPPv3N9BitMatrix9BitMatrixERK9BitMatrix"></span><span id="_CPPv2N9BitMatrix9BitMatrixERK9BitMatrix"></span><span id="BitMatrix::BitMatrix__BitMatrixCR"></span><span class="target" id="classBitMatrix_1aeb25da25d1353ec5302789f91efff6d5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BitMatrix</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9BitMatrix9BitMatrixERK9BitMatrix" title="BitMatrix::BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_matrix</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix9BitMatrixERK9BitMatrix" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrixD0Ev">
+<span id="_CPPv3N9BitMatrixD0Ev"></span><span id="_CPPv2N9BitMatrixD0Ev"></span><span id="BitMatrix::~BitMatrix"></span><span class="target" id="classBitMatrix_1a6bbd6f7274c0df80c0a44c5088992d8f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~BitMatrix</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrixD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix7NumRowsEv">
+<span id="_CPPv3NK9BitMatrix7NumRowsEv"></span><span id="_CPPv2NK9BitMatrix7NumRowsEv"></span><span id="BitMatrix::NumRowsCCE"></span><span class="target" id="classBitMatrix_1af71b87f7825180bc700bba763235e563"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumRows</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix7NumRowsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many rows are in this matrix? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix7NumColsEv">
+<span id="_CPPv3NK9BitMatrix7NumColsEv"></span><span id="_CPPv2NK9BitMatrix7NumColsEv"></span><span id="BitMatrix::NumColsCCE"></span><span class="target" id="classBitMatrix_1a82eeec3945ae26d98f24cf2754c653c2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumCols</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix7NumColsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many columns are in this matrix? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix7GetSizeEv">
+<span id="_CPPv3NK9BitMatrix7GetSizeEv"></span><span id="_CPPv2NK9BitMatrix7GetSizeEv"></span><span id="BitMatrix::GetSizeCCE"></span><span class="target" id="classBitMatrix_1afb7b1208740e209497a291ead414ad23"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many total cells are in this matrix? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix3AnyEv">
+<span id="_CPPv3NK9BitMatrix3AnyEv"></span><span id="_CPPv2NK9BitMatrix3AnyEv"></span><span id="BitMatrix::AnyC"></span><span class="target" id="classBitMatrix_1a560241dce1b25d4b6d445b029358c41f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Any</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix3AnyEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix4NoneEv">
+<span id="_CPPv3NK9BitMatrix4NoneEv"></span><span id="_CPPv2NK9BitMatrix4NoneEv"></span><span id="BitMatrix::NoneC"></span><span class="target" id="classBitMatrix_1adcff2b601da289054207e2f68f2c8fe1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">None</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix4NoneEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix3AllEv">
+<span id="_CPPv3NK9BitMatrix3AllEv"></span><span id="_CPPv2NK9BitMatrix3AllEv"></span><span id="BitMatrix::AllC"></span><span class="target" id="classBitMatrix_1a49d07075fcb02d0c5aa42e7f2804aebf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">All</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix3AllEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix3GetE6size_t6size_t">
+<span id="_CPPv3NK9BitMatrix3GetE6size_t6size_t"></span><span id="_CPPv2NK9BitMatrix3GetE6size_t6size_t"></span><span id="BitMatrix::Get__s.sC"></span><span class="target" id="classBitMatrix_1a2c08f789fb50c031fac465a9db740a42"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">col</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix3GetE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix3GetE6size_t">
+<span id="_CPPv3NK9BitMatrix3GetE6size_t"></span><span id="_CPPv2NK9BitMatrix3GetE6size_t"></span><span id="BitMatrix::Get__sC"></span><span class="target" id="classBitMatrix_1a1e5fda78c7cf8035041072dbce29d619"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix3GetE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix3SetE6size_t6size_tb">
+<span id="_CPPv3N9BitMatrix3SetE6size_t6size_tb"></span><span id="_CPPv2N9BitMatrix3SetE6size_t6size_tb"></span><span id="BitMatrix::Set__s.s.b"></span><span class="target" id="classBitMatrix_1a7698f182fa58f53b9ef4a8b68b95f424"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">col</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix3SetE6size_t6size_tb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix3SetE6size_t">
+<span id="_CPPv3N9BitMatrix3SetE6size_t"></span><span id="_CPPv2N9BitMatrix3SetE6size_t"></span><span id="BitMatrix::Set__s"></span><span class="target" id="classBitMatrix_1a9d9f62c9a6cbff23f9a5096320413498"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix3SetE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix5UnsetE6size_t6size_t">
+<span id="_CPPv3N9BitMatrix5UnsetE6size_t6size_t"></span><span id="_CPPv2N9BitMatrix5UnsetE6size_t6size_t"></span><span id="BitMatrix::Unset__s.s"></span><span class="target" id="classBitMatrix_1a41a14e206db89fe39106badb873b06ed"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Unset</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">col</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix5UnsetE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix5UnsetE6size_t">
+<span id="_CPPv3N9BitMatrix5UnsetE6size_t"></span><span id="_CPPv2N9BitMatrix5UnsetE6size_t"></span><span id="BitMatrix::Unset__s"></span><span class="target" id="classBitMatrix_1acf38a70aa4d4bde3bf02454b4c5699c1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Unset</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix5UnsetE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix4FlipE6size_t6size_t">
+<span id="_CPPv3N9BitMatrix4FlipE6size_t6size_t"></span><span id="_CPPv2N9BitMatrix4FlipE6size_t6size_t"></span><span id="BitMatrix::Flip__s.s"></span><span class="target" id="classBitMatrix_1a0bdf70a5888b5480b7b4190da462ed6f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Flip</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">col</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix4FlipE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix4FlipE6size_t">
+<span id="_CPPv3N9BitMatrix4FlipE6size_t"></span><span id="_CPPv2N9BitMatrix4FlipE6size_t"></span><span id="BitMatrix::Flip__s"></span><span class="target" id="classBitMatrix_1ac87bb6a26392fdde98da242757fb0d61"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Flip</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix4FlipE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix6SetAllEv">
+<span id="_CPPv3N9BitMatrix6SetAllEv"></span><span id="_CPPv2N9BitMatrix6SetAllEv"></span><span id="BitMatrix::SetAll"></span><span class="target" id="classBitMatrix_1a3e1762cd25dcccb2e2b4370faa794234"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetAll</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix6SetAllEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix6SetColE6size_t">
+<span id="_CPPv3N9BitMatrix6SetColE6size_t"></span><span id="_CPPv2N9BitMatrix6SetColE6size_t"></span><span id="BitMatrix::SetCol__s"></span><span class="target" id="classBitMatrix_1adad3c389e158f989633d107ee3c1be8f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetCol</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">col</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix6SetColE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix6SetRowE6size_t">
+<span id="_CPPv3N9BitMatrix6SetRowE6size_t"></span><span id="_CPPv2N9BitMatrix6SetRowE6size_t"></span><span id="BitMatrix::SetRow__s"></span><span class="target" id="classBitMatrix_1a86093c51a86230d0f4795c1de53cce3c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRow</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix6SetRowE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix5ClearEv">
+<span id="_CPPv3N9BitMatrix5ClearEv"></span><span id="_CPPv2N9BitMatrix5ClearEv"></span><span id="BitMatrix::Clear"></span><span class="target" id="classBitMatrix_1a1e68c75722e8390c8a91a50125c3e057"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix8ClearColE6size_t">
+<span id="_CPPv3N9BitMatrix8ClearColE6size_t"></span><span id="_CPPv2N9BitMatrix8ClearColE6size_t"></span><span id="BitMatrix::ClearCol__s"></span><span class="target" id="classBitMatrix_1a925d83557043a04863f5d20c19dd217f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClearCol</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">col</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix8ClearColE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix8ClearRowE6size_t">
+<span id="_CPPv3N9BitMatrix8ClearRowE6size_t"></span><span id="_CPPv2N9BitMatrix8ClearRowE6size_t"></span><span id="BitMatrix::ClearRow__s"></span><span class="target" id="classBitMatrix_1a4891b13cec8c7612b4879ec0856ed206"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClearRow</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix8ClearRowE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix9CountOnesEv">
+<span id="_CPPv3NK9BitMatrix9CountOnesEv"></span><span id="_CPPv2NK9BitMatrix9CountOnesEv"></span><span id="BitMatrix::CountOnesC"></span><span class="target" id="classBitMatrix_1a4c9173d5398ec2b8faaac8513b83265a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountOnes</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix9CountOnesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Count the number of set bits in the matrix. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix7FindOneEv">
+<span id="_CPPv3NK9BitMatrix7FindOneEv"></span><span id="_CPPv2NK9BitMatrix7FindOneEv"></span><span id="BitMatrix::FindOneC"></span><span class="target" id="classBitMatrix_1a885e669b838763680d7f52e72e1d8f37"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindOne</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix7FindOneEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Find the position of the first non-zero bit. size_t FindOne() const { return (~bits &amp; (bits - 1)).count(); } </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix9LeftShiftEv">
+<span id="_CPPv3NK9BitMatrix9LeftShiftEv"></span><span id="_CPPv2NK9BitMatrix9LeftShiftEv"></span><span id="BitMatrix::LeftShiftC"></span><span class="target" id="classBitMatrix_1a7b34ab90cdcdb71b4406fda3f5c2d1a4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LeftShift</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix9LeftShiftEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Shift the whole matrix in the specified direction. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix10RightShiftEv">
+<span id="_CPPv3NK9BitMatrix10RightShiftEv"></span><span id="_CPPv2NK9BitMatrix10RightShiftEv"></span><span id="BitMatrix::RightShiftC"></span><span class="target" id="classBitMatrix_1ac792aa9ed6b30dc4db87f5b5f49aabd0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RightShift</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix10RightShiftEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix7UpShiftEv">
+<span id="_CPPv3NK9BitMatrix7UpShiftEv"></span><span id="_CPPv2NK9BitMatrix7UpShiftEv"></span><span id="BitMatrix::UpShiftC"></span><span class="target" id="classBitMatrix_1a4fd840b4a759b239392bb2e9a4b0ff09"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UpShift</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix7UpShiftEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix9DownShiftEv">
+<span id="_CPPv3NK9BitMatrix9DownShiftEv"></span><span id="_CPPv2NK9BitMatrix9DownShiftEv"></span><span id="BitMatrix::DownShiftC"></span><span class="target" id="classBitMatrix_1ab4204f14a6ef15d291b449a9bd49c7f5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DownShift</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix9DownShiftEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix7ULShiftEv">
+<span id="_CPPv3NK9BitMatrix7ULShiftEv"></span><span id="_CPPv2NK9BitMatrix7ULShiftEv"></span><span id="BitMatrix::ULShiftC"></span><span class="target" id="classBitMatrix_1aa3139e6934aef4921cf2261918a21537"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ULShift</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix7ULShiftEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix7DLShiftEv">
+<span id="_CPPv3NK9BitMatrix7DLShiftEv"></span><span id="_CPPv2NK9BitMatrix7DLShiftEv"></span><span id="BitMatrix::DLShiftC"></span><span class="target" id="classBitMatrix_1a63d0bdb3a4f46601df00c4cb8519ed57"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DLShift</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix7DLShiftEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix7URShiftEv">
+<span id="_CPPv3NK9BitMatrix7URShiftEv"></span><span id="_CPPv2NK9BitMatrix7URShiftEv"></span><span id="BitMatrix::URShiftC"></span><span class="target" id="classBitMatrix_1a9d7828938634d3a120f2e39bcc537a23"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">URShift</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix7URShiftEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix7DRShiftEv">
+<span id="_CPPv3NK9BitMatrix7DRShiftEv"></span><span id="_CPPv2NK9BitMatrix7DRShiftEv"></span><span id="BitMatrix::DRShiftC"></span><span class="target" id="classBitMatrix_1ac746d9fdec8fb9256c228a286a069755"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DRShift</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix7DRShiftEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix8GetReachEv">
+<span id="_CPPv3NK9BitMatrix8GetReachEv"></span><span id="_CPPv2NK9BitMatrix8GetReachEv"></span><span id="BitMatrix::GetReachC"></span><span class="target" id="classBitMatrix_1a73b4b96bd2e8db38f92436e21bd5de61"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetReach</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix8GetReachEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Find all points within one step of the ones on this bit matrix. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix9GetRegionE6size_t">
+<span id="_CPPv3NK9BitMatrix9GetRegionE6size_t"></span><span id="_CPPv2NK9BitMatrix9GetRegionE6size_t"></span><span id="BitMatrix::GetRegion__sC"></span><span class="target" id="classBitMatrix_1a48ec399002d9a86d62b5ea7c5ea7849a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRegion</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix9GetRegionE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Find all points reachable from the start position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix9GetRegionE6size_t6size_t">
+<span id="_CPPv3NK9BitMatrix9GetRegionE6size_t6size_t"></span><span id="_CPPv2NK9BitMatrix9GetRegionE6size_t6size_t"></span><span id="BitMatrix::GetRegion__s.sC"></span><span class="target" id="classBitMatrix_1a80c18d80942f6cab0d3abae01a76f8d8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRegion</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">col</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix9GetRegionE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix11IsConnectedEv">
+<span id="_CPPv3NK9BitMatrix11IsConnectedEv"></span><span id="_CPPv2NK9BitMatrix11IsConnectedEv"></span><span id="BitMatrix::IsConnectedC"></span><span class="target" id="classBitMatrix_1a665e5c37da1089013e6f589c9643460e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsConnected</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix11IsConnectedEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Does this bit matrix represent a connected set of ones? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix6Has2x2Ev">
+<span id="_CPPv3NK9BitMatrix6Has2x2Ev"></span><span id="_CPPv2NK9BitMatrix6Has2x2Ev"></span><span id="BitMatrix::Has2x2C"></span><span class="target" id="classBitMatrix_1af05147b2a61e0abd5e665e9484d10334"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has2x2</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix6Has2x2Ev" title="Link to this definition"></a><br /></dt>
+<dd><p>Does this bit matrix have any 2x2 square of ones in it? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrix5PrintERNSt7ostreamE">
+<span id="_CPPv3NK9BitMatrix5PrintERNSt7ostreamE"></span><span id="_CPPv2NK9BitMatrix5PrintERNSt7ostreamE"></span><span id="BitMatrix::Print__osRC"></span><span class="target" id="classBitMatrix_1a39328118dded7c12086a1166fddf0391"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrix5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrixaSERK9BitMatrix">
+<span id="_CPPv3N9BitMatrixaSERK9BitMatrix"></span><span id="_CPPv2N9BitMatrixaSERK9BitMatrix"></span><span id="BitMatrix::assign-operator__BitMatrixCR"></span><span class="target" id="classBitMatrix_1a223eb512b15a8f83a9cb4937acdf5c64"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrixaSERK9BitMatrix" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrixaNERK9BitMatrix">
+<span id="_CPPv3N9BitMatrixaNERK9BitMatrix"></span><span id="_CPPv2N9BitMatrixaNERK9BitMatrix"></span><span id="BitMatrix::and-assign-operator__BitMatrixCR"></span><span class="target" id="classBitMatrix_1ad8c8919124f669d0c677b0076c612211"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&amp;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrixaNERK9BitMatrix" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrixoRERK9BitMatrix">
+<span id="_CPPv3N9BitMatrixoRERK9BitMatrix"></span><span id="_CPPv2N9BitMatrixoRERK9BitMatrix"></span><span id="BitMatrix::or-assign-operator__BitMatrixCR"></span><span class="target" id="classBitMatrix_1a3d8bb4f9a28ff54e3477c31e43681030"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">|=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrixoRERK9BitMatrix" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrixeOERK9BitMatrix">
+<span id="_CPPv3N9BitMatrixeOERK9BitMatrix"></span><span id="_CPPv2N9BitMatrixeOERK9BitMatrix"></span><span id="BitMatrix::xor-assign-operator__BitMatrixCR"></span><span class="target" id="classBitMatrix_1a3312394bbc021548634c485614ef0a54"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">^=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrixeOERK9BitMatrix" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrixeqERK9BitMatrix">
+<span id="_CPPv3NK9BitMatrixeqERK9BitMatrix"></span><span id="_CPPv2NK9BitMatrixeqERK9BitMatrix"></span><span id="BitMatrix::eq-operator__BitMatrixCRC"></span><span class="target" id="classBitMatrix_1a6744e3e8b777d211114adbe669cebc8d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrixeqERK9BitMatrix" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrixneERK9BitMatrix">
+<span id="_CPPv3NK9BitMatrixneERK9BitMatrix"></span><span id="_CPPv2NK9BitMatrixneERK9BitMatrix"></span><span id="BitMatrix::neq-operator__BitMatrixCRC"></span><span class="target" id="classBitMatrix_1a59c4a32163c6841db025e68710879a56"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrixneERK9BitMatrix" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrixcoEv">
+<span id="_CPPv3NK9BitMatrixcoEv"></span><span id="_CPPv2NK9BitMatrixcoEv"></span><span id="BitMatrix::inv-operatorC"></span><span class="target" id="classBitMatrix_1add9eae59fe61efec0691aefca8238c93"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">~</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrixcoEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrixanERK9BitMatrix">
+<span id="_CPPv3NK9BitMatrixanERK9BitMatrix"></span><span id="_CPPv2NK9BitMatrixanERK9BitMatrix"></span><span id="BitMatrix::and-operator__BitMatrixCRC"></span><span class="target" id="classBitMatrix_1a31c98ed9283fcd3301890c0f43ac28cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&amp;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrixanERK9BitMatrix" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrixorERK9BitMatrix">
+<span id="_CPPv3NK9BitMatrixorERK9BitMatrix"></span><span id="_CPPv2NK9BitMatrixorERK9BitMatrix"></span><span id="BitMatrix::or-operator__BitMatrixCRC"></span><span class="target" id="classBitMatrix_1a05eb9ff4c805ea5de857cf045f019223"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">|</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrixorERK9BitMatrix" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9BitMatrixeoERK9BitMatrix">
+<span id="_CPPv3NK9BitMatrixeoERK9BitMatrix"></span><span id="_CPPv2NK9BitMatrixeoERK9BitMatrix"></span><span id="BitMatrix::xor-operator__BitMatrixCRC"></span><span class="target" id="classBitMatrix_1a3f1b84409cd83ca648ae1b0829ecfe0d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">^</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9BitMatrixeoERK9BitMatrix" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix9to_bitsetEv">
+<span id="_CPPv3N9BitMatrix9to_bitsetEv"></span><span id="_CPPv2N9BitMatrix9to_bitsetEv"></span><span id="BitMatrix::to_bitset"></span><span class="target" id="classBitMatrix_1af8f6564a65231bb3c16a718cbd029d44"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Bits.html#_CPPv4I_6size_tE6BitSet" title="BitSet"><span class="n"><span class="pre">BitSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix::COLS"><span class="n"><span class="pre">COLS</span></span></a><span class="w"> </span><span class="o"><span class="pre">*</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix::ROWS"><span class="n"><span class="pre">ROWS</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">to_bitset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix9to_bitsetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_tEN9BitMatrix7MaskColERK6BitSetIXml4COLS4ROWSEEv">
+<span id="_CPPv3I_6size_tEN9BitMatrix7MaskColEv"></span><span id="_CPPv2I_6size_tEN9BitMatrix7MaskColEv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">COL_ID</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classBitMatrix_1acf894d4195917b149630b3c7e6473da6"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Bits.html#_CPPv4I_6size_tE6BitSet" title="BitSet"><span class="n"><span class="pre">BitSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix::COLS"><span class="n"><span class="pre">COLS</span></span></a><span class="w"> </span><span class="o"><span class="pre">*</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix::ROWS"><span class="n"><span class="pre">ROWS</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">MaskCol</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_6size_tEN9BitMatrix7MaskColERK6BitSetIXml4COLS4ROWSEEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Keep only a single column of values, reducing all others to zeros. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_tEN9BitMatrix7MaskRowERK6BitSetIXml4COLS4ROWSEEv">
+<span id="_CPPv3I_6size_tEN9BitMatrix7MaskRowEv"></span><span id="_CPPv2I_6size_tEN9BitMatrix7MaskRowEv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ROW_ID</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classBitMatrix_1a7e98907af51157ab7c1837e82f598b34"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Bits.html#_CPPv4I_6size_tE6BitSet" title="BitSet"><span class="n"><span class="pre">BitSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix::COLS"><span class="n"><span class="pre">COLS</span></span></a><span class="w"> </span><span class="o"><span class="pre">*</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix::ROWS"><span class="n"><span class="pre">ROWS</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">MaskRow</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_6size_tEN9BitMatrix7MaskRowERK6BitSetIXml4COLS4ROWSEEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Keep only a single row of values, reducing all others to zeros. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix5ToColE6size_t">
+<span id="_CPPv3N9BitMatrix5ToColE6size_t"></span><span id="_CPPv2N9BitMatrix5ToColE6size_t"></span><span id="BitMatrix::ToCol__s"></span><span class="target" id="classBitMatrix_1aba7fb8674b1814e3dc2b3138d9e44ef1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToCol</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix5ToColE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Identify which column a specific ID is part of. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix5ToRowE6size_t">
+<span id="_CPPv3N9BitMatrix5ToRowE6size_t"></span><span id="_CPPv2N9BitMatrix5ToRowE6size_t"></span><span id="BitMatrix::ToRow__s"></span><span class="target" id="classBitMatrix_1a40592a05f46a7950717a209047448499"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToRow</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix5ToRowE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Identify which row a specific ID is part of. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix4ToIDE6size_t6size_t">
+<span id="_CPPv3N9BitMatrix4ToIDE6size_t6size_t"></span><span id="_CPPv2N9BitMatrix4ToIDE6size_t6size_t"></span><span id="BitMatrix::ToID__s.s"></span><span class="target" id="classBitMatrix_1a74bab63e63011716a1c2621b5ec60937"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">col</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BitMatrix4ToIDE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Identify the ID associated with a specified row and column. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9BitMatrix4bitsE">
+<span id="_CPPv3N9BitMatrix4bitsE"></span><span id="_CPPv2N9BitMatrix4bitsE"></span><span id="BitMatrix::bits__BitSet:COLS-*-ROWS:"></span><span class="target" id="classBitMatrix_1a48729baeb4638f6b0dca7c58090f78bf"></span><a class="reference internal" href="Bits.html#_CPPv4I_6size_tE6BitSet" title="BitSet"><span class="n"><span class="pre">BitSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix::COLS"><span class="n"><span class="pre">COLS</span></span></a><span class="w"> </span><span class="o"><span class="pre">*</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix::ROWS"><span class="n"><span class="pre">ROWS</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bits</span></span></span><a class="headerlink" href="#_CPPv4N9BitMatrix4bitsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Actual bits in matrix. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="BitArray.html" class="btn btn-neutral float-left" title="BitArray.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="BitSet.html" class="btn btn-neutral float-right" title="BitSet.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

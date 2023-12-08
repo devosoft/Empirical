@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Using Empirica’s D3.js Wrapper &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/web/d3/d3-intro.3935214e-57a8-4a86-b617-ce4de664e887.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="D3 Wrapper API" href="d3-contents.html" />
+    <link rel="prev" title="D3 Wrapper" href="d3.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="d3.html">D3 Wrapper</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Using Empirica’s D3.js Wrapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="d3-contents.html">D3 Wrapper API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="d3.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../web.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../web.html">Web Tools (for use with Emscripten)</a></li>
+          <li class="breadcrumb-item"><a href="d3.html">D3 Wrapper</a></li>
+      <li class="breadcrumb-item active">Using Empirica’s D3.js Wrapper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="using-empirica-s-d3-js-wrapper">
+<h1>Using Empirica’s D3.js Wrapper<a class="headerlink" href="#using-empirica-s-d3-js-wrapper" title="Link to this heading"></a></h1>
+<p>If you’re writing scientific code that runs on the web, you’ll
+probably want to visualize the results (either as your program runs or
+after it’s done). To make this as easy as possible, Empirical includes
+a C++ wrapper for d3.js, a wildly popular and powerful Javascript data
+visualization library. Using the wrapper, you can create visualizations
+directly from C++.</p>
+<p>At a base level, the wrapper provides C++ equivalents for all objects,
+methods, and functions in d3.js. So, if you’re used to using d3, using
+the wrapper should be very similar. However, d3.js is a library that you
+use to build visualizations rather than a library of pre-built
+visualizations (a fact that has lead to the proliferation of many very
+similar libraries built on top of d3 that provide pre-built graphs).
+Where possible, we have tried to provide short-cut functions and
+pre-built graph objects in an effort to help those new to Javascript
+visualization get started fast. This is an ongoing process and we’re
+always open to suggestions!</p>
+<section id="a-minimal-example">
+<h2>A Minimal Example<a class="headerlink" href="#a-minimal-example" title="Link to this heading"></a></h2>
+<p>D3 visualizations run in web browsers. That means that to use this
+wrapper, you need to compile your C++ code to Javascript, using
+Emscripten. To see the visualization, you need to have an html file that
+loads your Javascript. Then you need to open that html file in a web
+browser. Optionally, you might also have a CSS file that contains rules
+for how elements of your web page should look.</p>
+<p>This example assumes the following file structure:</p>
+<p><img alt="Directory structure for this example" src="../../../_images/d3_file_tree.png" />{.align-center}</p>
+<p>Here are the basics of what you need in order to get up and running. The
+easiest way to make a visualization is to use one of the pre-built
+visualizations. Later we’ll get into writing your own. Either way,
+you’ll need:</p>
+<section id="c-file">
+<h3>C++ File<a class="headerlink" href="#c-file" title="Link to this heading"></a></h3>
+<p>The C++ file that you’ll compile to Javascript. For this example,
+we’ll use the Empirical web module to build the whole web page:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Always include web_init.h when you&#39;re doing web stuff -</span>
+<span class="c1">// it makes sure everything gets initialized right</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../Empirical/include/emp/web/web_init.hpp&quot;</span>
+
+<span class="c1">// We&#39;re using a document object to arrange everything</span>
+<span class="c1">// we&#39;re drawing.</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../Empirical/include/emp/web/Document.hpp&quot;</span>
+
+<span class="c1">//Contains pre-built visualizations</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../Empirical/include/emp/web/d3/visualizations.hpp&quot;</span>
+
+<span class="c1">// The document object is in charge of all of the Javascript</span>
+<span class="c1">// and html that goes in the &lt;div&gt; element in the html. It</span>
+<span class="c1">// gets created before main so that it stays in scope</span>
+<span class="c1">// when main ends</span>
+<span class="n">emp</span><span class="o">::</span><span class="n">web</span><span class="o">::</span><span class="n">Document</span><span class="w"> </span><span class="n">doc</span><span class="p">(</span><span class="s">&quot;my_visualization&quot;</span><span class="p">);</span>
+
+<span class="c1">// The visualization object needs to be declared globally for</span>
+<span class="c1">// the same reason. For this example, we&#39;ll use a</span>
+<span class="c1">// LineageVisualization, which is a type of D3 visualization</span>
+<span class="c1">// object. It takes two argumenets: the width and the height</span>
+<span class="c1">// of the visualization.</span>
+<span class="n">emp</span><span class="o">::</span><span class="n">web</span><span class="o">::</span><span class="n">LineageVisualization</span><span class="w"> </span><span class="nf">lineage_viz</span><span class="p">(</span><span class="mi">6000</span><span class="p">,</span><span class="w"> </span><span class="mi">5000</span><span class="p">);</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Add visualization to the document</span>
+<span class="w">  </span><span class="n">doc</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">lineage_viz</span><span class="p">;</span>
+
+<span class="w">  </span><span class="c1">// Load pre-existing data file, example.json,</span>
+<span class="w">  </span><span class="c1">// into the visualization</span>
+<span class="w">  </span><span class="n">lineage_viz</span><span class="p">.</span><span class="n">LoadDataFromFile</span><span class="p">(</span><span class="s">&quot;example.json&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now we need to compile it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emcc<span class="w"> </span>my_program.cc<span class="w"> </span>-o<span class="w"> </span>my_program.js<span class="w"> </span><span class="se">\ </span><span class="c1">#.js extension tells Emscripten to compile to Javascript</span>
+<span class="w">     </span>--js-library<span class="w"> </span>../Empirical/include/emp/web/library_emp.js<span class="w">    </span><span class="se">\ </span><span class="c1">#Include the Empirical Javascript library</span>
+<span class="w">     </span>--js-library<span class="w"> </span>../Empirical/include/emp/web/d3/library_d3.js<span class="w">  </span><span class="se">\ </span><span class="c1">#Include Javascript library for D3 wrapper</span>
+<span class="w">     </span>-s<span class="w"> </span><span class="nv">EXPORTED_FUNCTIONS</span><span class="o">=</span><span class="s2">&quot;[&#39;_main&#39;, &#39;_empCppCallback&#39;]&quot;</span><span class="w"> </span><span class="se">\ </span><span class="c1">#Tells Emscripten what to export from C++</span>
+<span class="w">     </span>-s<span class="w"> </span><span class="nv">ASSERTIONS</span><span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="se">\ </span><span class="c1">#Emscripten needs to know this</span>
+<span class="w">     </span>-s<span class="w"> </span><span class="nv">DEMANGLE_SUPPORT</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\ </span><span class="c1">#Make names of variables in Javascript more readable</span>
+<span class="w">     </span>-s<span class="w"> </span><span class="nv">TOTAL_MEMORY</span><span class="o">=</span><span class="m">67108864</span><span class="w"> </span><span class="se">\ </span><span class="c1">#The exact number doesn&#39;t matter, but default is too small</span>
+<span class="w">     </span>-s<span class="w"> </span><span class="nv">NO_EXIT_RUNTIME</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\ </span><span class="c1">#Make the page keep working after main() is done running</span>
+<span class="w">     </span>-O3<span class="w"> </span>-DNDEBUG<span class="w"> </span><span class="c1">#Turn on optimizations and turn off debugging (improves speed - only do this</span>
+<span class="w">                  </span><span class="c1">#once you&#39;re done debugging)</span>
+</pre></div>
+</div>
+</section>
+<section id="html-file">
+<h3>HTML File<a class="headerlink" href="#html-file" title="Link to this heading"></a></h3>
+<p>To tell the browser what to do with your Javascript, you need an html
+file:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- This is an html comment --&gt;</span>
+<span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+
+    <span class="cm">&lt;!-- The head is for stuff that needs to get set up first,</span>
+<span class="cm">    like metadata and styles --&gt;</span>
+    <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span> My D3/Empirical visualization! <span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+
+        <span class="cm">&lt;!-- Optional - load a stylesheet --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/css&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;style_sheet.css&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+
+    <span class="cm">&lt;!-- Everything else goes in the body --&gt;</span>
+    <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+        <span class="cm">&lt;!-- Include necessary javascript libraries</span>
+<span class="cm">        (jquery, d3, and a d3 tooltip library) --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;Empirical/include/emp/web/jquery-1.11.2.min.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;Empirical/include/emp/web/d3/d3.min.js&quot;</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;utf-8&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;Empirical/include/emp/web/d3/d3-tip.js&quot;</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;utf-8&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+
+        <span class="cm">&lt;!-- Include the Javascript file you</span>
+<span class="cm">        compiled your C++ code to --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;my_program.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+
+        <span class="cm">&lt;!-- We told the emp::document that it was in charge of</span>
+<span class="cm">        something called &quot;my_visualization,&quot; so we need to create</span>
+<span class="cm">        that element --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;my_visualization&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="css-file">
+<h3>CSS File<a class="headerlink" href="#css-file" title="Link to this heading"></a></h3>
+<p>Optionally, a CSS file can be used to make elements look the way you
+want them to. Here’s one that includes the necessary styles to make
+tooltips work (the html file above assumes it’s called
+style_sheet.css, and is in the same directory as the html file):</p>
+<div class="highlight-css notranslate"><div class="highlight"><pre><span></span><span class="p">.</span><span class="nc">d3-tip</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">line-height</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="k">font-weight</span><span class="p">:</span><span class="w"> </span><span class="kc">bold</span><span class="p">;</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="kt">px</span><span class="p">;</span>
+<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="nb">rgba</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">);</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="mh">#000</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border-radius</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="kt">px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c">/* Creates a small triangle extender for the tooltip */</span>
+<span class="p">.</span><span class="nc">d3-tip</span><span class="p">:</span><span class="nd">after</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">box-sizing</span><span class="p">:</span><span class="w"> </span><span class="kc">border-box</span><span class="p">;</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">inline</span><span class="p">;</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="kt">px</span><span class="p">;</span>
+<span class="w">  </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">%</span><span class="p">;</span>
+<span class="w">  </span><span class="k">line-height</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nb">rgba</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">);</span>
+<span class="w">  </span><span class="k">content</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;\25BC&quot;</span><span class="p">;</span>
+<span class="w">  </span><span class="k">position</span><span class="p">:</span><span class="w"> </span><span class="kc">absolute</span><span class="p">;</span>
+<span class="w">  </span><span class="k">text-align</span><span class="p">:</span><span class="w"> </span><span class="kc">center</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c">/* Style northward tooltips differently */</span>
+<span class="p">.</span><span class="nc">d3-tip</span><span class="p">.</span><span class="nc">n</span><span class="p">:</span><span class="nd">after</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span><span class="kt">px</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">top</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">%</span><span class="p">;</span>
+<span class="w">  </span><span class="k">left</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="running-your-visualization">
+<h3>Running your visualization<a class="headerlink" href="#running-your-visualization" title="Link to this heading"></a></h3>
+<p>Now to open up the page in a browser! Some browsers will let you open
+the page up directly, but some will complain about the fact that you’re
+trying to access a file on your computer (example.json) with Javascript.
+The easiest way around this is with the Python simpleHTTPServer library.
+If you’re using Python 2.x, run the following command from the
+directory containing your html file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>SimpleHTTPServer
+</pre></div>
+</div>
+<p><img alt="Using SimpleHTTPServer with Python2" src="../../../_images/SimpleHTTPServer.png" />{.align-center}</p>
+<p>If you’re running Python 3.x, use this command instead:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>http.server
+</pre></div>
+</div>
+<p><img alt="Using SimpleHTTPServer with Python3" src="../../../_images/python3HTTPserver.png" />{.align-center}</p>
+<p>You can now open a browser to the server (<a class="reference external" href="http://localhost:8000">http://localhost:8000</a>,
+replacing 8000 with whatever number was after “port” in the output
+from the command). You should see a list of file names in the directory
+your terminal was open to when you ran the HTTP Server command (unless
+you happen to have a file named index.html, in which case you’ll see
+the contents of that file). Assuming you ran this command from the
+“example” directory in the directory structure shown above, you should
+see “my_html.html” (or whatever you called your html file) on the
+list. Click on it.</p>
+<p>Ta-da! There’s your visualization.</p>
+<p>It’s convenient to have a visualization of data you’ve already
+generated, but the real power of D3 visualization objects is that they
+can update in real time while your code runs. Here’s an example C++
+file that does that:</p>
+<blockquote>
+<div><p>Example here</p>
+</div></blockquote>
+<p>So that’s how you use out-of-the-box D3 visualizations in Empirical.
+Sometimes, though, you want to do something new and exciting. Which
+brings us to the next section…</p>
+</section>
+</section>
+<section id="writing-your-own-visualization">
+<h2>Writing Your Own Visualization<a class="headerlink" href="#writing-your-own-visualization" title="Link to this heading"></a></h2>
+<p>To build your own visualization, you need to understand a bit about how
+D3 works. Which means you need to understand a bit about how Javascript
+and HTML work. I know, I know, the reason you’re doing this all in C++
+is that you want to avoid that, but I promise it’s worth it if you want
+to make interactive visualizations that run on the web.</p>
+<p>When your browser loads a website, it takes the html for that page and
+turns it into a tree:</p>
+<p><img alt="The tree your browser builds from an html file" src="../../../_images/DOM.png" />{.align-center}</p>
+<p>This tree is called the Document Object Model (DOM) and every set of
+tags (things in angle brackets, like &lt;head&gt;&lt;/head&gt;) in the html is
+an element in it. Elements that are nested inside other elements are
+represented as children of those elements in the tree. For instance, the
+tree pictured above is representing the following html:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>Javascript manipulates the DOM. It adds elements, it removes elements,
+it moves them around, and it changes information about them. D3’s
+primary innovation is that it binds data to DOM elements and lets you
+manipulate them based on that data. So, for instance, you can add a
+bunch of circle elements representing all of your data points. With the
+D3 C++ wrapper, you’re doing the same thing, but from C++.</p>
+<p>Let’s take a tour of the main components of D3:</p>
+<section id="selections">
+<h3>Selections<a class="headerlink" href="#selections" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">Selections</span> <span class="pre">&lt;Selections_and_Transitions_API&gt;</span></code>{.interpreted-text
+role=”ref”} are a way to work with groups of DOM elements. For instance,
+let’s say we have this html file:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span> My D3/Empirical visualization! <span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+        <span class="cm">&lt;!-- Include necessary javascript libraries</span>
+<span class="cm">        (jquery, and d3) --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;Empirical/include/emp/web/jquery-1.11.2.min.js&quot;</span><span class="p">&gt;</span>
+<span class="w">        </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;Empirical/include/emp/web/d3/d3.min.js&quot;</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;utf-8&quot;</span><span class="p">&gt;</span>
+<span class="w">        </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+
+        <span class="cm">&lt;!-- Include the Javascript file you compiled your</span>
+<span class="cm">         C++ code to --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;my_program.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;my_visualization&quot;</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">svg</span> <span class="na">id </span><span class="o">=</span> <span class="s">&quot;graph&quot;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">circle</span> <span class="na">cx</span><span class="o">=</span><span class="s">&quot;10&quot;</span> <span class="na">cy</span><span class="o">=</span><span class="s">&quot;10&quot;</span> <span class="na">r</span><span class="o">=</span><span class="s">&quot;5&quot;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">circle</span> <span class="na">cx</span><span class="o">=</span><span class="s">&quot;20&quot;</span> <span class="na">cy</span><span class="o">=</span><span class="s">&quot;20&quot;</span> <span class="na">r</span><span class="o">=</span><span class="s">&quot;5&quot;</span><span class="p">&gt;</span>
+          <span class="p">&lt;/</span><span class="nt">svg</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>Notice that we’ve added two types of elements: an SVG canvas and two
+circles. SVG stands for Scalable Vector Graphics, which is the type of
+graphics the D3 works with (the other type of graphics in Javascript are
+canvas graphics). In SVG graphics, every shape is its own element,
+nested inside an SVG canvas element, so each shape can be manipulated
+independently. Here we have two circle elements on our SVG canvas.
+We’ve set three attributes for the circles: the x coordinate of their
+center points (cx), the y coordinate of their center points (cy), and
+their radii (r).</p>
+<p>If we want to operate on the circles, we can create a selection object
+that contains them:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">//s is a container that contains both circle elements in the DOM</span>
+<span class="n">D3</span><span class="o">::</span><span class="n">Selection</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D3</span><span class="o">::</span><span class="n">SelectAll</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>We can then do things to all of the circles, like turn them purple:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Set the &quot;fill&quot; style of everything in the s selection</span>
+<span class="c1">// to &quot;purple&quot;. &quot;fill&quot; is the color of the inside of a shape</span>
+<span class="c1">// We&#39;ll talk more about modifying shapes a bit later</span>
+<span class="n">s</span><span class="p">.</span><span class="n">SetStyle</span><span class="p">(</span><span class="s">&quot;fill&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;purple&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>What if there are other circles outside the graph area that we don’t
+want to affect? We can select an element with a specific id using the
+“#”, and then take a sub-selection by calling the
+[SelectAll]{.title-ref} method on it:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Select will create a selection containing the first matching</span>
+<span class="c1">// element, whereas SelectAll creates a selection containing</span>
+<span class="c1">// all matching elements</span>
+<span class="n">D3</span><span class="o">::</span><span class="n">Selection</span><span class="w"> </span><span class="n">svg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D3</span><span class="o">::</span><span class="n">Select</span><span class="p">(</span><span class="s">&quot;#graph&quot;</span><span class="p">);</span>
+<span class="n">D3</span><span class="o">::</span><span class="n">Selection</span><span class="w"> </span><span class="n">graph_circles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">svg</span><span class="p">.</span><span class="n">SelectAll</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Advanced note: You can also make selections based on classes with
+[D3::Select(.classname)]{.title-ref}.</p>
+</section>
+<section id="binding-data">
+<h3>Binding Data<a class="headerlink" href="#binding-data" title="Link to this heading"></a></h3>
+<p>In D3, you bind data to selections. Usually, you are binding that data
+because you to visualize it with SVG elements. So, usually the selection
+that we’re binding data to is a selection of some type of SVG element
+on an SVG canvas. Something like this:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Here we&#39;re using D3 to add the svg canvas to the document.</span>
+<span class="c1">// We could also have Selected a pre-existing svg canvas that</span>
+<span class="c1">// we put in the html, as we did in previous examples.</span>
+<span class="n">D3</span><span class="o">::</span><span class="n">Selection</span><span class="w"> </span><span class="n">svg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D3</span><span class="o">::</span><span class="n">Select</span><span class="p">(</span><span class="s">&quot;body&quot;</span><span class="p">).</span><span class="n">Append</span><span class="p">(</span><span class="s">&quot;svg&quot;</span><span class="p">);</span>
+
+<span class="n">D3</span><span class="o">::</span><span class="n">Selection</span><span class="w"> </span><span class="n">data_points</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">svg</span><span class="p">.</span><span class="n">SelectAll</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Wait, what? Why did we select all of the circles on the SVG canvas when
+we know for a fact that there aren’t any, because we just created it?
+It turns out that D3 pays attention to the type of elements a selection
+contains. It knows that this is an empty selection for circles. So now
+we can bind our data to this selection and D3 will understand that each
+point should correspond to a circle. That means it can tell which data
+points don’t have corresponding circles (in this case all of them).
+These data points make up the “enter selection,” which we can access
+with the [selection.enter()]{.title-ref} method. Most commonly, we use
+the enter selection to append elements for every data point. Here’s
+what that all looks like together:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Create example data</span>
+<span class="n">emp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">};</span>
+
+<span class="c1">// Bind the data to the selection. We&#39;ll explain why this</span>
+<span class="c1">// variable is named update in moment</span>
+<span class="n">D3</span><span class="o">::</span><span class="n">Selection</span><span class="w"> </span><span class="n">update</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data_points</span><span class="p">.</span><span class="n">Data</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+
+<span class="c1">// Get the enter selection (data without a DOM element)</span>
+<span class="n">D3</span><span class="o">::</span><span class="n">Selection</span><span class="w"> </span><span class="n">enter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">update</span><span class="p">.</span><span class="n">Enter</span><span class="p">();</span>
+
+<span class="c1">// Give each data point in the enter selection a circle</span>
+<span class="c1">// (as a shortcut, we could also have just used</span>
+<span class="c1">// EnterAppend(&quot;circle&quot;) on the previous line)</span>
+<span class="n">enter</span><span class="p">.</span><span class="n">Append</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Our circles won’t show up if we don’t give them cx, cy, and r
+attributes. Let’s set them to be equal to each element’s corresponding
+data value. We can do this by passing [SetAttr()]{.title-ref} a function
+as its second object. Since passing functions around it much more common
+in Javascript than in C++, we’ll talk a bit more about the ins and outs
+a bit later. For now, you just need to know that [SetAttr()]{.title-ref}
+accepts a function that takes the data bound to the element and returns
+the value you want to set an attribute to. Technically, Javascript is
+going to pass it three arguements, so you should write your C++ function
+to accept three parameters, or your compiler will probably throw a
+tantrum:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// For now, we&#39;re going to use the simplest calllback function</span>
+<span class="c1">// possible: one that returns exactly the data value that it</span>
+<span class="c1">// was given.</span>
+<span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span><span class="o">&gt;</span><span class="w"> </span><span class="n">return_d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>\
+<span class="w">                            </span><span class="p">[](</span><span class="kt">int</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="p">){</span><span class="k">return</span><span class="w"> </span><span class="n">d</span><span class="p">;};</span>
+
+<span class="c1">// Set cx (the x coordinate of the circle&#39;s center), cy (the y</span>
+<span class="c1">// coordinate of the circle&#39;s center), and r (the radius) to</span>
+<span class="c1">// all be the return of the return_d function</span>
+<span class="c1">// (i.e. the bound data)</span>
+<span class="n">enter</span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">return_d</span><span class="p">)</span>
+<span class="w">     </span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cy&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">return_d</span><span class="p">)</span>
+<span class="w">     </span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;r&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">return_d</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Now we have 5 circles, with the numbers from 1-5 bound to them as data
+(one number per circle).</p>
+<p>What if we get more data?</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Change data</span>
+<span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">};</span>
+
+<span class="c1">// Select all of the circles and bind the new data</span>
+<span class="n">update</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">svg</span><span class="p">.</span><span class="n">SelectAll</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">).</span><span class="n">Data</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+
+<span class="c1">// This time the enter selection only contains two data points:</span>
+<span class="c1">//  6 and 7</span>
+<span class="n">enter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">update</span><span class="p">.</span><span class="n">Enter</span><span class="p">();</span>
+
+<span class="c1">// Add new circles for the new data and set</span>
+<span class="c1">// attributes appropriately</span>
+<span class="n">enter</span><span class="p">.</span><span class="n">Append</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">)</span>
+<span class="w">     </span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">return_d</span><span class="p">)</span>
+<span class="w">     </span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cy&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">return_d</span><span class="p">)</span>
+<span class="w">     </span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;r&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">return_d</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Now we have 7 circles. We added circles for the ones that didn’t
+already have circles.</p>
+<p>What happens if our dataset shrinks? We can use the
+[selection.Exit()]{.title-ref} method. This returns the “exit
+selection”. In the same way the enter selection contains all of the
+data points without circles, the exit selection contains all of the
+circles without data points. Usually we want to remove them:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Change data</span>
+<span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">};</span>
+
+<span class="c1">// Select all of the circles and bind the new data</span>
+<span class="n">update</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">svg</span><span class="p">.</span><span class="n">SelectAll</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">).</span><span class="n">Data</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+
+<span class="c1">// The enter selection would be empty, but the exit</span>
+<span class="c1">// selection has three things in it: 5, 6, and 7</span>
+<span class="n">exit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">update</span><span class="p">.</span><span class="n">Exit</span><span class="p">();</span>
+
+<span class="c1">// Remove everything in the exit selection from the DOM</span>
+<span class="c1">// (as a shortcut, we could have just used ExitRemove()</span>
+<span class="c1">// on the previous line)</span>
+<span class="n">exit</span><span class="p">.</span><span class="n">Remove</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Now we’re down to four circles.</p>
+<p>What happens if our data is replaced with four completely different
+numbers? The enter and exit selections will be empty (every data point
+has a circle and every circle has a data point), but the circles’
+attributes won’t correspond to the right data anymore. Now it’s
+finally time to use that “update” variable we keep making. That
+variable has been holding what’s called the “update selection.” The
+update selection is directly returned by the
+[selection.data()]{.title-ref} method, and it contains all of the data
+points associated with circles that already existed before the data was
+bound. We can use it to re-set the circles’ attributes, based on the
+new data:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Change data</span>
+<span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="mi">13</span><span class="p">};</span>
+
+<span class="c1">// Select all of the circles and bind the new data</span>
+<span class="n">update</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">svg</span><span class="p">.</span><span class="n">SelectAll</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">).</span><span class="n">Data</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+
+<span class="c1">// Reset the attributes of the update selection</span>
+<span class="n">update</span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">return_d</span><span class="p">)</span>
+<span class="w">      </span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cy&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">return_d</span><span class="p">)</span>
+<span class="w">      </span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;r&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">return_d</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Congratulations! You’ve now used d3’s popular enter-update-exit
+pattern. For a more thorough discussion, see [this
+article](<a class="reference external" href="https://bost.ocks.org/mike/join/">https://bost.ocks.org/mike/join/</a>) by the creator of d3.js.</p>
+<p>There’s one other thing you should know about binding data. Thus far,
+we’ve been matching data with DOM elements sequentially (the first data
+point in the array gets paired with the first circle in the selection,
+and so on). But sometimes you’d like to keep the same circle
+corresponding to the same data point (this is especially important if
+you’re applying transitions). To acheive this, you can pass
+[selection.Data()]{.title-ref} a “key” function that takes a piece of
+data (and optionally a position in the array/selection) and returns a
+string. Data points are then matched with DOM elements based on whether
+the string returned by running the function on the data point matches
+the string returned by running the function on the data bound to the
+element.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Change data (re-arrange three elements and replace the fourth)</span>
+<span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">13</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">}</span>
+
+<span class="c1">// Select all of the circles and bind the new data with a key</span>
+<span class="c1">// function. The key function supplied here is a lambda</span>
+<span class="c1">// function that, like the return_d function</span>
+<span class="c1">// we already wrote, just returns the value of the bound data</span>
+<span class="c1">// The update selection contains circles for 11, 12, and 13,</span>
+<span class="c1">// still associated with the correct data (so we don&#39;t need</span>
+<span class="c1">// to reset the attributes)</span>
+<span class="n">update</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">svg</span><span class="p">.</span><span class="n">SelectAll</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="n">Data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="p">[](</span><span class="kt">int</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">){</span><span class="k">return</span><span class="w"> </span><span class="n">d</span><span class="p">};);</span>
+
+<span class="c1">// The enter selection contains 8</span>
+<span class="c1">// EnterAppend just combines Enter() and Append()</span>
+<span class="c1">// In Javascript, it&#39;s common to chain methods, as is</span>
+<span class="c1">// done below. Most Selection methods in the D3 wrapper</span>
+<span class="c1">// return the selection, so that we can chain methods here too</span>
+<span class="c1">// The code below does exactly the same thing we did to the</span>
+<span class="c1">// other enter selections</span>
+<span class="n">update</span><span class="p">.</span><span class="n">EnterAppend</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">return_d</span><span class="p">)</span>
+<span class="w">      </span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cy&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">return_d</span><span class="p">)</span>
+<span class="w">      </span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;r&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">return_d</span><span class="p">);</span>
+
+<span class="c1">// The exit selection contains 10</span>
+<span class="n">update</span><span class="p">.</span><span class="n">ExitRemove</span><span class="p">();</span>
+</pre></div>
+</div>
+</section>
+<section id="changing-elements-traits">
+<h3>Changing Elements’ Traits<a class="headerlink" href="#changing-elements-traits" title="Link to this heading"></a></h3>
+<p>There are three types of traits that a DOM element might have:
+attributes, styles, and properties. For the most part, attributes are
+fundamental pieces of information about the element, styles deal with
+the element’s appearance (they are all things you could set with CSS),
+and properties are rare and specific to certain types of elements. The
+distinction mostly only matters because it determines which functions
+you call to set and get the values of a trait. Here are some examples of
+commonly used traits in each category:</p>
+<p><strong>Attributes (use SetAttr()):</strong></p>
+<ul class="simple">
+<li><p><strong>id</strong> - an element’s unique identifier</p></li>
+<li><p><strong>width</strong> - in pixels, by default</p></li>
+<li><p><strong>height</strong> - in pixels, by default</p></li>
+<li><p><strong>x</strong> - the location of an element on the x axis (in pixels)</p></li>
+<li><p><strong>y</strong> - the location of an element on the y axis (in pixels)</p></li>
+<li><p><strong>cx</strong> - the location of a circle’s center on the x axis (in
+pixels)</p></li>
+<li><p><strong>cy</strong> - the location of a circle’s center on the y axis (in
+pixels)</p></li>
+<li><p><strong>r</strong> - a circle’s radius (in pixels)</p></li>
+<li><p><strong>transform</strong> - a string indicating how to position the element. The
+Move and Rotate methods of selections are a convenient shortcut for
+this.</p></li>
+</ul>
+<p><strong>Styles (use SetStyle()):</strong></p>
+<ul class="simple">
+<li><p><strong>fill</strong> - the color an SVG shape is filled with</p></li>
+<li><p><strong>stroke</strong> - the color of a line (either the border of an SVG shape
+or a path object)</p></li>
+<li><p><strong>stroke-width</strong> - the length of a path or SVG shape border</p></li>
+</ul>
+<p><strong>Properties (use SetProperty()):</strong></p>
+<ul class="simple">
+<li><p><strong>checked</strong> - a property indicating whether or not a checkbox is
+checked</p></li>
+</ul>
+<p>All of these functions take two arguemnts: a string indicating the name
+of the trait being changed and the value to change it to. This vale can
+be a constant, such as a number, string, or color (depending on the
+trait). They also accept functions (simple example above, explained in
+more detail below) that allow you to set the trait based off of each
+element’s bound data. Javascript will pass these functions three
+parameters: the value bound as data, the index of the element in the
+selection, and a third element that we don’t currently have a good way
+to translate to C++ (use an int as a placeholder in your function
+definition so C++ doesn’t throw a tantrum).</p>
+</section>
+</section>
+<section id="transitions">
+<h2>Transitions<a class="headerlink" href="#transitions" title="Link to this heading"></a></h2>
+<p>One of the most powerful parts of D3 is the ease with which it allows
+you to animate your data. This is accomplished with
+<code class="docutils literal notranslate"><span class="pre">transitions</span> <span class="pre">&lt;Selections_and_Transitions_API&gt;</span></code>{.interpreted-text
+role=”ref”}. The most common way to make a transition is to call the
+[selection.MakeTransition()]{.title-ref} method on a selection
+containing all of the elements you want to animate (note: in Javascript,
+the method is just selection.transition(), because Javascript is less
+finicky about name collisions). You can then use the
+[attr()]{.title-ref} and [style()]{.title-ref} methods on the
+transition, just as you would on a selection, and the change will be
+animated. Note that the wrapper also allows you to set properties, html,
+and classes on a transition, but D3 doesn’t know how to animate changes
+in these, so they will just happen at the end of the transition. Other
+operations, such as appending new elements, are not allowed on
+transitions, because there isn’t a clear way to animate them.</p>
+<p>For instance, here’s an example of animating a circle moving across the
+screen and gradually changing color from black (default) to blue:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Add an svg canvas to the body and set its width to 100 pixels</span>
+<span class="n">D3</span><span class="o">::</span><span class="n">Selection</span><span class="w"> </span><span class="n">svg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D3</span><span class="o">::</span><span class="n">Select</span><span class="p">(</span><span class="s">&quot;body&quot;</span><span class="p">).</span><span class="n">Append</span><span class="p">(</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="w">                                      </span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;width&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+
+<span class="c1">// Put a circle on the canvas</span>
+<span class="n">D3</span><span class="o">::</span><span class="n">Selection</span><span class="w"> </span><span class="n">circle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">svg</span><span class="p">.</span><span class="n">Append</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">);</span>
+
+<span class="c1">// The circle will only show up if we give it x and y coordinates</span>
+<span class="c1">// for it&#39;s center, and a radius Since we&#39;re going to move it</span>
+<span class="c1">// from the left side of the screen to the right, we&#39;ll start it</span>
+<span class="c1">// centered at 0, the left edge (it will be half of the canvas)</span>
+<span class="n">circle</span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">).</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cy&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">).</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;r&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1">// Make a transition from the circle selection</span>
+<span class="n">D3</span><span class="o">::</span><span class="n">Transition</span><span class="w"> </span><span class="n">circle_anim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">circle</span><span class="p">.</span><span class="n">MakeTransition</span><span class="p">();</span>
+
+<span class="c1">// By changing the &quot;cx&quot; attribute via the transition, we cause</span>
+<span class="c1">// the change to be animated, so we see the circle moving across</span>
+<span class="c1">// the screen. Similarly, we see the circle fade from black</span>
+<span class="c1">// to blue.</span>
+<span class="n">circle_anim</span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">).</span><span class="n">SetStyle</span><span class="p">(</span><span class="s">&quot;fill&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;blue&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Some functions in Empirical’s D3 wrapper that accept selections will
+also select transitions, allowing you to choose to have their effects be
+animated, rather than occuring instantaneously (which can look choppy in
+many visualizations).</p>
+<section id="scales-and-axes">
+<h3>Scales and Axes<a class="headerlink" href="#scales-and-axes" title="Link to this heading"></a></h3>
+<p>Usually your data is not in units that you can directly draw on the
+screen. For instance, if you want to plot a variable on the Y axis that
+has values from -1 to 1, you’ll need a way to convert from these very
+small values to values representing where the elements of your
+visualization should appear on the SVG canvas (in pixels). This is what
+<code class="docutils literal notranslate"><span class="pre">scales</span> <span class="pre">&lt;Scales_API&gt;</span></code>{.interpreted-text role=”ref”} do. Like a number of
+other objects in D3, scales are actually functions. They accept a value
+in the domain (the range of values your data can have) and return a
+value in the range (the range of coordinates on your screen that you
+want data to show up in).</p>
+<p>For example, lets say we have data ranging from 0 to 1 and we want to
+convert it to coordinates on our screen from 0 to 100. We can make a
+scale to do it:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Make a scale. We&#39;ll use a LinearScale, but you could also use</span>
+<span class="c1">// an IdentityScale, LogScale, or PowScale</span>
+<span class="n">D3</span><span class="o">::</span><span class="n">LinearScale</span><span class="w"> </span><span class="n">y_scale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D3</span><span class="o">::</span><span class="n">LinearScale</span><span class="p">();</span>
+
+<span class="c1">// Set domain (possible input values)</span>
+<span class="n">y_scale</span><span class="p">.</span><span class="n">SetDomain</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+
+<span class="c1">// Set range (possible output values)</span>
+<span class="n">y_scale</span><span class="p">.</span><span class="n">SetRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+
+<span class="c1">// Convert value from domain to range</span>
+<span class="c1">// This will be 100</span>
+<span class="kt">double</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y_scale</span><span class="p">.</span><span class="n">ApplyScale</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="c1">// This will be 0</span>
+<span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y_scale</span><span class="p">.</span><span class="n">ApplyScale</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+<span class="c1">// This will be 50</span>
+<span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y_scale</span><span class="p">.</span><span class="n">ApplyScale</span><span class="p">(</span><span class="mf">.5</span><span class="p">);</span>
+
+<span class="c1">// Example data</span>
+<span class="n">emp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">.1</span><span class="p">,</span><span class="w"> </span><span class="mf">.2</span><span class="p">,</span><span class="w"> </span><span class="mf">.3</span><span class="p">,</span><span class="w"> </span><span class="mf">.4</span><span class="p">,</span><span class="w"> </span><span class="mf">.5</span><span class="p">};</span>
+
+<span class="c1">// Add SVG canvas to body, set its height to 100 (so our data</span>
+<span class="c1">// fits)</span>
+<span class="n">D3</span><span class="o">::</span><span class="n">Selection</span><span class="w"> </span><span class="n">svg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D3</span><span class="o">::</span><span class="n">Select</span><span class="p">(</span><span class="s">&quot;body&quot;</span><span class="p">)</span>
+<span class="w">                        </span><span class="p">.</span><span class="n">Append</span><span class="p">(</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="w">                        </span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;height&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+
+<span class="c1">// make empty selection for circles,</span>
+<span class="c1">// bind data to selection, and append circles for data</span>
+<span class="n">svg</span><span class="p">.</span><span class="n">SelectAll</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">)</span>
+<span class="w">   </span><span class="p">.</span><span class="n">Data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="w">   </span><span class="p">.</span><span class="n">Append</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">);</span>
+
+<span class="c1">// Set y coordinate of circle centers based on y_scale</span>
+<span class="c1">// Input to this function is the bound data, the index</span>
+<span class="c1">// of the circles in the selection, and a placeholder</span>
+<span class="c1">// value. Here, we use a lambda function, as it is a</span>
+<span class="c1">// convenient way to put the y_scale in the proper scope.</span>
+<span class="n">circles</span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cy&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="n">y_scale</span><span class="p">](</span><span class="kt">int</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="p">){</span>
+<span class="w">                        </span><span class="k">return</span><span class="w"> </span><span class="n">y_scale</span><span class="p">.</span><span class="n">ApplyScale</span><span class="p">(</span><span class="n">d</span><span class="p">);</span>
+<span class="w">                    </span><span class="p">});</span>
+
+<span class="c1">// Set cx and r so circles show up</span>
+<span class="n">circles</span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">).</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;r&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Great - we’ve used a scale to plot our data. But how are we supposed to
+know what the original data values were, now? With an
+<code class="docutils literal notranslate"><span class="pre">axis</span> <span class="pre">&lt;Axes_API&gt;</span></code>{.interpreted-text role=”ref”} object! Axes are a way
+of creating a visual representation of a scale:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Make an axis object, templated off of</span>
+<span class="c1">// the type of scale we&#39;re depicting</span>
+<span class="c1">// We pass the constructor a string to tell it</span>
+<span class="c1">// how to label the axis.</span>
+<span class="n">D3</span><span class="o">::</span><span class="n">Axis</span><span class="o">&lt;</span><span class="n">D3</span><span class="o">::</span><span class="n">LinearScale</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D3</span><span class="o">::</span><span class="n">Axis</span><span class="o">&lt;</span><span class="n">D3</span><span class="o">::</span><span class="n">LinearScale</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;yvar&quot;</span><span class="p">);</span>
+
+<span class="c1">// Set the axis to use our y scale</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">SetScale</span><span class="p">(</span><span class="n">y_scale</span><span class="p">);</span>
+
+<span class="c1">// This is a y axis, so we probably want it oriented</span>
+<span class="c1">// vertically with the numbers and label on the left</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">SetOrientation</span><span class="p">(</span><span class="s">&quot;left&quot;</span><span class="p">);</span>
+
+<span class="c1">// Draw the axis onto our SVG object</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">Draw</span><span class="p">(</span><span class="n">svg</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If you’re drawing both x and y axes, you may want to try using
+[DrawAxes()]{.title-ref}, which attempts to make a smart guess about
+where to place them.</p>
+<p>You’re not limited to working with numbers when you use scales. If you
+provide strings with color names (or hex representations), the scale
+will return an appropriately interpolated color. You can even provide an
+array of more than two numerical values to domain, and an array
+containing an equal number of colors to range, and D3 will interpolate
+appropriately. If you don’t want a continuous range of colors, try a
+categorical scale. The [Category10Scale]{.title-ref} will assign colors
+to up to 10 different categorical values. The
+[Category20Scale]{.title-ref} can handle 20.</p>
+</section>
+</section>
+<section id="passing-functions-as-arguments">
+<h2>Passing Functions as Arguments<a class="headerlink" href="#passing-functions-as-arguments" title="Link to this heading"></a></h2>
+<p>In Javascript, it’s very common to pass functions as arguments to other
+functions in order to customize their behavior. This comes, in part,
+from the fact that a lot of Javascript code is exectured asynchronously.
+Since the goal of most Javscript is to run a web page, Javascript needs
+to respond to events such as user interactions (clicking, scrolling,
+etc.). It also needs to avoid delaying everything on the page just
+because there’s a picture it’s trying to load from a server that’s
+down. As a result, functions that require waiting for something to
+happen often accept a “callback function” as an argument. This
+function will get run when the function it was passed to is done. This
+way of programming can take some getting used to for people who are more
+used to more linear programming languages, but it’s hard to avoid when
+writing web code.</p>
+<p>D3.js makes heavy use of functions-as-arguments. Most commonly, this
+happens when you’re trying to set attributes of graphical elements
+based on the data that is bound to them (as demonstrated in the section
+on binding data); you pass a function that takes a piece of data as an
+argument and returns the attribute value.</p>
+<p>In Empirical, there are a number of ways to pass functions as arguments
+into d3 methods:</p>
+<ul class="simple">
+<li><p>Write the callback function as a regular C++ function, a <a class="reference external" href="http://en.cppreference.com/w/cpp/language/lambda">C++ lambda
+function</a>, or a
+<a class="reference external" href="http://en.cppreference.com/w/cpp/utility/functional/function">std::function
+object</a>
+and pass it into the d3 method.</p></li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">times_two</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="k">return</span><span class="w"> </span><span class="n">d</span><span class="o">*</span><span class="mi">2</span><span class="p">;};</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Create an empty selection for circles on an svg canvas</span>
+<span class="w">  </span><span class="c1">// (assumes svg is already created). Bind data [1,2,3]</span>
+<span class="w">  </span><span class="c1">// to selection, and add a circle for each data point</span>
+<span class="w">  </span><span class="n">D3</span><span class="o">::</span><span class="n">Selection</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Select</span><span class="p">(</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="w">                      </span><span class="p">.</span><span class="n">SelectAll</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">)</span>
+<span class="w">                      </span><span class="p">.</span><span class="n">Data</span><span class="p">(</span><span class="n">emp</span><span class="o">::</span><span class="n">vector</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}))</span>
+<span class="w">                      </span><span class="p">.</span><span class="n">EnterAppend</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// We can use either of the following two lines to set</span>
+<span class="w">  </span><span class="c1">// the circles&#39; radii to be equal to two times their</span>
+<span class="w">  </span><span class="c1">// data point (1, 2, or 3). Here we use a normal C++</span>
+<span class="w">  </span><span class="c1">// function (could also be a std::function object)</span>
+<span class="w">  </span><span class="n">s</span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;r&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">times_two</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// Javascript will pass this function three things: the</span>
+<span class="w">  </span><span class="c1">// data (d) bound to an element (an int, in this case),</span>
+<span class="w">  </span><span class="c1">// an int (i) indicating the position of the element in</span>
+<span class="w">  </span><span class="c1">// the selection, and a third item that you</span>
+<span class="w">  </span><span class="c1">// don&#39;t need to worry about yet, but that requires an</span>
+<span class="w">  </span><span class="c1">// int parameter (j) as a placeholder</span>
+<span class="w">  </span><span class="n">s</span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;r&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[](</span><span class="kt">int</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="p">){</span><span class="k">return</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">;});</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Pass the d3 method a string containing the name of a function that
+exists in Javascript (either one that has been created by empirical,
+one that you defined globally on the current webpage, or a d3
+built-in function).</p></li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// For instance, if we wanted to sort our selection from</span>
+<span class="c1">// the previous example, we could use d3&#39;s built-in</span>
+<span class="c1">// &quot;ascending&quot; function:</span>
+<span class="n">s</span><span class="p">.</span><span class="n">sort</span><span class="p">(</span><span class="s">&quot;ascending&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>If you’re going to be repeatedly using a C++ function as a
+callback, you may improve the efficiency of your code by combining
+the two previous approaches, using Empirical’s
+<code class="docutils literal notranslate"><span class="pre">JSWrap</span> <span class="pre">&lt;JSWrap&gt;</span></code>{.interpreted-text role=”ref”} function.</p></li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Creates a function in Javascript called &quot;times_two&quot;</span>
+<span class="c1">// that calls times_two</span>
+<span class="n">emp</span><span class="o">::</span><span class="n">JSWrap</span><span class="p">(</span><span class="n">times_two</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;times_two&quot;</span><span class="p">);</span>
+
+<span class="c1">// Call the Javascript version of times_two</span>
+<span class="n">s</span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;r&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;times_two&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Advanced users may also wish to write functions directly in Javascript, which is possible using Emscripten’s macros.</p></li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Put the function in global scope by adding it</span>
+<span class="c1">// to the current window</span>
+<span class="n">EM_ASM</span><span class="p">({</span><span class="n">window</span><span class="p">[</span><span class="s">&quot;times_two&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">function</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">){</span><span class="k">return</span><span class="w"> </span><span class="n">d</span><span class="o">*</span><span class="mi">2</span><span class="p">;};});</span>
+
+<span class="c1">// Call the Javascript version of times_two</span>
+<span class="n">s</span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;r&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;times_two&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>All of these examples have assumed that the data points you’ve bound to
+your selection are ints. But most real-world data points are more
+complex than that (e.g. they may contain values for multiple variables).
+Javascript handles such data nicely by using <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON">JSON
+objects</a>.
+You can write functions in C++ that accept JSON data from Javascript,
+but you have to tell C++ what data it should be expecting. An Empirical
+feature called
+<code class="docutils literal notranslate"><span class="pre">introspective</span> <span class="pre">tuple</span> <span class="pre">structs</span> <span class="pre">&lt;tuple_struct&gt;</span></code>{.interpreted-text
+role=”ref”} provide a convenient way to do that, which JSWrap
+understands.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">JSONData</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">EMP_BUILD_INTROSPECTIVE_TUPLE</span><span class="p">(</span><span class="w"> </span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span>
+<span class="w">                                 </span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span>
+<span class="w">                                 </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span><span class="w"> </span><span class="n">name</span>
+<span class="w">                                </span><span class="p">)</span>
+<span class="p">};</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">get_x</span><span class="p">(</span><span class="n">JSONData</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="k">return</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">x</span><span class="p">();};</span>
+
+<span class="c1">// Assume s is a selection with a dataset already bound to it,</span>
+<span class="c1">// and that that dataset contains JSON objects with the</span>
+<span class="c1">// attributes described in the JSONData struct (x, y, and name).</span>
+<span class="c1">// Set the &quot;cx&quot; attribute of the circle (the x position of the</span>
+<span class="c1">// circle on your screen, in pixels) to the return of calling</span>
+<span class="c1">// get_x on the data bound to each circle (i.e. the x value</span>
+<span class="c1">// stored in the data point bound to a given circle)</span>
+<span class="n">s</span><span class="p">.</span><span class="n">SetAttr</span><span class="p">(</span><span class="s">&quot;cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">get_x</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="under-the-hood-for-the-curious-developers-and-people-trying-to-do-weird-stuff">
+<h2>Under the Hood (for the curious, developers, and people trying to do weird stuff)<a class="headerlink" href="#under-the-hood-for-the-curious-developers-and-people-trying-to-do-weird-stuff" title="Link to this heading"></a></h2>
+<p>For the most part, Empirical’s d3 wrapper isn’t that complicated under
+the hood. All C++ objects in the d3 module have a unique integer id.
+Most of them don’t actually store much more information. Instead, they
+serve as an interface to an object stored in Javascript. All Javascript
+objects that are being represented in C++ are stored in a Javascript
+array called [js.objects]{.title-ref}. An object’s id is actually the
+index of the corresponding Javascript object in the
+[js.objects]{.title-ref} array. Methods of that object reach into
+Javascript and call the corresponding method on the appropriate object.
+Some higher-level functions may call more than one d3 function.</p>
+<p>The other piece of complexity that is hidden from the user is the
+translation between JSON objects in Javascript and objects created with
+EMP_BUILD_INTROSPECTIVE_TUPLE. This is all handled by
+<code class="docutils literal notranslate"><span class="pre">JSWrap</span> <span class="pre">&lt;JSWrap&gt;</span></code>{.interpreted-text role=”ref”}, which identifies
+objects created with EMP_BUILD_INTROSPECTIVE_TUPLE by looking for a
+member called n_fields. n_fields is created by
+EMP_BUILD_INTROSPECTIVE_TUPLE and indicates how many fields an object
+has. All conversion from C++ functions to javascript functions is
+handled by JSWrap (if you pass a function directly to a d3 method,
+JSWrap is called behind the scenes). This is why it is potentially more
+efficient to wrap functions once and pass the Javascript name as a
+string than to keep passing them as C++ functions and re-wrapping them
+every time. Rigorous tests on how much of a slow-down this introduces
+have not been conducted.</p>
+<p>Things to watch out for:</p>
+<ul class="simple">
+<li><p>D3 object creation order - be careful of the order your constructors for d3 objects get called in. It’s hard to make this happen, but if you’re constructing objects in the constructors for other objects, it’s possible for the ids to get mixed up.</p></li>
+<li><p>Errors in Javascript usually won’t show up on compilation - you need to actually run the code.</p></li>
+<li><p>Main is a function that gets run like any other. When main finishes running, its local variables will go out of scope. This means that everything needed for an ongoing animation needs to live in global scope.</p></li>
+<li><p>Javascript is designed to work asynchronously in a lot of contexts (especially when loading outside resources or updating the graphics on the screen). This can change the way you need to structure your code.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="d3.html" class="btn btn-neutral float-left" title="D3 Wrapper" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="d3-contents.html" class="btn btn-neutral float-right" title="D3 Wrapper API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

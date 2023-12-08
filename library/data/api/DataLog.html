@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DataLog.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/data/api/DataLog.6282c890-8496-4c67-80de-6ff85d6b7d5f.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="DataManager.hpp" href="DataManager.html" />
+    <link rel="prev" title="DataLayout.hpp" href="DataLayout.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../data.html">Data Collection and Recording Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../data.html#data-tools-api">Data Tools API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AnnotatedType.html">AnnotatedType.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataFile.html">DataFile.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataInterface.html">DataInterface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataLayout.html">DataLayout.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">DataLog.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E7DataLog"><code class="docutils literal notranslate"><span class="pre">DataLog</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="DataManager.html">DataManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataMap.html">DataMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataNode.html">DataNode.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Datum.html">Datum.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="MemoryImage.html">MemoryImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SimpleParser.html">SimpleParser.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Trait.html">Trait.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="VarMap.html">VarMap.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../data.html">Data Collection and Recording Tools</a></li>
+      <li class="breadcrumb-item active">DataLog.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="datalog-hpp">
+<h1>DataLog.hpp<a class="headerlink" href="#datalog-hpp" title="Link to this heading"></a></h1>
+<p>Tools for processing a single set of data. </p>
+<p>
+A DataLog takes in a continuous series of data and allows for easy analysis, both by performing calculations on those values and by outputting ascii histograms, etc. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA</p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E7DataLog">
+<span id="_CPPv3I0E7DataLog"></span><span id="_CPPv2I0E7DataLog"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataLog"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DataLog</span></span></span><a class="headerlink" href="#_CPPv4I0E7DataLog" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;DataLog.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLog7DataLogEv">
+<span id="_CPPv3N7DataLog7DataLogEv"></span><span id="_CPPv2N7DataLog7DataLogEv"></span><span id="DataLog::DataLog"></span><span class="target" id="classDataLog_1ada774af43970e665be3657eb591b5d5b"></span><span class="sig-name descname"><span class="n"><span class="pre">DataLog</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N7DataLog7DataLogEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLog7DataLogERK7DataLog">
+<span id="_CPPv3N7DataLog7DataLogERK7DataLog"></span><span id="_CPPv2N7DataLog7DataLogERK7DataLog"></span><span id="DataLog::DataLog__DataLogCR"></span><span class="target" id="classDataLog_1a88739b7f60963c341f4dd59a474321af"></span><span class="sig-name descname"><span class="n"><span class="pre">DataLog</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7DataLog7DataLogERK7DataLog" title="DataLog::DataLog"><span class="n"><span class="pre">DataLog</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N7DataLog7DataLogERK7DataLog" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLog7DataLogERR7DataLog">
+<span id="_CPPv3N7DataLog7DataLogERR7DataLog"></span><span id="_CPPv2N7DataLog7DataLogERR7DataLog"></span><span id="DataLog::DataLog__DataLogRR"></span><span class="target" id="classDataLog_1a085cf403161f6c951d221290569ca7e8"></span><span class="sig-name descname"><span class="n"><span class="pre">DataLog</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N7DataLog7DataLogERR7DataLog" title="DataLog::DataLog"><span class="n"><span class="pre">DataLog</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N7DataLog7DataLogERR7DataLog" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLog7DataLogERK6vectorI1TE">
+<span id="_CPPv3N7DataLog7DataLogERK6vectorI1TE"></span><span id="_CPPv2N7DataLog7DataLogERK6vectorI1TE"></span><span id="DataLog::DataLog__vector:T:CR"></span><span class="target" id="classDataLog_1acd7037f3018051e4e0c4924762648d3b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DataLog</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataLog7DataLogERK6vectorI1TE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLogaSERK7DataLog">
+<span id="_CPPv3N7DataLogaSERK7DataLog"></span><span id="_CPPv2N7DataLogaSERK7DataLog"></span><span id="DataLog::assign-operator__DataLogCR"></span><span class="target" id="classDataLog_1a6c1b03e9e58195c641504910a543751f"></span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog"><span class="n"><span class="pre">DataLog</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog"><span class="n"><span class="pre">DataLog</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N7DataLogaSERK7DataLog" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLogaSERR7DataLog">
+<span id="_CPPv3N7DataLogaSERR7DataLog"></span><span id="_CPPv2N7DataLogaSERR7DataLog"></span><span id="DataLog::assign-operator__DataLogRR"></span><span class="target" id="classDataLog_1ad43d13f802266ac03b2a5cedad32441a"></span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog"><span class="n"><span class="pre">DataLog</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog"><span class="n"><span class="pre">DataLog</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N7DataLogaSERR7DataLog" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLogaSERK6vectorI1TE">
+<span id="_CPPv3N7DataLogaSERK6vectorI1TE"></span><span id="_CPPv2N7DataLogaSERK6vectorI1TE"></span><span id="DataLog::assign-operator__vector:T:CR"></span><span class="target" id="classDataLog_1a8b2ec50f0e0d310a5f897607c155f954"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog"><span class="n"><span class="pre">DataLog</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataLogaSERK6vectorI1TE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLog7GetSizeEv">
+<span id="_CPPv3N7DataLog7GetSizeEv"></span><span id="_CPPv2N7DataLog7GetSizeEv"></span><span id="DataLog::GetSize"></span><span class="target" id="classDataLog_1a979aa9dd933472bd95dd684d8d20c64a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataLog7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLog4sizeEv">
+<span id="_CPPv3N7DataLog4sizeEv"></span><span id="_CPPv2N7DataLog4sizeEv"></span><span id="DataLog::size"></span><span class="target" id="classDataLog_1af5b57e478b92fcaf3bb5e984c98d5f10"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataLog4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLogixE6size_t">
+<span id="_CPPv3N7DataLogixE6size_t"></span><span id="_CPPv2N7DataLogixE6size_t"></span><span id="DataLog::subscript-operator__s"></span><span class="target" id="classDataLog_1a727bbc3b9b896a39d5047043fe9ba72e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataLogixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataLogixE6size_t">
+<span id="_CPPv3NK7DataLogixE6size_t"></span><span id="_CPPv2NK7DataLogixE6size_t"></span><span id="DataLog::subscript-operator__sC"></span><span class="target" id="classDataLog_1ae73c0c3b0df0725ad300424f6614e153"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataLogixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLog4PushE1T">
+<span id="_CPPv3N7DataLog4PushE1T"></span><span id="_CPPv2N7DataLog4PushE1T"></span><span id="DataLog::Push__T"></span><span class="target" id="classDataLog_1a8885b9f0eb3f7e3455a6a3f3ccf212dd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog"><span class="n"><span class="pre">DataLog</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Push</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataLog4PushE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLog4SortEv">
+<span id="_CPPv3N7DataLog4SortEv"></span><span id="_CPPv2N7DataLog4SortEv"></span><span id="DataLog::Sort"></span><span class="target" id="classDataLog_1a2b817ac9c22ab97856743da0d75bb3d6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog"><span class="n"><span class="pre">DataLog</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Sort</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataLog4SortEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataLog3MinEv">
+<span id="_CPPv3NK7DataLog3MinEv"></span><span id="_CPPv2NK7DataLog3MinEv"></span><span id="DataLog::MinC"></span><span class="target" id="classDataLog_1a69defae7c374b479e2ff2976881c50f3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Min</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataLog3MinEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataLog3MaxEv">
+<span id="_CPPv3NK7DataLog3MaxEv"></span><span id="_CPPv2NK7DataLog3MaxEv"></span><span id="DataLog::MaxC"></span><span class="target" id="classDataLog_1abfd842efb99bbc4098615752af6397af"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Max</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataLog3MaxEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataLog4MeanEv">
+<span id="_CPPv3NK7DataLog4MeanEv"></span><span id="_CPPv2NK7DataLog4MeanEv"></span><span id="DataLog::MeanC"></span><span class="target" id="classDataLog_1abb7e97993d498c8cca087f1cc5ce27df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mean</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataLog4MeanEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataLog8VarianceEv">
+<span id="_CPPv3NK7DataLog8VarianceEv"></span><span id="_CPPv2NK7DataLog8VarianceEv"></span><span id="DataLog::VarianceC"></span><span class="target" id="classDataLog_1a02818eaa6c7eb9ef5aadd271c5ffcd56"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Variance</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataLog8VarianceEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataLog6StdDevEv">
+<span id="_CPPv3NK7DataLog6StdDevEv"></span><span id="_CPPv2NK7DataLog6StdDevEv"></span><span id="DataLog::StdDevC"></span><span class="target" id="classDataLog_1a634161fed0b751a984da57c5ace97e25"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StdDev</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataLog6StdDevEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7DataLog8StdErrorEv">
+<span id="_CPPv3NK7DataLog8StdErrorEv"></span><span id="_CPPv2NK7DataLog8StdErrorEv"></span><span id="DataLog::StdErrorC"></span><span class="target" id="classDataLog_1aff0241e1e308eab5733aae923a8aec36"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StdError</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7DataLog8StdErrorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLog13AsciiBarGraphE6size_tbbRNSt7ostreamE">
+<span id="_CPPv3N7DataLog13AsciiBarGraphE6size_tbbRNSt7ostreamE"></span><span id="_CPPv2N7DataLog13AsciiBarGraphE6size_tbbRNSt7ostreamE"></span><span id="DataLog::AsciiBarGraph__s.b.b.osR"></span><span class="target" id="classDataLog_1a08839fb15ab3db4b38e9de9c2a6fe5c2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsciiBarGraph</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_width</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">80</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">show_scale</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_scale_1</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataLog13AsciiBarGraphE6size_tbbRNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>The following function prints an ascii bar graph on to the screen (or provided stream). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_width</strong> – What’s the widest bars allowed? </p></li>
+<li><p><strong>show_scale</strong> – Should we show the scale at bottom. </p></li>
+<li><p><strong>max_scale_1</strong> – Should we limit scaling to 1:1? </p></li>
+<li><p><strong>os</strong> – Where to output the bar graph? </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLog14AsciiHistogramE6size_t6size_tbRNSt7ostreamE">
+<span id="_CPPv3N7DataLog14AsciiHistogramE6size_t6size_tbRNSt7ostreamE"></span><span id="_CPPv2N7DataLog14AsciiHistogramE6size_t6size_tbRNSt7ostreamE"></span><span id="DataLog::AsciiHistogram__s.s.b.osR"></span><span class="target" id="classDataLog_1a370dd3e45b4320ab5b1187b47e92f65c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsciiHistogram</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bins</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">40</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_width</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">80</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">show_scale</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7DataLog14AsciiHistogramE6size_t6size_tbRNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Take the input data, break it into bins, and print it as a bar graph. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_bins</strong> – How many bins in histogram? </p></li>
+<li><p><strong>max_width</strong> – What’s the widest bars allowed? </p></li>
+<li><p><strong>show_scale</strong> – Should we show the scale at bottom? </p></li>
+<li><p><strong>os</strong> – Where to output the bar graph? </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLog6data_tE">
+<span id="_CPPv3N7DataLog6data_tE"></span><span id="_CPPv2N7DataLog6data_tE"></span><span class="target" id="classDataLog_1ad393c1ab80581c676f891f29b02af6fd"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">data_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog::T"><span class="n"><span class="pre">T</span></span></a><a class="headerlink" href="#_CPPv4N7DataLog6data_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7DataLog4dataE">
+<span id="_CPPv3N7DataLog4dataE"></span><span id="_CPPv2N7DataLog4dataE"></span><span id="DataLog::data__vector:T:"></span><span class="target" id="classDataLog_1a8598c53e07dede3ba2622a1dcacbb70a"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E7DataLog" title="DataLog::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><a class="headerlink" href="#_CPPv4N7DataLog4dataE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="DataLayout.html" class="btn btn-neutral float-left" title="DataLayout.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="DataManager.html" class="btn btn-neutral float-right" title="DataManager.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

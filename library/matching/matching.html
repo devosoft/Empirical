@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matching &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/matching/matching.c5c48794-bbb3-42d3-a59d-bc3bf11c7765.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="MatchBin.hpp" href="api/MatchBin.html" />
+    <link rel="prev" title="serialize_macros.hpp" href="../io/api/serialize_macros.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Matching</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html">MatchBin.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html">MatchDepository.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html">matchbin_metrics.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html">matchbin_regulators.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html">matchbin_selectors.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_utils.html">matchbin_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Matching</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="matching">
+<h1>Matching<a class="headerlink" href="#matching" title="Link to this heading"></a></h1>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/MatchBin.html">MatchBin.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/MatchBin.html#_CPPv4I0000E8MatchBin"><code class="docutils literal notranslate"><span class="pre">MatchBin</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin6base_tE"><code class="docutils literal notranslate"><span class="pre">MatchBin::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin7query_tE"><code class="docutils literal notranslate"><span class="pre">MatchBin::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin5tag_tE"><code class="docutils literal notranslate"><span class="pre">MatchBin::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin5uid_tE"><code class="docutils literal notranslate"><span class="pre">MatchBin::uid_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin7state_tE"><code class="docutils literal notranslate"><span class="pre">MatchBin::state_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin8MatchBinEv"><code class="docutils literal notranslate"><span class="pre">MatchBin::MatchBin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin8MatchBinER6Random"><code class="docutils literal notranslate"><span class="pre">MatchBin::MatchBin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin8MatchBinERK8MatchBin"><code class="docutils literal notranslate"><span class="pre">MatchBin::MatchBin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin8MatchBinERR8MatchBin"><code class="docutils literal notranslate"><span class="pre">MatchBin::MatchBin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBinaSERK8MatchBin"><code class="docutils literal notranslate"><span class="pre">MatchBin::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBinaSERR8MatchBin"><code class="docutils literal notranslate"><span class="pre">MatchBin::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin5MatchERK7query_t6size_t"><code class="docutils literal notranslate"><span class="pre">MatchBin::Match()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin8MatchRawERK7query_t6size_t"><code class="docutils literal notranslate"><span class="pre">MatchBin::MatchRaw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin3PutERK3ValRK5tag_t"><code class="docutils literal notranslate"><span class="pre">MatchBin::Put()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin3SetERK3ValRK5tag_tK5uid_t"><code class="docutils literal notranslate"><span class="pre">MatchBin::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin6DeleteEK5uid_t"><code class="docutils literal notranslate"><span class="pre">MatchBin::Delete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin5ClearEv"><code class="docutils literal notranslate"><span class="pre">MatchBin::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin10ClearCacheEv"><code class="docutils literal notranslate"><span class="pre">MatchBin::ClearCache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin15ActivateCachingEv"><code class="docutils literal notranslate"><span class="pre">MatchBin::ActivateCaching()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin17DeactivateCachingEv"><code class="docutils literal notranslate"><span class="pre">MatchBin::DeactivateCaching()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin6GetValEK5uid_t"><code class="docutils literal notranslate"><span class="pre">MatchBin::GetVal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4NK8MatchBin6GetTagEK5uid_t"><code class="docutils literal notranslate"><span class="pre">MatchBin::GetTag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin6SetTagEK5uid_tK5tag_t"><code class="docutils literal notranslate"><span class="pre">MatchBin::SetTag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin7GetValsERK6vectorI5uid_tE"><code class="docutils literal notranslate"><span class="pre">MatchBin::GetVals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin7GetTagsERK6vectorI5uid_tE"><code class="docutils literal notranslate"><span class="pre">MatchBin::GetTags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4NK8MatchBin4SizeEv"><code class="docutils literal notranslate"><span class="pre">MatchBin::Size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin12AdjRegulatorEK5uid_tRKN9Regulator5adj_tE"><code class="docutils literal notranslate"><span class="pre">MatchBin::AdjRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin12SetRegulatorEK5uid_tRKN9Regulator5set_tE"><code class="docutils literal notranslate"><span class="pre">MatchBin::SetRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin12SetRegulatorEK5uid_tRK9Regulator"><code class="docutils literal notranslate"><span class="pre">MatchBin::SetRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4NK8MatchBin13ViewRegulatorEK5uid_t"><code class="docutils literal notranslate"><span class="pre">MatchBin::ViewRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin12GetRegulatorEK5uid_t"><code class="docutils literal notranslate"><span class="pre">MatchBin::GetRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin14DecayRegulatorEK5uid_tKi"><code class="docutils literal notranslate"><span class="pre">MatchBin::DecayRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin15DecayRegulatorsEKi"><code class="docutils literal notranslate"><span class="pre">MatchBin::DecayRegulators()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin17ImprintRegulatorsERK12BaseMatchBinI3Val7query_t5tag_t9RegulatorE"><code class="docutils literal notranslate"><span class="pre">MatchBin::ImprintRegulators()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin17ImprintRegulatorsERK7state_t"><code class="docutils literal notranslate"><span class="pre">MatchBin::ImprintRegulators()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4NK8MatchBin8ViewUIDsEv"><code class="docutils literal notranslate"><span class="pre">MatchBin::ViewUIDs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4NK8MatchBin4nameEv"><code class="docutils literal notranslate"><span class="pre">MatchBin::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4NK8MatchBin8GetStateEv"><code class="docutils literal notranslate"><span class="pre">MatchBin::GetState()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin8SetStateERK7state_t"><code class="docutils literal notranslate"><span class="pre">MatchBin::SetState()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin21GetRegulatedCacheSizeEv"><code class="docutils literal notranslate"><span class="pre">MatchBin::GetRegulatedCacheSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin15GetRawCacheSizeEv"><code class="docutils literal notranslate"><span class="pre">MatchBin::GetRawCacheSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin5stateE"><code class="docutils literal notranslate"><span class="pre">MatchBin::state</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin11uid_stepperE"><code class="docutils literal notranslate"><span class="pre">MatchBin::uid_stepper</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin5cacheE"><code class="docutils literal notranslate"><span class="pre">MatchBin::cache</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N8MatchBin8selectorE"><code class="docutils literal notranslate"><span class="pre">MatchBin::selector</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/MatchBin.html#_CPPv4I000E13MatchBinState"><code class="docutils literal notranslate"><span class="pre">MatchBinState</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N13MatchBinState5tag_tE"><code class="docutils literal notranslate"><span class="pre">MatchBinState::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N13MatchBinState5uid_tE"><code class="docutils literal notranslate"><span class="pre">MatchBinState::uid_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N13MatchBinState4dataE"><code class="docutils literal notranslate"><span class="pre">MatchBinState::data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N13MatchBinState5entryE"><code class="docutils literal notranslate"><span class="pre">MatchBinState::entry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/MatchBin.html#_CPPv4I0EN13MatchBinState5entry9serializeEvR7Archive"><code class="docutils literal notranslate"><span class="pre">MatchBinState::entry::serialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/MatchBin.html#_CPPv4N13MatchBinState5entry3valE"><code class="docutils literal notranslate"><span class="pre">MatchBinState::entry::val</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/MatchBin.html#_CPPv4N13MatchBinState5entry9regulatorE"><code class="docutils literal notranslate"><span class="pre">MatchBinState::entry::regulator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/MatchBin.html#_CPPv4N13MatchBinState5entry3tagE"><code class="docutils literal notranslate"><span class="pre">MatchBinState::entry::tag</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/MatchBin.html#_CPPv4I0000E12BaseMatchBin"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin7query_tE"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin5tag_tE"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin5uid_tE"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::uid_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin7state_tE"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::state_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBinD0Ev"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::~BaseMatchBin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin5MatchERK7query_t6size_t"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::Match()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin8MatchRawERK7query_t6size_t"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::MatchRaw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin3PutERK3ValRK5tag_t"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::Put()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin3SetERK3ValRK5tag_tK5uid_t"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin6DeleteEK5uid_t"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::Delete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin5ClearEv"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin10ClearCacheEv"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::ClearCache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin15ActivateCachingEv"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::ActivateCaching()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin17DeactivateCachingEv"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::DeactivateCaching()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin6GetValEK5uid_t"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::GetVal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4NK12BaseMatchBin6GetTagEK5uid_t"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::GetTag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin6SetTagEK5uid_t5tag_t"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::SetTag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin7GetValsERK6vectorI5uid_tE"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::GetVals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin7GetTagsERK6vectorI5uid_tE"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::GetTags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4NK12BaseMatchBin4SizeEv"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::Size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin14DecayRegulatorEK5uid_tKi"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::DecayRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin15DecayRegulatorsEKi"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::DecayRegulators()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin12AdjRegulatorEK5uid_tRKN9Regulator5adj_tE"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::AdjRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin12SetRegulatorEK5uid_tRKN9Regulator5set_tE"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::SetRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin12SetRegulatorEK5uid_tRK9Regulator"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::SetRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin12GetRegulatorEK5uid_t"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::GetRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4NK12BaseMatchBin13ViewRegulatorEK5uid_t"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::ViewRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4NK12BaseMatchBin8GetStateEv"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::GetState()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin17ImprintRegulatorsERK12BaseMatchBin"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::ImprintRegulators()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4N12BaseMatchBin17ImprintRegulatorsERKN12BaseMatchBin7state_tE"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::ImprintRegulators()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4NK12BaseMatchBin4nameEv"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4NK12BaseMatchBin8ViewUIDsEv"><code class="docutils literal notranslate"><span class="pre">BaseMatchBin::ViewUIDs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/MatchBin.html#_CPPv46cereal"><code class="docutils literal notranslate"><span class="pre">cereal</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4I00EN6cereal4saveEvR7ArchiveRKN10robin_hood18unordered_flat_mapI6size_t1TEE"><code class="docutils literal notranslate"><span class="pre">cereal::save()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchBin.html#_CPPv4I00EN6cereal4loadEvR7ArchiveRN10robin_hood18unordered_flat_mapI6size_t1TEE"><code class="docutils literal notranslate"><span class="pre">cereal::load()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/MatchDepository.html">MatchDepository.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/MatchDepository.html#_CPPv4I0000_6size_t_6size_tE15MatchDepository"><code class="docutils literal notranslate"><span class="pre">MatchDepository</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository7query_tE"><code class="docutils literal notranslate"><span class="pre">MatchDepository::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository5tag_tE"><code class="docutils literal notranslate"><span class="pre">MatchDepository::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository5uid_tE"><code class="docutils literal notranslate"><span class="pre">MatchDepository::uid_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository5res_tE"><code class="docutils literal notranslate"><span class="pre">MatchDepository::res_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository5adj_tE"><code class="docutils literal notranslate"><span class="pre">MatchDepository::adj_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository5set_tE"><code class="docutils literal notranslate"><span class="pre">MatchDepository::set_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository6view_tE"><code class="docutils literal notranslate"><span class="pre">MatchDepository::view_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4NK15MatchDepository6GetValEK6size_t"><code class="docutils literal notranslate"><span class="pre">MatchDepository::GetVal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository3PutERK3ValRK5tag_t"><code class="docutils literal notranslate"><span class="pre">MatchDepository::Put()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4NK15MatchDepository7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">MatchDepository::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository5ClearEv"><code class="docutils literal notranslate"><span class="pre">MatchDepository::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository12AdjRegulatorEK5uid_tK5adj_t"><code class="docutils literal notranslate"><span class="pre">MatchDepository::AdjRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository12SetRegulatorEK5uid_tK5set_t"><code class="docutils literal notranslate"><span class="pre">MatchDepository::SetRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository12SetRegulatorEK5uid_tRK9Regulator"><code class="docutils literal notranslate"><span class="pre">MatchDepository::SetRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository12GetRegulatorEK5uid_t"><code class="docutils literal notranslate"><span class="pre">MatchDepository::GetRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4NK15MatchDepository13ViewRegulatorEK5uid_t"><code class="docutils literal notranslate"><span class="pre">MatchDepository::ViewRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository14DecayRegulatorEK5uid_tKi"><code class="docutils literal notranslate"><span class="pre">MatchDepository::DecayRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository15DecayRegulatorsEKi"><code class="docutils literal notranslate"><span class="pre">MatchDepository::DecayRegulators()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4NK15MatchDepository6HasValERK3Val"><code class="docutils literal notranslate"><span class="pre">MatchDepository::HasVal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4NK15MatchDepository6GetUidERK3Val"><code class="docutils literal notranslate"><span class="pre">MatchDepository::GetUid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4NK15MatchDepository6GetUidERK5tag_t"><code class="docutils literal notranslate"><span class="pre">MatchDepository::GetUid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository16DoRegulatedMatchERK7query_t"><code class="docutils literal notranslate"><span class="pre">MatchDepository::DoRegulatedMatch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository17DoRegulatedLookupERK7query_t"><code class="docutils literal notranslate"><span class="pre">MatchDepository::DoRegulatedLookup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository10DoRawMatchERK7query_t"><code class="docutils literal notranslate"><span class="pre">MatchDepository::DoRawMatch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository11DoRawLookupERK7query_t"><code class="docutils literal notranslate"><span class="pre">MatchDepository::DoRawLookup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository10ClearCacheEv"><code class="docutils literal notranslate"><span class="pre">MatchDepository::ClearCache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository4dataE"><code class="docutils literal notranslate"><span class="pre">MatchDepository::data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository9cache_rawE"><code class="docutils literal notranslate"><span class="pre">MatchDepository::cache_raw</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MatchDepository.html#_CPPv4N15MatchDepository15cache_regulatedE"><code class="docutils literal notranslate"><span class="pre">MatchDepository::cache_regulated</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/matchbin_metrics.html">matchbin_metrics.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE12StreakMetric"><code class="docutils literal notranslate"><span class="pre">StreakMetric</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE43ExactStreakDistribution_ConstructOnFirstUseRK23ExactStreakDistributionI1NEv"><code class="docutils literal notranslate"><span class="pre">ExactStreakDistribution_ConstructOnFirstUse()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I00E10BaseMetric"><code class="docutils literal notranslate"><span class="pre">BaseMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N10BaseMetricD0Ev"><code class="docutils literal notranslate"><span class="pre">BaseMetric::~BaseMetric()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10BaseMetricclERK5QueryRK3Tag"><code class="docutils literal notranslate"><span class="pre">BaseMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10BaseMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">BaseMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10BaseMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">BaseMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10BaseMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">BaseMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10BaseMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">BaseMetric::base()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE13HammingMetric"><code class="docutils literal notranslate"><span class="pre">HammingMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N13HammingMetric7query_tE"><code class="docutils literal notranslate"><span class="pre">HammingMetric::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N13HammingMetric5tag_tE"><code class="docutils literal notranslate"><span class="pre">HammingMetric::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK13HammingMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">HammingMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK13HammingMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">HammingMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK13HammingMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">HammingMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK13HammingMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">HammingMetric::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK13HammingMetricclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">HammingMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N13HammingMetric9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">HammingMetric::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE10HashMetric"><code class="docutils literal notranslate"><span class="pre">HashMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N10HashMetric7query_tE"><code class="docutils literal notranslate"><span class="pre">HashMetric::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N10HashMetric5tag_tE"><code class="docutils literal notranslate"><span class="pre">HashMetric::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10HashMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">HashMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10HashMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">HashMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10HashMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">HashMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10HashMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">HashMetric::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10HashMetricclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">HashMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N10HashMetric9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">HashMetric::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv413AbsDiffMetric"><code class="docutils literal notranslate"><span class="pre">AbsDiffMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N13AbsDiffMetric7query_tE"><code class="docutils literal notranslate"><span class="pre">AbsDiffMetric::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N13AbsDiffMetric5tag_tE"><code class="docutils literal notranslate"><span class="pre">AbsDiffMetric::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK13AbsDiffMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">AbsDiffMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK13AbsDiffMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">AbsDiffMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK13AbsDiffMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">AbsDiffMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK13AbsDiffMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">AbsDiffMetric::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK13AbsDiffMetricclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">AbsDiffMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N13AbsDiffMetric9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">AbsDiffMetric::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE12NextUpMetric"><code class="docutils literal notranslate"><span class="pre">NextUpMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N12NextUpMetric7query_tE"><code class="docutils literal notranslate"><span class="pre">NextUpMetric::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N12NextUpMetric5tag_tE"><code class="docutils literal notranslate"><span class="pre">NextUpMetric::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK12NextUpMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">NextUpMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK12NextUpMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">NextUpMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK12NextUpMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">NextUpMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK12NextUpMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">NextUpMetric::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK12NextUpMetricclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">NextUpMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N12NextUpMetric9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">NextUpMetric::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE20AsymmetricWrapMetric"><code class="docutils literal notranslate"><span class="pre">AsymmetricWrapMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N20AsymmetricWrapMetric7query_tE"><code class="docutils literal notranslate"><span class="pre">AsymmetricWrapMetric::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N20AsymmetricWrapMetric5tag_tE"><code class="docutils literal notranslate"><span class="pre">AsymmetricWrapMetric::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK20AsymmetricWrapMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">AsymmetricWrapMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK20AsymmetricWrapMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">AsymmetricWrapMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK20AsymmetricWrapMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">AsymmetricWrapMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK20AsymmetricWrapMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">AsymmetricWrapMetric::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK20AsymmetricWrapMetricclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">AsymmetricWrapMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N20AsymmetricWrapMetric9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">AsymmetricWrapMetric::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE22AsymmetricNoWrapMetric"><code class="docutils literal notranslate"><span class="pre">AsymmetricNoWrapMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N22AsymmetricNoWrapMetric7query_tE"><code class="docutils literal notranslate"><span class="pre">AsymmetricNoWrapMetric::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N22AsymmetricNoWrapMetric5tag_tE"><code class="docutils literal notranslate"><span class="pre">AsymmetricNoWrapMetric::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK22AsymmetricNoWrapMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">AsymmetricNoWrapMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK22AsymmetricNoWrapMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">AsymmetricNoWrapMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK22AsymmetricNoWrapMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">AsymmetricNoWrapMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK22AsymmetricNoWrapMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">AsymmetricNoWrapMetric::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK22AsymmetricNoWrapMetricclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">AsymmetricNoWrapMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N22AsymmetricNoWrapMetric9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">AsymmetricNoWrapMetric::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE19SymmetricWrapMetric"><code class="docutils literal notranslate"><span class="pre">SymmetricWrapMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N19SymmetricWrapMetric7query_tE"><code class="docutils literal notranslate"><span class="pre">SymmetricWrapMetric::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N19SymmetricWrapMetric5tag_tE"><code class="docutils literal notranslate"><span class="pre">SymmetricWrapMetric::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK19SymmetricWrapMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">SymmetricWrapMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK19SymmetricWrapMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">SymmetricWrapMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK19SymmetricWrapMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">SymmetricWrapMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK19SymmetricWrapMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">SymmetricWrapMetric::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK19SymmetricWrapMetricclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">SymmetricWrapMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N19SymmetricWrapMetric9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">SymmetricWrapMetric::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE21SymmetricNoWrapMetric"><code class="docutils literal notranslate"><span class="pre">SymmetricNoWrapMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N21SymmetricNoWrapMetric7query_tE"><code class="docutils literal notranslate"><span class="pre">SymmetricNoWrapMetric::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N21SymmetricNoWrapMetric5tag_tE"><code class="docutils literal notranslate"><span class="pre">SymmetricNoWrapMetric::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK21SymmetricNoWrapMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">SymmetricNoWrapMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK21SymmetricNoWrapMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">SymmetricNoWrapMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK21SymmetricNoWrapMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">SymmetricNoWrapMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK21SymmetricNoWrapMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">SymmetricNoWrapMetric::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK21SymmetricNoWrapMetricclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">SymmetricNoWrapMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N21SymmetricNoWrapMetric9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">SymmetricNoWrapMetric::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE17HammingCumuMetric"><code class="docutils literal notranslate"><span class="pre">HammingCumuMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N17HammingCumuMetric7query_tE"><code class="docutils literal notranslate"><span class="pre">HammingCumuMetric::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N17HammingCumuMetric5tag_tE"><code class="docutils literal notranslate"><span class="pre">HammingCumuMetric::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK17HammingCumuMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">HammingCumuMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK17HammingCumuMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">HammingCumuMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK17HammingCumuMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">HammingCumuMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK17HammingCumuMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">HammingCumuMetric::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK17HammingCumuMetricclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">HammingCumuMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N17HammingCumuMetric9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">HammingCumuMetric::calculate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N17HammingCumuMetric10cumulativeE"><code class="docutils literal notranslate"><span class="pre">HammingCumuMetric::cumulative</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N17HammingCumuMetric18static_constructedE"><code class="docutils literal notranslate"><span class="pre">HammingCumuMetric::static_constructed</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N17HammingCumuMetric18static_constructed18static_constructedEv"><code class="docutils literal notranslate"><span class="pre">HammingCumuMetric::static_constructed::static_constructed()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE24ApproxSingleStreakMetric"><code class="docutils literal notranslate"><span class="pre">ApproxSingleStreakMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N24ApproxSingleStreakMetric7query_tE"><code class="docutils literal notranslate"><span class="pre">ApproxSingleStreakMetric::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N24ApproxSingleStreakMetric5tag_tE"><code class="docutils literal notranslate"><span class="pre">ApproxSingleStreakMetric::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK24ApproxSingleStreakMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">ApproxSingleStreakMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK24ApproxSingleStreakMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">ApproxSingleStreakMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK24ApproxSingleStreakMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">ApproxSingleStreakMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK24ApproxSingleStreakMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">ApproxSingleStreakMetric::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK24ApproxSingleStreakMetricclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">ApproxSingleStreakMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N24ApproxSingleStreakMetric9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">ApproxSingleStreakMetric::calculate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N24ApproxSingleStreakMetric23ProbabilityKBitSequenceEK6size_t"><code class="docutils literal notranslate"><span class="pre">ApproxSingleStreakMetric::ProbabilityKBitSequence()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE22ApproxDualStreakMetric"><code class="docutils literal notranslate"><span class="pre">ApproxDualStreakMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N22ApproxDualStreakMetric7query_tE"><code class="docutils literal notranslate"><span class="pre">ApproxDualStreakMetric::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N22ApproxDualStreakMetric5tag_tE"><code class="docutils literal notranslate"><span class="pre">ApproxDualStreakMetric::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK22ApproxDualStreakMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">ApproxDualStreakMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK22ApproxDualStreakMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">ApproxDualStreakMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK22ApproxDualStreakMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">ApproxDualStreakMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK22ApproxDualStreakMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">ApproxDualStreakMetric::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK22ApproxDualStreakMetricclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">ApproxDualStreakMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N22ApproxDualStreakMetric9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">ApproxDualStreakMetric::calculate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N22ApproxDualStreakMetric23ProbabilityKBitSequenceE6size_t"><code class="docutils literal notranslate"><span class="pre">ApproxDualStreakMetric::ProbabilityKBitSequence()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE23ExactStreakDistribution"><code class="docutils literal notranslate"><span class="pre">ExactStreakDistribution</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N23ExactStreakDistribution23ExactStreakDistributionEv"><code class="docutils literal notranslate"><span class="pre">ExactStreakDistribution::ExactStreakDistribution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK23ExactStreakDistribution20GetStreakProbabilityEK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">ExactStreakDistribution::GetStreakProbability()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N23ExactStreakDistribution21CalcStreakProbabilityEK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">ExactStreakDistribution::CalcStreakProbability()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N23ExactStreakDistribution8computedE"><code class="docutils literal notranslate"><span class="pre">ExactStreakDistribution::computed</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE21ExactDualStreakMetric"><code class="docutils literal notranslate"><span class="pre">ExactDualStreakMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N21ExactDualStreakMetric7query_tE"><code class="docutils literal notranslate"><span class="pre">ExactDualStreakMetric::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N21ExactDualStreakMetric5tag_tE"><code class="docutils literal notranslate"><span class="pre">ExactDualStreakMetric::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK21ExactDualStreakMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">ExactDualStreakMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK21ExactDualStreakMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">ExactDualStreakMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK21ExactDualStreakMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">ExactDualStreakMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK21ExactDualStreakMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">ExactDualStreakMetric::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK21ExactDualStreakMetricclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">ExactDualStreakMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N21ExactDualStreakMetric8GetDistnEv"><code class="docutils literal notranslate"><span class="pre">ExactDualStreakMetric::GetDistn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N21ExactDualStreakMetric9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">ExactDualStreakMetric::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I_6size_tE23ExactSingleStreakMetric"><code class="docutils literal notranslate"><span class="pre">ExactSingleStreakMetric</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N23ExactSingleStreakMetric7query_tE"><code class="docutils literal notranslate"><span class="pre">ExactSingleStreakMetric::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N23ExactSingleStreakMetric5tag_tE"><code class="docutils literal notranslate"><span class="pre">ExactSingleStreakMetric::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK23ExactSingleStreakMetric3dimEv"><code class="docutils literal notranslate"><span class="pre">ExactSingleStreakMetric::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK23ExactSingleStreakMetric5widthEv"><code class="docutils literal notranslate"><span class="pre">ExactSingleStreakMetric::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK23ExactSingleStreakMetric4nameEv"><code class="docutils literal notranslate"><span class="pre">ExactSingleStreakMetric::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK23ExactSingleStreakMetric4baseEv"><code class="docutils literal notranslate"><span class="pre">ExactSingleStreakMetric::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK23ExactSingleStreakMetricclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">ExactSingleStreakMetric::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N23ExactSingleStreakMetric8GetDistnEv"><code class="docutils literal notranslate"><span class="pre">ExactSingleStreakMetric::GetDistn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N23ExactSingleStreakMetric9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">ExactSingleStreakMetric::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I0_6size_tE8CacheMod"><code class="docutils literal notranslate"><span class="pre">CacheMod</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N8CacheMod7query_tE"><code class="docutils literal notranslate"><span class="pre">CacheMod::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N8CacheMod5tag_tE"><code class="docutils literal notranslate"><span class="pre">CacheMod::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK8CacheMod4nameEv"><code class="docutils literal notranslate"><span class="pre">CacheMod::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK8CacheModclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">CacheMod::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N8CacheMod6metricE"><code class="docutils literal notranslate"><span class="pre">CacheMod::metric</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N8CacheMod9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">CacheMod::calculate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N8CacheMod5cacheE"><code class="docutils literal notranslate"><span class="pre">CacheMod::cache</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N8CacheMod11purge_queueE"><code class="docutils literal notranslate"><span class="pre">CacheMod::purge_queue</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I0E8SlideMod"><code class="docutils literal notranslate"><span class="pre">SlideMod</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N8SlideMod7query_tE"><code class="docutils literal notranslate"><span class="pre">SlideMod::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N8SlideMod5tag_tE"><code class="docutils literal notranslate"><span class="pre">SlideMod::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK8SlideModclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">SlideMod::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N8SlideMod9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">SlideMod::calculate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N8SlideMod12metric_widthE"><code class="docutils literal notranslate"><span class="pre">SlideMod::metric_width</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I0E12HardStartMod"><code class="docutils literal notranslate"><span class="pre">HardStartMod</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N12HardStartMod7query_tE"><code class="docutils literal notranslate"><span class="pre">HardStartMod::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N12HardStartMod5tag_tE"><code class="docutils literal notranslate"><span class="pre">HardStartMod::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK12HardStartMod4nameEv"><code class="docutils literal notranslate"><span class="pre">HardStartMod::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK12HardStartModclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">HardStartMod::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N12HardStartMod6metricE"><code class="docutils literal notranslate"><span class="pre">HardStartMod::metric</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N12HardStartMod9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">HardStartMod::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I0E7AntiMod"><code class="docutils literal notranslate"><span class="pre">AntiMod</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N7AntiMod7query_tE"><code class="docutils literal notranslate"><span class="pre">AntiMod::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N7AntiMod5tag_tE"><code class="docutils literal notranslate"><span class="pre">AntiMod::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK7AntiModclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">AntiMod::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N7AntiMod6metricE"><code class="docutils literal notranslate"><span class="pre">AntiMod::metric</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N7AntiMod9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">AntiMod::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I00E6PowMod"><code class="docutils literal notranslate"><span class="pre">PowMod</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N6PowMod7query_tE"><code class="docutils literal notranslate"><span class="pre">PowMod::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N6PowMod5tag_tE"><code class="docutils literal notranslate"><span class="pre">PowMod::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK6PowMod4nameEv"><code class="docutils literal notranslate"><span class="pre">PowMod::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK6PowModclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">PowMod::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N6PowMod6metricE"><code class="docutils literal notranslate"><span class="pre">PowMod::metric</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N6PowMod9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">PowMod::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I00E6LogMod"><code class="docutils literal notranslate"><span class="pre">LogMod</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N6LogMod7query_tE"><code class="docutils literal notranslate"><span class="pre">LogMod::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N6LogMod5tag_tE"><code class="docutils literal notranslate"><span class="pre">LogMod::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK6LogMod4nameEv"><code class="docutils literal notranslate"><span class="pre">LogMod::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK6LogModclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">LogMod::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N6LogMod6metricE"><code class="docutils literal notranslate"><span class="pre">LogMod::metric</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N6LogMod9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">LogMod::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I0_6size_tE7UnifMod"><code class="docutils literal notranslate"><span class="pre">UnifMod</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N7UnifMod7query_tE"><code class="docutils literal notranslate"><span class="pre">UnifMod::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N7UnifMod5tag_tE"><code class="docutils literal notranslate"><span class="pre">UnifMod::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK7UnifMod4nameEv"><code class="docutils literal notranslate"><span class="pre">UnifMod::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK7UnifModclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">UnifMod::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N7UnifMod15GetLookupHolderEv"><code class="docutils literal notranslate"><span class="pre">UnifMod::GetLookupHolder()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N7UnifMod9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">UnifMod::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I0_6size_tE10MeanDimMod"><code class="docutils literal notranslate"><span class="pre">MeanDimMod</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N10MeanDimMod7query_tE"><code class="docutils literal notranslate"><span class="pre">MeanDimMod::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N10MeanDimMod5tag_tE"><code class="docutils literal notranslate"><span class="pre">MeanDimMod::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10MeanDimMod5widthEv"><code class="docutils literal notranslate"><span class="pre">MeanDimMod::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10MeanDimMod3dimEv"><code class="docutils literal notranslate"><span class="pre">MeanDimMod::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10MeanDimMod4nameEv"><code class="docutils literal notranslate"><span class="pre">MeanDimMod::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10MeanDimMod4baseEv"><code class="docutils literal notranslate"><span class="pre">MeanDimMod::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK10MeanDimModclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">MeanDimMod::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N10MeanDimMod6metricE"><code class="docutils literal notranslate"><span class="pre">MeanDimMod::metric</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N10MeanDimMod9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">MeanDimMod::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I0_6size_tE15EuclideanDimMod"><code class="docutils literal notranslate"><span class="pre">EuclideanDimMod</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N15EuclideanDimMod7query_tE"><code class="docutils literal notranslate"><span class="pre">EuclideanDimMod::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N15EuclideanDimMod5tag_tE"><code class="docutils literal notranslate"><span class="pre">EuclideanDimMod::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK15EuclideanDimMod5widthEv"><code class="docutils literal notranslate"><span class="pre">EuclideanDimMod::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK15EuclideanDimMod3dimEv"><code class="docutils literal notranslate"><span class="pre">EuclideanDimMod::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK15EuclideanDimMod4nameEv"><code class="docutils literal notranslate"><span class="pre">EuclideanDimMod::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK15EuclideanDimMod4baseEv"><code class="docutils literal notranslate"><span class="pre">EuclideanDimMod::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK15EuclideanDimModclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">EuclideanDimMod::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N15EuclideanDimMod6metricE"><code class="docutils literal notranslate"><span class="pre">EuclideanDimMod::metric</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N15EuclideanDimMod9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">EuclideanDimMod::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I0_6size_tE9MinDimMod"><code class="docutils literal notranslate"><span class="pre">MinDimMod</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N9MinDimMod7query_tE"><code class="docutils literal notranslate"><span class="pre">MinDimMod::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N9MinDimMod5tag_tE"><code class="docutils literal notranslate"><span class="pre">MinDimMod::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK9MinDimMod5widthEv"><code class="docutils literal notranslate"><span class="pre">MinDimMod::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK9MinDimMod3dimEv"><code class="docutils literal notranslate"><span class="pre">MinDimMod::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK9MinDimMod4nameEv"><code class="docutils literal notranslate"><span class="pre">MinDimMod::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK9MinDimMod4baseEv"><code class="docutils literal notranslate"><span class="pre">MinDimMod::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK9MinDimModclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">MinDimMod::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N9MinDimMod6metricE"><code class="docutils literal notranslate"><span class="pre">MinDimMod::metric</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N9MinDimMod9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">MinDimMod::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I0_6size_tE14HarmonicDimMod"><code class="docutils literal notranslate"><span class="pre">HarmonicDimMod</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N14HarmonicDimMod7query_tE"><code class="docutils literal notranslate"><span class="pre">HarmonicDimMod::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N14HarmonicDimMod5tag_tE"><code class="docutils literal notranslate"><span class="pre">HarmonicDimMod::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK14HarmonicDimMod5widthEv"><code class="docutils literal notranslate"><span class="pre">HarmonicDimMod::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK14HarmonicDimMod3dimEv"><code class="docutils literal notranslate"><span class="pre">HarmonicDimMod::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK14HarmonicDimMod4nameEv"><code class="docutils literal notranslate"><span class="pre">HarmonicDimMod::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK14HarmonicDimMod4baseEv"><code class="docutils literal notranslate"><span class="pre">HarmonicDimMod::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK14HarmonicDimModclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">HarmonicDimMod::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N14HarmonicDimMod6metricE"><code class="docutils literal notranslate"><span class="pre">HarmonicDimMod::metric</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N14HarmonicDimMod9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">HarmonicDimMod::calculate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4I0E7FlatMod"><code class="docutils literal notranslate"><span class="pre">FlatMod</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N7FlatMod7query_tE"><code class="docutils literal notranslate"><span class="pre">FlatMod::query_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N7FlatMod5tag_tE"><code class="docutils literal notranslate"><span class="pre">FlatMod::tag_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK7FlatMod5widthEv"><code class="docutils literal notranslate"><span class="pre">FlatMod::width()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK7FlatMod3dimEv"><code class="docutils literal notranslate"><span class="pre">FlatMod::dim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK7FlatMod4nameEv"><code class="docutils literal notranslate"><span class="pre">FlatMod::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK7FlatMod4baseEv"><code class="docutils literal notranslate"><span class="pre">FlatMod::base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4NK7FlatModclERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">FlatMod::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N7FlatMod9calculateERK7query_tRK5tag_t"><code class="docutils literal notranslate"><span class="pre">FlatMod::calculate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_metrics.html#_CPPv4N7FlatMod6metricE"><code class="docutils literal notranslate"><span class="pre">FlatMod::metric</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/matchbin_regulators.html">matchbin_regulators.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4I000E13RegulatorBase"><code class="docutils literal notranslate"><span class="pre">RegulatorBase</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N13RegulatorBase5set_tE"><code class="docutils literal notranslate"><span class="pre">RegulatorBase::set_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N13RegulatorBase5adj_tE"><code class="docutils literal notranslate"><span class="pre">RegulatorBase::adj_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N13RegulatorBase6view_tE"><code class="docutils literal notranslate"><span class="pre">RegulatorBase::view_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N13RegulatorBaseD0Ev"><code class="docutils literal notranslate"><span class="pre">RegulatorBase::~RegulatorBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N13RegulatorBase3SetERK5set_t"><code class="docutils literal notranslate"><span class="pre">RegulatorBase::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N13RegulatorBase3AdjERK5adj_t"><code class="docutils literal notranslate"><span class="pre">RegulatorBase::Adj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N13RegulatorBase5DecayEKi"><code class="docutils literal notranslate"><span class="pre">RegulatorBase::Decay()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK13RegulatorBase4ViewEv"><code class="docutils literal notranslate"><span class="pre">RegulatorBase::View()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK13RegulatorBaseclEd"><code class="docutils literal notranslate"><span class="pre">RegulatorBase::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK13RegulatorBase4nameEv"><code class="docutils literal notranslate"><span class="pre">RegulatorBase::name()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv412NopRegulator"><code class="docutils literal notranslate"><span class="pre">NopRegulator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK12NopRegulatorclEKd"><code class="docutils literal notranslate"><span class="pre">NopRegulator::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N12NopRegulator3SetERKd"><code class="docutils literal notranslate"><span class="pre">NopRegulator::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N12NopRegulator3AdjERKd"><code class="docutils literal notranslate"><span class="pre">NopRegulator::Adj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N12NopRegulator5DecayEKi"><code class="docutils literal notranslate"><span class="pre">NopRegulator::Decay()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK12NopRegulator4ViewEv"><code class="docutils literal notranslate"><span class="pre">NopRegulator::View()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK12NopRegulator4nameEv"><code class="docutils literal notranslate"><span class="pre">NopRegulator::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK12NopRegulatorneERK12NopRegulator"><code class="docutils literal notranslate"><span class="pre">NopRegulator::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N12NopRegulator5stateE"><code class="docutils literal notranslate"><span class="pre">NopRegulator::state</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv415LegacyRegulator"><code class="docutils literal notranslate"><span class="pre">LegacyRegulator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N15LegacyRegulator15LegacyRegulatorEv"><code class="docutils literal notranslate"><span class="pre">LegacyRegulator::LegacyRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK15LegacyRegulatorclEKd"><code class="docutils literal notranslate"><span class="pre">LegacyRegulator::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N15LegacyRegulator3SetERKd"><code class="docutils literal notranslate"><span class="pre">LegacyRegulator::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N15LegacyRegulator3AdjERKd"><code class="docutils literal notranslate"><span class="pre">LegacyRegulator::Adj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N15LegacyRegulator5DecayEKi"><code class="docutils literal notranslate"><span class="pre">LegacyRegulator::Decay()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK15LegacyRegulator4ViewEv"><code class="docutils literal notranslate"><span class="pre">LegacyRegulator::View()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK15LegacyRegulator4nameEv"><code class="docutils literal notranslate"><span class="pre">LegacyRegulator::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK15LegacyRegulatorneERK15LegacyRegulator"><code class="docutils literal notranslate"><span class="pre">LegacyRegulator::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N15LegacyRegulator5stateE"><code class="docutils literal notranslate"><span class="pre">LegacyRegulator::state</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4I0E26AdditiveCountdownRegulator"><code class="docutils literal notranslate"><span class="pre">AdditiveCountdownRegulator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N26AdditiveCountdownRegulator26AdditiveCountdownRegulatorEv"><code class="docutils literal notranslate"><span class="pre">AdditiveCountdownRegulator::AdditiveCountdownRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK26AdditiveCountdownRegulatorclEKd"><code class="docutils literal notranslate"><span class="pre">AdditiveCountdownRegulator::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N26AdditiveCountdownRegulator3SetERKd"><code class="docutils literal notranslate"><span class="pre">AdditiveCountdownRegulator::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N26AdditiveCountdownRegulator3AdjERKd"><code class="docutils literal notranslate"><span class="pre">AdditiveCountdownRegulator::Adj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N26AdditiveCountdownRegulator5DecayEKi"><code class="docutils literal notranslate"><span class="pre">AdditiveCountdownRegulator::Decay()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK26AdditiveCountdownRegulator4ViewEv"><code class="docutils literal notranslate"><span class="pre">AdditiveCountdownRegulator::View()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK26AdditiveCountdownRegulator4nameEv"><code class="docutils literal notranslate"><span class="pre">AdditiveCountdownRegulator::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK26AdditiveCountdownRegulatorneERK26AdditiveCountdownRegulator"><code class="docutils literal notranslate"><span class="pre">AdditiveCountdownRegulator::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N26AdditiveCountdownRegulator5stateE"><code class="docutils literal notranslate"><span class="pre">AdditiveCountdownRegulator::state</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N26AdditiveCountdownRegulator5timerE"><code class="docutils literal notranslate"><span class="pre">AdditiveCountdownRegulator::timer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N26AdditiveCountdownRegulator5slopeE"><code class="docutils literal notranslate"><span class="pre">AdditiveCountdownRegulator::slope</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4I0E32MultiplicativeCountdownRegulator"><code class="docutils literal notranslate"><span class="pre">MultiplicativeCountdownRegulator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N32MultiplicativeCountdownRegulator32MultiplicativeCountdownRegulatorEv"><code class="docutils literal notranslate"><span class="pre">MultiplicativeCountdownRegulator::MultiplicativeCountdownRegulator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK32MultiplicativeCountdownRegulatorclEKd"><code class="docutils literal notranslate"><span class="pre">MultiplicativeCountdownRegulator::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N32MultiplicativeCountdownRegulator3SetERKd"><code class="docutils literal notranslate"><span class="pre">MultiplicativeCountdownRegulator::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N32MultiplicativeCountdownRegulator3AdjERKd"><code class="docutils literal notranslate"><span class="pre">MultiplicativeCountdownRegulator::Adj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N32MultiplicativeCountdownRegulator5DecayEKi"><code class="docutils literal notranslate"><span class="pre">MultiplicativeCountdownRegulator::Decay()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK32MultiplicativeCountdownRegulator4ViewEv"><code class="docutils literal notranslate"><span class="pre">MultiplicativeCountdownRegulator::View()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK32MultiplicativeCountdownRegulator4nameEv"><code class="docutils literal notranslate"><span class="pre">MultiplicativeCountdownRegulator::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4NK32MultiplicativeCountdownRegulatorneERK32MultiplicativeCountdownRegulator"><code class="docutils literal notranslate"><span class="pre">MultiplicativeCountdownRegulator::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N32MultiplicativeCountdownRegulator5stateE"><code class="docutils literal notranslate"><span class="pre">MultiplicativeCountdownRegulator::state</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N32MultiplicativeCountdownRegulator5timerE"><code class="docutils literal notranslate"><span class="pre">MultiplicativeCountdownRegulator::timer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_regulators.html#_CPPv4N32MultiplicativeCountdownRegulator5slopeE"><code class="docutils literal notranslate"><span class="pre">MultiplicativeCountdownRegulator::slope</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/matchbin_selectors.html">matchbin_selectors.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv414CacheStateBase"><code class="docutils literal notranslate"><span class="pre">CacheStateBase</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N14CacheStateBase14CacheStateBaseEv"><code class="docutils literal notranslate"><span class="pre">CacheStateBase::CacheStateBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N14CacheStateBaseD0Ev"><code class="docutils literal notranslate"><span class="pre">CacheStateBase::~CacheStateBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N14CacheStateBaseclE6size_t"><code class="docutils literal notranslate"><span class="pre">CacheStateBase::operator()()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv418RouletteCacheState"><code class="docutils literal notranslate"><span class="pre">RouletteCacheState</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N18RouletteCacheState18RouletteCacheStateEv"><code class="docutils literal notranslate"><span class="pre">RouletteCacheState::RouletteCacheState()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N18RouletteCacheState18RouletteCacheStateER8IndexMap6vectorI6size_tER6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">RouletteCacheState::RouletteCacheState()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N18RouletteCacheStateclE6size_t"><code class="docutils literal notranslate"><span class="pre">RouletteCacheState::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N18RouletteCacheState8indexMapE"><code class="docutils literal notranslate"><span class="pre">RouletteCacheState::indexMap</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N18RouletteCacheState4uidsE"><code class="docutils literal notranslate"><span class="pre">RouletteCacheState::uids</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N18RouletteCacheState4randE"><code class="docutils literal notranslate"><span class="pre">RouletteCacheState::rand</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N18RouletteCacheState9default_nE"><code class="docutils literal notranslate"><span class="pre">RouletteCacheState::default_n</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv415SieveCacheState"><code class="docutils literal notranslate"><span class="pre">SieveCacheState</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N15SieveCacheState15SieveCacheStateEv"><code class="docutils literal notranslate"><span class="pre">SieveCacheState::SieveCacheState()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N15SieveCacheState15SieveCacheStateE6vectorI6size_tERK6vectorIdER6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">SieveCacheState::SieveCacheState()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N15SieveCacheStateclE6size_t"><code class="docutils literal notranslate"><span class="pre">SieveCacheState::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N15SieveCacheState4uidsE"><code class="docutils literal notranslate"><span class="pre">SieveCacheState::uids</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N15SieveCacheState5probsE"><code class="docutils literal notranslate"><span class="pre">SieveCacheState::probs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N15SieveCacheState4randE"><code class="docutils literal notranslate"><span class="pre">SieveCacheState::rand</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N15SieveCacheState9default_nE"><code class="docutils literal notranslate"><span class="pre">SieveCacheState::default_n</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv416RankedCacheState"><code class="docutils literal notranslate"><span class="pre">RankedCacheState</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N16RankedCacheState16RankedCacheStateEv"><code class="docutils literal notranslate"><span class="pre">RankedCacheState::RankedCacheState()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N16RankedCacheState16RankedCacheStateE6vectorI6size_tE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RankedCacheState::RankedCacheState()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N16RankedCacheStateclE6size_t"><code class="docutils literal notranslate"><span class="pre">RankedCacheState::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N16RankedCacheState4uidsE"><code class="docutils literal notranslate"><span class="pre">RankedCacheState::uids</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N16RankedCacheState11requestSizeE"><code class="docutils literal notranslate"><span class="pre">RankedCacheState::requestSize</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N16RankedCacheState9default_nE"><code class="docutils literal notranslate"><span class="pre">RankedCacheState::default_n</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4I0E12SelectorBase"><code class="docutils literal notranslate"><span class="pre">SelectorBase</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N12SelectorBaseD0Ev"><code class="docutils literal notranslate"><span class="pre">SelectorBase::~SelectorBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N12SelectorBaseclE6vectorINSt4pairI6size_tdEEE6size_t"><code class="docutils literal notranslate"><span class="pre">SelectorBase::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4NK12SelectorBase4nameEv"><code class="docutils literal notranslate"><span class="pre">SelectorBase::name()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4I0_6size_tE14RankedSelector"><code class="docutils literal notranslate"><span class="pre">RankedSelector</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N14RankedSelector13cache_state_tE"><code class="docutils literal notranslate"><span class="pre">RankedSelector::cache_state_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N14RankedSelector14RankedSelectorEv"><code class="docutils literal notranslate"><span class="pre">RankedSelector::RankedSelector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N14RankedSelector14RankedSelectorER6Random"><code class="docutils literal notranslate"><span class="pre">RankedSelector::RankedSelector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4NK14RankedSelector4nameEv"><code class="docutils literal notranslate"><span class="pre">RankedSelector::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N14RankedSelectorclE6vectorINSt4pairI6size_tdEEE6size_t"><code class="docutils literal notranslate"><span class="pre">RankedSelector::operator()()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4I000_6size_tE16RouletteSelector"><code class="docutils literal notranslate"><span class="pre">RouletteSelector</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N16RouletteSelector13cache_state_tE"><code class="docutils literal notranslate"><span class="pre">RouletteSelector::cache_state_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N16RouletteSelector16RouletteSelectorER6Random"><code class="docutils literal notranslate"><span class="pre">RouletteSelector::RouletteSelector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4NK16RouletteSelector4nameEv"><code class="docutils literal notranslate"><span class="pre">RouletteSelector::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N16RouletteSelectorclE6vectorINSt4pairI6size_tdEEE6size_t"><code class="docutils literal notranslate"><span class="pre">RouletteSelector::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N16RouletteSelector4randE"><code class="docutils literal notranslate"><span class="pre">RouletteSelector::rand</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4I00000_6size_tE19ExpRouletteSelector"><code class="docutils literal notranslate"><span class="pre">ExpRouletteSelector</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N19ExpRouletteSelector13cache_state_tE"><code class="docutils literal notranslate"><span class="pre">ExpRouletteSelector::cache_state_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N19ExpRouletteSelector19ExpRouletteSelectorER6Random"><code class="docutils literal notranslate"><span class="pre">ExpRouletteSelector::ExpRouletteSelector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4NK19ExpRouletteSelector4nameEv"><code class="docutils literal notranslate"><span class="pre">ExpRouletteSelector::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N19ExpRouletteSelectorclE6vectorINSt4pairI6size_tdEEE6size_t"><code class="docutils literal notranslate"><span class="pre">ExpRouletteSelector::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N19ExpRouletteSelector4randE"><code class="docutils literal notranslate"><span class="pre">ExpRouletteSelector::rand</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4I00_6size_tE13SieveSelector"><code class="docutils literal notranslate"><span class="pre">SieveSelector</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N13SieveSelector13cache_state_tE"><code class="docutils literal notranslate"><span class="pre">SieveSelector::cache_state_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N13SieveSelector13SieveSelectorER6Random"><code class="docutils literal notranslate"><span class="pre">SieveSelector::SieveSelector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4NK13SieveSelector4nameEv"><code class="docutils literal notranslate"><span class="pre">SieveSelector::name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N13SieveSelectorclE6vectorINSt4pairI6size_tdEEE6size_t"><code class="docutils literal notranslate"><span class="pre">SieveSelector::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/matchbin_selectors.html#_CPPv4N13SieveSelector4randE"><code class="docutils literal notranslate"><span class="pre">SieveSelector::rand</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/matchbin_utils.html">matchbin_utils.hpp</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../io/api/serialize_macros.html" class="btn btn-neutral float-left" title="serialize_macros.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/MatchBin.html" class="btn btn-neutral float-right" title="MatchBin.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

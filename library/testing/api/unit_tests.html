@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>unit_tests.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/testing/api/unit_tests.82fa2033-26a1-4dd9-b7c0-3d2eaf913cf4.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Text" href="../../text/text.html" />
+    <link rel="prev" title="Testing" href="../testing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../testing.html">Testing</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../testing.html#api">API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">unit_tests.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv417GetUnitTestOutputv"><code class="docutils literal notranslate"><span class="pre">GetUnitTestOutput()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415ResolveUnitTestbRKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE6size_tb"><code class="docutils literal notranslate"><span class="pre">ResolveUnitTest()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv417SetupUnitTestArgs6vectorINSt6stringEE"><code class="docutils literal notranslate"><span class="pre">SetupUnitTestArgs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv422ProcessUnitTestResultsv"><code class="docutils literal notranslate"><span class="pre">ProcessUnitTestResults()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414UnitTestOutput"><code class="docutils literal notranslate"><span class="pre">UnitTestOutput</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../testing.html">Testing</a></li>
+      <li class="breadcrumb-item active">unit_tests.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="unit-tests-hpp">
+<h1>unit_tests.hpp<a class="headerlink" href="#unit-tests-hpp" title="Link to this heading"></a></h1>
+<p>Macros to facilitate unit testing. </p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Setup proper command line color handling (probably in its own file.) </p>
+<p>Add EMP_TEST_BELOW, EMP_TEST_ABOVE, and EMP_TEST_RANGE to ensure that a value is in a certain range. </p>
+<p>Consider adding EMP_TEST_ASSERT to ensure that the contained value is true. </p>
+<p>Consider adding EMP_TEST_APPROX to compare within a tolerance level. </p>
+</dd></dl>
+
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: RESURGENT (Was deprecated; now back to ALPHA)</p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.emp_test_main">
+<span class="target" id="unit__tests_8hpp_1a03c4f162067ccf6a80158d238cb263f4"></span><span class="sig-name descname"><span class="n"><span class="pre">emp_test_main</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.emp_test_main" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417GetUnitTestOutputv">
+<span id="_CPPv317GetUnitTestOutputv"></span><span id="_CPPv217GetUnitTestOutputv"></span><span id="GetUnitTestOutput"></span><span class="target" id="unit__tests_8hpp_1aea41dc7dfebf777f685e9672144e0f90"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414UnitTestOutput" title="UnitTestOutput"><span class="n"><span class="pre">UnitTestOutput</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetUnitTestOutput</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417GetUnitTestOutputv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415ResolveUnitTestbRKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE6size_tb">
+<span id="_CPPv315ResolveUnitTestbRKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE6size_tb"></span><span id="_CPPv215ResolveUnitTestbRKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE6size_tb"></span><span id="ResolveUnitTest__b.ssCR.ssCR.ssCR.ssCR.s.b"></span><span class="target" id="unit__tests_8hpp_1a107197912a78e95a3d9af25717f764b2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResolveUnitTest</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pass</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">test_input</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">result</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">exp_result</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">filename</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line_num</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">is_require</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415ResolveUnitTestbRKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE6size_tb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417SetupUnitTestArgs6vectorINSt6stringEE">
+<span id="_CPPv317SetupUnitTestArgs6vectorINSt6stringEE"></span><span id="_CPPv217SetupUnitTestArgs6vectorINSt6stringEE"></span><span id="SetupUnitTestArgs__vector:ss:"></span><span class="target" id="unit__tests_8hpp_1a8f0af368506942284ec0b62edbcc715c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetupUnitTestArgs</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417SetupUnitTestArgs6vectorINSt6stringEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422ProcessUnitTestResultsv">
+<span id="_CPPv322ProcessUnitTestResultsv"></span><span id="_CPPv222ProcessUnitTestResultsv"></span><span id="ProcessUnitTestResults"></span><span class="target" id="unit__tests_8hpp_1a6641dd41a20ee042c3c4f17c643e6115"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ProcessUnitTestResults</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422ProcessUnitTestResultsv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv414UnitTestOutput">
+<span id="_CPPv314UnitTestOutput"></span><span id="_CPPv214UnitTestOutput"></span><span id="UnitTestOutput"></span><span class="target" id="structUnitTestOutput"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UnitTestOutput</span></span></span><a class="headerlink" href="#_CPPv414UnitTestOutput" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;unit_tests.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv4N14UnitTestOutput4ModeE">
+<span id="_CPPv3N14UnitTestOutput4ModeE"></span><span id="_CPPv2N14UnitTestOutput4ModeE"></span><span class="target" id="structUnitTestOutput_1a05019a5f2cc0c671e883f077687ba97b"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mode</span></span></span><a class="headerlink" href="#_CPPv4N14UnitTestOutput4ModeE" title="Link to this definition"></a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N14UnitTestOutput4Mode6SILENTE">
+<span id="_CPPv3N14UnitTestOutput4Mode6SILENTE"></span><span id="_CPPv2N14UnitTestOutput4Mode6SILENTE"></span><span class="target" id="structUnitTestOutput_1a05019a5f2cc0c671e883f077687ba97baf86cc00c45df9b50f023a6c1de9fc30e"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SILENT</span></span></span><a class="headerlink" href="#_CPPv4N14UnitTestOutput4Mode6SILENTE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N14UnitTestOutput4Mode6NORMALE">
+<span id="_CPPv3N14UnitTestOutput4Mode6NORMALE"></span><span id="_CPPv2N14UnitTestOutput4Mode6NORMALE"></span><span class="target" id="structUnitTestOutput_1a05019a5f2cc0c671e883f077687ba97ba328ea8c796caeecd0ae2402fc0ecb9ff"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NORMAL</span></span></span><a class="headerlink" href="#_CPPv4N14UnitTestOutput4Mode6NORMALE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N14UnitTestOutput4Mode7VERBOSEE">
+<span id="_CPPv3N14UnitTestOutput4Mode7VERBOSEE"></span><span id="_CPPv2N14UnitTestOutput4Mode7VERBOSEE"></span><span class="target" id="structUnitTestOutput_1a05019a5f2cc0c671e883f077687ba97ba79ae44ef147da9e3210285857128d0a1"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VERBOSE</span></span></span><a class="headerlink" href="#_CPPv4N14UnitTestOutput4Mode7VERBOSEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14UnitTestOutput7verboseE">
+<span id="_CPPv3N14UnitTestOutput7verboseE"></span><span id="_CPPv2N14UnitTestOutput7verboseE"></span><span id="UnitTestOutput::verbose__UnitTestOutput::Mode"></span><span class="target" id="structUnitTestOutput_1ae55824124bd656b34719acf13aa0de49"></span><a class="reference internal" href="#_CPPv414UnitTestOutput" title="UnitTestOutput"><span class="n"><span class="pre">UnitTestOutput</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N14UnitTestOutput4ModeE" title="UnitTestOutput::Mode"><span class="n"><span class="pre">Mode</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">verbose</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414UnitTestOutput" title="UnitTestOutput"><span class="n"><span class="pre">UnitTestOutput</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N14UnitTestOutput4ModeE" title="UnitTestOutput::Mode"><span class="n"><span class="pre">Mode</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N14UnitTestOutput4Mode6NORMALE" title="UnitTestOutput::Mode::NORMAL"><span class="n"><span class="pre">NORMAL</span></span></a><a class="headerlink" href="#_CPPv4N14UnitTestOutput7verboseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14UnitTestOutput9num_testsE">
+<span id="_CPPv3N14UnitTestOutput9num_testsE"></span><span id="_CPPv2N14UnitTestOutput9num_testsE"></span><span id="UnitTestOutput::num_tests__s"></span><span class="target" id="structUnitTestOutput_1ac064276396bb54972d1de993de407371"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_tests</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N14UnitTestOutput9num_testsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14UnitTestOutput6errorsE">
+<span id="_CPPv3N14UnitTestOutput6errorsE"></span><span id="_CPPv2N14UnitTestOutput6errorsE"></span><span id="UnitTestOutput::errors__s"></span><span class="target" id="structUnitTestOutput_1a5ee93e1c7023f478b979856b1674f84e"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">errors</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N14UnitTestOutput6errorsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14UnitTestOutput5abortE">
+<span id="_CPPv3N14UnitTestOutput5abortE"></span><span id="_CPPv2N14UnitTestOutput5abortE"></span><span id="UnitTestOutput::abort__b"></span><span class="target" id="structUnitTestOutput_1a61c9210a73857818d280f48b49c412a0"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">abort</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N14UnitTestOutput5abortE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../testing.html" class="btn btn-neutral float-left" title="Testing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../text/text.html" class="btn btn-neutral float-right" title="Text" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guide to Testing in Empirical &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../_static/tippy/dev/guide-to-testing.06365e65-94e4-450f-bee4-a31e9ab5aaa8.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Empirical Documentation Documentation" href="adding-documentation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../library/base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Guide to Testing in Empirical</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#running-tests">Running Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#writing-tests">Writing Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-tests-with-docker">Running Tests with Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tidyness-enforcement">Tidyness Enforcement</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Guide to Testing in Empirical</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="guide-to-testing-in-empirical">
+<h1>Guide to Testing in Empirical<a class="headerlink" href="#guide-to-testing-in-empirical" title="Link to this heading"></a></h1>
+<p>This document details how testing works in Empirical, both for writing
+and understanding tests. Empirical makes use of the <a class="reference external" href="https://github.com/philsquared/Catch">Catch testing
+framework</a>, the documentation of
+which is available
+<a class="reference external" href="https://github.com/philsquared/Catch/blob/master/docs/Readme.md">here</a>.</p>
+<section id="running-tests">
+<h2>Running Tests<a class="headerlink" href="#running-tests" title="Link to this heading"></a></h2>
+<p>In the root directory of Empirical, use the maketarget <code class="docutils literal notranslate"><span class="pre">test</span></code>, like so:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nb">test</span>
+</pre></div>
+</div>
+<p>The tests will compile and execute automatically, and you should see
+output that looks something like this:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>tests<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>make<span class="w"> </span><span class="nb">test</span>
+make<span class="o">[</span><span class="m">1</span><span class="o">]</span>:<span class="w"> </span>Entering<span class="w"> </span>directory<span class="w"> </span><span class="s1">&#39;/home/jgf/git/Empirical/tests&#39;</span>
+g++<span class="w"> </span>-std<span class="o">=</span>c++11<span class="w"> </span>test_driver.cc<span class="w"> </span>-o<span class="w"> </span>test.o
+<span class="c1"># Execute tests</span>
+./test.o
+<span class="o">===============================================================================</span>
+All<span class="w"> </span>tests<span class="w"> </span>passed<span class="w"> </span><span class="o">(</span><span class="m">562</span><span class="w"> </span>assertions<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">27</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>cases<span class="o">)</span>
+</pre></div>
+</div>
+<p>If you wish to see detailed coverage data you can use the maketarget
+<code class="docutils literal notranslate"><span class="pre">coverage</span></code>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>coverage
+</pre></div>
+</div>
+<p>Again, the tests will compile (this time with coverage flags) and
+execute, generating coverage data. This data will be analyzed and
+stuffed into helpful HTML files. You’ll see output that initially looks
+like the normal tests, followed by a lot of output, and then:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Overall</span><span class="w"> </span><span class="n">coverage</span><span class="w"> </span><span class="n">rate</span><span class="o">:</span>
+<span class="n">lines</span><span class="p">......</span><span class="o">:</span><span class="w"> </span><span class="mf">81.7</span><span class="o">%</span><span class="w"> </span><span class="p">(</span><span class="mi">946</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="mi">1158</span><span class="w"> </span><span class="n">lines</span><span class="p">)</span>
+<span class="n">functions</span><span class="p">..</span><span class="o">:</span><span class="w"> </span><span class="mf">87.0</span><span class="o">%</span><span class="w"> </span><span class="p">(</span><span class="mi">463</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="mi">532</span><span class="w"> </span><span class="n">functions</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The HTML info will give breakdowns on line-by-line coverage on each
+file. It is highly recommended that you consult these to verify that
+code is well covered. To view these files, open
+[tests/html/index.html]{.title-ref} in your favorite browser.</p>
+</section>
+<section id="writing-tests">
+<h2>Writing Tests<a class="headerlink" href="#writing-tests" title="Link to this heading"></a></h2>
+<p>It is required that contributions to the Empirical library have test
+coverage. Though writing tests can be a complex task in some cases the
+Catch testing framework is extremely easy to use.</p>
+<p>In general the best way to understand how to write tests is to look at
+the existing tests. I recommend skimming through <code class="docutils literal notranslate"><span class="pre">test_tools.cc</span></code> for an
+overview.</p>
+<p>If you are creating a new test file you will need to include the file
+you’ve made in the <code class="docutils literal notranslate"><span class="pre">test_driver.cc</span></code> file. That is, suppose you create a
+file <code class="docutils literal notranslate"><span class="pre">test_potatoes.cc</span></code>. You will then need to edit <code class="docutils literal notranslate"><span class="pre">test_driver.cc</span></code> so
+that it looks something like this:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../third-party/catch/single_include/catch.hpp&quot;</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;test_tools.cc&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;test_geometry.cc&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;test_scholar.cc&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;test_potatoes.cc&quot;</span>
+</pre></div>
+</div>
+<p>To write a test case you simply use the <code class="docutils literal notranslate"><span class="pre">TEST_CASE</span></code> macro provided by
+Catch:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TEST_CASE</span><span class="p">(</span><span class="s">&quot;Test name goes here&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;[test classification here]&quot;</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">        </span><span class="c1">// body of test</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Within a test case you can use the <code class="docutils literal notranslate"><span class="pre">REQUIRE</span></code> macro like an assert, to
+require certain conditions within the test:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">REQUIRE</span><span class="p">(</span><span class="mi">1</span><span class="o">==</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c1">// will pass, obviously</span>
+<span class="n">REQUIRE</span><span class="p">(</span><span class="mi">1</span><span class="o">==</span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="c1">// will fail, and Catch will complain</span>
+</pre></div>
+</div>
+<p>If a <code class="docutils literal notranslate"><span class="pre">REQUIRE</span></code> fails, Catch will expand it for you to show you what was
+compared. Supposing we have a test case like the following:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TEST_CASE</span><span class="p">(</span><span class="s">&quot;testing tests&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;[demo]&quot;</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="w">    </span><span class="n">REQUIRE</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">b</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It would execute like so:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>demo.cc:4:<span class="w"> </span>FAILED:
+REQUIRE<span class="o">(</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>b<span class="w"> </span><span class="o">)</span>
+with<span class="w"> </span>expansion:
+<span class="nb">false</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span>
+
+<span class="o">===============================================================================</span>
+<span class="nb">test</span><span class="w"> </span>cases:<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>failed
+assertions:<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>failed
+</pre></div>
+</div>
+<p>This allows for easier debugging of failed tests.</p>
+<p>Catch provides several different frameworks for constructing test cases
+which are detailed within <a class="reference external" href="https://github.com/philsquared/Catch/blob/master/docs/tutorial.md">their
+documentation</a>.</p>
+</section>
+<section id="running-tests-with-docker">
+<h2>Running Tests with Docker<a class="headerlink" href="#running-tests-with-docker" title="Link to this heading"></a></h2>
+<p>A <a class="reference external" href="https://hub.docker.com/r/devosoft/empirical">devosoft/empirical</a> Docker image has been set up
+to make recreating a development environment on your machine easier.
+The first step is to download Docker. <a class="reference external" href="https://docs.docker.com/get-docker/">https://docs.docker.com/get-docker/</a></p>
+<p>To download and run the Docker image, enter the following commands in the Docker terminal</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>pull<span class="w"> </span>devosoft/empirical:latest
+docker<span class="w"> </span>run<span class="w"> </span>--name<span class="w"> </span>emp-tests<span class="w"> </span>-dit<span class="w"> </span>devosoft/empirical:latest<span class="w"> </span>/sbin/init
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>emp-tests<span class="w"> </span>bash<span class="w"> </span>-l
+</pre></div>
+</div>
+<p>To exit Docker containter shell</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>CTRL+D
+</pre></div>
+</div>
+<p>Commands to stop and start the Docker container</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>start<span class="w"> </span>emp-tests
+docker<span class="w"> </span>stop<span class="w"> </span>emp-tests
+</pre></div>
+</div>
+<p>If you get <code class="docutils literal notranslate"><span class="pre">error:</span> <span class="pre">cannot</span> <span class="pre">open</span> <span class="pre">display:</span> <span class="pre">99</span></code> when running Mocha web tests, try</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Xvfb<span class="w"> </span>:99<span class="w"> </span>-ac<span class="w"> </span>-screen<span class="w"> </span><span class="m">0</span><span class="w"> </span>1024x768x8<span class="w"> </span><span class="p">&amp;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">DISPLAY</span><span class="o">=</span>:99
+</pre></div>
+</div>
+<p>If you get an error prompting you to <em>check if server X is already running</em> after
+entering <code class="docutils literal notranslate"><span class="pre">Xvfb</span> <span class="pre">:99</span> <span class="pre">-ac</span> <span class="pre">-screen</span> <span class="pre">0</span> <span class="pre">1024x768x8</span> <span class="pre">&amp;</span></code>, try this to kill the process</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ps<span class="w"> </span>-ef<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>Xvfb
+<span class="nb">kill</span><span class="w"> </span>*pid*
+</pre></div>
+</div>
+<p><strong>Note:</strong> Instructions adapted from <a class="reference external" href="https://andy-carter.com/blog/setting-up-travis-locally-with-docker-to-test-continuous-integration">https://andy-carter.com/blog/setting-up-travis-locally-with-docker-to-test-continuous-integration</a> and <a class="reference external" href="https://github.com/karma-runner/karma-firefox-launcher/issues/93#issuecomment-519333245">https://github.com/karma-runner/karma-firefox-launcher/issues/93#issuecomment-519333245</a></p>
+</section>
+<section id="tidyness-enforcement">
+<h2>Tidyness Enforcement<a class="headerlink" href="#tidyness-enforcement" title="Link to this heading"></a></h2>
+<p>As part of our continuous integration, we test for several tidyness violations, including</p>
+<ul class="simple">
+<li><p>unalphabetized C++ includes,</p></li>
+<li><p>unpartitioned C++ includes (i.e., no empty line between <code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;</span></code>’s and <code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;</span></code>’s),</p></li>
+<li><p>unalphabetized Python imports,</p></li>
+<li><p>missing end-of-file newlines,</p></li>
+<li><p>missing or malformed boilerplate (headerguards and file docstrings),</p></li>
+<li><p>trailing whitespace,</p></li>
+<li><p>improper indentation (using tabs or non-two-space),</p></li>
+<li><p>old-style source file suffixes,</p></li>
+<li><p>whitespace in filenames, and</p></li>
+<li><p>Git merge conflict markers.</p></li>
+</ul>
+<p>For the most part, our tidyness tests work by running transforms <em>to actually generate “tidy” source files</em> (for example, actually stripping out trailing whitespace) and then asserting that the file tree has not changed.
+This means you can easily correct any tidyness violations by running <code class="docutils literal notranslate"><span class="pre">./ci/test_tidy.sh</span></code> from the root directory of the project.
+Use <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">add</span> <span class="pre">.</span> <span class="pre">-p</span></code> to manually check the autotidied result, then commit the autogenerated fixes if you’re happy with them.
+Then, run <code class="docutils literal notranslate"><span class="pre">./ci/test_tidy.sh</span></code> again to check for any remaining tidyness violations.
+Repeat until <code class="docutils literal notranslate"><span class="pre">./ci/test_tidy.sh</span></code> succeeds!</p>
+<p>Warning: <code class="docutils literal notranslate"><span class="pre">./ci/test_tidy.sh</span></code> is potentially destructive.
+Make sure you don’t have any uncommitted changes you don’t have saved elsewhere.
+(Maybe <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">stash</span></code> or make a copy your local file tree.)</p>
+<p>Bonus: run <code class="docutils literal notranslate"><span class="pre">./ci/impl/generate_boilerplate.sh</span></code> when you create a new source file in <code class="docutils literal notranslate"><span class="pre">include/</span></code> to autogenerate headerguards and stub file docstrings.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="adding-documentation.html" class="btn btn-neutral float-left" title="Empirical Documentation Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

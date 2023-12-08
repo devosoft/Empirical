@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>utils.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../../_static/tippy/library/web/d3/api/utils.3b47019e-e3eb-4396-96b3-34553d8175be.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="visual_elements.hpp" href="visual_elements.html" />
+    <link rel="prev" title="svg_shapes.hpp" href="svg_shapes.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../d3.html">D3 Wrapper</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../d3-intro.html">Using Empirica’s D3.js Wrapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../d3-contents.html">D3 Wrapper API</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../d3.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../web.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../web.html">Web Tools (for use with Emscripten)</a></li>
+          <li class="breadcrumb-item"><a href="../d3.html">D3 Wrapper</a></li>
+      <li class="breadcrumb-item active">utils.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="utils-hpp">
+<h1>utils.hpp<a class="headerlink" href="#utils-hpp" title="Link to this heading"></a></h1>
+<p>This file contains macros used to build Empirical’s C++ wrapper for D3. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.IS_JS_FUNCTION">
+<span class="target" id="utils_8hpp_1accc993a2913e4ac6ec10954439e2c3b5"></span><span class="sig-name descname"><span class="n"><span class="pre">IS_JS_FUNCTION</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FN</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.IS_JS_FUNCTION" title="Link to this definition"></a><br /></dt>
+<dd><p>A more descriptive wrapper for the check to see if something is a function in Javascript. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_WINDOW">
+<span class="target" id="utils_8hpp_1a8eef707b7020b6a2f55402bbb5340c8e"></span><span class="sig-name descname"><span class="n"><span class="pre">CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_WINDOW</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_WINDOW" title="Link to this definition"></a><br /></dt>
+<dd><p>Expects func_string to be a pre-defined variable that holds a string that may or may not be a function and checks to see if it is a function defined within the current window. If it is, it stores that function in the variable func_string. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_1">
+<span class="target" id="utils_8hpp_1a2b978863370c1e9376aa55263e2be4ff"></span><span class="sig-name descname"><span class="n"><span class="pre">CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_1</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">A1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_1" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_2">
+<span class="target" id="utils_8hpp_1afe157de7fc56aff67fd778cd2bd07a43"></span><span class="sig-name descname"><span class="n"><span class="pre">CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_2</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">A1</span></span>, <span class="n"><span class="pre">A2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_2" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_3">
+<span class="target" id="utils_8hpp_1a4c04dcd95956af9a2e290d43760d00d4"></span><span class="sig-name descname"><span class="n"><span class="pre">CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_3</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">A1</span></span>, <span class="n"><span class="pre">A2</span></span>, <span class="n"><span class="pre">A3</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_3" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE">
+<span class="target" id="utils_8hpp_1a64f081cff8d86a2030cb892d29a34397"></span><span class="sig-name descname"><span class="n"><span class="pre">CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE</span></span></span><span class="sig-paren">(</span><span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE" title="Link to this definition"></a><br /></dt>
+<dd><p>Expects func_string to be a pre-defined variable that holds a string that may or may not be a function and checks to see if it is a function defined within and of the given namespaces. If it is, it stores that function in the variable func_string. Namespaces are checked in the order given and the first function found is used. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_WINDOW">
+<span class="target" id="utils_8hpp_1a7f72d6870daf50885643f110e0d5623b"></span><span class="sig-name descname"><span class="n"><span class="pre">CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_WINDOW</span></span></span><span class="sig-paren">(</span><span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_WINDOW" title="Link to this definition"></a><br /></dt>
+<dd><p>Expects func_string to be a pre-defined variable that holds a string that may or may not be a function and checks to see if it is a function defined within and of the given namespaces or the current window. If it is, it stores that function in the variable func_string. Namespaces are checked in the order given and the first function found is used. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.D3_CALLBACK_FUNCTION_1_ARG">
+<span class="target" id="utils_8hpp_1a0a3b298578884235f2c6e8f1966fcabb"></span><span class="sig-name descname"><span class="n"><span class="pre">D3_CALLBACK_FUNCTION_1_ARG</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FUNC</span></span>, <span class="n"><span class="pre">CALLBACK</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.D3_CALLBACK_FUNCTION_1_ARG" title="Link to this definition"></a><br /></dt>
+<dd><p>Call a Javascript function that accepts either a string indicating the name of a callback function or a normal string </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.D3_CALLBACK_FUNCTION_2_ARGS">
+<span class="target" id="utils_8hpp_1a22b75f4b50f4af6721f49666fa6b1c06"></span><span class="sig-name descname"><span class="n"><span class="pre">D3_CALLBACK_FUNCTION_2_ARGS</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FUNC</span></span>, <span class="n"><span class="pre">CALLBACK</span></span>, <span class="n"><span class="pre">ARG1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.D3_CALLBACK_FUNCTION_2_ARGS" title="Link to this definition"></a><br /></dt>
+<dd><p>Same as D3_CALLBACK_FUNCTION_1_ARG, but accepts an additional argument, ARG1, that goes before the callback function in the call to FUNC </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.D3_CALLBACK_METHOD_2_ARGS_IMPL">
+<span class="target" id="utils_8hpp_1a727a43de490310403e1e29572cebecfb"></span><span class="sig-name descname"><span class="n"><span class="pre">D3_CALLBACK_METHOD_2_ARGS_IMPL</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">MACRO</span></span>, <span class="n"><span class="pre">FUNC</span></span>, <span class="n"><span class="pre">ARG1</span></span>, <span class="n"><span class="pre">ARG2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.D3_CALLBACK_METHOD_2_ARGS_IMPL" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.D3_CALLBACK_METHOD_2_ARGS">
+<span class="target" id="utils_8hpp_1aafbab29cc4a1707894dccfe213a9598f"></span><span class="sig-name descname"><span class="n"><span class="pre">D3_CALLBACK_METHOD_2_ARGS</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FUNC</span></span>, <span class="n"><span class="pre">ARG1</span></span>, <span class="n"><span class="pre">ARG2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.D3_CALLBACK_METHOD_2_ARGS" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.D3_CALLBACK_METHOD_1_ARG_IMPL">
+<span class="target" id="utils_8hpp_1a8e7e677e38904a03c7078a2238a99bb5"></span><span class="sig-name descname"><span class="n"><span class="pre">D3_CALLBACK_METHOD_1_ARG_IMPL</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">MACRO</span></span>, <span class="n"><span class="pre">FUNC</span></span>, <span class="n"><span class="pre">ARG1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.D3_CALLBACK_METHOD_1_ARG_IMPL" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.D3_CALLBACK_METHOD_1_ARG">
+<span class="target" id="utils_8hpp_1a3c17ba1952f09a3faf96d4a9ba9618df"></span><span class="sig-name descname"><span class="n"><span class="pre">D3_CALLBACK_METHOD_1_ARG</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FUNC</span></span>, <span class="n"><span class="pre">ARG1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.D3_CALLBACK_METHOD_1_ARG" title="Link to this definition"></a><br /></dt>
+<dd><p>The same as D3_CALLBACK_METHOD_2_ARGS except for FUNCs that only accept a single argument (the string that might or might not be a function). </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS">
+<span class="target" id="utils_8hpp_1a1062be08f95c456f440bfbfe58860c6b"></span><span class="sig-name descname"><span class="n"><span class="pre">D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FUNC</span></span>, <span class="n"><span class="pre">ARG1</span></span>, <span class="n"><span class="pre">CPP_FUN</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG">
+<span class="target" id="utils_8hpp_1a726d20ad44f81ca2307fe5957a17fc98"></span><span class="sig-name descname"><span class="n"><span class="pre">D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FUNC</span></span>, <span class="n"><span class="pre">CPP_FUN</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414StoreNewObjecti">
+<span id="_CPPv314StoreNewObjecti"></span><span id="_CPPv214StoreNewObjecti"></span><span id="StoreNewObject__i"></span><span class="target" id="utils_8hpp_1aae53dc34edd015f92a25a4e64918d7b6"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StoreNewObject</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414StoreNewObjecti" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="svg_shapes.html" class="btn btn-neutral float-left" title="svg_shapes.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="visual_elements.html" class="btn btn-neutral float-right" title="visual_elements.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Signal.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/control/api/Signal.3e847acd-d620-47dc-90a3-dc7a21ea7a0b.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="SignalControl.hpp" href="SignalControl.html" />
+    <link rel="prev" title="ActionManager.hpp" href="ActionManager.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../control.html">Control</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../control.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Action.html">Action.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ActionManager.html">ActionManager.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Signal.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49SignalKey"><code class="docutils literal notranslate"><span class="pre">SignalKey</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410SignalBase"><code class="docutils literal notranslate"><span class="pre">SignalBase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE6Signal"><code class="docutils literal notranslate"><span class="pre">Signal</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE6SignalIFvDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">Signal</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">Signal</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="SignalControl.html">SignalControl.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SignalManager.html">SignalManager.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../control.html">Control</a></li>
+      <li class="breadcrumb-item active">Signal.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="signal-hpp">
+<h1>Signal.hpp<a class="headerlink" href="#signal-hpp" title="Link to this heading"></a></h1>
+<p>Allow functions to be bundled (as Actions) and triggered enmasse. </p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Setup easier mechanism to control the order in which actions are triggered. </p>
+<p>Signals should have default parameters so not all need be supplied when triggered. </p>
+</dd></dl>
+
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: Beta</p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv49SignalKey">
+<span id="_CPPv39SignalKey"></span><span id="_CPPv29SignalKey"></span><span id="SignalKey"></span><span class="target" id="classSignalKey"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SignalKey</span></span></span><a class="headerlink" href="#_CPPv49SignalKey" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Signal.hpp&gt;</em></div>
+<p>SignalKey tracks a specific function triggered by a signal. For now, its just a value pair. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9SignalKey9SignalKeyE8uint32_t8uint32_t">
+<span id="_CPPv3N9SignalKey9SignalKeyE8uint32_t8uint32_t"></span><span id="_CPPv2N9SignalKey9SignalKeyE8uint32_t8uint32_t"></span><span id="SignalKey::SignalKey__uint32_t.uint32_t"></span><span class="target" id="classSignalKey_1a89259bc8db296ed69482efe708bac6a5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SignalKey</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_kid</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_sid</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9SignalKey9SignalKeyE8uint32_t8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9SignalKey9SignalKeyERK9SignalKey">
+<span id="_CPPv3N9SignalKey9SignalKeyERK9SignalKey"></span><span id="_CPPv2N9SignalKey9SignalKeyERK9SignalKey"></span><span id="SignalKey::SignalKey__SignalKeyCR"></span><span class="target" id="classSignalKey_1a3ba1ea7ea5eefcc0bd1e2167551cb53a"></span><span class="sig-name descname"><span class="n"><span class="pre">SignalKey</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9SignalKey9SignalKeyERK9SignalKey" title="SignalKey::SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N9SignalKey9SignalKeyERK9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9SignalKeyaSERK9SignalKey">
+<span id="_CPPv3N9SignalKeyaSERK9SignalKey"></span><span id="_CPPv2N9SignalKeyaSERK9SignalKey"></span><span id="SignalKey::assign-operator__SignalKeyCR"></span><span class="target" id="classSignalKey_1a935ee02ed6f35d4870b201fb5bb7548d"></span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N9SignalKeyaSERK9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9SignalKeyD0Ev">
+<span id="_CPPv3N9SignalKeyD0Ev"></span><span id="_CPPv2N9SignalKeyD0Ev"></span><span id="SignalKey::~SignalKey"></span><span class="target" id="classSignalKey_1af37e71ca6797185b82be66d0d3cc2499"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~SignalKey</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9SignalKeyD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9SignalKeyeqERK9SignalKey">
+<span id="_CPPv3NK9SignalKeyeqERK9SignalKey"></span><span id="_CPPv2NK9SignalKeyeqERK9SignalKey"></span><span id="SignalKey::eq-operator__SignalKeyCRC"></span><span class="target" id="classSignalKey_1ac140889fc04e11a9aeaaf55bdf54c618"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9SignalKeyeqERK9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd><p>Are two signal keys identical? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9SignalKeyneERK9SignalKey">
+<span id="_CPPv3NK9SignalKeyneERK9SignalKey"></span><span id="_CPPv2NK9SignalKeyneERK9SignalKey"></span><span id="SignalKey::neq-operator__SignalKeyCRC"></span><span class="target" id="classSignalKey_1ac4a9494fc3c3f01e337582e2ce97d1ee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9SignalKeyneERK9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd><p>Are two signal keys different? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9SignalKeyltERK9SignalKey">
+<span id="_CPPv3NK9SignalKeyltERK9SignalKey"></span><span id="_CPPv2NK9SignalKeyltERK9SignalKey"></span><span id="SignalKey::lt-operator__SignalKeyCRC"></span><span class="target" id="classSignalKey_1a7a97bec46218c113e8bee55948d9a289"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9SignalKeyltERK9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9SignalKeygtERK9SignalKey">
+<span id="_CPPv3NK9SignalKeygtERK9SignalKey"></span><span id="_CPPv2NK9SignalKeygtERK9SignalKey"></span><span id="SignalKey::gt-operator__SignalKeyCRC"></span><span class="target" id="classSignalKey_1afec274aae9c3990ab3ac3bf9bdbd07fc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9SignalKeygtERK9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9SignalKeyleERK9SignalKey">
+<span id="_CPPv3NK9SignalKeyleERK9SignalKey"></span><span id="_CPPv2NK9SignalKeyleERK9SignalKey"></span><span id="SignalKey::lte-operator__SignalKeyCRC"></span><span class="target" id="classSignalKey_1a90979a09160b19d8c4298d9ac45297b0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9SignalKeyleERK9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9SignalKeygeERK9SignalKey">
+<span id="_CPPv3NK9SignalKeygeERK9SignalKey"></span><span id="_CPPv2NK9SignalKeygeERK9SignalKey"></span><span id="SignalKey::gte-operator__SignalKeyCRC"></span><span class="target" id="classSignalKey_1a1f7eecc69cbea0e3af1efcec96d7ea5d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9SignalKeygeERK9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9SignalKey5GetIDEv">
+<span id="_CPPv3NK9SignalKey5GetIDEv"></span><span id="_CPPv2NK9SignalKey5GetIDEv"></span><span id="SignalKey::GetIDC"></span><span class="target" id="classSignalKey_1a06166be697f49caa763d81e0aed3930d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetID</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9SignalKey5GetIDEv" title="Link to this definition"></a><br /></dt>
+<dd><p>What is the KeyID associated with this signal key. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9SignalKey11GetSignalIDEv">
+<span id="_CPPv3NK9SignalKey11GetSignalIDEv"></span><span id="_CPPv2NK9SignalKey11GetSignalIDEv"></span><span id="SignalKey::GetSignalIDC"></span><span class="target" id="classSignalKey_1a2ec1f32f1759fba137412de66e271ef5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSignalID</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9SignalKey11GetSignalIDEv" title="Link to this definition"></a><br /></dt>
+<dd><p>What is the ID of the signal that this key is associated with. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9SignalKey8IsActiveEv">
+<span id="_CPPv3NK9SignalKey8IsActiveEv"></span><span id="_CPPv2NK9SignalKey8IsActiveEv"></span><span id="SignalKey::IsActiveC"></span><span class="target" id="classSignalKey_1a65b0e17a9e2a9a2ef2dbd5ef6fbe8b72"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsActive</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9SignalKey8IsActiveEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Is this key currently pointing to a signal action? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9SignalKey3SetE8uint32_t8uint32_t">
+<span id="_CPPv3N9SignalKey3SetE8uint32_t8uint32_t"></span><span id="_CPPv2N9SignalKey3SetE8uint32_t8uint32_t"></span><span id="SignalKey::Set__uint32_t.uint32_t"></span><span class="target" id="classSignalKey_1acdda4530a99932d471740a27376d27b1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_kid</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_sid</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9SignalKey3SetE8uint32_t8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set this key to specified values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9SignalKey5ClearEv">
+<span id="_CPPv3N9SignalKey5ClearEv"></span><span id="_CPPv2N9SignalKey5ClearEv"></span><span id="SignalKey::Clear"></span><span class="target" id="classSignalKey_1ade4cfecfaedb18cceb38aedb172ab2b2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9SignalKey5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Clear this key. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9SignalKeycvbEv">
+<span id="_CPPv3N9SignalKeycvbEv"></span><span id="_CPPv2N9SignalKeycvbEv"></span><span id="SignalKey::castto-b-operator"></span><span class="target" id="classSignalKey_1afd570b5514f8c123fbdbdbf3804b4730"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9SignalKeycvbEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9SignalKey7CompareERK9SignalKey">
+<span id="_CPPv3NK9SignalKey7CompareERK9SignalKey"></span><span id="_CPPv2NK9SignalKey7CompareERK9SignalKey"></span><span id="SignalKey::Compare__SignalKeyCRC"></span><span class="target" id="classSignalKey_1a95bad6d948277c779db721442387669b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Compare</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9SignalKey7CompareERK9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9SignalKey9signal_idE">
+<span id="_CPPv3N9SignalKey9signal_idE"></span><span id="_CPPv2N9SignalKey9signal_idE"></span><span id="SignalKey::signal_id__uint32_t"></span><span class="target" id="classSignalKey_1a80bfefb97168359a79ec9aa4a030ad4c"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">signal_id</span></span></span><a class="headerlink" href="#_CPPv4N9SignalKey9signal_idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which signal is this key associated with? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9SignalKey6key_idE">
+<span id="_CPPv3N9SignalKey6key_idE"></span><span id="_CPPv2N9SignalKey6key_idE"></span><span id="SignalKey::key_id__uint32_t"></span><span class="target" id="classSignalKey_1afcfdc5d8e59c80ce066d615a8a378a67"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">key_id</span></span></span><a class="headerlink" href="#_CPPv4N9SignalKey6key_idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which key id is this. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv410SignalBase">
+<span id="_CPPv310SignalBase"></span><span id="_CPPv210SignalBase"></span><span id="SignalBase"></span><span class="target" id="classSignalBase"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SignalBase</span></span></span><a class="headerlink" href="#_CPPv410SignalBase" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Signal.hpp&gt;</em></div>
+<p>Base class for all signals. </p>
+<p>Subclassed by Signal&lt; RETURN(ARGS…)&gt;, Signal&lt; void(ARGS…)&gt;</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase10SignalBaseEv">
+<span id="_CPPv3N10SignalBase10SignalBaseEv"></span><span id="_CPPv2N10SignalBase10SignalBaseEv"></span><span id="SignalBase::SignalBase"></span><span class="target" id="classSignalBase_1a8a7142594ef31e132a6a185f66bc10ca"></span><span class="sig-name descname"><span class="n"><span class="pre">SignalBase</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N10SignalBase10SignalBaseEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase10SignalBaseERK10SignalBase">
+<span id="_CPPv3N10SignalBase10SignalBaseERK10SignalBase"></span><span id="_CPPv2N10SignalBase10SignalBaseERK10SignalBase"></span><span id="SignalBase::SignalBase__SignalBaseCR"></span><span class="target" id="classSignalBase_1a9fe15bdf08eee34ebdf18b9251e6c739"></span><span class="sig-name descname"><span class="n"><span class="pre">SignalBase</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10SignalBase10SignalBaseERK10SignalBase" title="SignalBase::SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N10SignalBase10SignalBaseERK10SignalBase" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase10SignalBaseERR10SignalBase">
+<span id="_CPPv3N10SignalBase10SignalBaseERR10SignalBase"></span><span id="_CPPv2N10SignalBase10SignalBaseERR10SignalBase"></span><span id="SignalBase::SignalBase__SignalBaseRR"></span><span class="target" id="classSignalBase_1a67c9bc75d9bf0f177ed949bff50f6d24"></span><span class="sig-name descname"><span class="n"><span class="pre">SignalBase</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N10SignalBase10SignalBaseERR10SignalBase" title="SignalBase::SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N10SignalBase10SignalBaseERR10SignalBase" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBaseaSERK10SignalBase">
+<span id="_CPPv3N10SignalBaseaSERK10SignalBase"></span><span id="_CPPv2N10SignalBaseaSERK10SignalBase"></span><span id="SignalBase::assign-operator__SignalBaseCR"></span><span class="target" id="classSignalBase_1a2085c5fcedaaae9a379d8d2fa19b44e8"></span><a class="reference internal" href="#_CPPv410SignalBase" title="SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410SignalBase" title="SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N10SignalBaseaSERK10SignalBase" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBaseaSERR10SignalBase">
+<span id="_CPPv3N10SignalBaseaSERR10SignalBase"></span><span id="_CPPv2N10SignalBaseaSERR10SignalBase"></span><span id="SignalBase::assign-operator__SignalBaseRR"></span><span class="target" id="classSignalBase_1a9e367ff95ac25ef7c5f0b62f00d9ed61"></span><a class="reference internal" href="#_CPPv410SignalBase" title="SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410SignalBase" title="SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N10SignalBaseaSERR10SignalBase" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBaseD0Ev">
+<span id="_CPPv3N10SignalBaseD0Ev"></span><span id="_CPPv2N10SignalBaseD0Ev"></span><span id="SignalBase::~SignalBase"></span><span class="target" id="classSignalBase_1a0ce9df9269c9c19fbf87dbfc54fa60c2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~SignalBase</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10SignalBaseD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SignalBase5CloneEv">
+<span id="_CPPv3NK10SignalBase5CloneEv"></span><span id="_CPPv2NK10SignalBase5CloneEv"></span><span id="SignalBase::CloneC"></span><span class="target" id="classSignalBase_1a0774095ca1acdf4b9ea920501dddf20e"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410SignalBase" title="SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Clone</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK10SignalBase5CloneEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SignalBase7GetNameEv">
+<span id="_CPPv3NK10SignalBase7GetNameEv"></span><span id="_CPPv2NK10SignalBase7GetNameEv"></span><span id="SignalBase::GetNameC"></span><span class="target" id="classSignalBase_1a87ae791e43ae60f7b5fe370ae535c965"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetName</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SignalBase7GetNameEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SignalBase10GetNumArgsEv">
+<span id="_CPPv3NK10SignalBase10GetNumArgsEv"></span><span id="_CPPv2NK10SignalBase10GetNumArgsEv"></span><span id="SignalBase::GetNumArgsC"></span><span class="target" id="classSignalBase_1ad3777e0026f2fc85ea52c06b74e88907"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumArgs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK10SignalBase10GetNumArgsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SignalBase13GetNumActionsEv">
+<span id="_CPPv3NK10SignalBase13GetNumActionsEv"></span><span id="_CPPv2NK10SignalBase13GetNumActionsEv"></span><span id="SignalBase::GetNumActionsC"></span><span class="target" id="classSignalBase_1aa9e215ea9882f1fdc6c251a7b0c4def0"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumActions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK10SignalBase13GetNumActionsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN10SignalBase11BaseTriggerEvDp4ARGS">
+<span id="_CPPv3IDpEN10SignalBase11BaseTriggerEDp4ARGS"></span><span id="_CPPv2IDpEN10SignalBase11BaseTriggerEDp4ARGS"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignalBase_1a2790e748e87914765c0cb7aeb8f5423f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BaseTrigger</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN10SignalBase11BaseTriggerEvDp4ARGS" title="SignalBase::BaseTrigger::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN10SignalBase11BaseTriggerEvDp4ARGS" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN10SignalBase9AddActionE9SignalKeyRKNSt8functionIFvDp4ARGSEEE">
+<span id="_CPPv3IDpEN10SignalBase9AddActionERKNSt8functionIFvDp4ARGSEEE"></span><span id="_CPPv2IDpEN10SignalBase9AddActionERKNSt8functionIFvDp4ARGSEEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignalBase_1ad1cc1aaa5e4d72e1716e17d3b2b42c20"></span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpEN10SignalBase9AddActionE9SignalKeyRKNSt8functionIFvDp4ARGSEEE" title="SignalBase::AddAction::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN10SignalBase9AddActionE9SignalKeyRKNSt8functionIFvDp4ARGSEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Actions without arguments or a return type can be associated with any signal. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase9AddActionER10ActionBase">
+<span id="_CPPv3N10SignalBase9AddActionER10ActionBase"></span><span id="_CPPv2N10SignalBase9AddActionER10ActionBase"></span><span id="SignalBase::AddAction__ActionBaseR"></span><span class="target" id="classSignalBase_1a905d9c9bf0198642ca0c006ca551c116"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Action.html#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N10SignalBase9AddActionER10ActionBase" title="Link to this definition"></a><br /></dt>
+<dd><p>Add an action using an Action object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase9TestMatchER10ActionBase">
+<span id="_CPPv3N10SignalBase9TestMatchER10ActionBase"></span><span id="_CPPv2N10SignalBase9TestMatchER10ActionBase"></span><span id="SignalBase::TestMatch__ActionBaseR"></span><span class="target" id="classSignalBase_1a37ed61cd0503de8f0f791fa105dea231"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TestMatch</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Action.html#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N10SignalBase9TestMatchER10ActionBase" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if an action is compatible with a signal. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase6RemoveE9SignalKey">
+<span id="_CPPv3N10SignalBase6RemoveE9SignalKey"></span><span id="_CPPv2N10SignalBase6RemoveE9SignalKey"></span><span id="SignalBase::Remove__SignalKey"></span><span class="target" id="classSignalBase_1ae73e31b9413bf88926bafab19fa0f6c8"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Remove</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N10SignalBase6RemoveE9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove an action specified by its key. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase5ClearEv">
+<span id="_CPPv3N10SignalBase5ClearEv"></span><span id="_CPPv2N10SignalBase5ClearEv"></span><span id="SignalBase::Clear"></span><span class="target" id="classSignalBase_1a156276d49ae15ecc3ea162b1890a428d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10SignalBase5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove all actions from this signal. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SignalBase3HasE9SignalKey">
+<span id="_CPPv3NK10SignalBase3HasE9SignalKey"></span><span id="_CPPv2NK10SignalBase3HasE9SignalKey"></span><span id="SignalBase::Has__SignalKeyC"></span><span class="target" id="classSignalBase_1a4183187100db99ae0824296c9a5cd683"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SignalBase3HasE9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-types">Protected Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase5man_tE">
+<span id="_CPPv3N10SignalBase5man_tE"></span><span id="_CPPv2N10SignalBase5man_tE"></span><span class="target" id="classSignalBase_1a0c9d3476fbe9f86f83887e3cf0eaa3ad"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">man_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">SignalManager_Base</span></span><a class="headerlink" href="#_CPPv4N10SignalBase5man_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase13NextSignalKeyEv">
+<span id="_CPPv3N10SignalBase13NextSignalKeyEv"></span><span id="_CPPv2N10SignalBase13NextSignalKeyEv"></span><span id="SignalBase::NextSignalKey"></span><span class="target" id="classSignalBase_1a56556c83bca93a9a5d30ea89b398e0ca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NextSignalKey</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10SignalBase13NextSignalKeyEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase10SignalBaseERKNSt6stringEPN8internal18SignalManager_BaseE">
+<span id="_CPPv3N10SignalBase10SignalBaseERKNSt6stringEPN8internal18SignalManager_BaseE"></span><span id="_CPPv2N10SignalBase10SignalBaseERKNSt6stringEPN8internal18SignalManager_BaseE"></span><span id="SignalBase::SignalBase__ssCR.internal::SignalManager_BaseP"></span><span class="target" id="classSignalBase_1a7d1c46e4abe2c1dc9713a2d66db28a12"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SignalBase</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">n</span></span>, <span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">SignalManager_Base</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">manager</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10SignalBase10SignalBaseERKNSt6stringEPN8internal18SignalManager_BaseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase4nameE">
+<span id="_CPPv3N10SignalBase4nameE"></span><span id="_CPPv2N10SignalBase4nameE"></span><span id="SignalBase::name__ss"></span><span class="target" id="classSignalBase_1a93d8906be8e36be835fccb4ab2ecba3e"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><a class="headerlink" href="#_CPPv4N10SignalBase4nameE" title="Link to this definition"></a><br /></dt>
+<dd><p>What is the unique name of this signal? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase9signal_idE">
+<span id="_CPPv3N10SignalBase9signal_idE"></span><span id="_CPPv2N10SignalBase9signal_idE"></span><span id="SignalBase::signal_id__uint32_t"></span><span class="target" id="classSignalBase_1a9026bd99b8ff59db7bf3a3d4fd2c5cdf"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">signal_id</span></span></span><a class="headerlink" href="#_CPPv4N10SignalBase9signal_idE" title="Link to this definition"></a><br /></dt>
+<dd><p>What is the unique ID of this signal? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase12next_link_idE">
+<span id="_CPPv3N10SignalBase12next_link_idE"></span><span id="_CPPv2N10SignalBase12next_link_idE"></span><span id="SignalBase::next_link_id__uint32_t"></span><span class="target" id="classSignalBase_1abf6d8f16a20e8ac10c98c68331917bd8"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">next_link_id</span></span></span><a class="headerlink" href="#_CPPv4N10SignalBase12next_link_idE" title="Link to this definition"></a><br /></dt>
+<dd><p>What ID should the next link have? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase12link_key_mapE">
+<span id="_CPPv3N10SignalBase12link_key_mapE"></span><span id="_CPPv2N10SignalBase12link_key_mapE"></span><span id="SignalBase::link_key_map__std::map:SignalKey.s:"></span><span class="target" id="classSignalBase_1ab179be98cb8569a9a5997102cf7dacf0"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">link_key_map</span></span></span><a class="headerlink" href="#_CPPv4N10SignalBase12link_key_mapE" title="Link to this definition"></a><br /></dt>
+<dd><p>Map unique link keys to link index for actions. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase8managersE">
+<span id="_CPPv3N10SignalBase8managersE"></span><span id="_CPPv2N10SignalBase8managersE"></span><span id="SignalBase::managers__vector:man_tP:"></span><span class="target" id="classSignalBase_1a0e3199b4edc3dc8f4dc6e1aa85dfd9ec"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N10SignalBase5man_tE" title="SignalBase::man_t"><span class="n"><span class="pre">man_t</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">managers</span></span></span><a class="headerlink" href="#_CPPv4N10SignalBase8managersE" title="Link to this definition"></a><br /></dt>
+<dd><p>What manager is handling this signal? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10SignalBase13prime_managerE">
+<span id="_CPPv3N10SignalBase13prime_managerE"></span><span id="_CPPv2N10SignalBase13prime_managerE"></span><span id="SignalBase::prime_manager__man_tP"></span><span class="target" id="classSignalBase_1ab6b7d7cc868717d00f63d2624f86bb0d"></span><a class="reference internal" href="#_CPPv4N10SignalBase5man_tE" title="SignalBase::man_t"><span class="n"><span class="pre">man_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">prime_manager</span></span></span><a class="headerlink" href="#_CPPv4N10SignalBase13prime_managerE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which manager leads deletion? (nullptr for self) </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-friends">Friends</p>
+<dl>
+<dt class="sig sig-object cpp">
+<em class="property"><span class="pre">friend</span> <span class="pre">class</span></em> <span class="pre">SignalManager</span></dt>
+</dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE6Signal">
+<span id="_CPPv3IDpE6Signal"></span><span id="_CPPv2IDpE6Signal"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignal"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Signal</span></span></span><a class="headerlink" href="#_CPPv4IDpE6Signal" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Signal.hpp&gt;</em></div>
+<p>Generic version of Signals; needs specialization to a function type.. </p>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE6SignalIFvDp4ARGSEE">
+<span id="_CPPv3IDpE6SignalIFvDp4ARGSEE"></span><span id="_CPPv2IDpE6SignalIFvDp4ARGSEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Signal</span></span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE6SignalIFvDp4ARGSEE" title="Signal&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410SignalBase" title="SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><a class="headerlink" href="#_CPPv4IDpE6SignalIFvDp4ARGSEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Signal.hpp&gt;</em></div>
+<p>Signals with void return. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIFvDp4ARGSEE5fun_tE">
+<span id="_CPPv3N6SignalIFvDp4ARGSEE5fun_tE"></span><span id="_CPPv2N6SignalIFvDp4ARGSEE5fun_tE"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1a8cccdf73db7fd1e48265c11e8a5d56ae"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE6SignalIFvDp4ARGSEE" title="Signal&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N6SignalIFvDp4ARGSEE5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIFvDp4ARGSEE6this_tE">
+<span id="_CPPv3N6SignalIFvDp4ARGSEE6this_tE"></span><span id="_CPPv2N6SignalIFvDp4ARGSEE6this_tE"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1a6dc3e11b3eec4eee8ed6081937d52e56"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6SignalIFvDp4ARGSEE6SignalERKNSt6stringEPN8internal18SignalManager_BaseE" title="Signal&lt;void(ARGS...)&gt;::Signal"><span class="n"><span class="pre">Signal</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6SignalIFvDp4ARGSEE5fun_tE" title="Signal&lt;void(ARGS...)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6SignalIFvDp4ARGSEE6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIFvDp4ARGSEE6SignalERKNSt6stringEPN8internal18SignalManager_BaseE">
+<span id="_CPPv3N6SignalIFvDp4ARGSEE6SignalERKNSt6stringEPN8internal18SignalManager_BaseE"></span><span id="_CPPv2N6SignalIFvDp4ARGSEE6SignalERKNSt6stringEPN8internal18SignalManager_BaseE"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1a0419320bbab65a05e88d697934dbb680"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Signal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span>, <span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">SignalManager_Base</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">manager</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIFvDp4ARGSEE6SignalERKNSt6stringEPN8internal18SignalManager_BaseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIFvDp4ARGSEE6SignalERKNSt6stringERN8internal18SignalControl_BaseE">
+<span id="_CPPv3N6SignalIFvDp4ARGSEE6SignalERKNSt6stringERN8internal18SignalControl_BaseE"></span><span id="_CPPv2N6SignalIFvDp4ARGSEE6SignalERKNSt6stringERN8internal18SignalControl_BaseE"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1ad5d2927112598c0ff01b740e87d26404"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Signal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">SignalControl_Base</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">control</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIFvDp4ARGSEE6SignalERKNSt6stringERN8internal18SignalControl_BaseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6SignalIFvDp4ARGSEE5CloneEv">
+<span id="_CPPv3NK6SignalIFvDp4ARGSEE5CloneEv"></span><span id="_CPPv2NK6SignalIFvDp4ARGSEE5CloneEv"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1aa98b72f59845787eaaa7f1203c850a17"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6SignalIFvDp4ARGSEE6this_tE" title="Signal&lt;void(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Clone</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6SignalIFvDp4ARGSEE5CloneEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6SignalIFvDp4ARGSEE10GetNumArgsEv">
+<span id="_CPPv3NK6SignalIFvDp4ARGSEE10GetNumArgsEv"></span><span id="_CPPv2NK6SignalIFvDp4ARGSEE10GetNumArgsEv"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1a2759f29eb6d01a5eb97bfa25301d96c7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumArgs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6SignalIFvDp4ARGSEE10GetNumArgsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6SignalIFvDp4ARGSEE13GetNumActionsEv">
+<span id="_CPPv3NK6SignalIFvDp4ARGSEE13GetNumActionsEv"></span><span id="_CPPv2NK6SignalIFvDp4ARGSEE13GetNumActionsEv"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1a80d06eb910db7509154c8cf4722f0489"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumActions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6SignalIFvDp4ARGSEE13GetNumActionsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIFvDp4ARGSEE7TriggerEDp4ARGS">
+<span id="_CPPv3N6SignalIFvDp4ARGSEE7TriggerEDp4ARGS"></span><span id="_CPPv2N6SignalIFvDp4ARGSEE7TriggerEDp4ARGS"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1a499315f8bb0646ff80a4f61370cbe2e7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Trigger</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpE6SignalIFvDp4ARGSEE" title="Signal&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIFvDp4ARGSEE7TriggerEDp4ARGS" title="Link to this definition"></a><br /></dt>
+<dd><p>Trigger this signal, providing all needed arguments. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIFvDp4ARGSEE9AddActionERKNSt8functionIFvDp4ARGSEEE">
+<span id="_CPPv3N6SignalIFvDp4ARGSEE9AddActionERKNSt8functionIFvDp4ARGSEEE"></span><span id="_CPPv2N6SignalIFvDp4ARGSEE9AddActionERKNSt8functionIFvDp4ARGSEEE"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1a87b94ca1aae543b3cd0cb4ea2da0a791"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE6SignalIFvDp4ARGSEE" title="Signal&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIFvDp4ARGSEE9AddActionERKNSt8functionIFvDp4ARGSEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add an action that takes the proper arguments. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIFvDp4ARGSEE9AddActionER10ActionBase">
+<span id="_CPPv3N6SignalIFvDp4ARGSEE9AddActionER10ActionBase"></span><span id="_CPPv2N6SignalIFvDp4ARGSEE9AddActionER10ActionBase"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1abb57906a25d8ae6ed2312d2d716d95d6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Action.html#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_action</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIFvDp4ARGSEE9AddActionER10ActionBase" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a specified action to this signal. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIFvDp4ARGSEE9TestMatchER10ActionBase">
+<span id="_CPPv3N6SignalIFvDp4ARGSEE9TestMatchER10ActionBase"></span><span id="_CPPv2N6SignalIFvDp4ARGSEE9TestMatchER10ActionBase"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1aa71f3f109ead076bdeb2c516212e2663"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TestMatch</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Action.html#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_action</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIFvDp4ARGSEE9TestMatchER10ActionBase" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if an action is compatible with a signal. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpDpEN6SignalIFvDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIFvDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE">
+<span id="_CPPv3IDpDpEN6SignalIFvDp4ARGSEE9AddActionERKNSt8functionIFvDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE"></span><span id="_CPPv2IDpDpEN6SignalIFvDp4ARGSEE9AddActionERKNSt8functionIFvDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">FUN_ARGS</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">EXTRA_ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1abc23802d3d444672994325e2f7996812"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpDpEN6SignalIFvDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIFvDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE" title="Signal&lt;void(ARGS...)&gt;::AddAction::FUN_ARGS"><span class="n"><span class="pre">FUN_ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span>, <a class="reference internal" href="../../meta/api/TypePack.html#_CPPv4IDpE8TypePack" title="TypePack"><span class="n"><span class="pre">TypePack</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpDpEN6SignalIFvDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIFvDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE" title="Signal&lt;void(ARGS...)&gt;::AddAction::EXTRA_ARGS"><span class="n"><span class="pre">EXTRA_ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpDpEN6SignalIFvDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIFvDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add an action that takes too few arguments… but provide specific padding info. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6SignalIFvDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIFvDp8FUN_ARGSEEE">
+<span id="_CPPv3IDpEN6SignalIFvDp4ARGSEE9AddActionERKNSt8functionIFvDp8FUN_ARGSEEE"></span><span id="_CPPv2IDpEN6SignalIFvDp4ARGSEE9AddActionERKNSt8functionIFvDp8FUN_ARGSEEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">FUN_ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1a1c881d59da41e9d01ee8be6a7791d8b8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpEN6SignalIFvDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIFvDp8FUN_ARGSEEE" title="Signal&lt;void(ARGS...)&gt;::AddAction::FUN_ARGS"><span class="n"><span class="pre">FUN_ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6SignalIFvDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIFvDp8FUN_ARGSEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add an std::function that takes the wrong number of arguments. For now, we will assume that there are too few and we need to figure out how to pad it out. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6SignalIFvDp4ARGSEE9AddActionE9SignalKeyFvDp8FUN_ARGSE">
+<span id="_CPPv3IDpEN6SignalIFvDp4ARGSEE9AddActionEFvDp8FUN_ARGSE"></span><span id="_CPPv2IDpEN6SignalIFvDp4ARGSEE9AddActionEFvDp8FUN_ARGSE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">FUN_ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1a6f7256d0dc9840cf156c3fab53f16746"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpEN6SignalIFvDp4ARGSEE9AddActionE9SignalKeyFvDp8FUN_ARGSE" title="Signal&lt;void(ARGS...)&gt;::AddAction::FUN_ARGS"><span class="n"><span class="pre">FUN_ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6SignalIFvDp4ARGSEE9AddActionE9SignalKeyFvDp8FUN_ARGSE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a regular function that takes the wrong number of arguments. For now, we will assume that there are too few and we need to figure out how to pad it out. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIFvDp4ARGSEE6RemoveE9SignalKey">
+<span id="_CPPv3N6SignalIFvDp4ARGSEE6RemoveE9SignalKey"></span><span id="_CPPv2N6SignalIFvDp4ARGSEE6RemoveE9SignalKey"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1ab9a1d53ec2faacd15031b70fa240a5e4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Remove</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIFvDp4ARGSEE6RemoveE9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove an action from this signal by providing its key. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIFvDp4ARGSEE11GetPriorityE9SignalKey">
+<span id="_CPPv3N6SignalIFvDp4ARGSEE11GetPriorityE9SignalKey"></span><span id="_CPPv2N6SignalIFvDp4ARGSEE11GetPriorityE9SignalKey"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1ad01c37167a3fcce28be6363c28f67308"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPriority</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIFvDp4ARGSEE11GetPriorityE9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd><p>Retrieve the relative priority associated with a specific. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIFvDp4ARGSEE7actionsE">
+<span id="_CPPv3N6SignalIFvDp4ARGSEE7actionsE"></span><span id="_CPPv2N6SignalIFvDp4ARGSEE7actionsE"></span><span class="target" id="classSignal_3_01void_07ARGS_8_8_8_08_4_1aa9d9e5c86259464e8c75c20534c26ef9"></span><a class="reference internal" href="../../functional/api/FunctionSet.html#_CPPv4I0E11FunctionSet" title="FunctionSet"><span class="n"><span class="pre">FunctionSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE6SignalIFvDp4ARGSEE" title="Signal&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">actions</span></span></span><a class="headerlink" href="#_CPPv4N6SignalIFvDp4ARGSEE7actionsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set of functions (actions) to be triggered with this signal. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE">
+<span id="_CPPv3I0DpE6SignalIF6RETURNDp4ARGSEE"></span><span id="_CPPv2I0DpE6SignalIF6RETURNDp4ARGSEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RETURN</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Signal</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE" title="Signal&lt;RETURN(ARGS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE" title="Signal&lt;RETURN(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410SignalBase" title="SignalBase"><span class="n"><span class="pre">SignalBase</span></span></a><a class="headerlink" href="#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Signal.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIF6RETURNDp4ARGSEE5fun_tE">
+<span id="_CPPv3N6SignalIF6RETURNDp4ARGSEE5fun_tE"></span><span id="_CPPv2N6SignalIF6RETURNDp4ARGSEE5fun_tE"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1af950e3a95e5b139fcbbe103be03a6f8d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE" title="Signal&lt;RETURN(ARGS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE" title="Signal&lt;RETURN(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIF6RETURNDp4ARGSEE6this_tE">
+<span id="_CPPv3N6SignalIF6RETURNDp4ARGSEE6this_tE"></span><span id="_CPPv2N6SignalIF6RETURNDp4ARGSEE6this_tE"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1ae82460e1907389f445625e94c335fde3"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE6SignalERKNSt6stringEPN8internal18SignalManager_BaseE" title="Signal&lt;RETURN(ARGS...)&gt;::Signal"><span class="n"><span class="pre">Signal</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE5fun_tE" title="Signal&lt;RETURN(ARGS...)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIF6RETURNDp4ARGSEE6SignalERKNSt6stringEPN8internal18SignalManager_BaseE">
+<span id="_CPPv3N6SignalIF6RETURNDp4ARGSEE6SignalERKNSt6stringEPN8internal18SignalManager_BaseE"></span><span id="_CPPv2N6SignalIF6RETURNDp4ARGSEE6SignalERKNSt6stringEPN8internal18SignalManager_BaseE"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1aadfbc305e494213999c61fa090e848e0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Signal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span>, <span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">SignalManager_Base</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">manager</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE6SignalERKNSt6stringEPN8internal18SignalManager_BaseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIF6RETURNDp4ARGSEE6SignalERKNSt6stringERN8internal18SignalControl_BaseE">
+<span id="_CPPv3N6SignalIF6RETURNDp4ARGSEE6SignalERKNSt6stringERN8internal18SignalControl_BaseE"></span><span id="_CPPv2N6SignalIF6RETURNDp4ARGSEE6SignalERKNSt6stringERN8internal18SignalControl_BaseE"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1a68e4173671f37aea415bc8e356384a95"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Signal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">SignalControl_Base</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">control</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE6SignalERKNSt6stringERN8internal18SignalControl_BaseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6SignalIF6RETURNDp4ARGSEE5CloneEv">
+<span id="_CPPv3NK6SignalIF6RETURNDp4ARGSEE5CloneEv"></span><span id="_CPPv2NK6SignalIF6RETURNDp4ARGSEE5CloneEv"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1a5a3657f861aee09819348a3dac4326eb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE6this_tE" title="Signal&lt;RETURN(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Clone</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6SignalIF6RETURNDp4ARGSEE5CloneEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6SignalIF6RETURNDp4ARGSEE10GetNumArgsEv">
+<span id="_CPPv3NK6SignalIF6RETURNDp4ARGSEE10GetNumArgsEv"></span><span id="_CPPv2NK6SignalIF6RETURNDp4ARGSEE10GetNumArgsEv"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1a93e4f843ac39b597893f595e8298fdf4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumArgs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6SignalIF6RETURNDp4ARGSEE10GetNumArgsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6SignalIF6RETURNDp4ARGSEE13GetNumActionsEv">
+<span id="_CPPv3NK6SignalIF6RETURNDp4ARGSEE13GetNumActionsEv"></span><span id="_CPPv2NK6SignalIF6RETURNDp4ARGSEE13GetNumActionsEv"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1a73d0132b4a6d48d1fd8adb2f63200394"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumActions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6SignalIF6RETURNDp4ARGSEE13GetNumActionsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIF6RETURNDp4ARGSEE7TriggerEDp4ARGS">
+<span id="_CPPv3N6SignalIF6RETURNDp4ARGSEE7TriggerEDp4ARGS"></span><span id="_CPPv2N6SignalIF6RETURNDp4ARGSEE7TriggerEDp4ARGS"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1a4c93e562b125756e3e551dc0bd7546d7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE" title="Signal&lt;RETURN(ARGS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Trigger</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE" title="Signal&lt;RETURN(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE7TriggerEDp4ARGS" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIF6RETURNDp4ARGSEE9AddActionERKNSt8functionI5fun_tEE">
+<span id="_CPPv3N6SignalIF6RETURNDp4ARGSEE9AddActionERKNSt8functionI5fun_tEE"></span><span id="_CPPv2N6SignalIF6RETURNDp4ARGSEE9AddActionERKNSt8functionI5fun_tEE"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1ae18dc47bba35a1e5ce4560e3854e4b41"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE5fun_tE" title="Signal&lt;RETURN(ARGS...)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE9AddActionERKNSt8functionI5fun_tEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIF6RETURNDp4ARGSEE9AddActionER10ActionBase">
+<span id="_CPPv3N6SignalIF6RETURNDp4ARGSEE9AddActionER10ActionBase"></span><span id="_CPPv2N6SignalIF6RETURNDp4ARGSEE9AddActionER10ActionBase"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1aa4b5ad5c93458389209e17a1ec09b1d6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Action.html#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_action</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE9AddActionER10ActionBase" title="Link to this definition"></a><br /></dt>
+<dd><p>Add an action using an Action object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIF6RETURNDp4ARGSEE9TestMatchER10ActionBase">
+<span id="_CPPv3N6SignalIF6RETURNDp4ARGSEE9TestMatchER10ActionBase"></span><span id="_CPPv2N6SignalIF6RETURNDp4ARGSEE9TestMatchER10ActionBase"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1aa5d3c4d6eda10745e581428b204aa72b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TestMatch</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Action.html#_CPPv410ActionBase" title="ActionBase"><span class="n"><span class="pre">ActionBase</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_action</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE9TestMatchER10ActionBase" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if an action is compatible with a signal. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpDpEN6SignalIF6RETURNDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIF6RETURNDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE">
+<span id="_CPPv3IDpDpEN6SignalIF6RETURNDp4ARGSEE9AddActionERKNSt8functionIF6RETURNDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE"></span><span id="_CPPv2IDpDpEN6SignalIF6RETURNDp4ARGSEE9AddActionERKNSt8functionIF6RETURNDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">FUN_ARGS</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">EXTRA_ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1afeb45b3716c542b821de07a054aa8555"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE" title="Signal&lt;RETURN(ARGS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpDpEN6SignalIF6RETURNDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIF6RETURNDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE" title="Signal&lt;RETURN(ARGS...)&gt;::AddAction::FUN_ARGS"><span class="n"><span class="pre">FUN_ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span>, <a class="reference internal" href="../../meta/api/TypePack.html#_CPPv4IDpE8TypePack" title="TypePack"><span class="n"><span class="pre">TypePack</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpDpEN6SignalIF6RETURNDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIF6RETURNDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE" title="Signal&lt;RETURN(ARGS...)&gt;::AddAction::EXTRA_ARGS"><span class="n"><span class="pre">EXTRA_ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpDpEN6SignalIF6RETURNDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIF6RETURNDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6SignalIF6RETURNDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIF6RETURNDp8FUN_ARGSEEE">
+<span id="_CPPv3IDpEN6SignalIF6RETURNDp4ARGSEE9AddActionERKNSt8functionIF6RETURNDp8FUN_ARGSEEE"></span><span id="_CPPv2IDpEN6SignalIF6RETURNDp4ARGSEE9AddActionERKNSt8functionIF6RETURNDp8FUN_ARGSEEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">FUN_ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1a1bb39804008dc5a44f3aa18e59fb979f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE" title="Signal&lt;RETURN(ARGS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpEN6SignalIF6RETURNDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIF6RETURNDp8FUN_ARGSEEE" title="Signal&lt;RETURN(ARGS...)&gt;::AddAction::FUN_ARGS"><span class="n"><span class="pre">FUN_ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6SignalIF6RETURNDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIF6RETURNDp8FUN_ARGSEEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6SignalIF6RETURNDp4ARGSEE9AddActionE9SignalKeyF6RETURNDp8FUN_ARGSE">
+<span id="_CPPv3IDpEN6SignalIF6RETURNDp4ARGSEE9AddActionEF6RETURNDp8FUN_ARGSE"></span><span id="_CPPv2IDpEN6SignalIF6RETURNDp4ARGSEE9AddActionEF6RETURNDp8FUN_ARGSE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">FUN_ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1afce3c7f9fad72d3f651999cdf2ef99b2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddAction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE" title="Signal&lt;RETURN(ARGS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpEN6SignalIF6RETURNDp4ARGSEE9AddActionE9SignalKeyF6RETURNDp8FUN_ARGSE" title="Signal&lt;RETURN(ARGS...)&gt;::AddAction::FUN_ARGS"><span class="n"><span class="pre">FUN_ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6SignalIF6RETURNDp4ARGSEE9AddActionE9SignalKeyF6RETURNDp8FUN_ARGSE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIF6RETURNDp4ARGSEE6RemoveE9SignalKey">
+<span id="_CPPv3N6SignalIF6RETURNDp4ARGSEE6RemoveE9SignalKey"></span><span id="_CPPv2N6SignalIF6RETURNDp4ARGSEE6RemoveE9SignalKey"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1a9193f4b73950d8cd224ffd5edd52af20"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Remove</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE6RemoveE9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove an action specified by its key. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIF6RETURNDp4ARGSEE11GetPriorityE9SignalKey">
+<span id="_CPPv3N6SignalIF6RETURNDp4ARGSEE11GetPriorityE9SignalKey"></span><span id="_CPPv2N6SignalIF6RETURNDp4ARGSEE11GetPriorityE9SignalKey"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1a73e6ebfbc70c442d920514b7ebcb6622"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPriority</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49SignalKey" title="SignalKey"><span class="n"><span class="pre">SignalKey</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE11GetPriorityE9SignalKey" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6SignalIF6RETURNDp4ARGSEE7actionsE">
+<span id="_CPPv3N6SignalIF6RETURNDp4ARGSEE7actionsE"></span><span id="_CPPv2N6SignalIF6RETURNDp4ARGSEE7actionsE"></span><span class="target" id="classSignal_3_01RETURN_07ARGS_8_8_8_08_4_1a8c2e59bc441314727c1d7dace182f9d5"></span><a class="reference internal" href="../../functional/api/FunctionSet.html#_CPPv4I0E11FunctionSet" title="FunctionSet"><span class="n"><span class="pre">FunctionSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE" title="Signal&lt;RETURN(ARGS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE" title="Signal&lt;RETURN(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">actions</span></span></span><a class="headerlink" href="#_CPPv4N6SignalIF6RETURNDp4ARGSEE7actionsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ActionManager.html" class="btn btn-neutral float-left" title="ActionManager.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SignalControl.html" class="btn btn-neutral float-right" title="SignalControl.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

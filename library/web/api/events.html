@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>events.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/web/api/events.53fb720d-cd79-4881-b32b-574fa5fe57e2.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="init.hpp" href="init.html" />
+    <link rel="prev" title="emfunctions.hpp" href="emfunctions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../web.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Animate.html">Animate.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Attributes.html">Attributes.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Button.html">Button.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Canvas.html">Canvas.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasAction.html">CanvasAction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasShape.html">CanvasShape.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Div.html">Div.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DocuExtras.html">DocuExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Document.html">Document.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Element.html">Element.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FileInput.html">FileInput.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Font.html">Font.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Image.html">Image.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Input.html">Input.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="JSWrap.html">JSWrap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="KeypressManager.html">KeypressManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Listeners.html">Listeners.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NodeDomShim.html">NodeDomShim.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RawImage.html">RawImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Selector.html">Selector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style.html">Style.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Table.html">Table.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Text.html">Text.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextArea.html">TextArea.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextFeed.html">TextFeed.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tween.html">Tween.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UrlParams.html">UrlParams.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Widget.html">Widget.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WidgetExtras.html">WidgetExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="canvas_utils.html">canvas_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="color_map.html">color_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html">commands.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emfunctions.html">emfunctions.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">events.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E15OnDocumentReadyvRR8FUN_TYPE"><code class="docutils literal notranslate"><span class="pre">OnDocumentReady()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E14OnDocumentLoadvRR8FUN_TYPE"><code class="docutils literal notranslate"><span class="pre">OnDocumentLoad()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv45Event"><code class="docutils literal notranslate"><span class="pre">Event</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410MouseEvent"><code class="docutils literal notranslate"><span class="pre">MouseEvent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413KeyboardEvent"><code class="docutils literal notranslate"><span class="pre">KeyboardEvent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410WheelEvent"><code class="docutils literal notranslate"><span class="pre">WheelEvent</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="init.html">init.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="js_utils.html">js_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="web.html">web.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../web.html">Web Tools (for use with Emscripten)</a></li>
+      <li class="breadcrumb-item active">events.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="events-hpp">
+<h1>events.hpp<a class="headerlink" href="#events-hpp" title="Link to this heading"></a></h1>
+<p>Event handlers that use JQuery. </p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Events can be further sub-divided and built up (similar to DataNode objects) so that we save only the information that we’re planning to use. This may be slightly faster (given how frequently some of these like mouse move might be used), but likely to be more compelx. </p>
+<p>An alternative speed-up might be to save the current event somewhere in emp_i on the Javascript side, and then just request the information that we might need. This approach should be easier to implement, but since everything would be copied anyway in such as case, it might not actually be a speedup. </p>
+</dd></dl>
+
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E15OnDocumentReadyvRR8FUN_TYPE">
+<span id="_CPPv3I0E15OnDocumentReadyRR8FUN_TYPE"></span><span id="_CPPv2I0E15OnDocumentReadyRR8FUN_TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FUN_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="events_8hpp_1a1e2b9795a8c9a92ec7df07f9eb92dd4c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OnDocumentReady</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E15OnDocumentReadyvRR8FUN_TYPE" title="OnDocumentReady::FUN_TYPE"><span class="n"><span class="pre">FUN_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E15OnDocumentReadyvRR8FUN_TYPE" title="Link to this definition"></a><br /></dt>
+<dd><p>Runs the specified function when the document is finished loading and being set up. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E14OnDocumentLoadvRR8FUN_TYPE">
+<span id="_CPPv3I0E14OnDocumentLoadRR8FUN_TYPE"></span><span id="_CPPv2I0E14OnDocumentLoadRR8FUN_TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FUN_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="events_8hpp_1accf375b12b6271dd8cee37002dd91226"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OnDocumentLoad</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E14OnDocumentLoadvRR8FUN_TYPE" title="OnDocumentLoad::FUN_TYPE"><span class="n"><span class="pre">FUN_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E14OnDocumentLoadvRR8FUN_TYPE" title="Link to this definition"></a><br /></dt>
+<dd><p>Runs the specified function when the document is finished loading. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv45Event">
+<span id="_CPPv35Event"></span><span id="_CPPv25Event"></span><span id="Event"></span><span class="target" id="structEvent"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Event</span></span></span><a class="headerlink" href="#_CPPv45Event" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;events.hpp&gt;</em></div>
+<p>Data common to all web events. </p>
+<p>Subclassed by KeyboardEvent, MouseEvent, WheelEvent</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_iEN5Event11LoadFromArgEvv">
+<span id="_CPPv3I_iEN5Event11LoadFromArgEv"></span><span id="_CPPv2I_iEN5Event11LoadFromArgEv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_ID</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structEvent_1abd5a308adc77ecf9472167a27fedab00"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LoadFromArg</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_iEN5Event11LoadFromArgEvv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Event7bubblesE">
+<span id="_CPPv3N5Event7bubblesE"></span><span id="_CPPv2N5Event7bubblesE"></span><span id="Event::bubbles__b"></span><span class="target" id="structEvent_1a2519bf8e6cfb834ab5086d2d7470b8ee"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bubbles</span></span></span><a class="headerlink" href="#_CPPv4N5Event7bubblesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Is this a bubbling event? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Event10cancelableE">
+<span id="_CPPv3N5Event10cancelableE"></span><span id="_CPPv2N5Event10cancelableE"></span><span id="Event::cancelable__b"></span><span class="target" id="structEvent_1a1c2d8c4b104f6617a87ea099089e62a0"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cancelable</span></span></span><a class="headerlink" href="#_CPPv4N5Event10cancelableE" title="Link to this definition"></a><br /></dt>
+<dd><p>Can the default action be prevented? </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv410MouseEvent">
+<span id="_CPPv310MouseEvent"></span><span id="_CPPv210MouseEvent"></span><span id="MouseEvent"></span><span class="target" id="structMouseEvent"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MouseEvent</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Event" title="Event"><span class="n"><span class="pre">Event</span></span></a><a class="headerlink" href="#_CPPv410MouseEvent" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;events.hpp&gt;</em></div>
+<p>Mouse-specific information about web events. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_iEN10MouseEvent11LoadFromArgEvv">
+<span id="_CPPv3I_iEN10MouseEvent11LoadFromArgEv"></span><span id="_CPPv2I_iEN10MouseEvent11LoadFromArgEv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_ID</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structMouseEvent_1a57f137412da37783f137939dc803f8ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LoadFromArg</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_iEN10MouseEvent11LoadFromArgEvv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10MouseEvent6altKeyE">
+<span id="_CPPv3N10MouseEvent6altKeyE"></span><span id="_CPPv2N10MouseEvent6altKeyE"></span><span id="MouseEvent::altKey__b"></span><span class="target" id="structMouseEvent_1a591181f52b76eba63a22b61dc2c531bd"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">altKey</span></span></span><a class="headerlink" href="#_CPPv4N10MouseEvent6altKeyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Was “ALT” key was pressed? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10MouseEvent7ctrlKeyE">
+<span id="_CPPv3N10MouseEvent7ctrlKeyE"></span><span id="_CPPv2N10MouseEvent7ctrlKeyE"></span><span id="MouseEvent::ctrlKey__b"></span><span class="target" id="structMouseEvent_1a8442df5f88d92dd5cf6f219f33618255"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ctrlKey</span></span></span><a class="headerlink" href="#_CPPv4N10MouseEvent7ctrlKeyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Was “CTRL” key pressed? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10MouseEvent7metaKeyE">
+<span id="_CPPv3N10MouseEvent7metaKeyE"></span><span id="_CPPv2N10MouseEvent7metaKeyE"></span><span id="MouseEvent::metaKey__b"></span><span class="target" id="structMouseEvent_1ae78e914b868a73541d789b1bb9029939"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">metaKey</span></span></span><a class="headerlink" href="#_CPPv4N10MouseEvent7metaKeyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Was “META” key pressed? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10MouseEvent8shiftKeyE">
+<span id="_CPPv3N10MouseEvent8shiftKeyE"></span><span id="_CPPv2N10MouseEvent8shiftKeyE"></span><span id="MouseEvent::shiftKey__b"></span><span class="target" id="structMouseEvent_1a575d137e21c2947934e5b9b724326946"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shiftKey</span></span></span><a class="headerlink" href="#_CPPv4N10MouseEvent8shiftKeyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Was “SHIFT” key pressed? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10MouseEvent6buttonE">
+<span id="_CPPv3N10MouseEvent6buttonE"></span><span id="_CPPv2N10MouseEvent6buttonE"></span><span id="MouseEvent::button__i"></span><span class="target" id="structMouseEvent_1a3b8e724a916508b95ef5c4f36e8424d4"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">button</span></span></span><a class="headerlink" href="#_CPPv4N10MouseEvent6buttonE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which mouse button was pressed? -1=none (0/1/2) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10MouseEvent7clientXE">
+<span id="_CPPv3N10MouseEvent7clientXE"></span><span id="_CPPv2N10MouseEvent7clientXE"></span><span id="MouseEvent::clientX__i"></span><span class="target" id="structMouseEvent_1adbf64db91c49975a087a0c011d3d504e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clientX</span></span></span><a class="headerlink" href="#_CPPv4N10MouseEvent7clientXE" title="Link to this definition"></a><br /></dt>
+<dd><p>X-mouse postion, relative to current window. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10MouseEvent7clientYE">
+<span id="_CPPv3N10MouseEvent7clientYE"></span><span id="_CPPv2N10MouseEvent7clientYE"></span><span id="MouseEvent::clientY__i"></span><span class="target" id="structMouseEvent_1a1e21f052248b0318e2da6821519abfe2"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clientY</span></span></span><a class="headerlink" href="#_CPPv4N10MouseEvent7clientYE" title="Link to this definition"></a><br /></dt>
+<dd><p>Y-mouse postion, relative to current window. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10MouseEvent7screenXE">
+<span id="_CPPv3N10MouseEvent7screenXE"></span><span id="_CPPv2N10MouseEvent7screenXE"></span><span id="MouseEvent::screenX__i"></span><span class="target" id="structMouseEvent_1aab8434b77a22385dc0431e8520ce7ff2"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">screenX</span></span></span><a class="headerlink" href="#_CPPv4N10MouseEvent7screenXE" title="Link to this definition"></a><br /></dt>
+<dd><p>X-mouse position, relative to the screen. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10MouseEvent7screenYE">
+<span id="_CPPv3N10MouseEvent7screenYE"></span><span id="_CPPv2N10MouseEvent7screenYE"></span><span id="MouseEvent::screenY__i"></span><span class="target" id="structMouseEvent_1a4d63c3ae37e7366796e19fcc269b475e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">screenY</span></span></span><a class="headerlink" href="#_CPPv4N10MouseEvent7screenYE" title="Link to this definition"></a><br /></dt>
+<dd><p>Y-mouse position, relative to the screen. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv413KeyboardEvent">
+<span id="_CPPv313KeyboardEvent"></span><span id="_CPPv213KeyboardEvent"></span><span id="KeyboardEvent"></span><span class="target" id="structKeyboardEvent"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KeyboardEvent</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Event" title="Event"><span class="n"><span class="pre">Event</span></span></a><a class="headerlink" href="#_CPPv413KeyboardEvent" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;events.hpp&gt;</em></div>
+<p>Keyboard-specific information about web events. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_iEN13KeyboardEvent11LoadFromArgEvv">
+<span id="_CPPv3I_iEN13KeyboardEvent11LoadFromArgEv"></span><span id="_CPPv2I_iEN13KeyboardEvent11LoadFromArgEv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_ID</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structKeyboardEvent_1a57b487bd358ce7e4fff4954fa367b226"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LoadFromArg</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_iEN13KeyboardEvent11LoadFromArgEvv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13KeyboardEvent6altKeyE">
+<span id="_CPPv3N13KeyboardEvent6altKeyE"></span><span id="_CPPv2N13KeyboardEvent6altKeyE"></span><span id="KeyboardEvent::altKey__b"></span><span class="target" id="structKeyboardEvent_1a5968ec1dbe6919bd219eed70f2a2aba9"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">altKey</span></span></span><a class="headerlink" href="#_CPPv4N13KeyboardEvent6altKeyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Was “ALT” key was pressed? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13KeyboardEvent7ctrlKeyE">
+<span id="_CPPv3N13KeyboardEvent7ctrlKeyE"></span><span id="_CPPv2N13KeyboardEvent7ctrlKeyE"></span><span id="KeyboardEvent::ctrlKey__b"></span><span class="target" id="structKeyboardEvent_1a314c423ffe96eca6710179910a5d8dab"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ctrlKey</span></span></span><a class="headerlink" href="#_CPPv4N13KeyboardEvent7ctrlKeyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Was “CTRL” key pressed? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13KeyboardEvent7metaKeyE">
+<span id="_CPPv3N13KeyboardEvent7metaKeyE"></span><span id="_CPPv2N13KeyboardEvent7metaKeyE"></span><span id="KeyboardEvent::metaKey__b"></span><span class="target" id="structKeyboardEvent_1adb47a81609ccf00a7b9161c56cb2472a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">metaKey</span></span></span><a class="headerlink" href="#_CPPv4N13KeyboardEvent7metaKeyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Was “META” key pressed? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13KeyboardEvent8shiftKeyE">
+<span id="_CPPv3N13KeyboardEvent8shiftKeyE"></span><span id="_CPPv2N13KeyboardEvent8shiftKeyE"></span><span id="KeyboardEvent::shiftKey__b"></span><span class="target" id="structKeyboardEvent_1a85632251dd9299f14ca8a02e7bf8fa15"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shiftKey</span></span></span><a class="headerlink" href="#_CPPv4N13KeyboardEvent8shiftKeyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Was “SHIFT” key pressed? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13KeyboardEvent8charCodeE">
+<span id="_CPPv3N13KeyboardEvent8charCodeE"></span><span id="_CPPv2N13KeyboardEvent8charCodeE"></span><span id="KeyboardEvent::charCode__i"></span><span class="target" id="structKeyboardEvent_1a44a0ee74fb83f829f19660f62e02d57b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">charCode</span></span></span><a class="headerlink" href="#_CPPv4N13KeyboardEvent8charCodeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Unicode character pressed. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13KeyboardEvent7keyCodeE">
+<span id="_CPPv3N13KeyboardEvent7keyCodeE"></span><span id="_CPPv2N13KeyboardEvent7keyCodeE"></span><span id="KeyboardEvent::keyCode__i"></span><span class="target" id="structKeyboardEvent_1a20e8d3cea0db60febd90473849dfd205"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">keyCode</span></span></span><a class="headerlink" href="#_CPPv4N13KeyboardEvent7keyCodeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which key was pressed on the keyboard (e.g., ‘a’ and ‘A’ are the same) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv410WheelEvent">
+<span id="_CPPv310WheelEvent"></span><span id="_CPPv210WheelEvent"></span><span id="WheelEvent"></span><span class="target" id="structWheelEvent"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WheelEvent</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Event" title="Event"><span class="n"><span class="pre">Event</span></span></a><a class="headerlink" href="#_CPPv410WheelEvent" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;events.hpp&gt;</em></div>
+<p>Mouse-wheel-specific information about web events. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_iEN10WheelEvent11LoadFromArgEvv">
+<span id="_CPPv3I_iEN10WheelEvent11LoadFromArgEv"></span><span id="_CPPv2I_iEN10WheelEvent11LoadFromArgEv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_ID</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structWheelEvent_1ac9f3fbd8ef620ff918780e6c7585b988"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LoadFromArg</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_iEN10WheelEvent11LoadFromArgEvv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10WheelEvent6deltaXE">
+<span id="_CPPv3N10WheelEvent6deltaXE"></span><span id="_CPPv2N10WheelEvent6deltaXE"></span><span id="WheelEvent::deltaX__i"></span><span class="target" id="structWheelEvent_1a7911a9e8e7b9a0559456e2551a8d634a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deltaX</span></span></span><a class="headerlink" href="#_CPPv4N10WheelEvent6deltaXE" title="Link to this definition"></a><br /></dt>
+<dd><p>Horizontal scroll amount. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10WheelEvent6deltaYE">
+<span id="_CPPv3N10WheelEvent6deltaYE"></span><span id="_CPPv2N10WheelEvent6deltaYE"></span><span id="WheelEvent::deltaY__i"></span><span class="target" id="structWheelEvent_1a619524fd2ae743cf04cbc6213f870efd"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deltaY</span></span></span><a class="headerlink" href="#_CPPv4N10WheelEvent6deltaYE" title="Link to this definition"></a><br /></dt>
+<dd><p>Vertical scroll amount. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10WheelEvent6deltaZE">
+<span id="_CPPv3N10WheelEvent6deltaZE"></span><span id="_CPPv2N10WheelEvent6deltaZE"></span><span id="WheelEvent::deltaZ__i"></span><span class="target" id="structWheelEvent_1a813b94e518f488baa62b551e6b9c9204"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deltaZ</span></span></span><a class="headerlink" href="#_CPPv4N10WheelEvent6deltaZE" title="Link to this definition"></a><br /></dt>
+<dd><p>Scroll amount of a mouse wheel for the z-axis. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10WheelEvent9deltaModeE">
+<span id="_CPPv3N10WheelEvent9deltaModeE"></span><span id="_CPPv2N10WheelEvent9deltaModeE"></span><span id="WheelEvent::deltaMode__i"></span><span class="target" id="structWheelEvent_1a20333cbd69a16e6301ea8f160c4b6ad8"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deltaMode</span></span></span><a class="headerlink" href="#_CPPv4N10WheelEvent9deltaModeE" title="Link to this definition"></a><br /></dt>
+<dd><p>The unit of measurements for delta values (pixels, lines or pages) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="emfunctions.html" class="btn btn-neutral float-left" title="emfunctions.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="init.html" class="btn btn-neutral float-right" title="init.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coding guidelines and review checklist &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../_static/tippy/dev/contribution-guidelines-and-review.818de4c7-9855-42ca-bfdd-d29f0ef7f2c2.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Empirical Documentation Documentation" href="adding-documentation.html" />
+    <link rel="prev" title="Getting started with Empirical development" href="getting-started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../library/base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Coding guidelines and review checklist</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#c-standards">C++ standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#guidelines-based-on-emscripten-limitations">Guidelines based on Emscripten Limitations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#commenting-in-files">Commenting in files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#general-standards">General Standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#checklist">Checklist</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Coding guidelines and review checklist</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="coding-guidelines-and-review-checklist">
+<h1>Coding guidelines and review checklist<a class="headerlink" href="#coding-guidelines-and-review-checklist" title="Link to this heading"></a></h1>
+<p>This document is for those who want to contribute code or documentation
+fixes to the Empirical project and describes our coding standards as
+well as our code review process.</p>
+<p>This document has been adapted from the <a class="reference external" href="https://khmer.readthedocs.org/en/v1.4.1/dev/coding-guidelines-and-review.html">khmer
+project</a></p>
+<section id="c-standards">
+<h2>C++ standards<a class="headerlink" href="#c-standards" title="Link to this heading"></a></h2>
+<p>We use C++17 features throughout the project and currently that is the
+de-facto standard version to use.</p>
+<p>All code should be in header files for ease of inclusion into Emscripten
+projects.</p>
+<p>Files that define a single class should be named after that class. Files
+that define sets of functions or multiple classes should have an
+all-lowercase name that describes its contents.</p>
+<p>All files and all directories must be levelized. This is partly enforced
+through all files being headerfiles (and thus we cannot have circular
+dependencies), but for clean coding practices (and easy of unit testing)
+whole directories should not refer to each other bidirectionally either.
+See <a class="reference external" href="http://www.amazon.com/Large-Scale-Software-Design-John-Lakos/dp/0201633620/">Large-Scale C++ Software Design by John
+Lakos</a>
+for a strong pro-levelization argument.</p>
+<p>In-code identifier formatting is always hard to settle upon. The
+guidelines below are for consistency.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Variable names should be all_lowercase, with words separated by
+underscores</p></li>
+<li><p>Function names should be CamelCase() unless they are meant to
+mimic a function from the C++ standard library, at which point
+they can be all_lowercase to fit in.</p></li>
+<li><p>User-defined types should be CamelCase</p></li>
+<li><p>Constants should be ALL_UPPERCASE, with words separated by
+underscores</p></li>
+<li><p>Template parameters should be ALL_UPPERCASE.</p></li>
+<li><p>Typedefs or using statements should be all lowercase with an _t at
+the end of the alaised type name.
+For example, a typedef on a template parameter CONTAINER_T might be
+container_t.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="guidelines-based-on-emscripten-limitations">
+<h2>Guidelines based on Emscripten Limitations<a class="headerlink" href="#guidelines-based-on-emscripten-limitations" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Do not rely on exceptions when possible. Emscripten is slow at
+dealing with them and they can slow down code even when not
+triggered.  By default, we compile with exceptions disabled.</p></li>
+<li><p>Do not write multi-threaded code that uses shared state.
+Javascript cannot (yet) handle such code and as such Emscripten
+cannot compile it. Note that Emscripten does have experimental
+support of pthreads.</p></li>
+<li><p>Obviously, do not use any architecture-specific tricks, such as
+assuming endianness, doing unaligned reads or writes, directly
+accessing registers, etc.</p></li>
+</ul>
+</div></blockquote>
+<p>Please see the <a class="reference external" href="https://kripken.github.io/emscripten-site/docs/porting/guidelines/portability_guidelines.html">Emscripten doc
+page</a>
+for a full list.</p>
+</section>
+<section id="commenting-in-files">
+<h2>Commenting in files<a class="headerlink" href="#commenting-in-files" title="Link to this heading"></a></h2>
+<p>All code should be well-commented such that it can be understood by a skilled
+C++ programmer that is not familiar with the code base.  Comments should be
+written in Doxygen format where appropriate.</p>
+<p>Each file should have a header at the top to describe the goals of that file.
+This header should include copyright information as well as the name of the file,
+a brief description, and its status.  Statuses include:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Status</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DESIGN</p></td>
+<td><p>Notes are in place, and some functionality may work, but needs more engineering.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ALPHA</p></td>
+<td><p>Some basic functionality works, but more features still need to be added and tested</p></td>
+</tr>
+<tr class="row-even"><td><p>BETA</p></td>
+<td><p>Basic functionality is all in place, but needs more thorough testing.</p></td>
+</tr>
+<tr class="row-odd"><td><p>RELEASE</p></td>
+<td><p>Well-tested functionality and used in multiple projects, at least by authors</p></td>
+</tr>
+<tr class="row-even"><td><p>STABLE</p></td>
+<td><p>Used by many non-authors in assorted projects without fixes for extended period</p></td>
+</tr>
+<tr class="row-odd"><td><p>BROKEN</p></td>
+<td><p>Once worked (at least BETA level), but now needs to be repaired (not abandoned!)</p></td>
+</tr>
+<tr class="row-even"><td><p>DEPRECATED</p></td>
+<td><p>Functionality has been replaced and should shift to replacement.</p></td>
+</tr>
+</tbody>
+</table>
+<p>An example header might look like:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> *  @note This file is part of Empirical, https://github.com/devosoft/Empirical</span>
+<span class="cm"> *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md</span>
+<span class="cm"> *  @date 2016-2020.</span>
+<span class="cm"> *</span>
+<span class="cm"> *  @file Ptr.hpp</span>
+<span class="cm"> *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).</span>
+<span class="cm"> *  @note Status: BETA</span>
+<span class="cm"> *</span>
+<span class="cm"> *  Ptr objects behave as normal pointers under most conditions.  However, if a program is</span>
+<span class="cm"> *  compiled with EMP_TRACK_MEM set, then these pointers perform extra tests to ensure that</span>
+<span class="cm"> *  they point to valid memory and that memory is freed before pointers are released.</span>
+<span class="cm"> *</span>
+<span class="cm"> *  If you want to prevent pointers to pointers (a common source of errors, but MAY be done</span>
+<span class="cm"> *  intentionally) you can define EMP_NO_PTR_TO_PTR</span>
+<span class="cm"> *</span>
+<span class="cm"> *  If you trip an assert, you can re-do the run a track a specific pointer by defining</span>
+<span class="cm"> *  EMP_ABORT_PTR_NEW or EMP_ABORT_PTR_DELETE to the ID of the pointer in question.  This will</span>
+<span class="cm"> *  allow you to track the pointer more easily in a debugger.</span>
+<span class="cm"> *</span>
+<span class="cm"> *  @todo Track information about emp::vector and emp::array objects to make sure we don&#39;t</span>
+<span class="cm"> *    point directly into them? (A resize() could make such pointers invalid!) Or better, warn</span>
+<span class="cm"> *    it vector memory could have moved.</span>
+<span class="cm"> *  @todo Get working with threads</span>
+<span class="cm"> */</span>
+</pre></div>
+</div>
+<p>Each class should have at least a one-sentence description of the goals of that
+class (unless it is the ONLY class in a file and the descriptions would be identical).
+Each function should have at least a one-sentence description; parameters and
+return value should also be described unless obvious from the function/parameter names.</p>
+<p>Sections of code should have a comment at the top, explaining what this section does.
+More detailed comments are only needed if that section might be non-intuitive for an
+outside programmer.  Detailed comment can be either in the form of a fuller explanation
+at the top of a section, or line-by-line hand holding.</p>
+<p>Comments should always focus on intention and reasoning, not merely restating
+what the code is obviously doing.
+Comments are especially criticial for bug fixes or for warnings in non-intuitive
+code – it is important to not just indicate what is now happening, but why
+seemingly intuitive alternative methods are not correct, especially if it seems like it
+would be simpler code.
+Make sure to always FIX comments when you change code – out of date comments
+are far worse than no comments at all.</p>
+</section>
+<section id="general-standards">
+<h2>General Standards<a class="headerlink" href="#general-standards" title="Link to this heading"></a></h2>
+<p>All plain-text files should have line widths of 100 characters or less
+unless that is unsupported for the particular file format or creates a
+major loss in readability.</p>
+<p>All contributions should have their spelling checked before being
+committed to the codebase.  For example, the VSCode plug-in
+“Code Spell Checker” is a good choice.</p>
+<p>Vim users can run:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="o">:</span><span class="n">setlocal</span><span class="w"> </span><span class="n">spell</span><span class="w"> </span><span class="n">spelllang</span><span class="o">=</span><span class="n">en_us</span>
+</pre></div>
+</div>
+<p>to automagically check the spelling within the file being edited.</p>
+<p>If there is an Empirical replacement for a standard C++ feature in
+the include/emp/base/ directory, you should use that replacement.
+Specific cases include:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Use emp::Ptr&lt;&gt; instead of raw pointers.</p></li>
+<li><p>Use emp_assert() instead of standard library assert().</p></li>
+<li><p>Use emp::array istead of std::array.</p></li>
+<li><p>Use emp::optional instead of std::optional.</p></li>
+<li><p>Use emp::vector instead of std::vector.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="checklist">
+<h2>Checklist<a class="headerlink" href="#checklist" title="Link to this heading"></a></h2>
+<p>To submit code to Empirical, open a Pull Request on Github. When you are ready for it to be reviewed, add the “Merge Ready” label. Before requesting a review, you should ensure that all checks on Github pass and confirm that the following automatically-checkable things are true:</p>
+<ul class="simple">
+<li><p>The code is merge-able into master (checked by Github)</p></li>
+<li><p>All tests pass (checked by Github actions CI)</p></li>
+<li><p>The documentation builds successfully (checked by readthedocs action and Github actions CI)</p></li>
+</ul>
+<p>You should also verify that the following are true. These cannot be manually checked, so copy and paste the following checklist into a pull request comment and check them off as you do them:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>- [ ] The source code follows the Empirical coding standards
+- [ ] The code been commented (especially non-intuitive sections)
+- [ ] A spellchecker was run on the source code and documentation after changes were made?
+- [ ] All newly added/modified code has high-quality tests associated with it (the CodeCov Github Automation will check this, but you should verify it)
+- [ ] All newly-added functions and classes have doxygen-compatible docstrings
+</pre></div>
+</div>
+<p>It’s expected that before requesting a code review the author of the PR
+will have checked all these things on their own. It’s also expected
+that whomever reviews the PR will check these individual items as well.
+The CI is not infallible and the whole point of having a code review process
+is to have human eyes go over the changes to the codebase.</p>
+<p>The code reviewer should verify that the above requirements are met, and also that:</p>
+<ul class="simple">
+<li><p>The code is well-organized</p></li>
+<li><p>The code is commented appropriately</p></li>
+<li><p>Any new tests are of acceptable quality</p></li>
+<li><p>The addition represents an improvement to Empirical</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting-started.html" class="btn btn-neutral float-left" title="Getting started with Empirical development" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="adding-documentation.html" class="btn btn-neutral float-right" title="Empirical Documentation Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

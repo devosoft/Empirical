@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TextEncoding.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/text/api/TextEncoding.343bb5d2-e236-43a4-9cce-e5e335216c11.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Other Tools" href="../../tools/tools.html" />
+    <link rel="prev" title="Text.hpp" href="Text.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../text.html">Text</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../text.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="EmphaticEncoding.html">EmphaticEncoding.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="HTMLEncoding.html">HTMLEncoding.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Text.html">Text.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">TextEncoding.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE15MakeEncodedText4TextDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">MakeEncodedText()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412TextEncoding"><code class="docutils literal notranslate"><span class="pre">TextEncoding</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../text.html">Text</a></li>
+      <li class="breadcrumb-item active">TextEncoding.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="textencoding-hpp">
+<h1>TextEncoding.hpp<a class="headerlink" href="#textencoding-hpp" title="Link to this heading"></a></h1>
+<p>Plugs into Text with the specification of a given encoding. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE15MakeEncodedText4TextDpRR2Ts">
+<span id="_CPPv3I0DpE15MakeEncodedTextDpRR2Ts"></span><span id="_CPPv2I0DpE15MakeEncodedTextDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ENCODING_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="TextEncoding_8hpp_1a9e1bc36711c1f175ba9bd978fa0f2a4b"></span><a class="reference internal" href="Text.html#_CPPv44Text" title="Text"><span class="n"><span class="pre">Text</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MakeEncodedText</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE15MakeEncodedText4TextDpRR2Ts" title="MakeEncodedText::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE15MakeEncodedText4TextDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv412TextEncoding">
+<span id="_CPPv312TextEncoding"></span><span id="_CPPv212TextEncoding"></span><span id="TextEncoding"></span><span class="target" id="classTextEncoding"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TextEncoding</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="Text.html#_CPPv422TextEncoding_Interface" title="TextEncoding_Interface"><span class="n"><span class="pre">TextEncoding_Interface</span></span></a><a class="headerlink" href="#_CPPv412TextEncoding" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;TextEncoding.hpp&gt;</em></div>
+<p>Subclassed by EmphaticEncoding, HTMLEncoding</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding12TextEncodingEv">
+<span id="_CPPv3N12TextEncoding12TextEncodingEv"></span><span id="_CPPv2N12TextEncoding12TextEncodingEv"></span><span id="TextEncoding::TextEncoding"></span><span class="target" id="classTextEncoding_1a84cd35e91d4e7d6e8e88e123d1599994"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TextEncoding</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12TextEncoding12TextEncodingEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncodingD0Ev">
+<span id="_CPPv3N12TextEncodingD0Ev"></span><span id="_CPPv2N12TextEncodingD0Ev"></span><span id="TextEncoding::~TextEncoding"></span><span class="target" id="classTextEncoding_1a8060548558b9d9b9c10e93e9caa00c12"></span><span class="sig-name descname"><span class="n"><span class="pre">~TextEncoding</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N12TextEncodingD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding5ResetEv">
+<span id="_CPPv3N12TextEncoding5ResetEv"></span><span id="_CPPv2N12TextEncoding5ResetEv"></span><span id="TextEncoding::Reset"></span><span class="target" id="classTextEncoding_1a1684378d288640d1e05d86c4e83f6b7b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Reset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12TextEncoding5ResetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding6AppendER4TextRK6String">
+<span id="_CPPv3N12TextEncoding6AppendER4TextRK6String"></span><span id="_CPPv2N12TextEncoding6AppendER4TextRK6String"></span><span id="TextEncoding::Append__TextR.StringCR"></span><span class="target" id="classTextEncoding_1ac6915bc6c6ebf20eb276aa54c379988a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Append</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Text.html#_CPPv44Text" title="Text"><span class="n"><span class="pre">Text</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">text</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N12TextEncoding6AppendER4TextRK6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12TextEncoding6EncodeERK4Text">
+<span id="_CPPv3NK12TextEncoding6EncodeERK4Text"></span><span id="_CPPv2NK12TextEncoding6EncodeERK4Text"></span><span id="TextEncoding::Encode__TextCRC"></span><span class="target" id="classTextEncoding_1aac3d7e318cd67d29898cbeca0499b3e7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Encode</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Text.html#_CPPv44Text" title="Text"><span class="n"><span class="pre">Text</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">text</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK12TextEncoding6EncodeERK4Text" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12TextEncoding10PrintDebugERNSt7ostreamE">
+<span id="_CPPv3NK12TextEncoding10PrintDebugERNSt7ostreamE"></span><span id="_CPPv2NK12TextEncoding10PrintDebugERNSt7ostreamE"></span><span id="TextEncoding::PrintDebug__osRC"></span><span class="target" id="classTextEncoding_1ad1a8a6e2613a9d401f983d9aa5b3369c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintDebug</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK12TextEncoding10PrintDebugERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding8GetTagIDERK6StringRK6String">
+<span id="_CPPv3N12TextEncoding8GetTagIDERK6StringRK6String"></span><span id="_CPPv2N12TextEncoding8GetTagIDERK6StringRK6String"></span><span id="TextEncoding::GetTagID__StringCR.StringCR"></span><span class="target" id="classTextEncoding_1aa0c8c71b611023ab0a52ba32087a0383"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTagID</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">tag_name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">tag_pattern</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12TextEncoding8GetTagIDERK6StringRK6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding8GetTagIDERK6String">
+<span id="_CPPv3N12TextEncoding8GetTagIDERK6String"></span><span id="_CPPv2N12TextEncoding8GetTagIDERK6String"></span><span id="TextEncoding::GetTagID__StringCR"></span><span class="target" id="classTextEncoding_1a347f964a4b5d020c375dc60bbe4e2010"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTagID</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">tag_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12TextEncoding8GetTagIDERK6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding8GetStyleERK6String">
+<span id="_CPPv3N12TextEncoding8GetStyleERK6String"></span><span id="_CPPv2N12TextEncoding8GetStyleERK6String"></span><span id="TextEncoding::GetStyle__StringCR"></span><span class="target" id="classTextEncoding_1a47bacd3a9ec7545a29f8e6c4991d6ebc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12TextEncoding5StyleE" title="TextEncoding::Style"><span class="n"><span class="pre">Style</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetStyle</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">style_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12TextEncoding8GetStyleERK6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding14SetupStyleTagsE6String6String6String">
+<span id="_CPPv3N12TextEncoding14SetupStyleTagsE6String6String6String"></span><span id="_CPPv2N12TextEncoding14SetupStyleTagsE6String6String6String"></span><span id="TextEncoding::SetupStyleTags__String.String.String"></span><span class="target" id="classTextEncoding_1adb24aa37a4d96f02f0000fd2c3cd4db8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetupStyleTags</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">style_name</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">open_name</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">close_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12TextEncoding14SetupStyleTagsE6String6String6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding15SetupReplaceTagE6Stringc6String">
+<span id="_CPPv3N12TextEncoding15SetupReplaceTagE6Stringc6String"></span><span id="_CPPv2N12TextEncoding15SetupReplaceTagE6Stringc6String"></span><span id="TextEncoding::SetupReplaceTag__String.c.String"></span><span class="target" id="classTextEncoding_1af1713f6dea88a61c2ca5e5d457eecc88"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetupReplaceTag</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">tag_name</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">replace_char</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">style_name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12TextEncoding15SetupReplaceTagE6Stringc6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding12GetStyleDescERK5StyleRK3TagRK6String">
+<span id="_CPPv3N12TextEncoding12GetStyleDescERK5StyleRK3TagRK6String"></span><span id="_CPPv2N12TextEncoding12GetStyleDescERK5StyleRK3TagRK6String"></span><span id="TextEncoding::GetStyleDesc__StyleCR.TagCR.StringCR"></span><span class="target" id="classTextEncoding_1af796437fa5e9468835edbcafcf45a40a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetStyleDesc</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12TextEncoding5StyleE" title="TextEncoding::Style"><span class="n"><span class="pre">Style</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">style</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12TextEncoding3TagE" title="TextEncoding::Tag"><span class="n"><span class="pre">Tag</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">start_tag</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">lexeme</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12TextEncoding12GetStyleDescERK5StyleRK3TagRK6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding14Append_RawTextER4TextRK6String">
+<span id="_CPPv3N12TextEncoding14Append_RawTextER4TextRK6String"></span><span id="_CPPv2N12TextEncoding14Append_RawTextER4TextRK6String"></span><span id="TextEncoding::Append_RawText__TextR.StringCR"></span><span class="target" id="classTextEncoding_1a563a2648a7a9d9babdba2b0798269514"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Append_RawText</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Text.html#_CPPv44Text" title="Text"><span class="n"><span class="pre">Text</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">text</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12TextEncoding14Append_RawTextER4TextRK6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding10Append_TagER4TextiRK6String">
+<span id="_CPPv3N12TextEncoding10Append_TagER4TextiRK6String"></span><span id="_CPPv2N12TextEncoding10Append_TagER4TextiRK6String"></span><span id="TextEncoding::Append_Tag__TextR.i.StringCR"></span><span class="target" id="classTextEncoding_1a7153809bdc171fb8320de3f7e1062b77"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Append_Tag</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Text.html#_CPPv44Text" title="Text"><span class="n"><span class="pre">Text</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">text</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">token_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">lexeme</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12TextEncoding10Append_TagER4TextiRK6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding10SetupLexerEv">
+<span id="_CPPv3N12TextEncoding10SetupLexerEv"></span><span id="_CPPv2N12TextEncoding10SetupLexerEv"></span><span id="TextEncoding::SetupLexer"></span><span class="target" id="classTextEncoding_1a533ca0edf559de1742477e5fa7c67aa2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetupLexer</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12TextEncoding10SetupLexerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12TextEncoding11_EncodeCharERK4TextR6StringK6size_t">
+<span id="_CPPv3NK12TextEncoding11_EncodeCharERK4TextR6StringK6size_t"></span><span id="_CPPv2NK12TextEncoding11_EncodeCharERK4TextR6StringK6size_t"></span><span id="TextEncoding::_EncodeChar__TextCR.StringR.sCC"></span><span class="target" id="classTextEncoding_1a9e3832129847e6320d19b05ce7d5b76a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_EncodeChar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Text.html#_CPPv44Text" title="Text"><span class="n"><span class="pre">Text</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">text</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out_string</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">char_pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12TextEncoding11_EncodeCharERK4TextR6StringK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12TextEncoding9_EncodeToERK4TextR6StringR6size_tK6size_t">
+<span id="_CPPv3NK12TextEncoding9_EncodeToERK4TextR6StringR6size_tK6size_t"></span><span id="_CPPv2NK12TextEncoding9_EncodeToERK4TextR6StringR6size_tK6size_t"></span><span id="TextEncoding::_EncodeTo__TextCR.StringR.sR.sCC"></span><span class="target" id="classTextEncoding_1ae71cfbc915d6589d3b845b2f55312ea5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_EncodeTo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Text.html#_CPPv44Text" title="Text"><span class="n"><span class="pre">Text</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">text</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out_string</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">start</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12TextEncoding9_EncodeToERK4TextR6StringR6size_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12TextEncoding13AddOutputTagsERK4TextRNSt3mapI6size_t6StringEE6String6String6String">
+<span id="_CPPv3NK12TextEncoding13AddOutputTagsERK4TextRNSt3mapI6size_t6StringEE6String6String6String"></span><span id="_CPPv2NK12TextEncoding13AddOutputTagsERK4TextRNSt3mapI6size_t6StringEE6String6String6String"></span><span id="TextEncoding::AddOutputTags__TextCR.std::map:s.String:R.String.String.StringC"></span><span class="target" id="classTextEncoding_1ad2bfd625095af509d2aca744f27f1f07"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddOutputTags</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Text.html#_CPPv44Text" title="Text"><span class="n"><span class="pre">Text</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">text</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">tag_map</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">style</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">start_tag</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">end_tag</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12TextEncoding13AddOutputTagsERK4TextRNSt3mapI6size_t6StringEE6String6String6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding7tag_setE">
+<span id="_CPPv3N12TextEncoding7tag_setE"></span><span id="_CPPv2N12TextEncoding7tag_setE"></span><span id="TextEncoding::tag_set__vector:Tag:"></span><span class="target" id="classTextEncoding_1a19c2f8aa4c1afe64afb321846f790634"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12TextEncoding3TagE" title="TextEncoding::Tag"><span class="n"><span class="pre">Tag</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag_set</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding7tag_setE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding9style_setE">
+<span id="_CPPv3N12TextEncoding9style_setE"></span><span id="_CPPv2N12TextEncoding9style_setE"></span><span id="TextEncoding::style_set__vector:Style:"></span><span class="target" id="classTextEncoding_1a01c49b35e0ca45ac5dc45c2964aab005"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12TextEncoding5StyleE" title="TextEncoding::Style"><span class="n"><span class="pre">Style</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">style_set</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding9style_setE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding17pattern_to_tag_idE">
+<span id="_CPPv3N12TextEncoding17pattern_to_tag_idE"></span><span id="_CPPv2N12TextEncoding17pattern_to_tag_idE"></span><span id="TextEncoding::pattern_to_tag_id__std::map:String.s:"></span><span class="target" id="classTextEncoding_1aa0581ea02cee3da3bc12c8c291658049"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pattern_to_tag_id</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding17pattern_to_tag_idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding15token_to_tag_idE">
+<span id="_CPPv3N12TextEncoding15token_to_tag_idE"></span><span id="_CPPv2N12TextEncoding15token_to_tag_idE"></span><span id="TextEncoding::token_to_tag_id__std::map:i.s:"></span><span class="target" id="classTextEncoding_1ad64bd1225ac391e9831af6bb6a019b25"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">token_to_tag_id</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding15token_to_tag_idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding16name_to_style_idE">
+<span id="_CPPv3N12TextEncoding16name_to_style_idE"></span><span id="_CPPv2N12TextEncoding16name_to_style_idE"></span><span id="TextEncoding::name_to_style_id__std::map:String.s:"></span><span class="target" id="classTextEncoding_1ae9a694fc7fe53bccd354616aed2844fb"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name_to_style_id</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding16name_to_style_idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding9char_tagsE">
+<span id="_CPPv3N12TextEncoding9char_tagsE"></span><span id="_CPPv2N12TextEncoding9char_tagsE"></span><span id="TextEncoding::char_tags__array:s.128:"></span><span class="target" id="classTextEncoding_1a807d0b3837292d7e4ad50e457e0c772f"></span><a class="reference internal" href="../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">128</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">char_tags</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding9char_tagsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding5lexerE">
+<span id="_CPPv3N12TextEncoding5lexerE"></span><span id="_CPPv2N12TextEncoding5lexerE"></span><span id="TextEncoding::lexer__Lexer"></span><span class="target" id="classTextEncoding_1a69a718c52297de3ad4612fcf0780a5a0"></span><a class="reference internal" href="../../compiler/api/Lexer.html#_CPPv45Lexer" title="Lexer"><span class="n"><span class="pre">Lexer</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lexer</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding5lexerE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding10text_tokenE">
+<span id="_CPPv3N12TextEncoding10text_tokenE"></span><span id="_CPPv2N12TextEncoding10text_tokenE"></span><span id="TextEncoding::text_token__i"></span><span class="target" id="classTextEncoding_1afaad26afa27266a208577f37ddfc2e3c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">text_token</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N12TextEncoding10text_tokenE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding13active_stylesE">
+<span id="_CPPv3N12TextEncoding13active_stylesE"></span><span id="_CPPv2N12TextEncoding13active_stylesE"></span><span id="TextEncoding::active_styles__std::vector:StyleEntry:"></span><span class="target" id="classTextEncoding_1a7c0de4ffee6d16c94627e9976891f730"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12TextEncoding10StyleEntryE" title="TextEncoding::StyleEntry"><span class="n"><span class="pre">StyleEntry</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">active_styles</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding13active_stylesE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding5StyleE">
+<span id="_CPPv3N12TextEncoding5StyleE"></span><span id="_CPPv2N12TextEncoding5StyleE"></span><span id="TextEncoding::Style"></span><span class="target" id="structTextEncoding_1_1Style"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Style</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding5StyleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;TextEncoding.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding5Style4nameE">
+<span id="_CPPv3N12TextEncoding5Style4nameE"></span><span id="_CPPv2N12TextEncoding5Style4nameE"></span><span id="TextEncoding::Style::name__String"></span><span class="target" id="structTextEncoding_1_1Style_1a897e324ae11ca9d213f647d72646d4d4"></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding5Style4nameE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding5Style2idE">
+<span id="_CPPv3N12TextEncoding5Style2idE"></span><span id="_CPPv2N12TextEncoding5Style2idE"></span><span id="TextEncoding::Style::id__s"></span><span class="target" id="structTextEncoding_1_1Style_1a9a04df584bb5e33187277b3f8e8668e2"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../math/api/constants.html#_CPPv410MAX_SIZE_T" title="MAX_SIZE_T"><span class="n"><span class="pre">MAX_SIZE_T</span></span></a><a class="headerlink" href="#_CPPv4N12TextEncoding5Style2idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding5Style12open_tag_idsE">
+<span id="_CPPv3N12TextEncoding5Style12open_tag_idsE"></span><span id="_CPPv2N12TextEncoding5Style12open_tag_idsE"></span><span id="TextEncoding::Style::open_tag_ids__std::set:s:"></span><span class="target" id="structTextEncoding_1_1Style_1acae5eef73989a1a1ff87288a480c0ab2"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">open_tag_ids</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding5Style12open_tag_idsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding5Style13close_tag_idsE">
+<span id="_CPPv3N12TextEncoding5Style13close_tag_idsE"></span><span id="_CPPv2N12TextEncoding5Style13close_tag_idsE"></span><span id="TextEncoding::Style::close_tag_ids__std::set:s:"></span><span class="target" id="structTextEncoding_1_1Style_1a35503c1091ae3fcf2d2910dbe91ff222"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">close_tag_ids</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding5Style13close_tag_idsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding5Style15replace_tag_idsE">
+<span id="_CPPv3N12TextEncoding5Style15replace_tag_idsE"></span><span id="_CPPv2N12TextEncoding5Style15replace_tag_idsE"></span><span id="TextEncoding::Style::replace_tag_ids__std::set:s:"></span><span class="target" id="structTextEncoding_1_1Style_1a10d2166b140975252abf098d80c6897e"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">replace_tag_ids</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding5Style15replace_tag_idsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding5Style13make_open_tagE">
+<span id="_CPPv3N12TextEncoding5Style13make_open_tagE"></span><span id="_CPPv2N12TextEncoding5Style13make_open_tagE"></span><span class="target" id="structTextEncoding_1_1Style_1a39bde771ae6e810fec6a9b86731ce7ff"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">make_open_tag</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding5Style13make_open_tagE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding5Style14make_close_tagE">
+<span id="_CPPv3N12TextEncoding5Style14make_close_tagE"></span><span id="_CPPv2N12TextEncoding5Style14make_close_tagE"></span><span class="target" id="structTextEncoding_1_1Style_1a10f77c8d0e2a61cebb840e2c4f42429e"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">make_close_tag</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding5Style14make_close_tagE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding10StyleEntryE">
+<span id="_CPPv3N12TextEncoding10StyleEntryE"></span><span id="_CPPv2N12TextEncoding10StyleEntryE"></span><span id="TextEncoding::StyleEntry"></span><span class="target" id="structTextEncoding_1_1StyleEntry"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StyleEntry</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding10StyleEntryE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;TextEncoding.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding10StyleEntry8style_idE">
+<span id="_CPPv3N12TextEncoding10StyleEntry8style_idE"></span><span id="_CPPv2N12TextEncoding10StyleEntry8style_idE"></span><span id="TextEncoding::StyleEntry::style_id__s"></span><span class="target" id="structTextEncoding_1_1StyleEntry_1ad86cc2860c9dfa5c767bef6c7fe33fc9"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">style_id</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding10StyleEntry8style_idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding10StyleEntry9full_infoE">
+<span id="_CPPv3N12TextEncoding10StyleEntry9full_infoE"></span><span id="_CPPv2N12TextEncoding10StyleEntry9full_infoE"></span><span id="TextEncoding::StyleEntry::full_info__String"></span><span class="target" id="structTextEncoding_1_1StyleEntry_1ae963aaf729c0d3681008278eda2cf931"></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">full_info</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding10StyleEntry9full_infoE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding3TagE">
+<span id="_CPPv3N12TextEncoding3TagE"></span><span id="_CPPv2N12TextEncoding3TagE"></span><span id="TextEncoding::Tag"></span><span class="target" id="structTextEncoding_1_1Tag"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Tag</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding3TagE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;TextEncoding.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding3Tag4nameE">
+<span id="_CPPv3N12TextEncoding3Tag4nameE"></span><span id="_CPPv2N12TextEncoding3Tag4nameE"></span><span id="TextEncoding::Tag::name__String"></span><span class="target" id="structTextEncoding_1_1Tag_1a2d53474505c64bb782ac70a1e17630ec"></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding3Tag4nameE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding3Tag7patternE">
+<span id="_CPPv3N12TextEncoding3Tag7patternE"></span><span id="_CPPv2N12TextEncoding3Tag7patternE"></span><span id="TextEncoding::Tag::pattern__String"></span><span class="target" id="structTextEncoding_1_1Tag_1ae06d258d4d4b584fc643e82fca16f4e9"></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pattern</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding3Tag7patternE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding3Tag2idE">
+<span id="_CPPv3N12TextEncoding3Tag2idE"></span><span id="_CPPv2N12TextEncoding3Tag2idE"></span><span id="TextEncoding::Tag::id__s"></span><span class="target" id="structTextEncoding_1_1Tag_1ab7c0b8b110032f602bd3c0dfe5aa4ced"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../math/api/constants.html#_CPPv410MAX_SIZE_T" title="MAX_SIZE_T"><span class="n"><span class="pre">MAX_SIZE_T</span></span></a><a class="headerlink" href="#_CPPv4N12TextEncoding3Tag2idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding3Tag8token_idE">
+<span id="_CPPv3N12TextEncoding3Tag8token_idE"></span><span id="_CPPv2N12TextEncoding3Tag8token_idE"></span><span id="TextEncoding::Tag::token_id__i"></span><span class="target" id="structTextEncoding_1_1Tag_1acbc4f56447522b66770e024ab6eba7d0"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">token_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N12TextEncoding3Tag8token_idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding3Tag14start_style_idE">
+<span id="_CPPv3N12TextEncoding3Tag14start_style_idE"></span><span id="_CPPv2N12TextEncoding3Tag14start_style_idE"></span><span id="TextEncoding::Tag::start_style_id__s"></span><span class="target" id="structTextEncoding_1_1Tag_1aeee8300f23856d45a124c9ee75f940f2"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">start_style_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12TextEncoding3Tag14start_style_idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding3Tag14get_style_argsE">
+<span id="_CPPv3N12TextEncoding3Tag14get_style_argsE"></span><span id="_CPPv2N12TextEncoding3Tag14get_style_argsE"></span><span class="target" id="structTextEncoding_1_1Tag_1ace1216e8da222d7b44d23dd7e00df16f"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_style_args</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding3Tag14get_style_argsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding3Tag13end_style_idsE">
+<span id="_CPPv3N12TextEncoding3Tag13end_style_idsE"></span><span id="_CPPv2N12TextEncoding3Tag13end_style_idsE"></span><span id="TextEncoding::Tag::end_style_ids__std::set:s:"></span><span class="target" id="structTextEncoding_1_1Tag_1a70270f4261200635b19dfc10fa0e4373"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end_style_ids</span></span></span><a class="headerlink" href="#_CPPv4N12TextEncoding3Tag13end_style_idsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding3Tag9multi_endE">
+<span id="_CPPv3N12TextEncoding3Tag9multi_endE"></span><span id="_CPPv2N12TextEncoding3Tag9multi_endE"></span><span id="TextEncoding::Tag::multi_end__b"></span><span class="target" id="structTextEncoding_1_1Tag_1a206395fdf4299f851cbafd8a15092dc5"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">multi_end</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N12TextEncoding3Tag9multi_endE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding3Tag12replace_charE">
+<span id="_CPPv3N12TextEncoding3Tag12replace_charE"></span><span id="_CPPv2N12TextEncoding3Tag12replace_charE"></span><span id="TextEncoding::Tag::replace_char__c"></span><span class="target" id="structTextEncoding_1_1Tag_1a2e2cad19e08427fa7a71ce2e730db85a"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">replace_char</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="sc"><span class="pre">'\0'</span></span><a class="headerlink" href="#_CPPv4N12TextEncoding3Tag12replace_charE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding3Tag16replace_style_idE">
+<span id="_CPPv3N12TextEncoding3Tag16replace_style_idE"></span><span id="_CPPv2N12TextEncoding3Tag16replace_style_idE"></span><span id="TextEncoding::Tag::replace_style_id__s"></span><span class="target" id="structTextEncoding_1_1Tag_1a4796b47091c662780da354c87fe20933"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">replace_style_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12TextEncoding3Tag16replace_style_idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12TextEncoding3Tag12out_encodingE">
+<span id="_CPPv3N12TextEncoding3Tag12out_encodingE"></span><span id="_CPPv2N12TextEncoding3Tag12out_encodingE"></span><span id="TextEncoding::Tag::out_encoding__String"></span><span class="target" id="structTextEncoding_1_1Tag_1afd1412e16c100c47f316adeba1a1f758"></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">out_encoding</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><a class="headerlink" href="#_CPPv4N12TextEncoding3Tag12out_encodingE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Text.html" class="btn btn-neutral float-left" title="Text.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../tools/tools.html" class="btn btn-neutral float-right" title="Other Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Citation.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/scholar/api/Citation.36a07211-3d38-46e9-b09f-a9880e8c9be6.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Testing" href="../../testing/testing.html" />
+    <link rel="prev" title="Bibliography.hpp" href="Bibliography.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../scholar.html">Scholar</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../scholar.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Author.html">Author.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Bibliography.html">Bibliography.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Citation.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv48Citation"><code class="docutils literal notranslate"><span class="pre">Citation</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../scholar.html">Scholar</a></li>
+      <li class="breadcrumb-item active">Citation.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="citation-hpp">
+<h1>Citation.hpp<a class="headerlink" href="#citation-hpp" title="Link to this heading"></a></h1>
+<p>Information about a citation for a single paper / book / etc. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv48Citation">
+<span id="_CPPv38Citation"></span><span id="_CPPv28Citation"></span><span id="Citation"></span><span class="target" id="classCitation"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Citation</span></span></span><a class="headerlink" href="#_CPPv48Citation" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Citation.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPEE">
+<span id="_CPPv3N8Citation9CITE_TYPEE"></span><span id="_CPPv2N8Citation9CITE_TYPEE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CITE_TYPE</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPEE" title="Link to this definition"></a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE5ERRORE">
+<span id="_CPPv3N8Citation9CITE_TYPE5ERRORE"></span><span id="_CPPv2N8Citation9CITE_TYPE5ERRORE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577a8314bd6baa07daf61b86484aab51b148"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ERROR</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE5ERRORE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE7UNKNOWNE">
+<span id="_CPPv3N8Citation9CITE_TYPE7UNKNOWNE"></span><span id="_CPPv2N8Citation9CITE_TYPE7UNKNOWNE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577ae50729ac2ac4a996c9fcdeadf10bdcbf"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UNKNOWN</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE7UNKNOWNE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE7ARTICLEE">
+<span id="_CPPv3N8Citation9CITE_TYPE7ARTICLEE"></span><span id="_CPPv2N8Citation9CITE_TYPE7ARTICLEE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577a4cb2bffaf7cbe6df1ddba6255420cce3"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARTICLE</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE7ARTICLEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE4BOOKE">
+<span id="_CPPv3N8Citation9CITE_TYPE4BOOKE"></span><span id="_CPPv2N8Citation9CITE_TYPE4BOOKE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577a0997d2025f6c1c15c80af7b860709e57"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BOOK</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE4BOOKE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE7BOOKLETE">
+<span id="_CPPv3N8Citation9CITE_TYPE7BOOKLETE"></span><span id="_CPPv2N8Citation9CITE_TYPE7BOOKLETE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577abf5444251bd4617f7268cc29c1d7ab18"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BOOKLET</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE7BOOKLETE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE10CONFERENCEE">
+<span id="_CPPv3N8Citation9CITE_TYPE10CONFERENCEE"></span><span id="_CPPv2N8Citation9CITE_TYPE10CONFERENCEE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577a2e433575bfd6c5f07889fdc9786ffb91"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CONFERENCE</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE10CONFERENCEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE7IN_BOOKE">
+<span id="_CPPv3N8Citation9CITE_TYPE7IN_BOOKE"></span><span id="_CPPv2N8Citation9CITE_TYPE7IN_BOOKE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577aaeb079c1594a68876784ca3dab51a4ec"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IN_BOOK</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE7IN_BOOKE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE13IN_COLLECTIONE">
+<span id="_CPPv3N8Citation9CITE_TYPE13IN_COLLECTIONE"></span><span id="_CPPv2N8Citation9CITE_TYPE13IN_COLLECTIONE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577ac80a65580ee6dce7716b98c692a1311f"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IN_COLLECTION</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE13IN_COLLECTIONE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE6MANUALE">
+<span id="_CPPv3N8Citation9CITE_TYPE6MANUALE"></span><span id="_CPPv2N8Citation9CITE_TYPE6MANUALE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577ac4dcd497afe4a88d18ef3c8768aa2f3d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MANUAL</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE6MANUALE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE14MASTERS_THESISE">
+<span id="_CPPv3N8Citation9CITE_TYPE14MASTERS_THESISE"></span><span id="_CPPv2N8Citation9CITE_TYPE14MASTERS_THESISE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577a8a19b3f0a9d954bfc4b96132b66a862d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MASTERS_THESIS</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE14MASTERS_THESISE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE4MISCE">
+<span id="_CPPv3N8Citation9CITE_TYPE4MISCE"></span><span id="_CPPv2N8Citation9CITE_TYPE4MISCE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577a45c493d51f5572881a0a8be962e03723"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MISC</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE4MISCE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE10PHD_THESISE">
+<span id="_CPPv3N8Citation9CITE_TYPE10PHD_THESISE"></span><span id="_CPPv2N8Citation9CITE_TYPE10PHD_THESISE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577acaff12084a5c8e894915e67d5546a484"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PHD_THESIS</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE10PHD_THESISE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE11PROCEEDINGSE">
+<span id="_CPPv3N8Citation9CITE_TYPE11PROCEEDINGSE"></span><span id="_CPPv2N8Citation9CITE_TYPE11PROCEEDINGSE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577ae4c415e3f7310a3fb2646de9a15162f9"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PROCEEDINGS</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE11PROCEEDINGSE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE11TECH_REPORTE">
+<span id="_CPPv3N8Citation9CITE_TYPE11TECH_REPORTE"></span><span id="_CPPv2N8Citation9CITE_TYPE11TECH_REPORTE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577aaefb52dcac3352e54a7a7a6db460307e"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TECH_REPORT</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE11TECH_REPORTE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9CITE_TYPE11UNPUBLISHEDE">
+<span id="_CPPv3N8Citation9CITE_TYPE11UNPUBLISHEDE"></span><span id="_CPPv2N8Citation9CITE_TYPE11UNPUBLISHEDE"></span><span class="target" id="classCitation_1a21959dde2f235b5221c5261ce9016577a6a209069d952c5c07c4a673970f2cf35"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UNPUBLISHED</span></span></span><a class="headerlink" href="#_CPPv4N8Citation9CITE_TYPE11UNPUBLISHEDE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation8CitationE9CITE_TYPE">
+<span id="_CPPv3N8Citation8CitationE9CITE_TYPE"></span><span id="_CPPv2N8Citation8CitationE9CITE_TYPE"></span><span id="Citation::Citation__CITE_TYPE"></span><span class="target" id="classCitation_1ac9f7ef84426e645964f660a2f21b7d63"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Citation</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Citation9CITE_TYPEE" title="Citation::CITE_TYPE"><span class="n"><span class="pre">CITE_TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_type</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Citation9CITE_TYPE7UNKNOWNE" title="Citation::UNKNOWN"><span class="n"><span class="pre">UNKNOWN</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation8CitationE9CITE_TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation8CitationERK8Citation">
+<span id="_CPPv3N8Citation8CitationERK8Citation"></span><span id="_CPPv2N8Citation8CitationERK8Citation"></span><span id="Citation::Citation__CitationCR"></span><span class="target" id="classCitation_1abdd0428103a151d7fa02bd7ae0794df0"></span><span class="sig-name descname"><span class="n"><span class="pre">Citation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Citation8CitationERK8Citation" title="Citation::Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N8Citation8CitationERK8Citation" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8CitationD0Ev">
+<span id="_CPPv3N8CitationD0Ev"></span><span id="_CPPv2N8CitationD0Ev"></span><span id="Citation::~Citation"></span><span class="target" id="classCitation_1a72e985edf6e8d9c4273d283a46bee1a2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Citation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8CitationD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8CitationaSERK8Citation">
+<span id="_CPPv3N8CitationaSERK8Citation"></span><span id="_CPPv2N8CitationaSERK8Citation"></span><span id="Citation::assign-operator__CitationCR"></span><span class="target" id="classCitation_1a73f8f8e862b977f65f0132dac9a74823"></span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N8CitationaSERK8Citation" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation7GetTypeEv">
+<span id="_CPPv3NK8Citation7GetTypeEv"></span><span id="_CPPv2NK8Citation7GetTypeEv"></span><span id="Citation::GetTypeC"></span><span class="target" id="classCitation_1abd69fa4f001ba6b26e16b0a7f70929af"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Citation9CITE_TYPEE" title="Citation::CITE_TYPE"><span class="n"><span class="pre">CITE_TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetType</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation7GetTypeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation10GetAuthorsEv">
+<span id="_CPPv3NK8Citation10GetAuthorsEv"></span><span id="_CPPv2NK8Citation10GetAuthorsEv"></span><span id="Citation::GetAuthorsC"></span><span class="target" id="classCitation_1a234d69996ba58c4436ace2a0be5ba751"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Author.html#_CPPv46Author" title="Author"><span class="n"><span class="pre">Author</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetAuthors</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation10GetAuthorsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation8GetNotesEv">
+<span id="_CPPv3NK8Citation8GetNotesEv"></span><span id="_CPPv2NK8Citation8GetNotesEv"></span><span id="Citation::GetNotesC"></span><span class="target" id="classCitation_1a0cf913b87d42e82d9fc578aa2b005bac"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetNotes</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation8GetNotesEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation11GetKeywordsEv">
+<span id="_CPPv3NK8Citation11GetKeywordsEv"></span><span id="_CPPv2NK8Citation11GetKeywordsEv"></span><span id="Citation::GetKeywordsC"></span><span class="target" id="classCitation_1af41f88f3e87c62fea085f365a46354fe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetKeywords</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation11GetKeywordsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation10HasKeywordERKNSt6stringE">
+<span id="_CPPv3NK8Citation10HasKeywordERKNSt6stringE"></span><span id="_CPPv2NK8Citation10HasKeywordERKNSt6stringE"></span><span id="Citation::HasKeyword__ssCRC"></span><span class="target" id="classCitation_1a3717de614c7043b7f67782a4e4c62896"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasKeyword</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">kw</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation10HasKeywordERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation6GetValERKNSt6stringE">
+<span id="_CPPv3NK8Citation6GetValERKNSt6stringE"></span><span id="_CPPv2NK8Citation6GetValERKNSt6stringE"></span><span id="Citation::GetVal__ssCRC"></span><span class="target" id="classCitation_1a00ae32356643ec90523ed5b0ad15757e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetVal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation6GetValERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation8GetTitleEv">
+<span id="_CPPv3NK8Citation8GetTitleEv"></span><span id="_CPPv2NK8Citation8GetTitleEv"></span><span id="Citation::GetTitleC"></span><span class="target" id="classCitation_1afc68d7dd2645e9587f6f5ce95093f80e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetTitle</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation8GetTitleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation10GetJournalEv">
+<span id="_CPPv3NK8Citation10GetJournalEv"></span><span id="_CPPv2NK8Citation10GetJournalEv"></span><span id="Citation::GetJournalC"></span><span class="target" id="classCitation_1a80b6b94986f681b539ba305bc841a66c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetJournal</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation10GetJournalEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation12GetBookTitleEv">
+<span id="_CPPv3NK8Citation12GetBookTitleEv"></span><span id="_CPPv2NK8Citation12GetBookTitleEv"></span><span id="Citation::GetBookTitleC"></span><span class="target" id="classCitation_1a9357665466016271025d99d2e6367896"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetBookTitle</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation12GetBookTitleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation9GetVolumeEv">
+<span id="_CPPv3NK8Citation9GetVolumeEv"></span><span id="_CPPv2NK8Citation9GetVolumeEv"></span><span id="Citation::GetVolumeC"></span><span class="target" id="classCitation_1ac5162500e9725fd605c28efbfa339da2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetVolume</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation9GetVolumeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation7GetYearEv">
+<span id="_CPPv3NK8Citation7GetYearEv"></span><span id="_CPPv2NK8Citation7GetYearEv"></span><span id="Citation::GetYearC"></span><span class="target" id="classCitation_1ab2594352734769ae617f3cd489790f72"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetYear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation7GetYearEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation9GetNumberEv">
+<span id="_CPPv3NK8Citation9GetNumberEv"></span><span id="_CPPv2NK8Citation9GetNumberEv"></span><span id="Citation::GetNumberC"></span><span class="target" id="classCitation_1a3282f7e9a109b52122e8dadca4bcc2dd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetNumber</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation9GetNumberEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation8GetMonthEv">
+<span id="_CPPv3NK8Citation8GetMonthEv"></span><span id="_CPPv2NK8Citation8GetMonthEv"></span><span id="Citation::GetMonthC"></span><span class="target" id="classCitation_1a4d80f54340c6c945593041bb036f087a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetMonth</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation8GetMonthEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation12GetStartPageEv">
+<span id="_CPPv3NK8Citation12GetStartPageEv"></span><span id="_CPPv2NK8Citation12GetStartPageEv"></span><span id="Citation::GetStartPageC"></span><span class="target" id="classCitation_1a78f0d9f71aa78e6050680a554fba95c6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetStartPage</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation12GetStartPageEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Citation10GetEndPageEv">
+<span id="_CPPv3NK8Citation10GetEndPageEv"></span><span id="_CPPv2NK8Citation10GetEndPageEv"></span><span id="Citation::GetEndPageC"></span><span class="target" id="classCitation_1aafe925a91ecb5429f87ef82a62db8c70"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetEndPage</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Citation10GetEndPageEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN8Citation9AddAuthorER8CitationDpRR4ARGS">
+<span id="_CPPv3IDpEN8Citation9AddAuthorEDpRR4ARGS"></span><span id="_CPPv2IDpEN8Citation9AddAuthorEDpRR4ARGS"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCitation_1aa72b08e191433ece1cb3257f82daf3cb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddAuthor</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN8Citation9AddAuthorER8CitationDpRR4ARGS" title="Citation::AddAuthor::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN8Citation9AddAuthorER8CitationDpRR4ARGS" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation7AddNoteERKNSt6stringE">
+<span id="_CPPv3N8Citation7AddNoteERKNSt6stringE"></span><span id="_CPPv2N8Citation7AddNoteERKNSt6stringE"></span><span id="Citation::AddNote__ssCR"></span><span class="target" id="classCitation_1a3a9b38ce494d6371f697ae1c72ca69ee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddNote</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">note</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation7AddNoteERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation10AddKeywordERKNSt6stringE">
+<span id="_CPPv3N8Citation10AddKeywordERKNSt6stringE"></span><span id="_CPPv2N8Citation10AddKeywordERKNSt6stringE"></span><span id="Citation::AddKeyword__ssCR"></span><span class="target" id="classCitation_1a48bc624de8172c92137a1b7af2692857"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddKeyword</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">kw</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation10AddKeywordERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN8Citation6SetValER8CitationRKNSt6stringERR1T">
+<span id="_CPPv3I0EN8Citation6SetValERKNSt6stringERR1T"></span><span id="_CPPv2I0EN8Citation6SetValERKNSt6stringERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCitation_1a134dcc7cda91d9f5e5d61476113e70a7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetVal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span>, <a class="reference internal" href="#_CPPv4I0EN8Citation6SetValER8CitationRKNSt6stringERR1T" title="Citation::SetVal::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN8Citation6SetValER8CitationRKNSt6stringERR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN8Citation8SetTitleER8CitationRR1T">
+<span id="_CPPv3I0EN8Citation8SetTitleERR1T"></span><span id="_CPPv2I0EN8Citation8SetTitleERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCitation_1a3c8ebaca6cea3d6e92652cca5e2c5468"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetTitle</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN8Citation8SetTitleER8CitationRR1T" title="Citation::SetTitle::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN8Citation8SetTitleER8CitationRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN8Citation10SetJournalER8CitationRR1T">
+<span id="_CPPv3I0EN8Citation10SetJournalERR1T"></span><span id="_CPPv2I0EN8Citation10SetJournalERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCitation_1a3c30662b80ed5d503b9e0a0de2eff82e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetJournal</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN8Citation10SetJournalER8CitationRR1T" title="Citation::SetJournal::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN8Citation10SetJournalER8CitationRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN8Citation12SetBookTitleER8CitationRR1T">
+<span id="_CPPv3I0EN8Citation12SetBookTitleERR1T"></span><span id="_CPPv2I0EN8Citation12SetBookTitleERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCitation_1a67aa78806a4c74715b668547ba46e9ff"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetBookTitle</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN8Citation12SetBookTitleER8CitationRR1T" title="Citation::SetBookTitle::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN8Citation12SetBookTitleER8CitationRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN8Citation9SetVolumeER8CitationRR1T">
+<span id="_CPPv3I0EN8Citation9SetVolumeERR1T"></span><span id="_CPPv2I0EN8Citation9SetVolumeERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCitation_1a0f18be4b5ec8f2accde480f4d9c992c3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetVolume</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN8Citation9SetVolumeER8CitationRR1T" title="Citation::SetVolume::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN8Citation9SetVolumeER8CitationRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN8Citation7SetYearER8CitationRR1T">
+<span id="_CPPv3I0EN8Citation7SetYearERR1T"></span><span id="_CPPv2I0EN8Citation7SetYearERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCitation_1a52c06c06fbaa730314ed4701a77fd7c0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetYear</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN8Citation7SetYearER8CitationRR1T" title="Citation::SetYear::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN8Citation7SetYearER8CitationRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN8Citation9SetNumberER8CitationRR1T">
+<span id="_CPPv3I0EN8Citation9SetNumberERR1T"></span><span id="_CPPv2I0EN8Citation9SetNumberERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCitation_1a521171c7ff7de9773e5d0bb6b044ff41"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetNumber</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN8Citation9SetNumberER8CitationRR1T" title="Citation::SetNumber::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN8Citation9SetNumberER8CitationRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN8Citation8SetMonthER8CitationRR1T">
+<span id="_CPPv3I0EN8Citation8SetMonthERR1T"></span><span id="_CPPv2I0EN8Citation8SetMonthERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCitation_1a507f8abd8b23f3956af5c041288e7f6d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetMonth</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN8Citation8SetMonthER8CitationRR1T" title="Citation::SetMonth::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN8Citation8SetMonthER8CitationRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN8Citation12SetStartPageER8CitationRR1T">
+<span id="_CPPv3I0EN8Citation12SetStartPageERR1T"></span><span id="_CPPv2I0EN8Citation12SetStartPageERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCitation_1af1e9c2fa754b62d974502d5733b77821"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetStartPage</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN8Citation12SetStartPageER8CitationRR1T" title="Citation::SetStartPage::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN8Citation12SetStartPageER8CitationRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN8Citation10SetEndPageER8CitationRR1T">
+<span id="_CPPv3I0EN8Citation10SetEndPageERR1T"></span><span id="_CPPv2I0EN8Citation10SetEndPageERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCitation_1a8afd17509fe6b87cfc9aac7c04af0fdd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetEndPage</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN8Citation10SetEndPageER8CitationRR1T" title="Citation::SetEndPage::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN8Citation10SetEndPageER8CitationRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN8Citation8SetPagesER8CitationRR1TRR1T">
+<span id="_CPPv3I0EN8Citation8SetPagesERR1TRR1T"></span><span id="_CPPv2I0EN8Citation8SetPagesERR1TRR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCitation_1ac9087f482817faf8f8c29ce0c22cafe8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Citation" title="Citation"><span class="n"><span class="pre">Citation</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetPages</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN8Citation8SetPagesER8CitationRR1TRR1T" title="Citation::SetPages::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">p1</span></span>, <a class="reference internal" href="#_CPPv4I0EN8Citation8SetPagesER8CitationRR1TRR1T" title="Citation::SetPages::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">p2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN8Citation8SetPagesER8CitationRR1TRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation7SetTypeE9CITE_TYPE">
+<span id="_CPPv3N8Citation7SetTypeE9CITE_TYPE"></span><span id="_CPPv2N8Citation7SetTypeE9CITE_TYPE"></span><span id="Citation::SetType__CITE_TYPE"></span><span class="target" id="classCitation_1acb4f59f8653421d140b666119ce61db7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetType</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Citation9CITE_TYPEE" title="Citation::CITE_TYPE"><span class="n"><span class="pre">CITE_TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation7SetTypeE9CITE_TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation7SetTypeENSt6stringE">
+<span id="_CPPv3N8Citation7SetTypeENSt6stringE"></span><span id="_CPPv2N8Citation7SetTypeENSt6stringE"></span><span id="Citation::SetType__ss"></span><span class="target" id="classCitation_1a918bcf3cbb206cfd5cddae0b5cf91582"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetType</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation7SetTypeENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation12PrintAuthorsERNSt7ostreamE">
+<span id="_CPPv3N8Citation12PrintAuthorsERNSt7ostreamE"></span><span id="_CPPv2N8Citation12PrintAuthorsERNSt7ostreamE"></span><span id="Citation::PrintAuthors__osR"></span><span class="target" id="classCitation_1a81f763f24cbc8c2275a5280962b5b8d3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintAuthors</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation12PrintAuthorsERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation10PrintERRORERNSt7ostreamE">
+<span id="_CPPv3N8Citation10PrintERRORERNSt7ostreamE"></span><span id="_CPPv2N8Citation10PrintERRORERNSt7ostreamE"></span><span id="Citation::PrintERROR__osR"></span><span class="target" id="classCitation_1afecba0850592a92f600285cfbe257dbe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintERROR</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation10PrintERRORERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation12PrintUNKNOWNERNSt7ostreamE">
+<span id="_CPPv3N8Citation12PrintUNKNOWNERNSt7ostreamE"></span><span id="_CPPv2N8Citation12PrintUNKNOWNERNSt7ostreamE"></span><span id="Citation::PrintUNKNOWN__osR"></span><span class="target" id="classCitation_1a103f4b5bcc579a18e320b23768254f4a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintUNKNOWN</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation12PrintUNKNOWNERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation12PrintARTICLEERNSt7ostreamE">
+<span id="_CPPv3N8Citation12PrintARTICLEERNSt7ostreamE"></span><span id="_CPPv2N8Citation12PrintARTICLEERNSt7ostreamE"></span><span id="Citation::PrintARTICLE__osR"></span><span class="target" id="classCitation_1a4aff6f7a69604f61838118caa77732dc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintARTICLE</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation12PrintARTICLEERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9PrintBOOKERNSt7ostreamE">
+<span id="_CPPv3N8Citation9PrintBOOKERNSt7ostreamE"></span><span id="_CPPv2N8Citation9PrintBOOKERNSt7ostreamE"></span><span id="Citation::PrintBOOK__osR"></span><span class="target" id="classCitation_1a5139d196acb859776efa5bd35bbfae6b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintBOOK</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation9PrintBOOKERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation12PrintBOOKLETERNSt7ostreamE">
+<span id="_CPPv3N8Citation12PrintBOOKLETERNSt7ostreamE"></span><span id="_CPPv2N8Citation12PrintBOOKLETERNSt7ostreamE"></span><span id="Citation::PrintBOOKLET__osR"></span><span class="target" id="classCitation_1a0a4d2d2b0c24786da42bd33a3202e7ce"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintBOOKLET</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation12PrintBOOKLETERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation15PrintCONFERENCEERNSt7ostreamE">
+<span id="_CPPv3N8Citation15PrintCONFERENCEERNSt7ostreamE"></span><span id="_CPPv2N8Citation15PrintCONFERENCEERNSt7ostreamE"></span><span id="Citation::PrintCONFERENCE__osR"></span><span class="target" id="classCitation_1aaca93821e1a3526901c4f741a72f51bd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintCONFERENCE</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation15PrintCONFERENCEERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation12PrintIN_BOOKERNSt7ostreamE">
+<span id="_CPPv3N8Citation12PrintIN_BOOKERNSt7ostreamE"></span><span id="_CPPv2N8Citation12PrintIN_BOOKERNSt7ostreamE"></span><span id="Citation::PrintIN_BOOK__osR"></span><span class="target" id="classCitation_1a9a36b9e9ea6ae210e3e7d4e3a013f73d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintIN_BOOK</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation12PrintIN_BOOKERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation18PrintIN_COLLECTIONERNSt7ostreamE">
+<span id="_CPPv3N8Citation18PrintIN_COLLECTIONERNSt7ostreamE"></span><span id="_CPPv2N8Citation18PrintIN_COLLECTIONERNSt7ostreamE"></span><span id="Citation::PrintIN_COLLECTION__osR"></span><span class="target" id="classCitation_1a306e74a059462b05ad3d7cc658fc8a32"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintIN_COLLECTION</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation18PrintIN_COLLECTIONERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation11PrintMANUALERNSt7ostreamE">
+<span id="_CPPv3N8Citation11PrintMANUALERNSt7ostreamE"></span><span id="_CPPv2N8Citation11PrintMANUALERNSt7ostreamE"></span><span id="Citation::PrintMANUAL__osR"></span><span class="target" id="classCitation_1a7f4e6a86910ff86e35ec20233a4ff07c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintMANUAL</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation11PrintMANUALERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation19PrintMASTERS_THESISERNSt7ostreamE">
+<span id="_CPPv3N8Citation19PrintMASTERS_THESISERNSt7ostreamE"></span><span id="_CPPv2N8Citation19PrintMASTERS_THESISERNSt7ostreamE"></span><span id="Citation::PrintMASTERS_THESIS__osR"></span><span class="target" id="classCitation_1a9b7e2736e3988bb1a56640a01841b607"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintMASTERS_THESIS</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation19PrintMASTERS_THESISERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation9PrintMISCERNSt7ostreamE">
+<span id="_CPPv3N8Citation9PrintMISCERNSt7ostreamE"></span><span id="_CPPv2N8Citation9PrintMISCERNSt7ostreamE"></span><span id="Citation::PrintMISC__osR"></span><span class="target" id="classCitation_1ac5c7758fe21d31fa71d98a8e95146035"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintMISC</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation9PrintMISCERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation15PrintPHD_THESISERNSt7ostreamE">
+<span id="_CPPv3N8Citation15PrintPHD_THESISERNSt7ostreamE"></span><span id="_CPPv2N8Citation15PrintPHD_THESISERNSt7ostreamE"></span><span id="Citation::PrintPHD_THESIS__osR"></span><span class="target" id="classCitation_1a8238aa45a5b16d99fc73ebd7056175d8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintPHD_THESIS</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation15PrintPHD_THESISERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation16PrintPROCEEDINGSERNSt7ostreamE">
+<span id="_CPPv3N8Citation16PrintPROCEEDINGSERNSt7ostreamE"></span><span id="_CPPv2N8Citation16PrintPROCEEDINGSERNSt7ostreamE"></span><span id="Citation::PrintPROCEEDINGS__osR"></span><span class="target" id="classCitation_1a8c2659bee522735b1d4f34c127100e59"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintPROCEEDINGS</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation16PrintPROCEEDINGSERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation16PrintTECH_REPORTERNSt7ostreamE">
+<span id="_CPPv3N8Citation16PrintTECH_REPORTERNSt7ostreamE"></span><span id="_CPPv2N8Citation16PrintTECH_REPORTERNSt7ostreamE"></span><span id="Citation::PrintTECH_REPORT__osR"></span><span class="target" id="classCitation_1a96698e7148609e293139abbc268c8c76"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintTECH_REPORT</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation16PrintTECH_REPORTERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation16PrintUNPUBLISHEDERNSt7ostreamE">
+<span id="_CPPv3N8Citation16PrintUNPUBLISHEDERNSt7ostreamE"></span><span id="_CPPv2N8Citation16PrintUNPUBLISHEDERNSt7ostreamE"></span><span id="Citation::PrintUNPUBLISHED__osR"></span><span class="target" id="classCitation_1aa4a3789beecc3d54f03d151b7def973c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintUNPUBLISHED</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation16PrintUNPUBLISHEDERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation5PrintERNSt7ostreamE">
+<span id="_CPPv3N8Citation5PrintERNSt7ostreamE"></span><span id="_CPPv2N8Citation5PrintERNSt7ostreamE"></span><span id="Citation::Print__osR"></span><span class="target" id="classCitation_1ae9e749d079e0f69e5a298f7552188dac"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation4typeE">
+<span id="_CPPv3N8Citation4typeE"></span><span id="_CPPv2N8Citation4typeE"></span><span id="Citation::type__CITE_TYPE"></span><span class="target" id="classCitation_1ad80b0e464c9db3d3d0b47c6efe17a2f0"></span><a class="reference internal" href="#_CPPv4N8Citation9CITE_TYPEE" title="Citation::CITE_TYPE"><span class="n"><span class="pre">CITE_TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type</span></span></span><a class="headerlink" href="#_CPPv4N8Citation4typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation11author_listE">
+<span id="_CPPv3N8Citation11author_listE"></span><span id="_CPPv2N8Citation11author_listE"></span><span id="Citation::author_list__vector:Author:"></span><span class="target" id="classCitation_1a0b3991a4c44b7a29d7e9039c93ec2184"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Author.html#_CPPv46Author" title="Author"><span class="n"><span class="pre">Author</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">author_list</span></span></span><a class="headerlink" href="#_CPPv4N8Citation11author_listE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation5notesE">
+<span id="_CPPv3N8Citation5notesE"></span><span id="_CPPv2N8Citation5notesE"></span><span id="Citation::notes__vector:ss:"></span><span class="target" id="classCitation_1ada657b0a327e6f7a981aafef1cb25cf1"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">notes</span></span></span><a class="headerlink" href="#_CPPv4N8Citation5notesE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation8keywordsE">
+<span id="_CPPv3N8Citation8keywordsE"></span><span id="_CPPv2N8Citation8keywordsE"></span><span id="Citation::keywords__std::set:ss:"></span><span class="target" id="classCitation_1a9c522304694b8e12f9f2a3db2fc577fd"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">keywords</span></span></span><a class="headerlink" href="#_CPPv4N8Citation8keywordsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation11setting_mapE">
+<span id="_CPPv3N8Citation11setting_mapE"></span><span id="_CPPv2N8Citation11setting_mapE"></span><span id="Citation::setting_map__map:ss.ss:"></span><span class="target" id="classCitation_1ad6096bb2459df811aaa598fef7fce43d"></span><a class="reference internal" href="../../base/api/map.html#_CPPv4I00DpE3map" title="map"><span class="n"><span class="pre">map</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setting_map</span></span></span><a class="headerlink" href="#_CPPv4N8Citation11setting_mapE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-static-functions">Private Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation10GetNameMapEv">
+<span id="_CPPv3N8Citation10GetNameMapEv"></span><span id="_CPPv2N8Citation10GetNameMapEv"></span><span id="Citation::GetNameMap"></span><span class="target" id="classCitation_1a8ff934c563e553ca92a48d0caefa9bb1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/map.html#_CPPv4I00DpE3map" title="map"><span class="n"><span class="pre">map</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Citation9CITE_TYPEE" title="Citation::CITE_TYPE"><span class="n"><span class="pre">CITE_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetNameMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation10GetNameMapEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Citation11GetRNameMapEv">
+<span id="_CPPv3N8Citation11GetRNameMapEv"></span><span id="_CPPv2N8Citation11GetRNameMapEv"></span><span id="Citation::GetRNameMap"></span><span class="target" id="classCitation_1a4a9fabf9a1e0bd8cb2194338f29cbce7"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/map.html#_CPPv4I00DpE8multimap" title="multimap"><span class="n"><span class="pre">multimap</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8Citation9CITE_TYPEE" title="Citation::CITE_TYPE"><span class="n"><span class="pre">CITE_TYPE</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetRNameMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Citation11GetRNameMapEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Bibliography.html" class="btn btn-neutral float-left" title="Bibliography.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../testing/testing.html" class="btn btn-neutral float-right" title="Testing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

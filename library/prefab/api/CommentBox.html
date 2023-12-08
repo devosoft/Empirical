@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CommentBox.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/prefab/api/CommentBox.7de8c433-d283-456f-8c5b-089626a0baf5.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="ConfigPanel.hpp" href="ConfigPanel.html" />
+    <link rel="prev" title="Collapse.hpp" href="Collapse.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../prefab.html">Prefab</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../prefab.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Card.html">Card.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CodeBlock.html">CodeBlock.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Collapse.html">Collapse.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">CommentBox.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410CommentBox"><code class="docutils literal notranslate"><span class="pre">CommentBox</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ConfigPanel.html">ConfigPanel.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FontAwesomeIcon.html">FontAwesomeIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LoadingIcon.html">LoadingIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LoadingModal.html">LoadingModal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Modal.html">Modal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ReadoutPanel.html">ReadoutPanel.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ToggleSwitch.html">ToggleSwitch.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ValueBox.html">ValueBox.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../prefab.html">Prefab</a></li>
+      <li class="breadcrumb-item active">CommentBox.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="commentbox-hpp">
+<h1>CommentBox.hpp<a class="headerlink" href="#commentbox-hpp" title="Link to this heading"></a></h1>
+<p>Create a light grey “comment bubble.”. </p>
+<p>TODO: When prefab tools for adding mobile only and desktop only content are created, remove AddMobileContent(), desktop_content and mobile_content divs, and ConfigPanel as a friend class. AddContent() should stream into all_content div. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv410CommentBox">
+<span id="_CPPv310CommentBox"></span><span id="_CPPv210CommentBox"></span><span id="CommentBox"></span><span class="target" id="classCommentBox"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CommentBox</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><a class="headerlink" href="#_CPPv410CommentBox" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;CommentBox.hpp&gt;</em></div>
+<p>Use CommentBox class to create a light grey “comment bubble”. Optionally, it can contain text and other web elements. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10CommentBox10CommentBoxEKNSt6stringE">
+<span id="_CPPv3N10CommentBox10CommentBoxEKNSt6stringE"></span><span id="_CPPv2N10CommentBox10CommentBoxEKNSt6stringE"></span><span id="CommentBox::CommentBox__ssC"></span><span class="target" id="classCommentBox_1a56b5b608070f962daea0c7b7864cf10f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CommentBox</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10CommentBox10CommentBoxEKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN10CommentBox10AddContentEv1T">
+<span id="_CPPv3I0EN10CommentBox10AddContentE1T"></span><span id="_CPPv2I0EN10CommentBox10AddContentE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCommentBox_1a8e4358b26e1e18eb9c80a5c189f0212a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddContent</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN10CommentBox10AddContentEv1T" title="CommentBox::AddContent::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN10CommentBox10AddContentEv1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Take input of any type and add it to the comment box. Content will show on all screen sizes. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN10CommentBox16AddMobileContentEv1T">
+<span id="_CPPv3I0EN10CommentBox16AddMobileContentE1T"></span><span id="_CPPv2I0EN10CommentBox16AddMobileContentE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCommentBox_1a8b31356488e5029b8c32dc0abe1e064a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddMobileContent</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN10CommentBox16AddMobileContentEv1T" title="CommentBox::AddMobileContent::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN10CommentBox16AddMobileContentEv1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Add content only to be shown on small screens. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10CommentBox8box_baseE">
+<span id="_CPPv3N10CommentBox8box_baseE"></span><span id="_CPPv2N10CommentBox8box_baseE"></span><span id="CommentBox::box_base__ss"></span><span class="target" id="classCommentBox_1a61701429c8c9e04bc79f634d5b1616e4"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">box_base</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">this</span></span><span class="o"><span class="pre">-&gt;</span></span><span class="n"><span class="pre">GetID</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N10CommentBox8box_baseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10CommentBox8triangleE">
+<span id="_CPPv3N10CommentBox8triangleE"></span><span id="_CPPv2N10CommentBox8triangleE"></span><span id="CommentBox::triangle__Div"></span><span class="target" id="classCommentBox_1a5c27d59034b1944012bcf3c676a9696a"></span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">triangle</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="../../tools/api/string_utils.html#_CPPv4IDpE9to_stringNSt6stringEDpRK2Ts" title="to_string"><span class="n"><span class="pre">to_string</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N10CommentBox8box_baseE" title="CommentBox::box_base"><span class="n"><span class="pre">box_base</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;_triangle&quot;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N10CommentBox8triangleE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10CommentBox11all_contentE">
+<span id="_CPPv3N10CommentBox11all_contentE"></span><span id="_CPPv2N10CommentBox11all_contentE"></span><span id="CommentBox::all_content__Div"></span><span class="target" id="classCommentBox_1ad464c62c8ce2e1d4e6c492f2e3820cb1"></span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">all_content</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="../../tools/api/string_utils.html#_CPPv4IDpE9to_stringNSt6stringEDpRK2Ts" title="to_string"><span class="n"><span class="pre">to_string</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N10CommentBox8box_baseE" title="CommentBox::box_base"><span class="n"><span class="pre">box_base</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;_all_content&quot;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N10CommentBox11all_contentE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10CommentBox15desktop_contentE">
+<span id="_CPPv3N10CommentBox15desktop_contentE"></span><span id="_CPPv2N10CommentBox15desktop_contentE"></span><span id="CommentBox::desktop_content__Div"></span><span class="target" id="classCommentBox_1a5a636b10420b4164b004f4061b6fd2cd"></span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">desktop_content</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="../../tools/api/string_utils.html#_CPPv4IDpE9to_stringNSt6stringEDpRK2Ts" title="to_string"><span class="n"><span class="pre">to_string</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N10CommentBox8box_baseE" title="CommentBox::box_base"><span class="n"><span class="pre">box_base</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;_desktop_content&quot;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N10CommentBox15desktop_contentE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10CommentBox14mobile_contentE">
+<span id="_CPPv3N10CommentBox14mobile_contentE"></span><span id="_CPPv2N10CommentBox14mobile_contentE"></span><span id="CommentBox::mobile_content__Div"></span><span class="target" id="classCommentBox_1a04d079fd7173d4f4d3af17022a7a2005"></span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mobile_content</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="../../tools/api/string_utils.html#_CPPv4IDpE9to_stringNSt6stringEDpRK2Ts" title="to_string"><span class="n"><span class="pre">to_string</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N10CommentBox8box_baseE" title="CommentBox::box_base"><span class="n"><span class="pre">box_base</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;_mobile_content&quot;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N10CommentBox14mobile_contentE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Collapse.html" class="btn btn-neutral float-left" title="Collapse.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ConfigPanel.html" class="btn btn-neutral float-right" title="ConfigPanel.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

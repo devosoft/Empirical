@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meta &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/meta/meta.3402d48a-469e-47b2-9c3e-f9142f28784d.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ConceptWrapper.hpp" href="api/ConceptWrapper.html" />
+    <link rel="prev" title="stats.hpp" href="../math/api/stats.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Meta</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ConceptWrapper.html">ConceptWrapper.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html">FunInfo.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html">TypeID.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html">TypePack.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html">ValPack.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/macro_math.html">macro_math.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/macros.html">macros.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/meta.html">meta.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/reflection.html">reflection.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html">type_traits.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Meta</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="meta">
+<h1>Meta<a class="headerlink" href="#meta" title="Link to this heading"></a></h1>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/ConceptWrapper.html">ConceptWrapper.hpp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/FunInfo.html">FunInfo.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/FunInfo.html#_CPPv4I00E16ChangeReturnTypeDa5FUN_T11CONVERTER_T"><code class="docutils literal notranslate"><span class="pre">ChangeReturnType()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/FunInfo.html#_CPPv4I000E20ChangeParameterTypesDa5FUN_T11CONVERTER_T"><code class="docutils literal notranslate"><span class="pre">ChangeParameterTypes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/FunInfo.html#_CPPv4I000E21ConvertParameterTypesDa5FUN_T11CONVERTER_T"><code class="docutils literal notranslate"><span class="pre">ConvertParameterTypes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/FunInfo.html#_CPPv4I0000E11ChangeTypesDa5FUN_T13R_CONVERTER_T13P_CONVERTER_T"><code class="docutils literal notranslate"><span class="pre">ChangeTypes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/FunInfo.html#_CPPv4I_6size_t00E6BindAtDa5FUN_TRR7BOUND_T"><code class="docutils literal notranslate"><span class="pre">BindAt()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/FunInfo.html#_CPPv4I00E9BindFirstDa5FUN_TRR7BOUND_T"><code class="docutils literal notranslate"><span class="pre">BindFirst()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/FunInfo.html#_CPPv4I_Dp6size_t0DpE4BindDa5FUN_TDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Bind()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/FunInfo.html#_CPPv4I0E7FunInfo"><code class="docutils literal notranslate"><span class="pre">FunInfo</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/FunInfo.html#_CPPv4I0DpE7FunInfoIF8RETURN_TDp8PARAM_TsEE"><code class="docutils literal notranslate"><span class="pre">FunInfo</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/FunInfo.html#_CPPv4I0DpE7FunInfoIPF8RETURN_TDp8PARAM_TsEE"><code class="docutils literal notranslate"><span class="pre">FunInfo</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/FunInfo.html#_CPPv4I000DpE7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE"><code class="docutils literal notranslate"><span class="pre">FunInfo</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4N7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE5fun_tE"><code class="docutils literal notranslate"><span class="pre">FunInfo::fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4N7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE8return_tE"><code class="docutils literal notranslate"><span class="pre">FunInfo::return_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4N7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE8params_tE"><code class="docutils literal notranslate"><span class="pre">FunInfo::params_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4I_6size_tEN7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE5arg_tE"><code class="docutils literal notranslate"><span class="pre">FunInfo::arg_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4I0DpEN7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE13InvocableWithEbRR4ARG1DpRR6ARG_Ts"><code class="docutils literal notranslate"><span class="pre">FunInfo::InvocableWith()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4IDpEN7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE13InvocableWithEbv"><code class="docutils literal notranslate"><span class="pre">FunInfo::InvocableWith()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4I00EN7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE16ChangeReturnTypeEDa5FUN_T11CONVERTER_T"><code class="docutils literal notranslate"><span class="pre">FunInfo::ChangeReturnType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4I000EN7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE20ChangeParameterTypesEDa5FUN_T11CONVERTER_T"><code class="docutils literal notranslate"><span class="pre">FunInfo::ChangeParameterTypes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4I000EN7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE21ConvertParameterTypesEDa5FUN_T11CONVERTER_T"><code class="docutils literal notranslate"><span class="pre">FunInfo::ConvertParameterTypes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4I_6size_t0EN7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE6BindAtEDa7CLASS_TRR1T"><code class="docutils literal notranslate"><span class="pre">FunInfo::BindAt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4I_6size_t_Dp6size_t0DpEN7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE4BindEDa7CLASS_TRR2T1DpRR2Ts"><code class="docutils literal notranslate"><span class="pre">FunInfo::Bind()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4N7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE8num_argsE"><code class="docutils literal notranslate"><span class="pre">FunInfo::num_args</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4I0DpDpEN7FunInfoIM7CLASS_TKF8RETURN_T8PARAM1_TDp8PARAM_TsEE11BindAt_implEDa7CLASS_TRR7BOUND_T8TypePackIDp9BEFORE_TsE8TypePackIDp8AFTER_TsE"><code class="docutils literal notranslate"><span class="pre">FunInfo::BindAt_impl()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/FunInfo.html#_CPPv4I00E7FunInfoIM7CLASS_TKF8RETURN_TvEE"><code class="docutils literal notranslate"><span class="pre">FunInfo</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4N7FunInfoIM7CLASS_TKF8RETURN_TvEE5fun_tE"><code class="docutils literal notranslate"><span class="pre">FunInfo::fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4N7FunInfoIM7CLASS_TKF8RETURN_TvEE8return_tE"><code class="docutils literal notranslate"><span class="pre">FunInfo::return_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4N7FunInfoIM7CLASS_TKF8RETURN_TvEE8params_tE"><code class="docutils literal notranslate"><span class="pre">FunInfo::params_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4IDpEN7FunInfoIM7CLASS_TKF8RETURN_TvEE13InvocableWithEbDp6ARG_Ts"><code class="docutils literal notranslate"><span class="pre">FunInfo::InvocableWith()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4I00EN7FunInfoIM7CLASS_TKF8RETURN_TvEE16ChangeReturnTypeEDa5FUN_T11CONVERTER_T"><code class="docutils literal notranslate"><span class="pre">FunInfo::ChangeReturnType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4I000EN7FunInfoIM7CLASS_TKF8RETURN_TvEE20ChangeParameterTypesEDa5FUN_T11CONVERTER_T"><code class="docutils literal notranslate"><span class="pre">FunInfo::ChangeParameterTypes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4I000EN7FunInfoIM7CLASS_TKF8RETURN_TvEE21ConvertParameterTypesEDa5FUN_T11CONVERTER_T"><code class="docutils literal notranslate"><span class="pre">FunInfo::ConvertParameterTypes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunInfo.html#_CPPv4N7FunInfoIM7CLASS_TKF8RETURN_TvEE8num_argsE"><code class="docutils literal notranslate"><span class="pre">FunInfo::num_args</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/TypeID.html">TypeID.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/TypeID.html#_CPPv4I0E9GetTypeID6TypeIDv"><code class="docutils literal notranslate"><span class="pre">GetTypeID()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/TypeID.html#_CPPv414SetupTypeNamesv"><code class="docutils literal notranslate"><span class="pre">SetupTypeNames()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/TypeID.html#_CPPv4I0E9BuildInfo3PtrIN6TypeID4InfoEEv"><code class="docutils literal notranslate"><span class="pre">BuildInfo()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/TypeID.html#_CPPv4IDpE10GetTypeIDs6vectorI6TypeIDEv"><code class="docutils literal notranslate"><span class="pre">GetTypeIDs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/TypeID.html#_CPPv4I0E14GetTypePackIDs6vectorI6TypeIDEv"><code class="docutils literal notranslate"><span class="pre">GetTypePackIDs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/TypeID.html#_CPPv46TypeID"><code class="docutils literal notranslate"><span class="pre">TypeID</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID6info_tE"><code class="docutils literal notranslate"><span class="pre">TypeID::info_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID6TypeIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::TypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID6TypeIDE6info_t"><code class="docutils literal notranslate"><span class="pre">TypeID::TypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID6TypeIDE6size_t"><code class="docutils literal notranslate"><span class="pre">TypeID::TypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID6TypeIDERK6TypeID"><code class="docutils literal notranslate"><span class="pre">TypeID::TypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeIDD0Ev"><code class="docutils literal notranslate"><span class="pre">TypeID::~TypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeIDaSERK6TypeID"><code class="docutils literal notranslate"><span class="pre">TypeID::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeIDcv6size_tEv"><code class="docutils literal notranslate"><span class="pre">TypeID::operator</span> <span class="pre">size_t()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeIDcvbEv"><code class="docutils literal notranslate"><span class="pre">TypeID::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeIDeqE6TypeID"><code class="docutils literal notranslate"><span class="pre">TypeID::operator==()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeIDneE6TypeID"><code class="docutils literal notranslate"><span class="pre">TypeID::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeIDltE6TypeID"><code class="docutils literal notranslate"><span class="pre">TypeID::operator&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeIDleE6TypeID"><code class="docutils literal notranslate"><span class="pre">TypeID::operator&lt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeIDgtE6TypeID"><code class="docutils literal notranslate"><span class="pre">TypeID::operator&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeIDgeE6TypeID"><code class="docutils literal notranslate"><span class="pre">TypeID::operator&gt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID5GetIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::GetID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID7GetNameEv"><code class="docutils literal notranslate"><span class="pre">TypeID::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID7SetNameERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">TypeID::SetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID13IsInitializedEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsInitialized()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID14SetInitializedEb"><code class="docutils literal notranslate"><span class="pre">TypeID::SetInitialized()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID10IsAbstractEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsAbstract()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID12IsArithmeticEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsArithmetic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID7IsArrayEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID7IsClassEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsClass()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID7IsConstEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsConst()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID7IsEmptyEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsEmpty()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8IsObjectEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsObject()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID9IsPointerEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsPointer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID11IsReferenceEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsReference()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID9IsTrivialEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsTrivial()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID6IsVoidEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsVoid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID10IsVolatileEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsVolatile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID10IsTypePackEv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsTypePack()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4I0ENK6TypeID6IsTypeEbv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4I0DpENK6TypeID8IsTypeInEbv"><code class="docutils literal notranslate"><span class="pre">TypeID::IsTypeIn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID14GetDecayTypeIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::GetDecayTypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID16GetElementTypeIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::GetElementTypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID20GetRemoveConstTypeIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::GetRemoveConstTypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID17GetRemoveCVTypeIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::GetRemoveCVTypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID21GetRemoveExtentTypeIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::GetRemoveExtentTypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID25GetRemoveAllExtentsTypeIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::GetRemoveAllExtentsTypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID22GetRemovePointerTypeIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::GetRemovePointerTypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID24GetRemoveReferenceTypeIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::GetRemoveReferenceTypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID23GetRemoveVolatileTypeIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::GetRemoveVolatileTypeID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">TypeID::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8ToDoubleEK3PtrIKvE"><code class="docutils literal notranslate"><span class="pre">TypeID::ToDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8ToStringEK3PtrIKvE"><code class="docutils literal notranslate"><span class="pre">TypeID::ToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID10FromDoubleEdK3PtrIvE"><code class="docutils literal notranslate"><span class="pre">TypeID::FromDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID10FromStringERKNSt6stringEK3PtrIvE"><code class="docutils literal notranslate"><span class="pre">TypeID::FromString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID8info_ptrE"><code class="docutils literal notranslate"><span class="pre">TypeID::info_ptr</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID17GetUnknownInfoPtrEv"><code class="docutils literal notranslate"><span class="pre">TypeID::GetUnknownInfoPtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID4InfoE"><code class="docutils literal notranslate"><span class="pre">TypeID::Info</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID4InfoD0Ev"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::~Info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info10IsAbstractEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsAbstract()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info12IsArithmeticEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsArithmetic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info7IsArrayEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info7IsClassEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsClass()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info7IsConstEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsConst()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info7IsEmptyEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsEmpty()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info8IsObjectEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsObject()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info9IsPointerEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsPointer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info11IsReferenceEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsReference()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info9IsTrivialEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsTrivial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info6IsVoidEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsVoid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info10IsVolatileEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsVolatile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info10IsFunctionEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsFunction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info10IsTypePackEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::IsTypePack()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info10GetDecayIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::GetDecayID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info12GetElementIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::GetElementID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info16GetRemoveConstIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::GetRemoveConstID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info13GetRemoveCVIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::GetRemoveCVID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info17GetRemoveExtentIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::GetRemoveExtentID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info21GetRemoveAllExtentsIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::GetRemoveAllExtentsID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info14GetRemovePtrIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::GetRemovePtrID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info14GetRemoveRefIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::GetRemoveRefID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info19GetRemoveVolatileIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::GetRemoveVolatileID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info8ToDoubleEK3PtrIKvE"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::ToDouble()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info8ToStringEK3PtrIKvE"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::ToString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info10FromDoubleEdK3PtrIvE"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::FromDouble()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID4Info10FromStringERKNSt6stringEK3PtrIvE"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::FromString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID4Info4InfoEv"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::Info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID4Info4InfoERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::Info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID4Info4InfoERK4Info"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::Info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID4Info4initE"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::init</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4N6TypeID4Info4nameE"><code class="docutils literal notranslate"><span class="pre">TypeID::Info::name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypeID.html#_CPPv4I0EN6TypeID8InfoDataE"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData10IsAbstractEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsAbstract()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData12IsArithmeticEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsArithmetic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData7IsArrayEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData7IsClassEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsClass()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData7IsConstEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsConst()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData7IsEmptyEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsEmpty()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData8IsObjectEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsObject()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData9IsPointerEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsPointer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData11IsReferenceEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsReference()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData9IsTrivialEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsTrivial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData6IsVoidEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsVoid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData10IsVolatileEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsVolatile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData10IsFunctionEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsFunction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData10IsTypePackEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::IsTypePack()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData10GetDecayIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::GetDecayID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData12GetElementIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::GetElementID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData16GetRemoveConstIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::GetRemoveConstID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData13GetRemoveCVIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::GetRemoveCVID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData17GetRemoveExtentIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::GetRemoveExtentID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData21GetRemoveAllExtentsIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::GetRemoveAllExtentsID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData14GetRemovePtrIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::GetRemovePtrID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData14GetRemoveRefIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::GetRemoveRefID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData19GetRemoveVolatileIDEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::GetRemoveVolatileID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData8ToDoubleEK3PtrIKvE"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::ToDouble()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData8ToStringEK3PtrIKvE"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::ToString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData10FromDoubleEdK3PtrIvE"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::FromDouble()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/TypeID.html#_CPPv4NK6TypeID8InfoData10FromStringERKNSt6stringEK3PtrIvE"><code class="docutils literal notranslate"><span class="pre">TypeID::InfoData::FromString()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/TypeID.html#_CPPv4I00E17HasEMPGetTypeName"><code class="docutils literal notranslate"><span class="pre">HasEMPGetTypeName</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/TypeID.html#_CPPv4I0E17HasEMPGetTypeNameI7decoy_tI1TDTclN1T14EMPGetTypeNameEEEEE"><code class="docutils literal notranslate"><span class="pre">HasEMPGetTypeName</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/TypePack.html">TypePack.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/TypePack.html#_CPPv4I0_iE12TypePackFill"><code class="docutils literal notranslate"><span class="pre">TypePackFill</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/TypePack.html#_CPPv4IDpE8TypePack"><code class="docutils literal notranslate"><span class="pre">TypePack</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/TypePack.html#_CPPv46null_t"><code class="docutils literal notranslate"><span class="pre">null_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/TypePack.html#_CPPv4I0DpE8TypePack"><code class="docutils literal notranslate"><span class="pre">TypePack</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePack8has_typeE"><code class="docutils literal notranslate"><span class="pre">TypePack::has_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I_iEN8TypePack3getE"><code class="docutils literal notranslate"><span class="pre">TypePack::get</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePack6this_tE"><code class="docutils literal notranslate"><span class="pre">TypePack::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePack7first_tE"><code class="docutils literal notranslate"><span class="pre">TypePack::first_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePack6last_tE"><code class="docutils literal notranslate"><span class="pre">TypePack::last_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IDpEN8TypePack10push_frontE"><code class="docutils literal notranslate"><span class="pre">TypePack::push_front</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IDpEN8TypePack9push_backE"><code class="docutils literal notranslate"><span class="pre">TypePack::push_back</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IDpEN8TypePack3addE"><code class="docutils literal notranslate"><span class="pre">TypePack::add</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePack3popE"><code class="docutils literal notranslate"><span class="pre">TypePack::pop</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I_iEN8TypePack4popNE"><code class="docutils literal notranslate"><span class="pre">TypePack::popN</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I_iEN8TypePack6shrinkE"><code class="docutils literal notranslate"><span class="pre">TypePack::shrink</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0_iEN8TypePack3padE"><code class="docutils literal notranslate"><span class="pre">TypePack::pad</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I_i0EN8TypePack6resizeE"><code class="docutils literal notranslate"><span class="pre">TypePack::resize</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePack5mergeE"><code class="docutils literal notranslate"><span class="pre">TypePack::merge</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePack10find_unionE"><code class="docutils literal notranslate"><span class="pre">TypePack::find_union</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePack14find_intersectE"><code class="docutils literal notranslate"><span class="pre">TypePack::find_intersect</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePack7reverseE"><code class="docutils literal notranslate"><span class="pre">TypePack::reverse</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePack6rotateE"><code class="docutils literal notranslate"><span class="pre">TypePack::rotate</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I_i0EN8TypePack3setE"><code class="docutils literal notranslate"><span class="pre">TypePack::set</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I_DpiEN8TypePack6selectE"><code class="docutils literal notranslate"><span class="pre">TypePack::select</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePack13to_function_tE"><code class="docutils literal notranslate"><span class="pre">TypePack::to_function_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IIDpE0EN8TypePack5applyE"><code class="docutils literal notranslate"><span class="pre">TypePack::apply</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IIDpE0EN8TypePack6filterE"><code class="docutils literal notranslate"><span class="pre">TypePack::filter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IIDpE0EN8TypePack10filter_outE"><code class="docutils literal notranslate"><span class="pre">TypePack::filter_out</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IIDpE0EN8TypePack6find_tE"><code class="docutils literal notranslate"><span class="pre">TypePack::find_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePack8remove_tE"><code class="docutils literal notranslate"><span class="pre">TypePack::remove_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePack11make_uniqueE"><code class="docutils literal notranslate"><span class="pre">TypePack::make_unique</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IIDpE0EN8TypePack4wrapE"><code class="docutils literal notranslate"><span class="pre">TypePack::wrap</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I_6size_tEN8TypePack11make_combosE"><code class="docutils literal notranslate"><span class="pre">TypePack::make_combos</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePack3HasEbv"><code class="docutils literal notranslate"><span class="pre">TypePack::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePack5CountE6size_tv"><code class="docutils literal notranslate"><span class="pre">TypePack::Count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePack5GetIDEiv"><code class="docutils literal notranslate"><span class="pre">TypePack::GetID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePack5GetIDEiRK1T"><code class="docutils literal notranslate"><span class="pre">TypePack::GetID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePack7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">TypePack::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePack7IsEmptyEv"><code class="docutils literal notranslate"><span class="pre">TypePack::IsEmpty()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePack8IsUniqueEv"><code class="docutils literal notranslate"><span class="pre">TypePack::IsUnique()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePack11CountUniqueEv"><code class="docutils literal notranslate"><span class="pre">TypePack::CountUnique()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePack4SIZEE"><code class="docutils literal notranslate"><span class="pre">TypePack::SIZE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePack12type_matcherE"><code class="docutils literal notranslate"><span class="pre">TypePack::type_matcher</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePack12type_matcher8is_matchE"><code class="docutils literal notranslate"><span class="pre">TypePack::type_matcher::is_match</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/TypePack.html#_CPPv4IE8TypePackIE"><code class="docutils literal notranslate"><span class="pre">TypePack</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePackIE6this_tE"><code class="docutils literal notranslate"><span class="pre">TypePack::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePackIE7first_tE"><code class="docutils literal notranslate"><span class="pre">TypePack::first_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePackIE6last_tE"><code class="docutils literal notranslate"><span class="pre">TypePack::last_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IDpEN8TypePackIE10push_frontE"><code class="docutils literal notranslate"><span class="pre">TypePack::push_front</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IDpEN8TypePackIE9push_backE"><code class="docutils literal notranslate"><span class="pre">TypePack::push_back</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IDpEN8TypePackIE3addE"><code class="docutils literal notranslate"><span class="pre">TypePack::add</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I_iEN8TypePackIE4popNE"><code class="docutils literal notranslate"><span class="pre">TypePack::popN</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I_iEN8TypePackIE6shrinkE"><code class="docutils literal notranslate"><span class="pre">TypePack::shrink</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0_iEN8TypePackIE3padE"><code class="docutils literal notranslate"><span class="pre">TypePack::pad</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I_i0EN8TypePackIE6resizeE"><code class="docutils literal notranslate"><span class="pre">TypePack::resize</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePackIE5mergeE"><code class="docutils literal notranslate"><span class="pre">TypePack::merge</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePackIE7reverseE"><code class="docutils literal notranslate"><span class="pre">TypePack::reverse</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePackIE6rotateE"><code class="docutils literal notranslate"><span class="pre">TypePack::rotate</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePackIE13to_function_tE"><code class="docutils literal notranslate"><span class="pre">TypePack::to_function_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IIDpE0EN8TypePackIE5applyE"><code class="docutils literal notranslate"><span class="pre">TypePack::apply</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IIDpE0EN8TypePackIE6filterE"><code class="docutils literal notranslate"><span class="pre">TypePack::filter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IIDpE0EN8TypePackIE10filter_outE"><code class="docutils literal notranslate"><span class="pre">TypePack::filter_out</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IIDpE0EN8TypePackIE6find_tE"><code class="docutils literal notranslate"><span class="pre">TypePack::find_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePackIE8remove_tE"><code class="docutils literal notranslate"><span class="pre">TypePack::remove_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePackIE11make_uniqueE"><code class="docutils literal notranslate"><span class="pre">TypePack::make_unique</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4IIDpE0EN8TypePackIE4wrapE"><code class="docutils literal notranslate"><span class="pre">TypePack::wrap</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePackIE3HasEbv"><code class="docutils literal notranslate"><span class="pre">TypePack::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4I0EN8TypePackIE5CountE6size_tv"><code class="docutils literal notranslate"><span class="pre">TypePack::Count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePackIE7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">TypePack::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePackIE7IsEmptyEv"><code class="docutils literal notranslate"><span class="pre">TypePack::IsEmpty()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePackIE8IsUniqueEv"><code class="docutils literal notranslate"><span class="pre">TypePack::IsUnique()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/TypePack.html#_CPPv4N8TypePackIE4SIZEE"><code class="docutils literal notranslate"><span class="pre">TypePack::SIZE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/TypePack.html#_CPPv4I0E11is_TypePack"><code class="docutils literal notranslate"><span class="pre">is_TypePack</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/TypePack.html#_CPPv4IDpE11is_TypePackI8TypePackIDp2TsEE"><code class="docutils literal notranslate"><span class="pre">is_TypePack</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/ValPack.html">ValPack.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/ValPack.html#_CPPv4I_Da_Da_DaE12ValPackRange"><code class="docutils literal notranslate"><span class="pre">ValPackRange</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/ValPack.html#_CPPv4I_DaE12ValPackCount"><code class="docutils literal notranslate"><span class="pre">ValPackCount</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/ValPack.html#_CPPv4I_DpDaE7ValPack"><code class="docutils literal notranslate"><span class="pre">ValPack</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/ValPack.html#_CPPv4I_Da_DpDaE7ValPack"><code class="docutils literal notranslate"><span class="pre">ValPack</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack6this_tE"><code class="docutils literal notranslate"><span class="pre">ValPack::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack3popE"><code class="docutils literal notranslate"><span class="pre">ValPack::pop</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I_DaEN7ValPack4pushE"><code class="docutils literal notranslate"><span class="pre">ValPack::push</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I_DaEN7ValPack9push_backE"><code class="docutils literal notranslate"><span class="pre">ValPack::push_back</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I_Da_DaEN7ValPack11push_if_notE"><code class="docutils literal notranslate"><span class="pre">ValPack::push_if_not</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I_Da_DaEN7ValPack16push_back_if_notE"><code class="docutils literal notranslate"><span class="pre">ValPack::push_back_if_not</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I_DaEN7ValPack7pop_valE"><code class="docutils literal notranslate"><span class="pre">ValPack::pop_val</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I_DaEN7ValPack6removeE"><code class="docutils literal notranslate"><span class="pre">ValPack::remove</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN7ValPack6appendE"><code class="docutils literal notranslate"><span class="pre">ValPack::append</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4II_DpiE0EN7ValPack5applyE"><code class="docutils literal notranslate"><span class="pre">ValPack::apply</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN7ValPack3HasEb1T"><code class="docutils literal notranslate"><span class="pre">ValPack::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN7ValPack5CountE6size_t1T"><code class="docutils literal notranslate"><span class="pre">ValPack::Count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN7ValPack5GetIDEi1T"><code class="docutils literal notranslate"><span class="pre">ValPack::GetID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">ValPack::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack7IsEmptyEv"><code class="docutils literal notranslate"><span class="pre">ValPack::IsEmpty()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack8IsUniqueEv"><code class="docutils literal notranslate"><span class="pre">ValPack::IsUnique()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack3SumEv"><code class="docutils literal notranslate"><span class="pre">ValPack::Sum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack7ProductEv"><code class="docutils literal notranslate"><span class="pre">ValPack::Product()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN7ValPack3MinEDa1T"><code class="docutils literal notranslate"><span class="pre">ValPack::Min()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack3MinEv"><code class="docutils literal notranslate"><span class="pre">ValPack::Min()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN7ValPack3MaxEDa1T"><code class="docutils literal notranslate"><span class="pre">ValPack::Max()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack3MaxEv"><code class="docutils literal notranslate"><span class="pre">ValPack::Max()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack8IsSortedEv"><code class="docutils literal notranslate"><span class="pre">ValPack::IsSorted()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN7ValPack10ApplyIndexEDaRR1T"><code class="docutils literal notranslate"><span class="pre">ValPack::ApplyIndex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack8ToStringEv"><code class="docutils literal notranslate"><span class="pre">ValPack::ToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack9PrintValsERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">ValPack::PrintVals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack5firstE"><code class="docutils literal notranslate"><span class="pre">ValPack::first</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPack4SIZEE"><code class="docutils literal notranslate"><span class="pre">ValPack::SIZE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/ValPack.html#_CPPv4IE7ValPackIE"><code class="docutils literal notranslate"><span class="pre">ValPack</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPackIE6this_tE"><code class="docutils literal notranslate"><span class="pre">ValPack::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I_DaEN7ValPackIE4pushE"><code class="docutils literal notranslate"><span class="pre">ValPack::push</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I_DaEN7ValPackIE9push_backE"><code class="docutils literal notranslate"><span class="pre">ValPack::push_back</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I_Da_DaEN7ValPackIE11push_if_notE"><code class="docutils literal notranslate"><span class="pre">ValPack::push_if_not</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I_Da_DaEN7ValPackIE16push_back_if_notE"><code class="docutils literal notranslate"><span class="pre">ValPack::push_back_if_not</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I_DaEN7ValPackIE7pop_valE"><code class="docutils literal notranslate"><span class="pre">ValPack::pop_val</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I_DaEN7ValPackIE6removeE"><code class="docutils literal notranslate"><span class="pre">ValPack::remove</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN7ValPackIE6appendE"><code class="docutils literal notranslate"><span class="pre">ValPack::append</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN7ValPackIE3HasEb1T"><code class="docutils literal notranslate"><span class="pre">ValPack::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN7ValPackIE5CountE6size_t1T"><code class="docutils literal notranslate"><span class="pre">ValPack::Count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN7ValPackIE5GetIDEi1T"><code class="docutils literal notranslate"><span class="pre">ValPack::GetID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPackIE7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">ValPack::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPackIE7IsEmptyEv"><code class="docutils literal notranslate"><span class="pre">ValPack::IsEmpty()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPackIE8IsUniqueEv"><code class="docutils literal notranslate"><span class="pre">ValPack::IsUnique()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPackIE3SumEv"><code class="docutils literal notranslate"><span class="pre">ValPack::Sum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPackIE7ProductEv"><code class="docutils literal notranslate"><span class="pre">ValPack::Product()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN7ValPackIE3MinEDa1T"><code class="docutils literal notranslate"><span class="pre">ValPack::Min()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN7ValPackIE3MaxEDa1T"><code class="docutils literal notranslate"><span class="pre">ValPack::Max()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPackIE8IsSortedEv"><code class="docutils literal notranslate"><span class="pre">ValPack::IsSorted()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPackIE8ToStringEv"><code class="docutils literal notranslate"><span class="pre">ValPack::ToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPackIE9PrintValsERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">ValPack::PrintVals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4N7ValPackIE4SIZEE"><code class="docutils literal notranslate"><span class="pre">ValPack::SIZE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/ValPack.html#_CPPv44pack"><code class="docutils literal notranslate"><span class="pre">pack</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN4pack7reverseE"><code class="docutils literal notranslate"><span class="pre">pack::reverse</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN4pack4uniqE"><code class="docutils literal notranslate"><span class="pre">pack::uniq</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN4pack4sortE"><code class="docutils literal notranslate"><span class="pre">pack::sort</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN4pack5RsortE"><code class="docutils literal notranslate"><span class="pre">pack::Rsort</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN4pack5UsortE"><code class="docutils literal notranslate"><span class="pre">pack::Usort</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValPack.html#_CPPv4I0EN4pack6RUsortE"><code class="docutils literal notranslate"><span class="pre">pack::RUsort</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/macro_math.html">macro_math.hpp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/macros.html">macros.hpp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/meta.html">meta.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4IDpE10first_type"><code class="docutils literal notranslate"><span class="pre">first_type</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4IDpE11second_type"><code class="docutils literal notranslate"><span class="pre">second_type</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4IDpE10third_type"><code class="docutils literal notranslate"><span class="pre">third_type</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4IDpE11fourth_type"><code class="docutils literal notranslate"><span class="pre">fourth_type</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I_6size_tDpE7pack_id"><code class="docutils literal notranslate"><span class="pre">pack_id</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4IDpE9last_type"><code class="docutils literal notranslate"><span class="pre">last_type</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I00E12sfinae_decoy"><code class="docutils literal notranslate"><span class="pre">sfinae_decoy</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I00E10type_decoy"><code class="docutils literal notranslate"><span class="pre">type_decoy</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I00E7decoy_t"><code class="docutils literal notranslate"><span class="pre">decoy_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0E10bool_decoy"><code class="docutils literal notranslate"><span class="pre">bool_decoy</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0E9int_decoy"><code class="docutils literal notranslate"><span class="pre">int_decoy</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0DpE13AdaptTemplate"><code class="docutils literal notranslate"><span class="pre">AdaptTemplate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I00E18AdaptTemplate_Arg1"><code class="docutils literal notranslate"><span class="pre">AdaptTemplate_Arg1</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4IDpE9DoNothingvDp2Ts"><code class="docutils literal notranslate"><span class="pre">DoNothing()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0E15BuildObjVector1vR6vectorI5OBJ_TE"><code class="docutils literal notranslate"><span class="pre">BuildObjVector1()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0E15BuildObjVector2vR6vectorI5OBJ_TE"><code class="docutils literal notranslate"><span class="pre">BuildObjVector2()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0E15BuildObjVector3vR6vectorI5OBJ_TE"><code class="docutils literal notranslate"><span class="pre">BuildObjVector3()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0E15BuildObjVector4vR6vectorI5OBJ_TE"><code class="docutils literal notranslate"><span class="pre">BuildObjVector4()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I00DpE15BuildObjVector1vR6vectorI5OBJ_TER2T1DpR2Ts"><code class="docutils literal notranslate"><span class="pre">BuildObjVector1()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I000DpE15BuildObjVector2vR6vectorI5OBJ_TER2T1R2T2DpR2Ts"><code class="docutils literal notranslate"><span class="pre">BuildObjVector2()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0000DpE15BuildObjVector3vR6vectorI5OBJ_TER2T1R2T2R2T3DpR2Ts"><code class="docutils literal notranslate"><span class="pre">BuildObjVector3()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I00000DpE15BuildObjVector4vR6vectorI5OBJ_TER2T1R2T2R2T3R2T4DpR2Ts"><code class="docutils literal notranslate"><span class="pre">BuildObjVector4()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0_6size_tDpE14BuildObjVector6vectorI5OBJ_TEDpR2Ts"><code class="docutils literal notranslate"><span class="pre">BuildObjVector()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I00DpE8has_typebv"><code class="docutils literal notranslate"><span class="pre">has_type()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I00DpE10count_type6size_tv"><code class="docutils literal notranslate"><span class="pre">count_type()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0DpE14get_type_indexiv"><code class="docutils literal notranslate"><span class="pre">get_type_index()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I00DpE21has_unique_first_typebv"><code class="docutils literal notranslate"><span class="pre">has_unique_first_type()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I00DpE16has_unique_typesbv"><code class="docutils literal notranslate"><span class="pre">has_unique_types()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4IIDpE00E15test_type_existbv"><code class="docutils literal notranslate"><span class="pre">test_type_exist()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4IIDpE00E15test_type_valuebv"><code class="docutils literal notranslate"><span class="pre">test_type_value()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4IIDpE00E9test_typebv"><code class="docutils literal notranslate"><span class="pre">test_type()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0DpDpE12TruncateCallDaNSt8functionIF1RDp6PARAMSEEEDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">TruncateCall()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0_6size_tE7GetSize6size_tRA1N_1T"><code class="docutils literal notranslate"><span class="pre">GetSize()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv414run_and_ignore"><code class="docutils literal notranslate"><span class="pre">run_and_ignore</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/meta.html#_CPPv4IDpEN14run_and_ignore14run_and_ignoreEDpRR1T"><code class="docutils literal notranslate"><span class="pre">run_and_ignore::run_and_ignore()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4IDpE10type_index"><code class="docutils literal notranslate"><span class="pre">type_index</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4IE10type_indexIE"><code class="docutils literal notranslate"><span class="pre">type_index</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/meta.html#_CPPv4N10type_indexIE2t1E"><code class="docutils literal notranslate"><span class="pre">type_index::t1</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/meta.html#_CPPv4N10type_indexIE2t2E"><code class="docutils literal notranslate"><span class="pre">type_index::t2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/meta.html#_CPPv4N10type_indexIE2t3E"><code class="docutils literal notranslate"><span class="pre">type_index::t3</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/meta.html#_CPPv4N10type_indexIE2t4E"><code class="docutils literal notranslate"><span class="pre">type_index::t4</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0E10type_index"><code class="docutils literal notranslate"><span class="pre">type_index</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/meta.html#_CPPv4N10type_index2t1E"><code class="docutils literal notranslate"><span class="pre">type_index::t1</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/meta.html#_CPPv4N10type_index2t2E"><code class="docutils literal notranslate"><span class="pre">type_index::t2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/meta.html#_CPPv4N10type_index2t3E"><code class="docutils literal notranslate"><span class="pre">type_index::t3</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/meta.html#_CPPv4N10type_index2t4E"><code class="docutils literal notranslate"><span class="pre">type_index::t4</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I00E10type_index"><code class="docutils literal notranslate"><span class="pre">type_index</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I000E10type_index"><code class="docutils literal notranslate"><span class="pre">type_index</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0000DpE10type_index"><code class="docutils literal notranslate"><span class="pre">type_index</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4IDpE8ShowType"><code class="docutils literal notranslate"><span class="pre">ShowType</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0E15dependent_false"><code class="docutils literal notranslate"><span class="pre">dependent_false</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I_iE15PlaceholderType"><code class="docutils literal notranslate"><span class="pre">PlaceholderType</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I0DpE13AdaptFunction"><code class="docutils literal notranslate"><span class="pre">AdaptFunction</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/meta.html#_CPPv4IDpEN13AdaptFunction6ExpandEDaRKNSt8functionIF1RDp4ARGSEEE"><code class="docutils literal notranslate"><span class="pre">AdaptFunction::Expand()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I_i_DpiE8tIntMath"><code class="docutils literal notranslate"><span class="pre">tIntMath</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/meta.html#_CPPv4N8tIntMath3SumEv"><code class="docutils literal notranslate"><span class="pre">tIntMath::Sum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/meta.html#_CPPv4N8tIntMath7ProductEv"><code class="docutils literal notranslate"><span class="pre">tIntMath::Product()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/meta.html#_CPPv4I_iE8tIntMath"><code class="docutils literal notranslate"><span class="pre">tIntMath</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/reflection.html">reflection.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/reflection.html#_CPPv4I0DpDpE10SubsetCall6RETURNNSt8functionIF6RETURNDp8FUN_ARGSEEEDp9CALL_ARGS"><code class="docutils literal notranslate"><span class="pre">SubsetCall()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/type_traits.html">type_traits.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E10IsIterable"><code class="docutils literal notranslate"><span class="pre">IsIterable</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E21remove_std_function_t"><code class="docutils literal notranslate"><span class="pre">remove_std_function_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E9element_t"><code class="docutils literal notranslate"><span class="pre">element_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E10is_pointer"><code class="docutils literal notranslate"><span class="pre">is_pointer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E17remove_ptr_type_t"><code class="docutils literal notranslate"><span class="pre">remove_ptr_type_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E16remove_pointer_t"><code class="docutils literal notranslate"><span class="pre">remove_pointer_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I_6size_t0E16uint_bit_count_t"><code class="docutils literal notranslate"><span class="pre">uint_bit_count_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I_6size_t0E15int_bit_count_t"><code class="docutils literal notranslate"><span class="pre">int_bit_count_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I00E13match_const_t"><code class="docutils literal notranslate"><span class="pre">match_const_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IDpE17variadic_concat_t"><code class="docutils literal notranslate"><span class="pre">variadic_concat_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0I0E0E17variadic_filter_t"><code class="docutils literal notranslate"><span class="pre">variadic_filter_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0I00EDpE28variadic_remove_duplicates_t"><code class="docutils literal notranslate"><span class="pre">variadic_remove_duplicates_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4II00E0DpE16variadic_union_t"><code class="docutils literal notranslate"><span class="pre">variadic_union_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4II00E0DpE23variadic_intersection_t"><code class="docutils literal notranslate"><span class="pre">variadic_intersection_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E13is_ptr_type_vbv"><code class="docutils literal notranslate"><span class="pre">is_ptr_type_v()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E13is_ptr_type_vbRK1T"><code class="docutils literal notranslate"><span class="pre">is_ptr_type_v()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E16remove_ptr_valueRDaR1T"><code class="docutils literal notranslate"><span class="pre">remove_ptr_value()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I00I00EDpE19variadic_contains_v"><code class="docutils literal notranslate"><span class="pre">variadic_contains_v</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I00I00EDpE19variadic_index_of_v"><code class="docutils literal notranslate"><span class="pre">variadic_index_of_v</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E3Ptr"><code class="docutils literal notranslate"><span class="pre">Ptr</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0DpE6vector"><code class="docutils literal notranslate"><span class="pre">vector</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I00E11HasToString"><code class="docutils literal notranslate"><span class="pre">HasToString</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E11HasToStringI7decoy_tI1TDTcldtclNSt7declvalI1TEEE8ToStringEEEE"><code class="docutils literal notranslate"><span class="pre">HasToString</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I00E11HasToDouble"><code class="docutils literal notranslate"><span class="pre">HasToDouble</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E11HasToDoubleI7decoy_tI1TDTcldtclNSt7declvalI1TEEE8ToDoubleEEEE"><code class="docutils literal notranslate"><span class="pre">HasToDouble</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E15is_std_function"><code class="docutils literal notranslate"><span class="pre">is_std_function</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IDpE15is_std_functionINSt8functionIDp2TsEEE"><code class="docutils literal notranslate"><span class="pre">is_std_function</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E24remove_std_function_type"><code class="docutils literal notranslate"><span class="pre">remove_std_function_type</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N24remove_std_function_type4typeE"><code class="docutils literal notranslate"><span class="pre">remove_std_function_type::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E24remove_std_function_typeINSt8functionI1TEEE"><code class="docutils literal notranslate"><span class="pre">remove_std_function_type</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N24remove_std_function_typeINSt8functionI1TEEE4typeE"><code class="docutils literal notranslate"><span class="pre">remove_std_function_type::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E12element_type"><code class="docutils literal notranslate"><span class="pre">element_type</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N12element_type4typeE"><code class="docutils literal notranslate"><span class="pre">element_type::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IIDpE00E12element_typeI4TMPLI1TEE"><code class="docutils literal notranslate"><span class="pre">element_type</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N12element_typeI4TMPLI1TEE4typeE"><code class="docutils literal notranslate"><span class="pre">element_type::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E13is_emp_vector"><code class="docutils literal notranslate"><span class="pre">is_emp_vector</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0DpE13is_emp_vectorI6vectorI1TDp2TsEE"><code class="docutils literal notranslate"><span class="pre">is_emp_vector</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E7is_span"><code class="docutils literal notranslate"><span class="pre">is_span</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E7is_spanINSt4spanI1TEEE"><code class="docutils literal notranslate"><span class="pre">is_span</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E11is_ptr_type"><code class="docutils literal notranslate"><span class="pre">is_ptr_type</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E11is_ptr_typeIP1TE"><code class="docutils literal notranslate"><span class="pre">is_ptr_type</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E11is_ptr_typeIPC1TE"><code class="docutils literal notranslate"><span class="pre">is_ptr_type</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E11is_ptr_typeI3PtrI1TEE"><code class="docutils literal notranslate"><span class="pre">is_ptr_type</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E15remove_ptr_type"><code class="docutils literal notranslate"><span class="pre">remove_ptr_type</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N15remove_ptr_type4typeE"><code class="docutils literal notranslate"><span class="pre">remove_ptr_type::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E15remove_ptr_typeIP1TE"><code class="docutils literal notranslate"><span class="pre">remove_ptr_type</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N15remove_ptr_typeIP1TE4typeE"><code class="docutils literal notranslate"><span class="pre">remove_ptr_type::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E15remove_ptr_typeIPC1TE"><code class="docutils literal notranslate"><span class="pre">remove_ptr_type</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N15remove_ptr_typeIPC1TE4typeE"><code class="docutils literal notranslate"><span class="pre">remove_ptr_type::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E15remove_ptr_typeI3PtrI1TEE"><code class="docutils literal notranslate"><span class="pre">remove_ptr_type</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N15remove_ptr_typeI3PtrI1TEE4typeE"><code class="docutils literal notranslate"><span class="pre">remove_ptr_type::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I_6size_t0E14uint_bit_count"><code class="docutils literal notranslate"><span class="pre">uint_bit_count</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N14uint_bit_count4typeE"><code class="docutils literal notranslate"><span class="pre">uint_bit_count::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IE14uint_bit_countIXL8EEE"><code class="docutils literal notranslate"><span class="pre">uint_bit_count</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N14uint_bit_countIXL8EEE4typeE"><code class="docutils literal notranslate"><span class="pre">uint_bit_count::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IE14uint_bit_countIXL16EEE"><code class="docutils literal notranslate"><span class="pre">uint_bit_count</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N14uint_bit_countIXL16EEE4typeE"><code class="docutils literal notranslate"><span class="pre">uint_bit_count::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IE14uint_bit_countIXL32EEE"><code class="docutils literal notranslate"><span class="pre">uint_bit_count</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N14uint_bit_countIXL32EEE4typeE"><code class="docutils literal notranslate"><span class="pre">uint_bit_count::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IE14uint_bit_countIXL64EEE"><code class="docutils literal notranslate"><span class="pre">uint_bit_count</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N14uint_bit_countIXL64EEE4typeE"><code class="docutils literal notranslate"><span class="pre">uint_bit_count::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I_6size_t0E13int_bit_count"><code class="docutils literal notranslate"><span class="pre">int_bit_count</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N13int_bit_count4typeE"><code class="docutils literal notranslate"><span class="pre">int_bit_count::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IE13int_bit_countIXL8EEE"><code class="docutils literal notranslate"><span class="pre">int_bit_count</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N13int_bit_countIXL8EEE4typeE"><code class="docutils literal notranslate"><span class="pre">int_bit_count::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IE13int_bit_countIXL16EEE"><code class="docutils literal notranslate"><span class="pre">int_bit_count</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N13int_bit_countIXL16EEE4typeE"><code class="docutils literal notranslate"><span class="pre">int_bit_count::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IE13int_bit_countIXL32EEE"><code class="docutils literal notranslate"><span class="pre">int_bit_count</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N13int_bit_countIXL32EEE4typeE"><code class="docutils literal notranslate"><span class="pre">int_bit_count::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IE13int_bit_countIXL64EEE"><code class="docutils literal notranslate"><span class="pre">int_bit_count</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N13int_bit_countIXL64EEE4typeE"><code class="docutils literal notranslate"><span class="pre">int_bit_count::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I00E11match_const"><code class="docutils literal notranslate"><span class="pre">match_const</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N11match_const4typeE"><code class="docutils literal notranslate"><span class="pre">match_const::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I00E11match_constI1TK7MATCH_TE"><code class="docutils literal notranslate"><span class="pre">match_const</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N11match_constI1TK7MATCH_TE4typeE"><code class="docutils literal notranslate"><span class="pre">match_const::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I00E8ptr_pair"><code class="docutils literal notranslate"><span class="pre">ptr_pair</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N8ptr_pair4SameEv"><code class="docutils literal notranslate"><span class="pre">ptr_pair::Same()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N8ptr_pair8SameBaseEv"><code class="docutils literal notranslate"><span class="pre">ptr_pair::SameBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N8ptr_pair9ConvertOKEP2T1"><code class="docutils literal notranslate"><span class="pre">ptr_pair::ConvertOK()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E8ptr_pairI1T1TE"><code class="docutils literal notranslate"><span class="pre">ptr_pair</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N8ptr_pairI1T1TE4SameEv"><code class="docutils literal notranslate"><span class="pre">ptr_pair::Same()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N8ptr_pairI1T1TE8SameBaseEv"><code class="docutils literal notranslate"><span class="pre">ptr_pair::SameBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N8ptr_pairI1T1TE9ConvertOKEP1T"><code class="docutils literal notranslate"><span class="pre">ptr_pair::ConvertOK()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E8ptr_pairI1TK1TE"><code class="docutils literal notranslate"><span class="pre">ptr_pair</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N8ptr_pairI1TK1TE4SameEv"><code class="docutils literal notranslate"><span class="pre">ptr_pair::Same()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N8ptr_pairI1TK1TE8SameBaseEv"><code class="docutils literal notranslate"><span class="pre">ptr_pair::SameBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N8ptr_pairI1TK1TE9ConvertOKEP1T"><code class="docutils literal notranslate"><span class="pre">ptr_pair::ConvertOK()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0E8ptr_pairIK1T1TE"><code class="docutils literal notranslate"><span class="pre">ptr_pair</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N8ptr_pairIK1T1TE4SameEv"><code class="docutils literal notranslate"><span class="pre">ptr_pair::Same()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N8ptr_pairIK1T1TE8SameBaseEv"><code class="docutils literal notranslate"><span class="pre">ptr_pair::SameBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N8ptr_pairIK1T1TE9ConvertOKEP1T"><code class="docutils literal notranslate"><span class="pre">ptr_pair::ConvertOK()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0DpE12is_invocable"><code class="docutils literal notranslate"><span class="pre">is_invocable</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I00I00E0E17variadic_contains"><code class="docutils literal notranslate"><span class="pre">variadic_contains</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0IDpE0DpI00E0E17variadic_containsI6Needle8VariadicIDp1UE3CmpE"><code class="docutils literal notranslate"><span class="pre">variadic_contains</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IDpE15variadic_concat"><code class="docutils literal notranslate"><span class="pre">variadic_concat</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IIDpE0DpDpE15variadic_concatI8VariadicIDp1AEDp4RestE"><code class="docutils literal notranslate"><span class="pre">variadic_concat</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N15variadic_concatI8VariadicIDp1AEDp4RestE4typeE"><code class="docutils literal notranslate"><span class="pre">variadic_concat::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0I0E0E15variadic_filter"><code class="docutils literal notranslate"><span class="pre">variadic_filter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IIDpE0DpI0E0E15variadic_filterI8VariadicIDp1UE6FilterE"><code class="docutils literal notranslate"><span class="pre">variadic_filter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N15variadic_filterI8VariadicIDp1UE6FilterE4typeE"><code class="docutils literal notranslate"><span class="pre">variadic_filter::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0I00E0E26variadic_remove_duplicates"><code class="docutils literal notranslate"><span class="pre">variadic_remove_duplicates</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IIDpE0DpI00E0E26variadic_remove_duplicatesI8VariadicIDp1UE3CmpE"><code class="docutils literal notranslate"><span class="pre">variadic_remove_duplicates</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N26variadic_remove_duplicatesI8VariadicIDp1UE3CmpE4typeE"><code class="docutils literal notranslate"><span class="pre">variadic_remove_duplicates::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4II00E0DpE14variadic_union"><code class="docutils literal notranslate"><span class="pre">variadic_union</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IIDpE0I00E0DpE14variadic_unionI3Cmp8VariadicIDp1UEE"><code class="docutils literal notranslate"><span class="pre">variadic_union</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N14variadic_unionI3Cmp8VariadicIDp1UEE4typeE"><code class="docutils literal notranslate"><span class="pre">variadic_union::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IIDpE0I00E0Dp0DpE14variadic_unionI3Cmp8VariadicIDp2U0E2U1Dp1UE"><code class="docutils literal notranslate"><span class="pre">variadic_union</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N14variadic_unionI3Cmp8VariadicIDp2U0E2U1Dp1UE4typeE"><code class="docutils literal notranslate"><span class="pre">variadic_union::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4II00E0DpE21variadic_intersection"><code class="docutils literal notranslate"><span class="pre">variadic_intersection</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IIDpE0I00E0DpE21variadic_intersectionI3Cmp8VariadicIDp1UEE"><code class="docutils literal notranslate"><span class="pre">variadic_intersection</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N21variadic_intersectionI3Cmp8VariadicIDp1UEE4typeE"><code class="docutils literal notranslate"><span class="pre">variadic_intersection::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4IIDpE0I00E0Dp0DpE21variadic_intersectionI3Cmp8VariadicIDp2U0E2U1Dp1UE"><code class="docutils literal notranslate"><span class="pre">variadic_intersection</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/type_traits.html#_CPPv4N21variadic_intersectionI3Cmp8VariadicIDp2U0E2U1Dp1UE4typeE"><code class="docutils literal notranslate"><span class="pre">variadic_intersection::type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I00I00E0E17variadic_index_of"><code class="docutils literal notranslate"><span class="pre">variadic_index_of</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/type_traits.html#_CPPv4I0IDpE0DpI00E0E17variadic_index_ofI6Needle8HaystackIDp1UE3CmpE"><code class="docutils literal notranslate"><span class="pre">variadic_index_of</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../math/api/stats.html" class="btn btn-neutral float-left" title="stats.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/ConceptWrapper.html" class="btn btn-neutral float-right" title="ConceptWrapper.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

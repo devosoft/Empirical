@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World_reflect.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/evolve/api/World_reflect.eec2af05-49b6-462b-b386-da54d11b8026.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="World_select.hpp" href="World_select.html" />
+    <link rel="prev" title="World_output.hpp" href="World_output.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../evolve.html">Evolution tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../evolve.html#phylotracklib-systematics-manager">Phylotracklib (Systematics Manager)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../evolve.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="NK.html">NK.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NK-const.html">NK-const.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="OEE.html">OEE.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="OrgInterface.html">OrgInterface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Resource.html">Resource.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StateGrid.html">StateGrid.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Systematics.html">Systematics.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SystematicsAnalysis.html">SystematicsAnalysis.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World.html">World.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_iterator.html">World_iterator.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_output.html">World_output.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">World_reflect.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E13find_genome_t"><code class="docutils literal notranslate"><span class="pre">find_genome_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00E16SetDefaultFitFunvR5WORLD"><code class="docutils literal notranslate"><span class="pre">SetDefaultFitFun()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00E16SetDefaultMutFunvR5WORLD"><code class="docutils literal notranslate"><span class="pre">SetDefaultMutFun()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00E18SetDefaultPrintFunvR5WORLD"><code class="docutils literal notranslate"><span class="pre">SetDefaultPrintFun()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00E22SetDefaultGetGenomeFunvR5WORLD"><code class="docutils literal notranslate"><span class="pre">SetDefaultGetGenomeFun()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="World_select.html">World_select.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_structure.html">World_structure.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../evolve.html">Evolution tools</a></li>
+      <li class="breadcrumb-item active">World_reflect.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="world-reflect-hpp">
+<h1>World_reflect.hpp<a class="headerlink" href="#world-reflect-hpp" title="Link to this heading"></a></h1>
+<p>Handle reflection on organisms to setup reasonable defaults in World. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>None of the functions defined here should be called from outside the world object; as such the comments below are not in Doxygen format and should only be used by LIBRARY developers working on World. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0E13find_genome_t">
+<span id="_CPPv3I0E13find_genome_t"></span><span id="_CPPv2I0E13find_genome_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__reflect_8hpp_1a6697fe9d7c4cd5e4a85be5d52348b1c2"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">find_genome_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">Org2Genome</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E13find_genome_t" title="find_genome_t::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">true</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4I0E13find_genome_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00E16SetDefaultFitFunvR5WORLD">
+<span id="_CPPv3I00E16SetDefaultFitFunR5WORLD"></span><span id="_CPPv2I00E16SetDefaultFitFunR5WORLD"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WORLD</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__reflect_8hpp_1aee71009578050e82d24ff8061cfbb560"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetDefaultFitFun</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00E16SetDefaultFitFunvR5WORLD" title="SetDefaultFitFun::WORLD"><span class="n"><span class="pre">WORLD</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00E16SetDefaultFitFunvR5WORLD" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00E16SetDefaultMutFunvR5WORLD">
+<span id="_CPPv3I00E16SetDefaultMutFunR5WORLD"></span><span id="_CPPv2I00E16SetDefaultMutFunR5WORLD"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WORLD</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__reflect_8hpp_1a06fbfd095f810d390a1de6bf577093c5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetDefaultMutFun</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00E16SetDefaultMutFunvR5WORLD" title="SetDefaultMutFun::WORLD"><span class="n"><span class="pre">WORLD</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00E16SetDefaultMutFunvR5WORLD" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00E18SetDefaultPrintFunvR5WORLD">
+<span id="_CPPv3I00E18SetDefaultPrintFunR5WORLD"></span><span id="_CPPv2I00E18SetDefaultPrintFunR5WORLD"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WORLD</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__reflect_8hpp_1a226e4c26c650f85277a62a3de69528ce"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetDefaultPrintFun</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00E18SetDefaultPrintFunvR5WORLD" title="SetDefaultPrintFun::WORLD"><span class="n"><span class="pre">WORLD</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00E18SetDefaultPrintFunvR5WORLD" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00E22SetDefaultGetGenomeFunvR5WORLD">
+<span id="_CPPv3I00E22SetDefaultGetGenomeFunR5WORLD"></span><span id="_CPPv2I00E22SetDefaultGetGenomeFunR5WORLD"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WORLD</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__reflect_8hpp_1ac5bafa1b878ec384ba5f4cfa47068181"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetDefaultGetGenomeFun</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00E22SetDefaultGetGenomeFunvR5WORLD" title="SetDefaultGetGenomeFun::WORLD"><span class="n"><span class="pre">WORLD</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00E22SetDefaultGetGenomeFunvR5WORLD" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="World_output.html" class="btn btn-neutral float-left" title="World_output.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="World_select.html" class="btn btn-neutral float-right" title="World_select.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

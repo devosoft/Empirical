@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>axis.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../../_static/tippy/library/web/d3/api/axis.f69a3004-365e-4e68-9c3b-ab7d9d3dcd62.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="d3_init.hpp" href="d3_init.html" />
+    <link rel="prev" title="D3 Wrapper API" href="../d3-contents.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../d3.html">D3 Wrapper</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../d3-intro.html">Using Empirica’s D3.js Wrapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../d3-contents.html">D3 Wrapper API</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../d3.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../web.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../web.html">Web Tools (for use with Emscripten)</a></li>
+          <li class="breadcrumb-item"><a href="../d3.html">D3 Wrapper</a></li>
+      <li class="breadcrumb-item active">axis.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="axis-hpp">
+<h1>axis.hpp<a class="headerlink" href="#axis-hpp" title="Link to this heading"></a></h1>
+<p>Handle drawing of axes on D3 graphts. </p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv42D3">
+<span id="_CPPv32D3"></span><span id="_CPPv22D3"></span><span id="D3"></span><span class="target" id="namespaceD3"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">D3</span></span></span><a class="headerlink" href="#_CPPv42D3" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN2D38DrawAxesEvR4AxisI12SCALE_X_TYPEER4AxisI12SCALE_Y_TYPEER9Selection">
+<span id="_CPPv3I00EN2D38DrawAxesER4AxisI12SCALE_X_TYPEER4AxisI12SCALE_Y_TYPEER9Selection"></span><span id="_CPPv2I00EN2D38DrawAxesER4AxisI12SCALE_X_TYPEER4AxisI12SCALE_Y_TYPEER9Selection"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SCALE_X_TYPE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="scales.html#_CPPv4N2D311LinearScaleE" title="D3::LinearScale"><span class="n"><span class="pre">LinearScale</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SCALE_Y_TYPE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="scales.html#_CPPv4N2D311LinearScaleE" title="D3::LinearScale"><span class="n"><span class="pre">LinearScale</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespaceD3_1a139f7ae1a4860a4d9cf83ec5e7cdcf31"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DrawAxes</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN2D38DrawAxesEvR4AxisI12SCALE_X_TYPEER4AxisI12SCALE_Y_TYPEER9Selection" title="D3::DrawAxes::SCALE_X_TYPE"><span class="n"><span class="pre">SCALE_X_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x_axis</span></span>, <a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN2D38DrawAxesEvR4AxisI12SCALE_X_TYPEER4AxisI12SCALE_Y_TYPEER9Selection" title="D3::DrawAxes::SCALE_Y_TYPE"><span class="n"><span class="pre">SCALE_Y_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">y_axis</span></span>, <a class="reference internal" href="selection.html#_CPPv4N2D39SelectionE" title="D3::Selection"><span class="n"><span class="pre">Selection</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">selection</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN2D38DrawAxesEvR4AxisI12SCALE_X_TYPEER4AxisI12SCALE_Y_TYPEER9Selection" title="Link to this definition"></a><br /></dt>
+<dd><p>Helper function to draw a standard set of x and y axes Takes the desired x axis, y axis, and the selection on which to draw them </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D34AxisE">
+<span id="_CPPv3I0EN2D34AxisE"></span><span id="_CPPv2I0EN2D34AxisE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SCALE_TYPE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="scales.html#_CPPv4N2D311LinearScaleE" title="D3::LinearScale"><span class="n"><span class="pre">LinearScale</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1Axis"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Axis</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="d3_init.html#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><a class="headerlink" href="#_CPPv4I0EN2D34AxisE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;axis.hpp&gt;</em></div>
+<p>Axis objects are in charge of drawing graphical axes onto svg canvases. An axis depicts a scale, so every axis has a scale, and is templated off of the type of that scale. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis4AxisENSt6stringENSt6stringE">
+<span id="_CPPv3N2D34Axis4AxisENSt6stringENSt6stringE"></span><span id="_CPPv2N2D34Axis4AxisENSt6stringENSt6stringE"></span><span id="D3::Axis::Axis__ss.ss"></span><span class="target" id="classD3_1_1Axis_1ae478ef78ccde8fdf380b87020e510c60"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Axis</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">label</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D34Axis4AxisENSt6stringENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Consruct an axis - this doesn’t draw anything yet, but sets up the necessary infrastructure to draw it when you call the Draw method. Optionally takes a label to label the axis with. This label will also be used to create an id for the axis, to make it easier to select it later. The id will be the same as [label], but with all whitespace removed and “_axis” appended to the end.</p>
+<p>For example, if your label was “Per capita mortality”, you could select the axis with: <code class="docutils literal notranslate"><span class="pre">D3::Select</span><span class="pre">(&quot;#Percapitamortality_axis&quot;);</span></code>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis4DrawER9Selection">
+<span id="_CPPv3N2D34Axis4DrawER9Selection"></span><span id="_CPPv2N2D34Axis4DrawER9Selection"></span><span id="D3::Axis::Draw__SelectionR"></span><span class="target" id="classD3_1_1Axis_1aed586059a51568b6f5be1b267d7544b6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="selection.html#_CPPv4N2D39SelectionE" title="D3::Selection"><span class="n"><span class="pre">Selection</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">selection</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D34Axis4DrawER9Selection" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw axis on [selection] (must contain a single SVG element) with intelligent default positioning </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D34Axis9ApplyAxisER4AxisRK21SelectionOrTransitionI1TE">
+<span id="_CPPv3I0EN2D34Axis9ApplyAxisERK21SelectionOrTransitionI1TE"></span><span id="_CPPv2I0EN2D34Axis9ApplyAxisERK21SelectionOrTransitionI1TE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1Axis_1a22446da637d66f9b2eee0c07a9ccc5db"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">ApplyAxis</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="selection.html#_CPPv4I0EN2D321SelectionOrTransitionE" title="D3::SelectionOrTransition"><span class="n"><span class="pre">SelectionOrTransition</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN2D34Axis9ApplyAxisER4AxisRK21SelectionOrTransitionI1TE" title="D3::Axis::ApplyAxis::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">selection</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D34Axis9ApplyAxisER4AxisRK21SelectionOrTransitionI1TE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis8SetScaleER10SCALE_TYPE">
+<span id="_CPPv3N2D34Axis8SetScaleER10SCALE_TYPE"></span><span id="_CPPv2N2D34Axis8SetScaleER10SCALE_TYPE"></span><span id="D3::Axis::SetScale__SCALE_TYPER"></span><span class="target" id="classD3_1_1Axis_1ad8eb2a92092bde108222672a5f7a181b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetScale</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis::SCALE_TYPE"><span class="n"><span class="pre">SCALE_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">scale</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D34Axis8SetScaleER10SCALE_TYPE" title="Link to this definition"></a><br /></dt>
+<dd><p>An axis must have a scale. By default, a scale of SCALE_TYPE will be constructed, but usually you want an axis to depict a specific scale. This method points this object’s scale member variable at [scale]. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis8GetScaleEv">
+<span id="_CPPv3N2D34Axis8GetScaleEv"></span><span id="_CPPv2N2D34Axis8GetScaleEv"></span><span id="D3::Axis::GetScale"></span><span class="target" id="classD3_1_1Axis_1ae866eaa795bdadb153343816acb26c44"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis::SCALE_TYPE"><span class="n"><span class="pre">SCALE_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetScale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D34Axis8GetScaleEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a reference to this object’s scale. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis17AdjustLabelOffsetENSt6stringE">
+<span id="_CPPv3N2D34Axis17AdjustLabelOffsetENSt6stringE"></span><span id="_CPPv2N2D34Axis17AdjustLabelOffsetENSt6stringE"></span><span id="D3::Axis::AdjustLabelOffset__ss"></span><span class="target" id="classD3_1_1Axis_1a075186a7441c1bfffd1cf5b243957df2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AdjustLabelOffset</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D34Axis17AdjustLabelOffsetENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Adjust the location of the label text relative to the axis (helpful if numbers are overlapping it). Can be negative. Use “em” (e.g. “2em”) to specify distance relative to font size. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis4MoveEii">
+<span id="_CPPv3N2D34Axis4MoveEii"></span><span id="_CPPv2N2D34Axis4MoveEii"></span><span id="D3::Axis::Move__i.i"></span><span class="target" id="classD3_1_1Axis_1af3c99c801000247c55835ec0085b56f2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Move</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D34Axis4MoveEii" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw tries to make a good guess about where to place the axis, but sometimes you want to scoot it over. This method will move the axis to the x,y location specified. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0_NSt6size_tEEN2D34Axis13SetTickValuesER4Axis5arrayI1T4SIZEE">
+<span id="_CPPv3I0_NSt6size_tEEN2D34Axis13SetTickValuesE5arrayI1T4SIZEE"></span><span id="_CPPv2I0_NSt6size_tEEN2D34Axis13SetTickValuesE5arrayI1T4SIZEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIZE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1Axis_1a84193383ca0a6324161df0696eeb39c7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetTickValues</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN2D34Axis13SetTickValuesER4Axis5arrayI1T4SIZEE" title="D3::Axis::SetTickValues::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN2D34Axis13SetTickValuesER4Axis5arrayI1T4SIZEE" title="D3::Axis::SetTickValues::SIZE"><span class="n"><span class="pre">SIZE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">values</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_NSt6size_tEEN2D34Axis13SetTickValuesER4Axis5arrayI1T4SIZEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis11SetTickSizeEf">
+<span id="_CPPv3N2D34Axis11SetTickSizeEf"></span><span id="_CPPv2N2D34Axis11SetTickSizeEf"></span><span id="D3::Axis::SetTickSize__float"></span><span class="target" id="classD3_1_1Axis_1a717d67aa8c00da67be1265001fe27507"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetTickSize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D34Axis11SetTickSizeEf" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis16SetTickSizeInnerEf">
+<span id="_CPPv3N2D34Axis16SetTickSizeInnerEf"></span><span id="_CPPv2N2D34Axis16SetTickSizeInnerEf"></span><span id="D3::Axis::SetTickSizeInner__float"></span><span class="target" id="classD3_1_1Axis_1ac38c2b19ecc6eec74cd7afade1725804"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetTickSizeInner</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D34Axis16SetTickSizeInnerEf" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis16SetTickSizeOuterEf">
+<span id="_CPPv3N2D34Axis16SetTickSizeOuterEf"></span><span id="_CPPv2N2D34Axis16SetTickSizeOuterEf"></span><span id="D3::Axis::SetTickSizeOuter__float"></span><span class="target" id="classD3_1_1Axis_1a515e55d4a64de87285502a1524ad6de4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetTickSizeOuter</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D34Axis16SetTickSizeOuterEf" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis14SetTickPaddingEi">
+<span id="_CPPv3N2D34Axis14SetTickPaddingEi"></span><span id="_CPPv2N2D34Axis14SetTickPaddingEi"></span><span id="D3::Axis::SetTickPadding__i"></span><span class="target" id="classD3_1_1Axis_1a379f7f67d7ec55f9b4367e561e4b3406"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetTickPadding</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">padding</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D34Axis14SetTickPaddingEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis8SetTicksEi">
+<span id="_CPPv3N2D34Axis8SetTicksEi"></span><span id="_CPPv2N2D34Axis8SetTicksEi"></span><span id="D3::Axis::SetTicks__i"></span><span class="target" id="classD3_1_1Axis_1aa6b4873b846c872ab273d35785f0993e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetTicks</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D34Axis8SetTicksEi" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the number of ticks along the axis. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis13SetTickFormatENSt6stringE">
+<span id="_CPPv3N2D34Axis13SetTickFormatENSt6stringE"></span><span id="_CPPv2N2D34Axis13SetTickFormatENSt6stringE"></span><span id="D3::Axis::SetTickFormat__ss"></span><span class="target" id="classD3_1_1Axis_1a5d47f51c24369ade3916efaa10314547"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetTickFormat</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">format</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D34Axis13SetTickFormatENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the format for displaying numbers assoiated with ticks. [format] should be a format following <a class="reference external" href="https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format">the rules for d3.format()</a></p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D34Axis7RescaleER4AxisddRKN2D321SelectionOrTransitionI1TEE">
+<span id="_CPPv3I0EN2D34Axis7RescaleEddRKN2D321SelectionOrTransitionI1TEE"></span><span id="_CPPv2I0EN2D34Axis7RescaleEddRKN2D321SelectionOrTransitionI1TEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1Axis_1ac7a9499a81eba4f9639090288b34d046"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Rescale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_min</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_max</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="selection.html#_CPPv4I0EN2D321SelectionOrTransitionE" title="D3::SelectionOrTransition"><span class="n"><span class="pre">SelectionOrTransition</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN2D34Axis7RescaleER4AxisddRKN2D321SelectionOrTransitionI1TEE" title="D3::Axis::Rescale::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">svg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D34Axis7RescaleER4AxisddRKN2D321SelectionOrTransitionI1TEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Adjust scale and axis to accomodate the new range of data specified by [new_min], and [new_max]. [svg] is a Selection or Transition containing the current axis. If it’s a transition, then the rescaling will be animated. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis5groupE">
+<span id="_CPPv3N2D34Axis5groupE"></span><span id="_CPPv2N2D34Axis5groupE"></span><span id="D3::Axis::group__Selection"></span><span class="target" id="classD3_1_1Axis_1a63ddaffbdb59fde3ba8e48976ec0c2d3"></span><a class="reference internal" href="selection.html#_CPPv4N2D39SelectionE" title="D3::Selection"><span class="n"><span class="pre">Selection</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">group</span></span></span><a class="headerlink" href="#_CPPv4N2D34Axis5groupE" title="Link to this definition"></a><br /></dt>
+<dd><p>There are a lot of graphical elements associated with an axis, so it’s best to group them all together into an html group element. This selection holds a pointer to the group for this axis </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis5scaleE">
+<span id="_CPPv3N2D34Axis5scaleE"></span><span id="_CPPv2N2D34Axis5scaleE"></span><span id="D3::Axis::scale__SCALE_TYPE"></span><span class="target" id="classD3_1_1Axis_1a7c9e430a245c38dcad1739c2376583fc"></span><a class="reference internal" href="#_CPPv4I0EN2D34AxisE" title="D3::Axis::SCALE_TYPE"><span class="n"><span class="pre">SCALE_TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">scale</span></span></span><a class="headerlink" href="#_CPPv4N2D34Axis5scaleE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis5labelE">
+<span id="_CPPv3N2D34Axis5labelE"></span><span id="_CPPv2N2D34Axis5labelE"></span><span id="D3::Axis::label__ss"></span><span class="target" id="classD3_1_1Axis_1ab00a913ecd92ae4722b39991b3b8acc8"></span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">label</span></span></span><a class="headerlink" href="#_CPPv4N2D34Axis5labelE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis6dom_idE">
+<span id="_CPPv3N2D34Axis6dom_idE"></span><span id="_CPPv2N2D34Axis6dom_idE"></span><span id="D3::Axis::dom_id__ss"></span><span class="target" id="classD3_1_1Axis_1a2762827309c6001500af32da1c75a782"></span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dom_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><a class="headerlink" href="#_CPPv4N2D34Axis6dom_idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis12label_offsetE">
+<span id="_CPPv3N2D34Axis12label_offsetE"></span><span id="_CPPv2N2D34Axis12label_offsetE"></span><span id="D3::Axis::label_offset__ss"></span><span class="target" id="classD3_1_1Axis_1a2bd17374b5829c657d57d45d15d99ba9"></span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">label_offset</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><a class="headerlink" href="#_CPPv4N2D34Axis12label_offsetE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N2D34Axis11orientationE">
+<span id="_CPPv3N2D34Axis11orientationE"></span><span id="_CPPv2N2D34Axis11orientationE"></span><span id="D3::Axis::orientation__ss"></span><span class="target" id="classD3_1_1Axis_1ac2853721c64eef532c5be1af476d722c"></span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">orientation</span></span></span><a class="headerlink" href="#_CPPv4N2D34Axis11orientationE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../d3-contents.html" class="btn btn-neutral float-left" title="D3 Wrapper API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="d3_init.html" class="btn btn-neutral float-right" title="d3_init.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

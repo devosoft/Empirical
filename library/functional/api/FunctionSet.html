@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FunctionSet.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/functional/api/FunctionSet.c1bc7891-496d-4b20-9b53-c7815302fade.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="GenericFunction.hpp" href="GenericFunction.html" />
+    <link rel="prev" title="AnyFunction.hpp" href="AnyFunction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../functional.html">Functional</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../functional.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AnyFunction.html">AnyFunction.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">FunctionSet.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E11FunctionSet"><code class="docutils literal notranslate"><span class="pre">FunctionSet</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">FunctionSet</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE11FunctionSetIFvDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">FunctionSet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="GenericFunction.html">GenericFunction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="flex_function.html">flex_function.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="memo_function.html">memo_function.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../functional.html">Functional</a></li>
+      <li class="breadcrumb-item active">FunctionSet.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="functionset-hpp">
+<h1>FunctionSet.hpp<a class="headerlink" href="#functionset-hpp" title="Link to this heading"></a></h1>
+<p>Setup a collection of functions, all with the same signature, that can be run as a group. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA </p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E11FunctionSet">
+<span id="_CPPv3I0E11FunctionSet"></span><span id="_CPPv2I0E11FunctionSet"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFunctionSet"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FunctionSet</span></span></span><a class="headerlink" href="#_CPPv4I0E11FunctionSet" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;FunctionSet.hpp&gt;</em></div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE">
+<span id="_CPPv3I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE"></span><span id="_CPPv2I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RETURN_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FunctionSet</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;FunctionSet.hpp&gt;</em></div>
+<p>A vector of functions that can all be triggered at onece; results can either be returned in a vector or post-processed in a function (such as max, min, etc.) Derived from vector, hence with all of the same methods as vector. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE6base_tE">
+<span id="_CPPv3N11FunctionSetIF8RETURN_TDp4ARGSEE6base_tE"></span><span id="_CPPv2N11FunctionSetIF8RETURN_TDp4ARGSEE6base_tE"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1a8c1af3183f56ff7b57a7abbecbe17c7d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">base_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE6base_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE10value_typeE">
+<span id="_CPPv3N11FunctionSetIF8RETURN_TDp4ARGSEE10value_typeE"></span><span id="_CPPv2N11FunctionSetIF8RETURN_TDp4ARGSEE10value_typeE"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1a00f76631375e436bef2d359e578d56f9"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE6base_tE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::base_t"><span class="n"><span class="pre">base_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value_type</span></span><a class="headerlink" href="#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE10value_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE8return_tE">
+<span id="_CPPv3N11FunctionSetIF8RETURN_TDp4ARGSEE8return_tE"></span><span id="_CPPv2N11FunctionSetIF8RETURN_TDp4ARGSEE8return_tE"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1a212f787a36d604afd09bbad2b896cc31"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">return_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><a class="headerlink" href="#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE8return_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE11FunctionSetEv">
+<span id="_CPPv3N11FunctionSetIF8RETURN_TDp4ARGSEE11FunctionSetEv"></span><span id="_CPPv2N11FunctionSetIF8RETURN_TDp4ARGSEE11FunctionSetEv"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1ab35351aac4155b19f9199a22eb021551"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FunctionSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE11FunctionSetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEED0Ev">
+<span id="_CPPv3N11FunctionSetIF8RETURN_TDp4ARGSEED0Ev"></span><span id="_CPPv2N11FunctionSetIF8RETURN_TDp4ARGSEED0Ev"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1a6e6a046ab37af457861ef389cb7fbfdd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~FunctionSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEED0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE7GetSizeEv">
+<span id="_CPPv3NK11FunctionSetIF8RETURN_TDp4ARGSEE7GetSizeEv"></span><span id="_CPPv2NK11FunctionSetIF8RETURN_TDp4ARGSEE7GetSizeEv"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1a23f0aedad78fb6d6f611d0fe3c20583b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many functions are in this FunctionSet? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE3AddERK10value_type">
+<span id="_CPPv3N11FunctionSetIF8RETURN_TDp4ARGSEE3AddERK10value_type"></span><span id="_CPPv2N11FunctionSetIF8RETURN_TDp4ARGSEE3AddERK10value_type"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1a1b039ebc52dbf2c7d141a250f6eaeaba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Add</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE10value_typeE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::value_type"><span class="n"><span class="pre">value_type</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE3AddERK10value_type" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new funtion to this FunctionSet. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE6RemoveE6size_t">
+<span id="_CPPv3N11FunctionSetIF8RETURN_TDp4ARGSEE6RemoveE6size_t"></span><span id="_CPPv2N11FunctionSetIF8RETURN_TDp4ARGSEE6RemoveE6size_t"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1a4188465c7d77246ba76b139822ef1374"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Remove</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE6RemoveE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove the function at a specified position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE3RunEDp4ARGS">
+<span id="_CPPv3NK11FunctionSetIF8RETURN_TDp4ARGSEE3RunEDp4ARGS"></span><span id="_CPPv2NK11FunctionSetIF8RETURN_TDp4ARGSEE3RunEDp4ARGS"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1a032ca3c81e381362f1327908b1bc9ec3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Run</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE3RunEDp4ARGS" title="Link to this definition"></a><br /></dt>
+<dd><p>Run all functions and return a vector of all results. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE3RunEDp4ARGSNSt8functionIF8RETURN_T8RETURN_T8RETURN_TEEE8RETURN_T">
+<span id="_CPPv3NK11FunctionSetIF8RETURN_TDp4ARGSEE3RunEDp4ARGSNSt8functionIF8RETURN_T8RETURN_T8RETURN_TEEE8RETURN_T"></span><span id="_CPPv2NK11FunctionSetIF8RETURN_TDp4ARGSEE3RunEDp4ARGSNSt8functionIF8RETURN_T8RETURN_T8RETURN_TEEE8RETURN_T"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1a07714925209ea52d508de5259dbdb4af"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Run</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">comp_fun</span></span>, <a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">default_val</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE3RunEDp4ARGSNSt8functionIF8RETURN_T8RETURN_T8RETURN_TEEE8RETURN_T" title="Link to this definition"></a><br /></dt>
+<dd><p>If you want to provide a filter function, you can retrieve a specific return value. The filter should take in two return values and indicate which is “better”. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindMaxEDp4ARGS8RETURN_T">
+<span id="_CPPv3NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindMaxEDp4ARGS8RETURN_T"></span><span id="_CPPv2NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindMaxEDp4ARGS8RETURN_T"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1a0daff5366cab5854dda0cb758a80a2bf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindMax</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span>, <a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">default_val</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindMaxEDp4ARGS8RETURN_T" title="Link to this definition"></a><br /></dt>
+<dd><p>Run all functions and return the highest value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindMinEDp4ARGS8RETURN_T">
+<span id="_CPPv3NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindMinEDp4ARGS8RETURN_T"></span><span id="_CPPv2NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindMinEDp4ARGS8RETURN_T"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1ac769399c4a581784094414c572379f5d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindMin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span>, <a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">default_val</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindMinEDp4ARGS8RETURN_T" title="Link to this definition"></a><br /></dt>
+<dd><p>Run all functions and return the lowest value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindSumEDp4ARGS8RETURN_T">
+<span id="_CPPv3NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindSumEDp4ARGS8RETURN_T"></span><span id="_CPPv2NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindSumEDp4ARGS8RETURN_T"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1a729f0c0a1c3d5e71fda92e6614402cd1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindSum</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span>, <a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">default_val</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindSumEDp4ARGS8RETURN_T" title="Link to this definition"></a><br /></dt>
+<dd><p>Run all functions and return the total value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE11FindProductEDp4ARGS8RETURN_T">
+<span id="_CPPv3NK11FunctionSetIF8RETURN_TDp4ARGSEE11FindProductEDp4ARGS8RETURN_T"></span><span id="_CPPv2NK11FunctionSetIF8RETURN_TDp4ARGSEE11FindProductEDp4ARGS8RETURN_T"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1a85c6a285e74ac826a46ae8a2009dbf72"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindProduct</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span>, <a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">default_val</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE11FindProductEDp4ARGS8RETURN_T" title="Link to this definition"></a><br /></dt>
+<dd><p>Run all functions and return a product of all values. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE11return_valsE">
+<span id="_CPPv3N11FunctionSetIF8RETURN_TDp4ARGSEE11return_valsE"></span><span id="_CPPv2N11FunctionSetIF8RETURN_TDp4ARGSEE11return_valsE"></span><span class="target" id="classFunctionSet_3_01RETURN__T_07ARGS_8_8_8_08_4_1a6042942b8758d9a69e87263e72f3702c"></span><span class="k"><span class="pre">mutable</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE" title="FunctionSet&lt;RETURN_T(ARGS...)&gt;::RETURN_T"><span class="n"><span class="pre">RETURN_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">return_vals</span></span></span><a class="headerlink" href="#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE11return_valsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE11FunctionSetIFvDp4ARGSEE">
+<span id="_CPPv3IDpE11FunctionSetIFvDp4ARGSEE"></span><span id="_CPPv2IDpE11FunctionSetIFvDp4ARGSEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFunctionSet_3_01void_07ARGS_8_8_8_08_4"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FunctionSet</span></span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE11FunctionSetIFvDp4ARGSEE" title="FunctionSet&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE11FunctionSetIFvDp4ARGSEE" title="FunctionSet&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IDpE11FunctionSetIFvDp4ARGSEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;FunctionSet.hpp&gt;</em></div>
+<p>A specialized version of FunctionSet for void functions. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIFvDp4ARGSEE6base_tE">
+<span id="_CPPv3N11FunctionSetIFvDp4ARGSEE6base_tE"></span><span id="_CPPv2N11FunctionSetIFvDp4ARGSEE6base_tE"></span><span class="target" id="classFunctionSet_3_01void_07ARGS_8_8_8_08_4_1ab610d0edd502afc6e098c729abc2e494"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">base_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE11FunctionSetIFvDp4ARGSEE" title="FunctionSet&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N11FunctionSetIFvDp4ARGSEE6base_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIFvDp4ARGSEE10value_typeE">
+<span id="_CPPv3N11FunctionSetIFvDp4ARGSEE10value_typeE"></span><span id="_CPPv2N11FunctionSetIFvDp4ARGSEE10value_typeE"></span><span class="target" id="classFunctionSet_3_01void_07ARGS_8_8_8_08_4_1ac915746ee0e2665f8771e643a8580221"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11FunctionSetIFvDp4ARGSEE6base_tE" title="FunctionSet&lt;void(ARGS...)&gt;::base_t"><span class="n"><span class="pre">base_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value_type</span></span><a class="headerlink" href="#_CPPv4N11FunctionSetIFvDp4ARGSEE10value_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIFvDp4ARGSEE8return_tE">
+<span id="_CPPv3N11FunctionSetIFvDp4ARGSEE8return_tE"></span><span id="_CPPv2N11FunctionSetIFvDp4ARGSEE8return_tE"></span><span class="target" id="classFunctionSet_3_01void_07ARGS_8_8_8_08_4_1a57b6819d96aa12e93173c728e6975081"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">return_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N11FunctionSetIFvDp4ARGSEE8return_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIFvDp4ARGSEE11FunctionSetEv">
+<span id="_CPPv3N11FunctionSetIFvDp4ARGSEE11FunctionSetEv"></span><span id="_CPPv2N11FunctionSetIFvDp4ARGSEE11FunctionSetEv"></span><span class="target" id="classFunctionSet_3_01void_07ARGS_8_8_8_08_4_1ae270b5f460f189490fe56770daf09983"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FunctionSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FunctionSetIFvDp4ARGSEE11FunctionSetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIFvDp4ARGSEED0Ev">
+<span id="_CPPv3N11FunctionSetIFvDp4ARGSEED0Ev"></span><span id="_CPPv2N11FunctionSetIFvDp4ARGSEED0Ev"></span><span class="target" id="classFunctionSet_3_01void_07ARGS_8_8_8_08_4_1abf6336f98592ff082ac2bd6b43a58500"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~FunctionSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FunctionSetIFvDp4ARGSEED0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FunctionSetIFvDp4ARGSEE7GetSizeEv">
+<span id="_CPPv3NK11FunctionSetIFvDp4ARGSEE7GetSizeEv"></span><span id="_CPPv2NK11FunctionSetIFvDp4ARGSEE7GetSizeEv"></span><span class="target" id="classFunctionSet_3_01void_07ARGS_8_8_8_08_4_1a1454ade87c0bc136b4e0f6072d4ae628"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FunctionSetIFvDp4ARGSEE7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many functions are in this FunctionSet? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIFvDp4ARGSEE3AddERKNSt8functionIFvDp4ARGSEEE">
+<span id="_CPPv3N11FunctionSetIFvDp4ARGSEE3AddERKNSt8functionIFvDp4ARGSEEE"></span><span id="_CPPv2N11FunctionSetIFvDp4ARGSEE3AddERKNSt8functionIFvDp4ARGSEEE"></span><span class="target" id="classFunctionSet_3_01void_07ARGS_8_8_8_08_4_1ae179881a4e0337f0de4280140141fa4b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Add</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE11FunctionSetIFvDp4ARGSEE" title="FunctionSet&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FunctionSetIFvDp4ARGSEE3AddERKNSt8functionIFvDp4ARGSEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new function to this FunctionSet. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11FunctionSetIFvDp4ARGSEE6RemoveE6size_t">
+<span id="_CPPv3N11FunctionSetIFvDp4ARGSEE6RemoveE6size_t"></span><span id="_CPPv2N11FunctionSetIFvDp4ARGSEE6RemoveE6size_t"></span><span class="target" id="classFunctionSet_3_01void_07ARGS_8_8_8_08_4_1a9aed857c4ce29d831f2496152c8530fb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Remove</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11FunctionSetIFvDp4ARGSEE6RemoveE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove the function at the designated position from this FunctionSet. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11FunctionSetIFvDp4ARGSEE3RunEDp4ARGS">
+<span id="_CPPv3NK11FunctionSetIFvDp4ARGSEE3RunEDp4ARGS"></span><span id="_CPPv2NK11FunctionSetIFvDp4ARGSEE3RunEDp4ARGS"></span><span class="target" id="classFunctionSet_3_01void_07ARGS_8_8_8_08_4_1ad48f8390dd210faf12afcd6a96c91ea9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Run</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpE11FunctionSetIFvDp4ARGSEE" title="FunctionSet&lt;void(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11FunctionSetIFvDp4ARGSEE3RunEDp4ARGS" title="Link to this definition"></a><br /></dt>
+<dd><p>Run all functions in the FunctionSet. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="AnyFunction.html" class="btn btn-neutral float-left" title="AnyFunction.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="GenericFunction.html" class="btn btn-neutral float-right" title="GenericFunction.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

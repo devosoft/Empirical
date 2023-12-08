@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Physics2D.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/geometry/api/Physics2D.06cf52e0-4a2b-4964-ace3-d9b9f3fef3e6.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Point2D.hpp" href="Point2D.html" />
+    <link rel="prev" title="Circle2D.hpp" href="Circle2D.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../geometry.html">Geometry</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../geometry.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Angle2D.html">Angle2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Body2D.html">Body2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Circle2D.html">Circle2D.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Physics2D.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E9Physics2D"><code class="docutils literal notranslate"><span class="pre">Physics2D</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Point2D.html">Point2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Surface.html">Surface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Surface2D.html">Surface2D.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../geometry.html">Geometry</a></li>
+      <li class="breadcrumb-item active">Physics2D.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="physics2d-hpp">
+<h1>Physics2D.hpp<a class="headerlink" href="#physics2d-hpp" title="Link to this heading"></a></h1>
+<p>Physics2D - handles movement and collissions in a simple 2D world. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E9Physics2D">
+<span id="_CPPv3I0E9Physics2D"></span><span id="_CPPv2I0E9Physics2D"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BODY_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classPhysics2D"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Physics2D</span></span></span><a class="headerlink" href="#_CPPv4I0E9Physics2D" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Physics2D.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D9Physics2DEdddb">
+<span id="_CPPv3N9Physics2D9Physics2DEdddb"></span><span id="_CPPv2N9Physics2D9Physics2DEdddb"></span><span id="Physics2D::Physics2D__double.double.double.b"></span><span class="target" id="classPhysics2D_1a8a489ce21573c0ab29ba50e1e84603d1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Physics2D</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">width</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">height</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_org_diameter</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">20</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">detach</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9Physics2D9Physics2DEdddb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2DD0Ev">
+<span id="_CPPv3N9Physics2DD0Ev"></span><span id="_CPPv2N9Physics2DD0Ev"></span><span id="Physics2D::~Physics2D"></span><span class="target" id="classPhysics2D_1a9de3ea9f1b550a4799f007a3f6dc0d53"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Physics2D</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9Physics2DD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9Physics2D10GetSurfaceEv">
+<span id="_CPPv3NK9Physics2D10GetSurfaceEv"></span><span id="_CPPv2NK9Physics2D10GetSurfaceEv"></span><span id="Physics2D::GetSurfaceC"></span><span class="target" id="classPhysics2D_1a81fcf1923946ebb57f45e0e5c1acfa92"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9Physics2D9Surface_tE" title="Physics2D::Surface_t"><span class="n"><span class="pre">Surface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetSurface</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9Physics2D10GetSurfaceEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9Physics2D13GetBackgroundEv">
+<span id="_CPPv3NK9Physics2D13GetBackgroundEv"></span><span id="_CPPv2NK9Physics2D13GetBackgroundEv"></span><span id="Physics2D::GetBackgroundC"></span><span class="target" id="classPhysics2D_1ac2cc891b89958005f4ebbd38819331f8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9Physics2D9Surface_tE" title="Physics2D::Surface_t"><span class="n"><span class="pre">Surface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetBackground</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9Physics2D13GetBackgroundEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9Physics2D9GetDetachEv">
+<span id="_CPPv3NK9Physics2D9GetDetachEv"></span><span id="_CPPv2NK9Physics2D9GetDetachEv"></span><span id="Physics2D::GetDetachC"></span><span class="target" id="classPhysics2D_1a216dfbd09fc218a5dd7912f9a16581e4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetDetach</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9Physics2D9GetDetachEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D9SetDetachEb">
+<span id="_CPPv3N9Physics2D9SetDetachEb"></span><span id="_CPPv2N9Physics2D9SetDetachEb"></span><span id="Physics2D::SetDetach__b"></span><span class="target" id="classPhysics2D_1af629cbb17148d795a736bb438c535eae"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D"><span class="n"><span class="pre">Physics2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetDetach</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9Physics2D9SetDetachEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D7AddBodyE3PtrI9BODY_TYPEE">
+<span id="_CPPv3N9Physics2D7AddBodyE3PtrI9BODY_TYPEE"></span><span id="_CPPv2N9Physics2D7AddBodyE3PtrI9BODY_TYPEE"></span><span id="Physics2D::AddBody__Ptr:BODY_TYPE:"></span><span class="target" id="classPhysics2D_1a61270c2685d76346f3078767b6ef9ae9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D"><span class="n"><span class="pre">Physics2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddBody</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_body</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9Physics2D7AddBodyE3PtrI9BODY_TYPEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D13AddBackgroundE3PtrI9BODY_TYPEE">
+<span id="_CPPv3N9Physics2D13AddBackgroundE3PtrI9BODY_TYPEE"></span><span id="_CPPv2N9Physics2D13AddBackgroundE3PtrI9BODY_TYPEE"></span><span id="Physics2D::AddBackground__Ptr:BODY_TYPE:"></span><span class="target" id="classPhysics2D_1aaedf61203cbb5c9d4e1851cc11e3b505"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D"><span class="n"><span class="pre">Physics2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddBackground</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_body</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9Physics2D13AddBackgroundE3PtrI9BODY_TYPEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D5ClearEv">
+<span id="_CPPv3N9Physics2D5ClearEv"></span><span id="_CPPv2N9Physics2D5ClearEv"></span><span id="Physics2D::Clear"></span><span class="target" id="classPhysics2D_1ac5f733aa22a5c5f7a3fb9d22efea7553"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D"><span class="n"><span class="pre">Physics2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9Physics2D5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D10KillOldestEv">
+<span id="_CPPv3N9Physics2D10KillOldestEv"></span><span id="_CPPv2N9Physics2D10KillOldestEv"></span><span id="Physics2D::KillOldest"></span><span class="target" id="classPhysics2D_1a8529f739ec1b0634c5de9a0b550528d2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D"><span class="n"><span class="pre">Physics2D</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">KillOldest</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9Physics2D10KillOldestEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D17TestPairCollisionER9BODY_TYPER9BODY_TYPE">
+<span id="_CPPv3N9Physics2D17TestPairCollisionER9BODY_TYPER9BODY_TYPE"></span><span id="_CPPv2N9Physics2D17TestPairCollisionER9BODY_TYPER9BODY_TYPE"></span><span id="Physics2D::TestPairCollision__BODY_TYPER.BODY_TYPER"></span><span class="target" id="classPhysics2D_1a0fe5e27d180b9f720dc15817e489ff74"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TestPairCollision</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">body1</span></span>, <a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">body2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9Physics2D17TestPairCollisionER9BODY_TYPER9BODY_TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D6UpdateEv">
+<span id="_CPPv3N9Physics2D6UpdateEv"></span><span id="_CPPv2N9Physics2D6UpdateEv"></span><span id="Physics2D::Update"></span><span class="target" id="classPhysics2D_1ae6e74fb9d3785c896a239ee47d22f607"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Update</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9Physics2D6UpdateEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D10GetBodySetEv">
+<span id="_CPPv3N9Physics2D10GetBodySetEv"></span><span id="_CPPv2N9Physics2D10GetBodySetEv"></span><span id="Physics2D::GetBodySet"></span><span class="target" id="classPhysics2D_1aec25a4f80241fb9f5b629ca2f8ebd6fd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetBodySet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9Physics2D10GetBodySetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D16GetBackgroundSetEv">
+<span id="_CPPv3N9Physics2D16GetBackgroundSetEv"></span><span id="_CPPv2N9Physics2D16GetBackgroundSetEv"></span><span id="Physics2D::GetBackgroundSet"></span><span class="target" id="classPhysics2D_1ae7c24636cdd98d09799efd08d733ac2c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetBackgroundSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9Physics2D16GetBackgroundSetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9Physics2D15GetConstBodySetEv">
+<span id="_CPPv3NK9Physics2D15GetConstBodySetEv"></span><span id="_CPPv2NK9Physics2D15GetConstBodySetEv"></span><span id="Physics2D::GetConstBodySetC"></span><span class="target" id="classPhysics2D_1aaf97eea4060b272992ab9748c3dde538"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetConstBodySet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9Physics2D15GetConstBodySetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9Physics2D21GetConstBackgroundSetEv">
+<span id="_CPPv3NK9Physics2D21GetConstBackgroundSetEv"></span><span id="_CPPv2NK9Physics2D21GetConstBackgroundSetEv"></span><span id="Physics2D::GetConstBackgroundSetC"></span><span class="target" id="classPhysics2D_1aceb9f0ec137668f521faa1870cda5d0c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetConstBackgroundSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9Physics2D21GetConstBackgroundSetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D9Surface_tE">
+<span id="_CPPv3N9Physics2D9Surface_tE"></span><span id="_CPPv2N9Physics2D9Surface_tE"></span><span class="target" id="classPhysics2D_1a193f6df39dd48456bfd41d7bbd5d1aed"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Surface_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="Surface2D.html#_CPPv4I0E9Surface2D" title="Surface2D"><span class="n"><span class="pre">Surface2D</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9Physics2D" title="Physics2D::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N9Physics2D9Surface_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D7surfaceE">
+<span id="_CPPv3N9Physics2D7surfaceE"></span><span id="_CPPv2N9Physics2D7surfaceE"></span><span id="Physics2D::surface__Surface_t"></span><span class="target" id="classPhysics2D_1a24e7bac7c5a97e6a56a2d6cbef0a5e6b"></span><a class="reference internal" href="#_CPPv4N9Physics2D9Surface_tE" title="Physics2D::Surface_t"><span class="n"><span class="pre">Surface_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">surface</span></span></span><a class="headerlink" href="#_CPPv4N9Physics2D7surfaceE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D10backgroundE">
+<span id="_CPPv3N9Physics2D10backgroundE"></span><span id="_CPPv2N9Physics2D10backgroundE"></span><span id="Physics2D::background__Surface_t"></span><span class="target" id="classPhysics2D_1a79e52237f476f0af1b1b8bae2b4ec089"></span><a class="reference internal" href="#_CPPv4N9Physics2D9Surface_tE" title="Physics2D::Surface_t"><span class="n"><span class="pre">Surface_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">background</span></span></span><a class="headerlink" href="#_CPPv4N9Physics2D10backgroundE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9Physics2D15detach_on_birthE">
+<span id="_CPPv3N9Physics2D15detach_on_birthE"></span><span id="_CPPv2N9Physics2D15detach_on_birthE"></span><span id="Physics2D::detach_on_birth__b"></span><span class="target" id="classPhysics2D_1a68a1ec5c101981bb68a0878d163a630a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">detach_on_birth</span></span></span><a class="headerlink" href="#_CPPv4N9Physics2D15detach_on_birthE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Circle2D.html" class="btn btn-neutral float-left" title="Circle2D.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Point2D.html" class="btn btn-neutral float-right" title="Point2D.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

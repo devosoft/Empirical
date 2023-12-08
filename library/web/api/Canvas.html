@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Canvas.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/web/api/Canvas.2508ae36-7ca9-4c66-a514-586c3bbcad98.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="CanvasAction.hpp" href="CanvasAction.html" />
+    <link rel="prev" title="Button.hpp" href="Button.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../web.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Animate.html">Animate.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Attributes.html">Attributes.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Button.html">Button.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Canvas.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv46Canvas"><code class="docutils literal notranslate"><span class="pre">Canvas</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasAction.html">CanvasAction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasShape.html">CanvasShape.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Div.html">Div.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DocuExtras.html">DocuExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Document.html">Document.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Element.html">Element.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FileInput.html">FileInput.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Font.html">Font.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Image.html">Image.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Input.html">Input.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="JSWrap.html">JSWrap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="KeypressManager.html">KeypressManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Listeners.html">Listeners.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NodeDomShim.html">NodeDomShim.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RawImage.html">RawImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Selector.html">Selector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style.html">Style.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Table.html">Table.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Text.html">Text.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextArea.html">TextArea.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextFeed.html">TextFeed.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tween.html">Tween.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UrlParams.html">UrlParams.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Widget.html">Widget.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WidgetExtras.html">WidgetExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="canvas_utils.html">canvas_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="color_map.html">color_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html">commands.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emfunctions.html">emfunctions.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="events.html">events.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="init.html">init.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="js_utils.html">js_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="web.html">web.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../web.html">Web Tools (for use with Emscripten)</a></li>
+      <li class="breadcrumb-item active">Canvas.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="canvas-hpp">
+<h1>Canvas.hpp<a class="headerlink" href="#canvas-hpp" title="Link to this heading"></a></h1>
+<p>Manage an HTML canvas object. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv46Canvas">
+<span id="_CPPv36Canvas"></span><span id="_CPPv26Canvas"></span><span id="Canvas"></span><span class="target" id="classCanvas"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Canvas</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">WidgetFacet</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv46Canvas" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Canvas.hpp&gt;</em></div>
+<p>Manage an HTML Canvas object. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas9INFO_TYPEE">
+<span id="_CPPv3N6Canvas9INFO_TYPEE"></span><span id="_CPPv2N6Canvas9INFO_TYPEE"></span><span class="target" id="classCanvas_1adc95033fd745b7c53d84e8503a9e2885"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">INFO_TYPE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">CanvasInfo</span></span><a class="headerlink" href="#_CPPv4N6Canvas9INFO_TYPEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas6CanvasEddRKNSt6stringE">
+<span id="_CPPv3N6Canvas6CanvasEddRKNSt6stringE"></span><span id="_CPPv2N6Canvas6CanvasEddRKNSt6stringE"></span><span id="Canvas::Canvas__double.double.ssCR"></span><span class="target" id="classCanvas_1ad4c44c43de59f4d00806b21e8b933631"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Canvas</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">w</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">h</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas6CanvasEddRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Create a new canvas with the specified size and optional HTML identifier. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas6CanvasERK6Canvas">
+<span id="_CPPv3N6Canvas6CanvasERK6Canvas"></span><span id="_CPPv2N6Canvas6CanvasERK6Canvas"></span><span id="Canvas::Canvas__CanvasCR"></span><span class="target" id="classCanvas_1a718b2b50f343ffce65439c50aad342d4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Canvas</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6Canvas6CanvasERK6Canvas" title="Canvas::Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas6CanvasERK6Canvas" title="Link to this definition"></a><br /></dt>
+<dd><p>Link to an existing canvas. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas6CanvasERK6Widget">
+<span id="_CPPv3N6Canvas6CanvasERK6Widget"></span><span id="_CPPv2N6Canvas6CanvasERK6Widget"></span><span id="Canvas::Canvas__WidgetCR"></span><span class="target" id="classCanvas_1a189292d509e6afa7254994159d54c968"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Canvas</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas6CanvasERK6Widget" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas6CanvasEv">
+<span id="_CPPv3N6Canvas6CanvasEv"></span><span id="_CPPv2N6Canvas6CanvasEv"></span><span id="Canvas::Canvas"></span><span class="target" id="classCanvas_1a5fce53f080ad6540094901f9768805a8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Canvas</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas6CanvasEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6CanvasD0Ev">
+<span id="_CPPv3N6CanvasD0Ev"></span><span id="_CPPv2N6CanvasD0Ev"></span><span id="Canvas::~Canvas"></span><span class="target" id="classCanvas_1aedb6d7db1e87a53be21157b5ce480e4b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Canvas</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6CanvasD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas7SetSizeEdd">
+<span id="_CPPv3N6Canvas7SetSizeEdd"></span><span id="_CPPv2N6Canvas7SetSizeEdd"></span><span id="Canvas::SetSize__double.double"></span><span class="target" id="classCanvas_1a446ba9312d5be6c5cd7de28dd737922c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetSize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">w</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">h</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas7SetSizeEdd" title="Link to this definition"></a><br /></dt>
+<dd><p>Set Canvas size. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6Canvas6CircleER6Canvas5PointdDpRR2Ts">
+<span id="_CPPv3IDpEN6Canvas6CircleE5PointdDpRR2Ts"></span><span id="_CPPv2IDpEN6Canvas6CircleE5PointdDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCanvas_1a0b140f21d2b68902dc447c8d8eb1d060"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Circle</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../geometry/api/Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">center</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_r</span></span>, <a class="reference internal" href="#_CPPv4IDpEN6Canvas6CircleER6Canvas5PointdDpRR2Ts" title="Canvas::Circle::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6Canvas6CircleER6Canvas5PointdDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a Circle to this canvas; provide constructor for the CanvasCircle with a position and radius as well as optional face color, line color, and line width. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6Canvas6CircleER6CanvasdddDpRR2Ts">
+<span id="_CPPv3IDpEN6Canvas6CircleEdddDpRR2Ts"></span><span id="_CPPv2IDpEN6Canvas6CircleEdddDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCanvas_1abc025c1406751ebc3defcf5723da0ecb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Circle</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_y</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_r</span></span>, <a class="reference internal" href="#_CPPv4IDpEN6Canvas6CircleER6CanvasdddDpRR2Ts" title="Canvas::Circle::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6Canvas6CircleER6CanvasdddDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6Canvas4RectER6Canvas5PointddDpRR2Ts">
+<span id="_CPPv3IDpEN6Canvas4RectE5PointddDpRR2Ts"></span><span id="_CPPv2IDpEN6Canvas4RectE5PointddDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCanvas_1a30a5544f54cee9b148d8d0f3a29dbdba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Rect</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../geometry/api/Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">corner</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">w</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">h</span></span>, <a class="reference internal" href="#_CPPv4IDpEN6Canvas4RectER6Canvas5PointddDpRR2Ts" title="Canvas::Rect::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6Canvas4RectER6Canvas5PointddDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a Rectangle to this canvas at x,y with width w and heigh h. Optional face color and line color. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6Canvas4RectER6CanvasddddDpRR2Ts">
+<span id="_CPPv3IDpEN6Canvas4RectEddddDpRR2Ts"></span><span id="_CPPv2IDpEN6Canvas4RectEddddDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCanvas_1a7708d1423c0a2f3125098e886b65cfad"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Rect</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">w</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">h</span></span>, <a class="reference internal" href="#_CPPv4IDpEN6Canvas4RectER6CanvasddddDpRR2Ts" title="Canvas::Rect::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6Canvas4RectER6CanvasddddDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6Canvas5ImageER6CanvasRK8RawImage5PointDpRR2Ts">
+<span id="_CPPv3IDpEN6Canvas5ImageERK8RawImage5PointDpRR2Ts"></span><span id="_CPPv2IDpEN6Canvas5ImageERK8RawImage5PointDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCanvas_1a072cc3f8c4ca910dd8e8e3001ef34505"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Image</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="RawImage.html#_CPPv48RawImage" title="RawImage"><span class="n"><span class="pre">RawImage</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span>, <a class="reference internal" href="../../geometry/api/Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">corner</span></span>, <a class="reference internal" href="#_CPPv4IDpEN6Canvas5ImageER6CanvasRK8RawImage5PointDpRR2Ts" title="Canvas::Image::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6Canvas5ImageER6CanvasRK8RawImage5PointDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Add an Image to this canvas at x,y with width w and heigh h. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6Canvas5ImageER6CanvasRK8RawImageddDpRR2Ts">
+<span id="_CPPv3IDpEN6Canvas5ImageERK8RawImageddDpRR2Ts"></span><span id="_CPPv2IDpEN6Canvas5ImageERK8RawImageddDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCanvas_1aea952ae3e16d41b55c174d2c879d72e3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Image</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="RawImage.html#_CPPv48RawImage" title="RawImage"><span class="n"><span class="pre">RawImage</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span>, <a class="reference internal" href="#_CPPv4IDpEN6Canvas5ImageER6CanvasRK8RawImageddDpRR2Ts" title="Canvas::Image::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6Canvas5ImageER6CanvasRK8RawImageddDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6Canvas4LineER6CanvasddddDpRR2Ts">
+<span id="_CPPv3IDpEN6Canvas4LineEddddDpRR2Ts"></span><span id="_CPPv2IDpEN6Canvas4LineEddddDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCanvas_1a5e0f319fd300259f1f2cf5c1257d0140"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Line</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x1</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y1</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x2</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y2</span></span>, <a class="reference internal" href="#_CPPv4IDpEN6Canvas4LineER6CanvasddddDpRR2Ts" title="Canvas::Line::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6Canvas4LineER6CanvasddddDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a Line from x1,y1 to x2,y2. Optional face color and line color. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6Canvas4LineER6Canvas5Point5PointDpRR2Ts">
+<span id="_CPPv3IDpEN6Canvas4LineE5Point5PointDpRR2Ts"></span><span id="_CPPv2IDpEN6Canvas4LineE5Point5PointDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCanvas_1a9ae330fd09792545a511452763d0cc9d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Line</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../geometry/api/Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">p1</span></span>, <a class="reference internal" href="../../geometry/api/Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">p2</span></span>, <a class="reference internal" href="#_CPPv4IDpEN6Canvas4LineER6Canvas5Point5PointDpRR2Ts" title="Canvas::Line::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6Canvas4LineER6Canvas5Point5PointDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6Canvas9MultiLineER6Canvas5PointRK6vectorI5PointEDpRR2Ts">
+<span id="_CPPv3IDpEN6Canvas9MultiLineE5PointRK6vectorI5PointEDpRR2Ts"></span><span id="_CPPv2IDpEN6Canvas9MultiLineE5PointRK6vectorI5PointEDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCanvas_1a5cb511e47173767dca93a9a9bc629d98"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">MultiLine</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../geometry/api/Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">p1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../geometry/api/Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">points</span></span>, <a class="reference internal" href="#_CPPv4IDpEN6Canvas9MultiLineER6Canvas5PointRK6vectorI5PointEDpRR2Ts" title="Canvas::MultiLine::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6Canvas9MultiLineER6Canvas5PointRK6vectorI5PointEDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a Line from x1,y1 to x2,y2. Optional face color and line color. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6Canvas4TextER6Canvas5PointDpRR2Ts">
+<span id="_CPPv3IDpEN6Canvas4TextE5PointDpRR2Ts"></span><span id="_CPPv2IDpEN6Canvas4TextE5PointDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCanvas_1ab613f01f8347251c2a09f323ee319622"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Text</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../geometry/api/Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span>, <a class="reference internal" href="#_CPPv4IDpEN6Canvas4TextER6Canvas5PointDpRR2Ts" title="Canvas::Text::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6Canvas4TextER6Canvas5PointDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a string to this canvas at x,y with specified text. Optional face color and line color. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6Canvas4TextER6CanvasddDpRR2Ts">
+<span id="_CPPv3IDpEN6Canvas4TextEddDpRR2Ts"></span><span id="_CPPv2IDpEN6Canvas4TextEddDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCanvas_1a93f7faa4bdad5ce1461b3fd82f4bb56a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Text</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span>, <a class="reference internal" href="#_CPPv4IDpEN6Canvas4TextER6CanvasddDpRR2Ts" title="Canvas::Text::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6Canvas4TextER6CanvasddDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6Canvas10CenterTextER6Canvas5PointDpRR2Ts">
+<span id="_CPPv3IDpEN6Canvas10CenterTextE5PointDpRR2Ts"></span><span id="_CPPv2IDpEN6Canvas10CenterTextE5PointDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCanvas_1a1efded007b6d52403f9bb7e340840e36"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">CenterText</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../geometry/api/Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span>, <a class="reference internal" href="#_CPPv4IDpEN6Canvas10CenterTextER6Canvas5PointDpRR2Ts" title="Canvas::CenterText::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6Canvas10CenterTextER6Canvas5PointDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a string to this canvas centered at x,y with specified text. Optional face color and line color. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6Canvas10CenterTextER6CanvasddDpRR2Ts">
+<span id="_CPPv3IDpEN6Canvas10CenterTextEddDpRR2Ts"></span><span id="_CPPv2IDpEN6Canvas10CenterTextEddDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCanvas_1accd059c463f831ae52c83296b041ba2a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">CenterText</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span>, <a class="reference internal" href="#_CPPv4IDpEN6Canvas10CenterTextER6CanvasddDpRR2Ts" title="Canvas::CenterText::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">vals</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6Canvas10CenterTextER6CanvasddDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas4FontEKNSt6stringE">
+<span id="_CPPv3N6Canvas4FontEKNSt6stringE"></span><span id="_CPPv2N6Canvas4FontEKNSt6stringE"></span><span id="Canvas::Font__ssC"></span><span class="target" id="classCanvas_1ac0ccf594aee706f0dddaaae36f89e1c3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Font</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">font</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas4FontEKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Update the default font for text. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas4DrawERK6CircleRKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N6Canvas4DrawERK6CircleRKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N6Canvas4DrawERK6CircleRKNSt6stringERKNSt6stringE"></span><span id="Canvas::Draw__CircleCR.ssCR.ssCR"></span><span class="target" id="classCanvas_1a36a8266519c54c2c8f6a7baa36068964"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpEN6Canvas6CircleER6Canvas5PointdDpRR2Ts" title="Canvas::Circle"><span class="n"><span class="pre">Circle</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">circle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">lc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas4DrawERK6CircleRKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a circle onto this canvas. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas4DrawERK11CanvasShape">
+<span id="_CPPv3N6Canvas4DrawERK11CanvasShape"></span><span id="_CPPv2N6Canvas4DrawERK11CanvasShape"></span><span id="Canvas::Draw__CanvasShapeCR"></span><span class="target" id="classCanvas_1ab6f0e2b078a615e351db1e96d912134a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="CanvasShape.html#_CPPv411CanvasShape" title="CanvasShape"><span class="n"><span class="pre">CanvasShape</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">shape</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas4DrawERK11CanvasShape" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw an arbitrary shape onto this canvas. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas11StrokeColorENSt6stringE">
+<span id="_CPPv3N6Canvas11StrokeColorENSt6stringE"></span><span id="_CPPv2N6Canvas11StrokeColorENSt6stringE"></span><span id="Canvas::StrokeColor__ss"></span><span class="target" id="classCanvas_1a42a7e40f5ab2a674f319437d4f24f10d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">StrokeColor</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas11StrokeColorENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Change the default stroke color. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas6RotateEd">
+<span id="_CPPv3N6Canvas6RotateEd"></span><span id="_CPPv2N6Canvas6RotateEd"></span><span id="Canvas::Rotate__double"></span><span class="target" id="classCanvas_1a7436a1b91a37bf05b7571c7240406652"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Rotate</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">angle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas6RotateEd" title="Link to this definition"></a><br /></dt>
+<dd><p>Rotate the entire canvas. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas5ClearEv">
+<span id="_CPPv3N6Canvas5ClearEv"></span><span id="_CPPv2N6Canvas5ClearEv"></span><span id="Canvas::Clear"></span><span class="target" id="classCanvas_1a3df173ceafc7b1b6ba7071f80da7b908"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Clear everything off of this canvas. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas5ClearERKNSt6stringE">
+<span id="_CPPv3N6Canvas5ClearERKNSt6stringE"></span><span id="_CPPv2N6Canvas5ClearERKNSt6stringE"></span><span id="Canvas::Clear__ssCR"></span><span class="target" id="classCanvas_1ac382d0566a002ce035d3e0175114373a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">bg_color</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas5ClearERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Clear to a specific background color. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Canvas11DownloadPNGEv">
+<span id="_CPPv3NK6Canvas11DownloadPNGEv"></span><span id="_CPPv2NK6Canvas11DownloadPNGEv"></span><span id="Canvas::DownloadPNGC"></span><span class="target" id="classCanvas_1a3e9bbaed8d06ffe6bb24c55d0b0756ba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DownloadPNG</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Canvas11DownloadPNGEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Download a PNG image of a canvas. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Canvas11DownloadPNGERKNSt6stringE">
+<span id="_CPPv3NK6Canvas11DownloadPNGERKNSt6stringE"></span><span id="_CPPv2NK6Canvas11DownloadPNGERKNSt6stringE"></span><span id="Canvas::DownloadPNG__ssCRC"></span><span class="target" id="classCanvas_1acc6173db5e2679374675e5848d251890"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DownloadPNG</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fname</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Canvas11DownloadPNGERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Download a PNG image of a canvas. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Canvas7SavePNGERKNSt6stringE">
+<span id="_CPPv3NK6Canvas7SavePNGERKNSt6stringE"></span><span id="_CPPv2NK6Canvas7SavePNGERKNSt6stringE"></span><span id="Canvas::SavePNG__ssCRC"></span><span class="target" id="classCanvas_1a93d5f6934b49f40d39a00123fed9014d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SavePNG</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fname</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Canvas7SavePNGERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Save a PNG image of a canvas with node.js. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas4InfoEv">
+<span id="_CPPv3N6Canvas4InfoEv"></span><span id="_CPPv2N6Canvas4InfoEv"></span><span id="Canvas::Info"></span><span class="target" id="classCanvas_1a7cf862a60724f4030cd7727a5ab2b618"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">CanvasInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Info</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas4InfoEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Canvas4InfoEv">
+<span id="_CPPv3NK6Canvas4InfoEv"></span><span id="_CPPv2NK6Canvas4InfoEv"></span><span id="Canvas::InfoC"></span><span class="target" id="classCanvas_1a2227042a7ebe9a12a2bc96f0071fa286"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">CanvasInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Info</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Canvas4InfoEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Canvas6CanvasEP10CanvasInfo">
+<span id="_CPPv3N6Canvas6CanvasEP10CanvasInfo"></span><span id="_CPPv2N6Canvas6CanvasEP10CanvasInfo"></span><span id="Canvas::Canvas__CanvasInfoP"></span><span class="target" id="classCanvas_1a03a39443de069585849821ae3fc46878"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Canvas</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">CanvasInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in_info</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Canvas6CanvasEP10CanvasInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-friends">Friends</p>
+<dl>
+<dt class="sig sig-object cpp">
+<em class="property"><span class="pre">friend</span> <span class="pre">class</span></em> <span class="pre">CanvasInfo</span></dt>
+</dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Button.html" class="btn btn-neutral float-left" title="Button.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="CanvasAction.html" class="btn btn-neutral float-right" title="CanvasAction.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

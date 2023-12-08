@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/math/math.0efa5f6d-8ef1-47fb-93c3-533ff4f788a1.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="CombinedBinomialDistribution.hpp" href="api/CombinedBinomialDistribution.html" />
+    <link rel="prev" title="matchbin_utils.hpp" href="../matching/api/matchbin_utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Math</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/CombinedBinomialDistribution.html">CombinedBinomialDistribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html">Distribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DistributionSet.html">DistributionSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Fraction.html">Fraction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html">Random.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html">Range.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html">RangeSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html">combos.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/constants.html">constants.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/distances.html">distances.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/info_theory.html">info_theory.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/math.html">math.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/random_utils.html">random_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/sequence_utils.html">sequence_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/spatial_stats.html">spatial_stats.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/stats.html">stats.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Math</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="math">
+<h1>Math<a class="headerlink" href="#math" title="Link to this heading"></a></h1>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/CombinedBinomialDistribution.html">CombinedBinomialDistribution.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/CombinedBinomialDistribution.html#_CPPv43emp"><code class="docutils literal notranslate"><span class="pre">emp</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/CombinedBinomialDistribution.html#_CPPv4N3emp28CombinedBinomialDistributionE"><code class="docutils literal notranslate"><span class="pre">emp::CombinedBinomialDistribution</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/CombinedBinomialDistribution.html#_CPPv4N3emp28CombinedBinomialDistribution28CombinedBinomialDistributionEv"><code class="docutils literal notranslate"><span class="pre">emp::CombinedBinomialDistribution::CombinedBinomialDistribution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/CombinedBinomialDistribution.html#_CPPv4N3emp28CombinedBinomialDistribution28CombinedBinomialDistributionEd6size_t"><code class="docutils literal notranslate"><span class="pre">emp::CombinedBinomialDistribution::CombinedBinomialDistribution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/CombinedBinomialDistribution.html#_CPPv4N3emp28CombinedBinomialDistribution10PickRandomE6size_tR6Random"><code class="docutils literal notranslate"><span class="pre">emp::CombinedBinomialDistribution::PickRandom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/CombinedBinomialDistribution.html#_CPPv4N3emp28CombinedBinomialDistribution5SetupEd6size_t"><code class="docutils literal notranslate"><span class="pre">emp::CombinedBinomialDistribution::Setup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/CombinedBinomialDistribution.html#_CPPv4N3emp28CombinedBinomialDistribution6ExpandE6size_t"><code class="docutils literal notranslate"><span class="pre">emp::CombinedBinomialDistribution::Expand()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/CombinedBinomialDistribution.html#_CPPv4N3emp28CombinedBinomialDistribution14GetCurMaxPowerEv"><code class="docutils literal notranslate"><span class="pre">emp::CombinedBinomialDistribution::GetCurMaxPower()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/CombinedBinomialDistribution.html#_CPPv4NK3emp28CombinedBinomialDistribution11GetMaxPowerE6size_t"><code class="docutils literal notranslate"><span class="pre">emp::CombinedBinomialDistribution::GetMaxPower()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/CombinedBinomialDistribution.html#_CPPv4N3emp28CombinedBinomialDistribution16distribution_vecE"><code class="docutils literal notranslate"><span class="pre">emp::CombinedBinomialDistribution::distribution_vec</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/CombinedBinomialDistribution.html#_CPPv4N3emp28CombinedBinomialDistribution1pE"><code class="docutils literal notranslate"><span class="pre">emp::CombinedBinomialDistribution::p</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/CombinedBinomialDistribution.html#_CPPv4N3emp28CombinedBinomialDistribution13cur_max_powerE"><code class="docutils literal notranslate"><span class="pre">emp::CombinedBinomialDistribution::cur_max_power</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Distribution.html">Distribution.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Distribution.html#_CPPv412Distribution"><code class="docutils literal notranslate"><span class="pre">Distribution</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4NK12Distribution7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">Distribution::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4NK12Distribution12GetTotalProbEv"><code class="docutils literal notranslate"><span class="pre">Distribution::GetTotalProb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4NK12DistributionixE6size_t"><code class="docutils literal notranslate"><span class="pre">Distribution::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N12Distribution12PickPositionEd"><code class="docutils literal notranslate"><span class="pre">Distribution::PickPosition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4NK12Distribution10PickRandomER6Random"><code class="docutils literal notranslate"><span class="pre">Distribution::PickRandom()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N12Distribution7weightsE"><code class="docutils literal notranslate"><span class="pre">Distribution::weights</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Distribution.html#_CPPv47Uniform"><code class="docutils literal notranslate"><span class="pre">Uniform</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N7Uniform7UniformE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Uniform::Uniform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4NK7Uniform6GetMinEv"><code class="docutils literal notranslate"><span class="pre">Uniform::GetMin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4NK7Uniform6GetMaxEv"><code class="docutils literal notranslate"><span class="pre">Uniform::GetMax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N7Uniform5SetupE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Uniform::Setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N7Uniform7min_valE"><code class="docutils literal notranslate"><span class="pre">Uniform::min_val</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N7Uniform7max_valE"><code class="docutils literal notranslate"><span class="pre">Uniform::max_val</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Distribution.html#_CPPv48Binomial"><code class="docutils literal notranslate"><span class="pre">Binomial</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N8Binomial8BinomialEv"><code class="docutils literal notranslate"><span class="pre">Binomial::Binomial()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N8Binomial8BinomialEd6size_t"><code class="docutils literal notranslate"><span class="pre">Binomial::Binomial()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4NK8Binomial4GetPEv"><code class="docutils literal notranslate"><span class="pre">Binomial::GetP()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4NK8Binomial4GetNEv"><code class="docutils literal notranslate"><span class="pre">Binomial::GetN()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N8Binomial5SetupEd6size_t"><code class="docutils literal notranslate"><span class="pre">Binomial::Setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N8Binomial1pE"><code class="docutils literal notranslate"><span class="pre">Binomial::p</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N8Binomial1NE"><code class="docutils literal notranslate"><span class="pre">Binomial::N</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Distribution.html#_CPPv416NegativeBinomial"><code class="docutils literal notranslate"><span class="pre">NegativeBinomial</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N16NegativeBinomial16NegativeBinomialEd6size_t"><code class="docutils literal notranslate"><span class="pre">NegativeBinomial::NegativeBinomial()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4NK16NegativeBinomial4GetPEv"><code class="docutils literal notranslate"><span class="pre">NegativeBinomial::GetP()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4NK16NegativeBinomial4GetNEv"><code class="docutils literal notranslate"><span class="pre">NegativeBinomial::GetN()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N16NegativeBinomial5SetupEd6size_t"><code class="docutils literal notranslate"><span class="pre">NegativeBinomial::Setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N16NegativeBinomial1pE"><code class="docutils literal notranslate"><span class="pre">NegativeBinomial::p</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Distribution.html#_CPPv4N16NegativeBinomial1NE"><code class="docutils literal notranslate"><span class="pre">NegativeBinomial::N</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/DistributionSet.html">DistributionSet.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/DistributionSet.html#_CPPv411BinomialSet"><code class="docutils literal notranslate"><span class="pre">BinomialSet</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/DistributionSet.html#_CPPv419NegativeBinomialSet"><code class="docutils literal notranslate"><span class="pre">NegativeBinomialSet</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/DistributionSet.html#_CPPv4I0DpE15DistributionSet"><code class="docutils literal notranslate"><span class="pre">DistributionSet</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DistributionSet.html#_CPPv4N15DistributionSet10PickRandomER6RandomDp2Ts"><code class="docutils literal notranslate"><span class="pre">DistributionSet::PickRandom()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DistributionSet.html#_CPPv4N15DistributionSet8dist_mapE"><code class="docutils literal notranslate"><span class="pre">DistributionSet::dist_map</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Fraction.html">Fraction.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Fraction.html#_CPPv48Fraction"><code class="docutils literal notranslate"><span class="pre">Fraction</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Fraction.html#_CPPv4N8Fraction8FractionE7int64_t7int64_t"><code class="docutils literal notranslate"><span class="pre">Fraction::Fraction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Fraction.html#_CPPv4N8Fraction8FractionERK8Fraction"><code class="docutils literal notranslate"><span class="pre">Fraction::Fraction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Fraction.html#_CPPv4NK8Fraction12GetNumeratorEv"><code class="docutils literal notranslate"><span class="pre">Fraction::GetNumerator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Fraction.html#_CPPv4NK8Fraction14GetDenomonatorEv"><code class="docutils literal notranslate"><span class="pre">Fraction::GetDenomonator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Fraction.html#_CPPv4N8Fraction6ReduceEv"><code class="docutils literal notranslate"><span class="pre">Fraction::Reduce()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Fraction.html#_CPPv4N8Fraction3numE"><code class="docutils literal notranslate"><span class="pre">Fraction::num</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Fraction.html#_CPPv4N8Fraction5denomE"><code class="docutils literal notranslate"><span class="pre">Fraction::denom</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Random.html">Random.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Random.html#_CPPv4I000E23sample_with_replacementv15ForwardIterator15ForwardIterator14OutputIterator14OutputIterator3RNG"><code class="docutils literal notranslate"><span class="pre">sample_with_replacement()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Random.html#_CPPv46Random"><code class="docutils literal notranslate"><span class="pre">Random</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random4ProbE"><code class="docutils literal notranslate"><span class="pre">Random::Prob</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Random.html#_CPPv4N6Random4Prob6PROB_0E"><code class="docutils literal notranslate"><span class="pre">Random::Prob::PROB_0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Random.html#_CPPv4N6Random4Prob9PROB_12_5E"><code class="docutils literal notranslate"><span class="pre">Random::Prob::PROB_12_5</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Random.html#_CPPv4N6Random4Prob7PROB_25E"><code class="docutils literal notranslate"><span class="pre">Random::Prob::PROB_25</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Random.html#_CPPv4N6Random4Prob9PROB_37_5E"><code class="docutils literal notranslate"><span class="pre">Random::Prob::PROB_37_5</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Random.html#_CPPv4N6Random4Prob7PROB_50E"><code class="docutils literal notranslate"><span class="pre">Random::Prob::PROB_50</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Random.html#_CPPv4N6Random4Prob9PROB_62_5E"><code class="docutils literal notranslate"><span class="pre">Random::Prob::PROB_62_5</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Random.html#_CPPv4N6Random4Prob7PROB_75E"><code class="docutils literal notranslate"><span class="pre">Random::Prob::PROB_75</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Random.html#_CPPv4N6Random4Prob9PROB_87_5E"><code class="docutils literal notranslate"><span class="pre">Random::Prob::PROB_87_5</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Random.html#_CPPv4N6Random4Prob8PROB_100E"><code class="docutils literal notranslate"><span class="pre">Random::Prob::PROB_100</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9mem_ptr_tE"><code class="docutils literal notranslate"><span class="pre">Random::mem_ptr_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random6RandomEKi"><code class="docutils literal notranslate"><span class="pre">Random::Random()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6RandomD0Ev"><code class="docutils literal notranslate"><span class="pre">Random::~Random()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random10StepEngineEv"><code class="docutils literal notranslate"><span class="pre">Random::StepEngine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4NK6Random7GetSeedEv"><code class="docutils literal notranslate"><span class="pre">Random::GetSeed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9ResetSeedEK7int64_t"><code class="docutils literal notranslate"><span class="pre">Random::ResetSeed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9GetDoubleEv"><code class="docutils literal notranslate"><span class="pre">Random::GetDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9GetDoubleEKd"><code class="docutils literal notranslate"><span class="pre">Random::GetDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9GetDoubleEKdKd"><code class="docutils literal notranslate"><span class="pre">Random::GetDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9GetDoubleEK5RangeIdE"><code class="docutils literal notranslate"><span class="pre">Random::GetDouble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random16GetDoubleNonZeroEv"><code class="docutils literal notranslate"><span class="pre">Random::GetDoubleNonZero()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random7GetUIntEv"><code class="docutils literal notranslate"><span class="pre">Random::GetUInt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4I0EN6Random7GetUIntE8uint32_tK1T"><code class="docutils literal notranslate"><span class="pre">Random::GetUInt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4I00EN6Random7GetUIntE8uint32_tK2T1K2T2"><code class="docutils literal notranslate"><span class="pre">Random::GetUInt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4I0EN6Random7GetUIntE8uint32_tK5RangeI1TE"><code class="docutils literal notranslate"><span class="pre">Random::GetUInt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random11GetBits12_5Ev"><code class="docutils literal notranslate"><span class="pre">Random::GetBits12_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9GetBits25Ev"><code class="docutils literal notranslate"><span class="pre">Random::GetBits25()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random11GetBits37_5Ev"><code class="docutils literal notranslate"><span class="pre">Random::GetBits37_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9GetBits50Ev"><code class="docutils literal notranslate"><span class="pre">Random::GetBits50()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random11GetBits62_5Ev"><code class="docutils literal notranslate"><span class="pre">Random::GetBits62_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9GetBits75Ev"><code class="docutils literal notranslate"><span class="pre">Random::GetBits75()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random11GetBits87_5Ev"><code class="docutils literal notranslate"><span class="pre">Random::GetBits87_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9GetUInt64Ev"><code class="docutils literal notranslate"><span class="pre">Random::GetUInt64()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9GetUInt64EK8uint64_t"><code class="docutils literal notranslate"><span class="pre">Random::GetUInt64()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random6GetIntEK7int32_t"><code class="docutils literal notranslate"><span class="pre">Random::GetInt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random6GetIntEKiKi"><code class="docutils literal notranslate"><span class="pre">Random::GetInt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random6GetIntEK5RangeIiE"><code class="docutils literal notranslate"><span class="pre">Random::GetInt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random8RandFillE9mem_ptr_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4I_4ProbEN6Random9RandFillPEv9mem_ptr_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFillP()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4I_4ProbEN6Random9RandFillPEv9mem_ptr_tK6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFillP()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9RandFill0E9mem_ptr_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random12RandFill12_5E9mem_ptr_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill12_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random10RandFill25E9mem_ptr_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill25()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random12RandFill37_5E9mem_ptr_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill37_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random10RandFill50E9mem_ptr_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill50()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random12RandFill62_5E9mem_ptr_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill62_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random10RandFill75E9mem_ptr_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill75()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random12RandFill87_5E9mem_ptr_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill87_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random11RandFill100E9mem_ptr_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill100()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9RandFill0E9mem_ptr_tK6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random12RandFill12_5E9mem_ptr_tK6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill12_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random10RandFill25E9mem_ptr_tK6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill25()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random12RandFill37_5E9mem_ptr_tK6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill37_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random10RandFill50E9mem_ptr_tK6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill50()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random12RandFill62_5E9mem_ptr_tK6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill62_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random10RandFill75E9mem_ptr_tK6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill75()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random12RandFill87_5E9mem_ptr_tK6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill87_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random11RandFill100E9mem_ptr_tK6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill100()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random8RandFillE9mem_ptr_tK6size_tKd"><code class="docutils literal notranslate"><span class="pre">Random::RandFill()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random8RandFillE9mem_ptr_tK6size_tKdK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Random::RandFill()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random1PEKd"><code class="docutils literal notranslate"><span class="pre">Random::P()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random7GetByteEKd"><code class="docutils literal notranslate"><span class="pre">Random::GetByte()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9GetNormalEv"><code class="docutils literal notranslate"><span class="pre">Random::GetNormal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9GetNormalEKdKd"><code class="docutils literal notranslate"><span class="pre">Random::GetNormal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random10GetPoissonEKdKd"><code class="docutils literal notranslate"><span class="pre">Random::GetPoisson()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random10GetPoissonEKd"><code class="docutils literal notranslate"><span class="pre">Random::GetPoisson()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random11GetBinomialEKdKd"><code class="docutils literal notranslate"><span class="pre">Random::GetBinomial()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random14GetExponentialEd"><code class="docutils literal notranslate"><span class="pre">Random::GetExponential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random12GetGeometricEd"><code class="docutils literal notranslate"><span class="pre">Random::GetGeometric()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random3GetEv"><code class="docutils literal notranslate"><span class="pre">Random::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random5valueE"><code class="docutils literal notranslate"><span class="pre">Random::value</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random10weyl_stateE"><code class="docutils literal notranslate"><span class="pre">Random::weyl_state</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random13original_seedE"><code class="docutils literal notranslate"><span class="pre">Random::original_seed</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random5expRVE"><code class="docutils literal notranslate"><span class="pre">Random::expRV</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random8RAND_CAPE"><code class="docutils literal notranslate"><span class="pre">Random::RAND_CAP</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random9STEP_SIZEE"><code class="docutils literal notranslate"><span class="pre">Random::STEP_SIZE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N6Random5BYTE1E"><code class="docutils literal notranslate"><span class="pre">Random::BYTE1</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Random.html#_CPPv416RandomStdAdaptor"><code class="docutils literal notranslate"><span class="pre">RandomStdAdaptor</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N16RandomStdAdaptor13argument_typeE"><code class="docutils literal notranslate"><span class="pre">RandomStdAdaptor::argument_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N16RandomStdAdaptor11result_typeE"><code class="docutils literal notranslate"><span class="pre">RandomStdAdaptor::result_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N16RandomStdAdaptor16RandomStdAdaptorER6Random"><code class="docutils literal notranslate"><span class="pre">RandomStdAdaptor::RandomStdAdaptor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N16RandomStdAdaptorclEi"><code class="docutils literal notranslate"><span class="pre">RandomStdAdaptor::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Random.html#_CPPv4N16RandomStdAdaptor4_rngE"><code class="docutils literal notranslate"><span class="pre">RandomStdAdaptor::_rng</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Range.html">Range.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Range.html#_CPPv4I0_bE9MakeRange5RangeI1T13INCLUDE_UPPERE1T1T"><code class="docutils literal notranslate"><span class="pre">MakeRange()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Range.html#_CPPv4I_bE8IntRange5RangeIi13INCLUDE_UPPEREii"><code class="docutils literal notranslate"><span class="pre">IntRange()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Range.html#_CPPv4I_bE6DRange5RangeId13INCLUDE_UPPEREdd"><code class="docutils literal notranslate"><span class="pre">DRange()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Range.html#_CPPv4I0_bE5Range"><code class="docutils literal notranslate"><span class="pre">Range</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range5RangeEv"><code class="docutils literal notranslate"><span class="pre">Range::Range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range5RangeE1T"><code class="docutils literal notranslate"><span class="pre">Range::Range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range5RangeE1T1T"><code class="docutils literal notranslate"><span class="pre">Range::Range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range5RangeERK5Range"><code class="docutils literal notranslate"><span class="pre">Range::Range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5RangeaSERK5Range"><code class="docutils literal notranslate"><span class="pre">Range::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5RangeeqERK5Range"><code class="docutils literal notranslate"><span class="pre">Range::operator==()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5RangeneERK5Range"><code class="docutils literal notranslate"><span class="pre">Range::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range8GetLowerEv"><code class="docutils literal notranslate"><span class="pre">Range::GetLower()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range8GetUpperEv"><code class="docutils literal notranslate"><span class="pre">Range::GetUpper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range10GetEpsilonEv"><code class="docutils literal notranslate"><span class="pre">Range::GetEpsilon()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range11GetMaxValueEv"><code class="docutils literal notranslate"><span class="pre">Range::GetMaxValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">Range::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range8ToStringEv"><code class="docutils literal notranslate"><span class="pre">Range::ToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range8SetLowerE1T"><code class="docutils literal notranslate"><span class="pre">Range::SetLower()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range8SetUpperE1T"><code class="docutils literal notranslate"><span class="pre">Range::SetUpper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range3SetE1T1T"><code class="docutils literal notranslate"><span class="pre">Range::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range9ShiftDownE1T"><code class="docutils literal notranslate"><span class="pre">Range::ShiftDown()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range7ShiftUpE1T"><code class="docutils literal notranslate"><span class="pre">Range::ShiftUp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range5ShiftE1T"><code class="docutils literal notranslate"><span class="pre">Range::Shift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range11SetMinLowerEv"><code class="docutils literal notranslate"><span class="pre">Range::SetMinLower()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range11SetMaxUpperEv"><code class="docutils literal notranslate"><span class="pre">Range::SetMaxUpper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range4GrowE1T"><code class="docutils literal notranslate"><span class="pre">Range::Grow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range5LowerEv"><code class="docutils literal notranslate"><span class="pre">Range::Lower()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range5UpperEv"><code class="docutils literal notranslate"><span class="pre">Range::Upper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range5LowerEv"><code class="docutils literal notranslate"><span class="pre">Range::Lower()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range5UpperEv"><code class="docutils literal notranslate"><span class="pre">Range::Upper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range3HasE1T"><code class="docutils literal notranslate"><span class="pre">Range::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range5ValidE1T"><code class="docutils literal notranslate"><span class="pre">Range::Valid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range8HasRangeE6this_t"><code class="docutils literal notranslate"><span class="pre">Range::HasRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range11IsConnectedE6this_t"><code class="docutils literal notranslate"><span class="pre">Range::IsConnected()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range10HasOverlapE6this_t"><code class="docutils literal notranslate"><span class="pre">Range::HasOverlap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range11CalcOverlapE6this_t"><code class="docutils literal notranslate"><span class="pre">Range::CalcOverlap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range6ExpandE1T"><code class="docutils literal notranslate"><span class="pre">Range::Expand()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4IDpEN5Range6ExpandEb1T1TDp2Ts"><code class="docutils literal notranslate"><span class="pre">Range::Expand()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range5MergeE6this_t"><code class="docutils literal notranslate"><span class="pre">Range::Merge()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range6AppendE1T"><code class="docutils literal notranslate"><span class="pre">Range::Append()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range5ClampE1T"><code class="docutils literal notranslate"><span class="pre">Range::Clamp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range10LimitValueE1T"><code class="docutils literal notranslate"><span class="pre">Range::LimitValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range10ToFractionE1T"><code class="docutils literal notranslate"><span class="pre">Range::ToFraction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range12FromFractionEd"><code class="docutils literal notranslate"><span class="pre">Range::FromFraction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range10LimitLowerE1T"><code class="docutils literal notranslate"><span class="pre">Range::LimitLower()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range10LimitUpperE1T"><code class="docutils literal notranslate"><span class="pre">Range::LimitUpper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range7CalcBinE1T6size_t"><code class="docutils literal notranslate"><span class="pre">Range::CalcBin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4NK5Range6SpreadEK6size_t"><code class="docutils literal notranslate"><span class="pre">Range::Spread()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range8MaxLimitEv"><code class="docutils literal notranslate"><span class="pre">Range::MaxLimit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range8MinLimitEv"><code class="docutils literal notranslate"><span class="pre">Range::MinLimit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range11is_integralE"><code class="docutils literal notranslate"><span class="pre">Range::is_integral</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range6this_tE"><code class="docutils literal notranslate"><span class="pre">Range::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range5lowerE"><code class="docutils literal notranslate"><span class="pre">Range::lower</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Range.html#_CPPv4N5Range5upperE"><code class="docutils literal notranslate"><span class="pre">Range::upper</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/RangeSet.html">RangeSet.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/RangeSet.html#_CPPv4I0E8RangeSet"><code class="docutils literal notranslate"><span class="pre">RangeSet</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet7range_tE"><code class="docutils literal notranslate"><span class="pre">RangeSet::range_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet6this_tE"><code class="docutils literal notranslate"><span class="pre">RangeSet::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet8RangeSetEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::RangeSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet8RangeSetE7range_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::RangeSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet8RangeSetE1T1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::RangeSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet8RangeSetERK8RangeSet"><code class="docutils literal notranslate"><span class="pre">RangeSet::RangeSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet8RangeSetERR8RangeSet"><code class="docutils literal notranslate"><span class="pre">RangeSet::RangeSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet8RangeSetERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">RangeSet::RangeSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSetaSERK8RangeSet"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSetaSERR8RangeSet"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSetaSERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet3HasE1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet8HasRangeE7range_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::HasRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet7IsEmptyEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::IsEmpty()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet8GetStartEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::GetStart()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet6GetEndEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::GetEnd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet12GetNumRangesEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::GetNumRanges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet8ToStringEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::ToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NKR8RangeSet9GetRangesEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::GetRanges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet10HasOverlapE7range_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::HasOverlap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet11CalcOverlapE7range_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::CalcOverlap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet5ClearEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet6SetAllEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::SetAll()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet5ShiftE1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::Shift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet7ShiftUpE1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::ShiftUp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet9ShiftDownE1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::ShiftDown()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet9CalcShiftE1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::CalcShift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet13CalcShiftDownE1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::CalcShiftDown()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet11CalcShiftUpE1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::CalcShiftUp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet6InsertE1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::Insert()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet6InsertE7range_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::Insert()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet6InsertERK6this_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::Insert()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet11InsertRangeE1T1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::InsertRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet6RemoveE1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::Remove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet8RemoveToE1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::RemoveTo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet10RemoveFromE1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::RemoveFrom()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet6RemoveE7range_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::Remove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet6RemoveERK6this_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::Remove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet11RemoveRangeE1T1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::RemoveRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet8KeepOnlyE1T1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::KeepOnly()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet8KeepOnlyE7range_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::KeepOnly()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet8KeepOnlyERK6this_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::KeepOnly()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet11CalcInverseEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::CalcInverse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet6InvertEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::Invert()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSetcoEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator~()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSetorERK6this_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator|()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSetanERK6this_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator&amp;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSeteoERK6this_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator^()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSetlsEK1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator&lt;&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSetrsEK1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator&gt;&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSetixE1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSetoRERK6this_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator|=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSetaNERK6this_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator&amp;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSeteOERK6this_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator^=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSetlSEK1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator&lt;&lt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSetrSEK1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator&gt;&gt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSetcvbEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet2OKEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::OK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet8MaxLimitEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::MaxLimit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet8MinLimitEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::MinLimit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet11is_integralE"><code class="docutils literal notranslate"><span class="pre">RangeSet::is_integral</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4NK8RangeSet10_FindRangeE1T"><code class="docutils literal notranslate"><span class="pre">RangeSet::_FindRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet12_InsertRangeE6size_t7range_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::_InsertRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet12_RemoveRangeE6size_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::_RemoveRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet13_RemoveRangesE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::_RemoveRanges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet16_PruneEmptyFrontEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::_PruneEmptyFront()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet15_PruneEmptyBackEv"><code class="docutils literal notranslate"><span class="pre">RangeSet::_PruneEmptyBack()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet13_CleanupMergeE6size_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::_CleanupMerge()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet11_FromStringE6String"><code class="docutils literal notranslate"><span class="pre">RangeSet::_FromString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSet9range_setE"><code class="docutils literal notranslate"><span class="pre">RangeSet::range_set</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RangeSet.html#_CPPv4N8RangeSetlsERNSt7ostreamERK6this_t"><code class="docutils literal notranslate"><span class="pre">RangeSet::operator&lt;&lt;()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/combos.html">combos.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/combos.html#_CPPv48ComboIDs"><code class="docutils literal notranslate"><span class="pre">ComboIDs</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDs8ComboIDsE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">ComboIDs::ComboIDs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDsD0Ev"><code class="docutils literal notranslate"><span class="pre">ComboIDs::~ComboIDs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4NK8ComboIDs8GetComboEv"><code class="docutils literal notranslate"><span class="pre">ComboIDs::GetCombo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4NK8ComboIDs11GetMaxComboEv"><code class="docutils literal notranslate"><span class="pre">ComboIDs::GetMaxCombo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4NK8ComboIDs12GetComboSizeEv"><code class="docutils literal notranslate"><span class="pre">ComboIDs::GetComboSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4NK8ComboIDs12GetNumCombosEv"><code class="docutils literal notranslate"><span class="pre">ComboIDs::GetNumCombos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDsixEK6size_t"><code class="docutils literal notranslate"><span class="pre">ComboIDs::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4NK8ComboIDsixEK6size_t"><code class="docutils literal notranslate"><span class="pre">ComboIDs::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDs5ResetEv"><code class="docutils literal notranslate"><span class="pre">ComboIDs::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDs9NextComboEv"><code class="docutils literal notranslate"><span class="pre">ComboIDs::NextCombo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDs12ResizeCombosE6size_t"><code class="docutils literal notranslate"><span class="pre">ComboIDs::ResizeCombos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDs15GetInverseComboEv"><code class="docutils literal notranslate"><span class="pre">ComboIDs::GetInverseCombo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDsppEv"><code class="docutils literal notranslate"><span class="pre">ComboIDs::operator++()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDsppEi"><code class="docutils literal notranslate"><span class="pre">ComboIDs::operator++()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDs4sizeEv"><code class="docutils literal notranslate"><span class="pre">ComboIDs::size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDs9max_countE"><code class="docutils literal notranslate"><span class="pre">ComboIDs::max_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDs9cur_comboE"><code class="docutils literal notranslate"><span class="pre">ComboIDs::cur_combo</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDs9max_comboE"><code class="docutils literal notranslate"><span class="pre">ComboIDs::max_combo</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDs10num_combosE"><code class="docutils literal notranslate"><span class="pre">ComboIDs::num_combos</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/combos.html#_CPPv4N8ComboIDs11CountCombosE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">ComboIDs::CountCombos()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/constants.html">constants.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv4I0E8MaxValue1Tv"><code class="docutils literal notranslate"><span class="pre">MaxValue()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv4I0E16InterpolateTabledRR1Tdd"><code class="docutils literal notranslate"><span class="pre">InterpolateTable()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv41E"><code class="docutils literal notranslate"><span class="pre">E</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv43PHI"><code class="docutils literal notranslate"><span class="pre">PHI</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv42PI"><code class="docutils literal notranslate"><span class="pre">PI</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv45SQRT2"><code class="docutils literal notranslate"><span class="pre">SQRT2</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv48MAX_BYTE"><code class="docutils literal notranslate"><span class="pre">MAX_BYTE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv49MAX_2BYTE"><code class="docutils literal notranslate"><span class="pre">MAX_2BYTE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv48MAX_WORD"><code class="docutils literal notranslate"><span class="pre">MAX_WORD</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv49MAX_3BYTE"><code class="docutils literal notranslate"><span class="pre">MAX_3BYTE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv48MAX_UINT"><code class="docutils literal notranslate"><span class="pre">MAX_UINT</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv49MAX_4BYTE"><code class="docutils literal notranslate"><span class="pre">MAX_4BYTE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv47MIN_INT"><code class="docutils literal notranslate"><span class="pre">MIN_INT</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv410MAX_SIZE_T"><code class="docutils literal notranslate"><span class="pre">MAX_SIZE_T</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv414log2_chart_1_2"><code class="docutils literal notranslate"><span class="pre">log2_chart_1_2</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv415pow2_chart_bits"><code class="docutils literal notranslate"><span class="pre">pow2_chart_bits</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/constants.html#_CPPv414pow2_chart_0_1"><code class="docutils literal notranslate"><span class="pre">pow2_chart_0_1</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/distances.html">distances.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/distances.html#_CPPv4I0E17EuclideanDistanceNSt9enable_ifIXntN11is_ptr_typeIN1C10value_typeEE5valueEEdE4typeER1CR1C"><code class="docutils literal notranslate"><span class="pre">EuclideanDistance()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/info_theory.html">info_theory.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/info_theory.html#_CPPv4I0E7EntropydRK9CONTAINER"><code class="docutils literal notranslate"><span class="pre">Entropy()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/info_theory.html#_CPPv4I00E7EntropydRK9CONTAINER10WEIGHT_FUNd"><code class="docutils literal notranslate"><span class="pre">Entropy()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/info_theory.html#_CPPv48Entropy2Kd"><code class="docutils literal notranslate"><span class="pre">Entropy2()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/math.html">math.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv43Modii"><code class="docutils literal notranslate"><span class="pre">Mod()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv43Moddd"><code class="docutils literal notranslate"><span class="pre">Mod()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E3Sgni1T"><code class="docutils literal notranslate"><span class="pre">Sgn()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E3Abs1T1T"><code class="docutils literal notranslate"><span class="pre">Abs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv411FloorDivideii"><code class="docutils literal notranslate"><span class="pre">FloorDivide()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv413RoundedDivideii"><code class="docutils literal notranslate"><span class="pre">RoundedDivide()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv413RoundedDivide6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RoundedDivide()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv414UnbiasedDivideiiR6Random"><code class="docutils literal notranslate"><span class="pre">UnbiasedDivide()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv414UnbiasedDivide6size_t6size_tR6Random"><code class="docutils literal notranslate"><span class="pre">UnbiasedDivide()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E7ToRange4TYPERK4TYPERK4TYPERK4TYPE"><code class="docutils literal notranslate"><span class="pre">ToRange()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E3Min1T1T"><code class="docutils literal notranslate"><span class="pre">Min()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0DpE3Min1T1T1TDp2Ts"><code class="docutils literal notranslate"><span class="pre">Min()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E3Max1T1T"><code class="docutils literal notranslate"><span class="pre">Max()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0DpE3Max1T1T1TDp2Ts"><code class="docutils literal notranslate"><span class="pre">Max()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E6MinRefRK1TRK1T"><code class="docutils literal notranslate"><span class="pre">MinRef()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0DpE6MinRefRK1TRK1TRK1TDpRK2Ts"><code class="docutils literal notranslate"><span class="pre">MinRef()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E6MaxRefRK1TRK1T"><code class="docutils literal notranslate"><span class="pre">MaxRef()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0DpE6MaxRefRK1TRK1TRK1TDpRK2Ts"><code class="docutils literal notranslate"><span class="pre">MaxRef()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv44Log2d"><code class="docutils literal notranslate"><span class="pre">Log2()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv43Logdd"><code class="docutils literal notranslate"><span class="pre">Log()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv42Lnd"><code class="docutils literal notranslate"><span class="pre">Ln()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv45Log10d"><code class="docutils literal notranslate"><span class="pre">Log10()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E6Square1T1T"><code class="docutils literal notranslate"><span class="pre">Square()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv44Pow2d"><code class="docutils literal notranslate"><span class="pre">Pow2()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E6IntPow4TYPE4TYPE4TYPE"><code class="docutils literal notranslate"><span class="pre">IntPow()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E3Pow1T1TN8internal8identityI1TE4typeE"><code class="docutils literal notranslate"><span class="pre">Pow()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv43Expd"><code class="docutils literal notranslate"><span class="pre">Exp()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E7IntLog2i4TYPE"><code class="docutils literal notranslate"><span class="pre">IntLog2()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E3MinRK1TRK1TRK1TRK1T"><code class="docutils literal notranslate"><span class="pre">Min()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E3MinRK1TNSt16initializer_listIRK1TEE"><code class="docutils literal notranslate"><span class="pre">Min()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E3MaxRK1TNSt16initializer_listIRK1TEE"><code class="docutils literal notranslate"><span class="pre">Max()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv412NextPowerOf28uint64_t"><code class="docutils literal notranslate"><span class="pre">NextPowerOf2()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv410IsPowerOf2K6size_t"><code class="docutils literal notranslate"><span class="pre">IsPowerOf2()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv49Factoriali"><code class="docutils literal notranslate"><span class="pre">Factorial()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv46ToggleRb"><code class="docutils literal notranslate"><span class="pre">Toggle()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv47AllTruev"><code class="docutils literal notranslate"><span class="pre">AllTrue()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4IDpE7AllTruebbDp2Ts"><code class="docutils literal notranslate"><span class="pre">AllTrue()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv47AnyTruev"><code class="docutils literal notranslate"><span class="pre">AnyTrue()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4IDpE7AnyTruebbDp2Ts"><code class="docutils literal notranslate"><span class="pre">AnyTrue()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E3GCD1TK1TK1T"><code class="docutils literal notranslate"><span class="pre">GCD()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/math.html#_CPPv4I0E3LCM1TK1TK1T"><code class="docutils literal notranslate"><span class="pre">LCM()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/random_utils.html">random_utils.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv4I0E12SelectRandomDaR6RandomRK1T"><code class="docutils literal notranslate"><span class="pre">SelectRandom()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv4I0E7ShufflevR6RandomR6vectorI1TE6size_t"><code class="docutils literal notranslate"><span class="pre">Shuffle()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv4I0E7ShufflevR6RandomR6vectorI1TE"><code class="docutils literal notranslate"><span class="pre">Shuffle()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv4I0E12ShuffleRangevR6RandomR6vectorI1TE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">ShuffleRange()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv414GetPermutationR6Random6size_t"><code class="docutils literal notranslate"><span class="pre">GetPermutation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv46ChooseR6Random6size_t6size_tRNSt6vectorI6size_tEE"><code class="docutils literal notranslate"><span class="pre">Choose()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv46ChooseR6Random6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Choose()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv415RandomBitVectorR6Random6size_td"><code class="docutils literal notranslate"><span class="pre">RandomBitVector()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv418RandomDoubleVectorR6Random6size_tdd"><code class="docutils literal notranslate"><span class="pre">RandomDoubleVector()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv416RandomUIntVectorR6Random6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RandomUIntVector()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv4I0E12RandomVector6vectorI1TER6Random6size_t1T1T"><code class="docutils literal notranslate"><span class="pre">RandomVector()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv418RandomizeBitVectorR9BitVectorR6Randomd"><code class="docutils literal notranslate"><span class="pre">RandomizeBitVector()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv4I0E15RandomizeVectorvR6vectorI1TER6Random1T1T"><code class="docutils literal notranslate"><span class="pre">RandomizeVector()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/random_utils.html#_CPPv415CountRngTouchesNSt8functionIFvR6RandomEEE"><code class="docutils literal notranslate"><span class="pre">CountRngTouches()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/sequence_utils.html">sequence_utils.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/sequence_utils.html#_CPPv4I0E10ToSequence6vectorI1TENSt6stringE"><code class="docutils literal notranslate"><span class="pre">ToSequence()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/sequence_utils.html#_CPPv4I0E21calc_hamming_distance6size_tRK4TYPERK4TYPEi"><code class="docutils literal notranslate"><span class="pre">calc_hamming_distance()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/sequence_utils.html#_CPPv4I0E18calc_edit_distance6size_tRK4TYPERK4TYPE"><code class="docutils literal notranslate"><span class="pre">calc_edit_distance()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/sequence_utils.html#_CPPv4I00E5align6size_tR4TYPER4TYPE8GAP_TYPE"><code class="docutils literal notranslate"><span class="pre">align()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/spatial_stats.html">spatial_stats.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/spatial_stats.html#_CPPv4I0E16GridPointDensitydR5WorldI3ORGE6size_t6size_ti"><code class="docutils literal notranslate"><span class="pre">GridPointDensity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/spatial_stats.html#_CPPv4I0E23GridPointShannonEntropydR5WorldI3ORGE6size_t6size_ti"><code class="docutils literal notranslate"><span class="pre">GridPointShannonEntropy()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/spatial_stats.html#_CPPv4I0E11GridDensity6vectorI6vectorIdEER5WorldI3ORGEi"><code class="docutils literal notranslate"><span class="pre">GridDensity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/spatial_stats.html#_CPPv4I0E18GridShannonEntropy6vectorI6vectorIdEER5WorldI3ORGEi"><code class="docutils literal notranslate"><span class="pre">GridShannonEntropy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/stats.html">stats.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/stats.html#_CPPv4I0E3SumN15remove_ptr_typeIN1C10value_typeEE4typeER1C"><code class="docutils literal notranslate"><span class="pre">Sum()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/stats.html#_CPPv4I00E16SumScalarResultsDaR1CRR3FUN"><code class="docutils literal notranslate"><span class="pre">SumScalarResults()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/stats.html#_CPPv4I0E14ShannonEntropydR1C"><code class="docutils literal notranslate"><span class="pre">ShannonEntropy()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/stats.html#_CPPv4I0E4Mean12sfinae_decoyIdN1C10value_typeEER1C"><code class="docutils literal notranslate"><span class="pre">Mean()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/stats.html#_CPPv4I0E6Median12sfinae_decoyIdN1C10value_typeEE1C"><code class="docutils literal notranslate"><span class="pre">Median()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/stats.html#_CPPv4I0E8VarianceDaR1C"><code class="docutils literal notranslate"><span class="pre">Variance()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/stats.html#_CPPv4I0E17StandardDeviation12sfinae_decoyIdN1C10value_typeEER1C"><code class="docutils literal notranslate"><span class="pre">StandardDeviation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/stats.html#_CPPv4I0E13StandardError12sfinae_decoyIdN1C10value_typeEER1C"><code class="docutils literal notranslate"><span class="pre">StandardError()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/stats.html#_CPPv4I0E11UniqueCountNSt9enable_ifIXntN11is_ptr_typeIN1C10value_typeEE5valueEEiE4typeER1C"><code class="docutils literal notranslate"><span class="pre">UniqueCount()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/stats.html#_CPPv4I000E9MaxResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"><code class="docutils literal notranslate"><span class="pre">MaxResult()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/stats.html#_CPPv4I000E9MinResult8RET_TYPERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"><code class="docutils literal notranslate"><span class="pre">MinResult()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/stats.html#_CPPv4I000E10MeanResultNSt9enable_ifINSt9is_scalarI8RET_TYPEE5valueEdE4typeERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"><code class="docutils literal notranslate"><span class="pre">MeanResult()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/stats.html#_CPPv4I000E13ApplyFunction6vectorI8RET_TYPEERNSt8functionIF8RET_TYPE8ARG_TYPEEEER1C"><code class="docutils literal notranslate"><span class="pre">ApplyFunction()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../matching/api/matchbin_utils.html" class="btn btn-neutral float-left" title="matchbin_utils.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/CombinedBinomialDistribution.html" class="btn btn-neutral float-right" title="CombinedBinomialDistribution.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

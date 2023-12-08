@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Range.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/math/api/Range.138ce5d3-24ff-46c6-aedb-8cbaf87b985a.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="RangeSet.hpp" href="RangeSet.html" />
+    <link rel="prev" title="Random.hpp" href="Random.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../math.html">Math</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../math.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="CombinedBinomialDistribution.html">CombinedBinomialDistribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Distribution.html">Distribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DistributionSet.html">DistributionSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Fraction.html">Fraction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Random.html">Random.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Range.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0_bE9MakeRange5RangeI1T13INCLUDE_UPPERE1T1T"><code class="docutils literal notranslate"><span class="pre">MakeRange()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_bE8IntRange5RangeIi13INCLUDE_UPPEREii"><code class="docutils literal notranslate"><span class="pre">IntRange()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_bE6DRange5RangeId13INCLUDE_UPPEREdd"><code class="docutils literal notranslate"><span class="pre">DRange()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0_bE5Range"><code class="docutils literal notranslate"><span class="pre">Range</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RangeSet.html">RangeSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="combos.html">combos.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="constants.html">constants.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="distances.html">distances.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="info_theory.html">info_theory.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="math.html">math.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="random_utils.html">random_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sequence_utils.html">sequence_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spatial_stats.html">spatial_stats.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stats.html">stats.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../math.html">Math</a></li>
+      <li class="breadcrumb-item active">Range.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="range-hpp">
+<h1>Range.hpp<a class="headerlink" href="#range-hpp" title="Link to this heading"></a></h1>
+<p>A simple way to track value ranges. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0_bE9MakeRange5RangeI1T13INCLUDE_UPPERE1T1T">
+<span id="_CPPv3I0_bE9MakeRange1T1T"></span><span id="_CPPv2I0_bE9MakeRange1T1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">INCLUDE_UPPER</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="Range_8hpp_1adf0b62c034a4ec29478a650d99412ca4"></span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range"><span class="n"><span class="pre">Range</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_bE9MakeRange5RangeI1T13INCLUDE_UPPERE1T1T" title="MakeRange::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE9MakeRange5RangeI1T13INCLUDE_UPPERE1T1T" title="MakeRange::INCLUDE_UPPER"><span class="n"><span class="pre">INCLUDE_UPPER</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MakeRange</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE9MakeRange5RangeI1T13INCLUDE_UPPERE1T1T" title="MakeRange::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_l</span></span>, <a class="reference internal" href="#_CPPv4I0_bE9MakeRange5RangeI1T13INCLUDE_UPPERE1T1T" title="MakeRange::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_u</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_bE9MakeRange5RangeI1T13INCLUDE_UPPERE1T1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a new range with auto-detected type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_bE8IntRange5RangeIi13INCLUDE_UPPEREii">
+<span id="_CPPv3I_bE8IntRangeii"></span><span id="_CPPv2I_bE8IntRangeii"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">INCLUDE_UPPER</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="Range_8hpp_1a0d82a4a7dbefbf9c6123995bd18d3b7e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range"><span class="n"><span class="pre">Range</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_bE8IntRange5RangeIi13INCLUDE_UPPEREii" title="IntRange::INCLUDE_UPPER"><span class="n"><span class="pre">INCLUDE_UPPER</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IntRange</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_l</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_u</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_bE8IntRange5RangeIi13INCLUDE_UPPEREii" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a new range of type int. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_bE6DRange5RangeId13INCLUDE_UPPEREdd">
+<span id="_CPPv3I_bE6DRangedd"></span><span id="_CPPv2I_bE6DRangedd"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">INCLUDE_UPPER</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="Range_8hpp_1ae88b7e97eeb329194ee42e826209131b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range"><span class="n"><span class="pre">Range</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_bE6DRange5RangeId13INCLUDE_UPPEREdd" title="DRange::INCLUDE_UPPER"><span class="n"><span class="pre">INCLUDE_UPPER</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DRange</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_l</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_u</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_bE6DRange5RangeId13INCLUDE_UPPEREdd" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a new range of type double. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0_bE5Range">
+<span id="_CPPv3I0_bE5Range"></span><span id="_CPPv2I0_bE5Range"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">INCLUDE_UPPER</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classRange"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Range</span></span></span><a class="headerlink" href="#_CPPv4I0_bE5Range" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Range.hpp&gt;</em></div>
+<p>A range of values from a lower limit to and upper limit, of any provided type. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range5RangeEv">
+<span id="_CPPv3N5Range5RangeEv"></span><span id="_CPPv2N5Range5RangeEv"></span><span id="Range::Range"></span><span class="target" id="classRange_1afa3502db1c6728e74e816495d054726c"></span><span class="sig-name descname"><span class="n"><span class="pre">Range</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5Range5RangeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range5RangeE1T">
+<span id="_CPPv3N5Range5RangeE1T"></span><span id="_CPPv2N5Range5RangeE1T"></span><span id="Range::Range__T"></span><span class="target" id="classRange_1ad571aba17ca17aec4d3979cc7ee16faf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Range</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range5RangeE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range5RangeE1T1T">
+<span id="_CPPv3N5Range5RangeE1T1T"></span><span id="_CPPv2N5Range5RangeE1T1T"></span><span id="Range::Range__T.T"></span><span class="target" id="classRange_1afed17013f7930f001cd33fe49e7357bb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Range</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_l</span></span>, <a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_u</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range5RangeE1T1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range5RangeERK5Range">
+<span id="_CPPv3N5Range5RangeERK5Range"></span><span id="_CPPv2N5Range5RangeERK5Range"></span><span id="Range::Range__RangeCR"></span><span class="target" id="classRange_1a0f73fcefd871245b5372273bfabecc59"></span><span class="sig-name descname"><span class="n"><span class="pre">Range</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Range5RangeERK5Range" title="Range::Range"><span class="n"><span class="pre">Range</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5Range5RangeERK5Range" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5RangeaSERK5Range">
+<span id="_CPPv3N5RangeaSERK5Range"></span><span id="_CPPv2N5RangeaSERK5Range"></span><span id="Range::assign-operator__RangeCR"></span><span class="target" id="classRange_1aa9510f1a7b4217d8a720e0e706a23986"></span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range"><span class="n"><span class="pre">Range</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range"><span class="n"><span class="pre">Range</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5RangeaSERK5Range" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RangeeqERK5Range">
+<span id="_CPPv3NK5RangeeqERK5Range"></span><span id="_CPPv2NK5RangeeqERK5Range"></span><span id="Range::eq-operator__RangeCRC"></span><span class="target" id="classRange_1a827f4c5e180fbad34fd829fda1112b12"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range"><span class="n"><span class="pre">Range</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4NK5RangeeqERK5Range" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5RangeneERK5Range">
+<span id="_CPPv3NK5RangeneERK5Range"></span><span id="_CPPv2NK5RangeneERK5Range"></span><span id="Range::neq-operator__RangeCRC"></span><span class="target" id="classRange_1a3b6323b7da8822dd4057a0adda3285dc"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range"><span class="n"><span class="pre">Range</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4NK5RangeneERK5Range" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range8GetLowerEv">
+<span id="_CPPv3NK5Range8GetLowerEv"></span><span id="_CPPv2NK5Range8GetLowerEv"></span><span id="Range::GetLowerC"></span><span class="target" id="classRange_1ac0c25ee366667b8238a8a7949f75b503"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetLower</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range8GetLowerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range8GetUpperEv">
+<span id="_CPPv3NK5Range8GetUpperEv"></span><span id="_CPPv2NK5Range8GetUpperEv"></span><span id="Range::GetUpperC"></span><span class="target" id="classRange_1ab9d84c2022ae86e56f976035ed73534d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetUpper</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range8GetUpperEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range10GetEpsilonEv">
+<span id="_CPPv3NK5Range10GetEpsilonEv"></span><span id="_CPPv2NK5Range10GetEpsilonEv"></span><span id="Range::GetEpsilonC"></span><span class="target" id="classRange_1a1e27a4e3c32d64655b85e29541185e2c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetEpsilon</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range10GetEpsilonEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range11GetMaxValueEv">
+<span id="_CPPv3NK5Range11GetMaxValueEv"></span><span id="_CPPv2NK5Range11GetMaxValueEv"></span><span id="Range::GetMaxValueC"></span><span class="target" id="classRange_1aa7a1c12dd34d4754cc02e412bee961cf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetMaxValue</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range11GetMaxValueEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range7GetSizeEv">
+<span id="_CPPv3NK5Range7GetSizeEv"></span><span id="_CPPv2NK5Range7GetSizeEv"></span><span id="Range::GetSizeC"></span><span class="target" id="classRange_1aafb1b9a4067cc9fe337b205e2e49a71d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range8ToStringEv">
+<span id="_CPPv3NK5Range8ToStringEv"></span><span id="_CPPv2NK5Range8ToStringEv"></span><span id="Range::ToStringC"></span><span class="target" id="classRange_1a07acf846aab7c167e928de8a9afdddfd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range8ToStringEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range8SetLowerE1T">
+<span id="_CPPv3N5Range8SetLowerE1T"></span><span id="_CPPv2N5Range8SetLowerE1T"></span><span id="Range::SetLower__T"></span><span class="target" id="classRange_1a5e214df5be3b5d406f7aaa57f1f17b5f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetLower</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">l</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range8SetLowerE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range8SetUpperE1T">
+<span id="_CPPv3N5Range8SetUpperE1T"></span><span id="_CPPv2N5Range8SetUpperE1T"></span><span id="Range::SetUpper__T"></span><span class="target" id="classRange_1abc080e415459daffa1dfabacc8475510"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetUpper</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">u</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range8SetUpperE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range3SetE1T1T">
+<span id="_CPPv3N5Range3SetE1T1T"></span><span id="_CPPv2N5Range3SetE1T1T"></span><span id="Range::Set__T.T"></span><span class="target" id="classRange_1a4dd7815c3781592f32622b6082d9df88"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_l</span></span>, <a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_u</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range3SetE1T1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range9ShiftDownE1T">
+<span id="_CPPv3N5Range9ShiftDownE1T"></span><span id="_CPPv2N5Range9ShiftDownE1T"></span><span id="Range::ShiftDown__T"></span><span class="target" id="classRange_1a02be1c5f1d0268dd4ee2745e88ab2605"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShiftDown</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">shift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range9ShiftDownE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range7ShiftUpE1T">
+<span id="_CPPv3N5Range7ShiftUpE1T"></span><span id="_CPPv2N5Range7ShiftUpE1T"></span><span id="Range::ShiftUp__T"></span><span class="target" id="classRange_1a37b8c8115c888e98030a2b86d659499a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShiftUp</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">shift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range7ShiftUpE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range5ShiftE1T">
+<span id="_CPPv3N5Range5ShiftE1T"></span><span id="_CPPv2N5Range5ShiftE1T"></span><span id="Range::Shift__T"></span><span class="target" id="classRange_1a3418a5321bf22ad385721d64af5e387f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Shift</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">shift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range5ShiftE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range11SetMinLowerEv">
+<span id="_CPPv3N5Range11SetMinLowerEv"></span><span id="_CPPv2N5Range11SetMinLowerEv"></span><span id="Range::SetMinLower"></span><span class="target" id="classRange_1ae518c19ccde501e14c5bd424729c810c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetMinLower</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range11SetMinLowerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range11SetMaxUpperEv">
+<span id="_CPPv3N5Range11SetMaxUpperEv"></span><span id="_CPPv2N5Range11SetMaxUpperEv"></span><span id="Range::SetMaxUpper"></span><span class="target" id="classRange_1acc90d339c48c1225dd710f5c081392e8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetMaxUpper</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range11SetMaxUpperEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range4GrowE1T">
+<span id="_CPPv3N5Range4GrowE1T"></span><span id="_CPPv2N5Range4GrowE1T"></span><span id="Range::Grow__T"></span><span class="target" id="classRange_1a60028ec6a5a05da364ea8520d86ec3d0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Grow</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">amount</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range4GrowE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range5LowerEv">
+<span id="_CPPv3N5Range5LowerEv"></span><span id="_CPPv2N5Range5LowerEv"></span><span id="Range::Lower"></span><span class="target" id="classRange_1a79a923ffd56ddd1a3d77179a2ed546b5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Lower</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range5LowerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range5UpperEv">
+<span id="_CPPv3N5Range5UpperEv"></span><span id="_CPPv2N5Range5UpperEv"></span><span id="Range::Upper"></span><span class="target" id="classRange_1afdc79e7817c09f2a458caecf9da1510a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Upper</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range5UpperEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range5LowerEv">
+<span id="_CPPv3NK5Range5LowerEv"></span><span id="_CPPv2NK5Range5LowerEv"></span><span id="Range::LowerC"></span><span class="target" id="classRange_1af41ad344fbb8730a062dfa3895b5661a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Lower</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK5Range5LowerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range5UpperEv">
+<span id="_CPPv3NK5Range5UpperEv"></span><span id="_CPPv2NK5Range5UpperEv"></span><span id="Range::UpperC"></span><span class="target" id="classRange_1adbf2c51ae8d1b44cbfef8364faffedda"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Upper</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK5Range5UpperEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range3HasE1T">
+<span id="_CPPv3NK5Range3HasE1T"></span><span id="_CPPv2NK5Range3HasE1T"></span><span id="Range::Has__TC"></span><span class="target" id="classRange_1a0a59a42a02e6026de3fa394938eec2cb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range3HasE1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if a provided value is in the range INCLUSIVE of the endpoints. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range5ValidE1T">
+<span id="_CPPv3NK5Range5ValidE1T"></span><span id="_CPPv2NK5Range5ValidE1T"></span><span id="Range::Valid__TC"></span><span class="target" id="classRange_1ada7609d876e5c3d71e8afec3aafae2f9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Valid</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range5ValidE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range8HasRangeE6this_t">
+<span id="_CPPv3N5Range8HasRangeE6this_t"></span><span id="_CPPv2N5Range8HasRangeE6this_t"></span><span id="Range::HasRange__this_t"></span><span class="target" id="classRange_1a40e63984352706cb1565a165049815aa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasRange</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Range6this_tE" title="Range::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_range</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range8HasRangeE6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range11IsConnectedE6this_t">
+<span id="_CPPv3NK5Range11IsConnectedE6this_t"></span><span id="_CPPv2NK5Range11IsConnectedE6this_t"></span><span id="Range::IsConnected__this_tC"></span><span class="target" id="classRange_1a2120700960f8d184b7dcdcd2065ca7c6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsConnected</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Range6this_tE" title="Range::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range11IsConnectedE6this_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Will identify if two ranges are next to each other or overlapping. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range10HasOverlapE6this_t">
+<span id="_CPPv3NK5Range10HasOverlapE6this_t"></span><span id="_CPPv2NK5Range10HasOverlapE6this_t"></span><span id="Range::HasOverlap__this_tC"></span><span class="target" id="classRange_1ac37f72be456ccf1e035751fdfb445620"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasOverlap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Range6this_tE" title="Range::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range10HasOverlapE6this_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if there is overlap between two range. Similar to IsConnected, but cannot be merely adjacent. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range11CalcOverlapE6this_t">
+<span id="_CPPv3NK5Range11CalcOverlapE6this_t"></span><span id="_CPPv2NK5Range11CalcOverlapE6this_t"></span><span id="Range::CalcOverlap__this_tC"></span><span class="target" id="classRange_1aecf4e034514e47bb239389712d1db595"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CalcOverlap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Range6this_tE" title="Range::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range11CalcOverlapE6this_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine the amount of overlap between two range. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range6ExpandE1T">
+<span id="_CPPv3N5Range6ExpandE1T"></span><span id="_CPPv2N5Range6ExpandE1T"></span><span id="Range::Expand__T"></span><span class="target" id="classRange_1a85a2145bbecb61926522bf8075540d30"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Expand</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range6ExpandE1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Expand this range to encompass a provided value. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – Value to expand through. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the range has changed due to this expansion. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN5Range6ExpandEb1T1TDp2Ts">
+<span id="_CPPv3IDpEN5Range6ExpandE1T1TDp2Ts"></span><span id="_CPPv2IDpEN5Range6ExpandE1T1TDp2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classRange_1a5b5a17117bd6274a3d11d227e75b4efd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Expand</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val1</span></span>, <a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val2</span></span>, <a class="reference internal" href="#_CPPv4IDpEN5Range6ExpandEb1T1TDp2Ts" title="Range::Expand::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN5Range6ExpandEb1T1TDp2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Expand this range to encompass all provided values. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether the range has changed due to this expansion. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range5MergeE6this_t">
+<span id="_CPPv3N5Range5MergeE6this_t"></span><span id="_CPPv2N5Range5MergeE6this_t"></span><span id="Range::Merge__this_t"></span><span class="target" id="classRange_1af6f024475858d495e62cc8596eb4c70b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Merge</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Range6this_tE" title="Range::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range5MergeE6this_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Merge this range with another. Must be adjacent or overlap (return false if not!) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range6AppendE1T">
+<span id="_CPPv3N5Range6AppendE1T"></span><span id="_CPPv2N5Range6AppendE1T"></span><span id="Range::Append__T"></span><span class="target" id="classRange_1aba42be70350c69067f2ac5a88190f55a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Append</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range6AppendE1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a specified value to the end of a range (or return false if failed). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range5ClampE1T">
+<span id="_CPPv3NK5Range5ClampE1T"></span><span id="_CPPv2NK5Range5ClampE1T"></span><span id="Range::Clamp__TC"></span><span class="target" id="classRange_1a682838f6a215852fbcdbc3dee812a842"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clamp</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range5ClampE1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Force a value into range. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range10LimitValueE1T">
+<span id="_CPPv3NK5Range10LimitValueE1T"></span><span id="_CPPv2NK5Range10LimitValueE1T"></span><span id="Range::LimitValue__TC"></span><span class="target" id="classRange_1a7a609cdf57117232e49376c59b429cd0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LimitValue</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range10LimitValueE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range10ToFractionE1T">
+<span id="_CPPv3NK5Range10ToFractionE1T"></span><span id="_CPPv2NK5Range10ToFractionE1T"></span><span id="Range::ToFraction__TC"></span><span class="target" id="classRange_1a744025afb3711d0856a333b3c3bc267b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToFraction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range10ToFractionE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range12FromFractionEd">
+<span id="_CPPv3NK5Range12FromFractionEd"></span><span id="_CPPv2NK5Range12FromFractionEd"></span><span id="Range::FromFraction__doubleC"></span><span class="target" id="classRange_1a77e2c0a8c7b63a99b94d25483d49e796"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FromFraction</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">frac</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range12FromFractionEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range10LimitLowerE1T">
+<span id="_CPPv3N5Range10LimitLowerE1T"></span><span id="_CPPv2N5Range10LimitLowerE1T"></span><span id="Range::LimitLower__T"></span><span class="target" id="classRange_1a85bce02c5b1be4c923dd752553796e5a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LimitLower</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range10LimitLowerE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range10LimitUpperE1T">
+<span id="_CPPv3N5Range10LimitUpperE1T"></span><span id="_CPPv2N5Range10LimitUpperE1T"></span><span id="Range::LimitUpper__T"></span><span class="target" id="classRange_1aa42ed8039894646f1321e03ef6c8db6b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LimitUpper</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range10LimitUpperE1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range7CalcBinE1T6size_t">
+<span id="_CPPv3NK5Range7CalcBinE1T6size_t"></span><span id="_CPPv2NK5Range7CalcBinE1T6size_t"></span><span id="Range::CalcBin__T.sC"></span><span class="target" id="classRange_1ada2f3810506ba7497cafaae06832e310"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CalcBin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">value</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bins</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range7CalcBinE1T6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Range6SpreadEK6size_t">
+<span id="_CPPv3NK5Range6SpreadEK6size_t"></span><span id="_CPPv2NK5Range6SpreadEK6size_t"></span><span id="Range::Spread__sCC"></span><span class="target" id="classRange_1a6bd2679ea29a2b51d95e0978a7d0b71f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Spread</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">s</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Range6SpreadEK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Produce a vector that spreads values evenly across the range. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range8MaxLimitEv">
+<span id="_CPPv3N5Range8MaxLimitEv"></span><span id="_CPPv2N5Range8MaxLimitEv"></span><span id="Range::MaxLimitCE"></span><span class="target" id="classRange_1a8df8dd309ecc80d17ddece4de8717e2a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaxLimit</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range8MaxLimitEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range8MinLimitEv">
+<span id="_CPPv3N5Range8MinLimitEv"></span><span id="_CPPv2N5Range8MinLimitEv"></span><span id="Range::MinLimitCE"></span><span class="target" id="classRange_1ab6fc964ca285a69f342f69415b288bc6"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MinLimit</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Range8MinLimitEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range11is_integralE">
+<span id="_CPPv3N5Range11is_integralE"></span><span id="_CPPv2N5Range11is_integralE"></span><span id="Range::is_integral__b"></span><span class="target" id="classRange_1aeaca5cc7f72f79fcce5cd0cf8752cf80"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_integral</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_integral</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N5Range11is_integralE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range6this_tE">
+<span id="_CPPv3N5Range6this_tE"></span><span id="_CPPv2N5Range6this_tE"></span><span class="target" id="classRange_1a15c2b6d44d6dac6b02d963ca490b3b81"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range"><span class="n"><span class="pre">Range</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::INCLUDE_UPPER"><span class="n"><span class="pre">INCLUDE_UPPER</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N5Range6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range5lowerE">
+<span id="_CPPv3N5Range5lowerE"></span><span id="_CPPv2N5Range5lowerE"></span><span id="Range::lower__T"></span><span class="target" id="classRange_1ad34985ad870d5f21c754f331b352109a"></span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lower</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">numeric_limits</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">lowest</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N5Range5lowerE" title="Link to this definition"></a><br /></dt>
+<dd><p>Beginning of range, inclusive. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Range5upperE">
+<span id="_CPPv3N5Range5upperE"></span><span id="_CPPv2N5Range5upperE"></span><span id="Range::upper__T"></span><span class="target" id="classRange_1aa10b89e7393515fddd59bf7c3ce89e0b"></span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">upper</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">numeric_limits</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_bE5Range" title="Range::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">max</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N5Range5upperE" title="Link to this definition"></a><br /></dt>
+<dd><p>End of range, (included if INCLUDE_UPPER) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Random.html" class="btn btn-neutral float-left" title="Random.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RangeSet.html" class="btn btn-neutral float-right" title="RangeSet.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

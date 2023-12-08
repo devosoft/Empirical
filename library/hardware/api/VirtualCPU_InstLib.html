@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VirtualCPU_InstLib.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/hardware/api/VirtualCPU_InstLib.40599ba6-ab94-4c2b-8285-e51bdb1f9455.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="signalgp_utils.hpp" href="signalgp_utils.html" />
+    <link rel="prev" title="VirtualCPU.hpp" href="VirtualCPU.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../hardware.html">Hardware</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../hardware.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AvidaCPU_InstLib.html">AvidaCPU_InstLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AvidaGP.html">AvidaGP.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BitSorter.html">BitSorter.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="EventDrivenGP.html">EventDrivenGP.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="EventLib.html">EventLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Genome.html">Genome.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="InstLib.html">InstLib.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LinearCode.html">LinearCode.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="VirtualCPU.html">VirtualCPU.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">VirtualCPU_InstLib.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00_6size_tE18VirtualCPU_InstLib"><code class="docutils literal notranslate"><span class="pre">VirtualCPU_InstLib</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="signalgp_utils.html">signalgp_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../hardware.html">Hardware</a></li>
+      <li class="breadcrumb-item active">VirtualCPU_InstLib.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="virtualcpu-instlib-hpp">
+<h1>VirtualCPU_InstLib.hpp<a class="headerlink" href="#virtualcpu-instlib-hpp" title="Link to this heading"></a></h1>
+<p>A specialized version of InstLib to handle VirtualCPU instructions. </p>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I00_6size_tE18VirtualCPU_InstLib">
+<span id="_CPPv3I00_6size_tE18VirtualCPU_InstLib"></span><span id="_CPPv2I00_6size_tE18VirtualCPU_InstLib"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HARDWARE_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_T</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_COUNT</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structVirtualCPU__InstLib"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VirtualCPU_InstLib</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="InstLib.html#_CPPv4I00_6size_tE7InstLib" title="InstLib"><span class="n"><span class="pre">InstLib</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00_6size_tE18VirtualCPU_InstLib" title="VirtualCPU_InstLib::HARDWARE_T"><span class="n"><span class="pre">HARDWARE_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I00_6size_tE18VirtualCPU_InstLib" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;VirtualCPU_InstLib.hpp&gt;</em></div>
+<p>A pure-virtual class that defines a series of instructions for VirtualCPU_Base or any of its derived classes. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib10hardware_tE">
+<span id="_CPPv3N18VirtualCPU_InstLib10hardware_tE"></span><span id="_CPPv2N18VirtualCPU_InstLib10hardware_tE"></span><span class="target" id="structVirtualCPU__InstLib_1a2b8ff526bf35f87b21c671f422adf24d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hardware_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE18VirtualCPU_InstLib" title="VirtualCPU_InstLib::HARDWARE_T"><span class="n"><span class="pre">HARDWARE_T</span></span></a><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib10inst_lib_tE">
+<span id="_CPPv3N18VirtualCPU_InstLib10inst_lib_tE"></span><span id="_CPPv2N18VirtualCPU_InstLib10inst_lib_tE"></span><span class="target" id="structVirtualCPU__InstLib_1a57194eea9c0e1e10561d8ad424699816"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">inst_lib_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="InstLib.html#_CPPv4I00_6size_tE7InstLib" title="InstLib"><span class="n"><span class="pre">InstLib</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00_6size_tE18VirtualCPU_InstLib" title="VirtualCPU_InstLib::HARDWARE_T"><span class="n"><span class="pre">HARDWARE_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE18VirtualCPU_InstLib" title="VirtualCPU_InstLib::ARG_T"><span class="n"><span class="pre">ARG_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE18VirtualCPU_InstLib" title="VirtualCPU_InstLib::ARG_COUNT"><span class="n"><span class="pre">ARG_COUNT</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib10inst_lib_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib5arg_tE">
+<span id="_CPPv3N18VirtualCPU_InstLib5arg_tE"></span><span id="_CPPv2N18VirtualCPU_InstLib5arg_tE"></span><span class="target" id="structVirtualCPU__InstLib_1a8b40887067c17009d0f93690d1ddf93f"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">arg_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE18VirtualCPU_InstLib" title="VirtualCPU_InstLib::ARG_T"><span class="n"><span class="pre">ARG_T</span></span></a><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib5arg_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib6this_tE">
+<span id="_CPPv3N18VirtualCPU_InstLib6this_tE"></span><span id="_CPPv2N18VirtualCPU_InstLib6this_tE"></span><span class="target" id="structVirtualCPU__InstLib_1a34706a87990ba673d76a88a91aa49795"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE18VirtualCPU_InstLib" title="VirtualCPU_InstLib"><span class="n"><span class="pre">VirtualCPU_InstLib</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00_6size_tE18VirtualCPU_InstLib" title="VirtualCPU_InstLib::HARDWARE_T"><span class="n"><span class="pre">HARDWARE_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE18VirtualCPU_InstLib" title="VirtualCPU_InstLib::ARG_T"><span class="n"><span class="pre">ARG_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00_6size_tE18VirtualCPU_InstLib" title="VirtualCPU_InstLib::ARG_COUNT"><span class="n"><span class="pre">ARG_COUNT</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib6inst_tE">
+<span id="_CPPv3N18VirtualCPU_InstLib6inst_tE"></span><span id="_CPPv2N18VirtualCPU_InstLib6inst_tE"></span><span class="target" id="structVirtualCPU__InstLib_1a821a0e412d5cae8566d59be4286c3614"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">inst_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">inst_t</span></span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib9nop_vec_tE">
+<span id="_CPPv3N18VirtualCPU_InstLib9nop_vec_tE"></span><span id="_CPPv2N18VirtualCPU_InstLib9nop_vec_tE"></span><span class="target" id="structVirtualCPU__InstLib_1a9cc1033c72ac3c8b4dbfd39a90b6f28e"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nop_vec_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">nop_vec_t</span></span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib9nop_vec_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib9Inst_NopAER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib9Inst_NopAER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib9Inst_NopAER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_NopA__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1a14ad5d9cc3f69b289b2bd3ba03f02349"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_NopA</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="p"><span class="pre">&amp;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib9Inst_NopAER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib9Inst_NopBER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib9Inst_NopBER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib9Inst_NopBER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_NopB__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1acd718a7d886cb844728f99726ac0b89b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_NopB</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="p"><span class="pre">&amp;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib9Inst_NopBER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib9Inst_NopCER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib9Inst_NopCER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib9Inst_NopCER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_NopC__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1a4712191c90a0b1f86ac51d4dfaee7c68"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_NopC</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="p"><span class="pre">&amp;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib9Inst_NopCER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib8Inst_IncER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib8Inst_IncER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib8Inst_IncER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Inc__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1a56cc67b1ab91f35988e40b70fefd4c1a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Inc</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib8Inst_IncER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib8Inst_DecER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib8Inst_DecER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib8Inst_DecER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Dec__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1a6058edbc4f22fd70cd07059a73967e45"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Dec</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib8Inst_DecER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib17Inst_If_Not_EqualER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib17Inst_If_Not_EqualER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib17Inst_If_Not_EqualER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_If_Not_Equal__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1a18689c2decad7ea05c365d88036141e6"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_If_Not_Equal</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib17Inst_If_Not_EqualER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib12Inst_If_LessER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib12Inst_If_LessER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib12Inst_If_LessER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_If_Less__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1a9770faf4638f36f42302d784a430f3f5"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_If_Less</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib12Inst_If_LessER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib8Inst_PopER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib8Inst_PopER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib8Inst_PopER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Pop__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1ac0255c36029682c8dc4fa5619eaa3205"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Pop</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib8Inst_PopER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib9Inst_PushER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib9Inst_PushER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib9Inst_PushER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Push__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1a43cde052bb1beff2e462e2757ca4f14c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Push</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib9Inst_PushER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib15Inst_Swap_StackER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib15Inst_Swap_StackER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib15Inst_Swap_StackER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Swap_Stack__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1a163278524d2da9c4208a5701e368b528"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Swap_Stack</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib15Inst_Swap_StackER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib16Inst_Shift_RightER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib16Inst_Shift_RightER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib16Inst_Shift_RightER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Shift_Right__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1a432046054e7c80e4de6f60dd80a89d3c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Shift_Right</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib16Inst_Shift_RightER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib15Inst_Shift_LeftER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib15Inst_Shift_LeftER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib15Inst_Shift_LeftER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Shift_Left__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1aa73e1a3e00cc2b0c374134d0526e1221"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Shift_Left</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib15Inst_Shift_LeftER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib8Inst_AddER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib8Inst_AddER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib8Inst_AddER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Add__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1a223c00773f1f01f5982f0b8f09a0bf62"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Add</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib8Inst_AddER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib8Inst_SubER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib8Inst_SubER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib8Inst_SubER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Sub__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1a9be399a6a6bbc54602a07f5c9a537f0d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Sub</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib8Inst_SubER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib9Inst_NandER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib9Inst_NandER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib9Inst_NandER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Nand__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1ab4f76f3517da9ac11592dfd601400306"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Nand</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib9Inst_NandER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib7Inst_IOER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib7Inst_IOER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib7Inst_IOER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_IO__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1ad07a2fbbd20bcd8ddc8598d93a400183"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_IO</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib7Inst_IOER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib12Inst_H_AllocER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib12Inst_H_AllocER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib12Inst_H_AllocER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_H_Alloc__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1ade68259cb4ab4f38050d3900a99195c3"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_H_Alloc</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib12Inst_H_AllocER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib13Inst_H_DivideER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib13Inst_H_DivideER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib13Inst_H_DivideER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_H_Divide__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1a4b5bbb278896c77f034e90e04c9398a3"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_H_Divide</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib13Inst_H_DivideER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib11Inst_H_CopyER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib11Inst_H_CopyER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib11Inst_H_CopyER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_H_Copy__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1a226d150634a8a04a8060ed1b01915512"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_H_Copy</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib11Inst_H_CopyER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib13Inst_H_SearchER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib13Inst_H_SearchER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib13Inst_H_SearchER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_H_Search__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1af3b74bce366e2b077a87c5ceddd7164a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_H_Search</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib13Inst_H_SearchER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib13Inst_Mov_HeadER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib13Inst_Mov_HeadER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib13Inst_Mov_HeadER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Mov_Head__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1ac7666d56bbcfb088bb8b0b710b1c2e39"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Mov_Head</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib13Inst_Mov_HeadER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib13Inst_Jmp_HeadER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib13Inst_Jmp_HeadER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib13Inst_Jmp_HeadER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Jmp_Head__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1aad8b075564d1bd41bf5cd52593e37736"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Jmp_Head</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib13Inst_Jmp_HeadER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib13Inst_Get_HeadER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib13Inst_Get_HeadER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib13Inst_Get_HeadER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Get_Head__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1ab546029beedf0317e3b11a1c1595fdb0"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Get_Head</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib13Inst_Get_HeadER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib13Inst_If_LabelER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib13Inst_If_LabelER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib13Inst_If_LabelER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_If_Label__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1afa4984df191c787d442955a5f0573fc8"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_If_Label</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib13Inst_If_LabelER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib13Inst_Set_FlowER10hardware_tRK6inst_t">
+<span id="_CPPv3N18VirtualCPU_InstLib13Inst_Set_FlowER10hardware_tRK6inst_t"></span><span id="_CPPv2N18VirtualCPU_InstLib13Inst_Set_FlowER10hardware_tRK6inst_t"></span><span id="VirtualCPU_InstLib::Inst_Set_Flow__hardware_tR.inst_tCR"></span><span class="target" id="structVirtualCPU__InstLib_1ac4f7db8b14a478f526ca2391aeb8d9c5"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Inst_Set_Flow</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib10hardware_tE" title="VirtualCPU_InstLib::hardware_t"><span class="n"><span class="pre">hardware_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hw</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6inst_tE" title="VirtualCPU_InstLib::inst_t"><span class="n"><span class="pre">inst_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib13Inst_Set_FlowER10hardware_tRK6inst_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18VirtualCPU_InstLib14DefaultInstLibEv">
+<span id="_CPPv3N18VirtualCPU_InstLib14DefaultInstLibEv"></span><span id="_CPPv2N18VirtualCPU_InstLib14DefaultInstLibEv"></span><span id="VirtualCPU_InstLib::DefaultInstLib"></span><span class="target" id="structVirtualCPU__InstLib_1a5e97b0693a8cc9b032dffaf1866dbeb6"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N18VirtualCPU_InstLib6this_tE" title="VirtualCPU_InstLib::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">DefaultInstLib</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18VirtualCPU_InstLib14DefaultInstLibEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Maintain and return a singleton of default instructions. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="VirtualCPU.html" class="btn btn-neutral float-left" title="VirtualCPU.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="signalgp_utils.html" class="btn btn-neutral float-right" title="signalgp_utils.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

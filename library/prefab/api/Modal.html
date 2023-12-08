@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modal.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/prefab/api/Modal.427ed33c-c760-441c-b9be-3742fc8ac681.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="ReadoutPanel.hpp" href="ReadoutPanel.html" />
+    <link rel="prev" title="LoadingModal.hpp" href="LoadingModal.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../prefab.html">Prefab</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../prefab.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Card.html">Card.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CodeBlock.html">CodeBlock.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Collapse.html">Collapse.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CommentBox.html">CommentBox.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ConfigPanel.html">ConfigPanel.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FontAwesomeIcon.html">FontAwesomeIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LoadingIcon.html">LoadingIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LoadingModal.html">LoadingModal.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Modal.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv45Modal"><code class="docutils literal notranslate"><span class="pre">Modal</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ReadoutPanel.html">ReadoutPanel.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ToggleSwitch.html">ToggleSwitch.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ValueBox.html">ValueBox.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../prefab.html">Prefab</a></li>
+      <li class="breadcrumb-item active">Modal.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="modal-hpp">
+<h1>Modal.hpp<a class="headerlink" href="#modal-hpp" title="Link to this heading"></a></h1>
+<p>Wraps a Bootstrap modal. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv45Modal">
+<span id="_CPPv35Modal"></span><span id="_CPPv25Modal"></span><span id="Modal"></span><span class="target" id="classModal"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Modal</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><a class="headerlink" href="#_CPPv45Modal" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Modal.hpp&gt;</em></div>
+<p>Use Modal class to add a Bootstrap style pop-up modal to your web app. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Modal5ModalERKNSt6stringE">
+<span id="_CPPv3N5Modal5ModalERKNSt6stringE"></span><span id="_CPPv2N5Modal5ModalERKNSt6stringE"></span><span id="Modal::Modal__ssCR"></span><span class="target" id="classModal_1abf720fc4d458e4a64d4591d3e9222b8f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Modal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Modal5ModalERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN5Modal16AddHeaderContentEv1T">
+<span id="_CPPv3I0EN5Modal16AddHeaderContentE1T"></span><span id="_CPPv2I0EN5Modal16AddHeaderContentE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classModal_1a981193003892ccc003f95701ff96aa60"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddHeaderContent</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN5Modal16AddHeaderContentEv1T" title="Modal::AddHeaderContent::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN5Modal16AddHeaderContentEv1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Add contnet to the header section of the modal Content can be of any type </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN5Modal14AddBodyContentEv1T">
+<span id="_CPPv3I0EN5Modal14AddBodyContentE1T"></span><span id="_CPPv2I0EN5Modal14AddBodyContentE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classModal_1a97459f8e34bb6497dd25aec47f95e605"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddBodyContent</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN5Modal14AddBodyContentEv1T" title="Modal::AddBodyContent::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN5Modal14AddBodyContentEv1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Add content to the body section of the modal Content can be of any type </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN5Modal16AddFooterContentEv1T">
+<span id="_CPPv3I0EN5Modal16AddFooterContentE1T"></span><span id="_CPPv2I0EN5Modal16AddFooterContentE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classModal_1ae6846b1bd7dea8aa481052ff7e748396"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddFooterContent</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN5Modal16AddFooterContentEv1T" title="Modal::AddFooterContent::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN5Modal16AddFooterContentEv1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Add content to the footer section of the modal Content can be of any type </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Modal11AddClosingXEv">
+<span id="_CPPv3N5Modal11AddClosingXEv"></span><span id="_CPPv2N5Modal11AddClosingXEv"></span><span id="Modal::AddClosingX"></span><span class="target" id="classModal_1a227e027e62779eba8f59c5f8af17c75e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddClosingX</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Modal11AddClosingXEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Adds an X button in the upper right corner of the modal so user can close it Should be called after all desired header content is added Best practice is to call this method, unless a close button is added somewhere else in the modal using AddButton()</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Modal9AddButtonER6Button">
+<span id="_CPPv3N5Modal9AddButtonER6Button"></span><span id="_CPPv2N5Modal9AddButtonER6Button"></span><span id="Modal::AddButton__ButtonR"></span><span class="target" id="classModal_1a1f21594c54551f039312a9edade0233f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddButton</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../web/api/Button.html#_CPPv46Button" title="Button"><span class="n"><span class="pre">Button</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">btn</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Modal9AddButtonER6Button" title="Link to this definition"></a><br /></dt>
+<dd><p>Add properties to a button element to make it open and close the modal. The button can then be added to the modal to close it or anywhere else in the web app to trigger the modal to open </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Modal13SetBackgroundEKNSt6stringE">
+<span id="_CPPv3N5Modal13SetBackgroundEKNSt6stringE"></span><span id="_CPPv2N5Modal13SetBackgroundEKNSt6stringE"></span><span id="Modal::SetBackground__ssC"></span><span class="target" id="classModal_1a896ca69f632fcae5946aabe0d10771ad"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetBackground</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">color</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Modal13SetBackgroundEKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Overrides SetBackground() in WidgetFacet so that the color will make the background of the modal change as expected. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Modal12modal_dialogE">
+<span id="_CPPv3N5Modal12modal_dialogE"></span><span id="_CPPv2N5Modal12modal_dialogE"></span><span id="Modal::modal_dialog__Div"></span><span class="target" id="classModal_1a2e778e73151663d86b63f6d576774185"></span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">modal_dialog</span></span></span><a class="headerlink" href="#_CPPv4N5Modal12modal_dialogE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Modal13modal_contentE">
+<span id="_CPPv3N5Modal13modal_contentE"></span><span id="_CPPv2N5Modal13modal_contentE"></span><span id="Modal::modal_content__Div"></span><span class="target" id="classModal_1ad6eb1022ab00606a8da6367a4727470d"></span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">modal_content</span></span></span><a class="headerlink" href="#_CPPv4N5Modal13modal_contentE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Modal12modal_headerE">
+<span id="_CPPv3N5Modal12modal_headerE"></span><span id="_CPPv2N5Modal12modal_headerE"></span><span id="Modal::modal_header__Div"></span><span class="target" id="classModal_1abf144f90ed21e1d5cb9dd57b488b3add"></span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">modal_header</span></span></span><a class="headerlink" href="#_CPPv4N5Modal12modal_headerE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Modal10modal_bodyE">
+<span id="_CPPv3N5Modal10modal_bodyE"></span><span id="_CPPv2N5Modal10modal_bodyE"></span><span id="Modal::modal_body__Div"></span><span class="target" id="classModal_1a0380a9f758ab4f0e1c08ad295bd3e824"></span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">modal_body</span></span></span><a class="headerlink" href="#_CPPv4N5Modal10modal_bodyE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Modal12modal_footerE">
+<span id="_CPPv3N5Modal12modal_footerE"></span><span id="_CPPv2N5Modal12modal_footerE"></span><span id="Modal::modal_footer__Div"></span><span class="target" id="classModal_1ad65831f9983e0691512df4ae46b6e220"></span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">modal_footer</span></span></span><a class="headerlink" href="#_CPPv4N5Modal12modal_footerE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="LoadingModal.html" class="btn btn-neutral float-left" title="LoadingModal.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ReadoutPanel.html" class="btn btn-neutral float-right" title="ReadoutPanel.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

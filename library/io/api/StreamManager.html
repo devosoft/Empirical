@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StreamManager.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/io/api/StreamManager.22f249db-63f3-49aa-80ab-9ae708e29e29.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="ascii_utils.hpp" href="ascii_utils.html" />
+    <link rel="prev" title="NullStream.hpp" href="NullStream.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../io.html">IO</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../io.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ContiguousStream.html">ContiguousStream.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="File.html">File.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="MemoryIStream.html">MemoryIStream.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NullStream.html">NullStream.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">StreamManager.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413StreamManager"><code class="docutils literal notranslate"><span class="pre">StreamManager</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ascii_utils.html">ascii_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="serialize.html">serialize.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="serialize_macros.html">serialize_macros.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../io.html">IO</a></li>
+      <li class="breadcrumb-item active">StreamManager.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="streammanager-hpp">
+<h1>StreamManager.hpp<a class="headerlink" href="#streammanager-hpp" title="Link to this heading"></a></h1>
+<p>The StreamManager object links names to files or other streams. </p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Ideally should also work with File</p>
+</dd></dl>
+
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA</p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv413StreamManager">
+<span id="_CPPv313StreamManager"></span><span id="_CPPv213StreamManager"></span><span id="StreamManager"></span><span class="target" id="classStreamManager"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StreamManager</span></span></span><a class="headerlink" href="#_CPPv413StreamManager" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;StreamManager.hpp&gt;</em></div>
+<p>A class to maintain files and other streams. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager4TypeE">
+<span id="_CPPv3N13StreamManager4TypeE"></span><span id="_CPPv2N13StreamManager4TypeE"></span><span class="target" id="classStreamManager_1af5f818e48a44ae7d95b63c42826dd7f8"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Type</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager4TypeE" title="Link to this definition"></a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager4Type4NONEE">
+<span id="_CPPv3N13StreamManager4Type4NONEE"></span><span id="_CPPv2N13StreamManager4Type4NONEE"></span><span class="target" id="classStreamManager_1af5f818e48a44ae7d95b63c42826dd7f8ab50339a10e1de285ac99d4c3990b8693"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NONE</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager4Type4NONEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager4Type4FILEE">
+<span id="_CPPv3N13StreamManager4Type4FILEE"></span><span id="_CPPv2N13StreamManager4Type4FILEE"></span><span class="target" id="classStreamManager_1af5f818e48a44ae7d95b63c42826dd7f8a9fc5887c030f7a3e19821ebec457e719"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FILE</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager4Type4FILEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager4Type6STRINGE">
+<span id="_CPPv3N13StreamManager4Type6STRINGE"></span><span id="_CPPv2N13StreamManager4Type6STRINGE"></span><span class="target" id="classStreamManager_1af5f818e48a44ae7d95b63c42826dd7f8a63b588d5559f64f89a416e656880b949"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">STRING</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager4Type6STRINGE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager4Type5OTHERE">
+<span id="_CPPv3N13StreamManager4Type5OTHERE"></span><span id="_CPPv2N13StreamManager4Type5OTHERE"></span><span class="target" id="classStreamManager_1af5f818e48a44ae7d95b63c42826dd7f8a03570470bad94692ce93e32700d2e1cb"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OTHER</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager4Type5OTHERE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager6AccessE">
+<span id="_CPPv3N13StreamManager6AccessE"></span><span id="_CPPv2N13StreamManager6AccessE"></span><span class="target" id="classStreamManager_1ae8832286c74bbd68ce193ca5d00715e0"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Access</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager6AccessE" title="Link to this definition"></a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager6Access4NONEE">
+<span id="_CPPv3N13StreamManager6Access4NONEE"></span><span id="_CPPv2N13StreamManager6Access4NONEE"></span><span class="target" id="classStreamManager_1ae8832286c74bbd68ce193ca5d00715e0ab50339a10e1de285ac99d4c3990b8693"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NONE</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager6Access4NONEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager6Access5INPUTE">
+<span id="_CPPv3N13StreamManager6Access5INPUTE"></span><span id="_CPPv2N13StreamManager6Access5INPUTE"></span><span class="target" id="classStreamManager_1ae8832286c74bbd68ce193ca5d00715e0aa84cc046d48610b05c21fd3670d0c829"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">INPUT</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager6Access5INPUTE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager6Access6OUTPUTE">
+<span id="_CPPv3N13StreamManager6Access6OUTPUTE"></span><span id="_CPPv2N13StreamManager6Access6OUTPUTE"></span><span class="target" id="classStreamManager_1ae8832286c74bbd68ce193ca5d00715e0a50a87f0d71f7221582dad4bf507a0f34"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OUTPUT</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager6Access6OUTPUTE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager6Access2IOE">
+<span id="_CPPv3N13StreamManager6Access2IOE"></span><span id="_CPPv2N13StreamManager6Access2IOE"></span><span class="target" id="classStreamManager_1ae8832286c74bbd68ce193ca5d00715e0acf3882f1c43ab22bff0bd9d82d83251b"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IO</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager6Access2IOE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager13StreamManagerEv">
+<span id="_CPPv3N13StreamManager13StreamManagerEv"></span><span id="_CPPv2N13StreamManager13StreamManagerEv"></span><span id="StreamManager::StreamManager"></span><span class="target" id="classStreamManager_1a91044033de4432d2f689ca3709a18716"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StreamManager</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager13StreamManagerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager13StreamManagerERK13StreamManager">
+<span id="_CPPv3N13StreamManager13StreamManagerERK13StreamManager"></span><span id="_CPPv2N13StreamManager13StreamManagerERK13StreamManager"></span><span id="StreamManager::StreamManager__StreamManagerCR"></span><span class="target" id="classStreamManager_1ab298ba9c4a94783c01603ead998bf55a"></span><span class="sig-name descname"><span class="n"><span class="pre">StreamManager</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager13StreamManagerERK13StreamManager" title="StreamManager::StreamManager"><span class="n"><span class="pre">StreamManager</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N13StreamManager13StreamManagerERK13StreamManager" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManagerD0Ev">
+<span id="_CPPv3N13StreamManagerD0Ev"></span><span id="_CPPv2N13StreamManagerD0Ev"></span><span id="StreamManager::~StreamManager"></span><span class="target" id="classStreamManager_1a2ca7bc50460e72eefc1215bb6e44a3b8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~StreamManager</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManagerD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager3HasERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager3HasERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager3HasERKNSt6stringE"></span><span id="StreamManager::Has__ssCRC"></span><span class="target" id="classStreamManager_1ac5abcabe2365926528b12f44d8405594"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager3HasERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager18HasInputFileStreamERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager18HasInputFileStreamERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager18HasInputFileStreamERKNSt6stringE"></span><span id="StreamManager::HasInputFileStream__ssCRC"></span><span class="target" id="classStreamManager_1a5e537e4720816198364bfb19f9509b39"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasInputFileStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager18HasInputFileStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager19HasOutputFileStreamERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager19HasOutputFileStreamERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager19HasOutputFileStreamERKNSt6stringE"></span><span id="StreamManager::HasOutputFileStream__ssCRC"></span><span class="target" id="classStreamManager_1a6026d260c755c08a0ac5da85a3eab00e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasOutputFileStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager19HasOutputFileStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager15HasIOFileStreamERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager15HasIOFileStreamERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager15HasIOFileStreamERKNSt6stringE"></span><span id="StreamManager::HasIOFileStream__ssCRC"></span><span class="target" id="classStreamManager_1a2e88671839184c78836a9c818f8e9ce0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasIOFileStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager15HasIOFileStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager15HasStringStreamERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager15HasStringStreamERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager15HasStringStreamERKNSt6stringE"></span><span id="StreamManager::HasStringStream__ssCRC"></span><span class="target" id="classStreamManager_1afaf431dbf8fbc74d4f70815e60f428ff"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasStringStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager15HasStringStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager17HasStdInputStreamERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager17HasStdInputStreamERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager17HasStdInputStreamERKNSt6stringE"></span><span id="StreamManager::HasStdInputStream__ssCRC"></span><span class="target" id="classStreamManager_1a7d9fc22787e445efe064ad70bbae2d18"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasStdInputStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager17HasStdInputStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager18HasStdOutputStreamERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager18HasStdOutputStreamERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager18HasStdOutputStreamERKNSt6stringE"></span><span id="StreamManager::HasStdOutputStream__ssCRC"></span><span class="target" id="classStreamManager_1a250d0a2aed66c722cf093c8488e8dccc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasStdOutputStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager18HasStdOutputStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager14HasStdIOStreamERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager14HasStdIOStreamERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager14HasStdIOStreamERKNSt6stringE"></span><span id="StreamManager::HasStdIOStream__ssCRC"></span><span class="target" id="classStreamManager_1a753b8eb2a64abe0eba9c2ad365090e26"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasStdIOStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager14HasStdIOStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager18HasInputOnlyStreamERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager18HasInputOnlyStreamERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager18HasInputOnlyStreamERKNSt6stringE"></span><span id="StreamManager::HasInputOnlyStream__ssCRC"></span><span class="target" id="classStreamManager_1adf6b16ff7ed05c19aa9de9462c966b46"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasInputOnlyStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager18HasInputOnlyStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager19HasOutputOnlyStreamERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager19HasOutputOnlyStreamERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager19HasOutputOnlyStreamERKNSt6stringE"></span><span id="StreamManager::HasOutputOnlyStream__ssCRC"></span><span class="target" id="classStreamManager_1a90054ed748e694816fb9bb7e24fd6723"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasOutputOnlyStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager19HasOutputOnlyStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager11HasIOStreamERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager11HasIOStreamERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager11HasIOStreamERKNSt6stringE"></span><span id="StreamManager::HasIOStream__ssCRC"></span><span class="target" id="classStreamManager_1ad633ea0864a97f4dc182612b62248750"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasIOStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager11HasIOStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager14HasInputStreamERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager14HasInputStreamERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager14HasInputStreamERKNSt6stringE"></span><span id="StreamManager::HasInputStream__ssCRC"></span><span class="target" id="classStreamManager_1afc79731e06cbfbe899ee2fd828fa13a8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasInputStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager14HasInputStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager15HasOutputStreamERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager15HasOutputStreamERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager15HasOutputStreamERKNSt6stringE"></span><span id="StreamManager::HasOutputStream__ssCRC"></span><span class="target" id="classStreamManager_1a3c077005586626a778fb72c4cd3d5c28"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasOutputStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager15HasOutputStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0_4Type_6AccessEN13StreamManager9AddStreamER1TRKNSt6stringE">
+<span id="_CPPv3I0_4Type_6AccessEN13StreamManager9AddStreamERKNSt6stringE"></span><span id="_CPPv2I0_4Type_6AccessEN13StreamManager9AddStreamERKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager4TypeE" title="StreamManager::Type"><span class="n"><span class="pre">Type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TYPE</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager6AccessE" title="StreamManager::Access"><span class="n"><span class="pre">Access</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ACCESS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStreamManager_1a73cbed4f7091d7d5b92ddd85cd6a9370"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_4Type_6AccessEN13StreamManager9AddStreamER1TRKNSt6stringE" title="StreamManager::AddStream::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_4Type_6AccessEN13StreamManager9AddStreamER1TRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager12AddInputFileENSt6stringE">
+<span id="_CPPv3N13StreamManager12AddInputFileENSt6stringE"></span><span id="_CPPv2N13StreamManager12AddInputFileENSt6stringE"></span><span id="StreamManager::AddInputFile__ss"></span><span class="target" id="classStreamManager_1a9fa200eaa37319614eb54553a7aef52a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddInputFile</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager12AddInputFileENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager13AddOutputFileENSt6stringE">
+<span id="_CPPv3N13StreamManager13AddOutputFileENSt6stringE"></span><span id="_CPPv2N13StreamManager13AddOutputFileENSt6stringE"></span><span id="StreamManager::AddOutputFile__ss"></span><span class="target" id="classStreamManager_1a92e895a3da4a93ab0c83c03326605465"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ofstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddOutputFile</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager13AddOutputFileENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager7AddFileENSt6stringE">
+<span id="_CPPv3N13StreamManager7AddFileENSt6stringE"></span><span id="_CPPv2N13StreamManager7AddFileENSt6stringE"></span><span id="StreamManager::AddFile__ss"></span><span class="target" id="classStreamManager_1abd1b5470f4985062e6ac6c685a64c7a4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">fstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddFile</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager7AddFileENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15AddStringStreamENSt6stringE">
+<span id="_CPPv3N13StreamManager15AddStringStreamENSt6stringE"></span><span id="_CPPv2N13StreamManager15AddStringStreamENSt6stringE"></span><span id="StreamManager::AddStringStream__ss"></span><span class="target" id="classStreamManager_1adb10d3dcfe9f6ddbc73515856aa81352"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">stringstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddStringStream</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager15AddStringStreamENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13StreamManager9AddStreamER1TRKNSt6stringER1T">
+<span id="_CPPv3I0EN13StreamManager9AddStreamERKNSt6stringER1T"></span><span id="_CPPv2I0EN13StreamManager9AddStreamERKNSt6stringER1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStreamManager_1a6ba991496e05c04d71b21b35b9bd4c0f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN13StreamManager9AddStreamER1TRKNSt6stringER1T" title="StreamManager::AddStream::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="#_CPPv4I0EN13StreamManager9AddStreamER1TRKNSt6stringER1T" title="StreamManager::AddStream::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_stream</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13StreamManager9AddStreamER1TRKNSt6stringER1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a stream maintained outside of manager (do not delete without removing first!) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager14AddInputStreamERKNSt6stringE">
+<span id="_CPPv3N13StreamManager14AddInputStreamERKNSt6stringE"></span><span id="_CPPv2N13StreamManager14AddInputStreamERKNSt6stringE"></span><span id="StreamManager::AddInputStream__ssCR"></span><span class="target" id="classStreamManager_1a91917087b81005b904dbfb1ab4b64919"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddInputStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager14AddInputStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a default input stream. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15AddOutputStreamERKNSt6stringE">
+<span id="_CPPv3N13StreamManager15AddOutputStreamERKNSt6stringE"></span><span id="_CPPv2N13StreamManager15AddOutputStreamERKNSt6stringE"></span><span id="StreamManager::AddOutputStream__ssCR"></span><span class="target" id="classStreamManager_1a3f759739506c151cfeb4993eb05dfe9e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddOutputStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager15AddOutputStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a default output stream. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager11AddIOStreamERKNSt6stringE">
+<span id="_CPPv3N13StreamManager11AddIOStreamERKNSt6stringE"></span><span id="_CPPv2N13StreamManager11AddIOStreamERKNSt6stringE"></span><span id="StreamManager::AddIOStream__ssCR"></span><span class="target" id="classStreamManager_1a5d5c82c8c66c603629e3141b237beed6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">iostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddIOStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager11AddIOStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Build a default IO stream. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager19SetInputDefaultFileEv">
+<span id="_CPPv3N13StreamManager19SetInputDefaultFileEv"></span><span id="_CPPv2N13StreamManager19SetInputDefaultFileEv"></span><span id="StreamManager::SetInputDefaultFile"></span><span class="target" id="classStreamManager_1adc850d29e732ff8f8a966828b7b9c3c0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetInputDefaultFile</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager19SetInputDefaultFileEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager20SetOutputDefaultFileEv">
+<span id="_CPPv3N13StreamManager20SetOutputDefaultFileEv"></span><span id="_CPPv2N13StreamManager20SetOutputDefaultFileEv"></span><span id="StreamManager::SetOutputDefaultFile"></span><span class="target" id="classStreamManager_1a282bc8bc531fdb22fcdb679d857ec3ca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetOutputDefaultFile</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager20SetOutputDefaultFileEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager16SetIODefaultFileEv">
+<span id="_CPPv3N13StreamManager16SetIODefaultFileEv"></span><span id="_CPPv2N13StreamManager16SetIODefaultFileEv"></span><span id="StreamManager::SetIODefaultFile"></span><span class="target" id="classStreamManager_1a2ca22762ee9ebd5263b5144c96fc0f5e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetIODefaultFile</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager16SetIODefaultFileEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager21SetInputDefaultStringEv">
+<span id="_CPPv3N13StreamManager21SetInputDefaultStringEv"></span><span id="_CPPv2N13StreamManager21SetInputDefaultStringEv"></span><span id="StreamManager::SetInputDefaultString"></span><span class="target" id="classStreamManager_1a34e0053ad7f09a6d9ea9b198e2ba5b76"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetInputDefaultString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager21SetInputDefaultStringEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager22SetOutputDefaultStringEv">
+<span id="_CPPv3N13StreamManager22SetOutputDefaultStringEv"></span><span id="_CPPv2N13StreamManager22SetOutputDefaultStringEv"></span><span id="StreamManager::SetOutputDefaultString"></span><span class="target" id="classStreamManager_1a718c4ddeef41d40dab18968b5ea9871b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetOutputDefaultString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager22SetOutputDefaultStringEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager18SetIODefaultStringEv">
+<span id="_CPPv3N13StreamManager18SetIODefaultStringEv"></span><span id="_CPPv2N13StreamManager18SetIODefaultStringEv"></span><span id="StreamManager::SetIODefaultString"></span><span class="target" id="classStreamManager_1a3e471bfc868b35a8d70f4abb1438f516"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetIODefaultString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager18SetIODefaultStringEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager23SetInputDefaultStandardEv">
+<span id="_CPPv3N13StreamManager23SetInputDefaultStandardEv"></span><span id="_CPPv2N13StreamManager23SetInputDefaultStandardEv"></span><span id="StreamManager::SetInputDefaultStandard"></span><span class="target" id="classStreamManager_1a993d4ecbcdd77b37a307a78ea1a917ac"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetInputDefaultStandard</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager23SetInputDefaultStandardEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager24SetOutputDefaultStandardEv">
+<span id="_CPPv3N13StreamManager24SetOutputDefaultStandardEv"></span><span id="_CPPv2N13StreamManager24SetOutputDefaultStandardEv"></span><span id="StreamManager::SetOutputDefaultStandard"></span><span class="target" id="classStreamManager_1ab044e884f41839afbe9a34f5bf6a49f1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetOutputDefaultStandard</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager24SetOutputDefaultStandardEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager14GetInputStreamERKNSt6stringE">
+<span id="_CPPv3N13StreamManager14GetInputStreamERKNSt6stringE"></span><span id="_CPPv2N13StreamManager14GetInputStreamERKNSt6stringE"></span><span id="StreamManager::GetInputStream__ssCR"></span><span class="target" id="classStreamManager_1a4e4fe2574593109fec43818aab4b0949"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetInputStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager14GetInputStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15GetOutputStreamERKNSt6stringE">
+<span id="_CPPv3N13StreamManager15GetOutputStreamERKNSt6stringE"></span><span id="_CPPv2N13StreamManager15GetOutputStreamERKNSt6stringE"></span><span id="StreamManager::GetOutputStream__ssCR"></span><span class="target" id="classStreamManager_1a80b6bf537a85ed05a93a18cfd1ffa7c5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetOutputStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager15GetOutputStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager11GetIOStreamERKNSt6stringE">
+<span id="_CPPv3N13StreamManager11GetIOStreamERKNSt6stringE"></span><span id="_CPPv2N13StreamManager11GetIOStreamERKNSt6stringE"></span><span id="StreamManager::GetIOStream__ssCR"></span><span class="target" id="classStreamManager_1ae1c5b34879c03cc766de54b8f3384aa6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">iostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetIOStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager11GetIOStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager11get_ostreamERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N13StreamManager11get_ostreamERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N13StreamManager11get_ostreamERKNSt6stringERKNSt6stringE"></span><span id="StreamManager::get_ostream__ssCR.ssCR"></span><span class="target" id="classStreamManager_1a24118529ec0fee3d2ce88eb6c2240340"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">get_ostream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;cout&quot;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stdout_name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;cout&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager11get_ostreamERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager7GetInfoERKNSt6stringE">
+<span id="_CPPv3N13StreamManager7GetInfoERKNSt6stringE"></span><span id="_CPPv2N13StreamManager7GetInfoERKNSt6stringE"></span><span id="StreamManager::GetInfo__ssCR"></span><span class="target" id="classStreamManager_1ada13a4abf876330921aabc20c76c0908"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager10StreamInfoE" title="StreamManager::StreamInfo"><span class="n"><span class="pre">StreamInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager7GetInfoERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager7GetInfoERKNSt6stringE">
+<span id="_CPPv3NK13StreamManager7GetInfoERKNSt6stringE"></span><span id="_CPPv2NK13StreamManager7GetInfoERKNSt6stringE"></span><span id="StreamManager::GetInfo__ssCRC"></span><span class="target" id="classStreamManager_1a5c75c8c0ec447079d62eee517ca0cbd7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager10StreamInfoE" title="StreamManager::StreamInfo"><span class="n"><span class="pre">StreamInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager7GetInfoERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager7streamsE">
+<span id="_CPPv3N13StreamManager7streamsE"></span><span id="_CPPv2N13StreamManager7streamsE"></span><span id="StreamManager::streams__std::unordered_map:ss.Ptr:StreamInfo::"></span><span class="target" id="classStreamManager_1ab23945535f055e7211713a31c8c372fa"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N13StreamManager10StreamInfoE" title="StreamManager::StreamInfo"><span class="n"><span class="pre">StreamInfo</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">streams</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager7streamsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager18default_input_typeE">
+<span id="_CPPv3N13StreamManager18default_input_typeE"></span><span id="_CPPv2N13StreamManager18default_input_typeE"></span><span id="StreamManager::default_input_type__Type"></span><span class="target" id="classStreamManager_1a5a33642507470bebbd8d7ee1e7698099"></span><a class="reference internal" href="#_CPPv4N13StreamManager4TypeE" title="StreamManager::Type"><span class="n"><span class="pre">Type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_input_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager4TypeE" title="StreamManager::Type"><span class="n"><span class="pre">Type</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N13StreamManager4Type5OTHERE" title="StreamManager::Type::OTHER"><span class="n"><span class="pre">OTHER</span></span></a><a class="headerlink" href="#_CPPv4N13StreamManager18default_input_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager19default_output_typeE">
+<span id="_CPPv3N13StreamManager19default_output_typeE"></span><span id="_CPPv2N13StreamManager19default_output_typeE"></span><span id="StreamManager::default_output_type__Type"></span><span class="target" id="classStreamManager_1a955e91b3a333821c179f2805786f990d"></span><a class="reference internal" href="#_CPPv4N13StreamManager4TypeE" title="StreamManager::Type"><span class="n"><span class="pre">Type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_output_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager4TypeE" title="StreamManager::Type"><span class="n"><span class="pre">Type</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N13StreamManager4Type5OTHERE" title="StreamManager::Type::OTHER"><span class="n"><span class="pre">OTHER</span></span></a><a class="headerlink" href="#_CPPv4N13StreamManager19default_output_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15default_io_typeE">
+<span id="_CPPv3N13StreamManager15default_io_typeE"></span><span id="_CPPv2N13StreamManager15default_io_typeE"></span><span id="StreamManager::default_io_type__Type"></span><span class="target" id="classStreamManager_1aa282e327ebb18fa14dbce72f73c246e0"></span><a class="reference internal" href="#_CPPv4N13StreamManager4TypeE" title="StreamManager::Type"><span class="n"><span class="pre">Type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_io_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager4TypeE" title="StreamManager::Type"><span class="n"><span class="pre">Type</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N13StreamManager4Type6STRINGE" title="StreamManager::Type::STRING"><span class="n"><span class="pre">STRING</span></span></a><a class="headerlink" href="#_CPPv4N13StreamManager15default_io_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager9info_noneE">
+<span id="_CPPv3N13StreamManager9info_noneE"></span><span id="_CPPv2N13StreamManager9info_noneE"></span><span id="StreamManager::info_none__StreamInfo_None"></span><span class="target" id="classStreamManager_1a441e2fcd9147dea7d0722df148a46fa4"></span><a class="reference internal" href="#_CPPv4N13StreamManager15StreamInfo_NoneE" title="StreamManager::StreamInfo_None"><span class="n"><span class="pre">StreamInfo_None</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">info_none</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager9info_noneE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-static-functions">Protected Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager16GetDefaultStreamEv">
+<span id="_CPPv3N13StreamManager16GetDefaultStreamEv"></span><span id="_CPPv2N13StreamManager16GetDefaultStreamEv"></span><span id="StreamManager::GetDefaultStream"></span><span class="target" id="classStreamManager_1a9312e0da5caece173f28f8b9fb2003e1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">iostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetDefaultStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager16GetDefaultStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager10StreamInfoE">
+<span id="_CPPv3N13StreamManager10StreamInfoE"></span><span id="_CPPv2N13StreamManager10StreamInfoE"></span><span id="StreamManager::StreamInfo"></span><span class="target" id="classStreamManager_1_1StreamInfo"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StreamInfo</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager10StreamInfoE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;StreamManager.hpp&gt;</em></div>
+<p>Subclassed by StreamManager::StreamInfo_None, StreamManager::TypedStreamInfo&lt; T, TYPE, ACCESS &gt;</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager10StreamInfo10StreamInfoERKNSt6stringEb">
+<span id="_CPPv3N13StreamManager10StreamInfo10StreamInfoERKNSt6stringEb"></span><span id="_CPPv2N13StreamManager10StreamInfo10StreamInfoERKNSt6stringEb"></span><span id="StreamManager::StreamInfo::StreamInfo__ssCR.b"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a9b6754564685e5b0377df0d243dc5d39"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StreamInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_name</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_owned</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager10StreamInfo10StreamInfoERKNSt6stringEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager10StreamInfo10StreamInfoERK10StreamInfo">
+<span id="_CPPv3N13StreamManager10StreamInfo10StreamInfoERK10StreamInfo"></span><span id="_CPPv2N13StreamManager10StreamInfo10StreamInfoERK10StreamInfo"></span><span id="StreamManager::StreamInfo::StreamInfo__StreamInfoCR"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a472a8f9a7969f568c63742070ac98054"></span><span class="sig-name descname"><span class="n"><span class="pre">StreamInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager10StreamInfo10StreamInfoERK10StreamInfo" title="StreamManager::StreamInfo::StreamInfo"><span class="n"><span class="pre">StreamInfo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N13StreamManager10StreamInfo10StreamInfoERK10StreamInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager10StreamInfoD0Ev">
+<span id="_CPPv3N13StreamManager10StreamInfoD0Ev"></span><span id="_CPPv2N13StreamManager10StreamInfoD0Ev"></span><span id="StreamManager::StreamInfo::~StreamInfo"></span><span class="target" id="classStreamManager_1_1StreamInfo_1aa2cefc258103d31e1aeb356c5d21fa88"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~StreamInfo</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager10StreamInfoD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo7GetTypeEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo7GetTypeEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo7GetTypeEv"></span><span id="StreamManager::StreamInfo::GetTypeC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a72ee6ea88e504329ad34e2a2e23c55a4"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager4TypeE" title="StreamManager::Type"><span class="n"><span class="pre">Type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetType</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo7GetTypeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo9GetAccessEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo9GetAccessEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo9GetAccessEv"></span><span id="StreamManager::StreamInfo::GetAccessC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a1e37688bbbda880a1ff9991f0a6e4377"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager6AccessE" title="StreamManager::Access"><span class="n"><span class="pre">Access</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetAccess</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo9GetAccessEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo6IsFileEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo6IsFileEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo6IsFileEv"></span><span id="StreamManager::StreamInfo::IsFileC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1af4aaa02f92332c7dd9cabc2aa9ebd8e0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsFile</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo6IsFileEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo8IsStringEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo8IsStringEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo8IsStringEv"></span><span id="StreamManager::StreamInfo::IsStringC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a835b3b650c0732c9dde6c4f57d7398e1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo8IsStringEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo7IsOtherEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo7IsOtherEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo7IsOtherEv"></span><span id="StreamManager::StreamInfo::IsOtherC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a031b71b9510afe346fdc5ab2beda6830"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsOther</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo7IsOtherEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo7IsInputEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo7IsInputEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo7IsInputEv"></span><span id="StreamManager::StreamInfo::IsInputC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1afa461571a7cbbe6fdfa888f6e3936fc3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsInput</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo7IsInputEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo8IsOutputEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo8IsOutputEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo8IsOutputEv"></span><span id="StreamManager::StreamInfo::IsOutputC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1ac6745e9bfc0e9466227d7a21154a5cca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsOutput</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo8IsOutputEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo4IsIOEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo4IsIOEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo4IsIOEv"></span><span id="StreamManager::StreamInfo::IsIOC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a7b92cca82520d2720082161ddafd38ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsIO</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo4IsIOEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo11IsInputFileEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo11IsInputFileEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo11IsInputFileEv"></span><span id="StreamManager::StreamInfo::IsInputFileC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a919c314b865924db4dc9ad39d07b89d5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsInputFile</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo11IsInputFileEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo12IsOutputFileEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo12IsOutputFileEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo12IsOutputFileEv"></span><span id="StreamManager::StreamInfo::IsOutputFileC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a6a538c25bee758498c1a26f4e13f8c52"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsOutputFile</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo12IsOutputFileEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo8IsIOFileEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo8IsIOFileEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo8IsIOFileEv"></span><span id="StreamManager::StreamInfo::IsIOFileC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1ada48678de9d417a5bd78aae41c12aa7c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsIOFile</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo8IsIOFileEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo12IsOtherInputEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo12IsOtherInputEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo12IsOtherInputEv"></span><span id="StreamManager::StreamInfo::IsOtherInputC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a574ed25372ff269319fc2903986a51c0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsOtherInput</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo12IsOtherInputEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo13IsOtherOutputEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo13IsOtherOutputEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo13IsOtherOutputEv"></span><span id="StreamManager::StreamInfo::IsOtherOutputC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1aecc9c4a716b304d1af48d71c1174801a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsOtherOutput</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo13IsOtherOutputEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo9IsOtherIOEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo9IsOtherIOEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo9IsOtherIOEv"></span><span id="StreamManager::StreamInfo::IsOtherIOC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a737431af980ad5c7c8b1830094adf4e2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsOtherIO</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo9IsOtherIOEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo7InputOKEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo7InputOKEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo7InputOKEv"></span><span id="StreamManager::StreamInfo::InputOKC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a95ac4c9701545771df25a6e7ac2ae61e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InputOK</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo7InputOKEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo8OutputOKEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo8OutputOKEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo8OutputOKEv"></span><span id="StreamManager::StreamInfo::OutputOKC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1ae018c7db9daa64c464cc55aca2690492"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OutputOK</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo8OutputOKEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager10StreamInfo7IsOwnedEv">
+<span id="_CPPv3NK13StreamManager10StreamInfo7IsOwnedEv"></span><span id="_CPPv2NK13StreamManager10StreamInfo7IsOwnedEv"></span><span id="StreamManager::StreamInfo::IsOwnedC"></span><span class="target" id="classStreamManager_1_1StreamInfo_1ac0712a20b59aa2d53775d6aa74c6eb12"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsOwned</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager10StreamInfo7IsOwnedEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager10StreamInfo14GetInputStreamEv">
+<span id="_CPPv3N13StreamManager10StreamInfo14GetInputStreamEv"></span><span id="_CPPv2N13StreamManager10StreamInfo14GetInputStreamEv"></span><span id="StreamManager::StreamInfo::GetInputStream"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a16bacc23370440e020e7c3d3bdddb1ce"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetInputStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N13StreamManager10StreamInfo14GetInputStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager10StreamInfo15GetOutputStreamEv">
+<span id="_CPPv3N13StreamManager10StreamInfo15GetOutputStreamEv"></span><span id="_CPPv2N13StreamManager10StreamInfo15GetOutputStreamEv"></span><span id="StreamManager::StreamInfo::GetOutputStream"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a30434fc4671c5ef1e1e22939424af692"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetOutputStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N13StreamManager10StreamInfo15GetOutputStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager10StreamInfo11GetIOStreamEv">
+<span id="_CPPv3N13StreamManager10StreamInfo11GetIOStreamEv"></span><span id="_CPPv2N13StreamManager10StreamInfo11GetIOStreamEv"></span><span id="StreamManager::StreamInfo::GetIOStream"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a0cbb542c21fa337c890e2ec378c86ffd"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">iostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetIOStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N13StreamManager10StreamInfo11GetIOStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager10StreamInfo4nameE">
+<span id="_CPPv3N13StreamManager10StreamInfo4nameE"></span><span id="_CPPv2N13StreamManager10StreamInfo4nameE"></span><span id="StreamManager::StreamInfo::name__ss"></span><span class="target" id="classStreamManager_1_1StreamInfo_1ac94d0f50144fd14e8b1c5aba3e8e4d23"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager10StreamInfo4nameE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager10StreamInfo5ownedE">
+<span id="_CPPv3N13StreamManager10StreamInfo5ownedE"></span><span id="_CPPv2N13StreamManager10StreamInfo5ownedE"></span><span id="StreamManager::StreamInfo::owned__b"></span><span class="target" id="classStreamManager_1_1StreamInfo_1a5af5866aab7cd99b0efdeac0e077b953"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">owned</span></span></span><a class="headerlink" href="#_CPPv4N13StreamManager10StreamInfo5ownedE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15StreamInfo_NoneE">
+<span id="_CPPv3N13StreamManager15StreamInfo_NoneE"></span><span id="_CPPv2N13StreamManager15StreamInfo_NoneE"></span><span id="StreamManager::StreamInfo_None"></span><span class="target" id="structStreamManager_1_1StreamInfo__None"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StreamInfo_None</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413StreamManager" title="StreamManager"><span class="n"><span class="pre">StreamManager</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N13StreamManager10StreamInfoE" title="StreamManager::StreamInfo"><span class="n"><span class="pre">StreamInfo</span></span></a><a class="headerlink" href="#_CPPv4N13StreamManager15StreamInfo_NoneE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;StreamManager.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15StreamInfo_None15StreamInfo_NoneEv">
+<span id="_CPPv3N13StreamManager15StreamInfo_None15StreamInfo_NoneEv"></span><span id="_CPPv2N13StreamManager15StreamInfo_None15StreamInfo_NoneEv"></span><span id="StreamManager::StreamInfo_None::StreamInfo_None"></span><span class="target" id="structStreamManager_1_1StreamInfo__None_1a1165b5419c2b8c1be7a185a2a5991f7b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StreamInfo_None</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager15StreamInfo_None15StreamInfo_NoneEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager15StreamInfo_None7GetTypeEv">
+<span id="_CPPv3NK13StreamManager15StreamInfo_None7GetTypeEv"></span><span id="_CPPv2NK13StreamManager15StreamInfo_None7GetTypeEv"></span><span id="StreamManager::StreamInfo_None::GetTypeC"></span><span class="target" id="structStreamManager_1_1StreamInfo__None_1a133d848db9c02efddf589ed45524c6c5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager4TypeE" title="StreamManager::Type"><span class="n"><span class="pre">Type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetType</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager15StreamInfo_None7GetTypeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager15StreamInfo_None9GetAccessEv">
+<span id="_CPPv3NK13StreamManager15StreamInfo_None9GetAccessEv"></span><span id="_CPPv2NK13StreamManager15StreamInfo_None9GetAccessEv"></span><span id="StreamManager::StreamInfo_None::GetAccessC"></span><span class="target" id="structStreamManager_1_1StreamInfo__None_1a8068990acafbf13520b6d5bd066565be"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager6AccessE" title="StreamManager::Access"><span class="n"><span class="pre">Access</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetAccess</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager15StreamInfo_None9GetAccessEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15StreamInfo_None14GetInputStreamEv">
+<span id="_CPPv3N13StreamManager15StreamInfo_None14GetInputStreamEv"></span><span id="_CPPv2N13StreamManager15StreamInfo_None14GetInputStreamEv"></span><span id="StreamManager::StreamInfo_None::GetInputStream"></span><span class="target" id="structStreamManager_1_1StreamInfo__None_1aad6c587c95cbc9d8218abe1d666b7f2f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetInputStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N13StreamManager15StreamInfo_None14GetInputStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15StreamInfo_None15GetOutputStreamEv">
+<span id="_CPPv3N13StreamManager15StreamInfo_None15GetOutputStreamEv"></span><span id="_CPPv2N13StreamManager15StreamInfo_None15GetOutputStreamEv"></span><span id="StreamManager::StreamInfo_None::GetOutputStream"></span><span class="target" id="structStreamManager_1_1StreamInfo__None_1a5cee430cf5fac53e1f5c9333707348fc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetOutputStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N13StreamManager15StreamInfo_None15GetOutputStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15StreamInfo_None11GetIOStreamEv">
+<span id="_CPPv3N13StreamManager15StreamInfo_None11GetIOStreamEv"></span><span id="_CPPv2N13StreamManager15StreamInfo_None11GetIOStreamEv"></span><span id="StreamManager::StreamInfo_None::GetIOStream"></span><span class="target" id="structStreamManager_1_1StreamInfo__None_1aa9fac5f38372cf36e2d3237255453b74"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">iostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetIOStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N13StreamManager15StreamInfo_None11GetIOStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0_4Type_6AccessEN13StreamManager15TypedStreamInfoE">
+<span id="_CPPv3I0_4Type_6AccessEN13StreamManager15TypedStreamInfoE"></span><span id="_CPPv2I0_4Type_6AccessEN13StreamManager15TypedStreamInfoE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager4TypeE" title="StreamManager::Type"><span class="n"><span class="pre">Type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TYPE</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager6AccessE" title="StreamManager::Access"><span class="n"><span class="pre">Access</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ACCESS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStreamManager_1_1TypedStreamInfo"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TypedStreamInfo</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413StreamManager" title="StreamManager"><span class="n"><span class="pre">StreamManager</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N13StreamManager10StreamInfoE" title="StreamManager::StreamInfo"><span class="n"><span class="pre">StreamInfo</span></span></a><a class="headerlink" href="#_CPPv4I0_4Type_6AccessEN13StreamManager15TypedStreamInfoE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;StreamManager.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15TypedStreamInfo15TypedStreamInfoERKNSt6stringE">
+<span id="_CPPv3N13StreamManager15TypedStreamInfo15TypedStreamInfoERKNSt6stringE"></span><span id="_CPPv2N13StreamManager15TypedStreamInfo15TypedStreamInfoERKNSt6stringE"></span><span id="StreamManager::TypedStreamInfo::TypedStreamInfo__ssCR"></span><span class="target" id="classStreamManager_1_1TypedStreamInfo_1a2e5023a18f067099e5450c6b8dcfc747"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TypedStreamInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager15TypedStreamInfo15TypedStreamInfoERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15TypedStreamInfo15TypedStreamInfoERKNSt6stringE3PtrI1TE">
+<span id="_CPPv3N13StreamManager15TypedStreamInfo15TypedStreamInfoERKNSt6stringE3PtrI1TE"></span><span id="_CPPv2N13StreamManager15TypedStreamInfo15TypedStreamInfoERKNSt6stringE3PtrI1TE"></span><span id="StreamManager::TypedStreamInfo::TypedStreamInfo__ssCR.Ptr:T:"></span><span class="target" id="classStreamManager_1_1TypedStreamInfo_1a1481ab5539fdcd8b729acbbea401d620"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TypedStreamInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_4Type_6AccessEN13StreamManager15TypedStreamInfoE" title="StreamManager::TypedStreamInfo::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_ptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager15TypedStreamInfo15TypedStreamInfoERKNSt6stringE3PtrI1TE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15TypedStreamInfoD0Ev">
+<span id="_CPPv3N13StreamManager15TypedStreamInfoD0Ev"></span><span id="_CPPv2N13StreamManager15TypedStreamInfoD0Ev"></span><span id="StreamManager::TypedStreamInfo::~TypedStreamInfo"></span><span class="target" id="classStreamManager_1_1TypedStreamInfo_1ab61d132ece9a6544ff811945d6e10ca7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~TypedStreamInfo</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager15TypedStreamInfoD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager15TypedStreamInfo7GetTypeEv">
+<span id="_CPPv3NK13StreamManager15TypedStreamInfo7GetTypeEv"></span><span id="_CPPv2NK13StreamManager15TypedStreamInfo7GetTypeEv"></span><span id="StreamManager::TypedStreamInfo::GetTypeC"></span><span class="target" id="classStreamManager_1_1TypedStreamInfo_1aed81f4a75498de1310a0f5d67ab96643"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager4TypeE" title="StreamManager::Type"><span class="n"><span class="pre">Type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetType</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager15TypedStreamInfo7GetTypeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13StreamManager15TypedStreamInfo9GetAccessEv">
+<span id="_CPPv3NK13StreamManager15TypedStreamInfo9GetAccessEv"></span><span id="_CPPv2NK13StreamManager15TypedStreamInfo9GetAccessEv"></span><span id="StreamManager::TypedStreamInfo::GetAccessC"></span><span class="target" id="classStreamManager_1_1TypedStreamInfo_1a7de75fa99f0308f39cc33ee62cae10f8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager6AccessE" title="StreamManager::Access"><span class="n"><span class="pre">Access</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetAccess</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK13StreamManager15TypedStreamInfo9GetAccessEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15TypedStreamInfo9GetStreamEv">
+<span id="_CPPv3N13StreamManager15TypedStreamInfo9GetStreamEv"></span><span id="_CPPv2N13StreamManager15TypedStreamInfo9GetStreamEv"></span><span id="StreamManager::TypedStreamInfo::GetStream"></span><span class="target" id="classStreamManager_1_1TypedStreamInfo_1a092e5953dde65000b5eab363be9bf078"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_4Type_6AccessEN13StreamManager15TypedStreamInfoE" title="StreamManager::TypedStreamInfo::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager15TypedStreamInfo9GetStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15TypedStreamInfo14GetInputStreamEv">
+<span id="_CPPv3N13StreamManager15TypedStreamInfo14GetInputStreamEv"></span><span id="_CPPv2N13StreamManager15TypedStreamInfo14GetInputStreamEv"></span><span id="StreamManager::TypedStreamInfo::GetInputStream"></span><span class="target" id="classStreamManager_1_1TypedStreamInfo_1a2b832e6c9d8b117ce796a571fd3da554"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetInputStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N13StreamManager15TypedStreamInfo14GetInputStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15TypedStreamInfo15GetOutputStreamEv">
+<span id="_CPPv3N13StreamManager15TypedStreamInfo15GetOutputStreamEv"></span><span id="_CPPv2N13StreamManager15TypedStreamInfo15GetOutputStreamEv"></span><span id="StreamManager::TypedStreamInfo::GetOutputStream"></span><span class="target" id="classStreamManager_1_1TypedStreamInfo_1a9be5d8d29491e5141e7de50b72ccf88f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetOutputStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N13StreamManager15TypedStreamInfo15GetOutputStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15TypedStreamInfo11GetIOStreamEv">
+<span id="_CPPv3N13StreamManager15TypedStreamInfo11GetIOStreamEv"></span><span id="_CPPv2N13StreamManager15TypedStreamInfo11GetIOStreamEv"></span><span id="StreamManager::TypedStreamInfo::GetIOStream"></span><span class="target" id="classStreamManager_1_1TypedStreamInfo_1ad09bc20a832d70535d460a22dc7697f7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">iostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetIOStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N13StreamManager15TypedStreamInfo11GetIOStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15TypedStreamInfo11ResetStreamEv">
+<span id="_CPPv3N13StreamManager15TypedStreamInfo11ResetStreamEv"></span><span id="_CPPv2N13StreamManager15TypedStreamInfo11ResetStreamEv"></span><span id="StreamManager::TypedStreamInfo::ResetStream"></span><span class="target" id="classStreamManager_1_1TypedStreamInfo_1a654299bd97acec4ae718bce13f659438"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResetStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13StreamManager15TypedStreamInfo11ResetStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15TypedStreamInfo8INPUT_OKE">
+<span id="_CPPv3N13StreamManager15TypedStreamInfo8INPUT_OKE"></span><span id="_CPPv2N13StreamManager15TypedStreamInfo8INPUT_OKE"></span><span id="StreamManager::TypedStreamInfo::INPUT_OK__b"></span><span class="target" id="classStreamManager_1_1TypedStreamInfo_1a83a387389cb6024e883166a1e57f1e22"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">INPUT_OK</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0_4Type_6AccessEN13StreamManager15TypedStreamInfoE" title="StreamManager::TypedStreamInfo::ACCESS"><span class="n"><span class="pre">ACCESS</span></span></a><span class="w"> </span><span class="o"><span class="pre">==</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager6AccessE" title="StreamManager::Access"><span class="n"><span class="pre">Access</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N13StreamManager6Access5INPUTE" title="StreamManager::Access::INPUT"><span class="n"><span class="pre">INPUT</span></span></a><span class="w"> </span><span class="o"><span class="pre">||</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_4Type_6AccessEN13StreamManager15TypedStreamInfoE" title="StreamManager::TypedStreamInfo::ACCESS"><span class="n"><span class="pre">ACCESS</span></span></a><span class="w"> </span><span class="o"><span class="pre">==</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager6AccessE" title="StreamManager::Access"><span class="n"><span class="pre">Access</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N13StreamManager6Access2IOE" title="StreamManager::Access::IO"><span class="n"><span class="pre">IO</span></span></a><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N13StreamManager15TypedStreamInfo8INPUT_OKE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15TypedStreamInfo9OUTPUT_OKE">
+<span id="_CPPv3N13StreamManager15TypedStreamInfo9OUTPUT_OKE"></span><span id="_CPPv2N13StreamManager15TypedStreamInfo9OUTPUT_OKE"></span><span id="StreamManager::TypedStreamInfo::OUTPUT_OK__b"></span><span class="target" id="classStreamManager_1_1TypedStreamInfo_1a71580cb50daf5da117f20a16cf8879a9"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OUTPUT_OK</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0_4Type_6AccessEN13StreamManager15TypedStreamInfoE" title="StreamManager::TypedStreamInfo::ACCESS"><span class="n"><span class="pre">ACCESS</span></span></a><span class="w"> </span><span class="o"><span class="pre">==</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager6AccessE" title="StreamManager::Access"><span class="n"><span class="pre">Access</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N13StreamManager6Access6OUTPUTE" title="StreamManager::Access::OUTPUT"><span class="n"><span class="pre">OUTPUT</span></span></a><span class="w"> </span><span class="o"><span class="pre">||</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_4Type_6AccessEN13StreamManager15TypedStreamInfoE" title="StreamManager::TypedStreamInfo::ACCESS"><span class="n"><span class="pre">ACCESS</span></span></a><span class="w"> </span><span class="o"><span class="pre">==</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13StreamManager6AccessE" title="StreamManager::Access"><span class="n"><span class="pre">Access</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N13StreamManager6Access2IOE" title="StreamManager::Access::IO"><span class="n"><span class="pre">IO</span></span></a><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N13StreamManager15TypedStreamInfo9OUTPUT_OKE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13StreamManager15TypedStreamInfo3ptrE">
+<span id="_CPPv3N13StreamManager15TypedStreamInfo3ptrE"></span><span id="_CPPv2N13StreamManager15TypedStreamInfo3ptrE"></span><span id="StreamManager::TypedStreamInfo::ptr__Ptr:T:"></span><span class="target" id="classStreamManager_1_1TypedStreamInfo_1aade7b4c94040498c373c9a2e07fc77f6"></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_4Type_6AccessEN13StreamManager15TypedStreamInfoE" title="StreamManager::TypedStreamInfo::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ptr</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13StreamManager15TypedStreamInfo3ptrE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="NullStream.html" class="btn btn-neutral float-left" title="NullStream.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ascii_utils.html" class="btn btn-neutral float-right" title="ascii_utils.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

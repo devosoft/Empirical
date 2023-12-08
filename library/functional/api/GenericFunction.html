@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GenericFunction.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/functional/api/GenericFunction.7d8eccd2-32ec-4dfa-806d-67d402f2b157.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="flex_function.hpp" href="flex_function.html" />
+    <link rel="prev" title="FunctionSet.hpp" href="FunctionSet.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../functional.html">Functional</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../functional.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AnyFunction.html">AnyFunction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FunctionSet.html">FunctionSet.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">GenericFunction.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415GenericFunction"><code class="docutils literal notranslate"><span class="pre">GenericFunction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE8Function"><code class="docutils literal notranslate"><span class="pre">Function</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE8FunctionIF6RETURNDp6PARAMSEE"><code class="docutils literal notranslate"><span class="pre">Function</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="flex_function.html">flex_function.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="memo_function.html">memo_function.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../functional.html">Functional</a></li>
+      <li class="breadcrumb-item active">GenericFunction.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="genericfunction-hpp">
+<h1>GenericFunction.hpp<a class="headerlink" href="#genericfunction-hpp" title="Link to this heading"></a></h1>
+<p>Based on std::function, but with a common base class. </p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Need to setup Call on GenericFunction to just take a function signature as a template argument, rather than listing all types. </p>
+</dd></dl>
+
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA</p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv415GenericFunction">
+<span id="_CPPv315GenericFunction"></span><span id="_CPPv215GenericFunction"></span><span id="GenericFunction"></span><span class="target" id="classGenericFunction"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GenericFunction</span></span></span><a class="headerlink" href="#_CPPv415GenericFunction" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;GenericFunction.hpp&gt;</em></div>
+<p>The Function templated class behaves almost identically to std::function, but can be reduced to the GenericFunction base class which is NOT templated.</p>
+<p>An GenericFunction object can be converted back into the derived type with the .Convert&lt;return(args…)&gt;() member function. </p>
+<p>Subclassed by Function&lt; RETURN(PARAMS…)&gt;</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15GenericFunctionD0Ev">
+<span id="_CPPv3N15GenericFunctionD0Ev"></span><span id="_CPPv2N15GenericFunctionD0Ev"></span><span id="GenericFunction::~GenericFunction"></span><span class="target" id="classGenericFunction_1a19b22e27f1366d3097dc5fc4e1e297d4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~GenericFunction</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15GenericFunctionD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK15GenericFunction7NumArgsEv">
+<span id="_CPPv3NK15GenericFunction7NumArgsEv"></span><span id="_CPPv2NK15GenericFunction7NumArgsEv"></span><span id="GenericFunction::NumArgsC"></span><span class="target" id="classGenericFunction_1acbb796c1d0f04949fbe1456bcde1c99f"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumArgs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK15GenericFunction7NumArgsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpEN15GenericFunction4CallEDaDpRR2Ts">
+<span id="_CPPv3I0DpEN15GenericFunction4CallEDpRR2Ts"></span><span id="_CPPv2I0DpEN15GenericFunction4CallEDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RETURN</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classGenericFunction_1a1b462615921522b8fe436ab2442bc88e"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Call</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpEN15GenericFunction4CallEDaDpRR2Ts" title="GenericFunction::Call::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN15GenericFunction4CallEDaDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>A generic form of the function call operator; use arg types to determine derived form. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpEN15GenericFunction6CallOKEbDpRR2Ts">
+<span id="_CPPv3I0DpEN15GenericFunction6CallOKEDpRR2Ts"></span><span id="_CPPv2I0DpEN15GenericFunction6CallOKEDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RETURN</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classGenericFunction_1a595ff60f698b1700e7f3f7286989f7ba"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CallOK</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpEN15GenericFunction6CallOKEbDpRR2Ts" title="GenericFunction::CallOK::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN15GenericFunction6CallOKEbDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if a function call will succeed before trying it. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpEN15GenericFunction10CallTypeOKEbv">
+<span id="_CPPv3I0DpEN15GenericFunction10CallTypeOKEv"></span><span id="_CPPv2I0DpEN15GenericFunction10CallTypeOKEv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RETURN</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classGenericFunction_1a2453edada41b29a65804b956adf9e779"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CallTypeOK</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN15GenericFunction10CallTypeOKEbv" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if a function call will succeed before trying it, based only on types. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpEN15GenericFunctionclEDaDpRR2Ts">
+<span id="_CPPv3I0DpEN15GenericFunctionclEDpRR2Ts"></span><span id="_CPPv2I0DpEN15GenericFunctionclEDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RETURN</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classGenericFunction_1af46190be7c7e690fb57f46b1912506fd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpEN15GenericFunctionclEDaDpRR2Ts" title="GenericFunction::operator()::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN15GenericFunctionclEDaDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>A generic form of the function call operator; use arg types to determine derived form. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN15GenericFunction7ConvertEDav">
+<span id="_CPPv3I0EN15GenericFunction7ConvertEv"></span><span id="_CPPv2I0EN15GenericFunction7ConvertEv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classGenericFunction_1aa467aba05b9f38a181586ca0776fb501"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Convert</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN15GenericFunction7ConvertEDav" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert this GenericFunction into a derived Function. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN15GenericFunction9ConvertOKEbv">
+<span id="_CPPv3I0EN15GenericFunction9ConvertOKEv"></span><span id="_CPPv2I0EN15GenericFunction9ConvertOKEv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classGenericFunction_1a15e15ef9a1b9e72e32a460a8590b3792"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ConvertOK</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN15GenericFunction9ConvertOKEbv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if this GenericFunction can be converted into a derived Function. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE8Function">
+<span id="_CPPv3IDpE8Function"></span><span id="_CPPv2IDpE8Function"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFunction"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Function</span></span></span><a class="headerlink" href="#_CPPv4IDpE8Function" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;GenericFunction.hpp&gt;</em></div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE8FunctionIF6RETURNDp6PARAMSEE">
+<span id="_CPPv3I0DpE8FunctionIF6RETURNDp6PARAMSEE"></span><span id="_CPPv2I0DpE8FunctionIF6RETURNDp6PARAMSEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RETURN</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">PARAMS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFunction_3_01RETURN_07PARAMS_8_8_8_08_4"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Function</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE8FunctionIF6RETURNDp6PARAMSEE" title="Function&lt;RETURN(PARAMS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE8FunctionIF6RETURNDp6PARAMSEE" title="Function&lt;RETURN(PARAMS...)&gt;::PARAMS"><span class="n"><span class="pre">PARAMS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415GenericFunction" title="GenericFunction"><span class="n"><span class="pre">GenericFunction</span></span></a><a class="headerlink" href="#_CPPv4I0DpE8FunctionIF6RETURNDp6PARAMSEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;GenericFunction.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN8FunctionIF6RETURNDp6PARAMSEE8FunctionEDpRR2Ts">
+<span id="_CPPv3IDpEN8FunctionIF6RETURNDp6PARAMSEE8FunctionEDpRR2Ts"></span><span id="_CPPv2IDpEN8FunctionIF6RETURNDp6PARAMSEE8FunctionEDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFunction_3_01RETURN_07PARAMS_8_8_8_08_4_1adfe1665dfdc32bd5ce0b014119ffe8cb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Function</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN8FunctionIF6RETURNDp6PARAMSEE8FunctionEDpRR2Ts" title="Function&lt;RETURN(PARAMS...)&gt;::Function::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN8FunctionIF6RETURNDp6PARAMSEE8FunctionEDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Forward all args to std::function constructor… </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8FunctionIF6RETURNDp6PARAMSEE7NumArgsEv">
+<span id="_CPPv3NK8FunctionIF6RETURNDp6PARAMSEE7NumArgsEv"></span><span id="_CPPv2NK8FunctionIF6RETURNDp6PARAMSEE7NumArgsEv"></span><span class="target" id="classFunction_3_01RETURN_07PARAMS_8_8_8_08_4_1a7388e5dfd4275e052014141228ba3b68"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumArgs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK8FunctionIF6RETURNDp6PARAMSEE7NumArgsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN8FunctionIF6RETURNDp6PARAMSEE4CallE6RETURNDpRR2Ts">
+<span id="_CPPv3IDpEN8FunctionIF6RETURNDp6PARAMSEE4CallEDpRR2Ts"></span><span id="_CPPv2IDpEN8FunctionIF6RETURNDp6PARAMSEE4CallEDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFunction_3_01RETURN_07PARAMS_8_8_8_08_4_1a2cd1d83d7cbb8de7ff3bfd9b19fe16c0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE8FunctionIF6RETURNDp6PARAMSEE" title="Function&lt;RETURN(PARAMS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Call</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN8FunctionIF6RETURNDp6PARAMSEE4CallE6RETURNDpRR2Ts" title="Function&lt;RETURN(PARAMS...)&gt;::Call::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN8FunctionIF6RETURNDp6PARAMSEE4CallE6RETURNDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Forward all args to std::function call. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN8FunctionIF6RETURNDp6PARAMSEEclE6RETURNDpRR2Ts">
+<span id="_CPPv3IDpEN8FunctionIF6RETURNDp6PARAMSEEclEDpRR2Ts"></span><span id="_CPPv2IDpEN8FunctionIF6RETURNDp6PARAMSEEclEDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFunction_3_01RETURN_07PARAMS_8_8_8_08_4_1aa686fd7d346835661b5add0e0b52cb26"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE8FunctionIF6RETURNDp6PARAMSEE" title="Function&lt;RETURN(PARAMS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN8FunctionIF6RETURNDp6PARAMSEEclE6RETURNDpRR2Ts" title="Function&lt;RETURN(PARAMS...)&gt;::operator()::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN8FunctionIF6RETURNDp6PARAMSEEclE6RETURNDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Forward all args to std::function call. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8FunctionIF6RETURNDp6PARAMSEE11GetFunctionEv">
+<span id="_CPPv3NK8FunctionIF6RETURNDp6PARAMSEE11GetFunctionEv"></span><span id="_CPPv2NK8FunctionIF6RETURNDp6PARAMSEE11GetFunctionEv"></span><span class="target" id="classFunction_3_01RETURN_07PARAMS_8_8_8_08_4_1a31518f3510ab4334813bf2ac0aac12b5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8FunctionIF6RETURNDp6PARAMSEE5fun_tE" title="Function&lt;RETURN(PARAMS...)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetFunction</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8FunctionIF6RETURNDp6PARAMSEE11GetFunctionEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the std::function to be called. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-types">Protected Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N8FunctionIF6RETURNDp6PARAMSEE5fun_tE">
+<span id="_CPPv3N8FunctionIF6RETURNDp6PARAMSEE5fun_tE"></span><span id="_CPPv2N8FunctionIF6RETURNDp6PARAMSEE5fun_tE"></span><span class="target" id="classFunction_3_01RETURN_07PARAMS_8_8_8_08_4_1a043fc8c3d99389590b578b66bfc7635f"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE8FunctionIF6RETURNDp6PARAMSEE" title="Function&lt;RETURN(PARAMS...)&gt;::RETURN"><span class="n"><span class="pre">RETURN</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE8FunctionIF6RETURNDp6PARAMSEE" title="Function&lt;RETURN(PARAMS...)&gt;::PARAMS"><span class="n"><span class="pre">PARAMS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N8FunctionIF6RETURNDp6PARAMSEE5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8FunctionIF6RETURNDp6PARAMSEE3funE">
+<span id="_CPPv3N8FunctionIF6RETURNDp6PARAMSEE3funE"></span><span id="_CPPv2N8FunctionIF6RETURNDp6PARAMSEE3funE"></span><span class="target" id="classFunction_3_01RETURN_07PARAMS_8_8_8_08_4_1adb3ac70024633f349e04db78225e7aa9"></span><a class="reference internal" href="#_CPPv4N8FunctionIF6RETURNDp6PARAMSEE5fun_tE" title="Function&lt;RETURN(PARAMS...)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun</span></span></span><a class="headerlink" href="#_CPPv4N8FunctionIF6RETURNDp6PARAMSEE3funE" title="Link to this definition"></a><br /></dt>
+<dd><p>The std::function to be called. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="FunctionSet.html" class="btn btn-neutral float-left" title="FunctionSet.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="flex_function.html" class="btn btn-neutral float-right" title="flex_function.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

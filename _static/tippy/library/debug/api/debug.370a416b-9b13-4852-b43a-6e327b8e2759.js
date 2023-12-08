@@ -1,0 +1,22 @@
+selector_to_html = {"a[href=\"#c.BlockRelease\"]": "<dt class=\"sig sig-object cpp\" id=\"c.BlockRelease\">\n<span class=\"target\" id=\"debug_8hpp_1a0e93c18b7976a92addec55a4e1bb7ad5\"></span><span class=\"sig-name descname\"><span class=\"n\"><span class=\"pre\">BlockRelease</span></span></span><span class=\"sig-paren\">(</span><span class=\"n\"><span class=\"pre\">BLOCK</span></span><span class=\"sig-paren\">)</span><br/></dt><dd><p>BlockRelease(true) will halt compilation if NDEBUG is on and EMP_NO_BLOCK is off. It is useful to include alongside debug code that you want to remember to remove when you are done debugging; it is automatically included with the emp_debug() function below. If you want to intentionally compile in release mode, make sure to define EMP_NO_BLOCK. </p></dd>", "a[href=\"#_CPPv4IDpE15emp_debug_printvDpRR2Ts\"]": "<dt class=\"sig sig-object cpp\" id=\"_CPPv4IDpE15emp_debug_printvDpRR2Ts\">\n<span id=\"_CPPv3IDpE15emp_debug_printDpRR2Ts\"></span><span id=\"_CPPv2IDpE15emp_debug_printDpRR2Ts\"></span><span class=\"k\"><span class=\"pre\">template</span></span><span class=\"p\"><span class=\"pre\">&lt;</span></span><span class=\"k\"><span class=\"pre\">typename</span></span><span class=\"w\"> </span><span class=\"p\"><span class=\"pre\">...</span></span><span class=\"sig-name descname\"><span class=\"n\"><span class=\"pre\">Ts</span></span></span><span class=\"p\"><span class=\"pre\">&gt;</span></span><br/><span class=\"target\" id=\"debug_8hpp_1a9ac0e31e7b1ac834b28a4f7dc6c6c33d\"></span><span class=\"kt\"><span class=\"pre\">void</span></span><span class=\"w\"> </span><span class=\"sig-name descname\"><span class=\"n\"><span class=\"pre\">emp_debug_print</span></span></span><span class=\"sig-paren\">(</span><a class=\"reference internal\" href=\"#_CPPv4IDpE15emp_debug_printvDpRR2Ts\" title=\"emp_debug_print::Ts\"><span class=\"n\"><span class=\"pre\">Ts</span></span></a><span class=\"p\"><span class=\"pre\">&amp;</span></span><span class=\"p\"><span class=\"pre\">&amp;</span></span><span class=\"p\"><span class=\"pre\">...</span></span><span class=\"w\"> </span><span class=\"n sig-param\"><span class=\"pre\">args</span></span><span class=\"sig-paren\">)</span><br/></dt><dd></dd>", "a[href=\"#_CPPv410test_debugv\"]": "<dt class=\"sig sig-object cpp\" id=\"_CPPv410test_debugv\">\n<span id=\"_CPPv310test_debugv\"></span><span id=\"_CPPv210test_debugv\"></span><span id=\"test_debugCE\"></span><span class=\"target\" id=\"debug_8hpp_1a4a4659554db6b9324c43bc95d1f64e46\"></span><span class=\"k\"><span class=\"pre\">constexpr</span></span><span class=\"w\"> </span><span class=\"kt\"><span class=\"pre\">bool</span></span><span class=\"w\"> </span><span class=\"sig-name descname\"><span class=\"n\"><span class=\"pre\">test_debug</span></span></span><span class=\"sig-paren\">(</span><span class=\"sig-paren\">)</span><br/></dt><dd></dd>", "a[href=\"#debug-hpp\"]": "<h1 class=\"tippy-header\" style=\"margin-top: 0;\">debug.hpp<a class=\"headerlink\" href=\"#debug-hpp\" title=\"Link to this heading\">\uf0c1</a></h1><p>Basic tools for use in developing high-assurance code. </p>", "a[href=\"#c.emp_debug\"]": "<dt class=\"sig sig-object cpp\" id=\"c.emp_debug\">\n<span class=\"target\" id=\"debug_8hpp_1a78bab811de1c3f0697b341acedd247fc\"></span><span class=\"sig-name descname\"><span class=\"n\"><span class=\"pre\">emp_debug</span></span></span><span class=\"sig-paren\">(</span><span class=\"p\"><span class=\"pre\">...</span></span><span class=\"sig-paren\">)</span><br/></dt><dd><p>emp_debug() will print its contents as a message in debug mode and BLOCK release mode until it is removed. It\u2019s a useful too for printing \u201cPing1\u201d, \u201cPing2\u201d, etc, but no forgetting to remove them. </p></dd>"}
+skip_classes = ["headerlink", "sd-stretched-link"]
+
+window.onload = function () {
+    for (const [select, tip_html] of Object.entries(selector_to_html)) {
+        const links = document.querySelectorAll(` ${select}`);
+        for (const link of links) {
+            if (skip_classes.some(c => link.classList.contains(c))) {
+                continue;
+            }
+
+            tippy(link, {
+                content: tip_html,
+                allowHTML: true,
+                arrow: true,
+                placement: 'auto-start', maxWidth: 500, interactive: false,
+
+            });
+        };
+    };
+    console.log("tippy tips loaded!");
+};

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>errors.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/base/api/errors.75503b85-5be7-442d-825b-8a1368877419.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="map.hpp" href="map.html" />
+    <link rel="prev" title="error.hpp" href="error.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../base.html">General Purpose Debugging Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../base.html#empirical-vectors-and-arrays">Empirical vectors and arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../base.html#empirical-asserts">Empirical asserts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../base.html#empirical-warnings">Empirical Warnings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../base.html#empirical-pointers">Empirical pointers</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../base.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="MapProxy.html">MapProxy.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Ptr.html">Ptr.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="always_assert.html">always_assert.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="always_assert_warning.html">always_assert_warning.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="array.html">array.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="assert.html">assert.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="assert_warning.html">assert_warning.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emscripten_assert.html">emscripten_assert.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="error.html">error.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">errors.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414GetEmptyExceptv"><code class="docutils literal notranslate"><span class="pre">GetEmptyExcept()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412GetExceptMapv"><code class="docutils literal notranslate"><span class="pre">GetExceptMap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413TriggerExceptRKNSt6stringERKNSt6stringEb"><code class="docutils literal notranslate"><span class="pre">TriggerExcept()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49GetExceptRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">GetExcept()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49PopExceptRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">PopExcept()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412CountExceptsv"><code class="docutils literal notranslate"><span class="pre">CountExcepts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49HasExceptv"><code class="docutils literal notranslate"><span class="pre">HasExcept()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49HasExceptRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">HasExcept()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412ClearExceptsv"><code class="docutils literal notranslate"><span class="pre">ClearExcepts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411ClearExceptRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ClearExcept()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE6NotifyvDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Notify()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE13NotifyWarningvDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">NotifyWarning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE11NotifyErrorvDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">NotifyError()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE14LibraryWarningvDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">LibraryWarning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE12LibraryErrorvDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">LibraryError()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE13InternalErrorvDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">InternalError()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410ExceptInfo"><code class="docutils literal notranslate"><span class="pre">ExceptInfo</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="map.html">map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notify.html">notify.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optional.html">optional.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unordered_map.html">unordered_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector.html">vector.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../base.html">General Purpose Debugging Tools</a></li>
+      <li class="breadcrumb-item active">errors.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="errors-hpp">
+<h1>errors.hpp<a class="headerlink" href="#errors-hpp" title="Link to this heading"></a></h1>
+<p>Tools to help manage various problems in command-line or Emscripten-based applications. </p>
+<p>
+There are three possible recipiants for all errors/warnings.<ul class="simple">
+<li><p>The end-user if the problem stems from inputs they provided to the executable.</p></li>
+<li><p>The library user if the problem is due to mis-use of library functionality.</p></li>
+<li><p>The library developers if something that should be impossible occurs.</p></li>
+</ul>
+</p>
+<p>There are also three types of problmes to notify about:<ul class="simple">
+<li><p>Warnings if something looks suspicious, but isn’t technically a problem.</p></li>
+<li><p>Errors if something has gone so horribly wrong that it is impossible to recover from.</p></li>
+<li><p>Exceptions if something didn’t go the way we expected, but we can still recover.</p></li>
+</ul>
+</p>
+<p>In general, most of the content of this file is targeted at providing useful tools for library users; end-users should receive more customized messages and asserts should capture suposedly “impossible” situations that none-the-less occur in the library itself.</p>
+<p>NOTES:<ul>
+<li><p>Whenever possible, exceptions should be preferred. They are more specific than warnings, but don’t halt execution like errors.</p></li>
+<li><p>Warnings should always detail what should be done differently to surpress the warning.</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>We should move over to a pure replacement for exceptions.<ul class="simple">
+<li><p>Different types of exceptions can trigger a signal. Actions should return a bool indicating whether the exception was fixed.</p></li>
+<li><p>Remaining exceptions are recorded and passed back up the chain to (hopefully) be caught.</p></li>
+<li><p>Uncaught exceptions should have a default behavior when Resolved. Exceptions could have various resolve times: Next exception added, Next exception check, when ResolveExceptions() is run, End of program, or ASAP. (perhaps) </p></li>
+</ul>
+</p>
+</dd></dl>
+
+</p>
+</li>
+</ul>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA</p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414GetEmptyExceptv">
+<span id="_CPPv314GetEmptyExceptv"></span><span id="_CPPv214GetEmptyExceptv"></span><span id="GetEmptyExcept"></span><span class="target" id="errors_8hpp_1a674c7784868982ed87ce8cb607755afd"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410ExceptInfo" title="ExceptInfo"><span class="n"><span class="pre">ExceptInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetEmptyExcept</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414GetEmptyExceptv" title="Link to this definition"></a><br /></dt>
+<dd><p>Function to generate an empty exception (returned when an exception is checked, but none exist.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412GetExceptMapv">
+<span id="_CPPv312GetExceptMapv"></span><span id="_CPPv212GetExceptMapv"></span><span id="GetExceptMap"></span><span class="target" id="errors_8hpp_1a661f68af8c9fd048f43fe203099daabf"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">multimap</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410ExceptInfo" title="ExceptInfo"><span class="n"><span class="pre">ExceptInfo</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetExceptMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412GetExceptMapv" title="Link to this definition"></a><br /></dt>
+<dd><p>A map of all exceptions that have occurred and are awaiting to be dealt with. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413TriggerExceptRKNSt6stringERKNSt6stringEb">
+<span id="_CPPv313TriggerExceptRKNSt6stringERKNSt6stringEb"></span><span id="_CPPv213TriggerExceptRKNSt6stringERKNSt6stringEb"></span><span id="TriggerExcept__ssCR.ssCR.b"></span><span class="target" id="errors_8hpp_1a92104de71c243e643d6a28c81546622f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TriggerExcept</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_desc</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_error</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413TriggerExceptRKNSt6stringERKNSt6stringEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Provide information about an exception that needs to be triggered. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49GetExceptRKNSt6stringE">
+<span id="_CPPv39GetExceptRKNSt6stringE"></span><span id="_CPPv29GetExceptRKNSt6stringE"></span><span id="GetExcept__ssCR"></span><span class="target" id="errors_8hpp_1a8490b33df130adc96ec67f18c0387c52"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410ExceptInfo" title="ExceptInfo"><span class="n"><span class="pre">ExceptInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetExcept</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49GetExceptRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the first waiting exception. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49PopExceptRKNSt6stringE">
+<span id="_CPPv39PopExceptRKNSt6stringE"></span><span id="_CPPv29PopExceptRKNSt6stringE"></span><span id="PopExcept__ssCR"></span><span class="target" id="errors_8hpp_1aad6ee82ff22a219a351377433c54bed3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410ExceptInfo" title="ExceptInfo"><span class="n"><span class="pre">ExceptInfo</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PopExcept</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49PopExceptRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get and <em>remove</em> a waiting exception. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412CountExceptsv">
+<span id="_CPPv312CountExceptsv"></span><span id="_CPPv212CountExceptsv"></span><span id="CountExcepts"></span><span class="target" id="errors_8hpp_1a5fea0b0a53fbfb6d18d1a6907ba43569"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountExcepts</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412CountExceptsv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many exceptions are waiting to be dealt with? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49HasExceptv">
+<span id="_CPPv39HasExceptv"></span><span id="_CPPv29HasExceptv"></span><span id="HasExcept"></span><span class="target" id="errors_8hpp_1a9eecd70b09ef6b7a033c4016e7d88d2b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasExcept</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49HasExceptv" title="Link to this definition"></a><br /></dt>
+<dd><p>Are any exceptions waiting? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49HasExceptRKNSt6stringE">
+<span id="_CPPv39HasExceptRKNSt6stringE"></span><span id="_CPPv29HasExceptRKNSt6stringE"></span><span id="HasExcept__ssCR"></span><span class="target" id="errors_8hpp_1a37c84e221d4cebdda64d49ec5d35f721"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasExcept</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49HasExceptRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Are any exceptions of a particular type waiting? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412ClearExceptsv">
+<span id="_CPPv312ClearExceptsv"></span><span id="_CPPv212ClearExceptsv"></span><span id="ClearExcepts"></span><span class="target" id="errors_8hpp_1aa10b3ec653b246ba2759910a2e2a02e2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClearExcepts</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ClearExceptsv" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove all waiting exceptions. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv411ClearExceptRKNSt6stringE">
+<span id="_CPPv311ClearExceptRKNSt6stringE"></span><span id="_CPPv211ClearExceptRKNSt6stringE"></span><span id="ClearExcept__ssCR"></span><span class="target" id="errors_8hpp_1accb602bd42fc51f23c982d9c340e15ab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClearExcept</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411ClearExceptRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove all waiting exceptions of the desginated type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE6NotifyvDpRR2Ts">
+<span id="_CPPv3IDpE6NotifyDpRR2Ts"></span><span id="_CPPv2IDpE6NotifyDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="errors_8hpp_1abf52c8f0b70c993c35c29b028739e970"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Notify</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpE6NotifyvDpRR2Ts" title="Notify::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpE6NotifyvDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Send information to a program user (via standard error in native mode, or alert in Emscripten) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE13NotifyWarningvDpRR2Ts">
+<span id="_CPPv3IDpE13NotifyWarningDpRR2Ts"></span><span id="_CPPv2IDpE13NotifyWarningDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="errors_8hpp_1a010025334ee21575de210d614eff8ade"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NotifyWarning</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpE13NotifyWarningvDpRR2Ts" title="NotifyWarning::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">msg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpE13NotifyWarningvDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>End user has done something possibly a problem. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE11NotifyErrorvDpRR2Ts">
+<span id="_CPPv3IDpE11NotifyErrorDpRR2Ts"></span><span id="_CPPv2IDpE11NotifyErrorDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="errors_8hpp_1a578ebcf9e13df44165c0352e0e204f6e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NotifyError</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpE11NotifyErrorvDpRR2Ts" title="NotifyError::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">msg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpE11NotifyErrorvDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>End user has done something resulting in an non-recoverable problem. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE14LibraryWarningvDpRR2Ts">
+<span id="_CPPv3IDpE14LibraryWarningDpRR2Ts"></span><span id="_CPPv2IDpE14LibraryWarningDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="errors_8hpp_1ac15add070021ddaa4d40feca493ac8de"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LibraryWarning</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpE14LibraryWarningvDpRR2Ts" title="LibraryWarning::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">msg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpE14LibraryWarningvDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Library user has made an error in how they are using the library. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE12LibraryErrorvDpRR2Ts">
+<span id="_CPPv3IDpE12LibraryErrorDpRR2Ts"></span><span id="_CPPv2IDpE12LibraryErrorDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="errors_8hpp_1a318786ba8539c317a04998176837d007"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LibraryError</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpE12LibraryErrorvDpRR2Ts" title="LibraryError::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">msg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpE12LibraryErrorvDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Library user has made an error in how they are using the library. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE13InternalErrorvDpRR2Ts">
+<span id="_CPPv3IDpE13InternalErrorDpRR2Ts"></span><span id="_CPPv2IDpE13InternalErrorDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="errors_8hpp_1aef349daa61329c7255594ef0d98eb7fd"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InternalError</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpE13InternalErrorvDpRR2Ts" title="InternalError::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">msg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpE13InternalErrorvDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Original library implementers must have made an error. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv410ExceptInfo">
+<span id="_CPPv310ExceptInfo"></span><span id="_CPPv210ExceptInfo"></span><span id="ExceptInfo"></span><span class="target" id="structExceptInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExceptInfo</span></span></span><a class="headerlink" href="#_CPPv410ExceptInfo" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;errors.hpp&gt;</em></div>
+<p>Information about an exception that has occured. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10ExceptInfo2idE">
+<span id="_CPPv3N10ExceptInfo2idE"></span><span id="_CPPv2N10ExceptInfo2idE"></span><span id="ExceptInfo::id__ss"></span><span class="target" id="structExceptInfo_1abc237b2b04429d2ea0b2fe3883bc6ed9"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id</span></span></span><a class="headerlink" href="#_CPPv4N10ExceptInfo2idE" title="Link to this definition"></a><br /></dt>
+<dd><p>A unique string ID for this exception type. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10ExceptInfo4descE">
+<span id="_CPPv3N10ExceptInfo4descE"></span><span id="_CPPv2N10ExceptInfo4descE"></span><span id="ExceptInfo::desc__ss"></span><span class="target" id="structExceptInfo_1ae60f5f9434da8133ef08e398d1fe4469"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">desc</span></span></span><a class="headerlink" href="#_CPPv4N10ExceptInfo4descE" title="Link to this definition"></a><br /></dt>
+<dd><p>A detailed description of thie exception. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10ExceptInfo16default_to_errorE">
+<span id="_CPPv3N10ExceptInfo16default_to_errorE"></span><span id="_CPPv2N10ExceptInfo16default_to_errorE"></span><span id="ExceptInfo::default_to_error__b"></span><span class="target" id="structExceptInfo_1a02d1efd7478a77f05dc651d1d3255013"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_to_error</span></span></span><a class="headerlink" href="#_CPPv4N10ExceptInfo16default_to_errorE" title="Link to this definition"></a><br /></dt>
+<dd><p>Should we default to an error (or a warning) if not resolved? </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="error.html" class="btn btn-neutral float-left" title="error.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="map.html" class="btn btn-neutral float-right" title="map.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

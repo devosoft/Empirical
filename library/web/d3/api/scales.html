@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scales.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../../_static/tippy/library/web/d3/api/scales.206230e7-3648-4922-a80f-a1c20814c5c1.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="selection.hpp" href="selection.html" />
+    <link rel="prev" title="layout.hpp" href="layout.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../d3.html">D3 Wrapper</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../d3-intro.html">Using Empirica’s D3.js Wrapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../d3-contents.html">D3 Wrapper API</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../d3.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../web.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../web.html">Web Tools (for use with Emscripten)</a></li>
+          <li class="breadcrumb-item"><a href="../d3.html">D3 Wrapper</a></li>
+      <li class="breadcrumb-item active">scales.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="scales-hpp">
+<h1>scales.hpp<a class="headerlink" href="#scales-hpp" title="Link to this heading"></a></h1>
+<p>Tools for scaling graph axes in D3. </p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv42D3">
+<span id="_CPPv32D3"></span><span id="_CPPv22D3"></span><span id="D3"></span><span class="target" id="namespaceD3"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">D3</span></span></span><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D39SqrtScaleEv">
+<span id="_CPPv3N2D39SqrtScaleEv"></span><span id="_CPPv2N2D39SqrtScaleEv"></span><span id="D3::SqrtScale"></span><span class="target" id="namespaceD3_1a350a86e4fcd6212630edb662bf1c44e4"></span><a class="reference internal" href="#_CPPv4N2D38PowScaleE" title="D3::PowScale"><span class="n"><span class="pre">PowScale</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SqrtScale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D39SqrtScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D315Category10ScaleE">
+<span id="_CPPv3N2D315Category10ScaleE"></span><span id="_CPPv2N2D315Category10ScaleE"></span><span id="D3::Category10Scale"></span><span class="target" id="classD3_1_1Category10Scale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Category10Scale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">private</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="d3_init.html#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><a class="headerlink" href="#_CPPv4N2D315Category10ScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D315Category10Scale15Category10ScaleEv">
+<span id="_CPPv3N2D315Category10Scale15Category10ScaleEv"></span><span id="_CPPv2N2D315Category10Scale15Category10ScaleEv"></span><span id="D3::Category10Scale::Category10Scale"></span><span class="target" id="classD3_1_1Category10Scale_1a2784190facbf618c954ca80b5c58c981"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Category10Scale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D315Category10Scale15Category10ScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D316Category20bScaleE">
+<span id="_CPPv3N2D316Category20bScaleE"></span><span id="_CPPv2N2D316Category20bScaleE"></span><span id="D3::Category20bScale"></span><span class="target" id="classD3_1_1Category20bScale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Category20bScale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">private</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="d3_init.html#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><a class="headerlink" href="#_CPPv4N2D316Category20bScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D316Category20bScale16Category20bScaleEv">
+<span id="_CPPv3N2D316Category20bScale16Category20bScaleEv"></span><span id="_CPPv2N2D316Category20bScale16Category20bScaleEv"></span><span id="D3::Category20bScale::Category20bScale"></span><span class="target" id="classD3_1_1Category20bScale_1a94a69ab306860a9a870580cc20fcabcd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Category20bScale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D316Category20bScale16Category20bScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D316Category20cScaleE">
+<span id="_CPPv3N2D316Category20cScaleE"></span><span id="_CPPv2N2D316Category20cScaleE"></span><span id="D3::Category20cScale"></span><span class="target" id="classD3_1_1Category20cScale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Category20cScale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">private</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="d3_init.html#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><a class="headerlink" href="#_CPPv4N2D316Category20cScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D316Category20cScale16Category20cScaleEv">
+<span id="_CPPv3N2D316Category20cScale16Category20cScaleEv"></span><span id="_CPPv2N2D316Category20cScale16Category20cScaleEv"></span><span id="D3::Category20cScale::Category20cScale"></span><span class="target" id="classD3_1_1Category20cScale_1aa6bf3d043d6822e11b91fac1dec0d848"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Category20cScale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D316Category20cScale16Category20cScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N2D316Category20cScale2idE">
+<span id="_CPPv3N2D316Category20cScale2idE"></span><span id="_CPPv2N2D316Category20cScale2idE"></span><span id="D3::Category20cScale::id__i"></span><span class="target" id="classD3_1_1Category20cScale_1ae2cb955c8296934d7b5855b5caf8fc6d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id</span></span></span><a class="headerlink" href="#_CPPv4N2D316Category20cScale2idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D315Category20ScaleE">
+<span id="_CPPv3N2D315Category20ScaleE"></span><span id="_CPPv2N2D315Category20ScaleE"></span><span id="D3::Category20Scale"></span><span class="target" id="classD3_1_1Category20Scale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Category20Scale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">private</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="d3_init.html#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><a class="headerlink" href="#_CPPv4N2D315Category20ScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D315Category20Scale15Category20ScaleEv">
+<span id="_CPPv3N2D315Category20Scale15Category20ScaleEv"></span><span id="_CPPv2N2D315Category20Scale15Category20ScaleEv"></span><span id="D3::Category20Scale::Category20Scale"></span><span class="target" id="classD3_1_1Category20Scale_1acebaeb95d2740f8cbfbf71c9415460a6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Category20Scale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D315Category20Scale15Category20ScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313IdentityScaleE">
+<span id="_CPPv3N2D313IdentityScaleE"></span><span id="_CPPv2N2D313IdentityScaleE"></span><span id="D3::IdentityScale"></span><span class="target" id="classD3_1_1IdentityScale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IdentityScale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D35ScaleE" title="D3::Scale"><span class="n"><span class="pre">Scale</span></span></a><a class="headerlink" href="#_CPPv4N2D313IdentityScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<p>Subclassed by D3::LinearScale</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313IdentityScale13IdentityScaleEv">
+<span id="_CPPv3N2D313IdentityScale13IdentityScaleEv"></span><span id="_CPPv2N2D313IdentityScale13IdentityScaleEv"></span><span id="D3::IdentityScale::IdentityScale"></span><span class="target" id="classD3_1_1IdentityScale_1a146b1c984ffbf1be964e9f603ff42cb4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IdentityScale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313IdentityScale13IdentityScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313IdentityScale13IdentityScaleEb">
+<span id="_CPPv3N2D313IdentityScale13IdentityScaleEb"></span><span id="_CPPv2N2D313IdentityScale13IdentityScaleEb"></span><span id="D3::IdentityScale::IdentityScale__b"></span><span class="target" id="classD3_1_1IdentityScale_1a7219db50b108343ba325ee2bdf4ca43a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IdentityScale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derived</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313IdentityScale13IdentityScaleEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D313IdentityScale6InvertEd1T">
+<span id="_CPPv3I0EN2D313IdentityScale6InvertE1T"></span><span id="_CPPv2I0EN2D313IdentityScale6InvertE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1IdentityScale_1a172611290b7172cc1a5b64b7c2722493"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Invert</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D313IdentityScale6InvertEd1T" title="D3::IdentityScale::Invert::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D313IdentityScale6InvertEd1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313IdentityScale8SetTicksEi">
+<span id="_CPPv3N2D313IdentityScale8SetTicksEi"></span><span id="_CPPv2N2D313IdentityScale8SetTicksEi"></span><span id="D3::IdentityScale::SetTicks__i"></span><span class="target" id="classD3_1_1IdentityScale_1acf236c59a73a58c89e24f723e9081029"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D313IdentityScaleE" title="D3::IdentityScale"><span class="n"><span class="pre">IdentityScale</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetTicks</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313IdentityScale8SetTicksEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313IdentityScale13SetTickFormatEiNSt6stringE">
+<span id="_CPPv3N2D313IdentityScale13SetTickFormatEiNSt6stringE"></span><span id="_CPPv2N2D313IdentityScale13SetTickFormatEiNSt6stringE"></span><span id="D3::IdentityScale::SetTickFormat__i.ss"></span><span class="target" id="classD3_1_1IdentityScale_1a50675f8c970a8ad57f1c0134691f5173"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D313IdentityScaleE" title="D3::IdentityScale"><span class="n"><span class="pre">IdentityScale</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetTickFormat</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span>, <a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">format</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313IdentityScale13SetTickFormatEiNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311LinearScaleE">
+<span id="_CPPv3N2D311LinearScaleE"></span><span id="_CPPv2N2D311LinearScaleE"></span><span id="D3::LinearScale"></span><span class="target" id="classD3_1_1LinearScale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LinearScale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D313IdentityScaleE" title="D3::IdentityScale"><span class="n"><span class="pre">IdentityScale</span></span></a><a class="headerlink" href="#_CPPv4N2D311LinearScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<p>Subclassed by D3::LogScale, D3::PowScale, D3::TimeScale</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311LinearScale11LinearScaleEv">
+<span id="_CPPv3N2D311LinearScale11LinearScaleEv"></span><span id="_CPPv2N2D311LinearScale11LinearScaleEv"></span><span id="D3::LinearScale::LinearScale"></span><span class="target" id="classD3_1_1LinearScale_1a68a2fd01fad2f6847992e1e6d601d7c2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LinearScale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D311LinearScale11LinearScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311LinearScale11LinearScaleEb">
+<span id="_CPPv3N2D311LinearScale11LinearScaleEb"></span><span id="_CPPv2N2D311LinearScale11LinearScaleEb"></span><span id="D3::LinearScale::LinearScale__b"></span><span class="target" id="classD3_1_1LinearScale_1a2d44ad04f521e1e42a9cf8be99cc46da"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LinearScale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derived</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D311LinearScale11LinearScaleEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0_6size_tEN2D311LinearScale13SetRangeRoundER11LinearScale5arrayI1T4SIZEE">
+<span id="_CPPv3I0_6size_tEN2D311LinearScale13SetRangeRoundE5arrayI1T4SIZEE"></span><span id="_CPPv2I0_6size_tEN2D311LinearScale13SetRangeRoundE5arrayI1T4SIZEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIZE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1LinearScale_1a905b2298fb095c8ac241403e35856837"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D311LinearScaleE" title="D3::LinearScale"><span class="n"><span class="pre">LinearScale</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetRangeRound</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_6size_tEN2D311LinearScale13SetRangeRoundER11LinearScale5arrayI1T4SIZEE" title="D3::LinearScale::SetRangeRound::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tEN2D311LinearScale13SetRangeRoundER11LinearScale5arrayI1T4SIZEE" title="D3::LinearScale::SetRangeRound::SIZE"><span class="n"><span class="pre">SIZE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">values</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_6size_tEN2D311LinearScale13SetRangeRoundER11LinearScale5arrayI1T4SIZEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311LinearScale13SetRangeRoundEdd">
+<span id="_CPPv3N2D311LinearScale13SetRangeRoundEdd"></span><span id="_CPPv2N2D311LinearScale13SetRangeRoundEdd"></span><span id="D3::LinearScale::SetRangeRound__double.double"></span><span class="target" id="classD3_1_1LinearScale_1a1de3de68c29bc4307cc9fb655f5dccf6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D311LinearScaleE" title="D3::LinearScale"><span class="n"><span class="pre">LinearScale</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetRangeRound</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D311LinearScale13SetRangeRoundEdd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311LinearScale14SetInterpolateENSt6stringE">
+<span id="_CPPv3N2D311LinearScale14SetInterpolateENSt6stringE"></span><span id="_CPPv2N2D311LinearScale14SetInterpolateENSt6stringE"></span><span id="D3::LinearScale::SetInterpolate__ss"></span><span class="target" id="classD3_1_1LinearScale_1a1cd58bea7a425298a7db1fc230b5d305"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D311LinearScaleE" title="D3::LinearScale"><span class="n"><span class="pre">LinearScale</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetInterpolate</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">factory</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D311LinearScale14SetInterpolateENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311LinearScale5ClampEb">
+<span id="_CPPv3N2D311LinearScale5ClampEb"></span><span id="_CPPv2N2D311LinearScale5ClampEb"></span><span id="D3::LinearScale::Clamp__b"></span><span class="target" id="classD3_1_1LinearScale_1ab436cacf796b73e80e57004037660fc5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D311LinearScaleE" title="D3::LinearScale"><span class="n"><span class="pre">LinearScale</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Clamp</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">clamp</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D311LinearScale5ClampEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D311LinearScale4NiceEi">
+<span id="_CPPv3N2D311LinearScale4NiceEi"></span><span id="_CPPv2N2D311LinearScale4NiceEi"></span><span id="D3::LinearScale::Nice__i"></span><span class="target" id="classD3_1_1LinearScale_1a41142ef85351ade683ba86eed9c65eb5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D311LinearScaleE" title="D3::LinearScale"><span class="n"><span class="pre">LinearScale</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Nice</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D311LinearScale4NiceEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D38LogScaleE">
+<span id="_CPPv3N2D38LogScaleE"></span><span id="_CPPv2N2D38LogScaleE"></span><span id="D3::LogScale"></span><span class="target" id="classD3_1_1LogScale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LogScale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D311LinearScaleE" title="D3::LinearScale"><span class="n"><span class="pre">LinearScale</span></span></a><a class="headerlink" href="#_CPPv4N2D38LogScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D38LogScale8LogScaleEv">
+<span id="_CPPv3N2D38LogScale8LogScaleEv"></span><span id="_CPPv2N2D38LogScale8LogScaleEv"></span><span id="D3::LogScale::LogScale"></span><span class="target" id="classD3_1_1LogScale_1a869a357c2d3c8ad826997103298faacd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LogScale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D38LogScale8LogScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D38LogScale8LogScaleEb">
+<span id="_CPPv3N2D38LogScale8LogScaleEb"></span><span id="_CPPv2N2D38LogScale8LogScaleEb"></span><span id="D3::LogScale::LogScale__b"></span><span class="target" id="classD3_1_1LogScale_1a3be881cf414aa9f54b472cfec30f0893"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LogScale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derived</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D38LogScale8LogScaleEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D312OrdinalScaleE">
+<span id="_CPPv3N2D312OrdinalScaleE"></span><span id="_CPPv2N2D312OrdinalScaleE"></span><span id="D3::OrdinalScale"></span><span class="target" id="classD3_1_1OrdinalScale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OrdinalScale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D313QuantizeScaleE" title="D3::QuantizeScale"><span class="n"><span class="pre">QuantizeScale</span></span></a><a class="headerlink" href="#_CPPv4N2D312OrdinalScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D312OrdinalScale12OrdinalScaleEv">
+<span id="_CPPv3N2D312OrdinalScale12OrdinalScaleEv"></span><span id="_CPPv2N2D312OrdinalScale12OrdinalScaleEv"></span><span id="D3::OrdinalScale::OrdinalScale"></span><span class="target" id="classD3_1_1OrdinalScale_1aae5a3768187ae20c158f07041a1b0b68"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OrdinalScale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D312OrdinalScale12OrdinalScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D312OrdinalScale12OrdinalScaleEb">
+<span id="_CPPv3N2D312OrdinalScale12OrdinalScaleEb"></span><span id="_CPPv2N2D312OrdinalScale12OrdinalScaleEb"></span><span id="D3::OrdinalScale::OrdinalScale__b"></span><span class="target" id="classD3_1_1OrdinalScale_1a4f0d1f859000b29f836fc276e6c8bfa3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OrdinalScale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derived</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D312OrdinalScale12OrdinalScaleEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D38PowScaleE">
+<span id="_CPPv3N2D38PowScaleE"></span><span id="_CPPv2N2D38PowScaleE"></span><span id="D3::PowScale"></span><span class="target" id="classD3_1_1PowScale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PowScale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D311LinearScaleE" title="D3::LinearScale"><span class="n"><span class="pre">LinearScale</span></span></a><a class="headerlink" href="#_CPPv4N2D38PowScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D38PowScale8PowScaleEv">
+<span id="_CPPv3N2D38PowScale8PowScaleEv"></span><span id="_CPPv2N2D38PowScale8PowScaleEv"></span><span id="D3::PowScale::PowScale"></span><span class="target" id="classD3_1_1PowScale_1a1c23511639d9f8e5f133f825a36dd12e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PowScale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D38PowScale8PowScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D38PowScale8PowScaleEb">
+<span id="_CPPv3N2D38PowScale8PowScaleEb"></span><span id="_CPPv2N2D38PowScale8PowScaleEb"></span><span id="D3::PowScale::PowScale__b"></span><span class="target" id="classD3_1_1PowScale_1aa32cf682625feb9c65ee521b7fee95f8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PowScale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derived</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D38PowScale8PowScaleEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D38PowScale8ExponentEd">
+<span id="_CPPv3N2D38PowScale8ExponentEd"></span><span id="_CPPv2N2D38PowScale8ExponentEd"></span><span id="D3::PowScale::Exponent__double"></span><span class="target" id="classD3_1_1PowScale_1a216e5b7be437694be197cf6c7be707bc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D38PowScaleE" title="D3::PowScale"><span class="n"><span class="pre">PowScale</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Exponent</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ex</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D38PowScale8ExponentEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313QuantileScaleE">
+<span id="_CPPv3N2D313QuantileScaleE"></span><span id="_CPPv2N2D313QuantileScaleE"></span><span id="D3::QuantileScale"></span><span class="target" id="classD3_1_1QuantileScale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QuantileScale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D313QuantizeScaleE" title="D3::QuantizeScale"><span class="n"><span class="pre">QuantizeScale</span></span></a><a class="headerlink" href="#_CPPv4N2D313QuantileScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313QuantileScale13QuantileScaleEv">
+<span id="_CPPv3N2D313QuantileScale13QuantileScaleEv"></span><span id="_CPPv2N2D313QuantileScale13QuantileScaleEv"></span><span id="D3::QuantileScale::QuantileScale"></span><span class="target" id="classD3_1_1QuantileScale_1a476a453e747f338fac83b46d231f2783"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QuantileScale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313QuantileScale13QuantileScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313QuantileScale13QuantileScaleEb">
+<span id="_CPPv3N2D313QuantileScale13QuantileScaleEb"></span><span id="_CPPv2N2D313QuantileScale13QuantileScaleEb"></span><span id="D3::QuantileScale::QuantileScale__b"></span><span class="target" id="classD3_1_1QuantileScale_1a6ea5ac4faccaabbf1b3afb56d5b1a122"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QuantileScale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derived</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313QuantileScale13QuantileScaleEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313QuantizeScaleE">
+<span id="_CPPv3N2D313QuantizeScaleE"></span><span id="_CPPv2N2D313QuantizeScaleE"></span><span id="D3::QuantizeScale"></span><span class="target" id="classD3_1_1QuantizeScale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QuantizeScale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D35ScaleE" title="D3::Scale"><span class="n"><span class="pre">Scale</span></span></a><a class="headerlink" href="#_CPPv4N2D313QuantizeScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<p>Subclassed by D3::OrdinalScale, D3::QuantileScale, D3::ThresholdScale</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313QuantizeScale13QuantizeScaleEv">
+<span id="_CPPv3N2D313QuantizeScale13QuantizeScaleEv"></span><span id="_CPPv2N2D313QuantizeScale13QuantizeScaleEv"></span><span id="D3::QuantizeScale::QuantizeScale"></span><span class="target" id="classD3_1_1QuantizeScale_1a069b14260b41a3751f8766a585119a11"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QuantizeScale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313QuantizeScale13QuantizeScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313QuantizeScale13QuantizeScaleEb">
+<span id="_CPPv3N2D313QuantizeScale13QuantizeScaleEb"></span><span id="_CPPv2N2D313QuantizeScale13QuantizeScaleEb"></span><span id="D3::QuantizeScale::QuantizeScale__b"></span><span class="target" id="classD3_1_1QuantizeScale_1acfc82bba80f3525d05c2ada33b770c9c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QuantizeScale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derived</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313QuantizeScale13QuantizeScaleEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D313QuantizeScale12InvertExtentEd1T">
+<span id="_CPPv3I0EN2D313QuantizeScale12InvertExtentE1T"></span><span id="_CPPv2I0EN2D313QuantizeScale12InvertExtentE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1QuantizeScale_1a75997dec107f88cfcc68d0c03e5e7e0a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InvertExtent</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D313QuantizeScale12InvertExtentEd1T" title="D3::QuantizeScale::InvertExtent::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D313QuantizeScale12InvertExtentEd1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D35ScaleE">
+<span id="_CPPv3N2D35ScaleE"></span><span id="_CPPv2N2D35ScaleE"></span><span id="D3::Scale"></span><span class="target" id="classD3_1_1Scale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Scale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="d3_init.html#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><a class="headerlink" href="#_CPPv4N2D35ScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<p>Scales in D3 are functions that take input values and map them to output based on a scaling function. They are often used to map data calues to x, y coordinates in pixels describing where on the screen elements should be placed. This is a base class to inherit from - should never be made stand-alone </p>
+<p>Subclassed by D3::IdentityScale, D3::QuantizeScale</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D35Scale5ScaleEv">
+<span id="_CPPv3N2D35Scale5ScaleEv"></span><span id="_CPPv2N2D35Scale5ScaleEv"></span><span id="D3::Scale::Scale"></span><span class="target" id="classD3_1_1Scale_1a60e7faeb07c82474101537a10d3143f6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Scale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D35Scale5ScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D35Scale5ScaleEb">
+<span id="_CPPv3N2D35Scale5ScaleEb"></span><span id="_CPPv2N2D35Scale5ScaleEb"></span><span id="D3::Scale::Scale__b"></span><span class="target" id="classD3_1_1Scale_1a58484635b4ba15635592698d5d233b67"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Scale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derived</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D35Scale5ScaleEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Decoy constructor so we don’t construct extra base scales. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0_6size_tEN2D35Scale8SetRangeER5Scale5arrayI1T4SIZEE">
+<span id="_CPPv3I0_6size_tEN2D35Scale8SetRangeE5arrayI1T4SIZEE"></span><span id="_CPPv2I0_6size_tEN2D35Scale8SetRangeE5arrayI1T4SIZEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIZE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1Scale_1ad0aa24c3fcea396437584738fc83b249"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D35ScaleE" title="D3::Scale"><span class="n"><span class="pre">Scale</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetRange</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_6size_tEN2D35Scale8SetRangeER5Scale5arrayI1T4SIZEE" title="D3::Scale::SetRange::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tEN2D35Scale8SetRangeER5Scale5arrayI1T4SIZEE" title="D3::Scale::SetRange::SIZE"><span class="n"><span class="pre">SIZE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">values</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_6size_tEN2D35Scale8SetRangeER5Scale5arrayI1T4SIZEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the output values corresponding to values in the domain. Output for values in between will be interpolated with a function determined by the type of the scale. Array should contain same number of elements as the one used to set the domain. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D35Scale8SetRangeEdd">
+<span id="_CPPv3N2D35Scale8SetRangeEdd"></span><span id="_CPPv2N2D35Scale8SetRangeEdd"></span><span id="D3::Scale::SetRange__double.double"></span><span class="target" id="classD3_1_1Scale_1a652152315ecd9db5b9f94ab49b082095"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D35ScaleE" title="D3::Scale"><span class="n"><span class="pre">Scale</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetRange</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D35Scale8SetRangeEdd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0_6size_tEN2D35Scale9SetDomainER5Scale5arrayI1T4SIZEE">
+<span id="_CPPv3I0_6size_tEN2D35Scale9SetDomainE5arrayI1T4SIZEE"></span><span id="_CPPv2I0_6size_tEN2D35Scale9SetDomainE5arrayI1T4SIZEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIZE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1Scale_1aa7576a035b923809d84f14f104f25864"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D35ScaleE" title="D3::Scale"><span class="n"><span class="pre">Scale</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetDomain</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_6size_tEN2D35Scale9SetDomainER5Scale5arrayI1T4SIZEE" title="D3::Scale::SetDomain::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tEN2D35Scale9SetDomainER5Scale5arrayI1T4SIZEE" title="D3::Scale::SetDomain::SIZE"><span class="n"><span class="pre">SIZE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">values</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_6size_tEN2D35Scale9SetDomainER5Scale5arrayI1T4SIZEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the input values corresponding to values in the range. Array should contain same number of elements as the one used to set the range. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D35Scale9SetDomainEdd">
+<span id="_CPPv3N2D35Scale9SetDomainEdd"></span><span id="_CPPv2N2D35Scale9SetDomainEdd"></span><span id="D3::Scale::SetDomain__double.double"></span><span class="target" id="classD3_1_1Scale_1a13e0cd5cc4491e8142c8c900e3e50544"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D35ScaleE" title="D3::Scale"><span class="n"><span class="pre">Scale</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetDomain</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D35Scale9SetDomainEdd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D35Scale4CopyEv">
+<span id="_CPPv3N2D35Scale4CopyEv"></span><span id="_CPPv2N2D35Scale4CopyEv"></span><span id="D3::Scale::Copy"></span><span class="target" id="classD3_1_1Scale_1ad66ddd7093a90a4189dcd819c56ff6d6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D35ScaleE" title="D3::Scale"><span class="n"><span class="pre">Scale</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Copy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D35Scale4CopyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Make a copy of this scale. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D35Scale10ApplyScaleEd">
+<span id="_CPPv3N2D35Scale10ApplyScaleEd"></span><span id="_CPPv2N2D35Scale10ApplyScaleEd"></span><span id="D3::Scale::ApplyScale__double"></span><span class="target" id="classD3_1_1Scale_1a513b3dba08c3fb56f0c38982b0e92cd5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ApplyScale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">input</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D35Scale10ApplyScaleEd" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate the ouput for [input], based on the scale’s scaling function. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D35Scale10ApplyScaleEi">
+<span id="_CPPv3N2D35Scale10ApplyScaleEi"></span><span id="_CPPv2N2D35Scale10ApplyScaleEi"></span><span id="D3::Scale::ApplyScale__i"></span><span class="target" id="classD3_1_1Scale_1a9543fe3f766138efad54b31a64417085"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ApplyScale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">input</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D35Scale10ApplyScaleEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D35Scale16ApplyScaleStringEd">
+<span id="_CPPv3N2D35Scale16ApplyScaleStringEd"></span><span id="_CPPv2N2D35Scale16ApplyScaleStringEd"></span><span id="D3::Scale::ApplyScaleString__double"></span><span class="target" id="classD3_1_1Scale_1ade5412600c03a25c2c93496e940b023c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ApplyScaleString</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">input</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D35Scale16ApplyScaleStringEd" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate the ouput for [input], based on the scale’s scaling function. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D35Scale5ScaleEi">
+<span id="_CPPv3N2D35Scale5ScaleEi"></span><span id="_CPPv2N2D35Scale5ScaleEi"></span><span id="D3::Scale::Scale__i"></span><span class="target" id="classD3_1_1Scale_1ac7a57543e512eb57a533acd2d4fc8d09"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Scale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D35Scale5ScaleEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D314ThresholdScaleE">
+<span id="_CPPv3N2D314ThresholdScaleE"></span><span id="_CPPv2N2D314ThresholdScaleE"></span><span id="D3::ThresholdScale"></span><span class="target" id="classD3_1_1ThresholdScale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ThresholdScale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D313QuantizeScaleE" title="D3::QuantizeScale"><span class="n"><span class="pre">QuantizeScale</span></span></a><a class="headerlink" href="#_CPPv4N2D314ThresholdScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D314ThresholdScale14ThresholdScaleEv">
+<span id="_CPPv3N2D314ThresholdScale14ThresholdScaleEv"></span><span id="_CPPv2N2D314ThresholdScale14ThresholdScaleEv"></span><span id="D3::ThresholdScale::ThresholdScale"></span><span class="target" id="classD3_1_1ThresholdScale_1a2b79d720973b0537e430e97bef79afff"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ThresholdScale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D314ThresholdScale14ThresholdScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D314ThresholdScale14ThresholdScaleEb">
+<span id="_CPPv3N2D314ThresholdScale14ThresholdScaleEb"></span><span id="_CPPv2N2D314ThresholdScale14ThresholdScaleEb"></span><span id="D3::ThresholdScale::ThresholdScale__b"></span><span class="target" id="classD3_1_1ThresholdScale_1ab82e36066ac02c9ca239e6f6ec0670e5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ThresholdScale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derived</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D314ThresholdScale14ThresholdScaleEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D39TimeScaleE">
+<span id="_CPPv3N2D39TimeScaleE"></span><span id="_CPPv2N2D39TimeScaleE"></span><span id="D3::TimeScale"></span><span class="target" id="classD3_1_1TimeScale"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TimeScale</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D311LinearScaleE" title="D3::LinearScale"><span class="n"><span class="pre">LinearScale</span></span></a><a class="headerlink" href="#_CPPv4N2D39TimeScaleE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;scales.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D39TimeScale9TimeScaleEv">
+<span id="_CPPv3N2D39TimeScale9TimeScaleEv"></span><span id="_CPPv2N2D39TimeScale9TimeScaleEv"></span><span id="D3::TimeScale::TimeScale"></span><span class="target" id="classD3_1_1TimeScale_1a39185a2f454e9028f9717a9596fd5846"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TimeScale</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D39TimeScale9TimeScaleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D39TimeScale9TimeScaleEb">
+<span id="_CPPv3N2D39TimeScale9TimeScaleEb"></span><span id="_CPPv2N2D39TimeScale9TimeScaleEb"></span><span id="D3::TimeScale::TimeScale__b"></span><span class="target" id="classD3_1_1TimeScale_1adeb0bc528fe319da3b812d05575f4ae9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TimeScale</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derived</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D39TimeScale9TimeScaleEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="layout.html" class="btn btn-neutral float-left" title="layout.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="selection.html" class="btn btn-neutral float-right" title="selection.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scholar &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/scholar/scholar.1bb03e14-83b6-4395-b62f-d5a3e71e6a1d.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Author.hpp" href="api/Author.html" />
+    <link rel="prev" title="ValueBox.hpp" href="../prefab/api/ValueBox.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Scholar</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html">Author.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bibliography.html">Bibliography.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html">Citation.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Scholar</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="scholar">
+<h1>Scholar<a class="headerlink" href="#scholar" title="Link to this heading"></a></h1>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/Author.html">Author.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Author.html#_CPPv46Author"><code class="docutils literal notranslate"><span class="pre">Author</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author6AuthorERKNSt6stringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Author::Author()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author6AuthorERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Author::Author()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author6AuthorERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Author::Author()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author6AuthorERK6Author"><code class="docutils literal notranslate"><span class="pre">Author::Author()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6AuthorD0Ev"><code class="docutils literal notranslate"><span class="pre">Author::~Author()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6AuthoraSERK6Author"><code class="docutils literal notranslate"><span class="pre">Author::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6AuthoreqERK6Author"><code class="docutils literal notranslate"><span class="pre">Author::operator==()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6AuthorneERK6Author"><code class="docutils literal notranslate"><span class="pre">Author::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6AuthorltERK6Author"><code class="docutils literal notranslate"><span class="pre">Author::operator&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6AuthorgtERK6Author"><code class="docutils literal notranslate"><span class="pre">Author::operator&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6AuthorgeERK6Author"><code class="docutils literal notranslate"><span class="pre">Author::operator&gt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6AuthorleERK6Author"><code class="docutils literal notranslate"><span class="pre">Author::operator&lt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author9HasPrefixEv"><code class="docutils literal notranslate"><span class="pre">Author::HasPrefix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author12HasFirstNameEv"><code class="docutils literal notranslate"><span class="pre">Author::HasFirstName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author13HasMiddleNameEv"><code class="docutils literal notranslate"><span class="pre">Author::HasMiddleName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author11HasLastNameEv"><code class="docutils literal notranslate"><span class="pre">Author::HasLastName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author9HasSuffixEv"><code class="docutils literal notranslate"><span class="pre">Author::HasSuffix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author9GetPrefixEv"><code class="docutils literal notranslate"><span class="pre">Author::GetPrefix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author12GetFirstNameEv"><code class="docutils literal notranslate"><span class="pre">Author::GetFirstName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author13GetMiddleNameE6size_t"><code class="docutils literal notranslate"><span class="pre">Author::GetMiddleName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author11GetLastNameEv"><code class="docutils literal notranslate"><span class="pre">Author::GetLastName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author9GetSuffixEv"><code class="docutils literal notranslate"><span class="pre">Author::GetSuffix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author11GetFullNameEv"><code class="docutils literal notranslate"><span class="pre">Author::GetFullName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author14GetReverseNameEv"><code class="docutils literal notranslate"><span class="pre">Author::GetReverseName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author15GetFirstInitialEv"><code class="docutils literal notranslate"><span class="pre">Author::GetFirstInitial()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author17GetMiddleInitialsEv"><code class="docutils literal notranslate"><span class="pre">Author::GetMiddleInitials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author14GetLastInitialEv"><code class="docutils literal notranslate"><span class="pre">Author::GetLastInitial()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4NK6Author11GetInitialsEv"><code class="docutils literal notranslate"><span class="pre">Author::GetInitials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author7GetNameENSt6stringE"><code class="docutils literal notranslate"><span class="pre">Author::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author5ClearEv"><code class="docutils literal notranslate"><span class="pre">Author::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author8SetFirstERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Author::SetFirst()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author7SetLastERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Author::SetLast()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author9AddMiddleERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Author::AddMiddle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author6prefixE"><code class="docutils literal notranslate"><span class="pre">Author::prefix</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author10first_nameE"><code class="docutils literal notranslate"><span class="pre">Author::first_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author12middle_namesE"><code class="docutils literal notranslate"><span class="pre">Author::middle_names</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author9last_nameE"><code class="docutils literal notranslate"><span class="pre">Author::last_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author6suffixE"><code class="docutils literal notranslate"><span class="pre">Author::suffix</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Author.html#_CPPv4N6Author14GetFormatLexerEv"><code class="docutils literal notranslate"><span class="pre">Author::GetFormatLexer()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Bibliography.html">Bibliography.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Bibliography.html#_CPPv412Bibliography"><code class="docutils literal notranslate"><span class="pre">Bibliography</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Bibliography.html#_CPPv4N12Bibliography12BibliographyEv"><code class="docutils literal notranslate"><span class="pre">Bibliography::Bibliography()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bibliography.html#_CPPv4N12BibliographyD0Ev"><code class="docutils literal notranslate"><span class="pre">Bibliography::~Bibliography()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bibliography.html#_CPPv4N12Bibliography6AddRefERK8Citation"><code class="docutils literal notranslate"><span class="pre">Bibliography::AddRef()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bibliography.html#_CPPv4N12Bibliography4refsE"><code class="docutils literal notranslate"><span class="pre">Bibliography::refs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bibliography.html#_CPPv4N12Bibliography8keywordsE"><code class="docutils literal notranslate"><span class="pre">Bibliography::keywords</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Citation.html">Citation.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Citation.html#_CPPv48Citation"><code class="docutils literal notranslate"><span class="pre">Citation</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPEE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE5ERRORE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::ERROR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE7UNKNOWNE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::UNKNOWN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE7ARTICLEE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::ARTICLE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE4BOOKE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::BOOK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE7BOOKLETE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::BOOKLET</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE10CONFERENCEE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::CONFERENCE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE7IN_BOOKE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::IN_BOOK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE13IN_COLLECTIONE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::IN_COLLECTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE6MANUALE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::MANUAL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE14MASTERS_THESISE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::MASTERS_THESIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE4MISCE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::MISC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE10PHD_THESISE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::PHD_THESIS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE11PROCEEDINGSE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::PROCEEDINGS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE11TECH_REPORTE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::TECH_REPORT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9CITE_TYPE11UNPUBLISHEDE"><code class="docutils literal notranslate"><span class="pre">Citation::CITE_TYPE::UNPUBLISHED</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation8CitationE9CITE_TYPE"><code class="docutils literal notranslate"><span class="pre">Citation::Citation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation8CitationERK8Citation"><code class="docutils literal notranslate"><span class="pre">Citation::Citation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8CitationD0Ev"><code class="docutils literal notranslate"><span class="pre">Citation::~Citation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8CitationaSERK8Citation"><code class="docutils literal notranslate"><span class="pre">Citation::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation7GetTypeEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation10GetAuthorsEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetAuthors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation8GetNotesEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetNotes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation11GetKeywordsEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetKeywords()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation10HasKeywordERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Citation::HasKeyword()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation6GetValERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Citation::GetVal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation8GetTitleEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetTitle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation10GetJournalEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetJournal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation12GetBookTitleEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetBookTitle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation9GetVolumeEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetVolume()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation7GetYearEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetYear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation9GetNumberEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetNumber()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation8GetMonthEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetMonth()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation12GetStartPageEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetStartPage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4NK8Citation10GetEndPageEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetEndPage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4IDpEN8Citation9AddAuthorER8CitationDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">Citation::AddAuthor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation7AddNoteERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Citation::AddNote()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation10AddKeywordERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Citation::AddKeyword()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4I0EN8Citation6SetValER8CitationRKNSt6stringERR1T"><code class="docutils literal notranslate"><span class="pre">Citation::SetVal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4I0EN8Citation8SetTitleER8CitationRR1T"><code class="docutils literal notranslate"><span class="pre">Citation::SetTitle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4I0EN8Citation10SetJournalER8CitationRR1T"><code class="docutils literal notranslate"><span class="pre">Citation::SetJournal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4I0EN8Citation12SetBookTitleER8CitationRR1T"><code class="docutils literal notranslate"><span class="pre">Citation::SetBookTitle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4I0EN8Citation9SetVolumeER8CitationRR1T"><code class="docutils literal notranslate"><span class="pre">Citation::SetVolume()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4I0EN8Citation7SetYearER8CitationRR1T"><code class="docutils literal notranslate"><span class="pre">Citation::SetYear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4I0EN8Citation9SetNumberER8CitationRR1T"><code class="docutils literal notranslate"><span class="pre">Citation::SetNumber()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4I0EN8Citation8SetMonthER8CitationRR1T"><code class="docutils literal notranslate"><span class="pre">Citation::SetMonth()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4I0EN8Citation12SetStartPageER8CitationRR1T"><code class="docutils literal notranslate"><span class="pre">Citation::SetStartPage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4I0EN8Citation10SetEndPageER8CitationRR1T"><code class="docutils literal notranslate"><span class="pre">Citation::SetEndPage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4I0EN8Citation8SetPagesER8CitationRR1TRR1T"><code class="docutils literal notranslate"><span class="pre">Citation::SetPages()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation7SetTypeE9CITE_TYPE"><code class="docutils literal notranslate"><span class="pre">Citation::SetType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation7SetTypeENSt6stringE"><code class="docutils literal notranslate"><span class="pre">Citation::SetType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation12PrintAuthorsERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintAuthors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation10PrintERRORERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintERROR()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation12PrintUNKNOWNERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintUNKNOWN()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation12PrintARTICLEERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintARTICLE()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9PrintBOOKERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintBOOK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation12PrintBOOKLETERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintBOOKLET()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation15PrintCONFERENCEERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintCONFERENCE()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation12PrintIN_BOOKERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintIN_BOOK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation18PrintIN_COLLECTIONERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintIN_COLLECTION()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation11PrintMANUALERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintMANUAL()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation19PrintMASTERS_THESISERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintMASTERS_THESIS()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation9PrintMISCERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintMISC()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation15PrintPHD_THESISERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintPHD_THESIS()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation16PrintPROCEEDINGSERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintPROCEEDINGS()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation16PrintTECH_REPORTERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintTECH_REPORT()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation16PrintUNPUBLISHEDERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::PrintUNPUBLISHED()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Citation::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation4typeE"><code class="docutils literal notranslate"><span class="pre">Citation::type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation11author_listE"><code class="docutils literal notranslate"><span class="pre">Citation::author_list</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation5notesE"><code class="docutils literal notranslate"><span class="pre">Citation::notes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation8keywordsE"><code class="docutils literal notranslate"><span class="pre">Citation::keywords</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation11setting_mapE"><code class="docutils literal notranslate"><span class="pre">Citation::setting_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation10GetNameMapEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetNameMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Citation.html#_CPPv4N8Citation11GetRNameMapEv"><code class="docutils literal notranslate"><span class="pre">Citation::GetRNameMap()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../prefab/api/ValueBox.html" class="btn btn-neutral float-left" title="ValueBox.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/Author.html" class="btn btn-neutral float-right" title="Author.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

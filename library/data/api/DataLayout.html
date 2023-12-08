@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DataLayout.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/data/api/DataLayout.ff8adf67-7c7e-48c3-aa26-c82e4f99d862.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="DataLog.hpp" href="DataLog.html" />
+    <link rel="prev" title="DataInterface.hpp" href="DataInterface.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../data.html">Data Collection and Recording Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../data.html#data-tools-api">Data Tools API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AnnotatedType.html">AnnotatedType.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataFile.html">DataFile.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataInterface.html">DataInterface.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">DataLayout.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410DataLayout"><code class="docutils literal notranslate"><span class="pre">DataLayout</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="DataLog.html">DataLog.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataManager.html">DataManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataMap.html">DataMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataNode.html">DataNode.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Datum.html">Datum.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="MemoryImage.html">MemoryImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SimpleParser.html">SimpleParser.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Trait.html">Trait.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="VarMap.html">VarMap.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../data.html">Data Collection and Recording Tools</a></li>
+      <li class="breadcrumb-item active">DataLayout.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="datalayout-hpp">
+<h1>DataLayout.hpp<a class="headerlink" href="#datalayout-hpp" title="Link to this heading"></a></h1>
+<p>A mapping of names to variables stored in a MemoryImage. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA </p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv410DataLayout">
+<span id="_CPPv310DataLayout"></span><span id="_CPPv210DataLayout"></span><span id="DataLayout"></span><span class="target" id="classDataLayout"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DataLayout</span></span></span><a class="headerlink" href="#_CPPv410DataLayout" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;DataLayout.hpp&gt;</em></div>
+<p>A helper class for DataMap; tracks how data is organized in a MemoryImage. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout10DataLayoutEv">
+<span id="_CPPv3N10DataLayout10DataLayoutEv"></span><span id="_CPPv2N10DataLayout10DataLayoutEv"></span><span id="DataLayout::DataLayout"></span><span class="target" id="classDataLayout_1a491cb57596ee64c62211e842108ce296"></span><span class="sig-name descname"><span class="n"><span class="pre">DataLayout</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N10DataLayout10DataLayoutEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout10DataLayoutERK10DataLayout">
+<span id="_CPPv3N10DataLayout10DataLayoutERK10DataLayout"></span><span id="_CPPv2N10DataLayout10DataLayoutERK10DataLayout"></span><span id="DataLayout::DataLayout__DataLayoutCR"></span><span class="target" id="classDataLayout_1a1b5578e83c0114e71c1442079047585e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DataLayout</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10DataLayout10DataLayoutERK10DataLayout" title="DataLayout::DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DataLayout10DataLayoutERK10DataLayout" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayoutD0Ev">
+<span id="_CPPv3N10DataLayoutD0Ev"></span><span id="_CPPv2N10DataLayoutD0Ev"></span><span id="DataLayout::~DataLayout"></span><span class="target" id="classDataLayout_1ac13b453a42da1c775de5e0f59013ce13"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~DataLayout</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DataLayoutD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayoutaSERK10DataLayout">
+<span id="_CPPv3N10DataLayoutaSERK10DataLayout"></span><span id="_CPPv2N10DataLayoutaSERK10DataLayout"></span><span id="DataLayout::assign-operator__DataLayoutCR"></span><span class="target" id="classDataLayout_1adad7feb2edb9fcafe2efe5c2b7e29dae"></span><a class="reference internal" href="#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N10DataLayoutaSERK10DataLayout" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayoutaSERR10DataLayout">
+<span id="_CPPv3N10DataLayoutaSERR10DataLayout"></span><span id="_CPPv2N10DataLayoutaSERR10DataLayout"></span><span id="DataLayout::assign-operator__DataLayoutRR"></span><span class="target" id="classDataLayout_1a8bd9c3fdeada15e2fae11d90ea8d010d"></span><a class="reference internal" href="#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N10DataLayoutaSERR10DataLayout" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout7IncMapsEv">
+<span id="_CPPv3N10DataLayout7IncMapsEv"></span><span id="_CPPv2N10DataLayout7IncMapsEv"></span><span id="DataLayout::IncMaps"></span><span class="target" id="classDataLayout_1aa01f684b0195dedf8504693a39803a9f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IncMaps</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DataLayout7IncMapsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout7DecMapsEv">
+<span id="_CPPv3N10DataLayout7DecMapsEv"></span><span id="_CPPv2N10DataLayout7DecMapsEv"></span><span id="DataLayout::DecMaps"></span><span class="target" id="classDataLayout_1a18cf2ae29345fcd22e690a26975e8b9c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecMaps</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DataLayout7DecMapsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout10GetNumMapsEv">
+<span id="_CPPv3NK10DataLayout10GetNumMapsEv"></span><span id="_CPPv2NK10DataLayout10GetNumMapsEv"></span><span id="DataLayout::GetNumMapsC"></span><span class="target" id="classDataLayout_1a7809e75d222a4683758ddb7d3a216a35"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumMaps</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout10GetNumMapsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout8IsLockedEv">
+<span id="_CPPv3NK10DataLayout8IsLockedEv"></span><span id="_CPPv2NK10DataLayout8IsLockedEv"></span><span id="DataLayout::IsLockedC"></span><span class="target" id="classDataLayout_1a72199abddfd0982a9974c0cce9a5ebc8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsLocked</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout8IsLockedEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout7HasNameERKNSt6stringE">
+<span id="_CPPv3NK10DataLayout7HasNameERKNSt6stringE"></span><span id="_CPPv2NK10DataLayout7HasNameERKNSt6stringE"></span><span id="DataLayout::HasName__ssCRC"></span><span class="target" id="classDataLayout_1af3440abb0361de9984de22033535df6a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasName</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout7HasNameERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if we have a variable by a given name. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout5HasIDE6size_t">
+<span id="_CPPv3NK10DataLayout5HasIDE6size_t"></span><span id="_CPPv2NK10DataLayout5HasIDE6size_t"></span><span id="DataLayout::HasID__sC"></span><span class="target" id="classDataLayout_1a933b03b7a80ae2aa7bc6a7073da6d85b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout5HasIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if we have an ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK10DataLayout6IsTypeEb6size_t">
+<span id="_CPPv3I0ENK10DataLayout6IsTypeE6size_t"></span><span id="_CPPv2I0ENK10DataLayout6IsTypeE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataLayout_1a3358e2e79ed0c1c681b423775f5965d7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsType</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK10DataLayout6IsTypeEb6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if we have the correct type of a specific variable ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK10DataLayout3HasEb6size_t6size_t">
+<span id="_CPPv3I0ENK10DataLayout3HasE6size_t6size_t"></span><span id="_CPPv2I0ENK10DataLayout3HasE6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataLayout_1a902925a934351e9e293aed0158923eb9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK10DataLayout3HasEb6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK10DataLayout3HasEbRKNSt6stringE6size_t">
+<span id="_CPPv3I0ENK10DataLayout3HasERKNSt6stringE6size_t"></span><span id="_CPPv2I0ENK10DataLayout3HasERKNSt6stringE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataLayout_1ace499f820881027375950e7783d81388"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK10DataLayout3HasEbRKNSt6stringE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00ENK10DataLayout11DiagnoseHasENSt6stringE5KEY_T6size_t">
+<span id="_CPPv3I00ENK10DataLayout11DiagnoseHasE5KEY_T6size_t"></span><span id="_CPPv2I00ENK10DataLayout11DiagnoseHasE5KEY_T6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KEY_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataLayout_1aab88f9459db86e6856852f9c7b9c517f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiagnoseHas</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00ENK10DataLayout11DiagnoseHasENSt6stringE5KEY_T6size_t" title="DataLayout::DiagnoseHas::KEY_T"><span class="n"><span class="pre">KEY_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I00ENK10DataLayout11DiagnoseHasENSt6stringE5KEY_T6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout12GetImageSizeEv">
+<span id="_CPPv3NK10DataLayout12GetImageSizeEv"></span><span id="_CPPv2NK10DataLayout12GetImageSizeEv"></span><span id="DataLayout::GetImageSizeC"></span><span class="target" id="classDataLayout_1adffc9f49e941227229d76aa2a7fa88e9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetImageSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout12GetImageSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the number of bytes in the default image. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout5GetIDERKNSt6stringE">
+<span id="_CPPv3NK10DataLayout5GetIDERKNSt6stringE"></span><span id="_CPPv2NK10DataLayout5GetIDERKNSt6stringE"></span><span id="DataLayout::GetID__ssCRC"></span><span class="target" id="classDataLayout_1aae246f74f060ae4545850b26f1f14316"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetID</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout5GetIDERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Lookup the unique idea for an entry. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout7GetTypeE6size_t">
+<span id="_CPPv3NK10DataLayout7GetTypeE6size_t"></span><span id="_CPPv2NK10DataLayout7GetTypeE6size_t"></span><span id="DataLayout::GetType__sC"></span><span class="target" id="classDataLayout_1ae810ebe07e7b9a108642b22626a4ec05"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../meta/api/TypeID.html#_CPPv46TypeID" title="TypeID"><span class="n"><span class="pre">TypeID</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetType</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout7GetTypeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Lookup the type of an entry by ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout8GetCountE6size_t">
+<span id="_CPPv3NK10DataLayout8GetCountE6size_t"></span><span id="_CPPv2NK10DataLayout8GetCountE6size_t"></span><span id="DataLayout::GetCount__sC"></span><span class="target" id="classDataLayout_1a606bbfbc9e370120611661ea933b9042"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetCount</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout8GetCountE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout9IsNumericE6size_t">
+<span id="_CPPv3NK10DataLayout9IsNumericE6size_t"></span><span id="_CPPv2NK10DataLayout9IsNumericE6size_t"></span><span id="DataLayout::IsNumeric__sC"></span><span class="target" id="classDataLayout_1ada74532b0e938fdd144f2ce5f3dec0a1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsNumeric</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout9IsNumericE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine is entry is some form of numeric type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout9IsNumericERKNSt6stringE">
+<span id="_CPPv3NK10DataLayout9IsNumericERKNSt6stringE"></span><span id="_CPPv2NK10DataLayout9IsNumericERKNSt6stringE"></span><span id="DataLayout::IsNumeric__ssCRC"></span><span class="target" id="classDataLayout_1a5c776e8cd6835ee7a6d3869c40faab7e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsNumeric</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout9IsNumericERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout4LockEv">
+<span id="_CPPv3N10DataLayout4LockEv"></span><span id="_CPPv2N10DataLayout4LockEv"></span><span id="DataLayout::Lock"></span><span class="target" id="classDataLayout_1ac894042ef849f14dca8d903ea310aa12"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Lock</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10DataLayout4LockEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Prevent this layout from being modified. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN10DataLayout3AddE6size_tR11MemoryImageRKNSt6stringERK1TRKNSt6stringERKNSt6stringEK6size_t">
+<span id="_CPPv3I0EN10DataLayout3AddER11MemoryImageRKNSt6stringERK1TRKNSt6stringERKNSt6stringEK6size_t"></span><span id="_CPPv2I0EN10DataLayout3AddER11MemoryImageRKNSt6stringERK1TRKNSt6stringERKNSt6stringEK6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classDataLayout_1aae002237522fd6a2de408e1091933a73"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Add</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="MemoryImage.html#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">base_memory</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN10DataLayout3AddE6size_tR11MemoryImageRKNSt6stringERK1TRKNSt6stringERKNSt6stringEK6size_t" title="DataLayout::Add::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">default_value</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">notes</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN10DataLayout3AddE6size_tR11MemoryImageRKNSt6stringERK1TRKNSt6stringERKNSt6stringEK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new variable with a specified type, name and value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout13DestructImageER11MemoryImage">
+<span id="_CPPv3NK10DataLayout13DestructImageER11MemoryImage"></span><span id="_CPPv2NK10DataLayout13DestructImageER11MemoryImage"></span><span id="DataLayout::DestructImage__MemoryImageRC"></span><span class="target" id="classDataLayout_1af29e9e1424a66f7258533f68a32b44c8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DestructImage</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="MemoryImage.html#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout13DestructImageER11MemoryImage" title="Link to this definition"></a><br /></dt>
+<dd><p>Run destructors on all objects in a memory image (but otherwise leave it intact.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout10ClearImageER11MemoryImage">
+<span id="_CPPv3NK10DataLayout10ClearImageER11MemoryImage"></span><span id="_CPPv2NK10DataLayout10ClearImageER11MemoryImage"></span><span id="DataLayout::ClearImage__MemoryImageRC"></span><span class="target" id="classDataLayout_1a80cbb9e0fbe63ed4db671587a39328f1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClearImage</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="MemoryImage.html#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout10ClearImageER11MemoryImage" title="Link to this definition"></a><br /></dt>
+<dd><p>Destruct and delete all memory associated in the provided image. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout9CopyImageERK11MemoryImageR11MemoryImage">
+<span id="_CPPv3NK10DataLayout9CopyImageERK11MemoryImageR11MemoryImage"></span><span id="_CPPv2NK10DataLayout9CopyImageERK11MemoryImageR11MemoryImage"></span><span id="DataLayout::CopyImage__MemoryImageCR.MemoryImageRC"></span><span class="target" id="classDataLayout_1a418e0ece12baa8af0fc2ec1645223ca6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CopyImage</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="MemoryImage.html#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">from_image</span></span>, <a class="reference internal" href="MemoryImage.html#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">to_image</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout9CopyImageERK11MemoryImageR11MemoryImage" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10DataLayout17MoveImageContentsER11MemoryImageR11MemoryImage">
+<span id="_CPPv3NK10DataLayout17MoveImageContentsER11MemoryImageR11MemoryImage"></span><span id="_CPPv2NK10DataLayout17MoveImageContentsER11MemoryImageR11MemoryImage"></span><span id="DataLayout::MoveImageContents__MemoryImageR.MemoryImageRC"></span><span class="target" id="classDataLayout_1a2d51d6d70061dacc0fb91ef11d8a3bf4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MoveImageContents</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="MemoryImage.html#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">from_image</span></span>, <a class="reference internal" href="MemoryImage.html#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">to_image</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10DataLayout17MoveImageContentsER11MemoryImageR11MemoryImage" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-types">Protected Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout10copy_fun_tE">
+<span id="_CPPv3N10DataLayout10copy_fun_tE"></span><span id="_CPPv2N10DataLayout10copy_fun_tE"></span><span class="target" id="classDataLayout_1a02b293f94af391101f86ba0fa27d8f2b"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">copy_fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="MemoryImage.html#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="MemoryImage.html#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N10DataLayout10copy_fun_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Collect all of the constructors and destructors that we need to worry about. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout10move_fun_tE">
+<span id="_CPPv3N10DataLayout10move_fun_tE"></span><span id="_CPPv2N10DataLayout10move_fun_tE"></span><span class="target" id="classDataLayout_1ac3c3a126b8994d5e26cadddd8ae4811d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">move_fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="MemoryImage.html#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="MemoryImage.html#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N10DataLayout10move_fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout14destruct_fun_tE">
+<span id="_CPPv3N10DataLayout14destruct_fun_tE"></span><span id="_CPPv2N10DataLayout14destruct_fun_tE"></span><span class="target" id="classDataLayout_1a5af6dcd03de43f91b439da30ffa2e37c"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">destruct_fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="MemoryImage.html#_CPPv411MemoryImage" title="MemoryImage"><span class="n"><span class="pre">MemoryImage</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N10DataLayout14destruct_fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout6id_mapE">
+<span id="_CPPv3N10DataLayout6id_mapE"></span><span id="_CPPv2N10DataLayout6id_mapE"></span><span id="DataLayout::id_map__std::unordered_map:ss.s:"></span><span class="target" id="classDataLayout_1a66e8bb5910518aaf8d15fd012975f69d"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id_map</span></span></span><a class="headerlink" href="#_CPPv4N10DataLayout6id_mapE" title="Link to this definition"></a><br /></dt>
+<dd><p>Lookup vector positions by name. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout11setting_mapE">
+<span id="_CPPv3N10DataLayout11setting_mapE"></span><span id="_CPPv2N10DataLayout11setting_mapE"></span><span id="DataLayout::setting_map__std::unordered_map:s.SettingInfo:"></span><span class="target" id="classDataLayout_1af266a87ba2e73cfbd9f5c13eb5a3ffa8"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10DataLayout11SettingInfoE" title="DataLayout::SettingInfo"><span class="n"><span class="pre">SettingInfo</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setting_map</span></span></span><a class="headerlink" href="#_CPPv4N10DataLayout11setting_mapE" title="Link to this definition"></a><br /></dt>
+<dd><p>Lookup setting info by id. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout10image_sizeE">
+<span id="_CPPv3N10DataLayout10image_sizeE"></span><span id="_CPPv2N10DataLayout10image_sizeE"></span><span id="DataLayout::image_size__s"></span><span class="target" id="classDataLayout_1aa1031260437aa9fb604df17a2c5581aa"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">image_size</span></span></span><a class="headerlink" href="#_CPPv4N10DataLayout10image_sizeE" title="Link to this definition"></a><br /></dt>
+<dd><p>What size image is expected? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout8num_mapsE">
+<span id="_CPPv3N10DataLayout8num_mapsE"></span><span id="_CPPv2N10DataLayout8num_mapsE"></span><span id="DataLayout::num_maps__s"></span><span class="target" id="classDataLayout_1a6c839c430948a19a35d416ad7154151c"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_maps</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N10DataLayout8num_mapsE" title="Link to this definition"></a><br /></dt>
+<dd><p>How many DataMaps use this layout? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout9is_lockedE">
+<span id="_CPPv3N10DataLayout9is_lockedE"></span><span id="_CPPv2N10DataLayout9is_lockedE"></span><span id="DataLayout::is_locked__b"></span><span class="target" id="classDataLayout_1ad405ae99757f339ad598dad94dd7c4f3"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_locked</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N10DataLayout9is_lockedE" title="Link to this definition"></a><br /></dt>
+<dd><p>Can this layout still be modified? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout17copy_constructorsE">
+<span id="_CPPv3N10DataLayout17copy_constructorsE"></span><span id="_CPPv2N10DataLayout17copy_constructorsE"></span><span id="DataLayout::copy_constructors__vector:copy_fun_t:"></span><span class="target" id="classDataLayout_1a39f9bb2797db22c6fd6f5a318e8e80db"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N10DataLayout10copy_fun_tE" title="DataLayout::copy_fun_t"><span class="n"><span class="pre">copy_fun_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">copy_constructors</span></span></span><a class="headerlink" href="#_CPPv4N10DataLayout17copy_constructorsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout17move_constructorsE">
+<span id="_CPPv3N10DataLayout17move_constructorsE"></span><span id="_CPPv2N10DataLayout17move_constructorsE"></span><span id="DataLayout::move_constructors__vector:move_fun_t:"></span><span class="target" id="classDataLayout_1afa932a0dcb5d079a61ca957fcea84e6e"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N10DataLayout10move_fun_tE" title="DataLayout::move_fun_t"><span class="n"><span class="pre">move_fun_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">move_constructors</span></span></span><a class="headerlink" href="#_CPPv4N10DataLayout17move_constructorsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout11destructorsE">
+<span id="_CPPv3N10DataLayout11destructorsE"></span><span id="_CPPv2N10DataLayout11destructorsE"></span><span id="DataLayout::destructors__vector:destruct_fun_t:"></span><span class="target" id="classDataLayout_1abdc70134966e3273c4ebe3c892986bd6"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N10DataLayout14destruct_fun_tE" title="DataLayout::destruct_fun_t"><span class="n"><span class="pre">destruct_fun_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">destructors</span></span></span><a class="headerlink" href="#_CPPv4N10DataLayout11destructorsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout11SettingInfoE">
+<span id="_CPPv3N10DataLayout11SettingInfoE"></span><span id="_CPPv2N10DataLayout11SettingInfoE"></span><span id="DataLayout::SettingInfo"></span><span class="target" id="structDataLayout_1_1SettingInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SettingInfo</span></span></span><a class="headerlink" href="#_CPPv4N10DataLayout11SettingInfoE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;DataLayout.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout11SettingInfo4typeE">
+<span id="_CPPv3N10DataLayout11SettingInfo4typeE"></span><span id="_CPPv2N10DataLayout11SettingInfo4typeE"></span><span id="DataLayout::SettingInfo::type__TypeID"></span><span class="target" id="structDataLayout_1_1SettingInfo_1ad4293744017c7305c55843c03ba072fe"></span><a class="reference internal" href="../../meta/api/TypeID.html#_CPPv46TypeID" title="TypeID"><span class="n"><span class="pre">TypeID</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type</span></span></span><a class="headerlink" href="#_CPPv4N10DataLayout11SettingInfo4typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Type name as converted to string by typeid() </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout11SettingInfo4nameE">
+<span id="_CPPv3N10DataLayout11SettingInfo4nameE"></span><span id="_CPPv2N10DataLayout11SettingInfo4nameE"></span><span id="DataLayout::SettingInfo::name__ss"></span><span class="target" id="structDataLayout_1_1SettingInfo_1a4ff597a2884aa6d80ca3ac84a161a5ce"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><a class="headerlink" href="#_CPPv4N10DataLayout11SettingInfo4nameE" title="Link to this definition"></a><br /></dt>
+<dd><p>Name of this setting. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout11SettingInfo4descE">
+<span id="_CPPv3N10DataLayout11SettingInfo4descE"></span><span id="_CPPv2N10DataLayout11SettingInfo4descE"></span><span id="DataLayout::SettingInfo::desc__ss"></span><span class="target" id="structDataLayout_1_1SettingInfo_1abc535a778a12f48db94fae05dc53cd45"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">desc</span></span></span><a class="headerlink" href="#_CPPv4N10DataLayout11SettingInfo4descE" title="Link to this definition"></a><br /></dt>
+<dd><p>Full description of this setting. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout11SettingInfo5notesE">
+<span id="_CPPv3N10DataLayout11SettingInfo5notesE"></span><span id="_CPPv2N10DataLayout11SettingInfo5notesE"></span><span id="DataLayout::SettingInfo::notes__ss"></span><span class="target" id="structDataLayout_1_1SettingInfo_1a7daa68f986d409aa28b03e6809dba744"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">notes</span></span></span><a class="headerlink" href="#_CPPv4N10DataLayout11SettingInfo5notesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Any additional notes about this setting. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout11SettingInfo5countE">
+<span id="_CPPv3N10DataLayout11SettingInfo5countE"></span><span id="_CPPv2N10DataLayout11SettingInfo5countE"></span><span id="DataLayout::SettingInfo::count__s"></span><span class="target" id="structDataLayout_1_1SettingInfo_1a62252ee9af270da6faa533c1fec173c1"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">count</span></span></span><a class="headerlink" href="#_CPPv4N10DataLayout11SettingInfo5countE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of objects in this entry. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10DataLayout11SettingInfo6is_logE">
+<span id="_CPPv3N10DataLayout11SettingInfo6is_logE"></span><span id="_CPPv2N10DataLayout11SettingInfo6is_logE"></span><span id="DataLayout::SettingInfo::is_log__b"></span><span class="target" id="structDataLayout_1_1SettingInfo_1a547710ed9d1fecc944156e1731ea239a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_log</span></span></span><a class="headerlink" href="#_CPPv4N10DataLayout11SettingInfo6is_logE" title="Link to this definition"></a><br /></dt>
+<dd><p>Is this setting a current value or a log of all values? </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="DataInterface.html" class="btn btn-neutral float-left" title="DataInterface.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="DataLog.html" class="btn btn-neutral float-right" title="DataLog.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

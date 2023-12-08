@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>d3_init.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../../_static/tippy/library/web/d3/api/d3_init.cf5fea0d-3e4e-46f3-a040-208e6907ecba.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="dataset.hpp" href="dataset.html" />
+    <link rel="prev" title="axis.hpp" href="axis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../d3.html">D3 Wrapper</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../d3-intro.html">Using Empirica’s D3.js Wrapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../d3-contents.html">D3 Wrapper API</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../d3.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../web.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../web.html">Web Tools (for use with Emscripten)</a></li>
+          <li class="breadcrumb-item"><a href="../d3.html">D3 Wrapper</a></li>
+      <li class="breadcrumb-item active">d3_init.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="d3-init-hpp">
+<h1>d3_init.hpp<a class="headerlink" href="#d3-init-hpp" title="Link to this heading"></a></h1>
+<p>TODO. </p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv42D3">
+<span id="_CPPv32D3"></span><span id="_CPPv22D3"></span><span id="D3"></span><span class="target" id="namespaceD3"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">D3</span></span></span><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D38NextD3IDEv">
+<span id="_CPPv3N2D38NextD3IDEv"></span><span id="_CPPv2N2D38NextD3IDEv"></span><span id="D3::NextD3ID"></span><span class="target" id="namespaceD3_1a9d8b92dc0c6a7848a7ca60f761dcd30d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NextD3ID</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D38NextD3IDEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37D3_BaseE">
+<span id="_CPPv3N2D37D3_BaseE"></span><span id="_CPPv2N2D37D3_BaseE"></span><span id="D3::D3_Base"></span><span class="target" id="classD3_1_1D3__Base"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">D3_Base</span></span></span><a class="headerlink" href="#_CPPv4N2D37D3_BaseE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;d3_init.hpp&gt;</em></div>
+<p>A base object that all D3 objects inherit from. Handles storing the object in Javascript You probably don’t want to instantiate this directly </p>
+<p>Subclassed by D3::Axis&lt; D3::LinearScale &gt;, D3::Axis&lt; SCALE_TYPE &gt;, D3::Category10Scale, D3::Category20bScale, D3::Category20cScale, D3::Category20Scale, D3::Dataset, D3::FormatFunction, D3::Histogram, D3::JSFunction, D3::JSObject, D3::Layout, D3::Scale, D3::SelectionOrTransition&lt; DERIVED &gt;, D3::SvgShapeGenerator, D3::ToolTip, D3::SelectionOrTransition&lt; Selection &gt;, D3::SelectionOrTransition&lt; Transition &gt;</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK2D37D3_Base5GetIDEv">
+<span id="_CPPv3NK2D37D3_Base5GetIDEv"></span><span id="_CPPv2NK2D37D3_Base5GetIDEv"></span><span id="D3::D3_Base::GetIDC"></span><span class="target" id="classD3_1_1D3__Base_1a02a87e00c61a716e983854adb0f1b686"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetID</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK2D37D3_Base5GetIDEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK2D37D3_Base3LogEv">
+<span id="_CPPv3NK2D37D3_Base3LogEv"></span><span id="_CPPv2NK2D37D3_Base3LogEv"></span><span id="D3::D3_Base::LogC"></span><span class="target" id="classD3_1_1D3__Base_1a48b936f0facde05cb029cee5c23957e2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Log</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK2D37D3_Base3LogEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37D3_Base7D3_BaseEv">
+<span id="_CPPv3N2D37D3_Base7D3_BaseEv"></span><span id="_CPPv2N2D37D3_Base7D3_BaseEv"></span><span id="D3::D3_Base::D3_Base"></span><span class="target" id="classD3_1_1D3__Base_1a14ec9e8faccbc9301b09e4822a6140e2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">D3_Base</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D37D3_Base7D3_BaseEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Default constructor - adds placeholder to js.objects array in Javascript. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37D3_Base7D3_BaseEi">
+<span id="_CPPv3N2D37D3_Base7D3_BaseEi"></span><span id="_CPPv2N2D37D3_Base7D3_BaseEi"></span><span id="D3::D3_Base::D3_Base__i"></span><span class="target" id="classD3_1_1D3__Base_1ad84b2b5e952fb58b39a20a9327955189"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">D3_Base</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D37D3_Base7D3_BaseEi" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct an object pointing to a pre-determined location in js.objects. Warning: This trusts that you know what you’re doing in choosing an id. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37D3_Base7D3_BaseERK7D3_Base">
+<span id="_CPPv3N2D37D3_Base7D3_BaseERK7D3_Base"></span><span id="_CPPv2N2D37D3_Base7D3_BaseERK7D3_Base"></span><span id="D3::D3_Base::D3_Base__D3_BaseCR"></span><span class="target" id="classD3_1_1D3__Base_1a20508edb907609dfa2d813975d58ddfb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">D3_Base</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D37D3_Base7D3_BaseERK7D3_Base" title="D3::D3_Base::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D37D3_Base7D3_BaseERK7D3_Base" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37D3_BaseaSERK7D3_Base">
+<span id="_CPPv3N2D37D3_BaseaSERK7D3_Base"></span><span id="_CPPv2N2D37D3_BaseaSERK7D3_Base"></span><span id="D3::D3_Base::assign-operator__D3_BaseCR"></span><span class="target" id="classD3_1_1D3__Base_1a6606eaaef9702a00fec5a495917de7a9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D37D3_BaseaSERK7D3_Base" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37D3_BaseD0Ev">
+<span id="_CPPv3N2D37D3_BaseD0Ev"></span><span id="_CPPv2N2D37D3_BaseD0Ev"></span><span id="D3::D3_Base::~D3_Base"></span><span class="target" id="classD3_1_1D3__Base_1a86a431fd962da50c7c2853b868cc6886"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~D3_Base</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D37D3_BaseD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37D3_Base2idE">
+<span id="_CPPv3N2D37D3_Base2idE"></span><span id="_CPPv2N2D37D3_Base2idE"></span><span id="D3::D3_Base::id__i"></span><span class="target" id="classD3_1_1D3__Base_1a1f32654b871cdf608d4c20941394045d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id</span></span></span><a class="headerlink" href="#_CPPv4N2D37D3_Base2idE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D314FormatFunctionE">
+<span id="_CPPv3N2D314FormatFunctionE"></span><span id="_CPPv2N2D314FormatFunctionE"></span><span id="D3::FormatFunction"></span><span class="target" id="classD3_1_1FormatFunction"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FormatFunction</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><a class="headerlink" href="#_CPPv4N2D314FormatFunctionE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;d3_init.hpp&gt;</em></div>
+<p>A callable string d3.format() string formatting function. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D314FormatFunction14FormatFunctionENSt6stringE">
+<span id="_CPPv3N2D314FormatFunction14FormatFunctionENSt6stringE"></span><span id="_CPPv2N2D314FormatFunction14FormatFunctionENSt6stringE"></span><span id="D3::FormatFunction::FormatFunction__ss"></span><span class="target" id="classD3_1_1FormatFunction_1a114aa9959aa9b9d2425c8b01eacdb091"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FormatFunction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">format</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D314FormatFunction14FormatFunctionENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D314FormatFunctionclEd">
+<span id="_CPPv3N2D314FormatFunctionclEd"></span><span id="_CPPv2N2D314FormatFunctionclEd"></span><span id="D3::FormatFunction::call-operator__double"></span><span class="target" id="classD3_1_1FormatFunction_1a7e478ce3af7678eb05154b836eecfcfe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">d</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D314FormatFunctionclEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310JSFunctionE">
+<span id="_CPPv3N2D310JSFunctionE"></span><span id="_CPPv2N2D310JSFunctionE"></span><span id="D3::JSFunction"></span><span class="target" id="classD3_1_1JSFunction"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">JSFunction</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><a class="headerlink" href="#_CPPv4N2D310JSFunctionE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;d3_init.hpp&gt;</em></div>
+<p>Wrapper for creating functions in javascript and calling them there. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310JSFunction10JSFunctionEv">
+<span id="_CPPv3N2D310JSFunction10JSFunctionEv"></span><span id="_CPPv2N2D310JSFunction10JSFunctionEv"></span><span id="D3::JSFunction::JSFunction"></span><span class="target" id="classD3_1_1JSFunction_1a5bc138361154e03249180b5845ca8ceb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">JSFunction</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D310JSFunction10JSFunctionEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310JSFunction10JSFunctionENSt6stringE">
+<span id="_CPPv3N2D310JSFunction10JSFunctionENSt6stringE"></span><span id="_CPPv2N2D310JSFunction10JSFunctionENSt6stringE"></span><span id="D3::JSFunction::JSFunction__ss"></span><span class="target" id="classD3_1_1JSFunction_1ad5b549ab1d4f3b37905f39158fccb0a0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">JSFunction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D310JSFunction10JSFunctionENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310JSFunctionclEv">
+<span id="_CPPv3N2D310JSFunctionclEv"></span><span id="_CPPv2N2D310JSFunctionclEv"></span><span id="D3::JSFunction::call-operator"></span><span class="target" id="classD3_1_1JSFunction_1ae22e31d846dc6781200d9ab6414fbbcb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D310JSFunctionclEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Only works if function has no arguments or returns. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D38JSObjectE">
+<span id="_CPPv3N2D38JSObjectE"></span><span id="_CPPv2N2D38JSObjectE"></span><span id="D3::JSObject"></span><span class="target" id="classD3_1_1JSObject"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">JSObject</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><a class="headerlink" href="#_CPPv4N2D38JSObjectE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;d3_init.hpp&gt;</em></div>
+<p>Catch-all object for storing references to things created in JS. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D38JSObject8JSObjectEv">
+<span id="_CPPv3N2D38JSObject8JSObjectEv"></span><span id="_CPPv2N2D38JSObject8JSObjectEv"></span><span id="D3::JSObject::JSObject"></span><span class="target" id="classD3_1_1JSObject_1a8b993abe75c54504240590754b74a806"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">JSObject</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D38JSObject8JSObjectEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37ToolTipE">
+<span id="_CPPv3N2D37ToolTipE"></span><span id="_CPPv2N2D37ToolTipE"></span><span id="D3::ToolTip"></span><span class="target" id="classD3_1_1ToolTip"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToolTip</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><a class="headerlink" href="#_CPPv4N2D37ToolTipE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;d3_init.hpp&gt;</em></div>
+<p>Create a tooltup using the d3.tip Javascript library. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37ToolTip7ToolTipEv">
+<span id="_CPPv3N2D37ToolTip7ToolTipEv"></span><span id="_CPPv2N2D37ToolTip7ToolTipEv"></span><span id="D3::ToolTip::ToolTip"></span><span class="target" id="classD3_1_1ToolTip_1a7ad03afad8d4b09b6daed83954a8ff0c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToolTip</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D37ToolTip7ToolTipEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Default constructor - displays whatever data is bound on mouseover. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37ToolTip7ToolTipENSt6stringE">
+<span id="_CPPv3N2D37ToolTip7ToolTipENSt6stringE"></span><span id="_CPPv2N2D37ToolTip7ToolTipENSt6stringE"></span><span id="D3::ToolTip::ToolTip__ss"></span><span class="target" id="classD3_1_1ToolTip_1a4cfb4e8ac8dbf921993e630ec93b22c0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToolTip</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">func</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D37ToolTip7ToolTipENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Cosntructor that allows you to specify a function that returns the html for the tooltip. As input, this function should take 3 parameters: the bound data, the index of this item in the selection (int), and a placeholder (int).</p>
+<p>Example:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">D3</span><span class="o">::</span><span class="n">FormatFunction</span><span class="w"> </span><span class="n">rounded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D3</span><span class="o">::</span><span class="n">FormatFunction</span><span class="p">(</span><span class="s">&quot;.2f&quot;</span><span class="p">);</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span><span class="o">&gt;</span><span class="w"> </span><span class="n">tooltip_display</span><span class="w"> </span><span class="o">=</span>
+<span class="w">  </span><span class="p">[</span><span class="k">this</span><span class="p">](</span><span class="kt">double</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="k">return</span><span class="w"> </span><span class="s">&quot;Data: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">to_string</span><span class="p">(</span><span class="n">rounded</span><span class="p">(</span><span class="n">d</span><span class="p">));}</span>
+
+<span class="n">D3</span><span class="o">::</span><span class="n">ToolTip</span><span class="w"> </span><span class="n">tip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D3</span><span class="o">::</span><span class="n">ToolTip</span><span class="p">(</span><span class="n">tooltip_display</span><span class="p">);</span>
+
+<span class="n">D3</span><span class="o">::</span><span class="n">Selection</span><span class="w"> </span><span class="n">example_selection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D3</span><span class="o">::</span><span class="n">SelectAll</span><span class="p">(</span><span class="s">&quot;circle&quot;</span><span class="p">);</span>
+
+<span class="n">example_selection</span><span class="p">.</span><span class="n">SetupToolTip</span><span class="p">(</span><span class="n">tip</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Mousing over a circle in the example selection will display “Data: “ followed by the value of d, rounded to two decimal points. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D37ToolTip7SetHtmlENSt6stringE">
+<span id="_CPPv3N2D37ToolTip7SetHtmlENSt6stringE"></span><span id="_CPPv2N2D37ToolTip7SetHtmlENSt6stringE"></span><span id="D3::ToolTip::SetHtml__ss"></span><span class="target" id="classD3_1_1ToolTip_1a394605ef2bc6ed250bac5f32714eb723"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetHtml</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">func</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D37ToolTip7SetHtmlENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="axis.html" class="btn btn-neutral float-left" title="axis.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dataset.html" class="btn btn-neutral float-right" title="dataset.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

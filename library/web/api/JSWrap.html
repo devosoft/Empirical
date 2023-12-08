@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JSWrap.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/web/api/JSWrap.ae3de983-1f5e-4cd3-ad5c-501ee19c1bb1.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="KeypressManager.hpp" href="KeypressManager.html" />
+    <link rel="prev" title="Input.hpp" href="Input.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../web.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Animate.html">Animate.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Attributes.html">Attributes.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Button.html">Button.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Canvas.html">Canvas.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasAction.html">CanvasAction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasShape.html">CanvasShape.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Div.html">Div.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DocuExtras.html">DocuExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Document.html">Document.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Element.html">Element.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FileInput.html">FileInput.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Font.html">Font.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Image.html">Image.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Input.html">Input.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">JSWrap.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E6JSWrap6size_tRK8FUN_TYPERKNSt6stringEb"><code class="docutils literal notranslate"><span class="pre">JSWrap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E10JSWrapOnce6size_tRR8FUN_TYPE"><code class="docutils literal notranslate"><span class="pre">JSWrapOnce()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv48JSDelete6size_t"><code class="docutils literal notranslate"><span class="pre">JSDelete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416empDoCppCallbackK6size_t"><code class="docutils literal notranslate"><span class="pre">empDoCppCallback()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414empCppCallbackK6size_t"><code class="docutils literal notranslate"><span class="pre">empCppCallback()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="KeypressManager.html">KeypressManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Listeners.html">Listeners.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NodeDomShim.html">NodeDomShim.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RawImage.html">RawImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Selector.html">Selector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style.html">Style.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Table.html">Table.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Text.html">Text.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextArea.html">TextArea.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextFeed.html">TextFeed.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tween.html">Tween.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UrlParams.html">UrlParams.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Widget.html">Widget.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WidgetExtras.html">WidgetExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="canvas_utils.html">canvas_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="color_map.html">color_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html">commands.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emfunctions.html">emfunctions.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="events.html">events.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="init.html">init.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="js_utils.html">js_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="web.html">web.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../web.html">Web Tools (for use with Emscripten)</a></li>
+      <li class="breadcrumb-item active">JSWrap.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="jswrap-hpp">
+<h1>JSWrap.hpp<a class="headerlink" href="#jswrap-hpp" title="Link to this heading"></a></h1>
+<p>Wrap a C++ function and convert it to an integer that can be called from Javascript. </p>
+<p>To wrap a function, call:</p>
+<p><code class="docutils literal notranslate"><span class="pre">uint32_t</span> <span class="pre">fun_id</span> <span class="pre">=</span> <span class="pre">JSWrap(FunctionToBeWrapped,</span> <span class="pre">&quot;JS_Function_Name&quot;);</span></code>`</p>
+<p>To manually callback a function from Javascript, first set <code class="docutils literal notranslate"><span class="pre">emp_i.cb_args</span></code> to an array of function arguments, then call <code class="docutils literal notranslate"><span class="pre">empCppCallback(</span> <span class="pre">fun_id</span> <span class="pre">);</span></code> This all happens automatically if you use the <code class="docutils literal notranslate"><span class="pre">emp.Callback(fun_id,</span> <span class="pre">args...)</span></code> function from Javascript.</p>
+<p>The JS_Function_Name string is optional, but if you use it, the appropriate function will be automatically generated in Javascript by JSWrap, in the emp class.</p>
+<p>For example, if you have:</p>
+<p><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">AddPair(int</span> <span class="pre">x,</span> <span class="pre">int</span> <span class="pre">y)</span> <span class="pre">{</span> <span class="pre">return</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">y;</span> <span class="pre">}</span></code>`</p>
+<p>You can wrap it with:</p>
+<p><code class="docutils literal notranslate"><span class="pre">size_t</span> <span class="pre">fun_id</span> <span class="pre">=</span> <span class="pre">JSWrap(AddPair,</span> <span class="pre">&quot;AddPair&quot;);</span></code></p>
+<p>And then in Javascript, you can simply call it as:</p>
+<p><code class="docutils literal notranslate"><span class="pre">emp.AddPair(4,</span> <span class="pre">5);</span> <span class="pre">//</span> <span class="pre">will</span> <span class="pre">return</span> <span class="pre">9.</span></code></p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Add a JSWrap that takes an object and method and does the bind automatically. </p>
+<p>Build a non-enscripten version; it should still be callable from the C++ side, but mostly to be able to test programs without Emscripten.</p>
+</dd></dl>
+
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E6JSWrap6size_tRK8FUN_TYPERKNSt6stringEb">
+<span id="_CPPv3I0E6JSWrapRK8FUN_TYPERKNSt6stringEb"></span><span id="_CPPv2I0E6JSWrapRK8FUN_TYPERKNSt6stringEb"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FUN_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="JSWrap_8hpp_1a3075694ebe6fd0dc19ac02b97e09d3d3"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">JSWrap</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E6JSWrap6size_tRK8FUN_TYPERKNSt6stringEb" title="JSWrap::FUN_TYPE"><span class="n"><span class="pre">FUN_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun_name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dispose_on_use</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E6JSWrap6size_tRK8FUN_TYPERKNSt6stringEb" title="Link to this definition"></a><br /></dt>
+<dd><p>JSWrap takes a C++ function and wraps it in Javascript for easy calling in web code </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_fun</strong> – a C++ function to wrap </p></li>
+<li><p><strong>fun_name</strong> – optionally, a name to call the function on the Javascript size </p></li>
+<li><p><strong>dispose_on_use</strong> – should we delete this function after using it? </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the id of the function on the Javascript side </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E10JSWrapOnce6size_tRR8FUN_TYPE">
+<span id="_CPPv3I0E10JSWrapOnceRR8FUN_TYPE"></span><span id="_CPPv2I0E10JSWrapOnceRR8FUN_TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FUN_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="JSWrap_8hpp_1ae42b98e8c5c40ea5eada32c2330c7c1b"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">JSWrapOnce</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E10JSWrapOnce6size_tRR8FUN_TYPE" title="JSWrapOnce::FUN_TYPE"><span class="n"><span class="pre">FUN_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E10JSWrapOnce6size_tRR8FUN_TYPE" title="Link to this definition"></a><br /></dt>
+<dd><p>If we want a quick, unnammed, disposable function, use JSWrapOnce. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48JSDelete6size_t">
+<span id="_CPPv38JSDelete6size_t"></span><span id="_CPPv28JSDelete6size_t"></span><span id="JSDelete__s"></span><span class="target" id="JSWrap_8hpp_1ad379b43ed5f73e209e4a9d6fb9d87428"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">JSDelete</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fun_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48JSDelete6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Cleanup a function pointer when finished with it. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416empDoCppCallbackK6size_t">
+<span id="_CPPv316empDoCppCallbackK6size_t"></span><span id="_CPPv216empDoCppCallbackK6size_t"></span><span id="empDoCppCallback__sC"></span><span class="target" id="JSWrap_8hpp_1a93719f8ed2484cc0c34e191066b6fbbd"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">empDoCppCallback</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cb_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416empDoCppCallbackK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>This function is dispatched by empCppCallback. It should be dispatched on the thread hosting the main Empirical runtime. If running with Emscripten pthreads, that would be the worker thread hosting the main Empirical runtime. If not running with Emscripten pthreads, that would be the main browser thread. (In a few limited cases when running with Emscripten pthreads, this function is called on the main browser thread.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414empCppCallbackK6size_t">
+<span id="_CPPv314empCppCallbackK6size_t"></span><span id="_CPPv214empCppCallbackK6size_t"></span><span id="empCppCallback__sC"></span><span class="target" id="JSWrap_8hpp_1a0d0b46d5b38223bbc36fbdec69d7d519"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">empCppCallback</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cb_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414empCppCallbackK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Once you use JSWrap to create an ID, you can call the wrapped function from Javascript by supplying CPPCallback with the id and all args. If running with Emscripten pthreads, this method is to be called from the DOM and it will forward the call to empDoCppCallback on the web worker hosting Empirical runtime. If not running with Emscripten pthreads, this method simply calls empDoCppCallback (on the main browser thread). </p>
+</dd></dl>
+
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Input.html" class="btn btn-neutral float-left" title="Input.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="KeypressManager.html" class="btn btn-neutral float-right" title="KeypressManager.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

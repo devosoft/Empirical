@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>memo_function.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/functional/api/memo_function.f0a4ce5b-edd7-4503-b122-239e10a1f763.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Games" href="../../games/games.html" />
+    <link rel="prev" title="flex_function.hpp" href="flex_function.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../functional.html">Functional</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../functional.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AnyFunction.html">AnyFunction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FunctionSet.html">FunctionSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="GenericFunction.html">GenericFunction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="flex_function.html">flex_function.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">memo_function.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E13memo_function"><code class="docutils literal notranslate"><span class="pre">memo_function</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE"><code class="docutils literal notranslate"><span class="pre">memo_function</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE"><code class="docutils literal notranslate"><span class="pre">memo_function</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E13memo_functionIF1RvEE"><code class="docutils literal notranslate"><span class="pre">memo_function</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../functional.html">Functional</a></li>
+      <li class="breadcrumb-item active">memo_function.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="memo-function-hpp">
+<h1>memo_function.hpp<a class="headerlink" href="#memo-function-hpp" title="Link to this heading"></a></h1>
+<p>A function that memorizes previous results to speed up any repeated calls. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA </p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E13memo_function">
+<span id="_CPPv3I0E13memo_function"></span><span id="_CPPv2I0E13memo_function"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmemo__function"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><a class="headerlink" href="#_CPPv4I0E13memo_function" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;memo_function.hpp&gt;</em></div>
+<p>Identical to std::function, but memorizes prior results (caches them) so that the function doesn’t have to process those results again. (note: Genetic version is undefinined; must have a function signature.) </p>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I00E13memo_functionIF1R3ARGEE">
+<span id="_CPPv3I00E13memo_functionIF1R3ARGEE"></span><span id="_CPPv2I00E13memo_functionIF1R3ARGEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">R</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmemo__function_3_01R_07ARG_08_4"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::ARG"><span class="n"><span class="pre">ARG</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;memo_function.hpp&gt;</em></div>
+<p>The simplest form of a memoized function with a single argument that is used as the cache key (no need for more complex caching). </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEE6size_tE">
+<span id="_CPPv3N13memo_functionIF1R3ARGEE6size_tE"></span><span id="_CPPv2N13memo_functionIF1R3ARGEE6size_tE"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1a8b277437f6e1e69f3dd70be9cbd7050c"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEE6size_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEE8return_tE">
+<span id="_CPPv3N13memo_functionIF1R3ARGEE8return_tE"></span><span id="_CPPv2N13memo_functionIF1R3ARGEE8return_tE"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1a9e84154212c10dbd8bb4906988aa96f1"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">return_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::R"><span class="n"><span class="pre">R</span></span></a><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEE8return_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEE7index_tE">
+<span id="_CPPv3N13memo_functionIF1R3ARGEE7index_tE"></span><span id="_CPPv2N13memo_functionIF1R3ARGEE7index_tE"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1ab7a689d51817a11fb0eb68be7236bc0d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">index_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">decay_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::ARG"><span class="n"><span class="pre">ARG</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEE7index_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEE5fun_tE">
+<span id="_CPPv3N13memo_functionIF1R3ARGEE5fun_tE"></span><span id="_CPPv2N13memo_functionIF1R3ARGEE5fun_tE"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1aeaf078b501543419ab88a38526d12e99"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::ARG"><span class="n"><span class="pre">ARG</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEE5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEE6this_tE">
+<span id="_CPPv3N13memo_functionIF1R3ARGEE6this_tE"></span><span id="_CPPv2N13memo_functionIF1R3ARGEE6this_tE"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1ae56dd533870cbf789c72155656f5a094"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN13memo_functionIF1R3ARGEE13memo_functionERR1T" title="memo_function&lt;R(ARG)&gt;::memo_function"><span class="n"><span class="pre">memo_function</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::ARG"><span class="n"><span class="pre">ARG</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEE6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13memo_functionIF1R3ARGEE13memo_functionERR1T">
+<span id="_CPPv3I0EN13memo_functionIF1R3ARGEE13memo_functionERR1T"></span><span id="_CPPv2I0EN13memo_functionIF1R3ARGEE13memo_functionERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1aa19328a11cca333bb267bc2d77d9cc18"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN13memo_functionIF1R3ARGEE13memo_functionERR1T" title="memo_function&lt;R(ARG)&gt;::memo_function::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun_info</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13memo_functionIF1R3ARGEE13memo_functionERR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEE13memo_functionERK6this_t">
+<span id="_CPPv3N13memo_functionIF1R3ARGEE13memo_functionERK6this_t"></span><span id="_CPPv2N13memo_functionIF1R3ARGEE13memo_functionERK6this_t"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1a0c458d820b07492d536344267d67125d"></span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE6this_tE" title="memo_function&lt;R(ARG)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEE13memo_functionERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEE13memo_functionERR6this_t">
+<span id="_CPPv3N13memo_functionIF1R3ARGEE13memo_functionERR6this_t"></span><span id="_CPPv2N13memo_functionIF1R3ARGEE13memo_functionERR6this_t"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1a8cd04e6a010e078a7bb94186524100c1"></span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE6this_tE" title="memo_function&lt;R(ARG)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEE13memo_functionERR6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEE13memo_functionEv">
+<span id="_CPPv3N13memo_functionIF1R3ARGEE13memo_functionEv"></span><span id="_CPPv2N13memo_functionIF1R3ARGEE13memo_functionEv"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1a747b61de6355f30d59ce8ebe84d295a3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEE13memo_functionEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEEaSERK6this_t">
+<span id="_CPPv3N13memo_functionIF1R3ARGEEaSERK6this_t"></span><span id="_CPPv2N13memo_functionIF1R3ARGEEaSERK6this_t"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1aa22e2d38010b6f9fe75b63f8c6980ab8"></span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE6this_tE" title="memo_function&lt;R(ARG)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE6this_tE" title="memo_function&lt;R(ARG)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEEaSERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Copy another memo_function of the same type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEEaSERR6this_t">
+<span id="_CPPv3N13memo_functionIF1R3ARGEEaSERR6this_t"></span><span id="_CPPv2N13memo_functionIF1R3ARGEEaSERR6this_t"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1a2bcaf14ea54d3cb8260b695929678bcd"></span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE6this_tE" title="memo_function&lt;R(ARG)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE6this_tE" title="memo_function&lt;R(ARG)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEEaSERR6this_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Move to here another memo function of the same type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEEaSERK5fun_t">
+<span id="_CPPv3N13memo_functionIF1R3ARGEEaSERK5fun_t"></span><span id="_CPPv2N13memo_functionIF1R3ARGEEaSERK5fun_t"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1afe90dc9c6bedc70212766a223b98553c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE6this_tE" title="memo_function&lt;R(ARG)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE5fun_tE" title="memo_function&lt;R(ARG)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEEaSERK5fun_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set a new std::function of the appropriate type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEEaSERR5fun_t">
+<span id="_CPPv3N13memo_functionIF1R3ARGEEaSERR5fun_t"></span><span id="_CPPv2N13memo_functionIF1R3ARGEEaSERR5fun_t"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1adeec0c179bcbd6f4e548602f9a9e350a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE6this_tE" title="memo_function&lt;R(ARG)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE5fun_tE" title="memo_function&lt;R(ARG)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEEaSERR5fun_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Move to here an std::function of the appropriate type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13memo_functionIF1R3ARGEEaSER6this_tRR1T">
+<span id="_CPPv3I0EN13memo_functionIF1R3ARGEEaSERR1T"></span><span id="_CPPv2I0EN13memo_functionIF1R3ARGEEaSERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1ade97564b02eaae1eb9cef8a653952a7f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE6this_tE" title="memo_function&lt;R(ARG)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN13memo_functionIF1R3ARGEEaSER6this_tRR1T" title="memo_function&lt;R(ARG)&gt;::operator=::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13memo_functionIF1R3ARGEEaSER6this_tRR1T" title="Link to this definition"></a><br /></dt>
+<dd><p>A universal copy/move for other combinations that work with std::function. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13memo_functionIF1R3ARGEE4sizeEv">
+<span id="_CPPv3NK13memo_functionIF1R3ARGEE4sizeEv"></span><span id="_CPPv2NK13memo_functionIF1R3ARGEE4sizeEv"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1af7bf0f4d51c0df0ccdc3a7cf9416ae6b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE6size_tE" title="memo_function&lt;R(ARG)&gt;::size_t"><span class="n"><span class="pre">size_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13memo_functionIF1R3ARGEE4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many values have been cached? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13memo_functionIF1R3ARGEE3HasERK3ARG">
+<span id="_CPPv3NK13memo_functionIF1R3ARGEE3HasERK3ARG"></span><span id="_CPPv2NK13memo_functionIF1R3ARGEE3HasERK3ARG"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1a85c58c36ab90bd3b7fca0ed04a3e9f96"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::ARG"><span class="n"><span class="pre">ARG</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">k</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13memo_functionIF1R3ARGEE3HasERK3ARG" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if a certain input has been cached. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEE5ClearEv">
+<span id="_CPPv3N13memo_functionIF1R3ARGEE5ClearEv"></span><span id="_CPPv2N13memo_functionIF1R3ARGEE5ClearEv"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1acee44e4433816e9887bff88c3697375f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEE5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Clear out the cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEE5EraseERK3ARG">
+<span id="_CPPv3N13memo_functionIF1R3ARGEE5EraseERK3ARG"></span><span id="_CPPv2N13memo_functionIF1R3ARGEE5EraseERK3ARG"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1a53e1a45cabad01600ff090ba56490c48"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Erase</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::ARG"><span class="n"><span class="pre">ARG</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">k</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEE5EraseERK3ARG" title="Link to this definition"></a><br /></dt>
+<dd><p>Erase a specific entry from the cache. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK13memo_functionIF1R3ARGEEclE8return_tRR3KEY">
+<span id="_CPPv3I0ENK13memo_functionIF1R3ARGEEclERR3KEY"></span><span id="_CPPv2I0ENK13memo_functionIF1R3ARGEEclERR3KEY"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KEY</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1a9f827d43aa3652b41ea7c9df09ff8f3e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE8return_tE" title="memo_function&lt;R(ARG)&gt;::return_t"><span class="n"><span class="pre">return_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0ENK13memo_functionIF1R3ARGEEclE8return_tRR3KEY" title="memo_function&lt;R(ARG)&gt;::operator()::KEY"><span class="n"><span class="pre">KEY</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">k</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK13memo_functionIF1R3ARGEEclE8return_tRR3KEY" title="Link to this definition"></a><br /></dt>
+<dd><p>Call the memo_function. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13memo_functionIF1R3ARGEEcvbEv">
+<span id="_CPPv3NK13memo_functionIF1R3ARGEEcvbEv"></span><span id="_CPPv2NK13memo_functionIF1R3ARGEEcvbEv"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1a46a34a380d9dfb40b79d910111be8f1b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13memo_functionIF1R3ARGEEcvbEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Identify if the memo_function has been set. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEEcvNSt8functionIF1R3ARGEEEEv">
+<span id="_CPPv3N13memo_functionIF1R3ARGEEcvNSt8functionIF1R3ARGEEEEv"></span><span id="_CPPv2N13memo_functionIF1R3ARGEEcvNSt8functionIF1R3ARGEEEEv"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1aad9bd4250c22caebbfe6614c256b54c0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::ARG"><span class="n"><span class="pre">ARG</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEEcvNSt8functionIF1R3ARGEEEEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert a memo_function to a regular std::function for function calls. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEE11to_functionEv">
+<span id="_CPPv3N13memo_functionIF1R3ARGEE11to_functionEv"></span><span id="_CPPv2N13memo_functionIF1R3ARGEE11to_functionEv"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1acfa67569527711845a05e2d4803d55c0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I00E13memo_functionIF1R3ARGEE" title="memo_function&lt;R(ARG)&gt;::ARG"><span class="n"><span class="pre">ARG</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">to_function</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEE11to_functionEv" title="Link to this definition"></a><br /></dt>
+<dd><p>More explicit conversion of a memo_function to a regular std::function for function calls. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEE9cache_mapE">
+<span id="_CPPv3N13memo_functionIF1R3ARGEE9cache_mapE"></span><span id="_CPPv2N13memo_functionIF1R3ARGEE9cache_mapE"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1ae10b6f035f57cd6d4fb16f0301d1c2b2"></span><span class="k"><span class="pre">mutable</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE7index_tE" title="memo_function&lt;R(ARG)&gt;::index_t"><span class="n"><span class="pre">index_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE8return_tE" title="memo_function&lt;R(ARG)&gt;::return_t"><span class="n"><span class="pre">return_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cache_map</span></span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEE9cache_mapE" title="Link to this definition"></a><br /></dt>
+<dd><p>Cached results. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R3ARGEE3funE">
+<span id="_CPPv3N13memo_functionIF1R3ARGEE3funE"></span><span id="_CPPv2N13memo_functionIF1R3ARGEE3funE"></span><span class="target" id="classmemo__function_3_01R_07ARG_08_4_1ab11d39a7cd1e83d89fc479daecdae567"></span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R3ARGEE5fun_tE" title="memo_function&lt;R(ARG)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun</span></span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R3ARGEE3funE" title="Link to this definition"></a><br /></dt>
+<dd><p>Function to call. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE">
+<span id="_CPPv3I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE"></span><span id="_CPPv2I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">R</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">A1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">A2</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">EXTRA</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A1"><span class="n"><span class="pre">A1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A2"><span class="n"><span class="pre">A2</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::EXTRA"><span class="n"><span class="pre">EXTRA</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;memo_function.hpp&gt;</em></div>
+<p>Memoize functions for when we have more than one argument… we need to convert inputs to a tuple to make this work. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6size_tE">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEE6size_tE"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEE6size_tE"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1ac4ea60cb4d9adb36261821578ea2acbb"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6size_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE8return_tE">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEE8return_tE"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEE8return_tE"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1a76b013fdee73c4d75fbd8d4cb7e7cfe3"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">return_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::R"><span class="n"><span class="pre">R</span></span></a><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE8return_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE5fun_tE">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEE5fun_tE"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEE5fun_tE"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1ad4672c57664bca716be4393a5f221460"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A1"><span class="n"><span class="pre">A1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A2"><span class="n"><span class="pre">A2</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::EXTRA"><span class="n"><span class="pre">EXTRA</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6hash_tE">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEE6hash_tE"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEE6hash_tE"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1ad73f3ca1cbb385862128fe92a0d70b40"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hash_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../datastructs/api/tuple_utils.html#_CPPv4IDpE9TupleHash" title="TupleHash"><span class="n"><span class="pre">TupleHash</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A1"><span class="n"><span class="pre">A1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A2"><span class="n"><span class="pre">A2</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::EXTRA"><span class="n"><span class="pre">EXTRA</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6hash_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6this_tE">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEE6this_tE"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEE6this_tE"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1aba4b59ca50ff2f0600220c91e6757d60"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpEN13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionEDpRR2Ts" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::memo_function"><span class="n"><span class="pre">memo_function</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A1"><span class="n"><span class="pre">A1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A2"><span class="n"><span class="pre">A2</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::EXTRA"><span class="n"><span class="pre">EXTRA</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE7tuple_tE">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEE7tuple_tE"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEE7tuple_tE"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1a5c9393fb18b4202a6f9c219a2d466060"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tuple_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">tuple</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">decay_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A1"><span class="n"><span class="pre">A1</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">decay_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A2"><span class="n"><span class="pre">A2</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">decay_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::EXTRA"><span class="n"><span class="pre">EXTRA</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE7tuple_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionEDpRR2Ts">
+<span id="_CPPv3IDpEN13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionEDpRR2Ts"></span><span id="_CPPv2IDpEN13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionEDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1ac6f457b9b42591126112f71e224e4656"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionEDpRR2Ts" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::memo_function::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionEDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionERK13memo_function">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionERK13memo_function"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionERK13memo_function"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1a57c49efb943129d408f88b23b13b3aa9"></span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionERK13memo_function" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::memo_function"><span class="n"><span class="pre">memo_function</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionERK13memo_function" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionERR13memo_function">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionERR13memo_function"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionERR13memo_function"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1aed13f8f8ba9474e53299756a088567f7"></span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionERR13memo_function" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::memo_function"><span class="n"><span class="pre">memo_function</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionERR13memo_function" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERK6this_t">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERK6this_t"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERK6this_t"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1adc974ce0de5ca544080cf5a8e09d9ee8"></span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6this_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6this_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERR6this_t">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERR6this_t"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERR6this_t"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1ab1a88f354e604bf68ada1202d3e695fd"></span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6this_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6this_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERR6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERK5fun_t">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERK5fun_t"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERK5fun_t"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1a01b9c29f5d4fc5d3aa66107021ede9a3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6this_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE5fun_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERK5fun_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERR5fun_t">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERR5fun_t"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERR5fun_t"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1afe8850aeb2b3bbeab8d6e1d9efa5a329"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6this_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE5fun_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERR5fun_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13memo_functionIF1R2A12A2Dp5EXTRAEEaSER6this_tRR1T">
+<span id="_CPPv3I0EN13memo_functionIF1R2A12A2Dp5EXTRAEEaSERR1T"></span><span id="_CPPv2I0EN13memo_functionIF1R2A12A2Dp5EXTRAEEaSERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1ac4159d9481d7242a53f542f332055637"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6this_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN13memo_functionIF1R2A12A2Dp5EXTRAEEaSER6this_tRR1T" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::operator=::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13memo_functionIF1R2A12A2Dp5EXTRAEEaSER6this_tRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEE4sizeEv">
+<span id="_CPPv3NK13memo_functionIF1R2A12A2Dp5EXTRAEE4sizeEv"></span><span id="_CPPv2NK13memo_functionIF1R2A12A2Dp5EXTRAEE4sizeEv"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1ad70084d9a6ace99198e6321ef2c5c92f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6size_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::size_t"><span class="n"><span class="pre">size_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEE4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEE3HasERK2A1RK2A2DpRK5EXTRA">
+<span id="_CPPv3NK13memo_functionIF1R2A12A2Dp5EXTRAEE3HasERK2A1RK2A2DpRK5EXTRA"></span><span id="_CPPv2NK13memo_functionIF1R2A12A2Dp5EXTRAEE3HasERK2A1RK2A2DpRK5EXTRA"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1a7481362e37f7a0b330cc508d88824d1c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A1"><span class="n"><span class="pre">A1</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">k1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A2"><span class="n"><span class="pre">A2</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">k2</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::EXTRA"><span class="n"><span class="pre">EXTRA</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">k_extra</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEE3HasERK2A1RK2A2DpRK5EXTRA" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE5ClearEv">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEE5ClearEv"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEE5ClearEv"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1a627757d93090dc81e0d586ad6ad69292"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE5EraseERK2A1RK2A2DpRK5EXTRA">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEE5EraseERK2A1RK2A2DpRK5EXTRA"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEE5EraseERK2A1RK2A2DpRK5EXTRA"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1ae0cb02784f183b82841cb2bbb2be525e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Erase</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A1"><span class="n"><span class="pre">A1</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">k1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A2"><span class="n"><span class="pre">A2</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">k2</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::EXTRA"><span class="n"><span class="pre">EXTRA</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">k_extra</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE5EraseERK2A1RK2A2DpRK5EXTRA" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEclERK2A1RK2A2DpRK5EXTRA">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEEclERK2A1RK2A2DpRK5EXTRA"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEEclERK2A1RK2A2DpRK5EXTRA"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1a8e08da26c5237e8e6f53f87a9e44894c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE8return_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::return_t"><span class="n"><span class="pre">return_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A1"><span class="n"><span class="pre">A1</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">k1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A2"><span class="n"><span class="pre">A2</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">k2</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::EXTRA"><span class="n"><span class="pre">EXTRA</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">k_extra</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEclERK2A1RK2A2DpRK5EXTRA" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEEcvbEv">
+<span id="_CPPv3NK13memo_functionIF1R2A12A2Dp5EXTRAEEcvbEv"></span><span id="_CPPv2NK13memo_functionIF1R2A12A2Dp5EXTRAEEcvbEv"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1abb2000bb25d2d4b572a8f0eec3c00f53"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEEcvbEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEEcvNSt8functionIF1R2A12A2Dp5EXTRAEEEEv">
+<span id="_CPPv3NK13memo_functionIF1R2A12A2Dp5EXTRAEEcvNSt8functionIF1R2A12A2Dp5EXTRAEEEEv"></span><span id="_CPPv2NK13memo_functionIF1R2A12A2Dp5EXTRAEEcvNSt8functionIF1R2A12A2Dp5EXTRAEEEEv"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1a7b2d7802457493c8596ad8c71081d3a8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A1"><span class="n"><span class="pre">A1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A2"><span class="n"><span class="pre">A2</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::EXTRA"><span class="n"><span class="pre">EXTRA</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEEcvNSt8functionIF1R2A12A2Dp5EXTRAEEEEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEE11to_functionEv">
+<span id="_CPPv3NK13memo_functionIF1R2A12A2Dp5EXTRAEE11to_functionEv"></span><span id="_CPPv2NK13memo_functionIF1R2A12A2Dp5EXTRAEE11to_functionEv"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1a335364dd891bafbf177540fa1ba82bee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A1"><span class="n"><span class="pre">A1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A2"><span class="n"><span class="pre">A2</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::EXTRA"><span class="n"><span class="pre">EXTRA</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">to_function</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEE11to_functionEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE4HashERK2A1RK2A2DpRK5EXTRA">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEE4HashERK2A1RK2A2DpRK5EXTRA"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEE4HashERK2A1RK2A2DpRK5EXTRA"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1a3cb9047a569a6141d002526dc15e5306"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6size_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::size_t"><span class="n"><span class="pre">size_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Hash</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A1"><span class="n"><span class="pre">A1</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">k1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::A2"><span class="n"><span class="pre">A2</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">k2</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::EXTRA"><span class="n"><span class="pre">EXTRA</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">k_extra</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE4HashERK2A1RK2A2DpRK5EXTRA" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE9cache_mapE">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEE9cache_mapE"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEE9cache_mapE"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1a352775ec0d82cf096095b66f93c05d7a"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE7tuple_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::tuple_t"><span class="n"><span class="pre">tuple_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE8return_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::return_t"><span class="n"><span class="pre">return_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6hash_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::hash_t"><span class="n"><span class="pre">hash_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cache_map</span></span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE9cache_mapE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE3funE">
+<span id="_CPPv3N13memo_functionIF1R2A12A2Dp5EXTRAEE3funE"></span><span id="_CPPv2N13memo_functionIF1R2A12A2Dp5EXTRAEE3funE"></span><span class="target" id="classmemo__function_3_01R_07A1_00_01A2_00_01EXTRA_8_8_8_08_4_1a4b30d88f42d913d4cac46a27b0bca1e6"></span><a class="reference internal" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE5fun_tE" title="memo_function&lt;R(A1, A2, EXTRA...)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun</span></span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE3funE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E13memo_functionIF1RvEE">
+<span id="_CPPv3I0E13memo_functionIF1RvEE"></span><span id="_CPPv2I0E13memo_functionIF1RvEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">R</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmemo__function_3_01R_07_08_4"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E13memo_functionIF1RvEE" title="memo_function&lt;R()&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0E13memo_functionIF1RvEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;memo_function.hpp&gt;</em></div>
+<p>Zero argument functions are trivial (since they need to cache only a single value), but should still work. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE6size_tE">
+<span id="_CPPv3N13memo_functionIF1RvEE6size_tE"></span><span id="_CPPv2N13memo_functionIF1RvEE6size_tE"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1adeb6e7ebf2c003eb45b7f5edd5a3c97b"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE6size_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE8return_tE">
+<span id="_CPPv3N13memo_functionIF1RvEE8return_tE"></span><span id="_CPPv2N13memo_functionIF1RvEE8return_tE"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a2f341be48f53508e66b13984e4d61efd"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">return_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E13memo_functionIF1RvEE" title="memo_function&lt;R()&gt;::R"><span class="n"><span class="pre">R</span></span></a><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE8return_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE7index_tE">
+<span id="_CPPv3N13memo_functionIF1RvEE7index_tE"></span><span id="_CPPv2N13memo_functionIF1RvEE7index_tE"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a427e77244429be8b2ac919a8eaa3f26e"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">index_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE7index_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE5fun_tE">
+<span id="_CPPv3N13memo_functionIF1RvEE5fun_tE"></span><span id="_CPPv2N13memo_functionIF1RvEE5fun_tE"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a1fe8d3c8dab2e4af26a484504dea364a"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E13memo_functionIF1RvEE" title="memo_function&lt;R()&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE6this_tE">
+<span id="_CPPv3N13memo_functionIF1RvEE6this_tE"></span><span id="_CPPv2N13memo_functionIF1RvEE6this_tE"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1adf03537025da9ab7fcabcf7db7a9949b"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN13memo_functionIF1RvEE13memo_functionERR1T" title="memo_function&lt;R()&gt;::memo_function"><span class="n"><span class="pre">memo_function</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E13memo_functionIF1RvEE" title="memo_function&lt;R()&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13memo_functionIF1RvEE13memo_functionERR1T">
+<span id="_CPPv3I0EN13memo_functionIF1RvEE13memo_functionERR1T"></span><span id="_CPPv2I0EN13memo_functionIF1RvEE13memo_functionERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmemo__function_3_01R_07_08_4_1aef1190690aac27d4689959ac4c0361c2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN13memo_functionIF1RvEE13memo_functionERR1T" title="memo_function&lt;R()&gt;::memo_function::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun_info</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13memo_functionIF1RvEE13memo_functionERR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE13memo_functionERK6this_t">
+<span id="_CPPv3N13memo_functionIF1RvEE13memo_functionERK6this_t"></span><span id="_CPPv2N13memo_functionIF1RvEE13memo_functionERK6this_t"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a33c8117b529da5f0bfcf07dc71745e81"></span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE6this_tE" title="memo_function&lt;R()&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE13memo_functionERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE13memo_functionERR6this_t">
+<span id="_CPPv3N13memo_functionIF1RvEE13memo_functionERR6this_t"></span><span id="_CPPv2N13memo_functionIF1RvEE13memo_functionERR6this_t"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a60e049d3d6dea5b1e1d0c7323f20b14e"></span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE6this_tE" title="memo_function&lt;R()&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE13memo_functionERR6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE13memo_functionEv">
+<span id="_CPPv3N13memo_functionIF1RvEE13memo_functionEv"></span><span id="_CPPv2N13memo_functionIF1RvEE13memo_functionEv"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a880a08b18f5362950b376ba633724ef7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memo_function</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE13memo_functionEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEEaSERK6this_t">
+<span id="_CPPv3N13memo_functionIF1RvEEaSERK6this_t"></span><span id="_CPPv2N13memo_functionIF1RvEEaSERK6this_t"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a3e7d8a659b5de5daec3dabfc304569ee"></span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE6this_tE" title="memo_function&lt;R()&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE6this_tE" title="memo_function&lt;R()&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEEaSERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEEaSERR6this_t">
+<span id="_CPPv3N13memo_functionIF1RvEEaSERR6this_t"></span><span id="_CPPv2N13memo_functionIF1RvEEaSERR6this_t"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a636b73cacf5878cef5994830e080d871"></span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE6this_tE" title="memo_function&lt;R()&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE6this_tE" title="memo_function&lt;R()&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEEaSERR6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEEaSERK5fun_t">
+<span id="_CPPv3N13memo_functionIF1RvEEaSERK5fun_t"></span><span id="_CPPv2N13memo_functionIF1RvEEaSERK5fun_t"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a640cf0852fed5762edd7a21982e5f006"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE6this_tE" title="memo_function&lt;R()&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE5fun_tE" title="memo_function&lt;R()&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEEaSERK5fun_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEEaSERR5fun_t">
+<span id="_CPPv3N13memo_functionIF1RvEEaSERR5fun_t"></span><span id="_CPPv2N13memo_functionIF1RvEEaSERR5fun_t"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a0b34573066f80ca56a200a330e1e2d49"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE6this_tE" title="memo_function&lt;R()&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE5fun_tE" title="memo_function&lt;R()&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEEaSERR5fun_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13memo_functionIF1RvEEaSER6this_tRR1T">
+<span id="_CPPv3I0EN13memo_functionIF1RvEEaSERR1T"></span><span id="_CPPv2I0EN13memo_functionIF1RvEEaSERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmemo__function_3_01R_07_08_4_1a9e117b8f1511ced8de9c17339ac71c53"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE6this_tE" title="memo_function&lt;R()&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN13memo_functionIF1RvEEaSER6this_tRR1T" title="memo_function&lt;R()&gt;::operator=::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13memo_functionIF1RvEEaSER6this_tRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13memo_functionIF1RvEE4sizeEv">
+<span id="_CPPv3NK13memo_functionIF1RvEE4sizeEv"></span><span id="_CPPv2NK13memo_functionIF1RvEE4sizeEv"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a354365d0d8b61041eba2dcd8d5ab6496"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE6size_tE" title="memo_function&lt;R()&gt;::size_t"><span class="n"><span class="pre">size_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13memo_functionIF1RvEE4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13memo_functionIF1RvEE3HasEv">
+<span id="_CPPv3NK13memo_functionIF1RvEE3HasEv"></span><span id="_CPPv2NK13memo_functionIF1RvEE3HasEv"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a78462d6a4e1374e78ac53416eb8641ba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13memo_functionIF1RvEE3HasEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE5ClearEv">
+<span id="_CPPv3N13memo_functionIF1RvEE5ClearEv"></span><span id="_CPPv2N13memo_functionIF1RvEE5ClearEv"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a71a620d5e358e4e43e02986283ecce02"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE5EraseEv">
+<span id="_CPPv3N13memo_functionIF1RvEE5EraseEv"></span><span id="_CPPv2N13memo_functionIF1RvEE5EraseEv"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a9f248258e8c21decfdbef58804d2582c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Erase</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE5EraseEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEEclEv">
+<span id="_CPPv3N13memo_functionIF1RvEEclEv"></span><span id="_CPPv2N13memo_functionIF1RvEEclEv"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a304753c11934c60856569b9635518c21"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE8return_tE" title="memo_function&lt;R()&gt;::return_t"><span class="n"><span class="pre">return_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEEclEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEEcvbEv">
+<span id="_CPPv3N13memo_functionIF1RvEEcvbEv"></span><span id="_CPPv2N13memo_functionIF1RvEEcvbEv"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a5dfc83220505e84f7e13c4c69698f945"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEEcvbEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEEcvNSt8functionIF1RvEEEEv">
+<span id="_CPPv3N13memo_functionIF1RvEEcvNSt8functionIF1RvEEEEv"></span><span id="_CPPv2N13memo_functionIF1RvEEcvNSt8functionIF1RvEEEEv"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a1505548c7e8c4e901f080a5b8c8b983c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E13memo_functionIF1RvEE" title="memo_function&lt;R()&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEEcvNSt8functionIF1RvEEEEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE11to_functionEv">
+<span id="_CPPv3N13memo_functionIF1RvEE11to_functionEv"></span><span id="_CPPv2N13memo_functionIF1RvEE11to_functionEv"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a49dad57b722c0407a9597865550fd657"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E13memo_functionIF1RvEE" title="memo_function&lt;R()&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">to_function</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE11to_functionEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE12cached_valueE">
+<span id="_CPPv3N13memo_functionIF1RvEE12cached_valueE"></span><span id="_CPPv2N13memo_functionIF1RvEE12cached_valueE"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1af5a1fe27c00ab841645fe7a9cedf8cf5"></span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE8return_tE" title="memo_function&lt;R()&gt;::return_t"><span class="n"><span class="pre">return_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cached_value</span></span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE12cached_valueE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE9has_cacheE">
+<span id="_CPPv3N13memo_functionIF1RvEE9has_cacheE"></span><span id="_CPPv2N13memo_functionIF1RvEE9has_cacheE"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a9058fae5d2ffadac24152ca903274484"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">has_cache</span></span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE9has_cacheE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13memo_functionIF1RvEE3funE">
+<span id="_CPPv3N13memo_functionIF1RvEE3funE"></span><span id="_CPPv2N13memo_functionIF1RvEE3funE"></span><span class="target" id="classmemo__function_3_01R_07_08_4_1a7ec590fa71078a9a9e0f90b68035b9e4"></span><a class="reference internal" href="#_CPPv4N13memo_functionIF1RvEE5fun_tE" title="memo_function&lt;R()&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun</span></span></span><a class="headerlink" href="#_CPPv4N13memo_functionIF1RvEE3funE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="flex_function.html" class="btn btn-neutral float-left" title="flex_function.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../games/games.html" class="btn btn-neutral float-right" title="Games" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

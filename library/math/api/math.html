@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>math.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/math/api/math.faa735ce-7682-4c1f-aae6-1da58b84fff6.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="random_utils.hpp" href="random_utils.html" />
+    <link rel="prev" title="info_theory.hpp" href="info_theory.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../math.html">Math</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../math.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="CombinedBinomialDistribution.html">CombinedBinomialDistribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Distribution.html">Distribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DistributionSet.html">DistributionSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Fraction.html">Fraction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Random.html">Random.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Range.html">Range.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RangeSet.html">RangeSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="combos.html">combos.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="constants.html">constants.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="distances.html">distances.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="info_theory.html">info_theory.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">math.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv43Modii"><code class="docutils literal notranslate"><span class="pre">Mod()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv43Moddd"><code class="docutils literal notranslate"><span class="pre">Mod()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E3Sgni1T"><code class="docutils literal notranslate"><span class="pre">Sgn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E3Abs1T1T"><code class="docutils literal notranslate"><span class="pre">Abs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411FloorDivideii"><code class="docutils literal notranslate"><span class="pre">FloorDivide()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413RoundedDivideii"><code class="docutils literal notranslate"><span class="pre">RoundedDivide()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413RoundedDivide6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RoundedDivide()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414UnbiasedDivideiiR6Random"><code class="docutils literal notranslate"><span class="pre">UnbiasedDivide()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414UnbiasedDivide6size_t6size_tR6Random"><code class="docutils literal notranslate"><span class="pre">UnbiasedDivide()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E7ToRange4TYPERK4TYPERK4TYPERK4TYPE"><code class="docutils literal notranslate"><span class="pre">ToRange()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E3Min1T1T"><code class="docutils literal notranslate"><span class="pre">Min()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE3Min1T1T1TDp2Ts"><code class="docutils literal notranslate"><span class="pre">Min()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E3Max1T1T"><code class="docutils literal notranslate"><span class="pre">Max()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE3Max1T1T1TDp2Ts"><code class="docutils literal notranslate"><span class="pre">Max()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E6MinRefRK1TRK1T"><code class="docutils literal notranslate"><span class="pre">MinRef()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE6MinRefRK1TRK1TRK1TDpRK2Ts"><code class="docutils literal notranslate"><span class="pre">MinRef()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E6MaxRefRK1TRK1T"><code class="docutils literal notranslate"><span class="pre">MaxRef()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE6MaxRefRK1TRK1TRK1TDpRK2Ts"><code class="docutils literal notranslate"><span class="pre">MaxRef()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv44Log2d"><code class="docutils literal notranslate"><span class="pre">Log2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv43Logdd"><code class="docutils literal notranslate"><span class="pre">Log()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv42Lnd"><code class="docutils literal notranslate"><span class="pre">Ln()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv45Log10d"><code class="docutils literal notranslate"><span class="pre">Log10()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E6Square1T1T"><code class="docutils literal notranslate"><span class="pre">Square()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv44Pow2d"><code class="docutils literal notranslate"><span class="pre">Pow2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E6IntPow4TYPE4TYPE4TYPE"><code class="docutils literal notranslate"><span class="pre">IntPow()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E3Pow1T1TN8internal8identityI1TE4typeE"><code class="docutils literal notranslate"><span class="pre">Pow()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv43Expd"><code class="docutils literal notranslate"><span class="pre">Exp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E7IntLog2i4TYPE"><code class="docutils literal notranslate"><span class="pre">IntLog2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E3MinRK1TRK1TRK1TRK1T"><code class="docutils literal notranslate"><span class="pre">Min()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E3MinRK1TNSt16initializer_listIRK1TEE"><code class="docutils literal notranslate"><span class="pre">Min()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E3MaxRK1TNSt16initializer_listIRK1TEE"><code class="docutils literal notranslate"><span class="pre">Max()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412NextPowerOf28uint64_t"><code class="docutils literal notranslate"><span class="pre">NextPowerOf2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410IsPowerOf2K6size_t"><code class="docutils literal notranslate"><span class="pre">IsPowerOf2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49Factoriali"><code class="docutils literal notranslate"><span class="pre">Factorial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv46ToggleRb"><code class="docutils literal notranslate"><span class="pre">Toggle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv47AllTruev"><code class="docutils literal notranslate"><span class="pre">AllTrue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE7AllTruebbDp2Ts"><code class="docutils literal notranslate"><span class="pre">AllTrue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv47AnyTruev"><code class="docutils literal notranslate"><span class="pre">AnyTrue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE7AnyTruebbDp2Ts"><code class="docutils literal notranslate"><span class="pre">AnyTrue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E3GCD1TK1TK1T"><code class="docutils literal notranslate"><span class="pre">GCD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E3LCM1TK1TK1T"><code class="docutils literal notranslate"><span class="pre">LCM()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="random_utils.html">random_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sequence_utils.html">sequence_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spatial_stats.html">spatial_stats.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stats.html">stats.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../math.html">Math</a></li>
+      <li class="breadcrumb-item active">math.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="math-hpp">
+<h1>math.hpp<a class="headerlink" href="#math-hpp" title="Link to this heading"></a></h1>
+<p>Useful mathematical functions (that are constexpr when possible.) </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA (though new functions are added frequently) </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv43Modii">
+<span id="_CPPv33Modii"></span><span id="_CPPv23Modii"></span><span id="Mod__i.iCE"></span><span class="target" id="math_8hpp_1a761ca5c4fa9271087ae59472b341ddb5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mod</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_val</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mod_val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv43Modii" title="Link to this definition"></a><br /></dt>
+<dd><p>% is actually remainder; Mod is a proper modulus command that handles negative #’s correctly </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv43Moddd">
+<span id="_CPPv33Moddd"></span><span id="_CPPv23Moddd"></span><span id="Mod__double.double"></span><span class="target" id="math_8hpp_1ac6244b311aea73c4953b3718cfe3af27"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mod</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_val</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mod_val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv43Moddd" title="Link to this definition"></a><br /></dt>
+<dd><p>Regular Mod doesn’t work on doubles. Build one that does! </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E3Sgni1T">
+<span id="_CPPv3I0E3Sgn1T"></span><span id="_CPPv2I0E3Sgn1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a26e765e84d3e0c1c42172200d6c6a13b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sgn</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E3Sgni1T" title="Sgn::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E3Sgni1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate the sign (i.e., +1, -1, or 0) of a value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E3Abs1T1T">
+<span id="_CPPv3I0E3Abs1T"></span><span id="_CPPv2I0E3Abs1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1aff6ea01b395c48120e9f95a58000139d"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3Abs1T1T" title="Abs::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Abs</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E3Abs1T1T" title="Abs::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E3Abs1T1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Find the absolute value for any variable. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv411FloorDivideii">
+<span id="_CPPv311FloorDivideii"></span><span id="_CPPv211FloorDivideii"></span><span id="FloorDivide__i.i"></span><span class="target" id="math_8hpp_1a4ebc40534baf86ea6553fe7a56f67094"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FloorDivide</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dividend</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">divisor</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411FloorDivideii" title="Link to this definition"></a><br /></dt>
+<dd><p>Divide one integer by another, rounding towards minus infinity. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413RoundedDivideii">
+<span id="_CPPv313RoundedDivideii"></span><span id="_CPPv213RoundedDivideii"></span><span id="RoundedDivide__i.i"></span><span class="target" id="math_8hpp_1a3d0e0b2257def22b8eb288621fda7ad6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RoundedDivide</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dividend</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">divisor</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413RoundedDivideii" title="Link to this definition"></a><br /></dt>
+<dd><p>Default integer division is truncated, not rounded. Round the division result instead of truncating it. Rounding ties (i.e., result % divisor == 0.5) are rounded up. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413RoundedDivide6size_t6size_t">
+<span id="_CPPv313RoundedDivide6size_t6size_t"></span><span id="_CPPv213RoundedDivide6size_t6size_t"></span><span id="RoundedDivide__s.s"></span><span class="target" id="math_8hpp_1a75e785a5649fdf37e95832061b0e0642"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RoundedDivide</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dividend</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">divisor</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413RoundedDivide6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Default integer division is truncated, not rounded. Round the division result instead of truncating it. Rounding ties (i.e., result % divisor == 0.5) will be rounded up. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414UnbiasedDivideiiR6Random">
+<span id="_CPPv314UnbiasedDivideiiR6Random"></span><span id="_CPPv214UnbiasedDivideiiR6Random"></span><span id="UnbiasedDivide__i.i.RandomR"></span><span class="target" id="math_8hpp_1a491d56170a1dce133ed1d886f34bbbe6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UnbiasedDivide</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dividend</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">divisor</span></span>, <a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414UnbiasedDivideiiR6Random" title="Link to this definition"></a><br /></dt>
+<dd><p>Regular integer division is truncated, not rounded. Round the division result instead of truncating it. Rounding ties (i.e., result % divisor == 0.5) are broken by coin toss. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414UnbiasedDivide6size_t6size_tR6Random">
+<span id="_CPPv314UnbiasedDivide6size_t6size_tR6Random"></span><span id="_CPPv214UnbiasedDivide6size_t6size_tR6Random"></span><span id="UnbiasedDivide__s.s.RandomR"></span><span class="target" id="math_8hpp_1a0485cca7ef770038d9e6a09c620c809e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UnbiasedDivide</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dividend</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">divisor</span></span>, <a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414UnbiasedDivide6size_t6size_tR6Random" title="Link to this definition"></a><br /></dt>
+<dd><p>Regular integer division is truncated, not rounded. Round the division result instead of truncating it. Rounding ties (i.e., result % divisor == 0.5) are broken by coin toss. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E7ToRange4TYPERK4TYPERK4TYPERK4TYPE">
+<span id="_CPPv3I0E7ToRangeRK4TYPERK4TYPERK4TYPE"></span><span id="_CPPv2I0E7ToRangeRK4TYPERK4TYPERK4TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a516dd4b230daaa9bba0a9517408bdec1"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7ToRange4TYPERK4TYPERK4TYPERK4TYPE" title="ToRange::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToRange</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7ToRange4TYPERK4TYPERK4TYPERK4TYPE" title="ToRange::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7ToRange4TYPERK4TYPERK4TYPERK4TYPE" title="ToRange::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_min</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E7ToRange4TYPERK4TYPERK4TYPERK4TYPE" title="ToRange::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E7ToRange4TYPERK4TYPERK4TYPERK4TYPE" title="Link to this definition"></a><br /></dt>
+<dd><p>Run both min and max on a value to put it into a desired range. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E3Min1T1T">
+<span id="_CPPv3I0E3Min1T"></span><span id="_CPPv2I0E3Min1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a1cc270ad39c6feb6f381763aba865937"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3Min1T1T" title="Min::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Min</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E3Min1T1T" title="Min::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E3Min1T1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Min of only one element is that element itself! </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE3Min1T1T1TDp2Ts">
+<span id="_CPPv3I0DpE3Min1T1TDp2Ts"></span><span id="_CPPv2I0DpE3Min1T1TDp2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1ab63564f26509b039407873776a994231"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE3Min1T1T1TDp2Ts" title="Min::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Min</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE3Min1T1T1TDp2Ts" title="Min::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in1</span></span>, <a class="reference internal" href="#_CPPv4I0DpE3Min1T1T1TDp2Ts" title="Min::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in2</span></span>, <a class="reference internal" href="#_CPPv4I0DpE3Min1T1T1TDp2Ts" title="Min::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">extras</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE3Min1T1T1TDp2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Min of multiple elements is solved recursively. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E3Max1T1T">
+<span id="_CPPv3I0E3Max1T"></span><span id="_CPPv2I0E3Max1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a5f7bc67c72acd15afb822f15f287f7da"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3Max1T1T" title="Max::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Max</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E3Max1T1T" title="Max::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E3Max1T1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Max of only one element is that element itself! </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE3Max1T1T1TDp2Ts">
+<span id="_CPPv3I0DpE3Max1T1TDp2Ts"></span><span id="_CPPv2I0DpE3Max1T1TDp2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a651295d36d6a8963e7fcabe9a535ee80"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE3Max1T1T1TDp2Ts" title="Max::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Max</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE3Max1T1T1TDp2Ts" title="Max::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in1</span></span>, <a class="reference internal" href="#_CPPv4I0DpE3Max1T1T1TDp2Ts" title="Max::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in2</span></span>, <a class="reference internal" href="#_CPPv4I0DpE3Max1T1T1TDp2Ts" title="Max::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">extras</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE3Max1T1T1TDp2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Max of multiple elements is solved recursively. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E6MinRefRK1TRK1T">
+<span id="_CPPv3I0E6MinRefRK1T"></span><span id="_CPPv2I0E6MinRefRK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a388322621c7c574bc741d69709a43492"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E6MinRefRK1TRK1T" title="MinRef::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">MinRef</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E6MinRefRK1TRK1T" title="MinRef::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E6MinRefRK1TRK1T" title="Link to this definition"></a><br /></dt>
+<dd><p>MinRef works like Min, but never copies any inputs; always treats as references. MinRef of only one element returns reference to that element itself! </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE6MinRefRK1TRK1TRK1TDpRK2Ts">
+<span id="_CPPv3I0DpE6MinRefRK1TRK1TDpRK2Ts"></span><span id="_CPPv2I0DpE6MinRefRK1TRK1TDpRK2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1aa67b39038813acab5fd52b1016ea225c"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE6MinRefRK1TRK1TRK1TDpRK2Ts" title="MinRef::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">MinRef</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE6MinRefRK1TRK1TRK1TDpRK2Ts" title="MinRef::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE6MinRefRK1TRK1TRK1TDpRK2Ts" title="MinRef::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in2</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE6MinRefRK1TRK1TRK1TDpRK2Ts" title="MinRef::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">extras</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE6MinRefRK1TRK1TRK1TDpRK2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>MinRef of multiple elements returns reference to minimum value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E6MaxRefRK1TRK1T">
+<span id="_CPPv3I0E6MaxRefRK1T"></span><span id="_CPPv2I0E6MaxRefRK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a6ff252f9eaf830c73a87b3d1d735f160"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E6MaxRefRK1TRK1T" title="MaxRef::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">MaxRef</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E6MaxRefRK1TRK1T" title="MaxRef::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E6MaxRefRK1TRK1T" title="Link to this definition"></a><br /></dt>
+<dd><p>MaxRef works like Max, but never copies any inputs; always treats as references. MaxRef of only one element returns reference to that element itself! </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE6MaxRefRK1TRK1TRK1TDpRK2Ts">
+<span id="_CPPv3I0DpE6MaxRefRK1TRK1TDpRK2Ts"></span><span id="_CPPv2I0DpE6MaxRefRK1TRK1TDpRK2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1ab0054d1c3f302bfa72c84b22bb8ab429"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE6MaxRefRK1TRK1TRK1TDpRK2Ts" title="MaxRef::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">MaxRef</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE6MaxRefRK1TRK1TRK1TDpRK2Ts" title="MaxRef::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE6MaxRefRK1TRK1TRK1TDpRK2Ts" title="MaxRef::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in2</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE6MaxRefRK1TRK1TRK1TDpRK2Ts" title="MaxRef::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">extras</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE6MaxRefRK1TRK1TRK1TDpRK2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>MaxRef of multiple elements returns reference to maximum value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv44Log2d">
+<span id="_CPPv34Log2d"></span><span id="_CPPv24Log2d"></span><span id="Log2__doubleCE"></span><span class="target" id="math_8hpp_1abc450d351bd3b6169f345a1ca4a7a455"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Log2</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv44Log2d" title="Link to this definition"></a><br /></dt>
+<dd><p>Compile-time log base 2 calculator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv43Logdd">
+<span id="_CPPv33Logdd"></span><span id="_CPPv23Logdd"></span><span id="Log__double.doubleCE"></span><span class="target" id="math_8hpp_1a71711adceeb2c4ff8eab3482471afba7"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Log</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">base</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">10.0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv43Logdd" title="Link to this definition"></a><br /></dt>
+<dd><p>Compile-time log calculator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv42Lnd">
+<span id="_CPPv32Lnd"></span><span id="_CPPv22Lnd"></span><span id="Ln__doubleCE"></span><span class="target" id="math_8hpp_1a4763d50afac45be02d48402048209539"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Ln</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv42Lnd" title="Link to this definition"></a><br /></dt>
+<dd><p>Compile-time natural log calculator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv45Log10d">
+<span id="_CPPv35Log10d"></span><span id="_CPPv25Log10d"></span><span id="Log10__doubleCE"></span><span class="target" id="math_8hpp_1ac79fe9a68923f2a6ae0f6eba07b7a19a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Log10</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv45Log10d" title="Link to this definition"></a><br /></dt>
+<dd><p>Compile-time log base 10 calculator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E6Square1T1T">
+<span id="_CPPv3I0E6Square1T"></span><span id="_CPPv2I0E6Square1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a5991753a77c5963e007d26ab024846d7"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E6Square1T1T" title="Square::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Square</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E6Square1T1T" title="Square::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E6Square1T1T" title="Link to this definition"></a><br /></dt>
+<dd><p>A simple function to square a value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv44Pow2d">
+<span id="_CPPv34Pow2d"></span><span id="_CPPv24Pow2d"></span><span id="Pow2__doubleCE"></span><span class="target" id="math_8hpp_1a3355f7a783877a89574a4fd9cbf72e50"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Pow2</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">exp</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv44Pow2d" title="Link to this definition"></a><br /></dt>
+<dd><p>A fast 2^x command. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E6IntPow4TYPE4TYPE4TYPE">
+<span id="_CPPv3I0E6IntPow4TYPE4TYPE"></span><span id="_CPPv2I0E6IntPow4TYPE4TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1ac215ac1af3c17b60cfae2fec3ed0f3d4"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E6IntPow4TYPE4TYPE4TYPE" title="IntPow::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IntPow</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E6IntPow4TYPE4TYPE4TYPE" title="IntPow::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">base</span></span>, <a class="reference internal" href="#_CPPv4I0E6IntPow4TYPE4TYPE4TYPE" title="IntPow::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">exp</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E6IntPow4TYPE4TYPE4TYPE" title="Link to this definition"></a><br /></dt>
+<dd><p>A fast method for calculating exponents for int types. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E3Pow1T1TN8internal8identityI1TE4typeE">
+<span id="_CPPv3I0E3Pow1TN8internal8identityI1TE4typeE"></span><span id="_CPPv2I0E3Pow1TN8internal8identityI1TE4typeE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a6ab92772c6a8e2c2743cd2b745efeb33"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3Pow1T1TN8internal8identityI1TE4typeE" title="Pow::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Pow</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E3Pow1T1TN8internal8identityI1TE4typeE" title="Pow::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">base</span></span>, <span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">identity</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E3Pow1T1TN8internal8identityI1TE4typeE" title="Pow::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">exp</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E3Pow1T1TN8internal8identityI1TE4typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>A fast method for calculating exponents on doubles or integral types. Uses if constexpr to work around compiler bug in Emscripten (issue #296). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv43Expd">
+<span id="_CPPv33Expd"></span><span id="_CPPv23Expd"></span><span id="Exp__doubleCE"></span><span class="target" id="math_8hpp_1a4fbbef7aeb0831c915e4d24480871cf7"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Exp</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">exp</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv43Expd" title="Link to this definition"></a><br /></dt>
+<dd><p>A fast method of calculating e^x. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E7IntLog2i4TYPE">
+<span id="_CPPv3I0E7IntLog24TYPE"></span><span id="_CPPv2I0E7IntLog24TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a8f9086cf8fa09da5c77e36a7d9352431"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IntLog2</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E7IntLog2i4TYPE" title="IntLog2::TYPE"><span class="n"><span class="pre">TYPE</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E7IntLog2i4TYPE" title="Link to this definition"></a><br /></dt>
+<dd><p>A compile-time int-log calculator (aka, significant bits) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E3MinRK1TRK1TRK1TRK1T">
+<span id="_CPPv3I0E3MinRK1TRK1TRK1T"></span><span id="_CPPv2I0E3MinRK1TRK1TRK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a3f2e9b17ad873a98e1d80e2371d4edbd"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3MinRK1TRK1TRK1TRK1T" title="Min::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Min</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3MinRK1TRK1TRK1TRK1T" title="Min::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3MinRK1TRK1TRK1TRK1T" title="Min::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in2</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3MinRK1TRK1TRK1TRK1T" title="Min::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in3</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E3MinRK1TRK1TRK1TRK1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the minimum of three values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E3MinRK1TNSt16initializer_listIRK1TEE">
+<span id="_CPPv3I0E3MinNSt16initializer_listIRK1TEE"></span><span id="_CPPv2I0E3MinNSt16initializer_listIRK1TEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1ac3e9e52a38631b307779f049bab0b848"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3MinRK1TNSt16initializer_listIRK1TEE" title="Min::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Min</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">initializer_list</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3MinRK1TNSt16initializer_listIRK1TEE" title="Min::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E3MinRK1TNSt16initializer_listIRK1TEE" title="Link to this definition"></a><br /></dt>
+<dd><p>A version of Min that allows a variable number of inputs to be compared. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E3MaxRK1TNSt16initializer_listIRK1TEE">
+<span id="_CPPv3I0E3MaxNSt16initializer_listIRK1TEE"></span><span id="_CPPv2I0E3MaxNSt16initializer_listIRK1TEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a7a155e7ea0b61c16cfa3cd7fd2d57eb4"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3MaxRK1TNSt16initializer_listIRK1TEE" title="Max::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Max</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">initializer_list</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3MaxRK1TNSt16initializer_listIRK1TEE" title="Max::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lst</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E3MaxRK1TNSt16initializer_listIRK1TEE" title="Link to this definition"></a><br /></dt>
+<dd><p>A version of Max that allows a variable number of inputs to be compared. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412NextPowerOf28uint64_t">
+<span id="_CPPv312NextPowerOf28uint64_t"></span><span id="_CPPv212NextPowerOf28uint64_t"></span><span id="NextPowerOf2__uint64_t"></span><span class="target" id="math_8hpp_1a0968a7354e9fa00d0046519fa0fdfd33"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NextPowerOf2</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">A</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412NextPowerOf28uint64_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the next power of two (in 64-bits) that is strictly greater than A. Returns zero on overflow. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410IsPowerOf2K6size_t">
+<span id="_CPPv310IsPowerOf2K6size_t"></span><span id="_CPPv210IsPowerOf2K6size_t"></span><span id="IsPowerOf2__sCCE"></span><span class="target" id="math_8hpp_1a35a1b480091c25a0bcf1dead1c0e7a46"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsPowerOf2</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410IsPowerOf2K6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Tests if a number is a power of two. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49Factoriali">
+<span id="_CPPv39Factoriali"></span><span id="_CPPv29Factoriali"></span><span id="Factorial__iCE"></span><span class="target" id="math_8hpp_1a48c178b8093a587714e508a3d1faa9fe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Factorial</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49Factoriali" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv46ToggleRb">
+<span id="_CPPv36ToggleRb"></span><span id="_CPPv26ToggleRb"></span><span id="Toggle__bR"></span><span class="target" id="math_8hpp_1a767bbd4f86428649687a79130d6f034f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Toggle</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_bool</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv46ToggleRb" title="Link to this definition"></a><br /></dt>
+<dd><p>Toggle an input bool. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47AllTruev">
+<span id="_CPPv37AllTruev"></span><span id="_CPPv27AllTruev"></span><span id="AllTrueCE"></span><span class="target" id="math_8hpp_1a9d7e61f0a4104b01129ef7c2f67d58ca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AllTrue</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47AllTruev" title="Link to this definition"></a><br /></dt>
+<dd><p>Combine bools to AND them all together. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE7AllTruebbDp2Ts">
+<span id="_CPPv3IDpE7AllTruebDp2Ts"></span><span id="_CPPv2IDpE7AllTruebDp2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a075f1126bb7a576c0395626114b8c172"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AllTrue</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <a class="reference internal" href="#_CPPv4IDpE7AllTruebbDp2Ts" title="AllTrue::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">OTHER</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpE7AllTruebbDp2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47AnyTruev">
+<span id="_CPPv37AnyTruev"></span><span id="_CPPv27AnyTruev"></span><span id="AnyTrueCE"></span><span class="target" id="math_8hpp_1ae6d5083dc4bce4ffda96b39d6b03e6f8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AnyTrue</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47AnyTruev" title="Link to this definition"></a><br /></dt>
+<dd><p>Combine bools to OR them all together. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE7AnyTruebbDp2Ts">
+<span id="_CPPv3IDpE7AnyTruebDp2Ts"></span><span id="_CPPv2IDpE7AnyTruebDp2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a84e11e43f933ac2d3cff5c7dfbc7d4d5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AnyTrue</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">result</span></span>, <a class="reference internal" href="#_CPPv4IDpE7AnyTruebbDp2Ts" title="AnyTrue::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">OTHER</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpE7AnyTruebbDp2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E3GCD1TK1TK1T">
+<span id="_CPPv3I0E3GCDK1TK1T"></span><span id="_CPPv2I0E3GCDK1TK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a4008cea25be02db39c3ed6b103728e76"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3GCD1TK1TK1T" title="GCD::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GCD</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3GCD1TK1TK1T" title="GCD::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3GCD1TK1TK1T" title="GCD::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E3GCD1TK1TK1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Greatest Common Divisor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E3LCM1TK1TK1T">
+<span id="_CPPv3I0E3LCMK1TK1T"></span><span id="_CPPv2I0E3LCMK1TK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="math_8hpp_1a370a6856b2279395e33e6bb76f87f212"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3LCM1TK1TK1T" title="LCM::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LCM</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3LCM1TK1TK1T" title="LCM::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E3LCM1TK1TK1T" title="LCM::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">v2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E3LCM1TK1TK1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Least common multiple. </p>
+</dd></dl>
+
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="info_theory.html" class="btn btn-neutral float-left" title="info_theory.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="random_utils.html" class="btn btn-neutral float-right" title="random_utils.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

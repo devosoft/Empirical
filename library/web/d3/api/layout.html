@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>layout.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../../_static/tippy/library/web/d3/api/layout.229f5637-f188-4baf-8643-a8a54fd9f3a1.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="scales.hpp" href="scales.html" />
+    <link rel="prev" title="histogram.hpp" href="histogram.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../d3.html">D3 Wrapper</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../d3-intro.html">Using Empirica’s D3.js Wrapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../d3-contents.html">D3 Wrapper API</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../d3.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../web.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../web.html">Web Tools (for use with Emscripten)</a></li>
+          <li class="breadcrumb-item"><a href="../d3.html">D3 Wrapper</a></li>
+      <li class="breadcrumb-item active">layout.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="layout-hpp">
+<h1>layout.hpp<a class="headerlink" href="#layout-hpp" title="Link to this heading"></a></h1>
+<p>Tools for laying out nodes in D3. </p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv42D3">
+<span id="_CPPv32D3"></span><span id="_CPPv22D3"></span><span id="D3"></span><span class="target" id="namespaceD3"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">D3</span></span></span><br /></dt>
+<dd><dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N2D312JSONTreeNodeE">
+<span id="_CPPv3N2D312JSONTreeNodeE"></span><span id="_CPPv2N2D312JSONTreeNodeE"></span><span id="D3::JSONTreeNode"></span><span class="target" id="structD3_1_1JSONTreeNode"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">JSONTreeNode</span></span></span><a class="headerlink" href="#_CPPv4N2D312JSONTreeNodeE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;layout.hpp&gt;</em></div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D36LayoutE">
+<span id="_CPPv3N2D36LayoutE"></span><span id="_CPPv2N2D36LayoutE"></span><span id="D3::Layout"></span><span class="target" id="classD3_1_1Layout"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Layout</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="d3_init.html#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><a class="headerlink" href="#_CPPv4N2D36LayoutE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;layout.hpp&gt;</em></div>
+<p>Subclassed by D3::TreeLayout&lt; NODE_TYPE &gt;, D3::TreeLayout&lt; SpatialGridTreeNode &gt;, D3::TreeLayout&lt; TreeNode &gt;</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D36Layout6LayoutEi">
+<span id="_CPPv3N2D36Layout6LayoutEi"></span><span id="_CPPv2N2D36Layout6LayoutEi"></span><span id="D3::Layout::Layout__i"></span><span class="target" id="classD3_1_1Layout_1a74b002f4d7a5b6ca9cbb0522220e6da6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Layout</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D36Layout6LayoutEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D36Layout6LayoutEv">
+<span id="_CPPv3N2D36Layout6LayoutEv"></span><span id="_CPPv2N2D36Layout6LayoutEv"></span><span id="D3::Layout::Layout"></span><span class="target" id="classD3_1_1Layout_1a12f342004f5dfc3be9e33e61b840adf6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Layout</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D36Layout6LayoutEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D310TreeLayoutE">
+<span id="_CPPv3I0EN2D310TreeLayoutE"></span><span id="_CPPv2I0EN2D310TreeLayoutE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NODE_TYPE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2D312JSONTreeNodeE" title="D3::JSONTreeNode"><span class="n"><span class="pre">JSONTreeNode</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1TreeLayout"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TreeLayout</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D36LayoutE" title="D3::Layout"><span class="n"><span class="pre">Layout</span></span></a><a class="headerlink" href="#_CPPv4I0EN2D310TreeLayoutE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;layout.hpp&gt;</em></div>
+<p>A TreeLayout can be used to visualize hierarchical data as a tree (a series of edges connecting parent and child nodes).</p>
+<p>Since hierarchical data is much more pleasant to store in JSON format than anything C++ can offer, the TreeLayout expects your data to be stored in a D3::JSONDataset<p>. Each node is expected to have, at a minimum, the following values:</p>
+<p>Calculating the tree layout will automatically create three additional values for each node:</p>
+
+You can include any additional parameters that you want to use to store data. The dataset is expected to be an array containing one element: the root node object, which in turn has the other nodes nested inside it. You must provide a dataset to the TreeLayout constructor.</p>
+<p>A TreeLayout must be templated off of a type that describes all of the values that a node contains (or at least the ones you care about using from C++, as well as x and y). This allows nodes to be passed back up to C++ without C++ throwing a fit about types. If you don’t need access to any data other than name, parent, x, y, and depth from C++, you can use the default, JSONTreeNode.</p>
+<p>If you need access to additional data, you can build structs to template TreeLayouts off with Empirical Introspective Tuple Structs (see JSONTreeNode as an example). Don’t be scared by the complicated sounding name - you just need to list the names and types of values you care about. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Param name<span class="colon">:</span></dt>
+<dd class="field-odd"><p>- a name that uniquely identifies a single node </p>
+</dd>
+<dt class="field-even">Param parent<span class="colon">:</span></dt>
+<dd class="field-even"><p>- the name of this node’s parent (each node is expected to have exactly one parent, unless it is the root, in which case the parent should be “null”) </p>
+</dd>
+<dt class="field-odd">Param children<span class="colon">:</span></dt>
+<dd class="field-odd"><p>- an array containing all of the node’s children (yes, the nesting gets intense).</p>
+</dd>
+<dt class="field-even">Param x<span class="colon">:</span></dt>
+<dd class="field-even"><p>- the x coordinate of the node </p>
+</dd>
+<dt class="field-odd">Param y<span class="colon">:</span></dt>
+<dd class="field-odd"><p>- the y coordinate </p>
+</dd>
+<dt class="field-even">Param depth<span class="colon">:</span></dt>
+<dd class="field-even"><p>- the depth of the node in the tree</p>
+</dd>
+</dl>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310TreeLayout10TreeLayoutEP11JSONDataset">
+<span id="_CPPv3N2D310TreeLayout10TreeLayoutEP11JSONDataset"></span><span id="_CPPv2N2D310TreeLayout10TreeLayoutEP11JSONDataset"></span><span id="D3::TreeLayout::TreeLayout__JSONDatasetP"></span><span class="target" id="classD3_1_1TreeLayout_1a28f4f352423a7c4f4e0afb88e023d12d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TreeLayout</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="dataset.html#_CPPv4N2D311JSONDatasetE" title="D3::JSONDataset"><span class="n"><span class="pre">JSONDataset</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">dataset</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D310TreeLayout10TreeLayoutEP11JSONDataset" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor - handles creating a default DiagonalGenerator and links the specified dataset up to this object’s data pointer. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310TreeLayout10TreeLayoutEv">
+<span id="_CPPv3N2D310TreeLayout10TreeLayoutEv"></span><span id="_CPPv2N2D310TreeLayout10TreeLayoutEv"></span><span id="D3::TreeLayout::TreeLayout"></span><span class="target" id="classD3_1_1TreeLayout_1a88c83a2b2a4f6d2815facd8ab050f151"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TreeLayout</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D310TreeLayout10TreeLayoutEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Default constructor - if you use this you need connect a dataset with SetDataset. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310TreeLayout10SetDatasetEP11JSONDataset">
+<span id="_CPPv3N2D310TreeLayout10SetDatasetEP11JSONDataset"></span><span id="_CPPv2N2D310TreeLayout10SetDatasetEP11JSONDataset"></span><span id="D3::TreeLayout::SetDataset__JSONDatasetP"></span><span class="target" id="classD3_1_1TreeLayout_1a77a7acd6cc506eb4c318aef01af905be"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetDataset</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="dataset.html#_CPPv4N2D311JSONDatasetE" title="D3::JSONDataset"><span class="n"><span class="pre">JSONDataset</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">dataset</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D310TreeLayout10SetDatasetEP11JSONDataset" title="Link to this definition"></a><br /></dt>
+<dd><p>Change this TreeLayout’s data to [dataset]. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310TreeLayout21GenerateNodesAndLinksE9Selection">
+<span id="_CPPv3N2D310TreeLayout21GenerateNodesAndLinksE9Selection"></span><span id="_CPPv2N2D310TreeLayout21GenerateNodesAndLinksE9Selection"></span><span id="D3::TreeLayout::GenerateNodesAndLinks__Selection"></span><span class="target" id="classD3_1_1TreeLayout_1a2567ed70ba3f9c33d7d9311209fe219a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="selection.html#_CPPv4N2D39SelectionE" title="D3::Selection"><span class="n"><span class="pre">Selection</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GenerateNodesAndLinks</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="selection.html#_CPPv4N2D39SelectionE" title="D3::Selection"><span class="n"><span class="pre">Selection</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">svg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D310TreeLayout21GenerateNodesAndLinksE9Selection" title="Link to this definition"></a><br /></dt>
+<dd><p>This function does the heavy lifting of visualizing your data. It generates nodes and links between them based on this object’s dataset. [svg] must be a selection containing a single svg element on which to draw the the visualization.</p>
+<p>In case you want to further customize the tree, this method returns an array of selections, containing: the enter selection for nodes (i.e. a selection containing all nodes that were just added to the tree), the exit selection for nodes (i.e. a selection containing any nodes that are currently drawn but are no longer in the dataset), the enter selection for links, and the exit selection for links. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310TreeLayout7SetSizeEii">
+<span id="_CPPv3N2D310TreeLayout7SetSizeEii"></span><span id="_CPPv2N2D310TreeLayout7SetSizeEii"></span><span id="D3::TreeLayout::SetSize__i.i"></span><span class="target" id="classD3_1_1TreeLayout_1a1ef4c2359b0c175d46e7379c1558a736"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetSize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">w</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">h</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D310TreeLayout7SetSizeEii" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the width of the tree area to [w] and the height to [h]. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310TreeLayout4dataE">
+<span id="_CPPv3N2D310TreeLayout4dataE"></span><span id="_CPPv2N2D310TreeLayout4dataE"></span><span id="D3::TreeLayout::data__JSONDatasetP"></span><span class="target" id="classD3_1_1TreeLayout_1aba55df272309be1c31125e2415b06cc6"></span><a class="reference internal" href="dataset.html#_CPPv4N2D311JSONDatasetE" title="D3::JSONDataset"><span class="n"><span class="pre">JSONDataset</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><a class="headerlink" href="#_CPPv4N2D310TreeLayout4dataE" title="Link to this definition"></a><br /></dt>
+<dd><p>Pointer to the data - must be in hierarchical JSON format. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N2D310TreeLayout9make_lineE">
+<span id="_CPPv3N2D310TreeLayout9make_lineE"></span><span id="_CPPv2N2D310TreeLayout9make_lineE"></span><span id="D3::TreeLayout::make_line__D3::LinkGeneratorP"></span><span class="target" id="classD3_1_1TreeLayout_1a66e61f87ac3448f7ed35940753055e86"></span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="svg_shapes.html#_CPPv4N2D313LinkGeneratorE" title="D3::LinkGenerator"><span class="n"><span class="pre">LinkGenerator</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">make_line</span></span></span><a class="headerlink" href="#_CPPv4N2D310TreeLayout9make_lineE" title="Link to this definition"></a><br /></dt>
+<dd><p>Function used to make the lines for the edges in the tree. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="histogram.html" class="btn btn-neutral float-left" title="histogram.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="scales.html" class="btn btn-neutral float-right" title="scales.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

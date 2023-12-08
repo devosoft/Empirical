@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>constants.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/math/api/constants.007f4e9d-d3cb-479e-a42c-d673c6794b47.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="distances.hpp" href="distances.html" />
+    <link rel="prev" title="combos.hpp" href="combos.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../math.html">Math</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../math.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="CombinedBinomialDistribution.html">CombinedBinomialDistribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Distribution.html">Distribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DistributionSet.html">DistributionSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Fraction.html">Fraction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Random.html">Random.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Range.html">Range.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RangeSet.html">RangeSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="combos.html">combos.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">constants.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E8MaxValue1Tv"><code class="docutils literal notranslate"><span class="pre">MaxValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E16InterpolateTabledRR1Tdd"><code class="docutils literal notranslate"><span class="pre">InterpolateTable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv41E"><code class="docutils literal notranslate"><span class="pre">E</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv43PHI"><code class="docutils literal notranslate"><span class="pre">PHI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv42PI"><code class="docutils literal notranslate"><span class="pre">PI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv45SQRT2"><code class="docutils literal notranslate"><span class="pre">SQRT2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv48MAX_BYTE"><code class="docutils literal notranslate"><span class="pre">MAX_BYTE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49MAX_2BYTE"><code class="docutils literal notranslate"><span class="pre">MAX_2BYTE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv48MAX_WORD"><code class="docutils literal notranslate"><span class="pre">MAX_WORD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49MAX_3BYTE"><code class="docutils literal notranslate"><span class="pre">MAX_3BYTE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv48MAX_UINT"><code class="docutils literal notranslate"><span class="pre">MAX_UINT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49MAX_4BYTE"><code class="docutils literal notranslate"><span class="pre">MAX_4BYTE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv47MIN_INT"><code class="docutils literal notranslate"><span class="pre">MIN_INT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410MAX_SIZE_T"><code class="docutils literal notranslate"><span class="pre">MAX_SIZE_T</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414log2_chart_1_2"><code class="docutils literal notranslate"><span class="pre">log2_chart_1_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415pow2_chart_bits"><code class="docutils literal notranslate"><span class="pre">pow2_chart_bits</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414pow2_chart_0_1"><code class="docutils literal notranslate"><span class="pre">pow2_chart_0_1</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="distances.html">distances.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="info_theory.html">info_theory.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="math.html">math.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="random_utils.html">random_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sequence_utils.html">sequence_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spatial_stats.html">spatial_stats.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stats.html">stats.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../math.html">Math</a></li>
+      <li class="breadcrumb-item active">constants.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="constants-hpp">
+<h1>constants.hpp<a class="headerlink" href="#constants-hpp" title="Link to this heading"></a></h1>
+<p>Commonly used constant values. Status: RELEASE. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E8MaxValue1Tv">
+<span id="_CPPv3I0E8MaxValuev"></span><span id="_CPPv2I0E8MaxValuev"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="constants_8hpp_1aa19af77945a88e3c1dc88ea4693edc2b"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E8MaxValue1Tv" title="MaxValue::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaxValue</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E8MaxValue1Tv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine the maximum value for any type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E16InterpolateTabledRR1Tdd">
+<span id="_CPPv3I0E16InterpolateTableRR1Tdd"></span><span id="_CPPv2I0E16InterpolateTableRR1Tdd"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="constants_8hpp_1a62221fe49c9a42785d4709081f696c99"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InterpolateTable</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E16InterpolateTabledRR1Tdd" title="InterpolateTable::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">table</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tsize</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E16InterpolateTabledRR1Tdd" title="Link to this definition"></a><br /></dt>
+<dd><p>The following function takes a table and a position [0.0, 1.0) and intepolates a value. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-variables">Variables</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv41E">
+<span id="_CPPv31E"></span><span id="_CPPv21E"></span><span id="E__doubleC"></span><span class="target" id="constants_8hpp_1a52c76c914d06d1353e2d38e8adf1db4d"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2.71828</span></span><a class="headerlink" href="#_CPPv41E" title="Link to this definition"></a><br /></dt>
+<dd><p>e </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv43PHI">
+<span id="_CPPv33PHI"></span><span id="_CPPv23PHI"></span><span id="PHI__doubleC"></span><span class="target" id="constants_8hpp_1ab165908327c65ab091aa39919c0eaca4"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PHI</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.61803398874</span></span><a class="headerlink" href="#_CPPv43PHI" title="Link to this definition"></a><br /></dt>
+<dd><p>Golden ratio. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv42PI">
+<span id="_CPPv32PI"></span><span id="_CPPv22PI"></span><span id="PI__doubleC"></span><span class="target" id="constants_8hpp_1a840013a3a22692ba2273927914021728"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PI</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3.14159265358979</span></span><a class="headerlink" href="#_CPPv42PI" title="Link to this definition"></a><br /></dt>
+<dd><p>pi </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv45SQRT2">
+<span id="_CPPv35SQRT2"></span><span id="_CPPv25SQRT2"></span><span id="SQRT2__doubleC"></span><span class="target" id="constants_8hpp_1acfa621314aa8e534c2afc5bb1209e024"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SQRT2</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.41421356237310</span></span><a class="headerlink" href="#_CPPv45SQRT2" title="Link to this definition"></a><br /></dt>
+<dd><p>sqrt(2) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv48MAX_BYTE">
+<span id="_CPPv38MAX_BYTE"></span><span id="_CPPv28MAX_BYTE"></span><span id="MAX_BYTE__uint32_tC"></span><span class="target" id="constants_8hpp_1a6922997756cb01269fc9ca7bbd0ec7d4"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_BYTE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">255</span></span><a class="headerlink" href="#_CPPv48MAX_BYTE" title="Link to this definition"></a><br /></dt>
+<dd><p>(2^8 - 1) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv49MAX_2BYTE">
+<span id="_CPPv39MAX_2BYTE"></span><span id="_CPPv29MAX_2BYTE"></span><span id="MAX_2BYTE__uint32_tC"></span><span class="target" id="constants_8hpp_1ae3a0808df405f9187d3457a9c26523b8"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_2BYTE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">65535</span></span><a class="headerlink" href="#_CPPv49MAX_2BYTE" title="Link to this definition"></a><br /></dt>
+<dd><p>(2^16 - 1) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv48MAX_WORD">
+<span id="_CPPv38MAX_WORD"></span><span id="_CPPv28MAX_WORD"></span><span id="MAX_WORD__uint32_tC"></span><span class="target" id="constants_8hpp_1a75230eb7a63832081ae7781a9d8df49e"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_WORD</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">65535</span></span><a class="headerlink" href="#_CPPv48MAX_WORD" title="Link to this definition"></a><br /></dt>
+<dd><p>(2^16 - 1) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv49MAX_3BYTE">
+<span id="_CPPv39MAX_3BYTE"></span><span id="_CPPv29MAX_3BYTE"></span><span id="MAX_3BYTE__uint32_tC"></span><span class="target" id="constants_8hpp_1a6adc91fdf1cea7a3246c060e4fb5a0b0"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_3BYTE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">16777215</span></span><a class="headerlink" href="#_CPPv49MAX_3BYTE" title="Link to this definition"></a><br /></dt>
+<dd><p>(2^24 - 1) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv48MAX_UINT">
+<span id="_CPPv38MAX_UINT"></span><span id="_CPPv28MAX_UINT"></span><span id="MAX_UINT__uint32_tC"></span><span class="target" id="constants_8hpp_1aabe2de513bd3288a21e93dbc1a4be79d"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_UINT</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4294967295</span></span><a class="headerlink" href="#_CPPv48MAX_UINT" title="Link to this definition"></a><br /></dt>
+<dd><p>(2^32 - 1) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv49MAX_4BYTE">
+<span id="_CPPv39MAX_4BYTE"></span><span id="_CPPv29MAX_4BYTE"></span><span id="MAX_4BYTE__uint32_tC"></span><span class="target" id="constants_8hpp_1a219d18062cc86bf7ab390239c20a4ba3"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_4BYTE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4294967295</span></span><a class="headerlink" href="#_CPPv49MAX_4BYTE" title="Link to this definition"></a><br /></dt>
+<dd><p>(2^32 - 1) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv47MIN_INT">
+<span id="_CPPv37MIN_INT"></span><span id="_CPPv27MIN_INT"></span><span id="MIN_INT__int32_tC"></span><span class="target" id="constants_8hpp_1aeff4ca14817d378fc7f3e57fc109b176"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MIN_INT</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">2147483648</span></span><a class="headerlink" href="#_CPPv47MIN_INT" title="Link to this definition"></a><br /></dt>
+<dd><p>(- 2^31) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv410MAX_SIZE_T">
+<span id="_CPPv310MAX_SIZE_T"></span><span id="_CPPv210MAX_SIZE_T"></span><span id="MAX_SIZE_T__sC"></span><span class="target" id="constants_8hpp_1a56ea054f07c77be754ab2c59c71f8914"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_SIZE_T</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">static_cast</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">(</span></span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv410MAX_SIZE_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv414log2_chart_1_2">
+<span id="_CPPv314log2_chart_1_2"></span><span id="_CPPv214log2_chart_1_2"></span><span id="log2_chart_1_2__doubleCA"></span><span class="target" id="constants_8hpp_1a8c9d3bc2d73b1ce80cfbbc4756612357"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">log2_chart_1_2</span></span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv414log2_chart_1_2" title="Link to this definition"></a><br /></dt>
+<dd><p>Large table to log base-2 results. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv415pow2_chart_bits">
+<span id="_CPPv315pow2_chart_bits"></span><span id="_CPPv215pow2_chart_bits"></span><span id="pow2_chart_bits__doubleCA"></span><span class="target" id="constants_8hpp_1ab0faa85c93a33f36775b2cc7150a8b50"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pow2_chart_bits</span></span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">1.4142135623730951</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.1892071150027210</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0905077326652577</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0442737824274138</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0218971486541166</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0108892860517005</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0054299011128027</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0027112750502025</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0013547198921082</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0006771306930664</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0003385080526823</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0001692397053021</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000846162726944</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000423072413958</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000211533969647</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000105766425498</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000052883072919</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000026441501502</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000013220742012</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000006610368821</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000003305183864</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000001652591795</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000000826295863</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000000413147923</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000000206573960</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000000103286979</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000000051643489</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000000025821745</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000000012910872</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000000006455436</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000000003227718</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.0000000001613858</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv415pow2_chart_bits" title="Link to this definition"></a><br /></dt>
+<dd><p>Table to provide results of Pow2 for values of bits (0.1, 0.01, 0.001, etc, in binary) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv414pow2_chart_0_1">
+<span id="_CPPv314pow2_chart_0_1"></span><span id="_CPPv214pow2_chart_0_1"></span><span id="pow2_chart_0_1__doubleCA"></span><span class="target" id="constants_8hpp_1a0334a8edddd75926dbe986265cf13358"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pow2_chart_0_1</span></span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv414pow2_chart_0_1" title="Link to this definition"></a><br /></dt>
+<dd><p>Table to provide results of Pow2 from 0 to 1. </p>
+</dd></dl>
+
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="combos.html" class="btn btn-neutral float-left" title="combos.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="distances.html" class="btn btn-neutral float-right" title="distances.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

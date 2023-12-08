@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/control/control.581e4fa6-037f-4cd5-b138-0b7f529b5fe7.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Action.hpp" href="api/Action.html" />
+    <link rel="prev" title="config_web_interface.hpp" href="../config/api/config_web_interface.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Control</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html">Action.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html">ActionManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html">Signal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html">SignalControl.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html">SignalManager.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Control</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="control">
+<h1>Control<a class="headerlink" href="#control" title="Link to this heading"></a></h1>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/Action.html">Action.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Action.html#_CPPv4I0DpE11make_actionDaRKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">make_action()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Action.html#_CPPv410ActionBase"><code class="docutils literal notranslate"><span class="pre">ActionBase</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N10ActionBaseD0Ev"><code class="docutils literal notranslate"><span class="pre">ActionBase::~ActionBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4NK10ActionBase7GetNameEv"><code class="docutils literal notranslate"><span class="pre">ActionBase::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4NK10ActionBase11GetArgCountEv"><code class="docutils literal notranslate"><span class="pre">ActionBase::GetArgCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4NK10ActionBase5CloneEv"><code class="docutils literal notranslate"><span class="pre">ActionBase::Clone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N10ActionBase10ActionBaseERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ActionBase::ActionBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N10ActionBase10ActionBaseERK10ActionBase"><code class="docutils literal notranslate"><span class="pre">ActionBase::ActionBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N10ActionBase10ActionBaseERR10ActionBase"><code class="docutils literal notranslate"><span class="pre">ActionBase::ActionBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N10ActionBaseaSERK10ActionBase"><code class="docutils literal notranslate"><span class="pre">ActionBase::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N10ActionBaseaSERR10ActionBase"><code class="docutils literal notranslate"><span class="pre">ActionBase::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N10ActionBase4nameE"><code class="docutils literal notranslate"><span class="pre">ActionBase::name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Action.html#_CPPv4I_6size_tE10ActionSize"><code class="docutils literal notranslate"><span class="pre">ActionSize</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4NK10ActionSize11GetArgCountEv"><code class="docutils literal notranslate"><span class="pre">ActionSize::GetArgCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N10ActionSize10ActionSizeERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ActionSize::ActionSize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Action.html#_CPPv4IDpE6Action"><code class="docutils literal notranslate"><span class="pre">Action</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Action.html#_CPPv4IDpE6ActionIFvDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">Action</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIFvDp4ARGSEE6this_tE"><code class="docutils literal notranslate"><span class="pre">Action::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIFvDp4ARGSEE8parent_tE"><code class="docutils literal notranslate"><span class="pre">Action::parent_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIFvDp4ARGSEE6ActionERKNSt8functionIFvDp4ARGSEEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Action::Action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4I0EN6ActionIFvDp4ARGSEE6ActionERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Action::Action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIFvDp4ARGSEE6ActionERK6this_t"><code class="docutils literal notranslate"><span class="pre">Action::Action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIFvDp4ARGSEE6ActionERR6this_t"><code class="docutils literal notranslate"><span class="pre">Action::Action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIFvDp4ARGSEEaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">Action::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIFvDp4ARGSEEaSERR6this_t"><code class="docutils literal notranslate"><span class="pre">Action::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4NK6ActionIFvDp4ARGSEE6GetFunEv"><code class="docutils literal notranslate"><span class="pre">Action::GetFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIFvDp4ARGSEE4CallEDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">Action::Call()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4NK6ActionIFvDp4ARGSEE5CloneEv"><code class="docutils literal notranslate"><span class="pre">Action::Clone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIFvDp4ARGSEE3funE"><code class="docutils literal notranslate"><span class="pre">Action::fun</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Action.html#_CPPv4I0DpE6ActionIF6RETURNDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">Action</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIF6RETURNDp4ARGSEE5fun_tE"><code class="docutils literal notranslate"><span class="pre">Action::fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIF6RETURNDp4ARGSEE6this_tE"><code class="docutils literal notranslate"><span class="pre">Action::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIF6RETURNDp4ARGSEE8parent_tE"><code class="docutils literal notranslate"><span class="pre">Action::parent_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIF6RETURNDp4ARGSEE6ActionERKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Action::Action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIF6RETURNDp4ARGSEE6ActionERK6this_t"><code class="docutils literal notranslate"><span class="pre">Action::Action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIF6RETURNDp4ARGSEE6ActionERR6this_t"><code class="docutils literal notranslate"><span class="pre">Action::Action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIF6RETURNDp4ARGSEEaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">Action::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIF6RETURNDp4ARGSEEaSERR6this_t"><code class="docutils literal notranslate"><span class="pre">Action::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4NK6ActionIF6RETURNDp4ARGSEE6GetFunEv"><code class="docutils literal notranslate"><span class="pre">Action::GetFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIF6RETURNDp4ARGSEE4CallEDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">Action::Call()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4NK6ActionIF6RETURNDp4ARGSEE5CloneEv"><code class="docutils literal notranslate"><span class="pre">Action::Clone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Action.html#_CPPv4N6ActionIF6RETURNDp4ARGSEE3funE"><code class="docutils literal notranslate"><span class="pre">Action::fun</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/ActionManager.html">ActionManager.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/ActionManager.html#_CPPv413ActionManager"><code class="docutils literal notranslate"><span class="pre">ActionManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4N13ActionManager13ActionManagerEv"><code class="docutils literal notranslate"><span class="pre">ActionManager::ActionManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4N13ActionManager13ActionManagerERR13ActionManager"><code class="docutils literal notranslate"><span class="pre">ActionManager::ActionManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4N13ActionManager13ActionManagerERK13ActionManager"><code class="docutils literal notranslate"><span class="pre">ActionManager::ActionManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4N13ActionManagerD0Ev"><code class="docutils literal notranslate"><span class="pre">ActionManager::~ActionManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4NK13ActionManager9GetNextIDEv"><code class="docutils literal notranslate"><span class="pre">ActionManager::GetNextID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4NK13ActionManager7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">ActionManager::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4N13ActionManagerixERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ActionManager::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4NK13ActionManagerixERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ActionManager::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4I0DpEN13ActionManager3AddERDaRKNSt8functionIF6RETURNDp4ARGSEEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ActionManager::Add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4I0DpEN13ActionManager3AddERDaRKNSt8functionIF6RETURNDp4ARGSEEE"><code class="docutils literal notranslate"><span class="pre">ActionManager::Add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4N13ActionManager3AddERK10ActionBase"><code class="docutils literal notranslate"><span class="pre">ActionManager::Add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4N13ActionManager10PrintNamesERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">ActionManager::PrintNames()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4N13ActionManager10action_mapE"><code class="docutils literal notranslate"><span class="pre">ActionManager::action_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4N13ActionManager7next_idE"><code class="docutils literal notranslate"><span class="pre">ActionManager::next_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ActionManager.html#_CPPv4N13ActionManager6prefixE"><code class="docutils literal notranslate"><span class="pre">ActionManager::prefix</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Signal.html">Signal.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Signal.html#_CPPv49SignalKey"><code class="docutils literal notranslate"><span class="pre">SignalKey</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N9SignalKey9SignalKeyE8uint32_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">SignalKey::SignalKey()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N9SignalKey9SignalKeyERK9SignalKey"><code class="docutils literal notranslate"><span class="pre">SignalKey::SignalKey()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N9SignalKeyaSERK9SignalKey"><code class="docutils literal notranslate"><span class="pre">SignalKey::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N9SignalKeyD0Ev"><code class="docutils literal notranslate"><span class="pre">SignalKey::~SignalKey()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK9SignalKeyeqERK9SignalKey"><code class="docutils literal notranslate"><span class="pre">SignalKey::operator==()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK9SignalKeyneERK9SignalKey"><code class="docutils literal notranslate"><span class="pre">SignalKey::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK9SignalKeyltERK9SignalKey"><code class="docutils literal notranslate"><span class="pre">SignalKey::operator&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK9SignalKeygtERK9SignalKey"><code class="docutils literal notranslate"><span class="pre">SignalKey::operator&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK9SignalKeyleERK9SignalKey"><code class="docutils literal notranslate"><span class="pre">SignalKey::operator&lt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK9SignalKeygeERK9SignalKey"><code class="docutils literal notranslate"><span class="pre">SignalKey::operator&gt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK9SignalKey5GetIDEv"><code class="docutils literal notranslate"><span class="pre">SignalKey::GetID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK9SignalKey11GetSignalIDEv"><code class="docutils literal notranslate"><span class="pre">SignalKey::GetSignalID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK9SignalKey8IsActiveEv"><code class="docutils literal notranslate"><span class="pre">SignalKey::IsActive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N9SignalKey3SetE8uint32_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">SignalKey::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N9SignalKey5ClearEv"><code class="docutils literal notranslate"><span class="pre">SignalKey::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N9SignalKeycvbEv"><code class="docutils literal notranslate"><span class="pre">SignalKey::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK9SignalKey7CompareERK9SignalKey"><code class="docutils literal notranslate"><span class="pre">SignalKey::Compare()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N9SignalKey9signal_idE"><code class="docutils literal notranslate"><span class="pre">SignalKey::signal_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N9SignalKey6key_idE"><code class="docutils literal notranslate"><span class="pre">SignalKey::key_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Signal.html#_CPPv410SignalBase"><code class="docutils literal notranslate"><span class="pre">SignalBase</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase10SignalBaseEv"><code class="docutils literal notranslate"><span class="pre">SignalBase::SignalBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase10SignalBaseERK10SignalBase"><code class="docutils literal notranslate"><span class="pre">SignalBase::SignalBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase10SignalBaseERR10SignalBase"><code class="docutils literal notranslate"><span class="pre">SignalBase::SignalBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBaseaSERK10SignalBase"><code class="docutils literal notranslate"><span class="pre">SignalBase::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBaseaSERR10SignalBase"><code class="docutils literal notranslate"><span class="pre">SignalBase::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBaseD0Ev"><code class="docutils literal notranslate"><span class="pre">SignalBase::~SignalBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK10SignalBase5CloneEv"><code class="docutils literal notranslate"><span class="pre">SignalBase::Clone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK10SignalBase7GetNameEv"><code class="docutils literal notranslate"><span class="pre">SignalBase::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK10SignalBase10GetNumArgsEv"><code class="docutils literal notranslate"><span class="pre">SignalBase::GetNumArgs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK10SignalBase13GetNumActionsEv"><code class="docutils literal notranslate"><span class="pre">SignalBase::GetNumActions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4IDpEN10SignalBase11BaseTriggerEvDp4ARGS"><code class="docutils literal notranslate"><span class="pre">SignalBase::BaseTrigger()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4IDpEN10SignalBase9AddActionE9SignalKeyRKNSt8functionIFvDp4ARGSEEE"><code class="docutils literal notranslate"><span class="pre">SignalBase::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase9AddActionER10ActionBase"><code class="docutils literal notranslate"><span class="pre">SignalBase::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase9TestMatchER10ActionBase"><code class="docutils literal notranslate"><span class="pre">SignalBase::TestMatch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase6RemoveE9SignalKey"><code class="docutils literal notranslate"><span class="pre">SignalBase::Remove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase5ClearEv"><code class="docutils literal notranslate"><span class="pre">SignalBase::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK10SignalBase3HasE9SignalKey"><code class="docutils literal notranslate"><span class="pre">SignalBase::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase5man_tE"><code class="docutils literal notranslate"><span class="pre">SignalBase::man_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase13NextSignalKeyEv"><code class="docutils literal notranslate"><span class="pre">SignalBase::NextSignalKey()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase10SignalBaseERKNSt6stringEPN8internal18SignalManager_BaseE"><code class="docutils literal notranslate"><span class="pre">SignalBase::SignalBase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase4nameE"><code class="docutils literal notranslate"><span class="pre">SignalBase::name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase9signal_idE"><code class="docutils literal notranslate"><span class="pre">SignalBase::signal_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase12next_link_idE"><code class="docutils literal notranslate"><span class="pre">SignalBase::next_link_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase12link_key_mapE"><code class="docutils literal notranslate"><span class="pre">SignalBase::link_key_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase8managersE"><code class="docutils literal notranslate"><span class="pre">SignalBase::managers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N10SignalBase13prime_managerE"><code class="docutils literal notranslate"><span class="pre">SignalBase::prime_manager</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Signal.html#_CPPv4IDpE6Signal"><code class="docutils literal notranslate"><span class="pre">Signal</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Signal.html#_CPPv4IDpE6SignalIFvDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">Signal</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIFvDp4ARGSEE5fun_tE"><code class="docutils literal notranslate"><span class="pre">Signal::fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIFvDp4ARGSEE6this_tE"><code class="docutils literal notranslate"><span class="pre">Signal::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIFvDp4ARGSEE6SignalERKNSt6stringEPN8internal18SignalManager_BaseE"><code class="docutils literal notranslate"><span class="pre">Signal::Signal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIFvDp4ARGSEE6SignalERKNSt6stringERN8internal18SignalControl_BaseE"><code class="docutils literal notranslate"><span class="pre">Signal::Signal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK6SignalIFvDp4ARGSEE5CloneEv"><code class="docutils literal notranslate"><span class="pre">Signal::Clone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK6SignalIFvDp4ARGSEE10GetNumArgsEv"><code class="docutils literal notranslate"><span class="pre">Signal::GetNumArgs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK6SignalIFvDp4ARGSEE13GetNumActionsEv"><code class="docutils literal notranslate"><span class="pre">Signal::GetNumActions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIFvDp4ARGSEE7TriggerEDp4ARGS"><code class="docutils literal notranslate"><span class="pre">Signal::Trigger()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIFvDp4ARGSEE9AddActionERKNSt8functionIFvDp4ARGSEEE"><code class="docutils literal notranslate"><span class="pre">Signal::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIFvDp4ARGSEE9AddActionER10ActionBase"><code class="docutils literal notranslate"><span class="pre">Signal::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIFvDp4ARGSEE9TestMatchER10ActionBase"><code class="docutils literal notranslate"><span class="pre">Signal::TestMatch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4IDpDpEN6SignalIFvDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIFvDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE"><code class="docutils literal notranslate"><span class="pre">Signal::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4IDpEN6SignalIFvDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIFvDp8FUN_ARGSEEE"><code class="docutils literal notranslate"><span class="pre">Signal::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4IDpEN6SignalIFvDp4ARGSEE9AddActionE9SignalKeyFvDp8FUN_ARGSE"><code class="docutils literal notranslate"><span class="pre">Signal::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIFvDp4ARGSEE6RemoveE9SignalKey"><code class="docutils literal notranslate"><span class="pre">Signal::Remove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIFvDp4ARGSEE11GetPriorityE9SignalKey"><code class="docutils literal notranslate"><span class="pre">Signal::GetPriority()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIFvDp4ARGSEE7actionsE"><code class="docutils literal notranslate"><span class="pre">Signal::actions</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Signal.html#_CPPv4I0DpE6SignalIF6RETURNDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">Signal</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIF6RETURNDp4ARGSEE5fun_tE"><code class="docutils literal notranslate"><span class="pre">Signal::fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIF6RETURNDp4ARGSEE6this_tE"><code class="docutils literal notranslate"><span class="pre">Signal::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIF6RETURNDp4ARGSEE6SignalERKNSt6stringEPN8internal18SignalManager_BaseE"><code class="docutils literal notranslate"><span class="pre">Signal::Signal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIF6RETURNDp4ARGSEE6SignalERKNSt6stringERN8internal18SignalControl_BaseE"><code class="docutils literal notranslate"><span class="pre">Signal::Signal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK6SignalIF6RETURNDp4ARGSEE5CloneEv"><code class="docutils literal notranslate"><span class="pre">Signal::Clone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK6SignalIF6RETURNDp4ARGSEE10GetNumArgsEv"><code class="docutils literal notranslate"><span class="pre">Signal::GetNumArgs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4NK6SignalIF6RETURNDp4ARGSEE13GetNumActionsEv"><code class="docutils literal notranslate"><span class="pre">Signal::GetNumActions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIF6RETURNDp4ARGSEE7TriggerEDp4ARGS"><code class="docutils literal notranslate"><span class="pre">Signal::Trigger()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIF6RETURNDp4ARGSEE9AddActionERKNSt8functionI5fun_tEE"><code class="docutils literal notranslate"><span class="pre">Signal::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIF6RETURNDp4ARGSEE9AddActionER10ActionBase"><code class="docutils literal notranslate"><span class="pre">Signal::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIF6RETURNDp4ARGSEE9TestMatchER10ActionBase"><code class="docutils literal notranslate"><span class="pre">Signal::TestMatch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4IDpDpEN6SignalIF6RETURNDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIF6RETURNDp8FUN_ARGSEEE8TypePackIDp10EXTRA_ARGSE"><code class="docutils literal notranslate"><span class="pre">Signal::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4IDpEN6SignalIF6RETURNDp4ARGSEE9AddActionE9SignalKeyRKNSt8functionIF6RETURNDp8FUN_ARGSEEE"><code class="docutils literal notranslate"><span class="pre">Signal::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4IDpEN6SignalIF6RETURNDp4ARGSEE9AddActionE9SignalKeyF6RETURNDp8FUN_ARGSE"><code class="docutils literal notranslate"><span class="pre">Signal::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIF6RETURNDp4ARGSEE6RemoveE9SignalKey"><code class="docutils literal notranslate"><span class="pre">Signal::Remove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIF6RETURNDp4ARGSEE11GetPriorityE9SignalKey"><code class="docutils literal notranslate"><span class="pre">Signal::GetPriority()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Signal.html#_CPPv4N6SignalIF6RETURNDp4ARGSEE7actionsE"><code class="docutils literal notranslate"><span class="pre">Signal::actions</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/SignalControl.html">SignalControl.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/SignalControl.html#_CPPv413SignalControl"><code class="docutils literal notranslate"><span class="pre">SignalControl</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4N13SignalControl13SignalControlEv"><code class="docutils literal notranslate"><span class="pre">SignalControl::SignalControl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4N13SignalControlD0Ev"><code class="docutils literal notranslate"><span class="pre">SignalControl::~SignalControl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4NK13SignalControl13GetNumActionsEv"><code class="docutils literal notranslate"><span class="pre">SignalControl::GetNumActions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4NK13SignalControl13GetNumSignalsEv"><code class="docutils literal notranslate"><span class="pre">SignalControl::GetNumSignals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4NK13SignalControl9GetActionERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SignalControl::GetAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4NK13SignalControl9GetSignalERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SignalControl::GetSignal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4N13SignalControl16GetActionManagerEv"><code class="docutils literal notranslate"><span class="pre">SignalControl::GetActionManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4N13SignalControl16GetSignalManagerEv"><code class="docutils literal notranslate"><span class="pre">SignalControl::GetSignalManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4IDpEN13SignalControl9AddActionERDaDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">SignalControl::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4IDpEN13SignalControl9AddSignalERDaRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SignalControl::AddSignal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4IDpEN13SignalControl9AddSignalERDaR6SignalIFvDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">SignalControl::AddSignal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4IDpEN13SignalControl4LinkEDaR10SignalBaseRKNSt8functionIFvDp4ARGSEEE"><code class="docutils literal notranslate"><span class="pre">SignalControl::Link()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4I0EN13SignalControl4LinkEDaRKNSt6stringERR1A"><code class="docutils literal notranslate"><span class="pre">SignalControl::Link()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4N13SignalControl4LinkER10SignalBaseRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SignalControl::Link()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4N13SignalControl4LinkER10SignalBaseR10ActionBase"><code class="docutils literal notranslate"><span class="pre">SignalControl::Link()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4IDpEN13SignalControl7TriggerEvRKNSt6stringEDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">SignalControl::Trigger()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4N13SignalControl15NotifyConstructEP10SignalBase"><code class="docutils literal notranslate"><span class="pre">SignalControl::NotifyConstruct()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4N13SignalControl10PrintNamesERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">SignalControl::PrintNames()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4N13SignalControl8action_mE"><code class="docutils literal notranslate"><span class="pre">SignalControl::action_m</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4N13SignalControl8signal_mE"><code class="docutils literal notranslate"><span class="pre">SignalControl::signal_m</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalControl.html#_CPPv4N13SignalControl12id_to_signalE"><code class="docutils literal notranslate"><span class="pre">SignalControl::id_to_signal</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/SignalManager.html">SignalManager.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/SignalManager.html#_CPPv413SignalManager"><code class="docutils literal notranslate"><span class="pre">SignalManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4N13SignalManager13SignalManagerEv"><code class="docutils literal notranslate"><span class="pre">SignalManager::SignalManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4N13SignalManager13SignalManagerERR13SignalManager"><code class="docutils literal notranslate"><span class="pre">SignalManager::SignalManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4N13SignalManager13SignalManagerERK13SignalManager"><code class="docutils literal notranslate"><span class="pre">SignalManager::SignalManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4N13SignalManagerD0Ev"><code class="docutils literal notranslate"><span class="pre">SignalManager::~SignalManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4NK13SignalManager9GetNextIDEv"><code class="docutils literal notranslate"><span class="pre">SignalManager::GetNextID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4NK13SignalManager7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">SignalManager::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4N13SignalManagerixERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SignalManager::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4NK13SignalManagerixERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SignalManager::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4I0EN13SignalManager3AddERDaRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SignalManager::Add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4I0EN13SignalManager3AddERDaR6SignalI5FUN_TE"><code class="docutils literal notranslate"><span class="pre">SignalManager::Add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4N13SignalManager15NotifyConstructEP10SignalBase"><code class="docutils literal notranslate"><span class="pre">SignalManager::NotifyConstruct()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4N13SignalManager14NotifyDestructEP10SignalBase"><code class="docutils literal notranslate"><span class="pre">SignalManager::NotifyDestruct()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4N13SignalManager10PrintNamesERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">SignalManager::PrintNames()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4N13SignalManager18GenerateSignalNameERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SignalManager::GenerateSignalName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4N13SignalManager10signal_mapE"><code class="docutils literal notranslate"><span class="pre">SignalManager::signal_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4N13SignalManager7next_idE"><code class="docutils literal notranslate"><span class="pre">SignalManager::next_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SignalManager.html#_CPPv4N13SignalManager6prefixE"><code class="docutils literal notranslate"><span class="pre">SignalManager::prefix</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../config/api/config_web_interface.html" class="btn btn-neutral float-left" title="config_web_interface.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/Action.html" class="btn btn-neutral float-right" title="Action.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

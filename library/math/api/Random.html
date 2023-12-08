@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Random.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/math/api/Random.86fb1c59-7e3e-4380-8ec0-565c7a845292.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Range.hpp" href="Range.html" />
+    <link rel="prev" title="Fraction.hpp" href="Fraction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../math.html">Math</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../math.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="CombinedBinomialDistribution.html">CombinedBinomialDistribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Distribution.html">Distribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DistributionSet.html">DistributionSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Fraction.html">Fraction.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Random.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I000E23sample_with_replacementv15ForwardIterator15ForwardIterator14OutputIterator14OutputIterator3RNG"><code class="docutils literal notranslate"><span class="pre">sample_with_replacement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv46Random"><code class="docutils literal notranslate"><span class="pre">Random</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416RandomStdAdaptor"><code class="docutils literal notranslate"><span class="pre">RandomStdAdaptor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Range.html">Range.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RangeSet.html">RangeSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="combos.html">combos.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="constants.html">constants.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="distances.html">distances.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="info_theory.html">info_theory.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="math.html">math.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="random_utils.html">random_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sequence_utils.html">sequence_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spatial_stats.html">spatial_stats.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stats.html">stats.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../math.html">Math</a></li>
+      <li class="breadcrumb-item active">Random.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="random-hpp">
+<h1>Random.hpp<a class="headerlink" href="#random-hpp" title="Link to this heading"></a></h1>
+<p>A versatile and non-patterned pseudo-random-number generator. Status: RELEASE. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I000E23sample_with_replacementv15ForwardIterator15ForwardIterator14OutputIterator14OutputIterator3RNG">
+<span id="_CPPv3I000E23sample_with_replacement15ForwardIterator15ForwardIterator14OutputIterator14OutputIterator3RNG"></span><span id="_CPPv2I000E23sample_with_replacement15ForwardIterator15ForwardIterator14OutputIterator14OutputIterator3RNG"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ForwardIterator</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OutputIterator</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RNG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="Random_8hpp_1aa797ed2399f9b332d6ad966f5b048542"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sample_with_replacement</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I000E23sample_with_replacementv15ForwardIterator15ForwardIterator14OutputIterator14OutputIterator3RNG" title="sample_with_replacement::ForwardIterator"><span class="n"><span class="pre">ForwardIterator</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">first</span></span>, <a class="reference internal" href="#_CPPv4I000E23sample_with_replacementv15ForwardIterator15ForwardIterator14OutputIterator14OutputIterator3RNG" title="sample_with_replacement::ForwardIterator"><span class="n"><span class="pre">ForwardIterator</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">last</span></span>, <a class="reference internal" href="#_CPPv4I000E23sample_with_replacementv15ForwardIterator15ForwardIterator14OutputIterator14OutputIterator3RNG" title="sample_with_replacement::OutputIterator"><span class="n"><span class="pre">OutputIterator</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">ofirst</span></span>, <a class="reference internal" href="#_CPPv4I000E23sample_with_replacementv15ForwardIterator15ForwardIterator14OutputIterator14OutputIterator3RNG" title="sample_with_replacement::OutputIterator"><span class="n"><span class="pre">OutputIterator</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">olast</span></span>, <a class="reference internal" href="#_CPPv4I000E23sample_with_replacementv15ForwardIterator15ForwardIterator14OutputIterator14OutputIterator3RNG" title="sample_with_replacement::RNG"><span class="n"><span class="pre">RNG</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">rng</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I000E23sample_with_replacementv15ForwardIterator15ForwardIterator14OutputIterator14OutputIterator3RNG" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a sample (with replacement) from an input range, copying to the output range. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv46Random">
+<span id="_CPPv36Random"></span><span id="_CPPv26Random"></span><span id="Random"></span><span class="target" id="classRandom"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Random</span></span></span><a class="headerlink" href="#_CPPv46Random" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Random.hpp&gt;</em></div>
+<p>Middle Square Weyl Sequence: A versatile and non-patterned pseudo-random-number generator. Based on: <a class="reference external" href="https://en.wikipedia.org/wiki/Middle-square_method">https://en.wikipedia.org/wiki/Middle-square_method</a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random4ProbE">
+<span id="_CPPv3N6Random4ProbE"></span><span id="_CPPv2N6Random4ProbE"></span><span class="target" id="classRandom_1a8cf2d1c0166f1439b7da141891ab5543"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Prob</span></span></span><a class="headerlink" href="#_CPPv4N6Random4ProbE" title="Link to this definition"></a><br /></dt>
+<dd><p>Enumeration for common probabilities. (not class, so can be referred to elsewhere as e.g., Random::PROB_50) </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random4Prob6PROB_0E">
+<span id="_CPPv3N6Random4Prob6PROB_0E"></span><span id="_CPPv2N6Random4Prob6PROB_0E"></span><span class="target" id="classRandom_1a8cf2d1c0166f1439b7da141891ab5543ab108ce3fec24e3bbfe7a01f5d0fd6a9a"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PROB_0</span></span></span><a class="headerlink" href="#_CPPv4N6Random4Prob6PROB_0E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random4Prob9PROB_12_5E">
+<span id="_CPPv3N6Random4Prob9PROB_12_5E"></span><span id="_CPPv2N6Random4Prob9PROB_12_5E"></span><span class="target" id="classRandom_1a8cf2d1c0166f1439b7da141891ab5543a180f274bc8479ff42865bdfe19b5559a"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PROB_12_5</span></span></span><a class="headerlink" href="#_CPPv4N6Random4Prob9PROB_12_5E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random4Prob7PROB_25E">
+<span id="_CPPv3N6Random4Prob7PROB_25E"></span><span id="_CPPv2N6Random4Prob7PROB_25E"></span><span class="target" id="classRandom_1a8cf2d1c0166f1439b7da141891ab5543a11c002ff5cf6f99d1943bba75ae47dbe"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PROB_25</span></span></span><a class="headerlink" href="#_CPPv4N6Random4Prob7PROB_25E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random4Prob9PROB_37_5E">
+<span id="_CPPv3N6Random4Prob9PROB_37_5E"></span><span id="_CPPv2N6Random4Prob9PROB_37_5E"></span><span class="target" id="classRandom_1a8cf2d1c0166f1439b7da141891ab5543aea93438356ece79009af69e2f98a2532"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PROB_37_5</span></span></span><a class="headerlink" href="#_CPPv4N6Random4Prob9PROB_37_5E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random4Prob7PROB_50E">
+<span id="_CPPv3N6Random4Prob7PROB_50E"></span><span id="_CPPv2N6Random4Prob7PROB_50E"></span><span class="target" id="classRandom_1a8cf2d1c0166f1439b7da141891ab5543aa0a7e5eb1666224fb8c0a448ab09e164"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PROB_50</span></span></span><a class="headerlink" href="#_CPPv4N6Random4Prob7PROB_50E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random4Prob9PROB_62_5E">
+<span id="_CPPv3N6Random4Prob9PROB_62_5E"></span><span id="_CPPv2N6Random4Prob9PROB_62_5E"></span><span class="target" id="classRandom_1a8cf2d1c0166f1439b7da141891ab5543a8265609dc183cb0085699027e1f36f9a"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PROB_62_5</span></span></span><a class="headerlink" href="#_CPPv4N6Random4Prob9PROB_62_5E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random4Prob7PROB_75E">
+<span id="_CPPv3N6Random4Prob7PROB_75E"></span><span id="_CPPv2N6Random4Prob7PROB_75E"></span><span class="target" id="classRandom_1a8cf2d1c0166f1439b7da141891ab5543a36f1854d3be55f2fc966581f30c4a238"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PROB_75</span></span></span><a class="headerlink" href="#_CPPv4N6Random4Prob7PROB_75E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random4Prob9PROB_87_5E">
+<span id="_CPPv3N6Random4Prob9PROB_87_5E"></span><span id="_CPPv2N6Random4Prob9PROB_87_5E"></span><span class="target" id="classRandom_1a8cf2d1c0166f1439b7da141891ab5543a5102116e3fbea027626c537e1224da9e"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PROB_87_5</span></span></span><a class="headerlink" href="#_CPPv4N6Random4Prob9PROB_87_5E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random4Prob8PROB_100E">
+<span id="_CPPv3N6Random4Prob8PROB_100E"></span><span id="_CPPv2N6Random4Prob8PROB_100E"></span><span class="target" id="classRandom_1a8cf2d1c0166f1439b7da141891ab5543a28da5cbf917f04d82b24a5439b08b9cd"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PROB_100</span></span></span><a class="headerlink" href="#_CPPv4N6Random4Prob8PROB_100E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9mem_ptr_tE">
+<span id="_CPPv3N6Random9mem_ptr_tE"></span><span id="_CPPv2N6Random9mem_ptr_tE"></span><span class="target" id="classRandom_1a55407b7ceb232630514b27848b92951a"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mem_ptr_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6Random9mem_ptr_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>Shortcut type for all functions that deal witch chunks of memory. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random6RandomEKi">
+<span id="_CPPv3N6Random6RandomEKi"></span><span id="_CPPv2N6Random6RandomEKi"></span><span id="Random::Random__iC"></span><span class="target" id="classRandom_1a48842ba6557558b53b3f8d4ad75854ec"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Random</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">seed</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random6RandomEKi" title="Link to this definition"></a><br /></dt>
+<dd><p>Set up the random generator object with an optional seed value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6RandomD0Ev">
+<span id="_CPPv3N6RandomD0Ev"></span><span id="_CPPv2N6RandomD0Ev"></span><span id="Random::~Random"></span><span class="target" id="classRandom_1ac0d4eaf1f32df4600eb321cb8dbc0c55"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Random</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6RandomD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random10StepEngineEv">
+<span id="_CPPv3N6Random10StepEngineEv"></span><span id="_CPPv2N6Random10StepEngineEv"></span><span id="Random::StepEngine"></span><span class="target" id="classRandom_1a11e5019e5b57910cf8c471d0c71fa511"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StepEngine</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random10StepEngineEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Advance pseudorandom number generation engine one step. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Random7GetSeedEv">
+<span id="_CPPv3NK6Random7GetSeedEv"></span><span id="_CPPv2NK6Random7GetSeedEv"></span><span id="Random::GetSeedC"></span><span class="target" id="classRandom_1a9dffa911bd9805daf79eb82810535e33"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSeed</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK6Random7GetSeedEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current seed used to initialize this pseudo-random sequence. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9ResetSeedEK7int64_t">
+<span id="_CPPv3N6Random9ResetSeedEK7int64_t"></span><span id="_CPPv2N6Random9ResetSeedEK7int64_t"></span><span id="Random::ResetSeed__int64_tC"></span><span class="target" id="classRandom_1a1f881158996871dccc0e5e7eed96b4bb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResetSeed</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">seed</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random9ResetSeedEK7int64_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Starts a new sequence of pseudo random numbers. A negative seed means that the random number generator gets its seed from the current system time and the process memory. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9GetDoubleEv">
+<span id="_CPPv3N6Random9GetDoubleEv"></span><span id="_CPPv2N6Random9GetDoubleEv"></span><span id="Random::GetDouble"></span><span class="target" id="classRandom_1adc4521109956ec579c979ad61af82d11"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetDouble</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random9GetDoubleEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random double value between 0.0 and 1.0 </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9GetDoubleEKd">
+<span id="_CPPv3N6Random9GetDoubleEKd"></span><span id="_CPPv2N6Random9GetDoubleEKd"></span><span id="Random::GetDouble__doubleC"></span><span class="target" id="classRandom_1abbdcb5767a3acec4969662edc3cee933"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetDouble</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random9GetDoubleEKd" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random double value between 0.0 and max </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9GetDoubleEKdKd">
+<span id="_CPPv3N6Random9GetDoubleEKdKd"></span><span id="_CPPv2N6Random9GetDoubleEKdKd"></span><span id="Random::GetDouble__doubleC.doubleC"></span><span class="target" id="classRandom_1a366998aee6e46897addf760654103182"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetDouble</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random9GetDoubleEKdKd" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random double value between min and max </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9GetDoubleEK5RangeIdE">
+<span id="_CPPv3N6Random9GetDoubleEK5RangeIdE"></span><span id="_CPPv2N6Random9GetDoubleEK5RangeIdE"></span><span id="Random::GetDouble__Range:double:C"></span><span class="target" id="classRandom_1a837fcab4a7c73dce7ee59487da8df69b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetDouble</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Range.html#_CPPv4I0_bE5Range" title="Range"><span class="n"><span class="pre">Range</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">range</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random9GetDoubleEK5RangeIdE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random double in the provided range. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random16GetDoubleNonZeroEv">
+<span id="_CPPv3N6Random16GetDoubleNonZeroEv"></span><span id="_CPPv2N6Random16GetDoubleNonZeroEv"></span><span id="Random::GetDoubleNonZero"></span><span class="target" id="classRandom_1ade264dce29f8723ce7bc00947265cbaf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetDoubleNonZero</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random16GetDoubleNonZeroEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random double value between (0.0, 1.0] </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random7GetUIntEv">
+<span id="_CPPv3N6Random7GetUIntEv"></span><span id="_CPPv2N6Random7GetUIntEv"></span><span id="Random::GetUInt"></span><span class="target" id="classRandom_1a14b75279cc935640004bd7ccfe60dbc5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetUInt</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random7GetUIntEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32-bit (4 byte) unsigned int value. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN6Random7GetUIntE8uint32_tK1T">
+<span id="_CPPv3I0EN6Random7GetUIntEK1T"></span><span id="_CPPv2I0EN6Random7GetUIntEK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classRandom_1adb0c8e8de1be3bf58b13453aa397ba26"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetUInt</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN6Random7GetUIntE8uint32_tK1T" title="Random::GetUInt::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I0EN6Random7GetUIntE8uint32_tK1T" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32-bit unsigned int value between 0 and max </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN6Random7GetUIntE8uint32_tK2T1K2T2">
+<span id="_CPPv3I00EN6Random7GetUIntEK2T1K2T2"></span><span id="_CPPv2I00EN6Random7GetUIntEK2T1K2T2"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T2</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classRandom_1a0a5bb7427557a7338d23752f3ae949a6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetUInt</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN6Random7GetUIntE8uint32_tK2T1K2T2" title="Random::GetUInt::T1"><span class="n"><span class="pre">T1</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN6Random7GetUIntE8uint32_tK2T1K2T2" title="Random::GetUInt::T2"><span class="n"><span class="pre">T2</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I00EN6Random7GetUIntE8uint32_tK2T1K2T2" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32-bit unsigned int value between min and max </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN6Random7GetUIntE8uint32_tK5RangeI1TE">
+<span id="_CPPv3I0EN6Random7GetUIntEK5RangeI1TE"></span><span id="_CPPv2I0EN6Random7GetUIntEK5RangeI1TE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classRandom_1ad366ef00ef4e1f41fd1515f516f34b26"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetUInt</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Range.html#_CPPv4I0_bE5Range" title="Range"><span class="n"><span class="pre">Range</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN6Random7GetUIntE8uint32_tK5RangeI1TE" title="Random::GetUInt::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">range</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I0EN6Random7GetUIntE8uint32_tK5RangeI1TE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32-bit unsigned int value in the provided range. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random11GetBits12_5Ev">
+<span id="_CPPv3N6Random11GetBits12_5Ev"></span><span id="_CPPv2N6Random11GetBits12_5Ev"></span><span id="Random::GetBits12_5"></span><span class="target" id="classRandom_1a0d7386b091096363465d79f0795cb40f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBits12_5</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random11GetBits12_5Ev" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32 bits (unsigned int) with a 12.5% chance of each bit being 1. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9GetBits25Ev">
+<span id="_CPPv3N6Random9GetBits25Ev"></span><span id="_CPPv2N6Random9GetBits25Ev"></span><span id="Random::GetBits25"></span><span class="target" id="classRandom_1a16e867fe8212a62e1e01180e8c2bd6be"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBits25</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random9GetBits25Ev" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32 bits (unsigned int) with a 25% chance of each bit being 1. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random11GetBits37_5Ev">
+<span id="_CPPv3N6Random11GetBits37_5Ev"></span><span id="_CPPv2N6Random11GetBits37_5Ev"></span><span id="Random::GetBits37_5"></span><span class="target" id="classRandom_1a202648566c52da8d7d96f0f8c0443234"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBits37_5</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random11GetBits37_5Ev" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32 bits (unsigned int) with a 37.5% chance of each bit being 1. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9GetBits50Ev">
+<span id="_CPPv3N6Random9GetBits50Ev"></span><span id="_CPPv2N6Random9GetBits50Ev"></span><span id="Random::GetBits50"></span><span class="target" id="classRandom_1ab838dd5d1396925958c9898b30f5872d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBits50</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random9GetBits50Ev" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32 bits (unsigned int) with a 50% chance of each bit being 1. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random11GetBits62_5Ev">
+<span id="_CPPv3N6Random11GetBits62_5Ev"></span><span id="_CPPv2N6Random11GetBits62_5Ev"></span><span id="Random::GetBits62_5"></span><span class="target" id="classRandom_1a07d4442b0ca9f2024bfc35b563e26e0d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBits62_5</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random11GetBits62_5Ev" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32 bits (unsigned int) with a 62.5% chance of each bit being 1. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9GetBits75Ev">
+<span id="_CPPv3N6Random9GetBits75Ev"></span><span id="_CPPv2N6Random9GetBits75Ev"></span><span id="Random::GetBits75"></span><span class="target" id="classRandom_1acdd225603201d0140623dec288fbd382"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBits75</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random9GetBits75Ev" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32 bits (unsigned int) with a 75% chance of each bit being 1. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random11GetBits87_5Ev">
+<span id="_CPPv3N6Random11GetBits87_5Ev"></span><span id="_CPPv2N6Random11GetBits87_5Ev"></span><span id="Random::GetBits87_5"></span><span class="target" id="classRandom_1a7024d2f27fee89f5a8e9bb045879aa0f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBits87_5</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random11GetBits87_5Ev" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32 bits (unsigned int) with a 87.5% chance of each bit being 1. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9GetUInt64Ev">
+<span id="_CPPv3N6Random9GetUInt64Ev"></span><span id="_CPPv2N6Random9GetUInt64Ev"></span><span id="Random::GetUInt64"></span><span class="target" id="classRandom_1aeda322f324d1eb022ba4746486eed027"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetUInt64</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random9GetUInt64Ev" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 64-bit (8 byte) unsigned int value. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9GetUInt64EK8uint64_t">
+<span id="_CPPv3N6Random9GetUInt64EK8uint64_t"></span><span id="_CPPv2N6Random9GetUInt64EK8uint64_t"></span><span id="Random::GetUInt64__uint64_tC"></span><span class="target" id="classRandom_1acf789547cecdffcfd460938962d47419"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetUInt64</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random9GetUInt64EK8uint64_t" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 64-bit unsigned int value between 0 and max </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random6GetIntEK7int32_t">
+<span id="_CPPv3N6Random6GetIntEK7int32_t"></span><span id="_CPPv2N6Random6GetIntEK7int32_t"></span><span id="Random::GetInt__int32_tC"></span><span class="target" id="classRandom_1a854661b3fb71b49978f66c2517ff7db0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetInt</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random6GetIntEK7int32_t" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32-bit (4 byte) int value between 0 and max </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random6GetIntEKiKi">
+<span id="_CPPv3N6Random6GetIntEKiKi"></span><span id="_CPPv2N6Random6GetIntEKiKi"></span><span id="Random::GetInt__iC.iC"></span><span class="target" id="classRandom_1a647ab2b51c9fd929b2115a95a2f18c34"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetInt</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random6GetIntEKiKi" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32-bit (4 byte) int value between min and max </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random6GetIntEK5RangeIiE">
+<span id="_CPPv3N6Random6GetIntEK5RangeIiE"></span><span id="_CPPv2N6Random6GetIntEK5RangeIiE"></span><span id="Random::GetInt__Range:i:C"></span><span class="target" id="classRandom_1a1a057202efeed8cd3a11aa4abc6eb93f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetInt</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Range.html#_CPPv4I0_bE5Range" title="Range"><span class="n"><span class="pre">Range</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">range</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random6GetIntEK5RangeIiE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pseudo-random 32-bit (4 byte) int value in range </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random8RandFillE9mem_ptr_tK6size_t">
+<span id="_CPPv3N6Random8RandFillE9mem_ptr_tK6size_t"></span><span id="_CPPv2N6Random8RandFillE9mem_ptr_tK6size_t"></span><span id="Random::RandFill__mem_ptr_t.sC"></span><span class="target" id="classRandom_1a5a73c103732746802ac4a90139036f2f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bytes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random8RandFillE9mem_ptr_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Randomize a contiguous segment of memory. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_4ProbEN6Random9RandFillPEv9mem_ptr_tK6size_t">
+<span id="_CPPv3I_4ProbEN6Random9RandFillPE9mem_ptr_tK6size_t"></span><span id="_CPPv2I_4ProbEN6Random9RandFillPE9mem_ptr_tK6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6Random4ProbE" title="Random::Prob"><span class="n"><span class="pre">Prob</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PROB</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classRandom_1a71820133fe2696fe5c37c723b18341bf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFillP</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bytes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I_4ProbEN6Random9RandFillPEv9mem_ptr_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Randomize a contiguous segment of memory. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_4ProbEN6Random9RandFillPEv9mem_ptr_tK6size_t6size_t6size_t">
+<span id="_CPPv3I_4ProbEN6Random9RandFillPE9mem_ptr_tK6size_t6size_t6size_t"></span><span id="_CPPv2I_4ProbEN6Random9RandFillPE9mem_ptr_tK6size_t6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6Random4ProbE" title="Random::Prob"><span class="n"><span class="pre">Prob</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PROB</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classRandom_1a6c391b9c6cf260486522ba2a3ebd030c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFillP</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="p"><span class="pre">[[</span></span><span class="pre">maybe_unused</span><span class="p"><span class="pre">]]</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bytes</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_bit</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop_bit</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I_4ProbEN6Random9RandFillPEv9mem_ptr_tK6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Randomize a contiguous segment of memory between specified bit positions. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9RandFill0E9mem_ptr_tK6size_t">
+<span id="_CPPv3N6Random9RandFill0E9mem_ptr_tK6size_t"></span><span id="_CPPv2N6Random9RandFill0E9mem_ptr_tK6size_t"></span><span id="Random::RandFill0__mem_ptr_t.sC"></span><span class="target" id="classRandom_1a1bc64c6a63bc38b4316bed688c5016c8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill0</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random9RandFill0E9mem_ptr_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random12RandFill12_5E9mem_ptr_tK6size_t">
+<span id="_CPPv3N6Random12RandFill12_5E9mem_ptr_tK6size_t"></span><span id="_CPPv2N6Random12RandFill12_5E9mem_ptr_tK6size_t"></span><span id="Random::RandFill12_5__mem_ptr_t.sC"></span><span class="target" id="classRandom_1a5e5e04a84a29a2709a278a4610984cbf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill12_5</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random12RandFill12_5E9mem_ptr_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random10RandFill25E9mem_ptr_tK6size_t">
+<span id="_CPPv3N6Random10RandFill25E9mem_ptr_tK6size_t"></span><span id="_CPPv2N6Random10RandFill25E9mem_ptr_tK6size_t"></span><span id="Random::RandFill25__mem_ptr_t.sC"></span><span class="target" id="classRandom_1a465fce07583f835e9e6ac8fdcecbbc64"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill25</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random10RandFill25E9mem_ptr_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random12RandFill37_5E9mem_ptr_tK6size_t">
+<span id="_CPPv3N6Random12RandFill37_5E9mem_ptr_tK6size_t"></span><span id="_CPPv2N6Random12RandFill37_5E9mem_ptr_tK6size_t"></span><span id="Random::RandFill37_5__mem_ptr_t.sC"></span><span class="target" id="classRandom_1ae9fb590d6ebfdddb4bc6eee3b97de7a2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill37_5</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random12RandFill37_5E9mem_ptr_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random10RandFill50E9mem_ptr_tK6size_t">
+<span id="_CPPv3N6Random10RandFill50E9mem_ptr_tK6size_t"></span><span id="_CPPv2N6Random10RandFill50E9mem_ptr_tK6size_t"></span><span id="Random::RandFill50__mem_ptr_t.sC"></span><span class="target" id="classRandom_1ac68765b291b769a15ee9fcba30692315"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill50</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random10RandFill50E9mem_ptr_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random12RandFill62_5E9mem_ptr_tK6size_t">
+<span id="_CPPv3N6Random12RandFill62_5E9mem_ptr_tK6size_t"></span><span id="_CPPv2N6Random12RandFill62_5E9mem_ptr_tK6size_t"></span><span id="Random::RandFill62_5__mem_ptr_t.sC"></span><span class="target" id="classRandom_1a383b0d26cf9165225912648d54da513f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill62_5</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random12RandFill62_5E9mem_ptr_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random10RandFill75E9mem_ptr_tK6size_t">
+<span id="_CPPv3N6Random10RandFill75E9mem_ptr_tK6size_t"></span><span id="_CPPv2N6Random10RandFill75E9mem_ptr_tK6size_t"></span><span id="Random::RandFill75__mem_ptr_t.sC"></span><span class="target" id="classRandom_1aa2646c56432c5e283d628b3851ff71e5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill75</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random10RandFill75E9mem_ptr_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random12RandFill87_5E9mem_ptr_tK6size_t">
+<span id="_CPPv3N6Random12RandFill87_5E9mem_ptr_tK6size_t"></span><span id="_CPPv2N6Random12RandFill87_5E9mem_ptr_tK6size_t"></span><span id="Random::RandFill87_5__mem_ptr_t.sC"></span><span class="target" id="classRandom_1ae238766bccda9b5fa1a45f6db97376fa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill87_5</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random12RandFill87_5E9mem_ptr_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random11RandFill100E9mem_ptr_tK6size_t">
+<span id="_CPPv3N6Random11RandFill100E9mem_ptr_tK6size_t"></span><span id="_CPPv2N6Random11RandFill100E9mem_ptr_tK6size_t"></span><span id="Random::RandFill100__mem_ptr_t.sC"></span><span class="target" id="classRandom_1a91682ccef0e39ec049e65c4b41557d90"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill100</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random11RandFill100E9mem_ptr_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9RandFill0E9mem_ptr_tK6size_t6size_t6size_t">
+<span id="_CPPv3N6Random9RandFill0E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="_CPPv2N6Random9RandFill0E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="Random::RandFill0__mem_ptr_t.sC.s.s"></span><span class="target" id="classRandom_1ae7f9eed406645ba758c7ea552832a395"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill0</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_bit</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop_bit</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random9RandFill0E9mem_ptr_tK6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random12RandFill12_5E9mem_ptr_tK6size_t6size_t6size_t">
+<span id="_CPPv3N6Random12RandFill12_5E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="_CPPv2N6Random12RandFill12_5E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="Random::RandFill12_5__mem_ptr_t.sC.s.s"></span><span class="target" id="classRandom_1a170badc3d925e596e5cf3ac620918f9f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill12_5</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_bit</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop_bit</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random12RandFill12_5E9mem_ptr_tK6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random10RandFill25E9mem_ptr_tK6size_t6size_t6size_t">
+<span id="_CPPv3N6Random10RandFill25E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="_CPPv2N6Random10RandFill25E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="Random::RandFill25__mem_ptr_t.sC.s.s"></span><span class="target" id="classRandom_1ae23d27358c9b6a21e11441d735af8d94"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill25</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_bit</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop_bit</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random10RandFill25E9mem_ptr_tK6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random12RandFill37_5E9mem_ptr_tK6size_t6size_t6size_t">
+<span id="_CPPv3N6Random12RandFill37_5E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="_CPPv2N6Random12RandFill37_5E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="Random::RandFill37_5__mem_ptr_t.sC.s.s"></span><span class="target" id="classRandom_1a0706e71a8e34ee205b35b4532b0dc1ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill37_5</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_bit</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop_bit</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random12RandFill37_5E9mem_ptr_tK6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random10RandFill50E9mem_ptr_tK6size_t6size_t6size_t">
+<span id="_CPPv3N6Random10RandFill50E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="_CPPv2N6Random10RandFill50E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="Random::RandFill50__mem_ptr_t.sC.s.s"></span><span class="target" id="classRandom_1af37b34b89c8d49873f5ac3ded1f8ee8c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill50</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_bit</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop_bit</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random10RandFill50E9mem_ptr_tK6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random12RandFill62_5E9mem_ptr_tK6size_t6size_t6size_t">
+<span id="_CPPv3N6Random12RandFill62_5E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="_CPPv2N6Random12RandFill62_5E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="Random::RandFill62_5__mem_ptr_t.sC.s.s"></span><span class="target" id="classRandom_1a92c10bac3e16d9f12013eaa0864a6466"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill62_5</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_bit</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop_bit</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random12RandFill62_5E9mem_ptr_tK6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random10RandFill75E9mem_ptr_tK6size_t6size_t6size_t">
+<span id="_CPPv3N6Random10RandFill75E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="_CPPv2N6Random10RandFill75E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="Random::RandFill75__mem_ptr_t.sC.s.s"></span><span class="target" id="classRandom_1ab2582748840e20fb60d0ff79dd0139ab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill75</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_bit</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop_bit</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random10RandFill75E9mem_ptr_tK6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random12RandFill87_5E9mem_ptr_tK6size_t6size_t6size_t">
+<span id="_CPPv3N6Random12RandFill87_5E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="_CPPv2N6Random12RandFill87_5E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="Random::RandFill87_5__mem_ptr_t.sC.s.s"></span><span class="target" id="classRandom_1ab464c73dc58e8e85350f00292001ea59"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill87_5</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_bit</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop_bit</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random12RandFill87_5E9mem_ptr_tK6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random11RandFill100E9mem_ptr_tK6size_t6size_t6size_t">
+<span id="_CPPv3N6Random11RandFill100E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="_CPPv2N6Random11RandFill100E9mem_ptr_tK6size_t6size_t6size_t"></span><span id="Random::RandFill100__mem_ptr_t.sC.s.s"></span><span class="target" id="classRandom_1aa59ea8ebf4f1555910827ca64c505242"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill100</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bytes</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_bit</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop_bit</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random11RandFill100E9mem_ptr_tK6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random8RandFillE9mem_ptr_tK6size_tKd">
+<span id="_CPPv3N6Random8RandFillE9mem_ptr_tK6size_tKd"></span><span id="_CPPv2N6Random8RandFillE9mem_ptr_tK6size_tKd"></span><span id="Random::RandFill__mem_ptr_t.sC.doubleC"></span><span class="target" id="classRandom_1a18cd7e89494ff44da36872cf5455dc27"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bytes</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random8RandFillE9mem_ptr_tK6size_tKd" title="Link to this definition"></a><br /></dt>
+<dd><p>Randomize a contiguous segment of memory with a given probability of each bit being on. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random8RandFillE9mem_ptr_tK6size_tKdK6size_tK6size_t">
+<span id="_CPPv3N6Random8RandFillE9mem_ptr_tK6size_tKdK6size_tK6size_t"></span><span id="_CPPv2N6Random8RandFillE9mem_ptr_tK6size_tKdK6size_tK6size_t"></span><span id="Random::RandFill__mem_ptr_t.sC.doubleC.sC.sC"></span><span class="target" id="classRandom_1a5b2cd0616bd09a1901044ea4b3a498cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandFill</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6Random9mem_ptr_tE" title="Random::mem_ptr_t"><span class="n"><span class="pre">mem_ptr_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dest</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bytes</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_bit</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stop_bit</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random8RandFillE9mem_ptr_tK6size_tKdK6size_tK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Randomize a contiguous segment of memory with a given probability of each bit being on. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random1PEKd">
+<span id="_CPPv3N6Random1PEKd"></span><span id="_CPPv2N6Random1PEKd"></span><span id="Random::P__doubleC"></span><span class="target" id="classRandom_1ae857bc9cc187281525de9b5f5e3daa7e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random1PEKd" title="Link to this definition"></a><br /></dt>
+<dd><p>Tests a random value [0,1) against a given probability p, and returns true of false. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p</strong> – The probability of the result being “true”. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random7GetByteEKd">
+<span id="_CPPv3N6Random7GetByteEKd"></span><span id="_CPPv2N6Random7GetByteEKd"></span><span id="Random::GetByte__doubleC"></span><span class="target" id="classRandom_1ae87036eef7c41f60f78146dea99301a2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetByte</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random7GetByteEKd" title="Link to this definition"></a><br /></dt>
+<dd><p>Full random byte with each bit being a one with a given probability. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9GetNormalEv">
+<span id="_CPPv3N6Random9GetNormalEv"></span><span id="_CPPv2N6Random9GetNormalEv"></span><span id="Random::GetNormal"></span><span class="target" id="classRandom_1a208d341ff9900f4b2958a9c1a3691137"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNormal</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random9GetNormalEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a random variable drawn from a unit normal distribution. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9GetNormalEKdKd">
+<span id="_CPPv3N6Random9GetNormalEKdKd"></span><span id="_CPPv2N6Random9GetNormalEKdKd"></span><span id="Random::GetNormal__doubleC.doubleC"></span><span class="target" id="classRandom_1a7f635f769ee0ba48bd991da64947cb43"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNormal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mean</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">std</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Random9GetNormalEKdKd" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mean</strong> – Center of distribution. </p></li>
+<li><p><strong>std</strong> – Standard deviation of distribution. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A random variable drawn from a normal distribution. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random10GetPoissonEKdKd">
+<span id="_CPPv3N6Random10GetPoissonEKdKd"></span><span id="_CPPv2N6Random10GetPoissonEKdKd"></span><span id="Random::GetPoisson__doubleC.doubleC"></span><span class="target" id="classRandom_1adf974127f24c01a47f0fb3f95393d7d4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPoisson</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Random10GetPoissonEKdKd" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a random variable drawn from a Poisson distribution. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random10GetPoissonEKd">
+<span id="_CPPv3N6Random10GetPoissonEKd"></span><span id="_CPPv2N6Random10GetPoissonEKd"></span><span id="Random::GetPoisson__doubleC"></span><span class="target" id="classRandom_1a392b2efead5f44c4c0d2d8f6b44899f6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPoisson</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mean</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Random10GetPoissonEKd" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a random variable drawn from a Poisson distribution. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random11GetBinomialEKdKd">
+<span id="_CPPv3N6Random11GetBinomialEKdKd"></span><span id="_CPPv2N6Random11GetBinomialEKdKd"></span><span id="Random::GetBinomial__doubleC.doubleC"></span><span class="target" id="classRandom_1a27896557449eb78be3ee0b94bc808b0a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBinomial</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Random11GetBinomialEKdKd" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a random variable drawn from a Binomial distribution.</p>
+<p>This function is exact, but slow. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>Random::GetApproxRandBinomial </p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>Binomial in source/tools/Distribution.h </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random14GetExponentialEd">
+<span id="_CPPv3N6Random14GetExponentialEd"></span><span id="_CPPv2N6Random14GetExponentialEd"></span><span id="Random::GetExponential__double"></span><span class="target" id="classRandom_1aea45fd930be2480e95753ede92fd62e6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetExponential</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Random14GetExponentialEd" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a random variable drawn from an exponential distribution. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random12GetGeometricEd">
+<span id="_CPPv3N6Random12GetGeometricEd"></span><span id="_CPPv2N6Random12GetGeometricEd"></span><span id="Random::GetGeometric__double"></span><span class="target" id="classRandom_1a025b85479d032b115c6eef3d0fcc525f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetGeometric</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Random12GetGeometricEd" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a random variable drawn from a geometric distribution. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random3GetEv">
+<span id="_CPPv3N6Random3GetEv"></span><span id="_CPPv2N6Random3GetEv"></span><span id="Random::Get"></span><span class="target" id="classRandom_1add9f1be97ee50a94127a193f9e7b9234"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6Random3GetEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Basic Random number Returns a random number [0, RAND_CAP) </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random5valueE">
+<span id="_CPPv3N6Random5valueE"></span><span id="_CPPv2N6Random5valueE"></span><span id="Random::value__uint64_t"></span><span class="target" id="classRandom_1a8ee57c6749ca888a5a974a9a15d03a77"></span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N6Random5valueE" title="Link to this definition"></a><br /></dt>
+<dd><p>Current squaring value. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random10weyl_stateE">
+<span id="_CPPv3N6Random10weyl_stateE"></span><span id="_CPPv2N6Random10weyl_stateE"></span><span id="Random::weyl_state__uint64_t"></span><span class="target" id="classRandom_1a42e5bed5823f9e3d5592577a3d0db9af"></span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">weyl_state</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N6Random10weyl_stateE" title="Link to this definition"></a><br /></dt>
+<dd><p>Weyl sequence state. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random13original_seedE">
+<span id="_CPPv3N6Random13original_seedE"></span><span id="_CPPv2N6Random13original_seedE"></span><span id="Random::original_seed__uint64_t"></span><span class="target" id="classRandom_1a8bbc2daa31fa84c73e148b08f98c4451"></span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">original_seed</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N6Random13original_seedE" title="Link to this definition"></a><br /></dt>
+<dd><p>Seed to start sequence; initialized weyl_state. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random5expRVE">
+<span id="_CPPv3N6Random5expRVE"></span><span id="_CPPv2N6Random5expRVE"></span><span id="Random::expRV__double"></span><span class="target" id="classRandom_1ac4a30df062142ab2706ad302f6c14425"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">expRV</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><a class="headerlink" href="#_CPPv4N6Random5expRVE" title="Link to this definition"></a><br /></dt>
+<dd><p>Exponential Random Variable for the randNormal function. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-static-attributes">Protected Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random8RAND_CAPE">
+<span id="_CPPv3N6Random8RAND_CAPE"></span><span id="_CPPv2N6Random8RAND_CAPE"></span><span id="Random::RAND_CAP__uint64_tC"></span><span class="target" id="classRandom_1afd612a9b50ee5422e3ace3dd600f8825"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RAND_CAP</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4294967296</span></span><a class="headerlink" href="#_CPPv4N6Random8RAND_CAPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random9STEP_SIZEE">
+<span id="_CPPv3N6Random9STEP_SIZEE"></span><span id="_CPPv2N6Random9STEP_SIZEE"></span><span id="Random::STEP_SIZE__uint64_tC"></span><span class="target" id="classRandom_1a4f83e4a031fd9989ca88b8419f48aa59"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">STEP_SIZE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0xb5ad4eceda1ce2a9</span></span><a class="headerlink" href="#_CPPv4N6Random9STEP_SIZEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Weyl sequence step size. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6Random5BYTE1E">
+<span id="_CPPv3N6Random5BYTE1E"></span><span id="_CPPv2N6Random5BYTE1E"></span><span id="Random::BYTE1__unsigned-cC"></span><span class="target" id="classRandom_1a2fd04a3587216f8455ac3eb97e736342"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BYTE1</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">)</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N6Random5BYTE1E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv416RandomStdAdaptor">
+<span id="_CPPv316RandomStdAdaptor"></span><span id="_CPPv216RandomStdAdaptor"></span><span id="RandomStdAdaptor"></span><span class="target" id="structRandomStdAdaptor"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandomStdAdaptor</span></span></span><a class="headerlink" href="#_CPPv416RandomStdAdaptor" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Random.hpp&gt;</em></div>
+<p>This is an adaptor to make Random behave like a proper STL random number generator. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N16RandomStdAdaptor13argument_typeE">
+<span id="_CPPv3N16RandomStdAdaptor13argument_typeE"></span><span id="_CPPv2N16RandomStdAdaptor13argument_typeE"></span><span id="RandomStdAdaptor::argument_type"></span><span class="target" id="structRandomStdAdaptor_1a62b1fed0e6a8c600e53bd4df76a57c83"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">argument_type</span></span></span><a class="headerlink" href="#_CPPv4N16RandomStdAdaptor13argument_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N16RandomStdAdaptor11result_typeE">
+<span id="_CPPv3N16RandomStdAdaptor11result_typeE"></span><span id="_CPPv2N16RandomStdAdaptor11result_typeE"></span><span id="RandomStdAdaptor::result_type"></span><span class="target" id="structRandomStdAdaptor_1abe6ec31487bbcc2f45c1e47df6bf79db"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">result_type</span></span></span><a class="headerlink" href="#_CPPv4N16RandomStdAdaptor11result_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16RandomStdAdaptor16RandomStdAdaptorER6Random">
+<span id="_CPPv3N16RandomStdAdaptor16RandomStdAdaptorER6Random"></span><span id="_CPPv2N16RandomStdAdaptor16RandomStdAdaptorER6Random"></span><span id="RandomStdAdaptor::RandomStdAdaptor__RandomR"></span><span class="target" id="structRandomStdAdaptor_1a8d1efadf0983c04a4d055033c43975a2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandomStdAdaptor</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rng</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16RandomStdAdaptor16RandomStdAdaptorER6Random" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16RandomStdAdaptorclEi">
+<span id="_CPPv3N16RandomStdAdaptorclEi"></span><span id="_CPPv2N16RandomStdAdaptorclEi"></span><span id="RandomStdAdaptor::call-operator__i"></span><span class="target" id="structRandomStdAdaptor_1abbec15b59cea0088f3adbc988e087363"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16RandomStdAdaptorclEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16RandomStdAdaptor4_rngE">
+<span id="_CPPv3N16RandomStdAdaptor4_rngE"></span><span id="_CPPv2N16RandomStdAdaptor4_rngE"></span><span id="RandomStdAdaptor::_rng__RandomR"></span><span class="target" id="structRandomStdAdaptor_1a2d2b4d9b13e98ac45f2202bf4f92735f"></span><a class="reference internal" href="#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">_rng</span></span></span><a class="headerlink" href="#_CPPv4N16RandomStdAdaptor4_rngE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Fraction.html" class="btn btn-neutral float-left" title="Fraction.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Range.html" class="btn btn-neutral float-right" title="Range.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

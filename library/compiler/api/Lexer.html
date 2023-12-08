@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lexer.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/compiler/api/Lexer.5012ea22-608e-4bd1-80e9-533f277b42c6.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="NFA.hpp" href="NFA.html" />
+    <link rel="prev" title="DFA.hpp" href="DFA.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../compiler.html">Compiler</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../compiler.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="DFA.html">DFA.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Lexer.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49TokenInfo"><code class="docutils literal notranslate"><span class="pre">TokenInfo</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv45Token"><code class="docutils literal notranslate"><span class="pre">Token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411TokenStream"><code class="docutils literal notranslate"><span class="pre">TokenStream</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv45Lexer"><code class="docutils literal notranslate"><span class="pre">Lexer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="NFA.html">NFA.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RegEx.html">RegEx.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lexer_utils.html">lexer_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="regex_utils.html">regex_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../compiler.html">Compiler</a></li>
+      <li class="breadcrumb-item active">Lexer.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lexer-hpp">
+<h1>Lexer.hpp<a class="headerlink" href="#lexer-hpp" title="Link to this heading"></a></h1>
+<p>A general-purpose, fast lexer. </p>
+<p>
+Build a lexer that can convert input strings or streams into a series of provided tokens.</p>
+<p>Use AddToken(name, regex) to list out the relevant tokens. ‘name’ is the unique name for this token. ‘regex’ is the regular expression that describes this token. It will return a unique ID associated with this lexeme.</p>
+<p>IgnoreToken(name, regex) uses the same arguments, but is used for tokens that should be skipped over.</p>
+<p>Names and IDs can be recovered later using GetTokenID(name) and GetTokenName(id).</p>
+<p>Tokens can be retrieved either one at a time with Process(string) or Process(stream), which will return the next (non-ignored) token, removing it from the input.</p>
+<p>Alternatively, an entire series of tokens can be processed with Tokenize().</p>
+<p>Finally, GetLexeme() can be used to retrieve the lexeme from the most recent token found. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA</p>
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv49TokenInfo">
+<span id="_CPPv39TokenInfo"></span><span id="_CPPv29TokenInfo"></span><span id="TokenInfo"></span><span class="target" id="structTokenInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TokenInfo</span></span></span><a class="headerlink" href="#_CPPv49TokenInfo" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Lexer.hpp&gt;</em></div>
+<p>Information about an individual TYPE of token to be processed within a Lexer. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9TokenInfo9TokenInfoEv">
+<span id="_CPPv3N9TokenInfo9TokenInfoEv"></span><span id="_CPPv2N9TokenInfo9TokenInfoEv"></span><span id="TokenInfo::TokenInfo"></span><span class="target" id="structTokenInfo_1a2c5574dee34a4ba209ca1b976a1b51d0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TokenInfo</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9TokenInfo9TokenInfoEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9TokenInfo9TokenInfoERKNSt6stringERKNSt6stringEibbRKNSt6stringE">
+<span id="_CPPv3N9TokenInfo9TokenInfoERKNSt6stringERKNSt6stringEibbRKNSt6stringE"></span><span id="_CPPv2N9TokenInfo9TokenInfoERKNSt6stringERKNSt6stringEibbRKNSt6stringE"></span><span id="TokenInfo::TokenInfo__ssCR.ssCR.i.b.b.ssCR"></span><span class="target" id="structTokenInfo_1a46b8bd0f1a4f07edbde37edea1f01ec5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TokenInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_regex</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_id</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_save_l</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_save_t</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9TokenInfo9TokenInfoERKNSt6stringERKNSt6stringEibbRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9TokenInfo9TokenInfoERK9TokenInfo">
+<span id="_CPPv3N9TokenInfo9TokenInfoERK9TokenInfo"></span><span id="_CPPv2N9TokenInfo9TokenInfoERK9TokenInfo"></span><span id="TokenInfo::TokenInfo__TokenInfoCR"></span><span class="target" id="structTokenInfo_1a45a98a617f3544811472d9927ba7ba3d"></span><span class="sig-name descname"><span class="n"><span class="pre">TokenInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9TokenInfo9TokenInfoERK9TokenInfo" title="TokenInfo::TokenInfo"><span class="n"><span class="pre">TokenInfo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N9TokenInfo9TokenInfoERK9TokenInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9TokenInfo9TokenInfoERR9TokenInfo">
+<span id="_CPPv3N9TokenInfo9TokenInfoERR9TokenInfo"></span><span id="_CPPv2N9TokenInfo9TokenInfoERR9TokenInfo"></span><span id="TokenInfo::TokenInfo__TokenInfoRR"></span><span class="target" id="structTokenInfo_1a15938284dd0d90adc602a0dc16a7e8fc"></span><span class="sig-name descname"><span class="n"><span class="pre">TokenInfo</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9TokenInfo9TokenInfoERR9TokenInfo" title="TokenInfo::TokenInfo"><span class="n"><span class="pre">TokenInfo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N9TokenInfo9TokenInfoERR9TokenInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9TokenInfoaSERK9TokenInfo">
+<span id="_CPPv3N9TokenInfoaSERK9TokenInfo"></span><span id="_CPPv2N9TokenInfoaSERK9TokenInfo"></span><span id="TokenInfo::assign-operator__TokenInfoCR"></span><span class="target" id="structTokenInfo_1a5c19aa66fceb35c69b51f874961e8216"></span><a class="reference internal" href="#_CPPv49TokenInfo" title="TokenInfo"><span class="n"><span class="pre">TokenInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49TokenInfo" title="TokenInfo"><span class="n"><span class="pre">TokenInfo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N9TokenInfoaSERK9TokenInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9TokenInfoaSERR9TokenInfo">
+<span id="_CPPv3N9TokenInfoaSERR9TokenInfo"></span><span id="_CPPv2N9TokenInfoaSERR9TokenInfo"></span><span id="TokenInfo::assign-operator__TokenInfoRR"></span><span class="target" id="structTokenInfo_1a7d65d5ef2a85e40f2b4381a6f6eff79c"></span><a class="reference internal" href="#_CPPv49TokenInfo" title="TokenInfo"><span class="n"><span class="pre">TokenInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49TokenInfo" title="TokenInfo"><span class="n"><span class="pre">TokenInfo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N9TokenInfoaSERR9TokenInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9TokenInfo5PrintERNSt7ostreamE">
+<span id="_CPPv3NK9TokenInfo5PrintERNSt7ostreamE"></span><span id="_CPPv2NK9TokenInfo5PrintERNSt7ostreamE"></span><span id="TokenInfo::Print__osRC"></span><span class="target" id="structTokenInfo_1a746db74f417534756734c84ec0eb0947"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9TokenInfo5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Print out the status of this token (for debugging) </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9TokenInfo4nameE">
+<span id="_CPPv3N9TokenInfo4nameE"></span><span id="_CPPv2N9TokenInfo4nameE"></span><span id="TokenInfo::name__ss"></span><span class="target" id="structTokenInfo_1abadb358d66ec14e22fe14be755eb9761"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><a class="headerlink" href="#_CPPv4N9TokenInfo4nameE" title="Link to this definition"></a><br /></dt>
+<dd><p>Name of this token type. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9TokenInfo4descE">
+<span id="_CPPv3N9TokenInfo4descE"></span><span id="_CPPv2N9TokenInfo4descE"></span><span id="TokenInfo::desc__ss"></span><span class="target" id="structTokenInfo_1a4af2c75d6b6059f88a35309cfed43219"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">desc</span></span></span><a class="headerlink" href="#_CPPv4N9TokenInfo4descE" title="Link to this definition"></a><br /></dt>
+<dd><p>More detailed description of this token type. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9TokenInfo5regexE">
+<span id="_CPPv3N9TokenInfo5regexE"></span><span id="_CPPv2N9TokenInfo5regexE"></span><span id="TokenInfo::regex__RegEx"></span><span class="target" id="structTokenInfo_1a7f8e3b809b36f567bb9abce40d6f73c3"></span><a class="reference internal" href="RegEx.html#_CPPv45RegEx" title="RegEx"><span class="n"><span class="pre">RegEx</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">regex</span></span></span><a class="headerlink" href="#_CPPv4N9TokenInfo5regexE" title="Link to this definition"></a><br /></dt>
+<dd><p>Pattern to describe token type. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9TokenInfo2idE">
+<span id="_CPPv3N9TokenInfo2idE"></span><span id="_CPPv2N9TokenInfo2idE"></span><span id="TokenInfo::id__i"></span><span class="target" id="structTokenInfo_1ab9c0ff8ec2c582d0e55e80ae35ec6d7e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id</span></span></span><a class="headerlink" href="#_CPPv4N9TokenInfo2idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Unique id for token. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9TokenInfo11save_lexemeE">
+<span id="_CPPv3N9TokenInfo11save_lexemeE"></span><span id="_CPPv2N9TokenInfo11save_lexemeE"></span><span id="TokenInfo::save_lexeme__b"></span><span class="target" id="structTokenInfo_1a55baf57b47fb25de1cbeb2e78e2250a2"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">save_lexeme</span></span></span><a class="headerlink" href="#_CPPv4N9TokenInfo11save_lexemeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Preserve the lexeme for this token? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9TokenInfo10save_tokenE">
+<span id="_CPPv3N9TokenInfo10save_tokenE"></span><span id="_CPPv2N9TokenInfo10save_tokenE"></span><span id="TokenInfo::save_token__b"></span><span class="target" id="structTokenInfo_1ab7c84c22d121dc6f5d57ee86ed8915bb"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">save_token</span></span></span><a class="headerlink" href="#_CPPv4N9TokenInfo10save_tokenE" title="Link to this definition"></a><br /></dt>
+<dd><p>Keep token at all? (Whitespace and comments are often discarded). </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv45Token">
+<span id="_CPPv35Token"></span><span id="_CPPv25Token"></span><span id="Token"></span><span class="target" id="structToken"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Token</span></span></span><a class="headerlink" href="#_CPPv45Token" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Lexer.hpp&gt;</em></div>
+<p>Information about a token instance from an input stream. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Token5TokenEiRKNSt6stringE6size_t">
+<span id="_CPPv3N5Token5TokenEiRKNSt6stringE6size_t"></span><span id="_CPPv2N5Token5TokenEiRKNSt6stringE6size_t"></span><span id="Token::Token__i.ssCR.s"></span><span class="target" id="structToken_1a633aa731ad0a99df63a6e7c93574e83d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Token</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">str</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_line</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Token5TokenEiRKNSt6stringE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Token5TokenERK5Token">
+<span id="_CPPv3N5Token5TokenERK5Token"></span><span id="_CPPv2N5Token5TokenERK5Token"></span><span id="Token::Token__TokenCR"></span><span class="target" id="structToken_1a350ebd7ea16caa846b858ecdb1c273c6"></span><span class="sig-name descname"><span class="n"><span class="pre">Token</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Token5TokenERK5Token" title="Token::Token"><span class="n"><span class="pre">Token</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5Token5TokenERK5Token" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Token5TokenERR5Token">
+<span id="_CPPv3N5Token5TokenERR5Token"></span><span id="_CPPv2N5Token5TokenERR5Token"></span><span id="Token::Token__TokenRR"></span><span class="target" id="structToken_1afc9d412fe95cc74013031eb46eb5d924"></span><span class="sig-name descname"><span class="n"><span class="pre">Token</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Token5TokenERR5Token" title="Token::Token"><span class="n"><span class="pre">Token</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5Token5TokenERR5Token" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5TokenaSERK5Token">
+<span id="_CPPv3N5TokenaSERK5Token"></span><span id="_CPPv2N5TokenaSERK5Token"></span><span id="Token::assign-operator__TokenCR"></span><span class="target" id="structToken_1a302f8febd87a9cca349ba76dfd782548"></span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5TokenaSERK5Token" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5TokenaSERR5Token">
+<span id="_CPPv3N5TokenaSERR5Token"></span><span id="_CPPv2N5TokenaSERR5Token"></span><span id="Token::assign-operator__TokenRR"></span><span class="target" id="structToken_1a4f45441b8d2dfe881c448377d4ca2cd4"></span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5TokenaSERR5Token" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5TokencviEv">
+<span id="_CPPv3NK5TokencviEv"></span><span id="_CPPv2NK5TokencviEv"></span><span id="Token::castto-i-operatorC"></span><span class="target" id="structToken_1ae9a4eb419bd82fc8eda72543a4a1d452"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5TokencviEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Token will automatically convert to its ID if used as an int. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5TokencvRKNSt6stringEEv">
+<span id="_CPPv3NK5TokencvRKNSt6stringEEv"></span><span id="_CPPv2NK5TokencvRKNSt6stringEEv"></span><span id="Token::castto-ssCR-operatorC"></span><span class="target" id="structToken_1af9c9e4f69d42be9d5dde29690ceac51d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&amp;</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5TokencvRKNSt6stringEEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Token will automatically convert to its matched sequence (lexeme) is used as a string. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Token2idE">
+<span id="_CPPv3N5Token2idE"></span><span id="_CPPv2N5Token2idE"></span><span id="Token::id__i"></span><span class="target" id="structToken_1aa17500abc453e3d873c385f9eb47fa53"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id</span></span></span><a class="headerlink" href="#_CPPv4N5Token2idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which type of token is this? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Token6lexemeE">
+<span id="_CPPv3N5Token6lexemeE"></span><span id="_CPPv2N5Token6lexemeE"></span><span id="Token::lexeme__ss"></span><span class="target" id="structToken_1abbff29ede445ed4a8520580f12490832"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lexeme</span></span></span><a class="headerlink" href="#_CPPv4N5Token6lexemeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Sequence matched by this token (or empty if not saved) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Token7line_idE">
+<span id="_CPPv3N5Token7line_idE"></span><span id="_CPPv2N5Token7line_idE"></span><span id="Token::line_id__s"></span><span class="target" id="structToken_1afcc9709a3eb24b02ea3525947bdced94"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">line_id</span></span></span><a class="headerlink" href="#_CPPv4N5Token7line_idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which line did this token start on? </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv411TokenStream">
+<span id="_CPPv311TokenStream"></span><span id="_CPPv211TokenStream"></span><span id="TokenStream"></span><span class="target" id="classTokenStream"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TokenStream</span></span></span><a class="headerlink" href="#_CPPv411TokenStream" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Lexer.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream11TokenStreamERKNSt6stringE">
+<span id="_CPPv3N11TokenStream11TokenStreamERKNSt6stringE"></span><span id="_CPPv2N11TokenStream11TokenStreamERKNSt6stringE"></span><span id="TokenStream::TokenStream__ssCR"></span><span class="target" id="classTokenStream_1a9ba8f01fe52e87fc8e70a9a9fc4ee957"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TokenStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11TokenStream11TokenStreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream11TokenStreamERK11TokenStream">
+<span id="_CPPv3N11TokenStream11TokenStreamERK11TokenStream"></span><span id="_CPPv2N11TokenStream11TokenStreamERK11TokenStream"></span><span id="TokenStream::TokenStream__TokenStreamCR"></span><span class="target" id="classTokenStream_1afcd8356a1a1ade7f31372f6c99f98c65"></span><span class="sig-name descname"><span class="n"><span class="pre">TokenStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream11TokenStreamERK11TokenStream" title="TokenStream::TokenStream"><span class="n"><span class="pre">TokenStream</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11TokenStream11TokenStreamERK11TokenStream" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream11TokenStreamERR11TokenStream">
+<span id="_CPPv3N11TokenStream11TokenStreamERR11TokenStream"></span><span id="_CPPv2N11TokenStream11TokenStreamERR11TokenStream"></span><span id="TokenStream::TokenStream__TokenStreamRR"></span><span class="target" id="classTokenStream_1a761410fe9e6a3b0918fa06ed258fb17a"></span><span class="sig-name descname"><span class="n"><span class="pre">TokenStream</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N11TokenStream11TokenStreamERR11TokenStream" title="TokenStream::TokenStream"><span class="n"><span class="pre">TokenStream</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11TokenStream11TokenStreamERR11TokenStream" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream11TokenStreamERK6vectorI5TokenERKNSt6stringE">
+<span id="_CPPv3N11TokenStream11TokenStreamERK6vectorI5TokenERKNSt6stringE"></span><span id="_CPPv2N11TokenStream11TokenStreamERK6vectorI5TokenERKNSt6stringE"></span><span id="TokenStream::TokenStream__vector:Token:CR.ssCR"></span><span class="target" id="classTokenStream_1ad1a1157fedf941cc5dbdb05222dbe4df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TokenStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_tokens</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11TokenStream11TokenStreamERK6vectorI5TokenERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStreamaSERK11TokenStream">
+<span id="_CPPv3N11TokenStreamaSERK11TokenStream"></span><span id="_CPPv2N11TokenStreamaSERK11TokenStream"></span><span id="TokenStream::assign-operator__TokenStreamCR"></span><span class="target" id="classTokenStream_1a9a71a6006ef5932b8f71fbd7f5da7371"></span><a class="reference internal" href="#_CPPv411TokenStream" title="TokenStream"><span class="n"><span class="pre">TokenStream</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411TokenStream" title="TokenStream"><span class="n"><span class="pre">TokenStream</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11TokenStreamaSERK11TokenStream" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStreamaSERR11TokenStream">
+<span id="_CPPv3N11TokenStreamaSERR11TokenStream"></span><span id="_CPPv2N11TokenStreamaSERR11TokenStream"></span><span id="TokenStream::assign-operator__TokenStreamRR"></span><span class="target" id="classTokenStream_1aff0dacefcb6415cb69efc771e84c3d79"></span><a class="reference internal" href="#_CPPv411TokenStream" title="TokenStream"><span class="n"><span class="pre">TokenStream</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411TokenStream" title="TokenStream"><span class="n"><span class="pre">TokenStream</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11TokenStreamaSERR11TokenStream" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream4sizeEv">
+<span id="_CPPv3NK11TokenStream4sizeEv"></span><span id="_CPPv2NK11TokenStream4sizeEv"></span><span id="TokenStream::sizeC"></span><span class="target" id="classTokenStream_1af4c880ec98557424099c0dcdafbd0023"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream3GetE6size_t">
+<span id="_CPPv3NK11TokenStream3GetE6size_t"></span><span id="_CPPv2NK11TokenStream3GetE6size_t"></span><span id="TokenStream::Get__sC"></span><span class="target" id="classTokenStream_1a74328745796757322766a1b80137be6d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream3GetE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream6GetPtrE6size_t">
+<span id="_CPPv3NK11TokenStream6GetPtrE6size_t"></span><span id="_CPPv2NK11TokenStream6GetPtrE6size_t"></span><span id="TokenStream::GetPtr__sC"></span><span class="target" id="classTokenStream_1ae5ab9c0530e5dd9f0246fd9bb26b5ac2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPtr</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream6GetPtrE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream7GetNameEv">
+<span id="_CPPv3NK11TokenStream7GetNameEv"></span><span id="_CPPv2NK11TokenStream7GetNameEv"></span><span id="TokenStream::GetNameC"></span><span class="target" id="classTokenStream_1aff8992ae17bd1c43ea6ca7dd7e99ea2f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetName</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream7GetNameEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream5beginEv">
+<span id="_CPPv3NK11TokenStream5beginEv"></span><span id="_CPPv2NK11TokenStream5beginEv"></span><span id="TokenStream::beginC"></span><span class="target" id="classTokenStream_1af96eafc7050ad7e7a7feb1d04ce395f8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream5beginEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream3endEv">
+<span id="_CPPv3NK11TokenStream3endEv"></span><span id="_CPPv2NK11TokenStream3endEv"></span><span id="TokenStream::endC"></span><span class="target" id="classTokenStream_1ab0c44af7debab9a0eb495a3092f52046"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream3endEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream4backEv">
+<span id="_CPPv3NK11TokenStream4backEv"></span><span id="_CPPv2NK11TokenStream4backEv"></span><span id="TokenStream::backC"></span><span class="target" id="classTokenStream_1af6c7dfe37b89aa95cf3ec9edd94ef80b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">back</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream4backEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream9push_backERK5Token">
+<span id="_CPPv3N11TokenStream9push_backERK5Token"></span><span id="_CPPv2N11TokenStream9push_backERK5Token"></span><span id="TokenStream::push_back__TokenCR"></span><span class="target" id="classTokenStream_1aa27e5a03e2596310834798b27366e282"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">push_back</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11TokenStream9push_backERK5Token" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream5PrintERNSt7ostreamE">
+<span id="_CPPv3NK11TokenStream5PrintERNSt7ostreamE"></span><span id="_CPPv2NK11TokenStream5PrintERNSt7ostreamE"></span><span id="TokenStream::Print__osRC"></span><span class="target" id="classTokenStream_1a44c955528a6c5ab9381b136e2c8a7caf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream4nameE">
+<span id="_CPPv3N11TokenStream4nameE"></span><span id="_CPPv2N11TokenStream4nameE"></span><span id="TokenStream::name__ss"></span><span class="target" id="classTokenStream_1a3d1bc6ec0e90496a19e01081a24ed768"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><a class="headerlink" href="#_CPPv4N11TokenStream4nameE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream6tokensE">
+<span id="_CPPv3N11TokenStream6tokensE"></span><span id="_CPPv2N11TokenStream6tokensE"></span><span id="TokenStream::tokens__vector:Token:"></span><span class="target" id="classTokenStream_1a4eeaae50cddfc0e5774a68145dec3299"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tokens</span></span></span><a class="headerlink" href="#_CPPv4N11TokenStream6tokensE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream8IteratorE">
+<span id="_CPPv3N11TokenStream8IteratorE"></span><span id="_CPPv2N11TokenStream8IteratorE"></span><span id="TokenStream::Iterator"></span><span class="target" id="classTokenStream_1_1Iterator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Iterator</span></span></span><a class="headerlink" href="#_CPPv4N11TokenStream8IteratorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Lexer.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream8Iterator8IteratorERK8Iterator">
+<span id="_CPPv3N11TokenStream8Iterator8IteratorERK8Iterator"></span><span id="_CPPv2N11TokenStream8Iterator8IteratorERK8Iterator"></span><span id="TokenStream::Iterator::Iterator__IteratorCR"></span><span class="target" id="classTokenStream_1_1Iterator_1a41552e2db87131cd9b4709241abc43f4"></span><span class="sig-name descname"><span class="n"><span class="pre">Iterator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8Iterator8IteratorERK8Iterator" title="TokenStream::Iterator::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11TokenStream8Iterator8IteratorERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream8Iterator8IteratorERK11TokenStream6size_t">
+<span id="_CPPv3N11TokenStream8Iterator8IteratorERK11TokenStream6size_t"></span><span id="_CPPv2N11TokenStream8Iterator8IteratorERK11TokenStream6size_t"></span><span id="TokenStream::Iterator::Iterator__TokenStreamCR.s"></span><span class="target" id="classTokenStream_1_1Iterator_1a4bdb39559ab0be00bc9d2786337d6a3d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Iterator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411TokenStream" title="TokenStream"><span class="n"><span class="pre">TokenStream</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_ts</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11TokenStream8Iterator8IteratorERK11TokenStream6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream8IteratoraSERK8Iterator">
+<span id="_CPPv3N11TokenStream8IteratoraSERK8Iterator"></span><span id="_CPPv2N11TokenStream8IteratoraSERK8Iterator"></span><span id="TokenStream::Iterator::assign-operator__IteratorCR"></span><span class="target" id="classTokenStream_1_1Iterator_1aa8095229e2cb0bd93bc17cf38c7be80e"></span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N11TokenStream8IteratoraSERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8Iterator14GetTokenStreamEv">
+<span id="_CPPv3NK11TokenStream8Iterator14GetTokenStreamEv"></span><span id="_CPPv2NK11TokenStream8Iterator14GetTokenStreamEv"></span><span id="TokenStream::Iterator::GetTokenStreamC"></span><span class="target" id="classTokenStream_1_1Iterator_1a8fd1682fc42b717db88aea145639644e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411TokenStream" title="TokenStream"><span class="n"><span class="pre">TokenStream</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetTokenStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8Iterator14GetTokenStreamEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8Iterator8GetIndexEv">
+<span id="_CPPv3NK11TokenStream8Iterator8GetIndexEv"></span><span id="_CPPv2NK11TokenStream8Iterator8GetIndexEv"></span><span id="TokenStream::Iterator::GetIndexC"></span><span class="target" id="classTokenStream_1_1Iterator_1aa6766773adfb469e992ad8bbc1d466fc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetIndex</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8Iterator8GetIndexEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8Iterator5ToPtrEv">
+<span id="_CPPv3NK11TokenStream8Iterator5ToPtrEv"></span><span id="_CPPv2NK11TokenStream8Iterator5ToPtrEv"></span><span id="TokenStream::Iterator::ToPtrC"></span><span class="target" id="classTokenStream_1_1Iterator_1a08ea4bc38420c09928d31049227c1e02"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToPtr</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8Iterator5ToPtrEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8IteratormlEv">
+<span id="_CPPv3NK11TokenStream8IteratormlEv"></span><span id="_CPPv2NK11TokenStream8IteratormlEv"></span><span id="TokenStream::Iterator::mul-operatorC"></span><span class="target" id="classTokenStream_1_1Iterator_1af300691a30bc28351ce53346503de113"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">*</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8IteratormlEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8IteratorptEv">
+<span id="_CPPv3NK11TokenStream8IteratorptEv"></span><span id="_CPPv2NK11TokenStream8IteratorptEv"></span><span id="TokenStream::Iterator::pointer-operatorC"></span><span class="target" id="classTokenStream_1_1Iterator_1a28f6a96a8d5103e81552211939247ee8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">-&gt;</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8IteratorptEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8IteratoreqERK8Iterator">
+<span id="_CPPv3NK11TokenStream8IteratoreqERK8Iterator"></span><span id="_CPPv2NK11TokenStream8IteratoreqERK8Iterator"></span><span id="TokenStream::Iterator::eq-operator__IteratorCRC"></span><span class="target" id="classTokenStream_1_1Iterator_1afcc9df0292f026d9c1bd6d43fd84c150"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8IteratoreqERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8IteratorneERK8Iterator">
+<span id="_CPPv3NK11TokenStream8IteratorneERK8Iterator"></span><span id="_CPPv2NK11TokenStream8IteratorneERK8Iterator"></span><span id="TokenStream::Iterator::neq-operator__IteratorCRC"></span><span class="target" id="classTokenStream_1_1Iterator_1a531a9217b953269b30725fc120025f43"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8IteratorneERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8IteratorltERK8Iterator">
+<span id="_CPPv3NK11TokenStream8IteratorltERK8Iterator"></span><span id="_CPPv2NK11TokenStream8IteratorltERK8Iterator"></span><span id="TokenStream::Iterator::lt-operator__IteratorCRC"></span><span class="target" id="classTokenStream_1_1Iterator_1af81231fb4f70a58b083fdeb5eec745a0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8IteratorltERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8IteratorleERK8Iterator">
+<span id="_CPPv3NK11TokenStream8IteratorleERK8Iterator"></span><span id="_CPPv2NK11TokenStream8IteratorleERK8Iterator"></span><span id="TokenStream::Iterator::lte-operator__IteratorCRC"></span><span class="target" id="classTokenStream_1_1Iterator_1a632c4a123237f29ae4050bfc4aa43cf5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8IteratorleERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8IteratorgtERK8Iterator">
+<span id="_CPPv3NK11TokenStream8IteratorgtERK8Iterator"></span><span id="_CPPv2NK11TokenStream8IteratorgtERK8Iterator"></span><span id="TokenStream::Iterator::gt-operator__IteratorCRC"></span><span class="target" id="classTokenStream_1_1Iterator_1a5ecdeb5adbcda027b4e76365f440dd6b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8IteratorgtERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8IteratorgeERK8Iterator">
+<span id="_CPPv3NK11TokenStream8IteratorgeERK8Iterator"></span><span id="_CPPv2NK11TokenStream8IteratorgeERK8Iterator"></span><span id="TokenStream::Iterator::gte-operator__IteratorCRC"></span><span class="target" id="classTokenStream_1_1Iterator_1a9e772d9377cfa051f060eb3870b4aa3e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8IteratorgeERK8Iterator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream8IteratorppEv">
+<span id="_CPPv3N11TokenStream8IteratorppEv"></span><span id="_CPPv2N11TokenStream8IteratorppEv"></span><span id="TokenStream::Iterator::inc-operator"></span><span class="target" id="classTokenStream_1_1Iterator_1af1097226febec4f83dc7e0e5e66be740"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">++</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11TokenStream8IteratorppEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream8IteratorppEi">
+<span id="_CPPv3N11TokenStream8IteratorppEi"></span><span id="_CPPv2N11TokenStream8IteratorppEi"></span><span id="TokenStream::Iterator::inc-operator__i"></span><span class="target" id="classTokenStream_1_1Iterator_1ab44c6663b2826677ceb155f9661584e1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">++</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11TokenStream8IteratorppEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream8IteratormmEv">
+<span id="_CPPv3N11TokenStream8IteratormmEv"></span><span id="_CPPv2N11TokenStream8IteratormmEv"></span><span id="TokenStream::Iterator::dec-operator"></span><span class="target" id="classTokenStream_1_1Iterator_1adec2d376f5e5008e57308e016b9bb8ed"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">--</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11TokenStream8IteratormmEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream8IteratormmEi">
+<span id="_CPPv3N11TokenStream8IteratormmEi"></span><span id="_CPPv2N11TokenStream8IteratormmEi"></span><span id="TokenStream::Iterator::dec-operator__i"></span><span class="target" id="classTokenStream_1_1Iterator_1ab6ff161bdaec9fd72440592ebbf3e4ba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">--</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11TokenStream8IteratormmEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8Iterator7IsValidEv">
+<span id="_CPPv3NK11TokenStream8Iterator7IsValidEv"></span><span id="_CPPv2NK11TokenStream8Iterator7IsValidEv"></span><span id="TokenStream::Iterator::IsValidC"></span><span class="target" id="classTokenStream_1_1Iterator_1a8267a47c5dbbb3c377321f8efa5c7df2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsValid</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8Iterator7IsValidEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8Iterator5AtEndEv">
+<span id="_CPPv3NK11TokenStream8Iterator5AtEndEv"></span><span id="_CPPv2NK11TokenStream8Iterator5AtEndEv"></span><span id="TokenStream::Iterator::AtEndC"></span><span class="target" id="classTokenStream_1_1Iterator_1a71378589074cd6ba211995bad00e57a0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AtEnd</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8Iterator5AtEndEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK11TokenStream8IteratorcvbEv">
+<span id="_CPPv3NK11TokenStream8IteratorcvbEv"></span><span id="_CPPv2NK11TokenStream8IteratorcvbEv"></span><span id="TokenStream::Iterator::castto-b-operatorC"></span><span class="target" id="classTokenStream_1_1Iterator_1a3987d7642c477b664f83a7a8feefd6d8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK11TokenStream8IteratorcvbEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream8Iterator2tsE">
+<span id="_CPPv3N11TokenStream8Iterator2tsE"></span><span id="_CPPv2N11TokenStream8Iterator2tsE"></span><span id="TokenStream::Iterator::ts__Ptr:TokenStreamC:"></span><span class="target" id="classTokenStream_1_1Iterator_1a51ad8ad4cb3cba75f29414574777ca00"></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411TokenStream" title="TokenStream"><span class="n"><span class="pre">TokenStream</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ts</span></span></span><a class="headerlink" href="#_CPPv4N11TokenStream8Iterator2tsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11TokenStream8Iterator3posE">
+<span id="_CPPv3N11TokenStream8Iterator3posE"></span><span id="_CPPv2N11TokenStream8Iterator3posE"></span><span id="TokenStream::Iterator::pos__s"></span><span class="target" id="classTokenStream_1_1Iterator_1a5d95c1f4ec63e7c9b89a32acda530c16"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pos</span></span></span><a class="headerlink" href="#_CPPv4N11TokenStream8Iterator3posE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv45Lexer">
+<span id="_CPPv35Lexer"></span><span id="_CPPv25Lexer"></span><span id="Lexer"></span><span class="target" id="classLexer"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Lexer</span></span></span><a class="headerlink" href="#_CPPv45Lexer" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Lexer.hpp&gt;</em></div>
+<p>A lexer with a set of token types (and associated regular expressions) </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer5LexerEv">
+<span id="_CPPv3N5Lexer5LexerEv"></span><span id="_CPPv2N5Lexer5LexerEv"></span><span id="Lexer::Lexer"></span><span class="target" id="classLexer_1a4ece67400cc4fdf07d1dae1b586fa0e1"></span><span class="sig-name descname"><span class="n"><span class="pre">Lexer</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5Lexer5LexerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer5LexerERK5Lexer">
+<span id="_CPPv3N5Lexer5LexerERK5Lexer"></span><span id="_CPPv2N5Lexer5LexerERK5Lexer"></span><span id="Lexer::Lexer__LexerCR"></span><span class="target" id="classLexer_1ae868294d65394f011a29ed122c883f6b"></span><span class="sig-name descname"><span class="n"><span class="pre">Lexer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Lexer5LexerERK5Lexer" title="Lexer::Lexer"><span class="n"><span class="pre">Lexer</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5Lexer5LexerERK5Lexer" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer5LexerERR5Lexer">
+<span id="_CPPv3N5Lexer5LexerERR5Lexer"></span><span id="_CPPv2N5Lexer5LexerERR5Lexer"></span><span id="Lexer::Lexer__LexerRR"></span><span class="target" id="classLexer_1a3275e598d15ba2c616ce3501160dbcac"></span><span class="sig-name descname"><span class="n"><span class="pre">Lexer</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Lexer5LexerERR5Lexer" title="Lexer::Lexer"><span class="n"><span class="pre">Lexer</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5Lexer5LexerERR5Lexer" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5LexerD0Ev">
+<span id="_CPPv3N5LexerD0Ev"></span><span id="_CPPv2N5LexerD0Ev"></span><span id="Lexer::~Lexer"></span><span class="target" id="classLexer_1a7a26f238ff21f31d754e5770d3501c71"></span><span class="sig-name descname"><span class="n"><span class="pre">~Lexer</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5LexerD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5LexeraSERK5Lexer">
+<span id="_CPPv3N5LexeraSERK5Lexer"></span><span id="_CPPv2N5LexeraSERK5Lexer"></span><span id="Lexer::assign-operator__LexerCR"></span><span class="target" id="classLexer_1a0cd1949b06fa81791ab4971532d1c093"></span><a class="reference internal" href="#_CPPv45Lexer" title="Lexer"><span class="n"><span class="pre">Lexer</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Lexer" title="Lexer"><span class="n"><span class="pre">Lexer</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5LexeraSERK5Lexer" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5LexeraSERR5Lexer">
+<span id="_CPPv3N5LexeraSERR5Lexer"></span><span id="_CPPv2N5LexeraSERR5Lexer"></span><span id="Lexer::assign-operator__LexerRR"></span><span class="target" id="classLexer_1ad6b850abea9c87be3fb52ea3f5737adc"></span><a class="reference internal" href="#_CPPv45Lexer" title="Lexer"><span class="n"><span class="pre">Lexer</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45Lexer" title="Lexer"><span class="n"><span class="pre">Lexer</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5LexeraSERR5Lexer" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer12GetNumTokensEv">
+<span id="_CPPv3NK5Lexer12GetNumTokensEv"></span><span id="_CPPv2NK5Lexer12GetNumTokensEv"></span><span id="Lexer::GetNumTokensC"></span><span class="target" id="classLexer_1ad37622d2438b39ab5f489e04ba09b755"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumTokens</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer12GetNumTokensEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many types of tokens can be identified in this Lexer? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer5ResetEv">
+<span id="_CPPv3N5Lexer5ResetEv"></span><span id="_CPPv2N5Lexer5ResetEv"></span><span id="Lexer::Reset"></span><span class="target" id="classLexer_1a48dbb740d0329148e7df9e03a7fabc22"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Reset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Lexer5ResetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer7TokenOKEi">
+<span id="_CPPv3NK5Lexer7TokenOKEi"></span><span id="_CPPv2NK5Lexer7TokenOKEi"></span><span id="Lexer::TokenOK__iC"></span><span class="target" id="classLexer_1a6966ab288112eae2ea36b11fb6f5c1ea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TokenOK</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer7TokenOKEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer8AddTokenERKNSt6stringERKNSt6stringEbbRKNSt6stringE">
+<span id="_CPPv3N5Lexer8AddTokenERKNSt6stringERKNSt6stringEbbRKNSt6stringE"></span><span id="_CPPv2N5Lexer8AddTokenERKNSt6stringERKNSt6stringEbbRKNSt6stringE"></span><span id="Lexer::AddToken__ssCR.ssCR.b.b.ssCR"></span><span class="target" id="classLexer_1a445b6f8843cc676ba6885fed4d90b3b8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddToken</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">regex</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">save_lexeme</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">save_token</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Lexer8AddTokenERKNSt6stringERKNSt6stringEbbRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new token, specified by a name and the regex used to identify it. Note that token ids count down with highest IDs having priority. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer11IgnoreTokenERKNSt6stringERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N5Lexer11IgnoreTokenERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N5Lexer11IgnoreTokenERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="Lexer::IgnoreToken__ssCR.ssCR.ssCR"></span><span class="target" id="classLexer_1a996a512b38750ba70bdd65c01e62ddd9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IgnoreToken</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">regex</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Lexer11IgnoreTokenERKNSt6stringERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a token to ignore, specified by a name and the regex used to identify it. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer10GetTokenIDERKNSt6stringE">
+<span id="_CPPv3NK5Lexer10GetTokenIDERKNSt6stringE"></span><span id="_CPPv2NK5Lexer10GetTokenIDERKNSt6stringE"></span><span id="Lexer::GetTokenID__ssCRC"></span><span class="target" id="classLexer_1acf2b6229a72044c3f0fc75b2b5b3ce3b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTokenID</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer10GetTokenIDERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the ID associated with a token type (you provide the token name) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer12GetTokenInfoEi">
+<span id="_CPPv3NK5Lexer12GetTokenInfoEi"></span><span id="_CPPv2NK5Lexer12GetTokenInfoEi"></span><span id="Lexer::GetTokenInfo__iC"></span><span class="target" id="classLexer_1a557a0b9627431e279525fb52c8074e00"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49TokenInfo" title="TokenInfo"><span class="n"><span class="pre">TokenInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetTokenInfo</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer12GetTokenInfoEi" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the full information about a token (you provide the id) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer12GetTokenNameEi">
+<span id="_CPPv3NK5Lexer12GetTokenNameEi"></span><span id="_CPPv2NK5Lexer12GetTokenNameEi"></span><span id="Lexer::GetTokenName__iC"></span><span class="target" id="classLexer_1a5b3577faf85dcdb9506710ea3f097f4e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTokenName</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer12GetTokenNameEi" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the name associated with a token type (you provide the ID) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer12GetSaveTokenEi">
+<span id="_CPPv3NK5Lexer12GetSaveTokenEi"></span><span id="_CPPv2NK5Lexer12GetSaveTokenEi"></span><span id="Lexer::GetSaveToken__iC"></span><span class="target" id="classLexer_1ad7d56cac0eedf8fb253a8bb96277e6ce"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSaveToken</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer12GetSaveTokenEi" title="Link to this definition"></a><br /></dt>
+<dd><p>Identify if a token should be saved. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer8GenerateEv">
+<span id="_CPPv3NK5Lexer8GenerateEv"></span><span id="_CPPv2NK5Lexer8GenerateEv"></span><span id="Lexer::GenerateC"></span><span class="target" id="classLexer_1a1d50338fb1866797103228bbce5b966b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Generate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer8GenerateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Create the NFA that will identify the current set of tokens in a sequence. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer7ProcessERNSt7istreamE">
+<span id="_CPPv3NK5Lexer7ProcessERNSt7istreamE"></span><span id="_CPPv2NK5Lexer7ProcessERNSt7istreamE"></span><span id="Lexer::Process__isRC"></span><span class="target" id="classLexer_1a6638c990d909de27e0c606b0bec74ecf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Process</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">is</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer7ProcessERNSt7istreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the next token found in an input stream. Do so by examining one character at a time. Keep going as long as there is a chance of a valid lexeme (since we want to choose the longest one we can find.) Every time we do hit a valid lexeme, store it as the current “best” and keep going. Once we hit a point where no other valid lexemes are possible, stop and return the best we’ve found so far. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer7ProcessERNSt6stringE">
+<span id="_CPPv3NK5Lexer7ProcessERNSt6stringE"></span><span id="_CPPv2NK5Lexer7ProcessERNSt6stringE"></span><span id="Lexer::Process__ssRC"></span><span class="target" id="classLexer_1a54878df84fc0cb5ecefa8307db5c71d6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Process</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_str</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer7ProcessERNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Shortcut to process a string rather than a stream, chopping off one token each time. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer7ToTokenENSt11string_viewE">
+<span id="_CPPv3NK5Lexer7ToTokenENSt11string_viewE"></span><span id="_CPPv2NK5Lexer7ToTokenENSt11string_viewE"></span><span id="Lexer::ToToken__std::string_viewC"></span><span class="target" id="classLexer_1a0c9a72a70a9f0eb73444e4a6f65b4f56"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToToken</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string_view</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_str</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer7ToTokenENSt11string_viewE" title="Link to this definition"></a><br /></dt>
+<dd><p>Shortcut to just get a single token. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer8TokenizeERNSt7istreamERKNSt6stringE">
+<span id="_CPPv3NK5Lexer8TokenizeERNSt7istreamERKNSt6stringE"></span><span id="_CPPv2NK5Lexer8TokenizeERNSt7istreamERKNSt6stringE"></span><span id="Lexer::Tokenize__isR.ssCRC"></span><span class="target" id="classLexer_1aad3233a4c4f0fc0d2fc1ed6b4dbe8f23"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411TokenStream" title="TokenStream"><span class="n"><span class="pre">TokenStream</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Tokenize</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">is</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;in_stream&quot;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer8TokenizeERNSt7istreamERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Turn an input stream of text into a vector of tokens. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer8TokenizeENSt11string_viewERKNSt6stringE">
+<span id="_CPPv3NK5Lexer8TokenizeENSt11string_viewERKNSt6stringE"></span><span id="_CPPv2NK5Lexer8TokenizeENSt11string_viewERKNSt6stringE"></span><span id="Lexer::Tokenize__std::string_view.ssCRC"></span><span class="target" id="classLexer_1af9f4c85f5d8e5d6f2dc9bf031fc36916"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411TokenStream" title="TokenStream"><span class="n"><span class="pre">TokenStream</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Tokenize</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string_view</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">str</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;in_view&quot;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer8TokenizeENSt11string_viewERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Turn an input string into a vector of tokens. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer8TokenizeERK6vectorINSt6stringEERKNSt6stringE">
+<span id="_CPPv3NK5Lexer8TokenizeERK6vectorINSt6stringEERKNSt6stringE"></span><span id="_CPPv2NK5Lexer8TokenizeERK6vectorINSt6stringEERKNSt6stringE"></span><span id="Lexer::Tokenize__vector:ss:CR.ssCRC"></span><span class="target" id="classLexer_1af9821433f7bbd851acbe4b70a961feb3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411TokenStream" title="TokenStream"><span class="n"><span class="pre">TokenStream</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Tokenize</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">str_v</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;in_string</span> <span class="pre">vector&quot;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer8TokenizeERK6vectorINSt6stringEERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Turn a vector of strings into a vector of tokens. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer9GetLexemeEv">
+<span id="_CPPv3NK5Lexer9GetLexemeEv"></span><span id="_CPPv2NK5Lexer9GetLexemeEv"></span><span id="Lexer::GetLexemeC"></span><span class="target" id="classLexer_1a20b5c02c882a9ddf905d8db13804a940"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetLexeme</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer9GetLexemeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the lexeme associated with the last token identified. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer5PrintERNSt7ostreamE">
+<span id="_CPPv3NK5Lexer5PrintERNSt7ostreamE"></span><span id="_CPPv2NK5Lexer5PrintERNSt7ostreamE"></span><span id="Lexer::Print__osRC"></span><span class="target" id="classLexer_1a5e67bfea5df55bf3218a78b07f5991fc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Print the full information about this lexer (for debugging) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer11DebugStringENSt6stringE">
+<span id="_CPPv3NK5Lexer11DebugStringENSt6stringE"></span><span id="_CPPv2NK5Lexer11DebugStringENSt6stringE"></span><span id="Lexer::DebugString__ssC"></span><span class="target" id="classLexer_1aa2380789f12974f433012f2be35a83ab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DebugString</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_string</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer11DebugStringENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Try out the lexer on a string and demonstrate how it’s tokenized. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Lexer10DebugTokenEi">
+<span id="_CPPv3NK5Lexer10DebugTokenEi"></span><span id="_CPPv2NK5Lexer10DebugTokenEi"></span><span id="Lexer::DebugToken__iC"></span><span class="target" id="classLexer_1acc27061c0d357b5d9244bf7356614b6d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DebugToken</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">token_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Lexer10DebugTokenEi" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer9token_setE">
+<span id="_CPPv3N5Lexer9token_setE"></span><span id="_CPPv2N5Lexer9token_setE"></span><span id="Lexer::token_set__vector:TokenInfo:"></span><span class="target" id="classLexer_1a316b86ef0e93af1a93c55e3af5ed5694"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv49TokenInfo" title="TokenInfo"><span class="n"><span class="pre">TokenInfo</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">token_set</span></span></span><a class="headerlink" href="#_CPPv4N5Lexer9token_setE" title="Link to this definition"></a><br /></dt>
+<dd><p>List of all active tokens types. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer9token_mapE">
+<span id="_CPPv3N5Lexer9token_mapE"></span><span id="_CPPv2N5Lexer9token_mapE"></span><span id="Lexer::token_map__map:ss.i:"></span><span class="target" id="classLexer_1a906e844b0cd86beeccf3d2612883f73f"></span><a class="reference internal" href="../../base/api/map.html#_CPPv4I00DpE3map" title="map"><span class="n"><span class="pre">map</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">token_map</span></span></span><a class="headerlink" href="#_CPPv4N5Lexer9token_mapE" title="Link to this definition"></a><br /></dt>
+<dd><p>Map of token names to id. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer12cur_token_idE">
+<span id="_CPPv3N5Lexer12cur_token_idE"></span><span id="_CPPv2N5Lexer12cur_token_idE"></span><span id="Lexer::cur_token_id__i"></span><span class="target" id="classLexer_1aa49f27c2807bedf7392ccd632ddcd8a8"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cur_token_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Lexer6MAX_IDE" title="Lexer::MAX_ID"><span class="n"><span class="pre">MAX_ID</span></span></a><a class="headerlink" href="#_CPPv4N5Lexer12cur_token_idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which ID should the next new token get? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer14generate_lexerE">
+<span id="_CPPv3N5Lexer14generate_lexerE"></span><span id="_CPPv2N5Lexer14generate_lexerE"></span><span id="Lexer::generate_lexer__b"></span><span class="target" id="classLexer_1a64f3c2ec2447f1b20504493f77d3f64c"></span><span class="k"><span class="pre">mutable</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">generate_lexer</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N5Lexer14generate_lexerE" title="Link to this definition"></a><br /></dt>
+<dd><p>Do we need to regenerate the lexer? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer9lexer_dfaE">
+<span id="_CPPv3N5Lexer9lexer_dfaE"></span><span id="_CPPv2N5Lexer9lexer_dfaE"></span><span id="Lexer::lexer_dfa__DFA"></span><span class="target" id="classLexer_1a4faaf2de94c9dc6683223100a5143510"></span><span class="k"><span class="pre">mutable</span></span><span class="w"> </span><a class="reference internal" href="DFA.html#_CPPv43DFA" title="DFA"><span class="n"><span class="pre">DFA</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lexer_dfa</span></span></span><a class="headerlink" href="#_CPPv4N5Lexer9lexer_dfaE" title="Link to this definition"></a><br /></dt>
+<dd><p>Table driven lexer implementation. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer6lexemeE">
+<span id="_CPPv3N5Lexer6lexemeE"></span><span id="_CPPv2N5Lexer6lexemeE"></span><span id="Lexer::lexeme__ss"></span><span class="target" id="classLexer_1a2df0f3b2ce2bbc03da92459d68c365d6"></span><span class="k"><span class="pre">mutable</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lexeme</span></span></span><a class="headerlink" href="#_CPPv4N5Lexer6lexemeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Current state of lexeme being generated. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-static-functions">Private Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer11ERROR_TOKENEv">
+<span id="_CPPv3N5Lexer11ERROR_TOKENEv"></span><span id="_CPPv2N5Lexer11ERROR_TOKENEv"></span><span id="Lexer::ERROR_TOKEN"></span><span class="target" id="classLexer_1ad7bfcef82c597fc6c7c93f38fc5ddfd0"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49TokenInfo" title="TokenInfo"><span class="n"><span class="pre">TokenInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">ERROR_TOKEN</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Lexer11ERROR_TOKENEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-static-attributes">Private Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer6MAX_IDE">
+<span id="_CPPv3N5Lexer6MAX_IDE"></span><span id="_CPPv2N5Lexer6MAX_IDE"></span><span id="Lexer::MAX_ID__i"></span><span class="target" id="classLexer_1ae79ffdf7af4a152b2c5dab8523873a0c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_ID</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">255</span></span><a class="headerlink" href="#_CPPv4N5Lexer6MAX_IDE" title="Link to this definition"></a><br /></dt>
+<dd><p>IDs count down so that first ones have priority. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Lexer8ERROR_IDE">
+<span id="_CPPv3N5Lexer8ERROR_IDE"></span><span id="_CPPv2N5Lexer8ERROR_IDE"></span><span id="Lexer::ERROR_ID__i"></span><span class="target" id="classLexer_1a521074d041690acc7e90ac072a076239"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ERROR_ID</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N5Lexer8ERROR_IDE" title="Link to this definition"></a><br /></dt>
+<dd><p>Code for unknown token ID. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="DFA.html" class="btn btn-neutral float-left" title="DFA.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="NFA.html" class="btn btn-neutral float-right" title="NFA.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

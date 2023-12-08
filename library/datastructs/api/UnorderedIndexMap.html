@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UnorderedIndexMap.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/datastructs/api/UnorderedIndexMap.f182c798-baa2-43e9-8b7f-f588b90e19e8.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="graph_utils.hpp" href="graph_utils.html" />
+    <link rel="prev" title="TypeMap.hpp" href="TypeMap.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../datastructs.html">Data structures</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../datastructs.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BloomFilter.html">BloomFilter.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Bool.html">Bool.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Cache.html">Cache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DynamicString.html">DynamicString.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Graph.html">Graph.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="IndexMap.html">IndexMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="IndexSet.html">IndexSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="QueueCache.html">QueueCache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallFifoMap.html">SmallFifoMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallVector.html">SmallVector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StringMap.html">StringMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TimeQueue.html">TimeQueue.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypeMap.html">TypeMap.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">UnorderedIndexMap.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv417UnorderedIndexMap"><code class="docutils literal notranslate"><span class="pre">UnorderedIndexMap</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="graph_utils.html">graph_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hash_utils.html">hash_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="map_utils.html">map_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_map.html">ra_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_set.html">ra_set.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference_vector.html">reference_vector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="set_utils.html">set_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_utils.html">span_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_struct.html">tuple_struct.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_utils.html">tuple_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="valsort_map.html">valsort_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector_utils.html">vector_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../datastructs.html">Data structures</a></li>
+      <li class="breadcrumb-item active">UnorderedIndexMap.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="unorderedindexmap-hpp">
+<h1>UnorderedIndexMap.hpp<a class="headerlink" href="#unorderedindexmap-hpp" title="Link to this heading"></a></h1>
+<p>A simple class to weight items differently within a container and return the correct index. </p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Convert to a template that acts as a glorified vector, simplifying random selection? </p>
+<p>Should operator[] index by element count or by weight? </p>
+</dd></dl>
+
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA</p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv417UnorderedIndexMap">
+<span id="_CPPv317UnorderedIndexMap"></span><span id="_CPPv217UnorderedIndexMap"></span><span id="UnorderedIndexMap"></span><span class="target" id="classUnorderedIndexMap"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UnorderedIndexMap</span></span></span><a class="headerlink" href="#_CPPv417UnorderedIndexMap" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;UnorderedIndexMap.hpp&gt;</em></div>
+<p>A map of weighted indices. If a random index is selected, the probability of an index being returned is directly proportional to its weight. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap17UnorderedIndexMapE6size_td">
+<span id="_CPPv3N17UnorderedIndexMap17UnorderedIndexMapE6size_td"></span><span id="_CPPv2N17UnorderedIndexMap17UnorderedIndexMapE6size_td"></span><span id="UnorderedIndexMap::UnorderedIndexMap__s.double"></span><span class="target" id="classUnorderedIndexMap_1a67bbb0ccf30eaa989f598adaea6cbc35"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UnorderedIndexMap</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_items</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">init_weight</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap17UnorderedIndexMapE6size_td" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct an UnorderedIndexMap where num_items is the maximum number of items that can be placed into the data structure. All item weights default to zero. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap17UnorderedIndexMapERK6vectorIdE">
+<span id="_CPPv3N17UnorderedIndexMap17UnorderedIndexMapERK6vectorIdE"></span><span id="_CPPv2N17UnorderedIndexMap17UnorderedIndexMapERK6vectorIdE"></span><span id="UnorderedIndexMap::UnorderedIndexMap__vector:double:CR"></span><span class="target" id="classUnorderedIndexMap_1aa7125c09f12c432b8db5eae0e01b06ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UnorderedIndexMap</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_weights</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap17UnorderedIndexMapERK6vectorIdE" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct an UnorderedIndexMap with a specified initial set of weights. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap17UnorderedIndexMapERK17UnorderedIndexMap">
+<span id="_CPPv3N17UnorderedIndexMap17UnorderedIndexMapERK17UnorderedIndexMap"></span><span id="_CPPv2N17UnorderedIndexMap17UnorderedIndexMapERK17UnorderedIndexMap"></span><span id="UnorderedIndexMap::UnorderedIndexMap__UnorderedIndexMapCR"></span><span class="target" id="classUnorderedIndexMap_1aca03d9b54f7351351c2ca6e4f0915897"></span><span class="sig-name descname"><span class="n"><span class="pre">UnorderedIndexMap</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17UnorderedIndexMap17UnorderedIndexMapERK17UnorderedIndexMap" title="UnorderedIndexMap::UnorderedIndexMap"><span class="n"><span class="pre">UnorderedIndexMap</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap17UnorderedIndexMapERK17UnorderedIndexMap" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap17UnorderedIndexMapERR17UnorderedIndexMap">
+<span id="_CPPv3N17UnorderedIndexMap17UnorderedIndexMapERR17UnorderedIndexMap"></span><span id="_CPPv2N17UnorderedIndexMap17UnorderedIndexMapERR17UnorderedIndexMap"></span><span id="UnorderedIndexMap::UnorderedIndexMap__UnorderedIndexMapRR"></span><span class="target" id="classUnorderedIndexMap_1ab78fbe44f3e386b346f539d94edee681"></span><span class="sig-name descname"><span class="n"><span class="pre">UnorderedIndexMap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N17UnorderedIndexMap17UnorderedIndexMapERR17UnorderedIndexMap" title="UnorderedIndexMap::UnorderedIndexMap"><span class="n"><span class="pre">UnorderedIndexMap</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap17UnorderedIndexMapERR17UnorderedIndexMap" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMapD0Ev">
+<span id="_CPPv3N17UnorderedIndexMapD0Ev"></span><span id="_CPPv2N17UnorderedIndexMapD0Ev"></span><span id="UnorderedIndexMap::~UnorderedIndexMap"></span><span class="target" id="classUnorderedIndexMap_1a92c3679c71373060526c5d06be19fbc0"></span><span class="sig-name descname"><span class="n"><span class="pre">~UnorderedIndexMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMapD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMapaSERK17UnorderedIndexMap">
+<span id="_CPPv3N17UnorderedIndexMapaSERK17UnorderedIndexMap"></span><span id="_CPPv2N17UnorderedIndexMapaSERK17UnorderedIndexMap"></span><span id="UnorderedIndexMap::assign-operator__UnorderedIndexMapCR"></span><span class="target" id="classUnorderedIndexMap_1aeab30ead3cc8b9073d8e148e404267e2"></span><a class="reference internal" href="#_CPPv417UnorderedIndexMap" title="UnorderedIndexMap"><span class="n"><span class="pre">UnorderedIndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv417UnorderedIndexMap" title="UnorderedIndexMap"><span class="n"><span class="pre">UnorderedIndexMap</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMapaSERK17UnorderedIndexMap" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMapaSERR17UnorderedIndexMap">
+<span id="_CPPv3N17UnorderedIndexMapaSERR17UnorderedIndexMap"></span><span id="_CPPv2N17UnorderedIndexMapaSERR17UnorderedIndexMap"></span><span id="UnorderedIndexMap::assign-operator__UnorderedIndexMapRR"></span><span class="target" id="classUnorderedIndexMap_1a7584a403edf4b2475db5d86beab89bc9"></span><a class="reference internal" href="#_CPPv417UnorderedIndexMap" title="UnorderedIndexMap"><span class="n"><span class="pre">UnorderedIndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv417UnorderedIndexMap" title="UnorderedIndexMap"><span class="n"><span class="pre">UnorderedIndexMap</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMapaSERR17UnorderedIndexMap" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK17UnorderedIndexMap7GetSizeEv">
+<span id="_CPPv3NK17UnorderedIndexMap7GetSizeEv"></span><span id="_CPPv2NK17UnorderedIndexMap7GetSizeEv"></span><span id="UnorderedIndexMap::GetSizeC"></span><span class="target" id="classUnorderedIndexMap_1aff2dd0cf609260c9e31b49b650aadaeb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK17UnorderedIndexMap7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many indices are in this map? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK17UnorderedIndexMap9GetWeightEv">
+<span id="_CPPv3NK17UnorderedIndexMap9GetWeightEv"></span><span id="_CPPv2NK17UnorderedIndexMap9GetWeightEv"></span><span id="UnorderedIndexMap::GetWeightC"></span><span class="target" id="classUnorderedIndexMap_1ab46650b8e38930fc997c19a1c624e969"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetWeight</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK17UnorderedIndexMap9GetWeightEv" title="Link to this definition"></a><br /></dt>
+<dd><p>What is the total weight of all indices in this map? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK17UnorderedIndexMap9RawWeightE6size_t">
+<span id="_CPPv3NK17UnorderedIndexMap9RawWeightE6size_t"></span><span id="_CPPv2NK17UnorderedIndexMap9RawWeightE6size_t"></span><span id="UnorderedIndexMap::RawWeight__sC"></span><span class="target" id="classUnorderedIndexMap_1abe19f18694a1df1cc071ba4e1a8384a9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RawWeight</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK17UnorderedIndexMap9RawWeightE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>What is the current weight of the specified index? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK17UnorderedIndexMap9GetWeightE6size_t">
+<span id="_CPPv3NK17UnorderedIndexMap9GetWeightE6size_t"></span><span id="_CPPv2NK17UnorderedIndexMap9GetWeightE6size_t"></span><span id="UnorderedIndexMap::GetWeight__sC"></span><span class="target" id="classUnorderedIndexMap_1adebc8f83fb827a22bd50dfb1a63f5980"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetWeight</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK17UnorderedIndexMap9GetWeightE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK17UnorderedIndexMap7RawProbE6size_t">
+<span id="_CPPv3NK17UnorderedIndexMap7RawProbE6size_t"></span><span id="_CPPv2NK17UnorderedIndexMap7RawProbE6size_t"></span><span id="UnorderedIndexMap::RawProb__sC"></span><span class="target" id="classUnorderedIndexMap_1a80e84677b01f4617eb477cae041a7c81"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RawProb</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK17UnorderedIndexMap7RawProbE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>What is the probability of the specified index being selected? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK17UnorderedIndexMap7GetProbE6size_t">
+<span id="_CPPv3NK17UnorderedIndexMap7GetProbE6size_t"></span><span id="_CPPv2NK17UnorderedIndexMap7GetProbE6size_t"></span><span id="UnorderedIndexMap::GetProb__sC"></span><span class="target" id="classUnorderedIndexMap_1a69c987b00532ab42038c23a9c8d94070"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetProb</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK17UnorderedIndexMap7GetProbE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap6ResizeE6size_td">
+<span id="_CPPv3N17UnorderedIndexMap6ResizeE6size_td"></span><span id="_CPPv2N17UnorderedIndexMap6ResizeE6size_td"></span><span id="UnorderedIndexMap::Resize__s.double"></span><span class="target" id="classUnorderedIndexMap_1aed1d8abc2906355dab96f7ee294ad041"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_size</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">def_value</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap6ResizeE6size_td" title="Link to this definition"></a><br /></dt>
+<dd><p>Change the number of indices in the map. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap5ClearEv">
+<span id="_CPPv3N17UnorderedIndexMap5ClearEv"></span><span id="_CPPv2N17UnorderedIndexMap5ClearEv"></span><span id="UnorderedIndexMap::Clear"></span><span class="target" id="classUnorderedIndexMap_1ab6b980580d19ec52f435157ab0a440f8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset all item weights to zero. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap11ResizeClearE6size_t">
+<span id="_CPPv3N17UnorderedIndexMap11ResizeClearE6size_t"></span><span id="_CPPv2N17UnorderedIndexMap11ResizeClearE6size_t"></span><span id="UnorderedIndexMap::ResizeClear__s"></span><span class="target" id="classUnorderedIndexMap_1a97b5e82c70857e38dcb04ada1c6e5431"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResizeClear</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap11ResizeClearE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Change the size of this map AND change all weights to zero. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap9RawAdjustE6size_tKd">
+<span id="_CPPv3N17UnorderedIndexMap9RawAdjustE6size_tKd"></span><span id="_CPPv2N17UnorderedIndexMap9RawAdjustE6size_tKd"></span><span id="UnorderedIndexMap::RawAdjust__s.doubleC"></span><span class="target" id="classUnorderedIndexMap_1a44a951e109fd7668f7ee1b900006b3e5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RawAdjust</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap9RawAdjustE6size_tKd" title="Link to this definition"></a><br /></dt>
+<dd><p>Adjust the weight associated with a particular index in the map. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – is the identification number of the item whose weight is being adjusted. </p></li>
+<li><p><strong>new_weight</strong> – is the new weight for that entry. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap6AdjustE6size_tKd">
+<span id="_CPPv3N17UnorderedIndexMap6AdjustE6size_tKd"></span><span id="_CPPv2N17UnorderedIndexMap6AdjustE6size_tKd"></span><span id="UnorderedIndexMap::Adjust__s.doubleC"></span><span class="target" id="classUnorderedIndexMap_1a31e034072908d3dcd1e10f542ffdd87e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Adjust</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap6AdjustE6size_tKd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap6AdjustERK6vectorIdE">
+<span id="_CPPv3N17UnorderedIndexMap6AdjustERK6vectorIdE"></span><span id="_CPPv2N17UnorderedIndexMap6AdjustERK6vectorIdE"></span><span id="UnorderedIndexMap::Adjust__vector:double:CR"></span><span class="target" id="classUnorderedIndexMap_1acf2fad0937d7b7972ae8fb24b02b805a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Adjust</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">new_weights</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap6AdjustERK6vectorIdE" title="Link to this definition"></a><br /></dt>
+<dd><p>Adjust all index &lt;weights to the set provided. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap9AdjustAllEd">
+<span id="_CPPv3N17UnorderedIndexMap9AdjustAllEd"></span><span id="_CPPv2N17UnorderedIndexMap9AdjustAllEd"></span><span id="UnorderedIndexMap::AdjustAll__double"></span><span class="target" id="classUnorderedIndexMap_1a518187ce834f558660ad208e1f5330a6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdjustAll</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap9AdjustAllEd" title="Link to this definition"></a><br /></dt>
+<dd><p>Adjust all index weights to the single weight provided. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK17UnorderedIndexMap5IndexEd6size_t">
+<span id="_CPPv3NK17UnorderedIndexMap5IndexEd6size_t"></span><span id="_CPPv2NK17UnorderedIndexMap5IndexEd6size_t"></span><span id="UnorderedIndexMap::Index__double.sC"></span><span class="target" id="classUnorderedIndexMap_1a3d114f142355c7ec83e00a3716c04861"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Index</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cur_id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK17UnorderedIndexMap5IndexEd6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine the ID at the specified index position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMapixE6size_t">
+<span id="_CPPv3N17UnorderedIndexMapixE6size_t"></span><span id="_CPPv2N17UnorderedIndexMapixE6size_t"></span><span id="UnorderedIndexMap::subscript-operator__s"></span><span class="target" id="classUnorderedIndexMap_1a72dc53fc1eca5a07e28515afa04e5ad1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17UnorderedIndexMap5ProxyE" title="UnorderedIndexMap::Proxy"><span class="n"><span class="pre">Proxy</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMapixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Index into a specified ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK17UnorderedIndexMapixE6size_t">
+<span id="_CPPv3NK17UnorderedIndexMapixE6size_t"></span><span id="_CPPv2NK17UnorderedIndexMapixE6size_t"></span><span id="UnorderedIndexMap::subscript-operator__sC"></span><span class="target" id="classUnorderedIndexMap_1a98b8591301595b43e3ad3bc8979c1ceb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK17UnorderedIndexMapixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMappLER17UnorderedIndexMap">
+<span id="_CPPv3N17UnorderedIndexMappLER17UnorderedIndexMap"></span><span id="_CPPv2N17UnorderedIndexMappLER17UnorderedIndexMap"></span><span id="UnorderedIndexMap::add-assign-operator__UnorderedIndexMapR"></span><span class="target" id="classUnorderedIndexMap_1ae309b3bd7f2232dfa38b3dde8480d6f6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv417UnorderedIndexMap" title="UnorderedIndexMap"><span class="n"><span class="pre">UnorderedIndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">+=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv417UnorderedIndexMap" title="UnorderedIndexMap"><span class="n"><span class="pre">UnorderedIndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMappLER17UnorderedIndexMap" title="Link to this definition"></a><br /></dt>
+<dd><p>Add the weights in another index map to this one. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMapmIER17UnorderedIndexMap">
+<span id="_CPPv3N17UnorderedIndexMapmIER17UnorderedIndexMap"></span><span id="_CPPv2N17UnorderedIndexMapmIER17UnorderedIndexMap"></span><span id="UnorderedIndexMap::sub-assign-operator__UnorderedIndexMapR"></span><span class="target" id="classUnorderedIndexMap_1ac5376acc813880b54ba151abefa00c92"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv417UnorderedIndexMap" title="UnorderedIndexMap"><span class="n"><span class="pre">UnorderedIndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">-=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv417UnorderedIndexMap" title="UnorderedIndexMap"><span class="n"><span class="pre">UnorderedIndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMapmIER17UnorderedIndexMap" title="Link to this definition"></a><br /></dt>
+<dd><p>Substract the weights from another index map from this one. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap12DeferRefreshEv">
+<span id="_CPPv3N17UnorderedIndexMap12DeferRefreshEv"></span><span id="_CPPv2N17UnorderedIndexMap12DeferRefreshEv"></span><span id="UnorderedIndexMap::DeferRefresh"></span><span class="target" id="classUnorderedIndexMap_1af7abcc83d4f6865bc4a439f4fb19da65"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DeferRefresh</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap12DeferRefreshEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Indicate that we need to adjust weights before relying on them in the future; this will prevent refreshes from occurring immediately and is useful when many updates to weights are likely to be done before any are accessed again. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK17UnorderedIndexMap8ParentIDE6size_t">
+<span id="_CPPv3NK17UnorderedIndexMap8ParentIDE6size_t"></span><span id="_CPPv2NK17UnorderedIndexMap8ParentIDE6size_t"></span><span id="UnorderedIndexMap::ParentID__sC"></span><span class="target" id="classUnorderedIndexMap_1abffce2ae0725d1801bddc53bcd52fb37"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ParentID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK17UnorderedIndexMap8ParentIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Which ID is the parent of the ID provided? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK17UnorderedIndexMap6LeftIDE6size_t">
+<span id="_CPPv3NK17UnorderedIndexMap6LeftIDE6size_t"></span><span id="_CPPv2NK17UnorderedIndexMap6LeftIDE6size_t"></span><span id="UnorderedIndexMap::LeftID__sC"></span><span class="target" id="classUnorderedIndexMap_1aa57eaadec290da22d91814b470b4b51f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LeftID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK17UnorderedIndexMap6LeftIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Which ID is the left child of the ID provided? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK17UnorderedIndexMap7RightIDE6size_t">
+<span id="_CPPv3NK17UnorderedIndexMap7RightIDE6size_t"></span><span id="_CPPv2NK17UnorderedIndexMap7RightIDE6size_t"></span><span id="UnorderedIndexMap::RightID__sC"></span><span class="target" id="classUnorderedIndexMap_1a0b509e42ae6f6b5ec05a9a93bb3448f2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RightID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK17UnorderedIndexMap7RightIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Which ID is the right child of the ID provided? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK17UnorderedIndexMap14ResolveRefreshEv">
+<span id="_CPPv3NK17UnorderedIndexMap14ResolveRefreshEv"></span><span id="_CPPv2NK17UnorderedIndexMap14ResolveRefreshEv"></span><span id="UnorderedIndexMap::ResolveRefreshC"></span><span class="target" id="classUnorderedIndexMap_1a6cdb0c028bcc7d9047b48772df52b371"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ResolveRefresh</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK17UnorderedIndexMap14ResolveRefreshEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Check if we need to do a refresh, and if so do it! </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap9num_itemsE">
+<span id="_CPPv3N17UnorderedIndexMap9num_itemsE"></span><span id="_CPPv2N17UnorderedIndexMap9num_itemsE"></span><span id="UnorderedIndexMap::num_items__s"></span><span class="target" id="classUnorderedIndexMap_1a5642868dc267ded7e2478298b4d4c745"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_items</span></span></span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap9num_itemsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Num items stored in this UnorderedIndexMap. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap9num_nodesE">
+<span id="_CPPv3N17UnorderedIndexMap9num_nodesE"></span><span id="_CPPv2N17UnorderedIndexMap9num_nodesE"></span><span id="UnorderedIndexMap::num_nodes__s"></span><span class="target" id="classUnorderedIndexMap_1a039f7fd9055da6f2531322555deca46b"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_nodes</span></span></span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap9num_nodesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Num internal nodes to organize items (num_items-1) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap13needs_refreshE">
+<span id="_CPPv3N17UnorderedIndexMap13needs_refreshE"></span><span id="_CPPv2N17UnorderedIndexMap13needs_refreshE"></span><span id="UnorderedIndexMap::needs_refresh__b"></span><span class="target" id="classUnorderedIndexMap_1ab2b92abfc301c24e6ea13d50aae962b3"></span><span class="k"><span class="pre">mutable</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">needs_refresh</span></span></span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap13needs_refreshE" title="Link to this definition"></a><br /></dt>
+<dd><p>Are tree weights out of date? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap7weightsE">
+<span id="_CPPv3N17UnorderedIndexMap7weightsE"></span><span id="_CPPv2N17UnorderedIndexMap7weightsE"></span><span id="UnorderedIndexMap::weights__vector:double:"></span><span class="target" id="classUnorderedIndexMap_1aeb16f4ef4cbcdb4ca25177cd1cc20969"></span><span class="k"><span class="pre">mutable</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">weights</span></span></span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap7weightsE" title="Link to this definition"></a><br /></dt>
+<dd><p>The total weights in each sub-tree. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap5ProxyE">
+<span id="_CPPv3N17UnorderedIndexMap5ProxyE"></span><span id="_CPPv2N17UnorderedIndexMap5ProxyE"></span><span id="UnorderedIndexMap::Proxy"></span><span class="target" id="classUnorderedIndexMap_1_1Proxy"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Proxy</span></span></span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap5ProxyE" title="Link to this definition"></a><br /></dt>
+<dd><p>A Proxy class so that an index can be treated as an l-value. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap5Proxy5ProxyER17UnorderedIndexMap6size_t">
+<span id="_CPPv3N17UnorderedIndexMap5Proxy5ProxyER17UnorderedIndexMap6size_t"></span><span id="_CPPv2N17UnorderedIndexMap5Proxy5ProxyER17UnorderedIndexMap6size_t"></span><span id="UnorderedIndexMap::Proxy::Proxy__UnorderedIndexMapR.s"></span><span class="target" id="classUnorderedIndexMap_1_1Proxy_1a64421397438fad0ff234379d44679682"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Proxy</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv417UnorderedIndexMap" title="UnorderedIndexMap"><span class="n"><span class="pre">UnorderedIndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_im</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap5Proxy5ProxyER17UnorderedIndexMap6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK17UnorderedIndexMap5ProxycvdEv">
+<span id="_CPPv3NK17UnorderedIndexMap5ProxycvdEv"></span><span id="_CPPv2NK17UnorderedIndexMap5ProxycvdEv"></span><span id="UnorderedIndexMap::Proxy::castto-double-operatorC"></span><span class="target" id="classUnorderedIndexMap_1_1Proxy_1aa283185b1dd66537eff63087350a7c7a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK17UnorderedIndexMap5ProxycvdEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap5ProxyaSEd">
+<span id="_CPPv3N17UnorderedIndexMap5ProxyaSEd"></span><span id="_CPPv2N17UnorderedIndexMap5ProxyaSEd"></span><span id="UnorderedIndexMap::Proxy::assign-operator__double"></span><span class="target" id="classUnorderedIndexMap_1_1Proxy_1ad8cc0d9ebabaf5ac5b60698f9b2576ab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17UnorderedIndexMap5ProxyE" title="UnorderedIndexMap::Proxy"><span class="n"><span class="pre">Proxy</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap5ProxyaSEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap5Proxy9index_mapE">
+<span id="_CPPv3N17UnorderedIndexMap5Proxy9index_mapE"></span><span id="_CPPv2N17UnorderedIndexMap5Proxy9index_mapE"></span><span id="UnorderedIndexMap::Proxy::index_map__UnorderedIndexMapR"></span><span class="target" id="classUnorderedIndexMap_1_1Proxy_1af3bb4bfc7d392a5d5ba7f067fd99689c"></span><a class="reference internal" href="#_CPPv417UnorderedIndexMap" title="UnorderedIndexMap"><span class="n"><span class="pre">UnorderedIndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">index_map</span></span></span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap5Proxy9index_mapE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which index map is this proxy from? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17UnorderedIndexMap5Proxy2idE">
+<span id="_CPPv3N17UnorderedIndexMap5Proxy2idE"></span><span id="_CPPv2N17UnorderedIndexMap5Proxy2idE"></span><span id="UnorderedIndexMap::Proxy::id__s"></span><span class="target" id="classUnorderedIndexMap_1_1Proxy_1a66ec378e7b3fcb14c001cadcfc2a10ca"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id</span></span></span><a class="headerlink" href="#_CPPv4N17UnorderedIndexMap5Proxy2idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which id does it represent? </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="TypeMap.html" class="btn btn-neutral float-left" title="TypeMap.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="graph_utils.html" class="btn btn-neutral float-right" title="graph_utils.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ra_map.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/datastructs/api/ra_map.b1826f4b-b18e-4407-b64f-b895c2e8819e.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="ra_set.hpp" href="ra_set.html" />
+    <link rel="prev" title="map_utils.hpp" href="map_utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../datastructs.html">Data structures</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../datastructs.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BloomFilter.html">BloomFilter.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Bool.html">Bool.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Cache.html">Cache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DynamicString.html">DynamicString.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Graph.html">Graph.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="IndexMap.html">IndexMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="IndexSet.html">IndexSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="QueueCache.html">QueueCache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallFifoMap.html">SmallFifoMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallVector.html">SmallVector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StringMap.html">StringMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TimeQueue.html">TimeQueue.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypeMap.html">TypeMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UnorderedIndexMap.html">UnorderedIndexMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graph_utils.html">graph_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hash_utils.html">hash_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="map_utils.html">map_utils.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ra_map.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00000E6ra_map"><code class="docutils literal notranslate"><span class="pre">ra_map</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ra_set.html">ra_set.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference_vector.html">reference_vector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="set_utils.html">set_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_utils.html">span_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_struct.html">tuple_struct.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_utils.html">tuple_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="valsort_map.html">valsort_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector_utils.html">vector_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../datastructs.html">Data structures</a></li>
+      <li class="breadcrumb-item active">ra_map.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ra-map-hpp">
+<h1>ra_map.hpp<a class="headerlink" href="#ra-map-hpp" title="Link to this heading"></a></h1>
+<p>This file defines a Random Access Map template. </p>
+<p>
+A random access map allows for simple traversal by index and a guarantee that a value at a given index will always be at that index unless any map element is deleted. This allows storage of indices for maps with a fixed layout, resulting in easy access. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA</p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I00000E6ra_map">
+<span id="_CPPv3I00000E6ra_map"></span><span id="_CPPv2I00000E6ra_map"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KEY_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Hash</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">hash</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::KEY_T"><span class="n"><span class="pre">KEY_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KeyEqual</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">equal_to</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::KEY_T"><span class="n"><span class="pre">KEY_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Allocator</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">allocator</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::KEY_T"><span class="n"><span class="pre">KEY_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classra__map"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ra_map</span></span></span><a class="headerlink" href="#_CPPv4I00000E6ra_map" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ra_map.hpp&gt;</em></div>
+<p>This class uses a combination of a hashtable (std::unordered_map) and vector to lookup insert, lookup, and delete values in constant time, while still being able to step through all values (albeit in an arbitrary order).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The arbitrary order of values may change if any values are deleted. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map8key_typeE">
+<span id="_CPPv3N6ra_map8key_typeE"></span><span id="_CPPv2N6ra_map8key_typeE"></span><span class="target" id="classra__map_1a0aecb90db32b50aa72519790b941c3ab"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">key_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::KEY_T"><span class="n"><span class="pre">KEY_T</span></span></a><a class="headerlink" href="#_CPPv4N6ra_map8key_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map11mapped_typeE">
+<span id="_CPPv3N6ra_map11mapped_typeE"></span><span id="_CPPv2N6ra_map11mapped_typeE"></span><span class="target" id="classra__map_1aece75c547f232c1a91aa6cd5059ceff8"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mapped_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::T"><span class="n"><span class="pre">T</span></span></a><a class="headerlink" href="#_CPPv4N6ra_map11mapped_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map10value_typeE">
+<span id="_CPPv3N6ra_map10value_typeE"></span><span id="_CPPv2N6ra_map10value_typeE"></span><span class="target" id="classra__map_1a6ad371496d3b1d9a8786d93e9dc9f94d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::KEY_T"><span class="n"><span class="pre">KEY_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6ra_map10value_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map9size_typeE">
+<span id="_CPPv3N6ra_map9size_typeE"></span><span id="_CPPv2N6ra_map9size_typeE"></span><span class="target" id="classra__map_1a3bf4c333e1205ffbe612e9d48e08de72"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><a class="headerlink" href="#_CPPv4N6ra_map9size_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map15difference_typeE">
+<span id="_CPPv3N6ra_map15difference_typeE"></span><span id="_CPPv2N6ra_map15difference_typeE"></span><span class="target" id="classra__map_1a01f7784233eead8a20c48eadd245a63a"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">difference_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ptrdiff_t</span></span><a class="headerlink" href="#_CPPv4N6ra_map15difference_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map6hasherE">
+<span id="_CPPv3N6ra_map6hasherE"></span><span id="_CPPv2N6ra_map6hasherE"></span><span class="target" id="classra__map_1a1cc60bbf3b67fd23c257723afe974902"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hasher</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::Hash"><span class="n"><span class="pre">Hash</span></span></a><a class="headerlink" href="#_CPPv4N6ra_map6hasherE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map9key_equalE">
+<span id="_CPPv3N6ra_map9key_equalE"></span><span id="_CPPv2N6ra_map9key_equalE"></span><span class="target" id="classra__map_1af76e6e48a69dda7d127a7c0c4e5af9f9"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">key_equal</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::KeyEqual"><span class="n"><span class="pre">KeyEqual</span></span></a><a class="headerlink" href="#_CPPv4N6ra_map9key_equalE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map14allocator_typeE">
+<span id="_CPPv3N6ra_map14allocator_typeE"></span><span id="_CPPv2N6ra_map14allocator_typeE"></span><span class="target" id="classra__map_1aa51cd5c862519e53b0c614c5a372808c"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">allocator_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::Allocator"><span class="n"><span class="pre">Allocator</span></span></a><a class="headerlink" href="#_CPPv4N6ra_map14allocator_typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map9referenceE">
+<span id="_CPPv3N6ra_map9referenceE"></span><span id="_CPPv2N6ra_map9referenceE"></span><span class="target" id="classra__map_1ac801d11db81e0b95081df153747698a2"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reference</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ra_map10value_typeE" title="ra_map::value_type"><span class="n"><span class="pre">value_type</span></span></a><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4N6ra_map9referenceE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map15const_referenceE">
+<span id="_CPPv3N6ra_map15const_referenceE"></span><span id="_CPPv2N6ra_map15const_referenceE"></span><span class="target" id="classra__map_1a9d538c74d89ad451afbe0dbd1872f704"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">const_reference</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ra_map10value_typeE" title="ra_map::value_type"><span class="n"><span class="pre">value_type</span></span></a><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4N6ra_map15const_referenceE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map7pointerE">
+<span id="_CPPv3N6ra_map7pointerE"></span><span id="_CPPv2N6ra_map7pointerE"></span><span class="target" id="classra__map_1a48826b9c1ba63114c5c126eb0e033f64"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pointer</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">allocator_traits</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::Allocator"><span class="n"><span class="pre">Allocator</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pointer</span></span><a class="headerlink" href="#_CPPv4N6ra_map7pointerE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map13const_pointerE">
+<span id="_CPPv3N6ra_map13const_pointerE"></span><span id="_CPPv2N6ra_map13const_pointerE"></span><span class="target" id="classra__map_1a82c71ad2c8bce32c30c144bb01809aa7"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">const_pointer</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">allocator_traits</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::Allocator"><span class="n"><span class="pre">Allocator</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">const_pointer</span></span><a class="headerlink" href="#_CPPv4N6ra_map13const_pointerE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map8layout_tE">
+<span id="_CPPv3N6ra_map8layout_tE"></span><span id="_CPPv2N6ra_map8layout_tE"></span><span class="target" id="classra__map_1a3b3d216774d08641790779d97367b191"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">layout_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/unordered_map.html#_CPPv4I00DpE13unordered_map" title="unordered_map"><span class="n"><span class="pre">unordered_map</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::KEY_T"><span class="n"><span class="pre">KEY_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::Hash"><span class="n"><span class="pre">Hash</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::KeyEqual"><span class="n"><span class="pre">KeyEqual</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6ra_map8layout_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map6ra_mapEv">
+<span id="_CPPv3N6ra_map6ra_mapEv"></span><span id="_CPPv2N6ra_map6ra_mapEv"></span><span id="ra_map::ra_map"></span><span class="target" id="classra__map_1ac362e2f2ec6e012541a9b86262e69916"></span><span class="sig-name descname"><span class="n"><span class="pre">ra_map</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6ra_map6ra_mapEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map6ra_mapERK6ra_map">
+<span id="_CPPv3N6ra_map6ra_mapERK6ra_map"></span><span id="_CPPv2N6ra_map6ra_mapERK6ra_map"></span><span id="ra_map::ra_map__ra_mapCR"></span><span class="target" id="classra__map_1a3a6170377f6f481d5c9862209b3335af"></span><span class="sig-name descname"><span class="n"><span class="pre">ra_map</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ra_map6ra_mapERK6ra_map" title="ra_map::ra_map"><span class="n"><span class="pre">ra_map</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6ra_map6ra_mapERK6ra_map" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map6ra_mapERR6ra_map">
+<span id="_CPPv3N6ra_map6ra_mapERR6ra_map"></span><span id="_CPPv2N6ra_map6ra_mapERR6ra_map"></span><span id="ra_map::ra_map__ra_mapRR"></span><span class="target" id="classra__map_1abf9451880df1b75d80a2a2654428579c"></span><span class="sig-name descname"><span class="n"><span class="pre">ra_map</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6ra_map6ra_mapERR6ra_map" title="ra_map::ra_map"><span class="n"><span class="pre">ra_map</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6ra_map6ra_mapERR6ra_map" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_mapaSERK6ra_map">
+<span id="_CPPv3N6ra_mapaSERK6ra_map"></span><span id="_CPPv2N6ra_mapaSERK6ra_map"></span><span id="ra_map::assign-operator__ra_mapCR"></span><span class="target" id="classra__map_1a901f23e5fa7bc84df36c469992a9494b"></span><a class="reference internal" href="#_CPPv4N6ra_map6this_tE" title="ra_map::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map"><span class="n"><span class="pre">ra_map</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6ra_mapaSERK6ra_map" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_mapaSERR6ra_map">
+<span id="_CPPv3N6ra_mapaSERR6ra_map"></span><span id="_CPPv2N6ra_mapaSERR6ra_map"></span><span id="ra_map::assign-operator__ra_mapRR"></span><span class="target" id="classra__map_1a55a437b29c0e451d5dc3195082b3b5a5"></span><a class="reference internal" href="#_CPPv4N6ra_map6this_tE" title="ra_map::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map"><span class="n"><span class="pre">ra_map</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6ra_mapaSERR6ra_map" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map5beginEv">
+<span id="_CPPv3N6ra_map5beginEv"></span><span id="_CPPv2N6ra_map5beginEv"></span><span id="ra_map::begin"></span><span class="target" id="classra__map_1aaad1d31e5b5cd40c14be98872cf54f25"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6ra_map5beginEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6ra_map6cbeginEv">
+<span id="_CPPv3NK6ra_map6cbeginEv"></span><span id="_CPPv2NK6ra_map6cbeginEv"></span><span id="ra_map::cbeginC"></span><span class="target" id="classra__map_1a6feb2ac21058c2c4a5c536fd9a92a067"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cbegin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6ra_map6cbeginEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map3endEv">
+<span id="_CPPv3N6ra_map3endEv"></span><span id="_CPPv2N6ra_map3endEv"></span><span id="ra_map::end"></span><span class="target" id="classra__map_1aec644af1fc0d799a7631ee350fefc67d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6ra_map3endEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6ra_map4cendEv">
+<span id="_CPPv3NK6ra_map4cendEv"></span><span id="_CPPv2NK6ra_map4cendEv"></span><span id="ra_map::cendC"></span><span class="target" id="classra__map_1a84a54740a80ad22b514f9728eb63cd2f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cend</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6ra_map4cendEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map6insertERK10value_type">
+<span id="_CPPv3N6ra_map6insertERK10value_type"></span><span id="_CPPv2N6ra_map6insertERK10value_type"></span><span id="ra_map::insert__value_typeCR"></span><span class="target" id="classra__map_1a8ab79b277a07bfbacf5db6795d1e11d0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">insert</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ra_map10value_typeE" title="ra_map::value_type"><span class="n"><span class="pre">value_type</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6ra_map6insertERK10value_type" title="Link to this definition"></a><br /></dt>
+<dd><p>Insert a new value into container by copy; return position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map6insertERR10value_type">
+<span id="_CPPv3N6ra_map6insertERR10value_type"></span><span id="_CPPv2N6ra_map6insertERR10value_type"></span><span id="ra_map::insert__value_typeRR"></span><span class="target" id="classra__map_1a3361af1af1ea03865b066185a57b80a7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">insert</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6ra_map10value_typeE" title="ra_map::value_type"><span class="n"><span class="pre">value_type</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6ra_map6insertERR10value_type" title="Link to this definition"></a><br /></dt>
+<dd><p>Insert a new value into container by move; return position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN6ra_map7emplaceE6size_tDpRR2Ts">
+<span id="_CPPv3IDpEN6ra_map7emplaceEDpRR2Ts"></span><span id="_CPPv2IDpEN6ra_map7emplaceEDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classra__map_1afe926ae3654b253315bf7ca9eb47bc6b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">emplace</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN6ra_map7emplaceE6size_tDpRR2Ts" title="ra_map::emplace::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN6ra_map7emplaceE6size_tDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new value in place in a container container; return position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map5eraseERK5KEY_T">
+<span id="_CPPv3N6ra_map5eraseERK5KEY_T"></span><span id="_CPPv2N6ra_map5eraseERK5KEY_T"></span><span id="ra_map::erase__KEY_TCR"></span><span class="target" id="classra__map_1ab3800ab6b945c6cb7322dc85ed7b6099"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">erase</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::KEY_T"><span class="n"><span class="pre">KEY_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6ra_map5eraseERK5KEY_T" title="Link to this definition"></a><br /></dt>
+<dd><p>Erase a specific value from the container. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6ra_map5countERK5KEY_T">
+<span id="_CPPv3NK6ra_map5countERK5KEY_T"></span><span id="_CPPv2NK6ra_map5countERK5KEY_T"></span><span id="ra_map::count__KEY_TCRC"></span><span class="target" id="classra__map_1affbc8df018a0461a57454bf61fc02dd9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">count</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::KEY_T"><span class="n"><span class="pre">KEY_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6ra_map5countERK5KEY_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_mapixE8key_type">
+<span id="_CPPv3N6ra_mapixE8key_type"></span><span id="_CPPv2N6ra_mapixE8key_type"></span><span id="ra_map::subscript-operator__key_type"></span><span class="target" id="classra__map_1ab5d2597c653c454603e046d29e2cf549"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6ra_map8key_typeE" title="ra_map::key_type"><span class="n"><span class="pre">key_type</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6ra_mapixE8key_type" title="Link to this definition"></a><br /></dt>
+<dd><p>Is value included? (0 or 1). </p>
+<p>Index into the ra_map by key. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6ra_map9GetLayoutEv">
+<span id="_CPPv3NK6ra_map9GetLayoutEv"></span><span id="_CPPv2NK6ra_map9GetLayoutEv"></span><span id="ra_map::GetLayoutC"></span><span class="target" id="classra__map_1a4a443e7904497164513f5c4acb35c230"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ra_map8layout_tE" title="ra_map::layout_t"><span class="n"><span class="pre">layout_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetLayout</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6ra_map9GetLayoutEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map8NewEntryE8key_type">
+<span id="_CPPv3N6ra_map8NewEntryE8key_type"></span><span id="_CPPv2N6ra_map8NewEntryE8key_type"></span><span id="ra_map::NewEntry__key_type"></span><span class="target" id="classra__map_1a9cc7c14cbf391e177f4e8f136e11bd03"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">NewEntry</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6ra_map8key_typeE" title="ra_map::key_type"><span class="n"><span class="pre">key_type</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6ra_map8NewEntryE8key_type" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6ra_map3HasE8key_type">
+<span id="_CPPv3NK6ra_map3HasE8key_type"></span><span id="_CPPv2NK6ra_map3HasE8key_type"></span><span id="ra_map::Has__key_typeC"></span><span class="target" id="classra__map_1ab6fc58a84ac3b53baf372cfe79be77bb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6ra_map8key_typeE" title="ra_map::key_type"><span class="n"><span class="pre">key_type</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6ra_map3HasE8key_type" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6ra_map5GetIDE8key_type">
+<span id="_CPPv3NK6ra_map5GetIDE8key_type"></span><span id="_CPPv2NK6ra_map5GetIDE8key_type"></span><span id="ra_map::GetID__key_typeC"></span><span class="target" id="classra__map_1ad3ca1bce2b0fb21fd8fa0d7b4890f263"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetID</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6ra_map8key_typeE" title="ra_map::key_type"><span class="n"><span class="pre">key_type</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">key</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6ra_map5GetIDE8key_type" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map7KeyAtIDE6size_t">
+<span id="_CPPv3N6ra_map7KeyAtIDE6size_t"></span><span id="_CPPv2N6ra_map7KeyAtIDE6size_t"></span><span id="ra_map::KeyAtID__s"></span><span class="target" id="classra__map_1a41bc22af79fec04ac745375d7afd1b97"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6ra_map8key_typeE" title="ra_map::key_type"><span class="n"><span class="pre">key_type</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">KeyAtID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6ra_map7KeyAtIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map4AtIDE6size_t">
+<span id="_CPPv3N6ra_map4AtIDE6size_t"></span><span id="_CPPv2N6ra_map4AtIDE6size_t"></span><span id="ra_map::AtID__s"></span><span class="target" id="classra__map_1a922a54ed2ee6c399d5e18c4bb30630b2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AtID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6ra_map4AtIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6ra_map4AtIDE6size_t">
+<span id="_CPPv3NK6ra_map4AtIDE6size_t"></span><span id="_CPPv2NK6ra_map4AtIDE6size_t"></span><span id="ra_map::AtID__sC"></span><span class="target" id="classra__map_1a5bd455ea10e5e8e3d79efa7f53c58700"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AtID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6ra_map4AtIDE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map6this_tE">
+<span id="_CPPv3N6ra_map6this_tE"></span><span id="_CPPv2N6ra_map6this_tE"></span><span class="target" id="classra__map_1ad192f38c26a59478bf6ceb84f49a9527"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map"><span class="n"><span class="pre">ra_map</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::KEY_T"><span class="n"><span class="pre">KEY_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::Hash"><span class="n"><span class="pre">Hash</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::KeyEqual"><span class="n"><span class="pre">KeyEqual</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00000E6ra_map" title="ra_map::Allocator"><span class="n"><span class="pre">Allocator</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6ra_map6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map6id_mapE">
+<span id="_CPPv3N6ra_map6id_mapE"></span><span id="_CPPv2N6ra_map6id_mapE"></span><span id="ra_map::id_map__layout_t"></span><span class="target" id="classra__map_1add9378b3f48defef05a0f125e7e860fe"></span><a class="reference internal" href="#_CPPv4N6ra_map8layout_tE" title="ra_map::layout_t"><span class="n"><span class="pre">layout_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id_map</span></span></span><a class="headerlink" href="#_CPPv4N6ra_map6id_mapE" title="Link to this definition"></a><br /></dt>
+<dd><p>Map to find keys in vector. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6ra_map4valsE">
+<span id="_CPPv3N6ra_map4valsE"></span><span id="_CPPv2N6ra_map4valsE"></span><span id="ra_map::vals__vector:value_type:"></span><span class="target" id="classra__map_1aaa33238739de98f2cd56295326323acf"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6ra_map10value_typeE" title="ra_map::value_type"><span class="n"><span class="pre">value_type</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vals</span></span></span><a class="headerlink" href="#_CPPv4N6ra_map4valsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Vector of all values. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="map_utils.html" class="btn btn-neutral float-left" title="map_utils.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ra_set.html" class="btn btn-neutral float-right" title="ra_set.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

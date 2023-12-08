@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SolveState.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/tools/api/SolveState.9752b824-f149-4007-8463-36e6494a0e9a.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="StaticString.hpp" href="StaticString.html" />
+    <link rel="prev" title="MemoryFactory.hpp" href="MemoryFactory.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tools.html">Other Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../tools.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="MemoryFactory.html">MemoryFactory.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">SolveState.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410SolveState"><code class="docutils literal notranslate"><span class="pre">SolveState</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="StaticString.html">StaticString.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="String.html">String.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypeTracker.html">TypeTracker.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="attrs.html">attrs.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="char_utils.html">char_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hash_namify.html">hash_namify.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="keyname_utils.html">keyname_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="string_utils.html">string_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timing.html">timing.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unique.html">unique.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="value_utils.html">value_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tools.html">Other Tools</a></li>
+      <li class="breadcrumb-item active">SolveState.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="solvestate-hpp">
+<h1>SolveState.hpp<a class="headerlink" href="#solvestate-hpp" title="Link to this heading"></a></h1>
+<p>Used as part of a branching solver to keep track of the current state. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA </p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv410SolveState">
+<span id="_CPPv310SolveState"></span><span id="_CPPv210SolveState"></span><span id="SolveState"></span><span class="target" id="classSolveState"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SolveState</span></span></span><a class="headerlink" href="#_CPPv410SolveState" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;SolveState.hpp&gt;</em></div>
+<p>Often in a branch-and-bound algorithm, we need to identify the sub-set of items that maximizes (or minimizes) an optimization metric. SolveState keeps track of the current state for which items have been locked in as “included” in the current branks, which have been “excluded”, and which are still “unknown” (still to be decided upon.) All tracking is performed with BitVectors for high efficiency. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SolveState10SolveStateE6size_t">
+<span id="_CPPv3N10SolveState10SolveStateE6size_t"></span><span id="_CPPv2N10SolveState10SolveStateE6size_t"></span><span id="SolveState::SolveState__s"></span><span class="target" id="classSolveState_1a9132082d6a0a9b1e236e18ed1cfff5c4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SolveState</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">state_size</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10SolveState10SolveStateE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SolveState10SolveStateERK10SolveState">
+<span id="_CPPv3N10SolveState10SolveStateERK10SolveState"></span><span id="_CPPv2N10SolveState10SolveStateERK10SolveState"></span><span id="SolveState::SolveState__SolveStateCR"></span><span class="target" id="classSolveState_1a21fa34d506a76b025f3c38d42220d3cc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SolveState</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N10SolveState10SolveStateERK10SolveState" title="SolveState::SolveState"><span class="n"><span class="pre">SolveState</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10SolveState10SolveStateERK10SolveState" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SolveStateD0Ev">
+<span id="_CPPv3N10SolveStateD0Ev"></span><span id="_CPPv2N10SolveStateD0Ev"></span><span id="SolveState::~SolveState"></span><span class="target" id="classSolveState_1a07b1bb3423e799eef8e97a6460a2eae3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~SolveState</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10SolveStateD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SolveStateaSERK10SolveState">
+<span id="_CPPv3N10SolveStateaSERK10SolveState"></span><span id="_CPPv2N10SolveStateaSERK10SolveState"></span><span id="SolveState::assign-operator__SolveStateCR"></span><span class="target" id="classSolveState_1a9bf30a1590d58943078c3b1b4a97b2f5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410SolveState" title="SolveState"><span class="n"><span class="pre">SolveState</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410SolveState" title="SolveState"><span class="n"><span class="pre">SolveState</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10SolveStateaSERK10SolveState" title="Link to this definition"></a><br /></dt>
+<dd><p>Set this SolveState to be identical to another. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SolveState7GetSizeEv">
+<span id="_CPPv3NK10SolveState7GetSizeEv"></span><span id="_CPPv2NK10SolveState7GetSizeEv"></span><span id="SolveState::GetSizeC"></span><span class="target" id="classSolveState_1a3c493be3cda699328cc23fafd45c4d46"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SolveState7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many items are being considered in the current SolveState? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SolveState4IsInE6size_t">
+<span id="_CPPv3NK10SolveState4IsInE6size_t"></span><span id="_CPPv2NK10SolveState4IsInE6size_t"></span><span id="SolveState::IsIn__sC"></span><span class="target" id="classSolveState_1a8c8dd11c866f33b21d14fa97ddc50240"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsIn</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SolveState4IsInE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if a particular item is going to be included for sure in the current solve state. (If it has been excluded -OR- is yet to be decided upon, false will be returned) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SolveState5IsUnkE6size_t">
+<span id="_CPPv3NK10SolveState5IsUnkE6size_t"></span><span id="_CPPv2NK10SolveState5IsUnkE6size_t"></span><span id="SolveState::IsUnk__sC"></span><span class="target" id="classSolveState_1a368741cfd924d1e7808a92551663c45d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsUnk</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SolveState5IsUnkE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if a particular item is yet to be decided upon in the current solve state. (If it has been excluded -OR- is included for sure, false will be returned) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SolveState5IsOutE6size_t">
+<span id="_CPPv3NK10SolveState5IsOutE6size_t"></span><span id="_CPPv2NK10SolveState5IsOutE6size_t"></span><span id="SolveState::IsOut__sC"></span><span class="target" id="classSolveState_1a94a0e089c2bbb73f5fca21eba768cd30"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsOut</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SolveState5IsOutE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if a particular item is going to be excluded for sure in the current solve state. (If it has been included -OR- is yet to be decided upon, false will be returned) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SolveState7IsFinalEv">
+<span id="_CPPv3NK10SolveState7IsFinalEv"></span><span id="_CPPv2NK10SolveState7IsFinalEv"></span><span id="SolveState::IsFinalC"></span><span class="target" id="classSolveState_1ac736e9ad27b545b1758bbc16648fe0c1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsFinal</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SolveState7IsFinalEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if all items have been decided upon (none are still in the “unknown” state) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SolveState7CountInEv">
+<span id="_CPPv3NK10SolveState7CountInEv"></span><span id="_CPPv2NK10SolveState7CountInEv"></span><span id="SolveState::CountInC"></span><span class="target" id="classSolveState_1a850d71755518fc230b3f95f3026c58ad"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountIn</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SolveState7CountInEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many items have been included for sure? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SolveState8CountUnkEv">
+<span id="_CPPv3NK10SolveState8CountUnkEv"></span><span id="_CPPv2NK10SolveState8CountUnkEv"></span><span id="SolveState::CountUnkC"></span><span class="target" id="classSolveState_1a0c244dba5ee4472c502daf421ddc5c6e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountUnk</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SolveState8CountUnkEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many items have yet to be decided upon (are “unknown”) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SolveState8CountOutEv">
+<span id="_CPPv3NK10SolveState8CountOutEv"></span><span id="_CPPv2NK10SolveState8CountOutEv"></span><span id="SolveState::CountOutC"></span><span class="target" id="classSolveState_1acd4380fcf93470377e536831e9fa12fa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountOut</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SolveState8CountOutEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many items have been excluded for sure. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SolveState11GetInVectorEv">
+<span id="_CPPv3NK10SolveState11GetInVectorEv"></span><span id="_CPPv2NK10SolveState11GetInVectorEv"></span><span id="SolveState::GetInVectorC"></span><span class="target" id="classSolveState_1a8c2fc0e8327e78fefbed29d7341d78ea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetInVector</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SolveState11GetInVectorEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the BitVector associated with which items have been included for sure. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SolveState12GetUnkVectorEv">
+<span id="_CPPv3NK10SolveState12GetUnkVectorEv"></span><span id="_CPPv2NK10SolveState12GetUnkVectorEv"></span><span id="SolveState::GetUnkVectorC"></span><span class="target" id="classSolveState_1a0e03cf5104caf4c3f4e1f9a7ea5ae9c1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetUnkVector</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SolveState12GetUnkVectorEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the BitVector associated with which items have yet to be decided upon. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SolveState12GetOutVectorEv">
+<span id="_CPPv3NK10SolveState12GetOutVectorEv"></span><span id="_CPPv2NK10SolveState12GetOutVectorEv"></span><span id="SolveState::GetOutVectorC"></span><span class="target" id="classSolveState_1a35a962ec546cfefab7493980e52663a4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetOutVector</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SolveState12GetOutVectorEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the BitVector associated with which iterm have been excluded for sure. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK10SolveState10GetNextUnkE6size_t">
+<span id="_CPPv3NK10SolveState10GetNextUnkE6size_t"></span><span id="_CPPv2NK10SolveState10GetNextUnkE6size_t"></span><span id="SolveState::GetNextUnk__sC"></span><span class="target" id="classSolveState_1a05190900ee5aec8d3b50bf20d65c3709"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNextUnk</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">prev_unk</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK10SolveState10GetNextUnkE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the ID of the next unknown item. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SolveState7IncludeE6size_t">
+<span id="_CPPv3N10SolveState7IncludeE6size_t"></span><span id="_CPPv2N10SolveState7IncludeE6size_t"></span><span id="SolveState::Include__s"></span><span class="target" id="classSolveState_1a9f1bbd56fcb249ed85dcfecb26f7a167"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Include</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10SolveState7IncludeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Mark a specific item as to be included. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SolveState7ExcludeE6size_t">
+<span id="_CPPv3N10SolveState7ExcludeE6size_t"></span><span id="_CPPv2N10SolveState7ExcludeE6size_t"></span><span id="SolveState::Exclude__s"></span><span class="target" id="classSolveState_1a3d747b7c3e1988f1a3237ae2e6a7d968"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Exclude</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10SolveState7ExcludeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Mark a specific item as to be excluded. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SolveState12ForceExcludeE6size_t">
+<span id="_CPPv3N10SolveState12ForceExcludeE6size_t"></span><span id="_CPPv2N10SolveState12ForceExcludeE6size_t"></span><span id="SolveState::ForceExclude__s"></span><span class="target" id="classSolveState_1a3d7c528f015b057d65d30d2a36a11747"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ForceExclude</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10SolveState12ForceExcludeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Change our mind about a potentially included node (Be careful since many algorithms don’t requite this type of changes to be made.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SolveState10IncludeSetERK9BitVector">
+<span id="_CPPv3N10SolveState10IncludeSetERK9BitVector"></span><span id="_CPPv2N10SolveState10IncludeSetERK9BitVector"></span><span id="SolveState::IncludeSet__BitVectorCR"></span><span class="target" id="classSolveState_1aed9e61568a184d9d51c910d6bce5f5c5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IncludeSet</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inc_set</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10SolveState10IncludeSetERK9BitVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Include ALL of the items specified in the provided BitVector. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N10SolveState10ExcludeSetERK9BitVector">
+<span id="_CPPv3N10SolveState10ExcludeSetERK9BitVector"></span><span id="_CPPv2N10SolveState10ExcludeSetERK9BitVector"></span><span id="SolveState::ExcludeSet__BitVectorCR"></span><span class="target" id="classSolveState_1a8a37bc1babe9789efd311caa1090f977"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExcludeSet</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">inc_set</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N10SolveState10ExcludeSetERK9BitVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Exclude ALL of the items specified in the provided BitVector. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10SolveState8in_itemsE">
+<span id="_CPPv3N10SolveState8in_itemsE"></span><span id="_CPPv2N10SolveState8in_itemsE"></span><span id="SolveState::in_items__BitVector"></span><span class="target" id="classSolveState_1ad201ba0f1c022e6e9e653d701a70b459"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">in_items</span></span></span><a class="headerlink" href="#_CPPv4N10SolveState8in_itemsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Items included for sure. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10SolveState9unk_itemsE">
+<span id="_CPPv3N10SolveState9unk_itemsE"></span><span id="_CPPv2N10SolveState9unk_itemsE"></span><span id="SolveState::unk_items__BitVector"></span><span class="target" id="classSolveState_1ad67480b7761fb6ccd553697fdf191ba5"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">unk_items</span></span></span><a class="headerlink" href="#_CPPv4N10SolveState9unk_itemsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Items yet to be decided on. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="MemoryFactory.html" class="btn btn-neutral float-left" title="MemoryFactory.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="StaticString.html" class="btn btn-neutral float-right" title="StaticString.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

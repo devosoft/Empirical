@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>meta.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/meta/api/meta.7fdf0835-3197-4a10-8b06-26a542b7832c.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="reflection.hpp" href="reflection.html" />
+    <link rel="prev" title="macros.hpp" href="macros.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../meta.html">Meta</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../meta.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ConceptWrapper.html">ConceptWrapper.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FunInfo.html">FunInfo.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypeID.html">TypeID.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypePack.html">TypePack.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ValPack.html">ValPack.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="macro_math.html">macro_math.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="macros.html">macros.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">meta.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE10first_type"><code class="docutils literal notranslate"><span class="pre">first_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE11second_type"><code class="docutils literal notranslate"><span class="pre">second_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE10third_type"><code class="docutils literal notranslate"><span class="pre">third_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE11fourth_type"><code class="docutils literal notranslate"><span class="pre">fourth_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_6size_tDpE7pack_id"><code class="docutils literal notranslate"><span class="pre">pack_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE9last_type"><code class="docutils literal notranslate"><span class="pre">last_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00E12sfinae_decoy"><code class="docutils literal notranslate"><span class="pre">sfinae_decoy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00E10type_decoy"><code class="docutils literal notranslate"><span class="pre">type_decoy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00E7decoy_t"><code class="docutils literal notranslate"><span class="pre">decoy_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E10bool_decoy"><code class="docutils literal notranslate"><span class="pre">bool_decoy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E9int_decoy"><code class="docutils literal notranslate"><span class="pre">int_decoy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE13AdaptTemplate"><code class="docutils literal notranslate"><span class="pre">AdaptTemplate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00E18AdaptTemplate_Arg1"><code class="docutils literal notranslate"><span class="pre">AdaptTemplate_Arg1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE9DoNothingvDp2Ts"><code class="docutils literal notranslate"><span class="pre">DoNothing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E15BuildObjVector1vR6vectorI5OBJ_TE"><code class="docutils literal notranslate"><span class="pre">BuildObjVector1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E15BuildObjVector2vR6vectorI5OBJ_TE"><code class="docutils literal notranslate"><span class="pre">BuildObjVector2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E15BuildObjVector3vR6vectorI5OBJ_TE"><code class="docutils literal notranslate"><span class="pre">BuildObjVector3()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E15BuildObjVector4vR6vectorI5OBJ_TE"><code class="docutils literal notranslate"><span class="pre">BuildObjVector4()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00DpE15BuildObjVector1vR6vectorI5OBJ_TER2T1DpR2Ts"><code class="docutils literal notranslate"><span class="pre">BuildObjVector1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I000DpE15BuildObjVector2vR6vectorI5OBJ_TER2T1R2T2DpR2Ts"><code class="docutils literal notranslate"><span class="pre">BuildObjVector2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0000DpE15BuildObjVector3vR6vectorI5OBJ_TER2T1R2T2R2T3DpR2Ts"><code class="docutils literal notranslate"><span class="pre">BuildObjVector3()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00000DpE15BuildObjVector4vR6vectorI5OBJ_TER2T1R2T2R2T3R2T4DpR2Ts"><code class="docutils literal notranslate"><span class="pre">BuildObjVector4()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0_6size_tDpE14BuildObjVector6vectorI5OBJ_TEDpR2Ts"><code class="docutils literal notranslate"><span class="pre">BuildObjVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00DpE8has_typebv"><code class="docutils literal notranslate"><span class="pre">has_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00DpE10count_type6size_tv"><code class="docutils literal notranslate"><span class="pre">count_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE14get_type_indexiv"><code class="docutils literal notranslate"><span class="pre">get_type_index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00DpE21has_unique_first_typebv"><code class="docutils literal notranslate"><span class="pre">has_unique_first_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00DpE16has_unique_typesbv"><code class="docutils literal notranslate"><span class="pre">has_unique_types()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IIDpE00E15test_type_existbv"><code class="docutils literal notranslate"><span class="pre">test_type_exist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IIDpE00E15test_type_valuebv"><code class="docutils literal notranslate"><span class="pre">test_type_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IIDpE00E9test_typebv"><code class="docutils literal notranslate"><span class="pre">test_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpDpE12TruncateCallDaNSt8functionIF1RDp6PARAMSEEEDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">TruncateCall()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0_6size_tE7GetSize6size_tRA1N_1T"><code class="docutils literal notranslate"><span class="pre">GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414run_and_ignore"><code class="docutils literal notranslate"><span class="pre">run_and_ignore</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE10type_index"><code class="docutils literal notranslate"><span class="pre">type_index</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IE10type_indexIE"><code class="docutils literal notranslate"><span class="pre">type_index</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E10type_index"><code class="docutils literal notranslate"><span class="pre">type_index</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00E10type_index"><code class="docutils literal notranslate"><span class="pre">type_index</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I000E10type_index"><code class="docutils literal notranslate"><span class="pre">type_index</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0000DpE10type_index"><code class="docutils literal notranslate"><span class="pre">type_index</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE8ShowType"><code class="docutils literal notranslate"><span class="pre">ShowType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E15dependent_false"><code class="docutils literal notranslate"><span class="pre">dependent_false</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_iE15PlaceholderType"><code class="docutils literal notranslate"><span class="pre">PlaceholderType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE13AdaptFunction"><code class="docutils literal notranslate"><span class="pre">AdaptFunction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_i_DpiE8tIntMath"><code class="docutils literal notranslate"><span class="pre">tIntMath</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_iE8tIntMath"><code class="docutils literal notranslate"><span class="pre">tIntMath</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="reflection.html">reflection.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="type_traits.html">type_traits.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../meta.html">Meta</a></li>
+      <li class="breadcrumb-item active">meta.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="meta-hpp">
+<h1>meta.hpp<a class="headerlink" href="#meta-hpp" title="Link to this heading"></a></h1>
+<p>A bunch of C++ Template Meta-programming tricks. </p>
+<p>Developer notes:<ul class="simple">
+<li><p>Right now test_type&lt;&gt; returns false if a template can’t resolve, but if it’s true it checks if a value field is present; if so that determines success. The reason for this choice was to make sure that true_type and false_type are handled correctly (with built-in type_tratis) </p></li>
+</ul>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.emp_bool_decoy">
+<span class="target" id="meta_8hpp_1a8aa099a417cef8e592355e1e3f4d5a07"></span><span class="sig-name descname"><span class="n"><span class="pre">emp_bool_decoy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">TEST</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.emp_bool_decoy" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.emp_int_decoy">
+<span class="target" id="meta_8hpp_1a7b0a9aafdaa2751e526d4db81b06e0e2"></span><span class="sig-name descname"><span class="n"><span class="pre">emp_int_decoy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">TEST</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.emp_int_decoy" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE10first_type">
+<span id="_CPPv3IDpE10first_type"></span><span id="_CPPv2IDpE10first_type"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1a37c3cf96964f996e0e5cc34046f13977"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">first_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpE10type_index" title="type_index"><span class="n"><span class="pre">type_index</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpE10first_type" title="first_type::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">t1</span></span><a class="headerlink" href="#_CPPv4IDpE10first_type" title="Link to this definition"></a><br /></dt>
+<dd><p>Trim off a specific type position from a pack. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE11second_type">
+<span id="_CPPv3IDpE11second_type"></span><span id="_CPPv2IDpE11second_type"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1a8a3ea5eda09d9746f8ba6a27998df5ee"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">second_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpE10type_index" title="type_index"><span class="n"><span class="pre">type_index</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpE11second_type" title="second_type::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">t2</span></span><a class="headerlink" href="#_CPPv4IDpE11second_type" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE10third_type">
+<span id="_CPPv3IDpE10third_type"></span><span id="_CPPv2IDpE10third_type"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1ad0c87e5c4d5cd3071ee9259131ab18de"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">third_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpE10type_index" title="type_index"><span class="n"><span class="pre">type_index</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpE10third_type" title="third_type::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">t3</span></span><a class="headerlink" href="#_CPPv4IDpE10third_type" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE11fourth_type">
+<span id="_CPPv3IDpE11fourth_type"></span><span id="_CPPv2IDpE11fourth_type"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1a637a6349fb4bf7b3dfee8be3a16fa4dc"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fourth_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpE10type_index" title="type_index"><span class="n"><span class="pre">type_index</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpE11fourth_type" title="fourth_type::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">t4</span></span><a class="headerlink" href="#_CPPv4IDpE11fourth_type" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_tDpE7pack_id">
+<span id="_CPPv3I_6size_tDpE7pack_id"></span><span id="_CPPv2I_6size_tDpE7pack_id"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ID</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1acfb37f238dc62ae91bb852fb12cbd2b0"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pack_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pack_id_impl</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_tDpE7pack_id" title="pack_id::ID"><span class="n"><span class="pre">ID</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_tDpE7pack_id" title="pack_id::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><a class="headerlink" href="#_CPPv4I_6size_tDpE7pack_id" title="Link to this definition"></a><br /></dt>
+<dd><p>Pick a specific position from a type pack. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE9last_type">
+<span id="_CPPv3IDpE9last_type"></span><span id="_CPPv2IDpE9last_type"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1a9a15d193a45be7be8245eb524942457f"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">last_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_tDpE7pack_id" title="pack_id"><span class="n"><span class="pre">pack_id</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">sizeof</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4IDpE9last_type" title="last_type::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">)</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpE9last_type" title="last_type::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IDpE9last_type" title="Link to this definition"></a><br /></dt>
+<dd><p>Trim off the last type from a pack. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I00E12sfinae_decoy">
+<span id="_CPPv3I00E12sfinae_decoy"></span><span id="_CPPv2I00E12sfinae_decoy"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">REAL_TYPE</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EVAL_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1afc8a980e8cee7112a4dca4a5b36e5673"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sfinae_decoy</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E12sfinae_decoy" title="sfinae_decoy::REAL_TYPE"><span class="n"><span class="pre">REAL_TYPE</span></span></a><a class="headerlink" href="#_CPPv4I00E12sfinae_decoy" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I00E10type_decoy">
+<span id="_CPPv3I00E10type_decoy"></span><span id="_CPPv2I00E10type_decoy"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">REAL_TYPE</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EVAL_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1a692bf7297a0cd5d74bba4736d80d2614"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type_decoy</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E10type_decoy" title="type_decoy::REAL_TYPE"><span class="n"><span class="pre">REAL_TYPE</span></span></a><a class="headerlink" href="#_CPPv4I00E10type_decoy" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I00E7decoy_t">
+<span id="_CPPv3I00E7decoy_t"></span><span id="_CPPv2I00E7decoy_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">REAL_TYPE</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EVAL_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1aa4f756a7e078c5689cc1eb42033f4596"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">decoy_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E7decoy_t" title="decoy_t::REAL_TYPE"><span class="n"><span class="pre">REAL_TYPE</span></span></a><a class="headerlink" href="#_CPPv4I00E7decoy_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0E10bool_decoy">
+<span id="_CPPv3I0E10bool_decoy"></span><span id="_CPPv2I0E10bool_decoy"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EVAL_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1ae15fe332f1afad616012ac89e51db11c"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bool_decoy</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><a class="headerlink" href="#_CPPv4I0E10bool_decoy" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0E9int_decoy">
+<span id="_CPPv3I0E9int_decoy"></span><span id="_CPPv2I0E9int_decoy"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EVAL_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1aef30ddd919076d3ac8079bee27862d5b"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">int_decoy</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><a class="headerlink" href="#_CPPv4I0E9int_decoy" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE13AdaptTemplate">
+<span id="_CPPv3I0DpE13AdaptTemplate"></span><span id="_CPPv2I0DpE13AdaptTemplate"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1a19fff48441a7c5a168c08059e78a4ccb"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdaptTemplate</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">AdaptTemplateHelper</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE13AdaptTemplate" title="AdaptTemplate::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE13AdaptTemplate" title="AdaptTemplate::U"><span class="n"><span class="pre">U</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><a class="headerlink" href="#_CPPv4I0DpE13AdaptTemplate" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I00E18AdaptTemplate_Arg1">
+<span id="_CPPv3I00E18AdaptTemplate_Arg1"></span><span id="_CPPv2I00E18AdaptTemplate_Arg1"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1ab6f02150e4b905005216bc0d2f6ba0e0"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdaptTemplate_Arg1</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">AdaptTemplateHelper_Arg1</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00E18AdaptTemplate_Arg1" title="AdaptTemplate_Arg1::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E18AdaptTemplate_Arg1" title="AdaptTemplate_Arg1::U"><span class="n"><span class="pre">U</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><a class="headerlink" href="#_CPPv4I00E18AdaptTemplate_Arg1" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE9DoNothingvDp2Ts">
+<span id="_CPPv3IDpE9DoNothingDp2Ts"></span><span id="_CPPv2IDpE9DoNothingDp2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1a01c8411f93d08bbba348cd7cef3d870f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoNothing</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpE9DoNothingvDp2Ts" title="DoNothing::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpE9DoNothingvDp2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>A function that will take any number of argument and do nothing with them. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E15BuildObjVector1vR6vectorI5OBJ_TE">
+<span id="_CPPv3I0E15BuildObjVector1R6vectorI5OBJ_TE"></span><span id="_CPPv2I0E15BuildObjVector1R6vectorI5OBJ_TE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OBJ_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1aee33979764f355000b2ed73b3eb85b0f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BuildObjVector1</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E15BuildObjVector1vR6vectorI5OBJ_TE" title="BuildObjVector1::OBJ_T"><span class="n"><span class="pre">OBJ_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E15BuildObjVector1vR6vectorI5OBJ_TE" title="Link to this definition"></a><br /></dt>
+<dd><p>Group types in a parameter pack to build a vector of a designated type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E15BuildObjVector2vR6vectorI5OBJ_TE">
+<span id="_CPPv3I0E15BuildObjVector2R6vectorI5OBJ_TE"></span><span id="_CPPv2I0E15BuildObjVector2R6vectorI5OBJ_TE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OBJ_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1aa0bf4bac96274b709f444fb18226182a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BuildObjVector2</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E15BuildObjVector2vR6vectorI5OBJ_TE" title="BuildObjVector2::OBJ_T"><span class="n"><span class="pre">OBJ_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E15BuildObjVector2vR6vectorI5OBJ_TE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E15BuildObjVector3vR6vectorI5OBJ_TE">
+<span id="_CPPv3I0E15BuildObjVector3R6vectorI5OBJ_TE"></span><span id="_CPPv2I0E15BuildObjVector3R6vectorI5OBJ_TE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OBJ_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1aef5931ba11c659cd41f807be4b61cede"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BuildObjVector3</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E15BuildObjVector3vR6vectorI5OBJ_TE" title="BuildObjVector3::OBJ_T"><span class="n"><span class="pre">OBJ_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E15BuildObjVector3vR6vectorI5OBJ_TE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E15BuildObjVector4vR6vectorI5OBJ_TE">
+<span id="_CPPv3I0E15BuildObjVector4R6vectorI5OBJ_TE"></span><span id="_CPPv2I0E15BuildObjVector4R6vectorI5OBJ_TE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OBJ_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1aba01327fd44fd578ec04718493ff80db"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BuildObjVector4</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E15BuildObjVector4vR6vectorI5OBJ_TE" title="BuildObjVector4::OBJ_T"><span class="n"><span class="pre">OBJ_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E15BuildObjVector4vR6vectorI5OBJ_TE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00DpE15BuildObjVector1vR6vectorI5OBJ_TER2T1DpR2Ts">
+<span id="_CPPv3I00DpE15BuildObjVector1R6vectorI5OBJ_TER2T1DpR2Ts"></span><span id="_CPPv2I00DpE15BuildObjVector1R6vectorI5OBJ_TER2T1DpR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OBJ_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1a2cf4faac6c0f114ef3b2a7037051e0ce"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BuildObjVector1</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00DpE15BuildObjVector1vR6vectorI5OBJ_TER2T1DpR2Ts" title="BuildObjVector1::OBJ_T"><span class="n"><span class="pre">OBJ_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <a class="reference internal" href="#_CPPv4I00DpE15BuildObjVector1vR6vectorI5OBJ_TER2T1DpR2Ts" title="BuildObjVector1::T1"><span class="n"><span class="pre">T1</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <a class="reference internal" href="#_CPPv4I00DpE15BuildObjVector1vR6vectorI5OBJ_TER2T1DpR2Ts" title="BuildObjVector1::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">extras</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00DpE15BuildObjVector1vR6vectorI5OBJ_TER2T1DpR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I000DpE15BuildObjVector2vR6vectorI5OBJ_TER2T1R2T2DpR2Ts">
+<span id="_CPPv3I000DpE15BuildObjVector2R6vectorI5OBJ_TER2T1R2T2DpR2Ts"></span><span id="_CPPv2I000DpE15BuildObjVector2R6vectorI5OBJ_TER2T1R2T2DpR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OBJ_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T2</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1ab7d6f749d43a7b3a2033014da00f3a58"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BuildObjVector2</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000DpE15BuildObjVector2vR6vectorI5OBJ_TER2T1R2T2DpR2Ts" title="BuildObjVector2::OBJ_T"><span class="n"><span class="pre">OBJ_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <a class="reference internal" href="#_CPPv4I000DpE15BuildObjVector2vR6vectorI5OBJ_TER2T1R2T2DpR2Ts" title="BuildObjVector2::T1"><span class="n"><span class="pre">T1</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <a class="reference internal" href="#_CPPv4I000DpE15BuildObjVector2vR6vectorI5OBJ_TER2T1R2T2DpR2Ts" title="BuildObjVector2::T2"><span class="n"><span class="pre">T2</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg2</span></span>, <a class="reference internal" href="#_CPPv4I000DpE15BuildObjVector2vR6vectorI5OBJ_TER2T1R2T2DpR2Ts" title="BuildObjVector2::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">extras</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I000DpE15BuildObjVector2vR6vectorI5OBJ_TER2T1R2T2DpR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0000DpE15BuildObjVector3vR6vectorI5OBJ_TER2T1R2T2R2T3DpR2Ts">
+<span id="_CPPv3I0000DpE15BuildObjVector3R6vectorI5OBJ_TER2T1R2T2R2T3DpR2Ts"></span><span id="_CPPv2I0000DpE15BuildObjVector3R6vectorI5OBJ_TER2T1R2T2R2T3DpR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OBJ_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T2</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T3</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1a2f51f9fc411922755509ec3d4d1456e9"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BuildObjVector3</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0000DpE15BuildObjVector3vR6vectorI5OBJ_TER2T1R2T2R2T3DpR2Ts" title="BuildObjVector3::OBJ_T"><span class="n"><span class="pre">OBJ_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <a class="reference internal" href="#_CPPv4I0000DpE15BuildObjVector3vR6vectorI5OBJ_TER2T1R2T2R2T3DpR2Ts" title="BuildObjVector3::T1"><span class="n"><span class="pre">T1</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <a class="reference internal" href="#_CPPv4I0000DpE15BuildObjVector3vR6vectorI5OBJ_TER2T1R2T2R2T3DpR2Ts" title="BuildObjVector3::T2"><span class="n"><span class="pre">T2</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg2</span></span>, <a class="reference internal" href="#_CPPv4I0000DpE15BuildObjVector3vR6vectorI5OBJ_TER2T1R2T2R2T3DpR2Ts" title="BuildObjVector3::T3"><span class="n"><span class="pre">T3</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg3</span></span>, <a class="reference internal" href="#_CPPv4I0000DpE15BuildObjVector3vR6vectorI5OBJ_TER2T1R2T2R2T3DpR2Ts" title="BuildObjVector3::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">extras</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0000DpE15BuildObjVector3vR6vectorI5OBJ_TER2T1R2T2R2T3DpR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00000DpE15BuildObjVector4vR6vectorI5OBJ_TER2T1R2T2R2T3R2T4DpR2Ts">
+<span id="_CPPv3I00000DpE15BuildObjVector4R6vectorI5OBJ_TER2T1R2T2R2T3R2T4DpR2Ts"></span><span id="_CPPv2I00000DpE15BuildObjVector4R6vectorI5OBJ_TER2T1R2T2R2T3R2T4DpR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OBJ_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T2</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T3</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T4</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1afd4fb5fe4d8fa86ca45aee4f1d74e149"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BuildObjVector4</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00000DpE15BuildObjVector4vR6vectorI5OBJ_TER2T1R2T2R2T3R2T4DpR2Ts" title="BuildObjVector4::OBJ_T"><span class="n"><span class="pre">OBJ_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <a class="reference internal" href="#_CPPv4I00000DpE15BuildObjVector4vR6vectorI5OBJ_TER2T1R2T2R2T3R2T4DpR2Ts" title="BuildObjVector4::T1"><span class="n"><span class="pre">T1</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <a class="reference internal" href="#_CPPv4I00000DpE15BuildObjVector4vR6vectorI5OBJ_TER2T1R2T2R2T3R2T4DpR2Ts" title="BuildObjVector4::T2"><span class="n"><span class="pre">T2</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg2</span></span>, <a class="reference internal" href="#_CPPv4I00000DpE15BuildObjVector4vR6vectorI5OBJ_TER2T1R2T2R2T3R2T4DpR2Ts" title="BuildObjVector4::T3"><span class="n"><span class="pre">T3</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg3</span></span>, <a class="reference internal" href="#_CPPv4I00000DpE15BuildObjVector4vR6vectorI5OBJ_TER2T1R2T2R2T3R2T4DpR2Ts" title="BuildObjVector4::T4"><span class="n"><span class="pre">T4</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg4</span></span>, <a class="reference internal" href="#_CPPv4I00000DpE15BuildObjVector4vR6vectorI5OBJ_TER2T1R2T2R2T3R2T4DpR2Ts" title="BuildObjVector4::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">extras</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00000DpE15BuildObjVector4vR6vectorI5OBJ_TER2T1R2T2R2T3R2T4DpR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0_6size_tDpE14BuildObjVector6vectorI5OBJ_TEDpR2Ts">
+<span id="_CPPv3I0_6size_tDpE14BuildObjVectorDpR2Ts"></span><span id="_CPPv2I0_6size_tDpE14BuildObjVectorDpR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OBJ_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NUM_ARGS</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1a317a33666b5961f4e9b4537c613ccfe2"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_6size_tDpE14BuildObjVector6vectorI5OBJ_TEDpR2Ts" title="BuildObjVector::OBJ_T"><span class="n"><span class="pre">OBJ_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BuildObjVector</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_6size_tDpE14BuildObjVector6vectorI5OBJ_TEDpR2Ts" title="BuildObjVector::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_6size_tDpE14BuildObjVector6vectorI5OBJ_TEDpR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00DpE8has_typebv">
+<span id="_CPPv3I00DpE8has_typev"></span><span id="_CPPv2I00DpE8has_typev"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TEST</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FIRST</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">OTHERS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1ad5efff55bd412d345458e5b2a1ba8187"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">has_type</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00DpE8has_typebv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00DpE10count_type6size_tv">
+<span id="_CPPv3I00DpE10count_typev"></span><span id="_CPPv2I00DpE10count_typev"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TEST</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FIRST</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">OTHERS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1aee984475c403c8706bcf42eb2365eff0"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">count_type</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00DpE10count_type6size_tv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE14get_type_indexiv">
+<span id="_CPPv3I0DpE14get_type_indexv"></span><span id="_CPPv2I0DpE14get_type_indexv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TEST_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1aa489f8fffe5aacfab381ca82cc30babf"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_type_index</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE14get_type_indexiv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00DpE21has_unique_first_typebv">
+<span id="_CPPv3I00DpE21has_unique_first_typev"></span><span id="_CPPv2I00DpE21has_unique_first_typev"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TYPE1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TYPE2</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">TYPE_LIST</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1af2b7b60228b5b68f3bc977b3d5f2b450"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">has_unique_first_type</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00DpE21has_unique_first_typebv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00DpE16has_unique_typesbv">
+<span id="_CPPv3I00DpE16has_unique_typesv"></span><span id="_CPPv2I00DpE16has_unique_typesv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TYPE1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TYPE2</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">TYPE_LIST</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1a79148663f4a03c102721159083bad4c4"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">has_unique_types</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00DpE16has_unique_typesbv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IIDpE00E15test_type_existbv">
+<span id="_CPPv3IIDpE00E15test_type_existv"></span><span id="_CPPv2IIDpE00E15test_type_existv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TEST</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1ab9bc10a27fa4b324ce330f990b492fd6"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">test_type_exist</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IIDpE00E15test_type_existbv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IIDpE00E15test_type_valuebv">
+<span id="_CPPv3IIDpE00E15test_type_valuev"></span><span id="_CPPv2IIDpE00E15test_type_valuev"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TEST</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1a80ba2bc24692bd61351e1e486f8fbad0"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">test_type_value</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IIDpE00E15test_type_valuebv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IIDpE00E9test_typebv">
+<span id="_CPPv3IIDpE00E9test_typev"></span><span id="_CPPv2IIDpE00E9test_typev"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TEST</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1af83bdd7a9d701864d3872aae8b17e85c"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">test_type</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IIDpE00E9test_typebv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpDpE12TruncateCallDaNSt8functionIF1RDp6PARAMSEEEDpRR4ARGS">
+<span id="_CPPv3I0DpDpE12TruncateCallNSt8functionIF1RDp6PARAMSEEEDpRR4ARGS"></span><span id="_CPPv2I0DpDpE12TruncateCallNSt8functionIF1RDp6PARAMSEEEDpRR4ARGS"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">R</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">PARAMS</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1a03718d081f6b34e84529cf5628772160"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TruncateCall</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpDpE12TruncateCallDaNSt8functionIF1RDp6PARAMSEEEDpRR4ARGS" title="TruncateCall::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpDpE12TruncateCallDaNSt8functionIF1RDp6PARAMSEEEDpRR4ARGS" title="TruncateCall::PARAMS"><span class="n"><span class="pre">PARAMS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fun</span></span>, <a class="reference internal" href="#_CPPv4I0DpDpE12TruncateCallDaNSt8functionIF1RDp6PARAMSEEEDpRR4ARGS" title="TruncateCall::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpDpE12TruncateCallDaNSt8functionIF1RDp6PARAMSEEEDpRR4ARGS" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0_6size_tE7GetSize6size_tRA1N_1T">
+<span id="_CPPv3I0_6size_tE7GetSizeRA1N_1T"></span><span id="_CPPv2I0_6size_tE7GetSizeRAN_1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">N</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="meta_8hpp_1aa132a5fc792f00ca5d60a1c9e92a9f74"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_6size_tE7GetSize6size_tRA1N_1T" title="GetSize::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#_CPPv4I0_6size_tE7GetSize6size_tRA1N_1T" title="GetSize::N"><span class="n"><span class="pre">N</span></span></a><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_6size_tE7GetSize6size_tRA1N_1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine the size of a built-in array. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv414run_and_ignore">
+<span id="_CPPv314run_and_ignore"></span><span id="_CPPv214run_and_ignore"></span><span id="run_and_ignore"></span><span class="target" id="structrun__and__ignore"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">run_and_ignore</span></span></span><a class="headerlink" href="#_CPPv414run_and_ignore" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;meta.hpp&gt;</em></div>
+<p>Effectively create a function (via constructor) where all args are computed, then ignored. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN14run_and_ignore14run_and_ignoreEDpRR1T">
+<span id="_CPPv3IDpEN14run_and_ignore14run_and_ignoreEDpRR1T"></span><span id="_CPPv2IDpEN14run_and_ignore14run_and_ignoreEDpRR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structrun__and__ignore_1ade9b23197305be291d1d7e52929ce39d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">run_and_ignore</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN14run_and_ignore14run_and_ignoreEDpRR1T" title="run_and_ignore::run_and_ignore::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN14run_and_ignore14run_and_ignoreEDpRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE10type_index">
+<span id="_CPPv3IDpE10type_index"></span><span id="_CPPv2IDpE10type_index"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structtype__index"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type_index</span></span></span><a class="headerlink" href="#_CPPv4IDpE10type_index" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;meta.hpp&gt;</em></div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4IE10type_indexIE">
+<span id="_CPPv3IE10type_indexIE"></span><span id="_CPPv2IE10type_indexIE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structtype__index_3_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type_index</span></span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IE10type_indexIE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;meta.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N10type_indexIE2t1E">
+<span id="_CPPv3N10type_indexIE2t1E"></span><span id="_CPPv2N10type_indexIE2t1E"></span><span class="target" id="structtype__index_3_4_1a9a062f73f5fcbc44d8266ed2fabe44bf"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t1</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N10type_indexIE2t1E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N10type_indexIE2t2E">
+<span id="_CPPv3N10type_indexIE2t2E"></span><span id="_CPPv2N10type_indexIE2t2E"></span><span class="target" id="structtype__index_3_4_1aa548a9a8779e2f840721c2bc7ecad23b"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t2</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N10type_indexIE2t2E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N10type_indexIE2t3E">
+<span id="_CPPv3N10type_indexIE2t3E"></span><span id="_CPPv2N10type_indexIE2t3E"></span><span class="target" id="structtype__index_3_4_1a0df8b5b41fa7bcfbe0a3b538decd44c9"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t3</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N10type_indexIE2t3E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N10type_indexIE2t4E">
+<span id="_CPPv3N10type_indexIE2t4E"></span><span id="_CPPv2N10type_indexIE2t4E"></span><span class="target" id="structtype__index_3_4_1a884ac3363171bed6e79aa2054f52321e"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t4</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N10type_indexIE2t4E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0E10type_index">
+<span id="_CPPv3I0E10type_index"></span><span id="_CPPv2I0E10type_index"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T1</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structtype__index_3_01T1_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type_index</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E10type_index" title="type_index::T1"><span class="n"><span class="pre">T1</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0E10type_index" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;meta.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N10type_index2t1E">
+<span id="_CPPv3N10type_index2t1E"></span><span id="_CPPv2N10type_index2t1E"></span><span class="target" id="structtype__index_3_01T1_01_4_1a55e1749064a1e46a01bda4b97347bf43"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t1</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E10type_index" title="type_index::T1"><span class="n"><span class="pre">T1</span></span></a><a class="headerlink" href="#_CPPv4N10type_index2t1E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N10type_index2t2E">
+<span id="_CPPv3N10type_index2t2E"></span><span id="_CPPv2N10type_index2t2E"></span><span class="target" id="structtype__index_3_01T1_01_4_1acb8bb29b20a927138abee5dd56c763df"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t2</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N10type_index2t2E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N10type_index2t3E">
+<span id="_CPPv3N10type_index2t3E"></span><span id="_CPPv2N10type_index2t3E"></span><span class="target" id="structtype__index_3_01T1_01_4_1abd0feebd15ea4eb707352660901e16f3"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t3</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N10type_index2t3E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N10type_index2t4E">
+<span id="_CPPv3N10type_index2t4E"></span><span id="_CPPv2N10type_index2t4E"></span><span class="target" id="structtype__index_3_01T1_01_4_1a9a89fc5d8615cb1c524231e1916538a9"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t4</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N10type_index2t4E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I00E10type_index">
+<span id="_CPPv3I00E10type_index"></span><span id="_CPPv2I00E10type_index"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T2</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structtype__index_3_01T1_00_01T2_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type_index</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00E10type_index" title="type_index::T1"><span class="n"><span class="pre">T1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E10type_index" title="type_index::T2"><span class="n"><span class="pre">T2</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I00E10type_index" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;meta.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtype__index_3_01T1_00_01T2_01_4_1ac02dddcb7ff02fa1004f193e7f364428"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t1</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E10type_index" title="type_index::T1"><span class="n"><span class="pre">T1</span></span></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtype__index_3_01T1_00_01T2_01_4_1ae707d9fcade4622f4d1450d987327360"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t2</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00E10type_index" title="type_index::T2"><span class="n"><span class="pre">T2</span></span></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtype__index_3_01T1_00_01T2_01_4_1a0b108d6b7d10b965be985374c4774252"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t3</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtype__index_3_01T1_00_01T2_01_4_1a710ab1e6927411313d25f169cdc2ea64"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t4</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I000E10type_index">
+<span id="_CPPv3I000E10type_index"></span><span id="_CPPv2I000E10type_index"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T2</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T3</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structtype__index_3_01T1_00_01T2_00_01T3_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type_index</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000E10type_index" title="type_index::T1"><span class="n"><span class="pre">T1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000E10type_index" title="type_index::T2"><span class="n"><span class="pre">T2</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000E10type_index" title="type_index::T3"><span class="n"><span class="pre">T3</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I000E10type_index" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;meta.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtype__index_3_01T1_00_01T2_00_01T3_01_4_1aac169d5e0316a71b52a07a9b3d98c2b2"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t1</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000E10type_index" title="type_index::T1"><span class="n"><span class="pre">T1</span></span></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtype__index_3_01T1_00_01T2_00_01T3_01_4_1a48f844114ddacee125e033ea1f2317f9"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t2</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000E10type_index" title="type_index::T2"><span class="n"><span class="pre">T2</span></span></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtype__index_3_01T1_00_01T2_00_01T3_01_4_1a97693f233a7b59d1b5cfce3cbfcc5acb"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t3</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000E10type_index" title="type_index::T3"><span class="n"><span class="pre">T3</span></span></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtype__index_3_01T1_00_01T2_00_01T3_01_4_1a34d07218ce1b841aa0e30d9d4f074d53"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t4</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0000DpE10type_index">
+<span id="_CPPv3I0000DpE10type_index"></span><span id="_CPPv2I0000DpE10type_index"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T2</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T3</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T4</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structtype__index_3_01T1_00_01T2_00_01T3_00_01T4_00_01Ts_8_8_8_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type_index</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0000DpE10type_index" title="type_index::T1"><span class="n"><span class="pre">T1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000DpE10type_index" title="type_index::T2"><span class="n"><span class="pre">T2</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000DpE10type_index" title="type_index::T3"><span class="n"><span class="pre">T3</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000DpE10type_index" title="type_index::T4"><span class="n"><span class="pre">T4</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000DpE10type_index" title="type_index::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0000DpE10type_index" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;meta.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtype__index_3_01T1_00_01T2_00_01T3_00_01T4_00_01Ts_8_8_8_01_4_1a1a6650b5cc9bd8dc1671a2f30fb1b439"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t1</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000DpE10type_index" title="type_index::T1"><span class="n"><span class="pre">T1</span></span></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtype__index_3_01T1_00_01T2_00_01T3_00_01T4_00_01Ts_8_8_8_01_4_1ae2d9e78950c6d15003b2ada37270423a"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t2</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000DpE10type_index" title="type_index::T2"><span class="n"><span class="pre">T2</span></span></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtype__index_3_01T1_00_01T2_00_01T3_00_01T4_00_01Ts_8_8_8_01_4_1a99a35f2b36dd00d9198f939a01e91aee"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t3</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000DpE10type_index" title="type_index::T3"><span class="n"><span class="pre">T3</span></span></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtype__index_3_01T1_00_01T2_00_01T3_00_01T4_00_01Ts_8_8_8_01_4_1ac51a18df59b4f0f4d25ac0804f92a11f"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t4</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000DpE10type_index" title="type_index::T4"><span class="n"><span class="pre">T4</span></span></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE8ShowType">
+<span id="_CPPv3IDpE8ShowType"></span><span id="_CPPv2IDpE8ShowType"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structShowType"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShowType</span></span></span><a class="headerlink" href="#_CPPv4IDpE8ShowType" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;meta.hpp&gt;</em></div>
+<p>A struct declaration with no definition to show a type name in a compile time error. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0E15dependent_false">
+<span id="_CPPv3I0E15dependent_false"></span><span id="_CPPv2I0E15dependent_false"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structdependent__false"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dependent_false</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">false_type</span></span><a class="headerlink" href="#_CPPv4I0E15dependent_false" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;meta.hpp&gt;</em></div>
+<p>A false type that does NOT resolve in unexecuted if-constexpr branches. By Brian Bi; from: <a class="reference external" href="https://stackoverflow.com/questions/69501472/best-way-to-trigger-a-compile-time-error-if-no-if-constexprs-succeed">https://stackoverflow.com/questions/69501472/best-way-to-trigger-a-compile-time-error-if-no-if-constexprs-succeed</a></p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I_iE15PlaceholderType">
+<span id="_CPPv3I_iE15PlaceholderType"></span><span id="_CPPv2I_iE15PlaceholderType"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structPlaceholderType"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PlaceholderType</span></span></span><a class="headerlink" href="#_CPPv4I_iE15PlaceholderType" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;meta.hpp&gt;</em></div>
+<p>Create a placeholder template to substitute for a real type. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE13AdaptFunction">
+<span id="_CPPv3I0DpE13AdaptFunction"></span><span id="_CPPv2I0DpE13AdaptFunction"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">R</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structAdaptFunction"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdaptFunction</span></span></span><a class="headerlink" href="#_CPPv4I0DpE13AdaptFunction" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;meta.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN13AdaptFunction6ExpandEDaRKNSt8functionIF1RDp4ARGSEEE">
+<span id="_CPPv3IDpEN13AdaptFunction6ExpandERKNSt8functionIF1RDp4ARGSEEE"></span><span id="_CPPv2IDpEN13AdaptFunction6ExpandERKNSt8functionIF1RDp4ARGSEEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">EXTRA_ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structAdaptFunction_1abfd40f477eb6a60f0f1b51049f30fbd1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Expand</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE13AdaptFunction" title="AdaptFunction::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE13AdaptFunction" title="AdaptFunction::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN13AdaptFunction6ExpandEDaRKNSt8functionIF1RDp4ARGSEEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I_i_DpiE8tIntMath">
+<span id="_CPPv3I_i_DpiE8tIntMath"></span><span id="_CPPv2I_i_DpiE8tIntMath"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">I</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Is</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structtIntMath"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tIntMath</span></span></span><a class="headerlink" href="#_CPPv4I_i_DpiE8tIntMath" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;meta.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8tIntMath3SumEv">
+<span id="_CPPv3N8tIntMath3SumEv"></span><span id="_CPPv2N8tIntMath3SumEv"></span><span id="tIntMath::SumCE"></span><span class="target" id="structtIntMath_1a044ceea939ffd42637ade33974152b1f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sum</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8tIntMath3SumEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8tIntMath7ProductEv">
+<span id="_CPPv3N8tIntMath7ProductEv"></span><span id="_CPPv2N8tIntMath7ProductEv"></span><span id="tIntMath::ProductCE"></span><span class="target" id="structtIntMath_1a4d4c3e5a6365e35d2b62fb2029bc8c08"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Product</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8tIntMath7ProductEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I_iE8tIntMath">
+<span id="_CPPv3I_iE8tIntMath"></span><span id="_CPPv2I_iE8tIntMath"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">I</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structtIntMath_3_01I_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tIntMath</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_iE8tIntMath" title="tIntMath::I"><span class="n"><span class="pre">I</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I_iE8tIntMath" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;meta.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtIntMath_3_01I_01_4_1a77ced7eef2a5ec940cbca660d8d2fc76"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sum</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="structtIntMath_3_01I_01_4_1aaa59fb1c9fd3e09ac0bddf44daeecd30"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Product</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="macros.html" class="btn btn-neutral float-left" title="macros.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reflection.html" class="btn btn-neutral float-right" title="reflection.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

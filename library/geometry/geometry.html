@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Geometry &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/geometry/geometry.10c89138-29a2-4f06-9f3c-9afaf681d5b4.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Angle2D.hpp" href="api/Angle2D.html" />
+    <link rel="prev" title="PayoffMatrix.hpp" href="../games/api/PayoffMatrix.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Geometry</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html">Angle2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html">Body2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html">Circle2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html">Physics2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html">Point2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html">Surface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface2D.html">Surface2D.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Geometry</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="geometry">
+<h1>Geometry<a class="headerlink" href="#geometry" title="Link to this heading"></a></h1>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/Angle2D.html">Angle2D.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Angle2D.html#_CPPv412sin_chart_1K"><code class="docutils literal notranslate"><span class="pre">sin_chart_1K</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Angle2D.html#_CPPv412cos_chart_1K"><code class="docutils literal notranslate"><span class="pre">cos_chart_1K</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Angle2D.html#_CPPv412tan_chart_1K"><code class="docutils literal notranslate"><span class="pre">tan_chart_1K</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Angle2D.html#_CPPv45Angle"><code class="docutils literal notranslate"><span class="pre">Angle</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle5AngleEv"><code class="docutils literal notranslate"><span class="pre">Angle::Angle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle5AngleERK5Angle"><code class="docutils literal notranslate"><span class="pre">Angle::Angle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle5AngleEd"><code class="docutils literal notranslate"><span class="pre">Angle::Angle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle5AngleE8uint32_tb"><code class="docutils literal notranslate"><span class="pre">Angle::Angle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5Angle9AsPortionEv"><code class="docutils literal notranslate"><span class="pre">Angle::AsPortion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5Angle9AsRadiansEv"><code class="docutils literal notranslate"><span class="pre">Angle::AsRadians()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5Angle9AsDegreesEv"><code class="docutils literal notranslate"><span class="pre">Angle::AsDegrees()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle10SetPortionEd"><code class="docutils literal notranslate"><span class="pre">Angle::SetPortion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle10SetRadiansEd"><code class="docutils literal notranslate"><span class="pre">Angle::SetRadians()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle10SetDegreesEd"><code class="docutils literal notranslate"><span class="pre">Angle::SetDegrees()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle7PointUpEv"><code class="docutils literal notranslate"><span class="pre">Angle::PointUp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle10PointRightEv"><code class="docutils literal notranslate"><span class="pre">Angle::PointRight()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle9PointDownEv"><code class="docutils literal notranslate"><span class="pre">Angle::PointDown()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle9PointLeftEv"><code class="docutils literal notranslate"><span class="pre">Angle::PointLeft()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle8TruncateEv"><code class="docutils literal notranslate"><span class="pre">Angle::Truncate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle16CountFullCirclesEv"><code class="docutils literal notranslate"><span class="pre">Angle::CountFullCircles()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle11RotateRightEv"><code class="docutils literal notranslate"><span class="pre">Angle::RotateRight()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle10RotateLeftEv"><code class="docutils literal notranslate"><span class="pre">Angle::RotateLeft()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle11RotateUTurnEv"><code class="docutils literal notranslate"><span class="pre">Angle::RotateUTurn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle10RotateFullE8uint32_t"><code class="docutils literal notranslate"><span class="pre">Angle::RotateFull()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle13RotateRadiansEd"><code class="docutils literal notranslate"><span class="pre">Angle::RotateRadians()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle13RotateDegreesEd"><code class="docutils literal notranslate"><span class="pre">Angle::RotateDegrees()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5AngleaSERK5Angle"><code class="docutils literal notranslate"><span class="pre">Angle::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5AngleeqERK5Angle"><code class="docutils literal notranslate"><span class="pre">Angle::operator==()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5AngleneERK5Angle"><code class="docutils literal notranslate"><span class="pre">Angle::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5AngleltERK5Angle"><code class="docutils literal notranslate"><span class="pre">Angle::operator&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5AngleleERK5Angle"><code class="docutils literal notranslate"><span class="pre">Angle::operator&lt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5AnglegtERK5Angle"><code class="docutils literal notranslate"><span class="pre">Angle::operator&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5AnglegeERK5Angle"><code class="docutils literal notranslate"><span class="pre">Angle::operator&gt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5AngleplERK5Angle"><code class="docutils literal notranslate"><span class="pre">Angle::operator+()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5AnglemiERK5Angle"><code class="docutils literal notranslate"><span class="pre">Angle::operator-()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5AnglemlEd"><code class="docutils literal notranslate"><span class="pre">Angle::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5AngledvEd"><code class="docutils literal notranslate"><span class="pre">Angle::operator/()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5AnglepLERK5Angle"><code class="docutils literal notranslate"><span class="pre">Angle::operator+=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5AnglemIERK5Angle"><code class="docutils literal notranslate"><span class="pre">Angle::operator-=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5AnglemLEd"><code class="docutils literal notranslate"><span class="pre">Angle::operator*=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5AngledVEd"><code class="docutils literal notranslate"><span class="pre">Angle::operator/=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5Angle3SinEv"><code class="docutils literal notranslate"><span class="pre">Angle::Sin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5Angle3CosEv"><code class="docutils literal notranslate"><span class="pre">Angle::Cos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5Angle3TanEv"><code class="docutils literal notranslate"><span class="pre">Angle::Tan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5Angle11Sin_Quick1KEv"><code class="docutils literal notranslate"><span class="pre">Angle::Sin_Quick1K()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5Angle11Cos_Quick1KEv"><code class="docutils literal notranslate"><span class="pre">Angle::Cos_Quick1K()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5Angle11Tan_Quick1KEv"><code class="docutils literal notranslate"><span class="pre">Angle::Tan_Quick1K()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5Angle8GetPointEd"><code class="docutils literal notranslate"><span class="pre">Angle::GetPoint()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4NK5Angle8GetPointERK5Pointd"><code class="docutils literal notranslate"><span class="pre">Angle::GetPoint()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle5angleE"><code class="docutils literal notranslate"><span class="pre">Angle::angle</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle9ANGLE_CAPE"><code class="docutils literal notranslate"><span class="pre">Angle::ANGLE_CAP</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle2UPE"><code class="docutils literal notranslate"><span class="pre">Angle::UP</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle5RIGHTE"><code class="docutils literal notranslate"><span class="pre">Angle::RIGHT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle4DOWNE"><code class="docutils literal notranslate"><span class="pre">Angle::DOWN</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Angle2D.html#_CPPv4N5Angle4LEFTE"><code class="docutils literal notranslate"><span class="pre">Angle::LEFT</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Body2D.html">Body2D.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Body2D.html#_CPPv411Body2D_Base"><code class="docutils literal notranslate"><span class="pre">Body2D_Base</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base11Body2D_BaseEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::Body2D_Base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_BaseD0Ev"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::~Body2D_Base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK11Body2D_Base12GetBirthTimeEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::GetBirthTime()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK11Body2D_Base14GetOrientationEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::GetOrientation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK11Body2D_Base11GetVelocityEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::GetVelocity()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK11Body2D_Base7GetMassEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::GetMass()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK11Body2D_Base10GetColorIDEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::GetColorID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK11Body2D_Base13IsReproducingEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::IsReproducing()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK11Body2D_Base13GetReproCountEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::GetReproCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK11Body2D_Base8GetShiftEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::GetShift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK11Body2D_Base11GetPressureEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::GetPressure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK11Body2D_Base17GetDetachOnDivideEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::GetDetachOnDivide()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base12SetBirthTimeEd"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::SetBirthTime()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base14SetOrientationE5Angle"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::SetOrientation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base11SetVelocityE5Point"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::SetVelocity()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base7SetMassEd"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::SetMass()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base10SetColorIDE8uint32_t"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::SetColorID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8TurnLeftEi"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::TurnLeft()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base9TurnRightEi"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::TurnRight()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base13RotateDegreesEd"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::RotateDegrees()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8IncSpeedERK5Point"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::IncSpeed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8IncSpeedEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::IncSpeed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8DecSpeedEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::DecSpeed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base11SetVelocityEdd"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::SetVelocity()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8AddShiftERK5Point"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::AddShift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base17SetDetachOnDivideEb"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::SetDetachOnDivide()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base9LINK_TYPEE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::LINK_TYPE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base9LINK_TYPE7DEFAULTE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::LINK_TYPE::DEFAULT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base9LINK_TYPE12REPRODUCTIONE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::LINK_TYPE::REPRODUCTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base9LINK_TYPE6ATTACKE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::LINK_TYPE::ATTACK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base9LINK_TYPE8PARASITEE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::LINK_TYPE::PARASITE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base9LINK_TYPE9MULTICELLE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::LINK_TYPE::MULTICELL</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base10birth_timeE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::birth_time</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base11orientationE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::orientation</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8velocityE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::velocity</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base4massE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::mass</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8color_idE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::color_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base11repro_countE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::repro_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base5shiftE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::shift</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base9cum_shiftE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::cum_shift</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base15total_abs_shiftE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::total_abs_shift</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8pressureE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::pressure</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base16detach_on_divideE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::detach_on_divide</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4I0EN11Body2D_Base8BodyLinkE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::BodyLink</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8BodyLink8BodyLinkEv"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::BodyLink::BodyLink()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8BodyLink8BodyLinkE9LINK_TYPE3PtrI9BODY_TYPEE3PtrI9BODY_TYPEEdd"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::BodyLink::BodyLink()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8BodyLink8BodyLinkERK8BodyLink"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::BodyLink::BodyLink()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8BodyLinkD0Ev"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::BodyLink::~BodyLink()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8BodyLink4typeE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::BodyLink::type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8BodyLink4fromE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::BodyLink::from</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8BodyLink2toE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::BodyLink::to</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8BodyLink8cur_distE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::BodyLink::cur_dist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Body2D.html#_CPPv4N11Body2D_Base8BodyLink11target_distE"><code class="docutils literal notranslate"><span class="pre">Body2D_Base::BodyLink::target_dist</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Body2D.html#_CPPv412CircleBody2D"><code class="docutils literal notranslate"><span class="pre">CircleBody2D</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D12CircleBody2DEv"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::CircleBody2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D12CircleBody2DERK8Circle2DIdE"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::CircleBody2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2DD0Ev"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::~CircleBody2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK12CircleBody2D12GetPerimeterEv"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::GetPerimeter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK12CircleBody2D11GetPositionEv"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::GetPosition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK12CircleBody2D9GetCenterEv"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::GetCenter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK12CircleBody2D9GetRadiusEv"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::GetRadius()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK12CircleBody2D15GetTargetRadiusEv"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::GetTargetRadius()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D11SetPositionERK5Point"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::SetPosition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D9SetRadiusEd"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::SetRadius()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D15SetTargetRadiusEd"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::SetTargetRadius()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D9TranslateERK5Point"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::Translate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK12CircleBody2D12IsLinkedFromERK12CircleBody2D"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::IsLinkedFrom()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK12CircleBody2D10IsLinkedToERK12CircleBody2D"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::IsLinkedTo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK12CircleBody2D8IsLinkedERK12CircleBody2D"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::IsLinked()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK12CircleBody2D12GetLinkCountEv"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::GetLinkCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D7AddLinkE9LINK_TYPER12CircleBody2Ddd"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::AddLink()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D10RemoveLinkE3PtrI8BodyLinkI12CircleBody2DEE"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::RemoveLink()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK12CircleBody2D8FindLinkERK12CircleBody2D"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::FindLink()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D8FindLinkER12CircleBody2D"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::FindLink()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK12CircleBody2D11GetLinkDistERK12CircleBody2D"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::GetLinkDist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4NK12CircleBody2D17GetTargetLinkDistERK12CircleBody2D"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::GetTargetLinkDist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D13ShiftLinkDistER12CircleBody2Dd"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::ShiftLinkDist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D14BuildOffspringE5Point"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::BuildOffspring()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D10BodyUpdateEd"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::BodyUpdate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D11ProcessStepEd"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::ProcessStep()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D16FinalizePositionERK5Point"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::FinalizePosition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D2OKEv"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::OK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D9perimeterE"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::perimeter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D13target_radiusE"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::target_radius</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D10from_linksE"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::from_links</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Body2D.html#_CPPv4N12CircleBody2D8to_linksE"><code class="docutils literal notranslate"><span class="pre">CircleBody2D::to_links</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Circle2D.html">Circle2D.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Circle2D.html#_CPPv46Circle"><code class="docutils literal notranslate"><span class="pre">Circle</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Circle2D.html#_CPPv4I0E8Circle2D"><code class="docutils literal notranslate"><span class="pre">Circle2D</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4N8Circle2D8Circle2DERK7Point2DI4TYPEE4TYPE"><code class="docutils literal notranslate"><span class="pre">Circle2D::Circle2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4N8Circle2D8Circle2DE4TYPE4TYPE4TYPE"><code class="docutils literal notranslate"><span class="pre">Circle2D::Circle2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4N8Circle2D8Circle2DE4TYPE"><code class="docutils literal notranslate"><span class="pre">Circle2D::Circle2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4NK8Circle2D9GetCenterEv"><code class="docutils literal notranslate"><span class="pre">Circle2D::GetCenter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4NK8Circle2D10GetCenterXEv"><code class="docutils literal notranslate"><span class="pre">Circle2D::GetCenterX()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4NK8Circle2D10GetCenterYEv"><code class="docutils literal notranslate"><span class="pre">Circle2D::GetCenterY()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4NK8Circle2D9GetRadiusEv"><code class="docutils literal notranslate"><span class="pre">Circle2D::GetRadius()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4NK8Circle2D15GetSquareRadiusEv"><code class="docutils literal notranslate"><span class="pre">Circle2D::GetSquareRadius()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4N8Circle2D9SetCenterERK7Point2DI4TYPEE"><code class="docutils literal notranslate"><span class="pre">Circle2D::SetCenter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4N8Circle2D9SetCenterE4TYPE4TYPE"><code class="docutils literal notranslate"><span class="pre">Circle2D::SetCenter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4N8Circle2D10SetCenterXE4TYPE"><code class="docutils literal notranslate"><span class="pre">Circle2D::SetCenterX()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4N8Circle2D10SetCenterYE4TYPE"><code class="docutils literal notranslate"><span class="pre">Circle2D::SetCenterY()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4N8Circle2D9SetRadiusE4TYPE"><code class="docutils literal notranslate"><span class="pre">Circle2D::SetRadius()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4N8Circle2D3SetERK7Point2DI4TYPEE4TYPE"><code class="docutils literal notranslate"><span class="pre">Circle2D::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4N8Circle2D3SetE4TYPE4TYPE4TYPE"><code class="docutils literal notranslate"><span class="pre">Circle2D::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4N8Circle2D9TranslateE7Point2DI4TYPEE"><code class="docutils literal notranslate"><span class="pre">Circle2D::Translate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4NK8Circle2D8ContainsERK7Point2DI4TYPEE"><code class="docutils literal notranslate"><span class="pre">Circle2D::Contains()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4NK8Circle2D8ContainsE4TYPE4TYPE"><code class="docutils literal notranslate"><span class="pre">Circle2D::Contains()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4NK8Circle2D8ContainsERK8Circle2DI4TYPEE"><code class="docutils literal notranslate"><span class="pre">Circle2D::Contains()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4NK8Circle2D10HasOverlapERK8Circle2DI4TYPEE"><code class="docutils literal notranslate"><span class="pre">Circle2D::HasOverlap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4N8Circle2D6centerE"><code class="docutils literal notranslate"><span class="pre">Circle2D::center</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Circle2D.html#_CPPv4N8Circle2D6radiusE"><code class="docutils literal notranslate"><span class="pre">Circle2D::radius</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Physics2D.html">Physics2D.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Physics2D.html#_CPPv4I0E9Physics2D"><code class="docutils literal notranslate"><span class="pre">Physics2D</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D9Physics2DEdddb"><code class="docutils literal notranslate"><span class="pre">Physics2D::Physics2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2DD0Ev"><code class="docutils literal notranslate"><span class="pre">Physics2D::~Physics2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4NK9Physics2D10GetSurfaceEv"><code class="docutils literal notranslate"><span class="pre">Physics2D::GetSurface()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4NK9Physics2D13GetBackgroundEv"><code class="docutils literal notranslate"><span class="pre">Physics2D::GetBackground()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4NK9Physics2D9GetDetachEv"><code class="docutils literal notranslate"><span class="pre">Physics2D::GetDetach()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D9SetDetachEb"><code class="docutils literal notranslate"><span class="pre">Physics2D::SetDetach()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D7AddBodyE3PtrI9BODY_TYPEE"><code class="docutils literal notranslate"><span class="pre">Physics2D::AddBody()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D13AddBackgroundE3PtrI9BODY_TYPEE"><code class="docutils literal notranslate"><span class="pre">Physics2D::AddBackground()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D5ClearEv"><code class="docutils literal notranslate"><span class="pre">Physics2D::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D10KillOldestEv"><code class="docutils literal notranslate"><span class="pre">Physics2D::KillOldest()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D17TestPairCollisionER9BODY_TYPER9BODY_TYPE"><code class="docutils literal notranslate"><span class="pre">Physics2D::TestPairCollision()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D6UpdateEv"><code class="docutils literal notranslate"><span class="pre">Physics2D::Update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D10GetBodySetEv"><code class="docutils literal notranslate"><span class="pre">Physics2D::GetBodySet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D16GetBackgroundSetEv"><code class="docutils literal notranslate"><span class="pre">Physics2D::GetBackgroundSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4NK9Physics2D15GetConstBodySetEv"><code class="docutils literal notranslate"><span class="pre">Physics2D::GetConstBodySet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4NK9Physics2D21GetConstBackgroundSetEv"><code class="docutils literal notranslate"><span class="pre">Physics2D::GetConstBackgroundSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D9Surface_tE"><code class="docutils literal notranslate"><span class="pre">Physics2D::Surface_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D7surfaceE"><code class="docutils literal notranslate"><span class="pre">Physics2D::surface</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D10backgroundE"><code class="docutils literal notranslate"><span class="pre">Physics2D::background</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Physics2D.html#_CPPv4N9Physics2D15detach_on_birthE"><code class="docutils literal notranslate"><span class="pre">Physics2D::detach_on_birth</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Point2D.html">Point2D.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Point2D.html#_CPPv45Point"><code class="docutils literal notranslate"><span class="pre">Point</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Point2D.html#_CPPv4I0E7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D7Point2DEv"><code class="docutils literal notranslate"><span class="pre">Point2D::Point2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D7Point2DERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::Point2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D7Point2DE4TYPE4TYPE"><code class="docutils literal notranslate"><span class="pre">Point2D::Point2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D7Point2DERK7Point2D4TYPE"><code class="docutils literal notranslate"><span class="pre">Point2D::Point2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2DaSERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2DeqERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::operator==()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2DneERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2DleERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::operator&lt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2DgeERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::operator&gt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D4GetXEv"><code class="docutils literal notranslate"><span class="pre">Point2D::GetX()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D4GetYEv"><code class="docutils literal notranslate"><span class="pre">Point2D::GetY()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D4SetXE4TYPE"><code class="docutils literal notranslate"><span class="pre">Point2D::SetX()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D4SetYE4TYPE"><code class="docutils literal notranslate"><span class="pre">Point2D::SetY()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D3SetE4TYPE4TYPE"><code class="docutils literal notranslate"><span class="pre">Point2D::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D15SquareMagnitudeEv"><code class="docutils literal notranslate"><span class="pre">Point2D::SquareMagnitude()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D9MagnitudeEv"><code class="docutils literal notranslate"><span class="pre">Point2D::Magnitude()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D8AtOriginEv"><code class="docutils literal notranslate"><span class="pre">Point2D::AtOrigin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D7NonZeroEv"><code class="docutils literal notranslate"><span class="pre">Point2D::NonZero()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D11GetMidpointERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::GetMidpoint()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D8GetRot90Ev"><code class="docutils literal notranslate"><span class="pre">Point2D::GetRot90()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D9GetRot180Ev"><code class="docutils literal notranslate"><span class="pre">Point2D::GetRot180()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D9GetRot270Ev"><code class="docutils literal notranslate"><span class="pre">Point2D::GetRot270()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D9GetOffsetE4TYPE4TYPE"><code class="docutils literal notranslate"><span class="pre">Point2D::GetOffset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2DplERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::operator+()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2DmiERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::operator-()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2DmlEd"><code class="docutils literal notranslate"><span class="pre">Point2D::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2DdvEd"><code class="docutils literal notranslate"><span class="pre">Point2D::operator/()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2DmlEi"><code class="docutils literal notranslate"><span class="pre">Point2D::operator*()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2DdvEi"><code class="docutils literal notranslate"><span class="pre">Point2D::operator/()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2DmiEv"><code class="docutils literal notranslate"><span class="pre">Point2D::operator-()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D3AbsEv"><code class="docutils literal notranslate"><span class="pre">Point2D::Abs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D9TranslateE4TYPE4TYPE"><code class="docutils literal notranslate"><span class="pre">Point2D::Translate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D10TranslateXE4TYPE"><code class="docutils literal notranslate"><span class="pre">Point2D::TranslateX()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D10TranslateYE4TYPE"><code class="docutils literal notranslate"><span class="pre">Point2D::TranslateY()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D5ScaleEd"><code class="docutils literal notranslate"><span class="pre">Point2D::Scale()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D5ScaleEdd"><code class="docutils literal notranslate"><span class="pre">Point2D::Scale()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D8ToOriginEv"><code class="docutils literal notranslate"><span class="pre">Point2D::ToOrigin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D7NegateXEv"><code class="docutils literal notranslate"><span class="pre">Point2D::NegateX()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D7NegateYEv"><code class="docutils literal notranslate"><span class="pre">Point2D::NegateY()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D3ModERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::Mod()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2DpLERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::operator+=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2DmIERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::operator-=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2DmLEd"><code class="docutils literal notranslate"><span class="pre">Point2D::operator*=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2DdVEd"><code class="docutils literal notranslate"><span class="pre">Point2D::operator/=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2DmLEi"><code class="docutils literal notranslate"><span class="pre">Point2D::operator*=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2DdVEi"><code class="docutils literal notranslate"><span class="pre">Point2D::operator/=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D5Rot90Ev"><code class="docutils literal notranslate"><span class="pre">Point2D::Rot90()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D6Rot180Ev"><code class="docutils literal notranslate"><span class="pre">Point2D::Rot180()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D6Rot270Ev"><code class="docutils literal notranslate"><span class="pre">Point2D::Rot270()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D14SquareDistanceERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::SquareDistance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4NK7Point2D8DistanceERK7Point2D"><code class="docutils literal notranslate"><span class="pre">Point2D::Distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D1xE"><code class="docutils literal notranslate"><span class="pre">Point2D::x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Point2D.html#_CPPv4N7Point2D1yE"><code class="docutils literal notranslate"><span class="pre">Point2D::y</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Surface.html">Surface.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Surface.html#_CPPv4IDpE7Surface"><code class="docutils literal notranslate"><span class="pre">Surface</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface10body_typesE"><code class="docutils literal notranslate"><span class="pre">Surface::body_types</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8sector_tE"><code class="docutils literal notranslate"><span class="pre">Surface::sector_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface7SurfaceE5Point"><code class="docutils literal notranslate"><span class="pre">Surface::Surface()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7SurfaceD0Ev"><code class="docutils literal notranslate"><span class="pre">Surface::~Surface()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4NK7Surface8GetWidthEv"><code class="docutils literal notranslate"><span class="pre">Surface::GetWidth()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4NK7Surface9GetHeightEv"><code class="docutils literal notranslate"><span class="pre">Surface::GetHeight()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4NK7Surface14GetMaxPositionEv"><code class="docutils literal notranslate"><span class="pre">Surface::GetMaxPosition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4NK7Surface10GetBodySetEv"><code class="docutils literal notranslate"><span class="pre">Surface::GetBodySet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4NK7Surface8IsActiveE6size_t"><code class="docutils literal notranslate"><span class="pre">Surface::IsActive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4I0ENK7Surface6GetPtrE3PtrI10ORIGINAL_TE6size_t"><code class="docutils literal notranslate"><span class="pre">Surface::GetPtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4NK7Surface9GetCenterE6size_t"><code class="docutils literal notranslate"><span class="pre">Surface::GetCenter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4NK7Surface9GetRadiusE6size_t"><code class="docutils literal notranslate"><span class="pre">Surface::GetRadius()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4NK7Surface8GetColorE6size_t"><code class="docutils literal notranslate"><span class="pre">Surface::GetColor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface9SetCenterE6size_t5Point"><code class="docutils literal notranslate"><span class="pre">Surface::SetCenter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface9TranslateE6size_t5Point"><code class="docutils literal notranslate"><span class="pre">Surface::Translate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface13TranslateWrapE6size_t5Point"><code class="docutils literal notranslate"><span class="pre">Surface::TranslateWrap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface9SetRadiusE6size_td"><code class="docutils literal notranslate"><span class="pre">Surface::SetRadius()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface11ScaleRadiusE6size_td"><code class="docutils literal notranslate"><span class="pre">Surface::ScaleRadius()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8SetColorE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Surface::SetColor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface10RemoveBodyE6size_t"><code class="docutils literal notranslate"><span class="pre">Surface::RemoveBody()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4I0EN7Surface7AddBodyE6size_t3PtrI6BODY_TE5Pointd6size_t"><code class="docutils literal notranslate"><span class="pre">Surface::AddBody()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4I0EN7Surface7AddBodyE6size_tP6BODY_T5Pointd6size_t"><code class="docutils literal notranslate"><span class="pre">Surface::AddBody()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface5ClearEv"><code class="docutils literal notranslate"><span class="pre">Surface::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4I00EN7Surface13AddOverlapFunEvRKNSt8functionIFvR7BODY1_TR7BODY2_TEEE"><code class="docutils literal notranslate"><span class="pre">Surface::AddOverlapFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4I00EN7Surface13AddOverlapFunEvPFvR7BODY1_TR7BODY2_TE"><code class="docutils literal notranslate"><span class="pre">Surface::AddOverlapFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4I0EN7Surface13AddOverlapFunEvRK8LAMBDA_T"><code class="docutils literal notranslate"><span class="pre">Surface::AddOverlapFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface18FindSectorOverlapsER8BodyInfo6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Surface::FindSectorOverlaps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface12FindOverlapsEv"><code class="docutils literal notranslate"><span class="pre">Surface::FindOverlaps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface11FindOverlapER8BodyInfo"><code class="docutils literal notranslate"><span class="pre">Surface::FindOverlap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface11FindOverlapE6size_t"><code class="docutils literal notranslate"><span class="pre">Surface::FindOverlap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface11FindOverlapE5Pointd"><code class="docutils literal notranslate"><span class="pre">Surface::FindOverlap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface11TestOverlapERK8BodyInfoRK8BodyInfo"><code class="docutils literal notranslate"><span class="pre">Surface::TestOverlap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface11InitSectorsEv"><code class="docutils literal notranslate"><span class="pre">Surface::InitSectors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface12TestBodySizeER8BodyInfo"><code class="docutils literal notranslate"><span class="pre">Surface::TestBodySize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface15RefreshBodySizeEv"><code class="docutils literal notranslate"><span class="pre">Surface::RefreshBodySize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface10FindSectorE5Point"><code class="docutils literal notranslate"><span class="pre">Surface::FindSector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface9PlaceBodyER8BodyInfo"><code class="docutils literal notranslate"><span class="pre">Surface::PlaceBody()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8ActivateEv"><code class="docutils literal notranslate"><span class="pre">Surface::Activate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface12type_trackerE"><code class="docutils literal notranslate"><span class="pre">Surface::type_tracker</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface7max_posE"><code class="docutils literal notranslate"><span class="pre">Surface::max_pos</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8body_setE"><code class="docutils literal notranslate"><span class="pre">Surface::body_set</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8open_idsE"><code class="docutils literal notranslate"><span class="pre">Surface::open_ids</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface11data_activeE"><code class="docutils literal notranslate"><span class="pre">Surface::data_active</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface10max_radiusE"><code class="docutils literal notranslate"><span class="pre">Surface::max_radius</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8num_colsE"><code class="docutils literal notranslate"><span class="pre">Surface::num_cols</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8num_rowsE"><code class="docutils literal notranslate"><span class="pre">Surface::num_rows</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface11num_sectorsE"><code class="docutils literal notranslate"><span class="pre">Surface::num_sectors</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface12sector_widthE"><code class="docutils literal notranslate"><span class="pre">Surface::sector_width</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface13sector_heightE"><code class="docutils literal notranslate"><span class="pre">Surface::sector_height</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface7sectorsE"><code class="docutils literal notranslate"><span class="pre">Surface::sectors</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfoE"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo8BodyInfoERR10TrackedVar6size_t5Pointd6size_t"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::BodyInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo8BodyInfoE6size_t5Pointd"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::BodyInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo8BodyInfoERK8BodyInfo"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::BodyInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo8BodyInfoERR8BodyInfo"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::BodyInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo10GetBodyPtrEv"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::GetBodyPtr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4NK7Surface8BodyInfo5GetIDEv"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::GetID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4NK7Surface8BodyInfo9GetCenterEv"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::GetCenter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4NK7Surface8BodyInfo9GetRadiusEv"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::GetRadius()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4NK7Surface8BodyInfo8GetColorEv"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::GetColor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo9SetCenterE5Point"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::SetCenter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo9SetRadiusEd"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::SetRadius()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo8SetColorE6size_t"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::SetColor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfoaSERK8BodyInfo"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfoaSERR8BodyInfo"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4NK7Surface8BodyInfo8IsActiveEv"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::IsActive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo10DeactivateEv"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::Deactivate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo8body_ptrE"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::body_ptr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo2idE"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo6centerE"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::center</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo6radiusE"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::radius</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Surface.html#_CPPv4N7Surface8BodyInfo5colorE"><code class="docutils literal notranslate"><span class="pre">Surface::BodyInfo::color</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Surface2D.html">Surface2D.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Surface2D.html#_CPPv4I0E9Surface2D"><code class="docutils literal notranslate"><span class="pre">Surface2D</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface2D.html#_CPPv4N9Surface2D9Surface2DEdd"><code class="docutils literal notranslate"><span class="pre">Surface2D::Surface2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface2D.html#_CPPv4N9Surface2DD0Ev"><code class="docutils literal notranslate"><span class="pre">Surface2D::~Surface2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface2D.html#_CPPv4NK9Surface2D8GetWidthEv"><code class="docutils literal notranslate"><span class="pre">Surface2D::GetWidth()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface2D.html#_CPPv4NK9Surface2D9GetHeightEv"><code class="docutils literal notranslate"><span class="pre">Surface2D::GetHeight()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface2D.html#_CPPv4NK9Surface2D14GetMaxPositionEv"><code class="docutils literal notranslate"><span class="pre">Surface2D::GetMaxPosition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface2D.html#_CPPv4N9Surface2D10GetBodySetEv"><code class="docutils literal notranslate"><span class="pre">Surface2D::GetBodySet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface2D.html#_CPPv4NK9Surface2D15GetConstBodySetEv"><code class="docutils literal notranslate"><span class="pre">Surface2D::GetConstBodySet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface2D.html#_CPPv4N9Surface2D7AddBodyE3PtrI9BODY_TYPEE"><code class="docutils literal notranslate"><span class="pre">Surface2D::AddBody()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface2D.html#_CPPv4N9Surface2D5ClearEv"><code class="docutils literal notranslate"><span class="pre">Surface2D::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface2D.html#_CPPv4N9Surface2D14TestCollisionsENSt8functionIFbR9BODY_TYPER9BODY_TYPEEEE"><code class="docutils literal notranslate"><span class="pre">Surface2D::TestCollisions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface2D.html#_CPPv4N9Surface2D7max_posE"><code class="docutils literal notranslate"><span class="pre">Surface2D::max_pos</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Surface2D.html#_CPPv4N9Surface2D8body_setE"><code class="docutils literal notranslate"><span class="pre">Surface2D::body_set</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../games/api/PayoffMatrix.html" class="btn btn-neutral float-left" title="PayoffMatrix.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/Angle2D.html" class="btn btn-neutral float-right" title="Angle2D.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

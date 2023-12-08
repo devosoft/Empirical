@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ValueBox.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/prefab/api/ValueBox.f6672211-3500-4fdb-91df-5c3f5d1b37b5.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Scholar" href="../../scholar/scholar.html" />
+    <link rel="prev" title="ToggleSwitch.hpp" href="ToggleSwitch.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../prefab.html">Prefab</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../prefab.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Card.html">Card.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CodeBlock.html">CodeBlock.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Collapse.html">Collapse.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CommentBox.html">CommentBox.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ConfigPanel.html">ConfigPanel.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FontAwesomeIcon.html">FontAwesomeIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LoadingIcon.html">LoadingIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LoadingModal.html">LoadingModal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Modal.html">Modal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ReadoutPanel.html">ReadoutPanel.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ToggleSwitch.html">ToggleSwitch.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ValueBox.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv48ValueBox"><code class="docutils literal notranslate"><span class="pre">ValueBox</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412ValueDisplay"><code class="docutils literal notranslate"><span class="pre">ValueDisplay</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416LiveValueDisplay"><code class="docutils literal notranslate"><span class="pre">LiveValueDisplay</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412ValueControl"><code class="docutils literal notranslate"><span class="pre">ValueControl</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416TextValueControl"><code class="docutils literal notranslate"><span class="pre">TextValueControl</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416BoolValueControl"><code class="docutils literal notranslate"><span class="pre">BoolValueControl</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv419NumericValueControl"><code class="docutils literal notranslate"><span class="pre">NumericValueControl</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../prefab.html">Prefab</a></li>
+      <li class="breadcrumb-item active">ValueBox.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="valuebox-hpp">
+<h1>ValueBox.hpp<a class="headerlink" href="#valuebox-hpp" title="Link to this heading"></a></h1>
+<p>UI sub-component for ConfigPanel and ReadoutPanel. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv48ValueBox">
+<span id="_CPPv38ValueBox"></span><span id="_CPPv28ValueBox"></span><span id="ValueBox"></span><span class="target" id="classValueBox"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValueBox</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><a class="headerlink" href="#_CPPv48ValueBox" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ValueBox.hpp&gt;</em></div>
+<p>ValueBox is the base class for a component to show information. At its core it has a label, a description, and a value to display.</p>
+<p>ValueBoxes and derived classes placed in component with the “settings_group” or “display_group” class will align to a grid. </p>
+<p>Subclassed by BoolValueControl, LiveValueDisplay, ValueControl, ValueDisplay</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8ValueBox8ValueBoxERKNSt6stringERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N8ValueBox8ValueBoxERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N8ValueBox8ValueBoxERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="ValueBox::ValueBox__ssCR.ssCR.ssCR"></span><span class="target" id="classValueBox_1a572f7d396412734989b736701d86f435"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValueBox</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">label</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8ValueBox8ValueBoxERKNSt6stringERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – name for this value </p></li>
+<li><p><strong>desc</strong> – a more detailed description of what the value means </p></li>
+<li><p><strong>id</strong> – user defined ID for ValueBox Div (default is emscripten generated) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8ValueBox7GetViewEv">
+<span id="_CPPv3N8ValueBox7GetViewEv"></span><span id="_CPPv2N8ValueBox7GetViewEv"></span><span id="ValueBox::GetView"></span><span class="target" id="classValueBox_1af4329317f7684b3d4a190d8def7be586"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetView</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8ValueBox7GetViewEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the view div containing live values to animate (use this in an Animate instance).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the view div </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8ValueBox11descriptionE">
+<span id="_CPPv3N8ValueBox11descriptionE"></span><span id="_CPPv2N8ValueBox11descriptionE"></span><span id="ValueBox::description__CommentBox"></span><span class="target" id="classValueBox_1a2f59d3a7720afb8a3fdeb8056f020136"></span><a class="reference internal" href="CommentBox.html#_CPPv410CommentBox" title="CommentBox"><span class="n"><span class="pre">CommentBox</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">description</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="../../tools/api/string_utils.html#_CPPv4IDpE9to_stringNSt6stringEDpRK2Ts" title="to_string"><span class="n"><span class="pre">to_string</span></span></a><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">GetID</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;_descr&quot;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N8ValueBox11descriptionE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8ValueBox4viewE">
+<span id="_CPPv3N8ValueBox4viewE"></span><span id="_CPPv2N8ValueBox4viewE"></span><span id="ValueBox::view__Div"></span><span class="target" id="classValueBox_1a80895a5cc4afbb879c256d82d053d0b9"></span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">view</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="../../tools/api/string_utils.html#_CPPv4IDpE9to_stringNSt6stringEDpRK2Ts" title="to_string"><span class="n"><span class="pre">to_string</span></span></a><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">GetID</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;_view&quot;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N8ValueBox4viewE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv412ValueDisplay">
+<span id="_CPPv312ValueDisplay"></span><span id="_CPPv212ValueDisplay"></span><span id="ValueDisplay"></span><span class="target" id="classValueDisplay"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValueDisplay</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ValueBox" title="ValueBox"><span class="n"><span class="pre">ValueBox</span></span></a><a class="headerlink" href="#_CPPv412ValueDisplay" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ValueBox.hpp&gt;</em></div>
+<p>Use a ValueDisplay component to display a labeled, static value with a nice description of what this value means.</p>
+<p>We suggest adding the “display_group” class to the enclosing tag around multiple ValueDisplays to align labels and values along a common grid. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12ValueDisplay12ValueDisplayERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N12ValueDisplay12ValueDisplayERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N12ValueDisplay12ValueDisplayERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="ValueDisplay::ValueDisplay__ssCR.ssCR.ssCR.ssCR"></span><span class="target" id="classValueDisplay_1ae223bbbc9d88bbf51ff1b71f97afcb37"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValueDisplay</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">label</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12ValueDisplay12ValueDisplayERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – name for this value </p></li>
+<li><p><strong>desc</strong> – a more detailed description of what the value means </p></li>
+<li><p><strong>value</strong> – the piece of information or data being displayed </p></li>
+<li><p><strong>id</strong> – user defined ID for ValueDisplay div (default is emscripten generated) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv416LiveValueDisplay">
+<span id="_CPPv316LiveValueDisplay"></span><span id="_CPPv216LiveValueDisplay"></span><span id="LiveValueDisplay"></span><span class="target" id="classLiveValueDisplay"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LiveValueDisplay</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ValueBox" title="ValueBox"><span class="n"><span class="pre">ValueBox</span></span></a><a class="headerlink" href="#_CPPv416LiveValueDisplay" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ValueBox.hpp&gt;</em></div>
+<p>Use a LiveValueDisplay component to display a labeled value which will change over the course of a simulation with a nice description of what this value means. Internally, it manages an Animator to redraw the view at the fastest possible framerate unless independent=false.</p>
+<p>We suggest adding the “display_group” class to the enclosing tag around multiple LiveValueDisplays to align labels and values along a common grid. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN16LiveValueDisplay16LiveValueDisplayERKNSt6stringERKNSt6stringERR1TRKbRKNSt6stringE">
+<span id="_CPPv3I0EN16LiveValueDisplay16LiveValueDisplayERKNSt6stringERKNSt6stringERR1TRKbRKNSt6stringE"></span><span id="_CPPv2I0EN16LiveValueDisplay16LiveValueDisplayERKNSt6stringERKNSt6stringERR1TRKbRKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classLiveValueDisplay_1acef1fe9aef5b418feb39d86bf44beb2f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LiveValueDisplay</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">label</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <a class="reference internal" href="#_CPPv4I0EN16LiveValueDisplay16LiveValueDisplayERKNSt6stringERKNSt6stringERR1TRKbRKNSt6stringE" title="LiveValueDisplay::LiveValueDisplay::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">independent</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN16LiveValueDisplay16LiveValueDisplayERKNSt6stringERKNSt6stringERR1TRKbRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – name for this value </p></li>
+<li><p><strong>desc</strong> – a more detailed description of what the value means </p></li>
+<li><p><strong>value</strong> – a value to display or function returning a string </p></li>
+<li><p><strong>independent</strong> – should this component be independently animated? Or will some other component manage its animation? </p></li>
+<li><p><strong>id</strong> – user defined ID for LiveValueDisplay div (default is emscripten generated) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv412ValueControl">
+<span id="_CPPv312ValueControl"></span><span id="_CPPv212ValueControl"></span><span id="ValueControl"></span><span class="target" id="classValueControl"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValueControl</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ValueBox" title="ValueBox"><span class="n"><span class="pre">ValueBox</span></span></a><a class="headerlink" href="#_CPPv412ValueControl" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ValueBox.hpp&gt;</em></div>
+<p>ValueControl is the base class for components the user should be able to interact with. The view will contain the Input object for controlling the value. </p>
+<p>Subclassed by NumericValueControl, TextValueControl</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12ValueControl12ValueControlERKNSt6stringERKNSt6stringERKNSt6stringE5InputRKNSt6stringE">
+<span id="_CPPv3N12ValueControl12ValueControlERKNSt6stringERKNSt6stringERKNSt6stringE5InputRKNSt6stringE"></span><span id="_CPPv2N12ValueControl12ValueControlERKNSt6stringERKNSt6stringERKNSt6stringE5InputRKNSt6stringE"></span><span id="ValueControl::ValueControl__ssCR.ssCR.ssCR.Input.ssCR"></span><span class="target" id="classValueControl_1ad7744148bb220bb88678d0c66035503b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValueControl</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">label</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">initial_value</span></span>, <a class="reference internal" href="../../web/api/Input.html#_CPPv45Input" title="Input"><span class="n"><span class="pre">Input</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">input</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12ValueControl12ValueControlERKNSt6stringERKNSt6stringERKNSt6stringE5InputRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – name for this value </p></li>
+<li><p><strong>desc</strong> – a more detailed description of what the value means </p></li>
+<li><p><strong>initial_value</strong> – the initial value </p></li>
+<li><p><strong>input</strong> – Input component that user can interact with </p></li>
+<li><p><strong>id</strong> – user defined ID for ValueControl div (default is emscripten generated) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12ValueControl8mainCtrlE">
+<span id="_CPPv3N12ValueControl8mainCtrlE"></span><span id="_CPPv2N12ValueControl8mainCtrlE"></span><span id="ValueControl::mainCtrl__Input"></span><span class="target" id="classValueControl_1a188406d5298aa0ac2c0168253eea9043"></span><a class="reference internal" href="../../web/api/Input.html#_CPPv45Input" title="Input"><span class="n"><span class="pre">Input</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mainCtrl</span></span></span><a class="headerlink" href="#_CPPv4N12ValueControl8mainCtrlE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv416TextValueControl">
+<span id="_CPPv316TextValueControl"></span><span id="_CPPv216TextValueControl"></span><span id="TextValueControl"></span><span class="target" id="classTextValueControl"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TextValueControl</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412ValueControl" title="ValueControl"><span class="n"><span class="pre">ValueControl</span></span></a><a class="headerlink" href="#_CPPv416TextValueControl" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ValueBox.hpp&gt;</em></div>
+<p>Use a TextValueControl to display a boolean value with a label, description, and a text input to manipulate the value. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16TextValueControl16TextValueControlERKNSt6stringERKNSt6stringERKNSt6stringERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE">
+<span id="_CPPv3N16TextValueControl16TextValueControlERKNSt6stringERKNSt6stringERKNSt6stringERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE"></span><span id="_CPPv2N16TextValueControl16TextValueControlERKNSt6stringERKNSt6stringERKNSt6stringERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE"></span><span class="target" id="classTextValueControl_1a12aacacaada15769c161dedf7f99edd8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TextValueControl</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">label</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">onChange</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16TextValueControl16TextValueControlERKNSt6stringERKNSt6stringERKNSt6stringERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – name for this value </p></li>
+<li><p><strong>desc</strong> – a more detailed description of what the value means </p></li>
+<li><p><strong>value</strong> – the initial value </p></li>
+<li><p><strong>onChange</strong> – function to be called when the user changes this value </p></li>
+<li><p><strong>id</strong> – user defined ID for TextValueControl div (default is emscripten generated) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv416BoolValueControl">
+<span id="_CPPv316BoolValueControl"></span><span id="_CPPv216BoolValueControl"></span><span id="BoolValueControl"></span><span class="target" id="classBoolValueControl"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BoolValueControl</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ValueBox" title="ValueBox"><span class="n"><span class="pre">ValueBox</span></span></a><a class="headerlink" href="#_CPPv416BoolValueControl" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ValueBox.hpp&gt;</em></div>
+<p>Use a BoolValueControl to display a boolean value with a label, description, and a switch to toggle the value. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16BoolValueControl16BoolValueControlERKNSt6stringERKNSt6stringEKbRKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE">
+<span id="_CPPv3N16BoolValueControl16BoolValueControlERKNSt6stringERKNSt6stringEKbRKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE"></span><span id="_CPPv2N16BoolValueControl16BoolValueControlERKNSt6stringERKNSt6stringEKbRKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE"></span><span class="target" id="classBoolValueControl_1a88260b4d00e8167ffd53d7abff304440"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BoolValueControl</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">label</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">is_checked</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">onChange</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16BoolValueControl16BoolValueControlERKNSt6stringERKNSt6stringEKbRKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – name for this value </p></li>
+<li><p><strong>desc</strong> – a more detailed description of what the value means </p></li>
+<li><p><strong>is_checked</strong> – is switch initially on? </p></li>
+<li><p><strong>onChange</strong> – function to be called when the user changes this value </p></li>
+<li><p><strong>id</strong> – user defined ID for BoolValueControl div (default is emscripten generated) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv419NumericValueControl">
+<span id="_CPPv319NumericValueControl"></span><span id="_CPPv219NumericValueControl"></span><span id="NumericValueControl"></span><span class="target" id="classNumericValueControl"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumericValueControl</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412ValueControl" title="ValueControl"><span class="n"><span class="pre">ValueControl</span></span></a><a class="headerlink" href="#_CPPv419NumericValueControl" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ValueBox.hpp&gt;</em></div>
+<p>Use a NumericValueControl to display a number with a label, description, synchronized slider and number box to change the value. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N19NumericValueControl19NumericValueControlERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE">
+<span id="_CPPv3N19NumericValueControl19NumericValueControlERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE"></span><span id="_CPPv2N19NumericValueControl19NumericValueControlERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE"></span><span class="target" id="classNumericValueControl_1a87742a0a2c86dad26fce6d8e7eaa49ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumericValueControl</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">label</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">onChange</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19NumericValueControl19NumericValueControlERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – name for this value </p></li>
+<li><p><strong>desc</strong> – a more detailed description of what the value means </p></li>
+<li><p><strong>type</strong> – the numeric type (‘float’, ‘double’ or ‘int’) </p></li>
+<li><p><strong>value</strong> – the initial value </p></li>
+<li><p><strong>onChange</strong> – function to be called when the user changes this value </p></li>
+<li><p><strong>id</strong> – user defined ID for NumericValueControl div (default is emscripten generated) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N19NumericValueControl20setDefaultRangeMakerERK14range_setter_t">
+<span id="_CPPv3N19NumericValueControl20setDefaultRangeMakerERK14range_setter_t"></span><span id="_CPPv2N19NumericValueControl20setDefaultRangeMakerERK14range_setter_t"></span><span id="NumericValueControl::setDefaultRangeMaker__range_setter_tCR"></span><span class="target" id="classNumericValueControl_1a8034334e90a94f02c9bd8ded6bd45292"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setDefaultRangeMaker</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N19NumericValueControl14range_setter_tE" title="NumericValueControl::range_setter_t"><span class="n"><span class="pre">range_setter_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">det</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19NumericValueControl20setDefaultRangeMakerERK14range_setter_t" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>det</strong> – a function that based on the value and type provided sets a slider input’s min, max and step values appropriately. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N19NumericValueControl14range_setter_tE">
+<span id="_CPPv3N19NumericValueControl14range_setter_tE"></span><span id="_CPPv2N19NumericValueControl14range_setter_tE"></span><span class="target" id="classNumericValueControl_1a6d0a01680e5026abf314c9b5df5ded24"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">range_setter_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../web/api/Input.html#_CPPv45Input" title="Input"><span class="n"><span class="pre">Input</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N19NumericValueControl14range_setter_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ToggleSwitch.html" class="btn btn-neutral float-left" title="ToggleSwitch.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../scholar/scholar.html" class="btn btn-neutral float-right" title="Scholar" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

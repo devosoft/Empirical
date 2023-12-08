@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Games &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/games/games.88fb8d48-4c26-4443-be54-08f5feca2001.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Mancala.hpp" href="api/Mancala.html" />
+    <link rel="prev" title="memo_function.hpp" href="../functional/api/memo_function.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Games</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html">Mancala.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html">Othello.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html">Othello8.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/PayoffMatrix.html">PayoffMatrix.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Games</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="games">
+<h1>Games<a class="headerlink" href="#games" title="Link to this heading"></a></h1>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/Mancala.html">Mancala.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Mancala.html#_CPPv47Mancala"><code class="docutils literal notranslate"><span class="pre">Mancala</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala6move_tE"><code class="docutils literal notranslate"><span class="pre">Mancala::move_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala7MancalaEb"><code class="docutils literal notranslate"><span class="pre">Mancala::Mancala()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7MancalaD0Ev"><code class="docutils literal notranslate"><span class="pre">Mancala::~Mancala()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala5ResetEb"><code class="docutils literal notranslate"><span class="pre">Mancala::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala4GetAE6size_t"><code class="docutils literal notranslate"><span class="pre">Mancala::GetA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala4GetBE6size_t"><code class="docutils literal notranslate"><span class="pre">Mancala::GetB()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala8GetSideAEv"><code class="docutils literal notranslate"><span class="pre">Mancala::GetSideA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala8GetSideBEv"><code class="docutils literal notranslate"><span class="pre">Mancala::GetSideB()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala10GetCurSideEv"><code class="docutils literal notranslate"><span class="pre">Mancala::GetCurSide()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala12GetOtherSideEv"><code class="docutils literal notranslate"><span class="pre">Mancala::GetOtherSide()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala8GetSideAEv"><code class="docutils literal notranslate"><span class="pre">Mancala::GetSideA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala8GetSideBEv"><code class="docutils literal notranslate"><span class="pre">Mancala::GetSideB()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala10GetCurSideEv"><code class="docutils literal notranslate"><span class="pre">Mancala::GetCurSide()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala12GetOtherSideEv"><code class="docutils literal notranslate"><span class="pre">Mancala::GetOtherSide()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala7AsInputE6size_t"><code class="docutils literal notranslate"><span class="pre">Mancala::AsInput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala13AsVectorInputE6size_t"><code class="docutils literal notranslate"><span class="pre">Mancala::AsVectorInput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala6DoMoveE6move_t"><code class="docutils literal notranslate"><span class="pre">Mancala::DoMove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala6DoMoveE6size_t6move_t"><code class="docutils literal notranslate"><span class="pre">Mancala::DoMove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala8SetBoardE6side_t6side_t"><code class="docutils literal notranslate"><span class="pre">Mancala::SetBoard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala6IsDoneEv"><code class="docutils literal notranslate"><span class="pre">Mancala::IsDone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala11IsMoveValidE6size_t"><code class="docutils literal notranslate"><span class="pre">Mancala::IsMoveValid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala14GetMoveOptionsEv"><code class="docutils literal notranslate"><span class="pre">Mancala::GetMoveOptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala10PrintSmallERKNSt6stringERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Mancala::PrintSmall()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Mancala::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala12GetCurPlayerEv"><code class="docutils literal notranslate"><span class="pre">Mancala::GetCurPlayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala7IsTurnAEv"><code class="docutils literal notranslate"><span class="pre">Mancala::IsTurnA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala7IsTurnBEv"><code class="docutils literal notranslate"><span class="pre">Mancala::IsTurnB()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala6ScoreAEv"><code class="docutils literal notranslate"><span class="pre">Mancala::ScoreA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4NK7Mancala6ScoreBEv"><code class="docutils literal notranslate"><span class="pre">Mancala::ScoreB()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala8GetScoreE6size_t"><code class="docutils literal notranslate"><span class="pre">Mancala::GetScore()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala6side_tE"><code class="docutils literal notranslate"><span class="pre">Mancala::side_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala8TestOverEv"><code class="docutils literal notranslate"><span class="pre">Mancala::TestOver()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala6boardAE"><code class="docutils literal notranslate"><span class="pre">Mancala::boardA</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala6boardBE"><code class="docutils literal notranslate"><span class="pre">Mancala::boardB</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala10turn_countE"><code class="docutils literal notranslate"><span class="pre">Mancala::turn_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala4overE"><code class="docutils literal notranslate"><span class="pre">Mancala::over</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Mancala.html#_CPPv4N7Mancala9is_A_turnE"><code class="docutils literal notranslate"><span class="pre">Mancala::is_A_turn</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Othello.html">Othello.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Othello.html#_CPPv47Othello"><code class="docutils literal notranslate"><span class="pre">Othello</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Othello.html#_CPPv412Othello_Base"><code class="docutils literal notranslate"><span class="pre">Othello_Base</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base6PlayerE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::Player</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base6Player4NONEE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::Player::NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base6Player4DARKE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::Player::DARK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base6Player5LIGHTE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::Player::LIGHT</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base6FacingE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::Facing</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base6Facing1NE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::Facing::N</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base6Facing2NEE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::Facing::NE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base6Facing1EE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::Facing::E</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base6Facing2SEE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::Facing::SE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base6Facing1SE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::Facing::S</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base6Facing2SWE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::Facing::SW</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base6Facing1WE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::Facing::W</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base6Facing2NWE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::Facing::NW</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Base14NUM_DIRECTIONSE"><code class="docutils literal notranslate"><span class="pre">Othello_Base::NUM_DIRECTIONS</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Othello.html#_CPPv4I_6size_tE12Othello_Game"><code class="docutils literal notranslate"><span class="pre">Othello_Game</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game6this_tE"><code class="docutils literal notranslate"><span class="pre">Othello_Game::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game7board_tE"><code class="docutils literal notranslate"><span class="pre">Othello_Game::board_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game12Othello_GameEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Othello_Game()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_GameD0Ev"><code class="docutils literal notranslate"><span class="pre">Othello_Game::~Othello_Game()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game5ResetEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4NK12Othello_Game13GetBoardWidthEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetBoardWidth()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4NK12Othello_Game11GetNumCellsEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetNumCells()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4NK12Othello_Game12GetCurPlayerEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetCurPlayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4NK12Othello_Game11GetOpponentE6Player"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetOpponent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4NK12Othello_Game13IsValidPlayerE6Player"><code class="docutils literal notranslate"><span class="pre">Othello_Game::IsValidPlayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game14BuildNeighborsEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::BuildNeighbors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4NK12Othello_Game11GetNeighborE5Index6Facing"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetNeighbor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4NK12Othello_Game11GetPosOwnerE5Index"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetPosOwner()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game8GetBoardEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetBoard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4NK12Othello_Game8GetBoardEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetBoard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game11IsValidMoveE6Player5Index"><code class="docutils literal notranslate"><span class="pre">Othello_Game::IsValidMove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4NK12Othello_Game6IsOverEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::IsOver()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game11GetFlipListE6Player5Index"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetFlipList()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game12GetFlipCountE6Player5Index"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetFlipCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game13HasValidFlipsE6Player5Index"><code class="docutils literal notranslate"><span class="pre">Othello_Game::HasValidFlips()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game14GetMoveOptionsE6Player"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetMoveOptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game14GetMoveOptionsEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetMoveOptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game14HasMoveOptionsE6Player"><code class="docutils literal notranslate"><span class="pre">Othello_Game::HasMoveOptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game8GetScoreE6Player"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetScore()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game16CountFrontierPosE6Player"><code class="docutils literal notranslate"><span class="pre">Othello_Game::CountFrontierPos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game12IsAdjacentToE5Index6Player"><code class="docutils literal notranslate"><span class="pre">Othello_Game::IsAdjacentTo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game6SetPosE5Index6Player"><code class="docutils literal notranslate"><span class="pre">Othello_Game::SetPos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game12SetPositionsE6vectorI5IndexE6Player"><code class="docutils literal notranslate"><span class="pre">Othello_Game::SetPositions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game8SetBoardERK7board_t"><code class="docutils literal notranslate"><span class="pre">Othello_Game::SetBoard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game8SetBoardERK6this_t"><code class="docutils literal notranslate"><span class="pre">Othello_Game::SetBoard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game12SetCurPlayerE6Player"><code class="docutils literal notranslate"><span class="pre">Othello_Game::SetCurPlayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game10DoNextMoveE5Index"><code class="docutils literal notranslate"><span class="pre">Othello_Game::DoNextMove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game6DoMoveE6Player5Index"><code class="docutils literal notranslate"><span class="pre">Othello_Game::DoMove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game7DoFlipsE6Player5Index"><code class="docutils literal notranslate"><span class="pre">Othello_Game::DoFlips()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game5PrintERNSt7ostreamENSt6stringENSt6stringENSt6stringE"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game8GetIndexE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetIndex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game9NUM_CELLSE"><code class="docutils literal notranslate"><span class="pre">Othello_Game::NUM_CELLS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game14ALL_DIRECTIONSE"><code class="docutils literal notranslate"><span class="pre">Othello_Game::ALL_DIRECTIONS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game9neighborsE"><code class="docutils literal notranslate"><span class="pre">Othello_Game::neighbors</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game4overE"><code class="docutils literal notranslate"><span class="pre">Othello_Game::over</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game10cur_playerE"><code class="docutils literal notranslate"><span class="pre">Othello_Game::cur_player</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game10game_boardE"><code class="docutils literal notranslate"><span class="pre">Othello_Game::game_board</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game16GetNeighborIndexE5Index6Facing"><code class="docutils literal notranslate"><span class="pre">Othello_Game::GetNeighborIndex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game5IndexE"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Index</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game5Index5IndexEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Index::Index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game5Index5IndexE6size_t"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Index::Index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game5Index5IndexE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Index::Index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game5Index5IndexERK5Index"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Index::Index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4NK12Othello_Game5Indexcv6size_tEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Index::operator</span> <span class="pre">size_t()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4NK12Othello_Game5Index1xEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Index::x()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4NK12Othello_Game5Index1yEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Index::y()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game5Index3SetE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Index::Set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4NK12Othello_Game5Index7IsValidEv"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Index::IsValid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game5Index12CalcNeighborE6Facing"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Index::CalcNeighbor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello.html#_CPPv4N12Othello_Game5Index3posE"><code class="docutils literal notranslate"><span class="pre">Othello_Game::Index::pos</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Othello8.html">Othello8.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Othello8.html#_CPPv48Othello8"><code class="docutils literal notranslate"><span class="pre">Othello8</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86PlayerE"><code class="docutils literal notranslate"><span class="pre">Othello8::Player</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86Player4DARKE"><code class="docutils literal notranslate"><span class="pre">Othello8::Player::DARK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86Player5LIGHTE"><code class="docutils literal notranslate"><span class="pre">Othello8::Player::LIGHT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86Player4NONEE"><code class="docutils literal notranslate"><span class="pre">Othello8::Player::NONE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86FacingE"><code class="docutils literal notranslate"><span class="pre">Othello8::Facing</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86Facing1NE"><code class="docutils literal notranslate"><span class="pre">Othello8::Facing::N</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86Facing2NEE"><code class="docutils literal notranslate"><span class="pre">Othello8::Facing::NE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86Facing1EE"><code class="docutils literal notranslate"><span class="pre">Othello8::Facing::E</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86Facing2SEE"><code class="docutils literal notranslate"><span class="pre">Othello8::Facing::SE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86Facing1SE"><code class="docutils literal notranslate"><span class="pre">Othello8::Facing::S</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86Facing2SWE"><code class="docutils literal notranslate"><span class="pre">Othello8::Facing::SW</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86Facing1WE"><code class="docutils literal notranslate"><span class="pre">Othello8::Facing::W</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86Facing2NWE"><code class="docutils literal notranslate"><span class="pre">Othello8::Facing::NW</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86this_tE"><code class="docutils literal notranslate"><span class="pre">Othello8::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello88Othello8Ev"><code class="docutils literal notranslate"><span class="pre">Othello8::Othello8()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello8D0Ev"><code class="docutils literal notranslate"><span class="pre">Othello8::~Othello8()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85ResetEv"><code class="docutils literal notranslate"><span class="pre">Othello8::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4NK8Othello811GetNumCellsEv"><code class="docutils literal notranslate"><span class="pre">Othello8::GetNumCells()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4NK8Othello812GetCurPlayerEv"><code class="docutils literal notranslate"><span class="pre">Othello8::GetCurPlayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4NK8Othello87GetHashEv"><code class="docutils literal notranslate"><span class="pre">Othello8::GetHash()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4NK8Othello811GetOpponentE6Player"><code class="docutils literal notranslate"><span class="pre">Othello8::GetOpponent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4NK8Othello813IsValidPlayerE6Player"><code class="docutils literal notranslate"><span class="pre">Othello8::IsValidPlayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello811GetNeighborE5Index6Facing"><code class="docutils literal notranslate"><span class="pre">Othello8::GetNeighbor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4NK8Othello811GetPosOwnerE5Index"><code class="docutils literal notranslate"><span class="pre">Othello8::GetPosOwner()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello88GetBoardEv"><code class="docutils literal notranslate"><span class="pre">Othello8::GetBoard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4NK8Othello88GetBoardEv"><code class="docutils literal notranslate"><span class="pre">Othello8::GetBoard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello811IsValidMoveE6Player5Index"><code class="docutils literal notranslate"><span class="pre">Othello8::IsValidMove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4NK8Othello86IsOverEv"><code class="docutils literal notranslate"><span class="pre">Othello8::IsOver()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello810SetupCacheEv"><code class="docutils literal notranslate"><span class="pre">Othello8::SetupCache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello811GetFlipListE6Player5Index"><code class="docutils literal notranslate"><span class="pre">Othello8::GetFlipList()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello812GetFlipCountE6Player5Index"><code class="docutils literal notranslate"><span class="pre">Othello8::GetFlipCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello813HasValidFlipsE6Player5Index"><code class="docutils literal notranslate"><span class="pre">Othello8::HasValidFlips()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello814GetMoveOptionsE6Player"><code class="docutils literal notranslate"><span class="pre">Othello8::GetMoveOptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello814GetMoveOptionsEv"><code class="docutils literal notranslate"><span class="pre">Othello8::GetMoveOptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello814HasMoveOptionsE6Player"><code class="docutils literal notranslate"><span class="pre">Othello8::HasMoveOptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello88GetScoreE6Player"><code class="docutils literal notranslate"><span class="pre">Othello8::GetScore()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello816CountFrontierPosE6Player"><code class="docutils literal notranslate"><span class="pre">Othello8::CountFrontierPos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello812IsAdjacentToE5Index6Player"><code class="docutils literal notranslate"><span class="pre">Othello8::IsAdjacentTo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86SetPosE5Index6Player"><code class="docutils literal notranslate"><span class="pre">Othello8::SetPos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello88ClearPosE5Index"><code class="docutils literal notranslate"><span class="pre">Othello8::ClearPos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello812SetPositionsE6vectorI5IndexE6Player"><code class="docutils literal notranslate"><span class="pre">Othello8::SetPositions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello88SetBoardERK5Board"><code class="docutils literal notranslate"><span class="pre">Othello8::SetBoard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello88SetBoardERK6this_t"><code class="docutils literal notranslate"><span class="pre">Othello8::SetBoard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello812SetCurPlayerE6Player"><code class="docutils literal notranslate"><span class="pre">Othello8::SetCurPlayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello810DoNextMoveE5Index"><code class="docutils literal notranslate"><span class="pre">Othello8::DoNextMove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello86DoMoveE6Player5Index"><code class="docutils literal notranslate"><span class="pre">Othello8::DoMove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello87DoFlipsE6Player5Index"><code class="docutils literal notranslate"><span class="pre">Othello8::DoFlips()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85PrintERNSt7ostreamENSt6stringENSt6stringENSt6stringE"><code class="docutils literal notranslate"><span class="pre">Othello8::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello88GetIndexE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Othello8::GetIndex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello813GetBoardWidthEv"><code class="docutils literal notranslate"><span class="pre">Othello8::GetBoardWidth()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello814NUM_DIRECTIONSE"><code class="docutils literal notranslate"><span class="pre">Othello8::NUM_DIRECTIONS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello810BOARD_SIZEE"><code class="docutils literal notranslate"><span class="pre">Othello8::BOARD_SIZE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello89NUM_CELLSE"><code class="docutils literal notranslate"><span class="pre">Othello8::NUM_CELLS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello811flip_list_tE"><code class="docutils literal notranslate"><span class="pre">Othello8::flip_list_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello84overE"><code class="docutils literal notranslate"><span class="pre">Othello8::over</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello810cur_playerE"><code class="docutils literal notranslate"><span class="pre">Othello8::cur_player</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello810game_boardE"><code class="docutils literal notranslate"><span class="pre">Othello8::game_board</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello811light_flipsE"><code class="docutils literal notranslate"><span class="pre">Othello8::light_flips</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello810dark_flipsE"><code class="docutils literal notranslate"><span class="pre">Othello8::dark_flips</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello88cache_okE"><code class="docutils literal notranslate"><span class="pre">Othello8::cache_ok</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello814ALL_DIRECTIONSEv"><code class="docutils literal notranslate"><span class="pre">Othello8::ALL_DIRECTIONS()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello816GetNeighborIndexE5Index6Facing"><code class="docutils literal notranslate"><span class="pre">Othello8::GetNeighborIndex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello89NEIGHBORSEv"><code class="docutils literal notranslate"><span class="pre">Othello8::NEIGHBORS()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85BoardE"><code class="docutils literal notranslate"><span class="pre">Othello8::Board</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Board5ClearEv"><code class="docutils literal notranslate"><span class="pre">Othello8::Board::Clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Board5ClearE5Index"><code class="docutils literal notranslate"><span class="pre">Othello8::Board::Clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4NK8Othello85Board5OwnerE5Index"><code class="docutils literal notranslate"><span class="pre">Othello8::Board::Owner()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Board8SetOwnerE5Index6Player"><code class="docutils literal notranslate"><span class="pre">Othello8::Board::SetOwner()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Board8OccupiedE5Index"><code class="docutils literal notranslate"><span class="pre">Othello8::Board::Occupied()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Board5ScoreE6Player"><code class="docutils literal notranslate"><span class="pre">Othello8::Board::Score()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Board8occupiedE"><code class="docutils literal notranslate"><span class="pre">Othello8::Board::occupied</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Board6playerE"><code class="docutils literal notranslate"><span class="pre">Othello8::Board::player</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85IndexE"><code class="docutils literal notranslate"><span class="pre">Othello8::Index</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Index5IndexEv"><code class="docutils literal notranslate"><span class="pre">Othello8::Index::Index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Index5IndexE6size_t"><code class="docutils literal notranslate"><span class="pre">Othello8::Index::Index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Index5IndexE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Othello8::Index::Index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Index5IndexERK5Index"><code class="docutils literal notranslate"><span class="pre">Othello8::Index::Index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4NK8Othello85Indexcv6size_tEv"><code class="docutils literal notranslate"><span class="pre">Othello8::Index::operator</span> <span class="pre">size_t()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4NK8Othello85Index1xEv"><code class="docutils literal notranslate"><span class="pre">Othello8::Index::x()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4NK8Othello85Index1yEv"><code class="docutils literal notranslate"><span class="pre">Othello8::Index::y()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Index3SetE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Othello8::Index::Set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4NK8Othello85Index7IsValidEv"><code class="docutils literal notranslate"><span class="pre">Othello8::Index::IsValid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Index12CalcNeighborE6Facing"><code class="docutils literal notranslate"><span class="pre">Othello8::Index::CalcNeighbor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Othello8.html#_CPPv4N8Othello85Index3posE"><code class="docutils literal notranslate"><span class="pre">Othello8::Index::pos</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/PayoffMatrix.html">PayoffMatrix.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/PayoffMatrix.html#_CPPv412PayoffMatrix"><code class="docutils literal notranslate"><span class="pre">PayoffMatrix</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/PayoffMatrix.html#_CPPv4N12PayoffMatrix6move_tE"><code class="docutils literal notranslate"><span class="pre">PayoffMatrix::move_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/PayoffMatrix.html#_CPPv4N12PayoffMatrix12PayoffMatrixE6size_t"><code class="docutils literal notranslate"><span class="pre">PayoffMatrix::PayoffMatrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/PayoffMatrix.html#_CPPv4N12PayoffMatrix5ResetEv"><code class="docutils literal notranslate"><span class="pre">PayoffMatrix::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/PayoffMatrix.html#_CPPv4N12PayoffMatrix6SetValE6size_t6size_td"><code class="docutils literal notranslate"><span class="pre">PayoffMatrix::SetVal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/PayoffMatrix.html#_CPPv4N12PayoffMatrixclE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">PayoffMatrix::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/PayoffMatrix.html#_CPPv4NK12PayoffMatrixclE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">PayoffMatrix::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/PayoffMatrix.html#_CPPv4N12PayoffMatrix7SetupPDEd"><code class="docutils literal notranslate"><span class="pre">PayoffMatrix::SetupPD()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/PayoffMatrix.html#_CPPv4N12PayoffMatrix14SetupSnowdriftEd"><code class="docutils literal notranslate"><span class="pre">PayoffMatrix::SetupSnowdrift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/PayoffMatrix.html#_CPPv4NK12PayoffMatrix7AsInputE6size_t"><code class="docutils literal notranslate"><span class="pre">PayoffMatrix::AsInput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/PayoffMatrix.html#_CPPv4NK12PayoffMatrix8to_indexE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">PayoffMatrix::to_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/PayoffMatrix.html#_CPPv4N12PayoffMatrix6payoffE"><code class="docutils literal notranslate"><span class="pre">PayoffMatrix::payoff</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/PayoffMatrix.html#_CPPv4N12PayoffMatrix9num_movesE"><code class="docutils literal notranslate"><span class="pre">PayoffMatrix::num_moves</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../functional/api/memo_function.html" class="btn btn-neutral float-left" title="memo_function.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/Mancala.html" class="btn btn-neutral float-right" title="Mancala.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

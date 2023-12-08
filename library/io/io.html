@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IO &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/io/io.f21ba781-8665-4ed3-9065-48186e2c1a07.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ContiguousStream.hpp" href="api/ContiguousStream.html" />
+    <link rel="prev" title="struct.hpp" href="../in_progress/api/struct.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">IO</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html">ContiguousStream.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html">File.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryIStream.html">MemoryIStream.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NullStream.html">NullStream.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html">StreamManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ascii_utils.html">ascii_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/serialize.html">serialize.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/serialize_macros.html">serialize_macros.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">IO</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="io">
+<h1>IO<a class="headerlink" href="#io" title="Link to this heading"></a></h1>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/ContiguousStream.html">ContiguousStream.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/ContiguousStream.html#_CPPv416ContiguousBuffer"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4N16ContiguousBuffer14const_iteratorE"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::const_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4N16ContiguousBuffer16ContiguousBufferEK6size_t"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::ContiguousBuffer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4N16ContiguousBuffer5ResetEv"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4NK16ContiguousBuffer7GetDataEv"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::GetData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4NK16ContiguousBuffer7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4NK16ContiguousBuffer5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4NK16ContiguousBuffer6cbeginEv"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::cbegin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4NK16ContiguousBuffer4cendEv"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::cend()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4N16ContiguousBuffer7GetDataEv"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::GetData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4NK16ContiguousBuffer11GetCapacityEv"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::GetCapacity()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4N16ContiguousBuffer8overflowE8int_type"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::overflow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4N16ContiguousBuffer6bufferE"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::buffer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4N16ContiguousBuffer18uninitialized_charE"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::uninitialized_char</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4N16ContiguousBuffer18uninitialized_char18uninitialized_charEv"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::uninitialized_char::uninitialized_char()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4NK16ContiguousBuffer18uninitialized_charcvcEv"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::uninitialized_char::operator</span> <span class="pre">char()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4N16ContiguousBuffer18uninitialized_char3valE"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer::uninitialized_char::val</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/ContiguousStream.html#_CPPv416ContiguousStream"><code class="docutils literal notranslate"><span class="pre">ContiguousStream</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4N16ContiguousStream14const_iteratorE"><code class="docutils literal notranslate"><span class="pre">ContiguousStream::const_iterator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4N16ContiguousStream16ContiguousStreamEK6size_t"><code class="docutils literal notranslate"><span class="pre">ContiguousStream::ContiguousStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4N16ContiguousStream5ResetEv"><code class="docutils literal notranslate"><span class="pre">ContiguousStream::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4NK16ContiguousStream7GetDataEv"><code class="docutils literal notranslate"><span class="pre">ContiguousStream::GetData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4NK16ContiguousStream7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">ContiguousStream::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4NK16ContiguousStream5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">ContiguousStream::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4NK16ContiguousStream6cbeginEv"><code class="docutils literal notranslate"><span class="pre">ContiguousStream::cbegin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4NK16ContiguousStream4cendEv"><code class="docutils literal notranslate"><span class="pre">ContiguousStream::cend()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ContiguousStream.html#_CPPv4N16ContiguousStream6bufferE"><code class="docutils literal notranslate"><span class="pre">ContiguousStream::buffer</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/File.html">File.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/File.html#_CPPv44File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File4FileEv"><code class="docutils literal notranslate"><span class="pre">File::File()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File4FileERNSt7istreamE"><code class="docutils literal notranslate"><span class="pre">File::File()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File4FileERK6String"><code class="docutils literal notranslate"><span class="pre">File::File()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File4FileERK4File"><code class="docutils literal notranslate"><span class="pre">File::File()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File4FileERR4File"><code class="docutils literal notranslate"><span class="pre">File::File()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4FileD0Ev"><code class="docutils literal notranslate"><span class="pre">File::~File()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4FileaSERK4File"><code class="docutils literal notranslate"><span class="pre">File::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4FileaSERR4File"><code class="docutils literal notranslate"><span class="pre">File::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File5beginEv"><code class="docutils literal notranslate"><span class="pre">File::begin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File3endEv"><code class="docutils literal notranslate"><span class="pre">File::end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File5beginEv"><code class="docutils literal notranslate"><span class="pre">File::begin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File3endEv"><code class="docutils literal notranslate"><span class="pre">File::end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File11GetNumLinesEv"><code class="docutils literal notranslate"><span class="pre">File::GetNumLines()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File4sizeEv"><code class="docutils literal notranslate"><span class="pre">File::size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File11GetAllLinesEv"><code class="docutils literal notranslate"><span class="pre">File::GetAllLines()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4FileixE6size_t"><code class="docutils literal notranslate"><span class="pre">File::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4FileixE6size_t"><code class="docutils literal notranslate"><span class="pre">File::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File5frontEv"><code class="docutils literal notranslate"><span class="pre">File::front()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File5frontEv"><code class="docutils literal notranslate"><span class="pre">File::front()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File4backEv"><code class="docutils literal notranslate"><span class="pre">File::back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File4backEv"><code class="docutils literal notranslate"><span class="pre">File::back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File8HasErrorEv"><code class="docutils literal notranslate"><span class="pre">File::HasError()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File8GetErrorEv"><code class="docutils literal notranslate"><span class="pre">File::GetError()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File10ClearErrorEv"><code class="docutils literal notranslate"><span class="pre">File::ClearError()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File6AppendERK6String"><code class="docutils literal notranslate"><span class="pre">File::Append()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4I0EN4File6AppendER4FileRK6vectorI1TE"><code class="docutils literal notranslate"><span class="pre">File::Append()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File6AppendERK4File"><code class="docutils literal notranslate"><span class="pre">File::Append()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4I0EN4FilepLER4FileRR1T"><code class="docutils literal notranslate"><span class="pre">File::operator+=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4I0EN4FilelsEDaRR1T"><code class="docutils literal notranslate"><span class="pre">File::operator&lt;&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4FilersERNSt6stringE"><code class="docutils literal notranslate"><span class="pre">File::operator&gt;&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4FileeqERK4File"><code class="docutils literal notranslate"><span class="pre">File::operator==()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4FileneERK4File"><code class="docutils literal notranslate"><span class="pre">File::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File8LoadLineERNSt7istreamE"><code class="docutils literal notranslate"><span class="pre">File::LoadLine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File4LoadERNSt7istreamE"><code class="docutils literal notranslate"><span class="pre">File::Load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File4LoadERK6String"><code class="docutils literal notranslate"><span class="pre">File::Load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File5WriteERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">File::Write()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File5WriteERK6String"><code class="docutils literal notranslate"><span class="pre">File::Write()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File8ContainsERK6String"><code class="docutils literal notranslate"><span class="pre">File::Contains()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File5AsSetEv"><code class="docutils literal notranslate"><span class="pre">File::AsSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4I0EN4File5ApplyER4File5FUN_T"><code class="docutils literal notranslate"><span class="pre">File::Apply()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File6KeepIfERKNSt8functionIFbRK6StringEEE"><code class="docutils literal notranslate"><span class="pre">File::KeepIf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File14KeepIfContainsERK6String"><code class="docutils literal notranslate"><span class="pre">File::KeepIfContains()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File16RemoveIfContainsERK6String"><code class="docutils literal notranslate"><span class="pre">File::RemoveIfContains()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File12KeepIfBeginsERK6String"><code class="docutils literal notranslate"><span class="pre">File::KeepIfBegins()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File14RemoveIfBeginsERK6String"><code class="docutils literal notranslate"><span class="pre">File::RemoveIfBegins()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File11RemoveEmptyEv"><code class="docutils literal notranslate"><span class="pre">File::RemoveEmpty()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File18CompressWhitespaceEv"><code class="docutils literal notranslate"><span class="pre">File::CompressWhitespace()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File16RemoveWhitespaceEb"><code class="docutils literal notranslate"><span class="pre">File::RemoveWhitespace()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File14RemoveCommentsERK6Stringb"><code class="docutils literal notranslate"><span class="pre">File::RemoveComments()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File14RemoveCommentsEcb"><code class="docutils literal notranslate"><span class="pre">File::RemoveComments()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4I0EN4File7ProcessE6vectorI1TERKNSt8functionIF1TR6StringEEE"><code class="docutils literal notranslate"><span class="pre">File::Process()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File4ReadE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">File::Read()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File9ReadUntilE6size_tDa"><code class="docutils literal notranslate"><span class="pre">File::ReadUntil()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File9ReadWhileE6size_tDa"><code class="docutils literal notranslate"><span class="pre">File::ReadWhile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File10ExtractColEc"><code class="docutils literal notranslate"><span class="pre">File::ExtractCol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4I0EN4File12ExtractColAsE6vectorI1TEc"><code class="docutils literal notranslate"><span class="pre">File::ExtractColAs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File13ViewRowSlicesE6size_t6String"><code class="docutils literal notranslate"><span class="pre">File::ViewRowSlices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File10ExtractRowE6String"><code class="docutils literal notranslate"><span class="pre">File::ExtractRow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4I0EN4File12ExtractRowAsE6vectorI1TE6String"><code class="docutils literal notranslate"><span class="pre">File::ExtractRowAs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File5ToCSVE6String"><code class="docutils literal notranslate"><span class="pre">File::ToCSV()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4I0ENK4File6ToDataE6vectorI6vectorI1TEE6String"><code class="docutils literal notranslate"><span class="pre">File::ToData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4NK4File9StartScanE6size_t"><code class="docutils literal notranslate"><span class="pre">File::StartScan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File5linesE"><code class="docutils literal notranslate"><span class="pre">File::lines</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File10file_errorE"><code class="docutils literal notranslate"><span class="pre">File::file_error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/File.html#_CPPv4N4File4ScanE"><code class="docutils literal notranslate"><span class="pre">File::Scan</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4N4File4Scan4ScanERK4File6size_t"><code class="docutils literal notranslate"><span class="pre">File::Scan::Scan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4N4File4Scan4ScanERK4Scan"><code class="docutils literal notranslate"><span class="pre">File::Scan::Scan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4NK4File4Scan7GetFileEv"><code class="docutils literal notranslate"><span class="pre">File::Scan::GetFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4NK4File4Scan7GetLineEv"><code class="docutils literal notranslate"><span class="pre">File::Scan::GetLine()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4NK4File4Scan7AtStartEv"><code class="docutils literal notranslate"><span class="pre">File::Scan::AtStart()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4NK4File4Scan5AtEndEv"><code class="docutils literal notranslate"><span class="pre">File::Scan::AtEnd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4NK4File4ScancvbEv"><code class="docutils literal notranslate"><span class="pre">File::Scan::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4N4File4Scan3SetE6size_t"><code class="docutils literal notranslate"><span class="pre">File::Scan::Set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4N4File4Scan5ResetEv"><code class="docutils literal notranslate"><span class="pre">File::Scan::Reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4N4File4Scan6SetEndEv"><code class="docutils literal notranslate"><span class="pre">File::Scan::SetEnd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4N4File4Scan4ReadEv"><code class="docutils literal notranslate"><span class="pre">File::Scan::Read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4N4File4Scan6ReadToE6size_t"><code class="docutils literal notranslate"><span class="pre">File::Scan::ReadTo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4N4File4Scan9ReadUntilEDa"><code class="docutils literal notranslate"><span class="pre">File::Scan::ReadUntil()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4N4File4Scan9ReadWhileEDa"><code class="docutils literal notranslate"><span class="pre">File::Scan::ReadWhile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4N4File4Scan4fileE"><code class="docutils literal notranslate"><span class="pre">File::Scan::file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/File.html#_CPPv4N4File4Scan4lineE"><code class="docutils literal notranslate"><span class="pre">File::Scan::line</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/MemoryIStream.html">MemoryIStream.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/MemoryIStream.html#_CPPv49MemoryBuf"><code class="docutils literal notranslate"><span class="pre">MemoryBuf</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryIStream.html#_CPPv4N9MemoryBuf9MemoryBufEPKc6size_t"><code class="docutils literal notranslate"><span class="pre">MemoryBuf::MemoryBuf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/MemoryIStream.html#_CPPv413MemoryIStream"><code class="docutils literal notranslate"><span class="pre">MemoryIStream</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/MemoryIStream.html#_CPPv4N13MemoryIStream13MemoryIStreamEPKc6size_t"><code class="docutils literal notranslate"><span class="pre">MemoryIStream::MemoryIStream()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/NullStream.html">NullStream.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/NullStream.html#_CPPv44nout"><code class="docutils literal notranslate"><span class="pre">nout</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/NullStream.html#_CPPv410NullBuffer"><code class="docutils literal notranslate"><span class="pre">NullBuffer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/NullStream.html#_CPPv4N10NullBuffer8overflowEi"><code class="docutils literal notranslate"><span class="pre">NullBuffer::overflow()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/NullStream.html#_CPPv410NullStream"><code class="docutils literal notranslate"><span class="pre">NullStream</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/NullStream.html#_CPPv4N10NullStream10NullStreamEv"><code class="docutils literal notranslate"><span class="pre">NullStream::NullStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NullStream.html#_CPPv4N10NullStream4m_sbE"><code class="docutils literal notranslate"><span class="pre">NullStream::m_sb</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/StreamManager.html">StreamManager.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/StreamManager.html#_CPPv413StreamManager"><code class="docutils literal notranslate"><span class="pre">StreamManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager4TypeE"><code class="docutils literal notranslate"><span class="pre">StreamManager::Type</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager4Type4NONEE"><code class="docutils literal notranslate"><span class="pre">StreamManager::Type::NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager4Type4FILEE"><code class="docutils literal notranslate"><span class="pre">StreamManager::Type::FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager4Type6STRINGE"><code class="docutils literal notranslate"><span class="pre">StreamManager::Type::STRING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager4Type5OTHERE"><code class="docutils literal notranslate"><span class="pre">StreamManager::Type::OTHER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager6AccessE"><code class="docutils literal notranslate"><span class="pre">StreamManager::Access</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager6Access4NONEE"><code class="docutils literal notranslate"><span class="pre">StreamManager::Access::NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager6Access5INPUTE"><code class="docutils literal notranslate"><span class="pre">StreamManager::Access::INPUT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager6Access6OUTPUTE"><code class="docutils literal notranslate"><span class="pre">StreamManager::Access::OUTPUT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager6Access2IOE"><code class="docutils literal notranslate"><span class="pre">StreamManager::Access::IO</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager13StreamManagerEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager13StreamManagerERK13StreamManager"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManagerD0Ev"><code class="docutils literal notranslate"><span class="pre">StreamManager::~StreamManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager3HasERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager18HasInputFileStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::HasInputFileStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager19HasOutputFileStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::HasOutputFileStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager15HasIOFileStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::HasIOFileStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager15HasStringStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::HasStringStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager17HasStdInputStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::HasStdInputStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager18HasStdOutputStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::HasStdOutputStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager14HasStdIOStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::HasStdIOStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager18HasInputOnlyStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::HasInputOnlyStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager19HasOutputOnlyStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::HasOutputOnlyStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager11HasIOStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::HasIOStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager14HasInputStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::HasInputStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager15HasOutputStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::HasOutputStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4I0_4Type_6AccessEN13StreamManager9AddStreamER1TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::AddStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager12AddInputFileENSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::AddInputFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager13AddOutputFileENSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::AddOutputFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager7AddFileENSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::AddFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15AddStringStreamENSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::AddStringStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4I0EN13StreamManager9AddStreamER1TRKNSt6stringER1T"><code class="docutils literal notranslate"><span class="pre">StreamManager::AddStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager14AddInputStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::AddInputStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15AddOutputStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::AddOutputStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager11AddIOStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::AddIOStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager19SetInputDefaultFileEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::SetInputDefaultFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager20SetOutputDefaultFileEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::SetOutputDefaultFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager16SetIODefaultFileEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::SetIODefaultFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager21SetInputDefaultStringEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::SetInputDefaultString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager22SetOutputDefaultStringEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::SetOutputDefaultString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager18SetIODefaultStringEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::SetIODefaultString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager23SetInputDefaultStandardEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::SetInputDefaultStandard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager24SetOutputDefaultStandardEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::SetOutputDefaultStandard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager14GetInputStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::GetInputStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15GetOutputStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::GetOutputStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager11GetIOStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::GetIOStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager11get_ostreamERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::get_ostream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager7GetInfoERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::GetInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager7GetInfoERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::GetInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager7streamsE"><code class="docutils literal notranslate"><span class="pre">StreamManager::streams</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager18default_input_typeE"><code class="docutils literal notranslate"><span class="pre">StreamManager::default_input_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager19default_output_typeE"><code class="docutils literal notranslate"><span class="pre">StreamManager::default_output_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15default_io_typeE"><code class="docutils literal notranslate"><span class="pre">StreamManager::default_io_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager9info_noneE"><code class="docutils literal notranslate"><span class="pre">StreamManager::info_none</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager16GetDefaultStreamEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::GetDefaultStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager10StreamInfoE"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager10StreamInfo10StreamInfoERKNSt6stringEb"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::StreamInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager10StreamInfo10StreamInfoERK10StreamInfo"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::StreamInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager10StreamInfoD0Ev"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::~StreamInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo7GetTypeEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::GetType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo9GetAccessEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::GetAccess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo6IsFileEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::IsFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo8IsStringEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::IsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo7IsOtherEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::IsOther()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo7IsInputEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::IsInput()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo8IsOutputEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::IsOutput()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo4IsIOEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::IsIO()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo11IsInputFileEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::IsInputFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo12IsOutputFileEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::IsOutputFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo8IsIOFileEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::IsIOFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo12IsOtherInputEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::IsOtherInput()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo13IsOtherOutputEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::IsOtherOutput()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo9IsOtherIOEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::IsOtherIO()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo7InputOKEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::InputOK()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo8OutputOKEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::OutputOK()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager10StreamInfo7IsOwnedEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::IsOwned()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager10StreamInfo14GetInputStreamEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::GetInputStream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager10StreamInfo15GetOutputStreamEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::GetOutputStream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager10StreamInfo11GetIOStreamEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::GetIOStream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager10StreamInfo4nameE"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager10StreamInfo5ownedE"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo::owned</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15StreamInfo_NoneE"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo_None</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15StreamInfo_None15StreamInfo_NoneEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo_None::StreamInfo_None()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager15StreamInfo_None7GetTypeEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo_None::GetType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager15StreamInfo_None9GetAccessEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo_None::GetAccess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15StreamInfo_None14GetInputStreamEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo_None::GetInputStream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15StreamInfo_None15GetOutputStreamEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo_None::GetOutputStream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15StreamInfo_None11GetIOStreamEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::StreamInfo_None::GetIOStream()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/StreamManager.html#_CPPv4I0_4Type_6AccessEN13StreamManager15TypedStreamInfoE"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15TypedStreamInfo15TypedStreamInfoERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo::TypedStreamInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15TypedStreamInfo15TypedStreamInfoERKNSt6stringE3PtrI1TE"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo::TypedStreamInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15TypedStreamInfoD0Ev"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo::~TypedStreamInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager15TypedStreamInfo7GetTypeEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo::GetType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4NK13StreamManager15TypedStreamInfo9GetAccessEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo::GetAccess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15TypedStreamInfo9GetStreamEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo::GetStream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15TypedStreamInfo14GetInputStreamEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo::GetInputStream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15TypedStreamInfo15GetOutputStreamEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo::GetOutputStream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15TypedStreamInfo11GetIOStreamEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo::GetIOStream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15TypedStreamInfo11ResetStreamEv"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo::ResetStream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15TypedStreamInfo8INPUT_OKE"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo::INPUT_OK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15TypedStreamInfo9OUTPUT_OKE"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo::OUTPUT_OK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/StreamManager.html#_CPPv4N13StreamManager15TypedStreamInfo3ptrE"><code class="docutils literal notranslate"><span class="pre">StreamManager::TypedStreamInfo::ptr</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/ascii_utils.html">ascii_utils.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/ascii_utils.html#_CPPv4I0E13AsciiBarGraphv6vectorI1TE6size_tbbRNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">AsciiBarGraph()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/ascii_utils.html#_CPPv4I0E14AsciiHistogramv6vectorI1TE6size_t6size_tbRNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">AsciiHistogram()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/serialize.html">serialize.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/serialize.html#_CPPv49serialize"><code class="docutils literal notranslate"><span class="pre">serialize</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/serialize.html#_CPPv4I0EN9serialize8StoreVarERN1T20emp_load_return_typeER7DataPodRK1Tb"><code class="docutils literal notranslate"><span class="pre">serialize::StoreVar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/serialize.html#_CPPv4I0EN9serialize8StoreVarEvR7DataPodRK6vectorI1TEb"><code class="docutils literal notranslate"><span class="pre">serialize::StoreVar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/serialize.html#_CPPv4I0EN9serialize8StoreVarEvR7DataPodRK1Ti"><code class="docutils literal notranslate"><span class="pre">serialize::StoreVar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/serialize.html#_CPPv4I0EN9serialize9SetupLoadERN1T20emp_load_return_typeER7DataPodP1Tb"><code class="docutils literal notranslate"><span class="pre">serialize::SetupLoad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/serialize.html#_CPPv4I0EN9serialize9SetupLoadE1TR7DataPodPK1Ti"><code class="docutils literal notranslate"><span class="pre">serialize::SetupLoad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize9SetupLoadER7DataPodPNSt6stringEb"><code class="docutils literal notranslate"><span class="pre">serialize::SetupLoad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/serialize.html#_CPPv4I0EN9serialize9SetupLoadE6vectorI1TER7DataPodP6vectorI1TEb"><code class="docutils literal notranslate"><span class="pre">serialize::SetupLoad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/serialize.html#_CPPv4IDpEN9serialize5StoreEvR7DataPodDpR9ARG_TYPES"><code class="docutils literal notranslate"><span class="pre">serialize::Store()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPodE"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPod7DataPodERNSt7ostreamERNSt7istreamE"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::DataPod()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPod7DataPodERNSt8iostreamE"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::DataPod()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPod7DataPodERR7DataPod"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::DataPod()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPodaSERR7DataPod"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPod7DataPodEv"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::DataPod()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPod7DataPodERK7DataPod"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::DataPod()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPodD0Ev"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::~DataPod()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPod7OStreamEv"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::OStream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPod7IStreamEv"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::IStream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPod9ClearDataEv"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::ClearData()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPod2osE"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::os</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPod2isE"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::is</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPod6own_osE"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::own_os</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/serialize.html#_CPPv4N9serialize7DataPod6own_isE"><code class="docutils literal notranslate"><span class="pre">serialize::DataPod::own_is</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/serialize_macros.html">serialize_macros.hpp</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../in_progress/api/struct.html" class="btn btn-neutral float-left" title="struct.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/ContiguousStream.html" class="btn btn-neutral float-right" title="ContiguousStream.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bits &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/bits/bits.651978b4-8363-43cb-973a-ac7a6f92dbd9.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="BitArray.hpp" href="api/BitArray.html" />
+    <link rel="prev" title="vector.hpp" href="../base/api/vector.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Bits</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/BitArray.html">BitArray.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html">BitMatrix.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitSet.html">BitSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitVector.html">BitVector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html">Bits.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits_Data.html">Bits_Data.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/bitset_utils.html">bitset_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Bits</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bits">
+<h1>Bits<a class="headerlink" href="#bits" title="Link to this heading"></a></h1>
+<p>Stuff about bits</p>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/BitArray.html">BitArray.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/BitArray.html#_CPPv43old"><code class="docutils literal notranslate"><span class="pre">old</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_t_6size_tEN3old4joinE8BitArrayIXpl9NUM_BITS19NUM_BITS2EERK8BitArrayI9NUM_BITS1ERK8BitArrayI9NUM_BITS2E"><code class="docutils literal notranslate"><span class="pre">old::join()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_t_bEN3old16SimpleMatchCoeffEdRK8BitArrayI8NUM_BITS9ZERO_LEFTERK8BitArrayI8NUM_BITS9ZERO_LEFTE"><code class="docutils literal notranslate"><span class="pre">old::SimpleMatchCoeff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_t_bEN3old8BitArrayE"><code class="docutils literal notranslate"><span class="pre">old::BitArray</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8BitArrayEb"><code class="docutils literal notranslate"><span class="pre">old::BitArray::BitArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8BitArrayERK6this_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::BitArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8BitArrayERKNSt6bitsetI8NUM_BITSEE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::BitArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8BitArrayERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::BitArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8BitArrayEPKc"><code class="docutils literal notranslate"><span class="pre">old::BitArray::BitArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8BitArrayER6Random"><code class="docutils literal notranslate"><span class="pre">old::BitArray::BitArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8BitArrayER6Randomd"><code class="docutils literal notranslate"><span class="pre">old::BitArray::BitArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8BitArrayER6Random6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::BitArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8BitArrayER6Randomi"><code class="docutils literal notranslate"><span class="pre">old::BitArray::BitArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I0EN3old8BitArray8BitArrayEKNSt16initializer_listI1TEE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::BitArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArrayD0Ev"><code class="docutils literal notranslate"><span class="pre">old::BitArray::~BitArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NR3old8BitArrayaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NR3old8BitArrayaSERKNSt6bitsetI8NUM_BITSEE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NR3old8BitArrayaSERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NR3old8BitArrayaSEPKc"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_t_bEN3old8BitArray6ImportER8BitArrayRK8BitArrayI9FROM_BITS9FROM_LEFTEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Import()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_t_bENK3old8BitArray6ExportE8BitArrayI7TO_BITS7TO_LEFTE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray2OKEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::OK()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray3GetE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray3HasE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Has()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray3SetE6size_tb"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray6SetAllEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetAll()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8SetRangeE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetRange()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray5ClearEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray5ClearE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray5ClearEK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArrayixE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator[]()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArrayixE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator[]()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray6ToggleEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Toggle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray6ToggleE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Toggle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray6ToggleE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Toggle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray3AnyEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Any()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray4NoneEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::None()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray3AllEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::All()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray9RandomizeER6Random"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Randomize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I_N6Random4ProbEEN3old8BitArray10RandomizePER8BitArrayR6RandomK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::RandomizeP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray9RandomizeER6RandomKdK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Randomize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray12ChooseRandomER6RandomK6size_tK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ChooseRandom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray10FlipRandomER6RandomKdK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FlipRandom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray9SetRandomER6RandomKdK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetRandom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray11ClearRandomER6RandomKdK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ClearRandom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray15FlipRandomCountER6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FlipRandomCount()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray14SetRandomCountER6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetRandomCount()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray16ClearRandomCountER6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ClearRandomCount()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_t_bENK3old8BitArrayeqEbRK8BitArrayI2T22L2E"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator==()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_t_bENK3old8BitArrayneEbRK8BitArrayI2T22L2E"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator!=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_t_bENK3old8BitArrayltEbRK8BitArrayI2T22L2E"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator&lt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_t_bENK3old8BitArraygtEbRK8BitArrayI2T22L2E"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator&gt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_t_bENK3old8BitArrayleEbRK8BitArrayI2T22L2E"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator&lt;=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_t_bENK3old8BitArraygeEbRK8BitArrayI2T22L2E"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator&gt;=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArraycvbEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray7GetByteE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetByte()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray8GetBytesEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetBytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray8RawBytesEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::RawBytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray7SetByteE6size_t7uint8_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetByte()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray8GetValueEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I0ENK3old8BitArray15GetValueAtIndexE1TK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetValueAtIndex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray8GetSizeTE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetSizeT()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray8GetUInt8E6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetUInt8()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray9GetUInt16E6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetUInt16()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray9GetUInt32E6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetUInt32()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray9GetUInt64E6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetUInt64()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray7GetUIntE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetUInt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I0EN3old8BitArray15SetValueAtIndexEvK6size_t1T"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetValueAtIndex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8SetUInt8EK6size_t7uint8_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetUInt8()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray9SetUInt16EK6size_t8uint16_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetUInt16()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray9SetUInt32EK6size_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetUInt32()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray9SetUInt64EK6size_t8uint64_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetUInt64()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray7SetUIntEK6size_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetUInt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I0ENK3old8BitArray13GetValueAtBitE1TK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetValueAtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray13GetUInt8AtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetUInt8AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray14GetUInt16AtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetUInt16AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray14GetUInt32AtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetUInt32AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray14GetUInt64AtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetUInt64AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray12GetUIntAtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetUIntAtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I0EN3old8BitArray13SetValueAtBitEvK6size_t1T"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetValueAtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray13SetUInt8AtBitEK6size_t7uint8_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetUInt8AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray14SetUInt16AtBitEK6size_t8uint16_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetUInt16AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray14SetUInt32AtBitEK6size_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetUInt32AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray14SetUInt64AtBitEK6size_t8uint64_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetUInt64AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray12SetUIntAtBitEK6size_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SetUIntAtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray4HashEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Hash()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray9CountOnesEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::CountOnes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray16CountOnes_SparseEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::CountOnes_Sparse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray10CountZerosEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::CountZeros()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray7FindOneEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FindOne()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray7FindBitEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FindBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray7FindOneEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FindOne()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray7FindBitEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FindBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray10FindMaxOneEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FindMaxOne()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray6PopOneEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::PopOne()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray6PopBitEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::PopBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray7GetOnesEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetOnes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray18LongestSegmentOnesEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::LongestSegmentOnes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray9GetAsCharE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetAsChar()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray8ToStringEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ToString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray13ToArrayStringEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ToArrayString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray14ToBinaryStringEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ToBinaryString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray10ToIDStringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ToIDString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray13ToRangeStringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ToRangeString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray11PrintBinaryERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::PrintBinary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray10PrintArrayERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::PrintArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray11PrintFieldsERNSt7ostreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::PrintFields()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::PrintDebug()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray11PrintOneIDsERNSt7ostreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::PrintOneIDs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray12PrintAsRangeERNSt7ostreamERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::PrintAsRange()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8NOT_SELFEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::NOT_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8AND_SELFERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::AND_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray7OR_SELFERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::OR_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray9NAND_SELFERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::NAND_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8NOR_SELFERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::NOR_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8XOR_SELFERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::XOR_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8EQU_SELFERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::EQU_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray3NOTEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::NOT()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray3ANDERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::AND()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray2ORERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::OR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray4NANDERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::NAND()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray3NORERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::NOR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray3XORERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::XOR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray3EQUERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::EQU()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray5SHIFTEKi"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SHIFT()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray10SHIFT_SELFEKi"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SHIFT_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray12REVERSE_SELFEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::REVERSE_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray7REVERSEEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::REVERSE()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray6ROTATEEKi"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ROTATE()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray11ROTATE_SELFEKi"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ROTATE_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_tEN3old8BitArray9ROTL_SELFER8BitArrayv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ROTL_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_tEN3old8BitArray9ROTR_SELFER8BitArrayv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ROTR_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray3ADDERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ADD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8ADD_SELFERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ADD_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray3SUBERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SUB()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8SUB_SELFERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::SUB_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArraycoEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator~()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArrayanERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator&amp;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArrayorERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator|()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArrayeoERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator^()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArraylsEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator&lt;&lt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArrayrsEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator&gt;&gt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArrayaNERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator&amp;=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArrayoRERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator|=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArrayeOERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator^=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArraylSEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator&lt;&lt;=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArrayrSEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator&gt;&gt;=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArrayplERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator+()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArraymiERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator-()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArraypLERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator+=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArraymIERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator-=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray3allEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray3anyEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::any()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray4noneEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::none()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray5countEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray4flipEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray4flipE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray4flipE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray5resetEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray5resetE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray3setEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray3setE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray4testE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::test()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I0EN3old8BitArray9serializeEvR7Archive"><code class="docutils literal notranslate"><span class="pre">old::BitArray::serialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I0EN3old8BitArray10ApplyRangeER8BitArrayI8NUM_BITS9ZERO_LEFTERK5FUN_T6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ApplyRange()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray11GetNumBytesEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetNumBytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray12GetNumStatesEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::GetNumStates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray4sizeEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray6this_tE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::this_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray7field_tE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::field_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I_6size_t_6size_tEN3old8BitArray4CopyER8BitArrayA9IN_FIELDS_K7field_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray15ClearExcessBitsEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ClearExcessBits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4I0EN3old8BitArray10ApplyRangeER8BitArrayRK5FUN_T6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ApplyRange()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4NK3old8BitArray7BytePtrEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::BytePtr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray7BytePtrEv"><code class="docutils literal notranslate"><span class="pre">old::BitArray::BytePtr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray9ShiftLeftEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ShiftLeft()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray10ShiftRightEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ShiftRight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray10RotateLeftEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::RotateLeft()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray11RotateRightEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::RotateRight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray4bitsE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::bits</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray7FieldIDEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FieldID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray6ByteIDEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::ByteID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8FieldPosEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FieldPos()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray7BytePosEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::BytePos()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray10Byte2FieldEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Byte2Field()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray13Byte2FieldPosEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitArray::Byte2FieldPos()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray10FIELD_BITSE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FIELD_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray10NUM_FIELDSE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::NUM_FIELDS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray11TOTAL_BYTESE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::TOTAL_BYTES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray10LAST_FIELDE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::LAST_FIELD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray10FIELD_LOG2E"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FIELD_LOG2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray15FIELD_LOG2_MASKE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FIELD_LOG2_MASK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray12NUM_END_BITSE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::NUM_END_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray7END_GAPE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::END_GAP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray8END_MASKE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::END_MASK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray7FIELD_0E"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FIELD_0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray7FIELD_1E"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FIELD_1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray9FIELD_255E"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FIELD_255</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArray9FIELD_ALLE"><code class="docutils literal notranslate"><span class="pre">old::BitArray::FIELD_ALL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitArray.html#_CPPv4N3old8BitArraylsERNSt7ostreamERK8BitArray"><code class="docutils literal notranslate"><span class="pre">old::BitArray::operator&lt;&lt;()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/BitMatrix.html">BitMatrix.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/BitMatrix.html#_CPPv4I_6size_t_6size_tE9BitMatrix"><code class="docutils literal notranslate"><span class="pre">BitMatrix</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix9BitMatrixEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::BitMatrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix9BitMatrixERK6BitSetIXml4COLS4ROWSEE"><code class="docutils literal notranslate"><span class="pre">BitMatrix::BitMatrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix9BitMatrixERK9BitMatrix"><code class="docutils literal notranslate"><span class="pre">BitMatrix::BitMatrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrixD0Ev"><code class="docutils literal notranslate"><span class="pre">BitMatrix::~BitMatrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix7NumRowsEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::NumRows()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix7NumColsEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::NumCols()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix3AnyEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::Any()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix4NoneEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::None()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix3AllEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::All()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix3GetE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix3GetE6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix3SetE6size_t6size_tb"><code class="docutils literal notranslate"><span class="pre">BitMatrix::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix3SetE6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix5UnsetE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::Unset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix5UnsetE6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::Unset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix4FlipE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::Flip()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix4FlipE6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::Flip()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix6SetAllEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::SetAll()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix6SetColE6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::SetCol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix6SetRowE6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::SetRow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix5ClearEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix8ClearColE6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::ClearCol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix8ClearRowE6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::ClearRow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix9CountOnesEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::CountOnes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix7FindOneEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::FindOne()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix9LeftShiftEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::LeftShift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix10RightShiftEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::RightShift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix7UpShiftEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::UpShift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix9DownShiftEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::DownShift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix7ULShiftEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::ULShift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix7DLShiftEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::DLShift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix7URShiftEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::URShift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix7DRShiftEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::DRShift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix8GetReachEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::GetReach()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix9GetRegionE6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::GetRegion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix9GetRegionE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::GetRegion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix11IsConnectedEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::IsConnected()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix6Has2x2Ev"><code class="docutils literal notranslate"><span class="pre">BitMatrix::Has2x2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrix5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">BitMatrix::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrixaSERK9BitMatrix"><code class="docutils literal notranslate"><span class="pre">BitMatrix::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrixaNERK9BitMatrix"><code class="docutils literal notranslate"><span class="pre">BitMatrix::operator&amp;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrixoRERK9BitMatrix"><code class="docutils literal notranslate"><span class="pre">BitMatrix::operator|=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrixeOERK9BitMatrix"><code class="docutils literal notranslate"><span class="pre">BitMatrix::operator^=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrixeqERK9BitMatrix"><code class="docutils literal notranslate"><span class="pre">BitMatrix::operator==()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrixneERK9BitMatrix"><code class="docutils literal notranslate"><span class="pre">BitMatrix::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrixcoEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::operator~()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrixanERK9BitMatrix"><code class="docutils literal notranslate"><span class="pre">BitMatrix::operator&amp;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrixorERK9BitMatrix"><code class="docutils literal notranslate"><span class="pre">BitMatrix::operator|()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4NK9BitMatrixeoERK9BitMatrix"><code class="docutils literal notranslate"><span class="pre">BitMatrix::operator^()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix9to_bitsetEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::to_bitset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4I_6size_tEN9BitMatrix7MaskColERK6BitSetIXml4COLS4ROWSEEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::MaskCol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4I_6size_tEN9BitMatrix7MaskRowERK6BitSetIXml4COLS4ROWSEEv"><code class="docutils literal notranslate"><span class="pre">BitMatrix::MaskRow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix5ToColE6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::ToCol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix5ToRowE6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::ToRow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix4ToIDE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">BitMatrix::ToID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/BitMatrix.html#_CPPv4N9BitMatrix4bitsE"><code class="docutils literal notranslate"><span class="pre">BitMatrix::bits</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/BitSet.html">BitSet.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/BitSet.html#_CPPv43old"><code class="docutils literal notranslate"><span class="pre">old</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/BitSet.html#_CPPv4I_6size_tEN3old6BitSetE"><code class="docutils literal notranslate"><span class="pre">old::BitSet</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/BitVector.html">BitVector.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/BitVector.html#_CPPv4IE4hashIN3old9BitVectorEE"><code class="docutils literal notranslate"><span class="pre">hash</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/BitVector.html#_CPPv4NK4hashIN3old9BitVectorEEclERKN3old9BitVectorE"><code class="docutils literal notranslate"><span class="pre">hash::operator()()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/BitVector.html#_CPPv43old"><code class="docutils literal notranslate"><span class="pre">old</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVectorE"><code class="docutils literal notranslate"><span class="pre">old::BitVector</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9BitVectorE6size_tb"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I0_NSt9enable_ifINSt13is_arithmeticI1TE5valueEiE4typeEEN3old9BitVector9BitVectorE1T"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9BitVectorERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9BitVectorERR9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I_6size_tEN3old9BitVector9BitVectorERKNSt6bitsetI8NUM_BITSEE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9BitVectorERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9BitVectorEPKc"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9BitVectorE6size_tR6Random"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9BitVectorE6size_tR6RandomKd"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9BitVectorE6size_tR6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9BitVectorE6size_tR6RandomKi"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I0EN3old9BitVector9BitVectorEKNSt16initializer_listI1TEE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9BitVectorERK9BitVector6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVectorD0Ev"><code class="docutils literal notranslate"><span class="pre">old::BitVector::~BitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NR3old9BitVectoraSERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NR3old9BitVectoraSERR9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I_6size_tENR3old9BitVectoraSER9BitVectorRKNSt6bitsetI8NUM_BITSEE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NR3old9BitVectoraSERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NR3old9BitVectoraSEPKc"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector6ImportERK9BitVectorK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Import()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector6ExportE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector2OKEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::OK()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector11GetNumBytesEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetNumBytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector12GetNumStatesEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetNumStates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector3GetE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector3HasE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Has()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector3SetE6size_tb"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector6SetAllEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetAll()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector8SetRangeE6size_t6size_tb"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetRange()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector5ClearEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector5ClearE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector5ClearEK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectorixE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator[]()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVectorixE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator[]()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector6ToggleEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Toggle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector6ToggleE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Toggle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector6ToggleE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Toggle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector3AnyEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Any()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector4NoneEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::None()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector3AllEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::All()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector6ResizeE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Resize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9RandomizeER6Random"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Randomize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I_N6Random4ProbEEN3old9BitVector10RandomizePER9BitVectorR6RandomK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::RandomizeP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9RandomizeER6RandomKdK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Randomize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector12ChooseRandomER6RandomK6size_tK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ChooseRandom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector10FlipRandomER6RandomKdK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FlipRandom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9SetRandomER6RandomKdK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetRandom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector11ClearRandomER6RandomKdK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ClearRandom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector15FlipRandomCountER6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FlipRandomCount()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector14SetRandomCountER6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetRandomCount()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector16ClearRandomCountER6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ClearRandomCount()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectoreqERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator==()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectorneERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator!=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectorltERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator&lt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectorgtERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator&gt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectorleERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator&lt;=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectorgeERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator&gt;=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I0EN3old9BitVectorcv6vectorI1TEEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator</span> <span class="pre">vector&lt;T&gt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectorcvbEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector7GetByteE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetByte()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector8GetBytesEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetBytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector8RawBytesEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::RawBytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector7SetByteE6size_t7uint8_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetByte()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector8GetValueEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9FieldSpanEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FieldSpan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I0ENK3old9BitVector15GetValueAtIndexE1TK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetValueAtIndex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector8GetUInt8E6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetUInt8()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector9GetUInt16E6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetUInt16()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector9GetUInt32E6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetUInt32()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector9GetUInt64E6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetUInt64()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector7GetUIntE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetUInt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I0EN3old9BitVector15SetValueAtIndexEvK6size_t1T"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetValueAtIndex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector8SetUInt8EK6size_t7uint8_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetUInt8()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9SetUInt16EK6size_t8uint16_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetUInt16()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9SetUInt32EK6size_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetUInt32()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9SetUInt64EK6size_t8uint64_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetUInt64()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector7SetUIntEK6size_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetUInt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I0ENK3old9BitVector13GetValueAtBitE1TK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetValueAtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector13GetUInt8AtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetUInt8AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector14GetUInt16AtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetUInt16AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector14GetUInt32AtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetUInt32AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector14GetUInt64AtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetUInt64AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector12GetUIntAtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetUIntAtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I0EN3old9BitVector13SetValueAtBitEvK6size_t1T"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetValueAtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector13SetUInt8AtBitEK6size_t7uint8_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetUInt8AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector14SetUInt16AtBitEK6size_t8uint16_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetUInt16AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector14SetUInt32AtBitEK6size_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetUInt32AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector14SetUInt64AtBitEK6size_t8uint64_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetUInt64AtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector12SetUIntAtBitEK6size_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SetUIntAtBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector4HashE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Hash()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector9CountOnesEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::CountOnes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector16CountOnes_SparseEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::CountOnes_Sparse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector10CountZerosEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::CountZeros()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector7PopBackEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::PopBack()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector8PushBackEKbK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::PushBack()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector6InsertEK6size_tKbK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Insert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector6DeleteEK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Delete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector7FindOneEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FindOne()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector7FindBitEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FindBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector7FindOneEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FindOne()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector7FindOneEi"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FindOne()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector7FindBitEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FindBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector10FindMaxOneEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FindMaxOne()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector6PopOneEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::PopOne()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector6PopBitEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::PopBit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector7GetOnesEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetOnes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I0ENK3old9BitVector7GetOnesER6vectorI1TER6vectorI1TE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetOnes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector18LongestSegmentOnesEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::LongestSegmentOnes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector10HasOverlapERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::HasOverlap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector9GetAsCharE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::GetAsChar()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector8ToStringEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ToString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector14ToBinaryStringEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ToBinaryString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector10ToIDStringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ToIDString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector13ToRangeStringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ToRangeString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector11PrintBinaryERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::PrintBinary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector10PrintArrayERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::PrintArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector11PrintFieldsERNSt7ostreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::PrintFields()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector10PrintDebugERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::PrintDebug()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector11PrintOneIDsERNSt7ostreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::PrintOneIDs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector12PrintAsRangeERNSt7ostreamERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::PrintAsRange()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector8NOT_SELFEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::NOT_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector8AND_SELFERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::AND_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector7OR_SELFERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::OR_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9NAND_SELFERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::NAND_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector8NOR_SELFERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::NOR_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector8XOR_SELFERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::XOR_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector8EQU_SELFERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::EQU_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector3NOTEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::NOT()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector3ANDERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::AND()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector2ORERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::OR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector4NANDERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::NAND()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector3NORERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::NOR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector3XORERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::XOR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector3EQUERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::EQU()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector5SHIFTEKi"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SHIFT()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector10SHIFT_SELFEKi"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SHIFT_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector12REVERSE_SELFEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::REVERSE_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector7REVERSEEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::REVERSE()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector6ROTATEEKi"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ROTATE()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector11ROTATE_SELFEKi"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ROTATE_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I_6size_tEN3old9BitVector9ROTL_SELFER9BitVectorv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ROTL_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I_6size_tEN3old9BitVector9ROTR_SELFER9BitVectorv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ROTR_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector3ADDERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ADD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector8ADD_SELFERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ADD_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector3SUBERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SUB()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector8SUB_SELFERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::SUB_SELF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectorcoEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator~()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectoranERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator&amp;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectororERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator|()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectoreoERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator^()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectorlsEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator&lt;&lt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVectorrsEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator&gt;&gt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVectoraNERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator&amp;=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVectoroRERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator|=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVectoreOERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator^=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVectorlSEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator&lt;&lt;=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVectorrSEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator&gt;&gt;=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector4sizeEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector6resizeENSt6size_tE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::resize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9push_backEb"><code class="docutils literal notranslate"><span class="pre">old::BitVector::push_back()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector2atE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector2atE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector5frontEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::front()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector5frontEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::front()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector4backEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::back()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector4backEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::back()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector3allEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector3anyEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::any()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector4noneEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::none()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector5countEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector4flipEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector4flipE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector4flipE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::flip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector5resetEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector5resetE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector3setEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector3setE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector4testE6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::test()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector7field_tE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::field_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector10NumEndBitsEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::NumEndBits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector6EndGapEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::EndGap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector7EndMaskEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::EndMask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector9NumFieldsEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::NumFields()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector9LastFieldEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::LastField()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector8NumBytesEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::NumBytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector10TotalBytesEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::TotalBytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector7RawCopyEK3PtrI7field_tE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::RawCopy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector7RawCopyEK6size_tK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::RawCopy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector7BytePtrEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BytePtr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4NK3old9BitVector7BytePtrEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::BytePtr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector15ClearExcessBitsEv"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ClearExcessBits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4I0EN3old9BitVector10ApplyRangeER9BitVectorRK5FUN_T6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ApplyRange()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9ShiftLeftEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ShiftLeft()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector10ShiftRightEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::ShiftRight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector10RotateLeftEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::RotateLeft()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector11RotateRightEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::RotateRight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector8num_bitsE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::num_bits</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector4bitsE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::bits</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector7FieldIDEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FieldID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector8FieldPosEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FieldPos()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector10Byte2FieldEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Byte2Field()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector13Byte2FieldPosEK6size_t"><code class="docutils literal notranslate"><span class="pre">old::BitVector::Byte2FieldPos()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector10FIELD_BITSE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FIELD_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector7FIELD_0E"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FIELD_0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector7FIELD_1E"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FIELD_1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9FIELD_255E"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FIELD_255</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector9FIELD_ALLE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FIELD_ALL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector8MAX_BITSE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::MAX_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector10FIELD_LOG2E"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FIELD_LOG2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVector15FIELD_LOG2_MASKE"><code class="docutils literal notranslate"><span class="pre">old::BitVector::FIELD_LOG2_MASK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/BitVector.html#_CPPv4N3old9BitVectorlsERNSt7ostreamERK9BitVector"><code class="docutils literal notranslate"><span class="pre">old::BitVector::operator&lt;&lt;()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Bits.html">Bits.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Bits.html#_CPPv49BitVector"><code class="docutils literal notranslate"><span class="pre">BitVector</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Bits.html#_CPPv48BitValue"><code class="docutils literal notranslate"><span class="pre">BitValue</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Bits.html#_CPPv4I_6size_tE8BitArray"><code class="docutils literal notranslate"><span class="pre">BitArray</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Bits.html#_CPPv4I_6size_tE6BitSet"><code class="docutils literal notranslate"><span class="pre">BitSet</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Bits.html#_CPPv4I_6size_tE15StaticBitVector"><code class="docutils literal notranslate"><span class="pre">StaticBitVector</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Bits.html#_CPPv4I_6size_tE14StaticBitValue"><code class="docutils literal notranslate"><span class="pre">StaticBitValue</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bE4Bits"><code class="docutils literal notranslate"><span class="pre">Bits</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsEb"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsE6size_tb"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_NSt9enable_ifINSt13is_arithmeticI1TE5valueEiE4typeEEN4Bits4BitsE1Tb"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bEN4Bits4BitsERK4BitsI7DATA2_T10ZERO_LEFT2E"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsERR6this_t"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I_6size_tEN4Bits4BitsERKNSt6bitsetI8NUM_BITSEE"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsEPKc"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsER6Random"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsER6RandomKd"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsER6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsER6RandomKi"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsE6size_tR6Random"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsE6size_tR6RandomKd"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsE6size_tR6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4BitsE6size_tR6RandomKi"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0EN4Bits4BitsEKNSt16initializer_listI1TEE"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bEN4Bits4BitsERK4BitsI7DATA2_T10ZERO_LEFT2E6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4BitsD0Ev"><code class="docutils literal notranslate"><span class="pre">Bits::~Bits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NR4BitsaSERK4BitsI6DATA_T9ZERO_LEFTE"><code class="docutils literal notranslate"><span class="pre">Bits::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bENR4BitsaSER4BitsRK4BitsI7DATA2_T10ZERO_LEFT2E"><code class="docutils literal notranslate"><span class="pre">Bits::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NR4BitsaSERR4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I_6size_tENR4BitsaSER4BitsRKNSt6bitsetI8NUM_BITSEE"><code class="docutils literal notranslate"><span class="pre">Bits::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NR4BitsaSERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Bits::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NR4BitsaSEPKc"><code class="docutils literal notranslate"><span class="pre">Bits::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bEN4Bits6ImportER4BitsRK4BitsI7DATA2_T10ZERO_LEFT2EK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Import()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0ENK4Bits6ExportE5OUT_T6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Export()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I_6size_tENK4Bits11ExportArrayE4BitsI14Bits_FixedDataI8NUM_BITSEXL1EEE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::ExportArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bEN4Bits6AppendER4BitsRK4BitsI7DATA2_T10ZERO_LEFT2E"><code class="docutils literal notranslate"><span class="pre">Bits::Append()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits2OKEv"><code class="docutils literal notranslate"><span class="pre">Bits::OK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">Bits::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits11GetNumBytesEv"><code class="docutils literal notranslate"><span class="pre">Bits::GetNumBytes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits12GetNumStatesEv"><code class="docutils literal notranslate"><span class="pre">Bits::GetNumStates()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits3GetE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits3HasE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits3SetE6size_tb"><code class="docutils literal notranslate"><span class="pre">Bits::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits6SetAllEv"><code class="docutils literal notranslate"><span class="pre">Bits::SetAll()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits8SetRangeE6size_t6size_tb"><code class="docutils literal notranslate"><span class="pre">Bits::SetRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits5ClearEv"><code class="docutils literal notranslate"><span class="pre">Bits::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits5ClearE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits5ClearEK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4BitsixE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4BitsixE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits6ToggleEv"><code class="docutils literal notranslate"><span class="pre">Bits::Toggle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits6ToggleE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Toggle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits6ToggleE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Toggle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits3AnyEv"><code class="docutils literal notranslate"><span class="pre">Bits::Any()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits4NoneEv"><code class="docutils literal notranslate"><span class="pre">Bits::None()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits3AllEv"><code class="docutils literal notranslate"><span class="pre">Bits::All()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits6ResizeE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Resize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9RandomizeER6Random"><code class="docutils literal notranslate"><span class="pre">Bits::Randomize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I_N6Random4ProbEEN4Bits10RandomizePER4BitsR6RandomK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::RandomizeP()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9RandomizeER6RandomKdK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Randomize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits12ChooseRandomER6RandomK6size_tK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::ChooseRandom()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits10FlipRandomER6RandomKdK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::FlipRandom()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9SetRandomER6RandomKdK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::SetRandom()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits11ClearRandomER6RandomKdK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::ClearRandom()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits15FlipRandomCountER6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::FlipRandomCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits14SetRandomCountER6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::SetRandomCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits16ClearRandomCountER6RandomK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::ClearRandomCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bENK4BitseqEbRK4BitsI7DATA2_T3ZL2E"><code class="docutils literal notranslate"><span class="pre">Bits::operator==()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bENK4BitsneEbRK4BitsI7DATA2_T3ZL2E"><code class="docutils literal notranslate"><span class="pre">Bits::operator!=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bENK4BitsltEbRK4BitsI7DATA2_T3ZL2E"><code class="docutils literal notranslate"><span class="pre">Bits::operator&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bENK4BitsgtEbRK4BitsI7DATA2_T3ZL2E"><code class="docutils literal notranslate"><span class="pre">Bits::operator&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bENK4BitsleEbRK4BitsI7DATA2_T3ZL2E"><code class="docutils literal notranslate"><span class="pre">Bits::operator&lt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bENK4BitsgeEbRK4BitsI7DATA2_T3ZL2E"><code class="docutils literal notranslate"><span class="pre">Bits::operator&gt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0EN4Bitscv6vectorI1TEEv"><code class="docutils literal notranslate"><span class="pre">Bits::operator</span> <span class="pre">vector&lt;T&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4BitscvbEv"><code class="docutils literal notranslate"><span class="pre">Bits::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits7GetByteE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetByte()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits8GetBytesEv"><code class="docutils literal notranslate"><span class="pre">Bits::GetBytes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9FieldSpanEv"><code class="docutils literal notranslate"><span class="pre">Bits::FieldSpan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits9FieldSpanEv"><code class="docutils literal notranslate"><span class="pre">Bits::FieldSpan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits9NumFieldsEv"><code class="docutils literal notranslate"><span class="pre">Bits::NumFields()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits8FieldPtrEv"><code class="docutils literal notranslate"><span class="pre">Bits::FieldPtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits8FieldPtrEv"><code class="docutils literal notranslate"><span class="pre">Bits::FieldPtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits8RawBytesEv"><code class="docutils literal notranslate"><span class="pre">Bits::RawBytes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits7SetByteE6size_t7uint8_t"><code class="docutils literal notranslate"><span class="pre">Bits::SetByte()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits8GetValueEv"><code class="docutils literal notranslate"><span class="pre">Bits::GetValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0ENK4Bits15GetValueAtIndexE1TK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetValueAtIndex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits8GetUInt8E6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetUInt8()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits9GetUInt16E6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetUInt16()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits9GetUInt32E6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetUInt32()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits9GetUInt64E6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetUInt64()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits7GetUIntE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetUInt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0EN4Bits15SetValueAtIndexER4BitsK6size_t1T"><code class="docutils literal notranslate"><span class="pre">Bits::SetValueAtIndex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits8SetUInt8EK6size_t7uint8_t"><code class="docutils literal notranslate"><span class="pre">Bits::SetUInt8()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9SetUInt16EK6size_t8uint16_t"><code class="docutils literal notranslate"><span class="pre">Bits::SetUInt16()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9SetUInt32EK6size_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">Bits::SetUInt32()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9SetUInt64EK6size_t8uint64_t"><code class="docutils literal notranslate"><span class="pre">Bits::SetUInt64()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits7SetUIntEK6size_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">Bits::SetUInt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0ENK4Bits13GetValueAtBitE1TK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetValueAtBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits13GetUInt8AtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetUInt8AtBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits14GetUInt16AtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetUInt16AtBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits14GetUInt32AtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetUInt32AtBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits14GetUInt64AtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetUInt64AtBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits12GetUIntAtBitE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetUIntAtBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0EN4Bits13SetValueAtBitER4BitsK6size_t1T"><code class="docutils literal notranslate"><span class="pre">Bits::SetValueAtBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits13SetUInt8AtBitEK6size_t7uint8_t"><code class="docutils literal notranslate"><span class="pre">Bits::SetUInt8AtBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits14SetUInt16AtBitEK6size_t8uint16_t"><code class="docutils literal notranslate"><span class="pre">Bits::SetUInt16AtBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits14SetUInt32AtBitEK6size_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">Bits::SetUInt32AtBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits14SetUInt64AtBitEK6size_t8uint64_t"><code class="docutils literal notranslate"><span class="pre">Bits::SetUInt64AtBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits12SetUIntAtBitEK6size_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">Bits::SetUIntAtBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits4HashE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Hash()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits9CountOnesEv"><code class="docutils literal notranslate"><span class="pre">Bits::CountOnes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits9CountOnesE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::CountOnes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits16CountOnes_SparseEv"><code class="docutils literal notranslate"><span class="pre">Bits::CountOnes_Sparse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits10CountZerosEv"><code class="docutils literal notranslate"><span class="pre">Bits::CountZeros()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits7PopBackEv"><code class="docutils literal notranslate"><span class="pre">Bits::PopBack()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits8PushBackEKbK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::PushBack()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9PushFrontEKbK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::PushFront()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits6InsertEK6size_tKbK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Insert()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits6DeleteEK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Delete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits7FindOneEv"><code class="docutils literal notranslate"><span class="pre">Bits::FindOne()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits8FindZeroEv"><code class="docutils literal notranslate"><span class="pre">Bits::FindZero()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits7FindBitEv"><code class="docutils literal notranslate"><span class="pre">Bits::FindBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits7FindOneEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::FindOne()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits8FindZeroEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::FindZero()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits7FindOneEi"><code class="docutils literal notranslate"><span class="pre">Bits::FindOne()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits8FindZeroEi"><code class="docutils literal notranslate"><span class="pre">Bits::FindZero()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits7FindBitEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::FindBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits10FindMaxOneEv"><code class="docutils literal notranslate"><span class="pre">Bits::FindMaxOne()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits6PopOneEv"><code class="docutils literal notranslate"><span class="pre">Bits::PopOne()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits6PopBitEv"><code class="docutils literal notranslate"><span class="pre">Bits::PopBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits7GetOnesEv"><code class="docutils literal notranslate"><span class="pre">Bits::GetOnes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0ENK4Bits7GetOnesER6vectorI1TER6vectorI1TE"><code class="docutils literal notranslate"><span class="pre">Bits::GetOnes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits18LongestSegmentOnesEv"><code class="docutils literal notranslate"><span class="pre">Bits::LongestSegmentOnes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits9GetRangesEv"><code class="docutils literal notranslate"><span class="pre">Bits::GetRanges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits10HasOverlapERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::HasOverlap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits9GetAsCharE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::GetAsChar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits8ToStringEv"><code class="docutils literal notranslate"><span class="pre">Bits::ToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits13ToArrayStringEv"><code class="docutils literal notranslate"><span class="pre">Bits::ToArrayString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits14ToBinaryStringEv"><code class="docutils literal notranslate"><span class="pre">Bits::ToBinaryString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits10ToIDStringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Bits::ToIDString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits13ToRangeStringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Bits::ToRangeString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Bits::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits11PrintBinaryERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Bits::PrintBinary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits10PrintArrayERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Bits::PrintArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits11PrintFieldsERNSt7ostreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Bits::PrintFields()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits10PrintDebugERNSt7ostreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Bits::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits11PrintOneIDsERNSt7ostreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Bits::PrintOneIDs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits12PrintAsRangeERNSt7ostreamERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Bits::PrintAsRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits8NOT_SELFEv"><code class="docutils literal notranslate"><span class="pre">Bits::NOT_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits8AND_SELFERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::AND_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits7OR_SELFERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::OR_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9NAND_SELFERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::NAND_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits8NOR_SELFERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::NOR_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits8XOR_SELFERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::XOR_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits8EQU_SELFERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::EQU_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits3NOTEv"><code class="docutils literal notranslate"><span class="pre">Bits::NOT()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits3ANDERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::AND()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits2ORERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::OR()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits4NANDERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::NAND()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits3NORERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::NOR()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits3XORERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::XOR()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits3EQUERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::EQU()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits5SHIFTEKi"><code class="docutils literal notranslate"><span class="pre">Bits::SHIFT()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits10SHIFT_SELFEKi"><code class="docutils literal notranslate"><span class="pre">Bits::SHIFT_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits12REVERSE_SELFEv"><code class="docutils literal notranslate"><span class="pre">Bits::REVERSE_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits7REVERSEEv"><code class="docutils literal notranslate"><span class="pre">Bits::REVERSE()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits6ROTATEEKi"><code class="docutils literal notranslate"><span class="pre">Bits::ROTATE()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits11ROTATE_SELFEKi"><code class="docutils literal notranslate"><span class="pre">Bits::ROTATE_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits3ADDERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::ADD()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits8ADD_SELFERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::ADD_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits3SUBERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::SUB()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits8SUB_SELFERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::SUB_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4BitscoEv"><code class="docutils literal notranslate"><span class="pre">Bits::operator~()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4BitsanERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::operator&amp;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4BitsorERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::operator|()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4BitseoERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::operator^()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4BitslsEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::operator&lt;&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4BitsrsEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::operator&gt;&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4BitsaNERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::operator&amp;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4BitsoRERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::operator|=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4BitseOERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::operator^=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4BitslSEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::operator&lt;&lt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4BitsrSEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::operator&gt;&gt;=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4BitsplERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::operator+()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4BitsmiERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::operator-()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4BitspLERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::operator+=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4BitsmIERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::operator-=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0EN4Bits9serializeEvR7Archive"><code class="docutils literal notranslate"><span class="pre">Bits::serialize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits4sizeEv"><code class="docutils literal notranslate"><span class="pre">Bits::size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits2atE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::at()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits2atE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::at()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits5frontEv"><code class="docutils literal notranslate"><span class="pre">Bits::front()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits5frontEv"><code class="docutils literal notranslate"><span class="pre">Bits::front()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4backEv"><code class="docutils literal notranslate"><span class="pre">Bits::back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits4backEv"><code class="docutils literal notranslate"><span class="pre">Bits::back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits6resizeENSt6size_tE"><code class="docutils literal notranslate"><span class="pre">Bits::resize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9push_backEKbK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::push_back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits8pop_backEv"><code class="docutils literal notranslate"><span class="pre">Bits::pop_back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits3allEv"><code class="docutils literal notranslate"><span class="pre">Bits::all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits3anyEv"><code class="docutils literal notranslate"><span class="pre">Bits::any()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits4noneEv"><code class="docutils literal notranslate"><span class="pre">Bits::none()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits5countEv"><code class="docutils literal notranslate"><span class="pre">Bits::count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4flipEv"><code class="docutils literal notranslate"><span class="pre">Bits::flip()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4flipE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::flip()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4flipE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::flip()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits5resetEv"><code class="docutils literal notranslate"><span class="pre">Bits::reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits5resetE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits3setEv"><code class="docutils literal notranslate"><span class="pre">Bits::set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits3setE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits4testE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::test()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits4dataEv"><code class="docutils literal notranslate"><span class="pre">Bits::data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits4dataEv"><code class="docutils literal notranslate"><span class="pre">Bits::data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bENR4BitsaSER4BitsI6DATA_T9ZERO_LEFTERK4BitsI6DATA_T9ZERO_LEFTE"><code class="docutils literal notranslate"><span class="pre">Bits::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bENR4BitsaSER4BitsI6DATA_T9ZERO_LEFTERK4BitsI7DATA2_T10ZERO_LEFT2E"><code class="docutils literal notranslate"><span class="pre">Bits::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bENR4BitsaSER4BitsI6DATA_T9ZERO_LEFTERR4BitsI6DATA_T9ZERO_LEFTE"><code class="docutils literal notranslate"><span class="pre">Bits::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I_6size_tENR4BitsaSER4BitsI6DATA_T9ZERO_LEFTERKNSt6bitsetI8NUM_BITSEE"><code class="docutils literal notranslate"><span class="pre">Bits::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bENR4BitsaSER4BitsI6DATA_T9ZERO_LEFTERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Bits::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bEN4Bits6ImportER4BitsI6DATA_T9ZERO_LEFTERK4BitsI7DATA2_T10ZERO_LEFT2EK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Import()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bEN4Bits6AppendER4BitsI6DATA_T9ZERO_LEFTERK4BitsI7DATA2_T10ZERO_LEFT2E"><code class="docutils literal notranslate"><span class="pre">Bits::Append()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I_N6Random4ProbEEN4Bits10RandomizePER4BitsI6DATA_T9ZERO_LEFTER6RandomK6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::RandomizeP()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0EN4Bits15SetValueAtIndexER4BitsI6DATA_T9ZERO_LEFTEK6size_t1T"><code class="docutils literal notranslate"><span class="pre">Bits::SetValueAtIndex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0EN4Bits13SetValueAtBitER4BitsI6DATA_T9ZERO_LEFTEK6size_t1T"><code class="docutils literal notranslate"><span class="pre">Bits::SetValueAtBit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9GetCTSizeEv"><code class="docutils literal notranslate"><span class="pre">Bits::GetCTSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits6this_tE"><code class="docutils literal notranslate"><span class="pre">Bits::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits7field_tE"><code class="docutils literal notranslate"><span class="pre">Bits::field_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits9MaskFieldE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::MaskField()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits9MaskFieldE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::MaskField()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits7RawCopyEK3PtrIK7field_tE6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::RawCopy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bEN4Bits7RawCopyEvRK4BitsI7DATA2_T10ZERO_LEFT2E"><code class="docutils literal notranslate"><span class="pre">Bits::RawCopy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits7RawMoveEK6size_tK6size_tK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::RawMove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits7BytePtrEv"><code class="docutils literal notranslate"><span class="pre">Bits::BytePtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4NK4Bits7BytePtrEv"><code class="docutils literal notranslate"><span class="pre">Bits::BytePtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits15ClearExcessBitsEv"><code class="docutils literal notranslate"><span class="pre">Bits::ClearExcessBits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0EN4Bits10ApplyRangeER4BitsI6DATA_T9ZERO_LEFTERK5FUN_T6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::ApplyRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9ShiftLeftEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::ShiftLeft()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits10ShiftRightEK6size_tb"><code class="docutils literal notranslate"><span class="pre">Bits::ShiftRight()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9ROTL_SELFEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::ROTL_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9ROTR_SELFEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::ROTR_SELF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits5_dataE"><code class="docutils literal notranslate"><span class="pre">Bits::_data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits7FieldIDEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::FieldID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits8FieldPosEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::FieldPos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits10Byte2FieldEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Byte2Field()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits13Byte2FieldPosEK6size_t"><code class="docutils literal notranslate"><span class="pre">Bits::Byte2FieldPos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits10FIELD_BITSE"><code class="docutils literal notranslate"><span class="pre">Bits::FIELD_BITS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits10FIELD_LOG2E"><code class="docutils literal notranslate"><span class="pre">Bits::FIELD_LOG2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits15FIELD_LOG2_MASKE"><code class="docutils literal notranslate"><span class="pre">Bits::FIELD_LOG2_MASK</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits7FIELD_0E"><code class="docutils literal notranslate"><span class="pre">Bits::FIELD_0</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits7FIELD_1E"><code class="docutils literal notranslate"><span class="pre">Bits::FIELD_1</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9FIELD_255E"><code class="docutils literal notranslate"><span class="pre">Bits::FIELD_255</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4Bits9FIELD_ALLE"><code class="docutils literal notranslate"><span class="pre">Bits::FIELD_ALL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4N4BitslsERNSt7ostreamERK4Bits"><code class="docutils literal notranslate"><span class="pre">Bits::operator&lt;&lt;()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Bits.html#_CPPv4St"><code class="docutils literal notranslate"><span class="pre">std</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits.html#_CPPv4I0_bENSt4hashI4BitsI6DATA_T9ZERO_LEFTEEE"><code class="docutils literal notranslate"><span class="pre">std::hash</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Bits.html#_CPPv4NKSt4hashI4BitsI6DATA_T9ZERO_LEFTEEclERK4BitsI6DATA_T9ZERO_LEFTE"><code class="docutils literal notranslate"><span class="pre">std::hash::operator()()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Bits_Data.html">Bits_Data.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Bits_Data.html#_CPPv418Bits_WatermarkData"><code class="docutils literal notranslate"><span class="pre">Bits_WatermarkData</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Bits_Data.html#_CPPv416Bits_DynamicData"><code class="docutils literal notranslate"><span class="pre">Bits_DynamicData</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Bits_Data.html#_CPPv4I_6size_tE14Bits_FixedData"><code class="docutils literal notranslate"><span class="pre">Bits_FixedData</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Bits_Data.html#_CPPv4I_6size_tE15Bits_StaticData"><code class="docutils literal notranslate"><span class="pre">Bits_StaticData</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/Bits_Data.html#_CPPv48BitsMode"><code class="docutils literal notranslate"><span class="pre">BitsMode</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits_Data.html#_CPPv4N8BitsMode5FIXEDE"><code class="docutils literal notranslate"><span class="pre">BitsMode::FIXED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits_Data.html#_CPPv4N8BitsMode6CAPPEDE"><code class="docutils literal notranslate"><span class="pre">BitsMode::CAPPED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits_Data.html#_CPPv4N8BitsMode7DYNAMICE"><code class="docutils literal notranslate"><span class="pre">BitsMode::DYNAMIC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Bits_Data.html#_CPPv4N8BitsMode9WATERMARKE"><code class="docutils literal notranslate"><span class="pre">BitsMode::WATERMARK</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/bitset_utils.html">bitset_utils.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv412bits_field_t"><code class="docutils literal notranslate"><span class="pre">bits_field_t</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv412NumBitFields6size_t"><code class="docutils literal notranslate"><span class="pre">NumBitFields()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv416BitFieldToString12bits_field_t"><code class="docutils literal notranslate"><span class="pre">BitFieldToString()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv417BitFieldsToString3PtrI12bits_field_tE6size_t"><code class="docutils literal notranslate"><span class="pre">BitFieldsToString()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4I_iE13UIntMaskFirst8uint32_tv"><code class="docutils literal notranslate"><span class="pre">UIntMaskFirst()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4IE13UIntMaskFirstIXL0EEE8uint32_tv"><code class="docutils literal notranslate"><span class="pre">UIntMaskFirst()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4I0E10count_bits6size_t1T"><code class="docutils literal notranslate"><span class="pre">count_bits()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4I0E8find_bit6size_tK1T"><code class="docutils literal notranslate"><span class="pre">find_bit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4I0E13find_last_bit6size_t1T"><code class="docutils literal notranslate"><span class="pre">find_last_bit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4I0E7pop_bit6size_tR1T"><code class="docutils literal notranslate"><span class="pre">pop_bit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4I0E7MaskLow4TYPENSt6size_tE"><code class="docutils literal notranslate"><span class="pre">MaskLow()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4I0E8MaskHigh4TYPENSt6size_tE"><code class="docutils literal notranslate"><span class="pre">MaskHigh()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4I0E8MaskUsed4TYPE4TYPE"><code class="docutils literal notranslate"><span class="pre">MaskUsed()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4I0E11ReverseBits1T1T"><code class="docutils literal notranslate"><span class="pre">ReverseBits()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4I0E14RotateBitsLeft1T1T6size_t"><code class="docutils literal notranslate"><span class="pre">RotateBitsLeft()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4I0E14RotateBitsLeft1T1T6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RotateBitsLeft()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4I0E15RotateBitsRight1T1T6size_t"><code class="docutils literal notranslate"><span class="pre">RotateBitsRight()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv4I0E15RotateBitsRight1T1T6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RotateBitsRight()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv49CountBitsRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">CountBits()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv414NUM_FIELD_BITS"><code class="docutils literal notranslate"><span class="pre">NUM_FIELD_BITS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/bitset_utils.html#_CPPv49ByteCount"><code class="docutils literal notranslate"><span class="pre">ByteCount</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../base/api/vector.html" class="btn btn-neutral float-left" title="vector.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/BitArray.html" class="btn btn-neutral float-right" title="BitArray.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collapse.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/prefab/api/Collapse.8be85c37-66cb-45cd-97b5-ad1ef0b0bf2c.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="CommentBox.hpp" href="CommentBox.html" />
+    <link rel="prev" title="CodeBlock.hpp" href="CodeBlock.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../prefab.html">Prefab</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../prefab.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Card.html">Card.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CodeBlock.html">CodeBlock.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Collapse.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416CollapseCoupling"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="CommentBox.html">CommentBox.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ConfigPanel.html">ConfigPanel.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FontAwesomeIcon.html">FontAwesomeIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LoadingIcon.html">LoadingIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LoadingModal.html">LoadingModal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Modal.html">Modal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ReadoutPanel.html">ReadoutPanel.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ToggleSwitch.html">ToggleSwitch.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ValueBox.html">ValueBox.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../prefab.html">Prefab</a></li>
+      <li class="breadcrumb-item active">Collapse.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="collapse-hpp">
+<h1>Collapse.hpp<a class="headerlink" href="#collapse-hpp" title="Link to this heading"></a></h1>
+<p>Sets up a collapsable DOM element. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv416CollapseCoupling">
+<span id="_CPPv316CollapseCoupling"></span><span id="_CPPv216CollapseCoupling"></span><span id="CollapseCoupling"></span><span class="target" id="classCollapseCoupling"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CollapseCoupling</span></span></span><a class="headerlink" href="#_CPPv416CollapseCoupling" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Collapse.hpp&gt;</em></div>
+<p>CollapseCoupling class maintains a group of targets and controllers. When a controller is clicked on a web page, all the associated targets will change state (expand/collapse). </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling16CollapseCouplingE6Widget6WidgetKbKNSt6stringE">
+<span id="_CPPv3N16CollapseCoupling16CollapseCouplingE6Widget6WidgetKbKNSt6stringE"></span><span id="_CPPv2N16CollapseCoupling16CollapseCouplingE6Widget6WidgetKbKNSt6stringE"></span><span id="CollapseCoupling::CollapseCoupling__Widget.Widget.bC.ssC"></span><span class="target" id="classCollapseCoupling_1aa038af2b0ed0c245d78c4965f085bf5c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CollapseCoupling</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../web/api/Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">controller</span></span>, <a class="reference internal" href="../../web/api/Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">target</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">expanded</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_class</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16CollapseCoupling16CollapseCouplingE6Widget6WidgetKbKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor which takes web elements as the controller and target. It will put each in a vector and call the constructor which takes vectors as controller and target parameters. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling16CollapseCouplingE6vectorI6WidgetE6vectorI6WidgetEKbKNSt6stringE">
+<span id="_CPPv3N16CollapseCoupling16CollapseCouplingE6vectorI6WidgetE6vectorI6WidgetEKbKNSt6stringE"></span><span id="_CPPv2N16CollapseCoupling16CollapseCouplingE6vectorI6WidgetE6vectorI6WidgetEKbKNSt6stringE"></span><span id="CollapseCoupling::CollapseCoupling__vector:Widget:.vector:Widget:.bC.ssC"></span><span class="target" id="classCollapseCoupling_1a52860a54c9f13fe6e173e499de4cb341"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CollapseCoupling</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../web/api/Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">controllers</span></span>, <a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../web/api/Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">targets</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">expanded</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_class</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16CollapseCoupling16CollapseCouplingE6vectorI6WidgetE6vectorI6WidgetEKbKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor which takes vectors of web elements as the controller and target It will create the collapse coupling by adding necessary HTML attributes to all controllers and targets </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling16CollapseCouplingEKNSt6stringEKNSt6stringEKbKNSt6stringE">
+<span id="_CPPv3N16CollapseCoupling16CollapseCouplingEKNSt6stringEKNSt6stringEKbKNSt6stringE"></span><span id="_CPPv2N16CollapseCoupling16CollapseCouplingEKNSt6stringEKNSt6stringEKbKNSt6stringE"></span><span id="CollapseCoupling::CollapseCoupling__ssC.ssC.bC.ssC"></span><span class="target" id="classCollapseCoupling_1a7c22e1d30ba4e883b30484c52357afc1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CollapseCoupling</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">controller</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">expanded</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_class</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16CollapseCoupling16CollapseCouplingEKNSt6stringEKNSt6stringEKbKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor which takes strings as the controller and target It will put each in a Div element and call the constructor which takes web elements as controller and target parameters. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling13AddControllerE6WidgetKb">
+<span id="_CPPv3N16CollapseCoupling13AddControllerE6WidgetKb"></span><span id="_CPPv2N16CollapseCoupling13AddControllerE6WidgetKb"></span><span id="CollapseCoupling::AddController__Widget.bC"></span><span class="target" id="classCollapseCoupling_1a330f98772c1c1d568711b5127a9efa72"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddController</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../web/api/Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">controller</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">expanded</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16CollapseCoupling13AddControllerE6WidgetKb" title="Link to this definition"></a><br /></dt>
+<dd><p>Adds a controller to the vector of controllers for this CollapseCouple</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> – new controller to add to coupling is of type Widget</p></li>
+<li><p><strong>expanded</strong> – initial state of the target(s), is it expanded or not? </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling13AddControllerEKNSt6stringEKb">
+<span id="_CPPv3N16CollapseCoupling13AddControllerEKNSt6stringEKb"></span><span id="_CPPv2N16CollapseCoupling13AddControllerEKNSt6stringEKb"></span><span id="CollapseCoupling::AddController__ssC.bC"></span><span class="target" id="classCollapseCoupling_1a428429502ec7c77be4ce3339da5523aa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddController</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">controller</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">expanded</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16CollapseCoupling13AddControllerEKNSt6stringEKb" title="Link to this definition"></a><br /></dt>
+<dd><p>Adds a controller to the vector of controllers for this CollapseCouple.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> – new controller to add to coupling is of type string </p></li>
+<li><p><strong>expanded</strong> – initial state of the target(s), is it expanded or not? </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling9AddTargetEN8internal13FacetedWidgetEKb">
+<span id="_CPPv3N16CollapseCoupling9AddTargetEN8internal13FacetedWidgetEKb"></span><span id="_CPPv2N16CollapseCoupling9AddTargetEN8internal13FacetedWidgetEKb"></span><span id="CollapseCoupling::AddTarget__internal::FacetedWidget.bC"></span><span class="target" id="classCollapseCoupling_1ad5144da6e7c848debc991fd7599b024e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddTarget</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">FacetedWidget</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">widget</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">expanded</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16CollapseCoupling9AddTargetEN8internal13FacetedWidgetEKb" title="Link to this definition"></a><br /></dt>
+<dd><p>Adds a target to the vector of targets for this CollapseCouple</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>widget</strong> – new target to add to coupling is a web element </p></li>
+<li><p><strong>expanded</strong> – initial state of the target(s), is it expanded or not? </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling9AddTargetEKNSt6stringEKb">
+<span id="_CPPv3N16CollapseCoupling9AddTargetEKNSt6stringEKb"></span><span id="_CPPv2N16CollapseCoupling9AddTargetEKNSt6stringEKb"></span><span id="CollapseCoupling::AddTarget__ssC.bC"></span><span class="target" id="classCollapseCoupling_1aece88bdcddf6b00d6efbe60a7a4dcf6e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddTarget</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">expanded</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16CollapseCoupling9AddTargetEKNSt6stringEKb" title="Link to this definition"></a><br /></dt>
+<dd><p>Adds a target to the vector of targets for this CollapseCouple</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target</strong> – new target to add to coupling is a string </p></li>
+<li><p><strong>expanded</strong> – initial state of the target(s), is it expanded or not? </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling14GetTargetClassEv">
+<span id="_CPPv3N16CollapseCoupling14GetTargetClassEv"></span><span id="_CPPv2N16CollapseCoupling14GetTargetClassEv"></span><span id="CollapseCoupling::GetTargetClass"></span><span class="target" id="classCollapseCoupling_1a23b35b612b58dc2bde29b8f0ef9e032a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetTargetClass</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16CollapseCoupling14GetTargetClassEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the target_class associated with this CollapseCouple. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling17GetControllerDivsEv">
+<span id="_CPPv3N16CollapseCoupling17GetControllerDivsEv"></span><span id="_CPPv2N16CollapseCoupling17GetControllerDivsEv"></span><span id="CollapseCoupling::GetControllerDivs"></span><span class="target" id="classCollapseCoupling_1a8cb1056bd9bec3ebf05b2e535922c51a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../web/api/Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetControllerDivs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16CollapseCoupling17GetControllerDivsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the vector of all controllers associated with this CollapseCouple. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling16GetControllerDivEK6size_t">
+<span id="_CPPv3N16CollapseCoupling16GetControllerDivEK6size_t"></span><span id="_CPPv2N16CollapseCoupling16GetControllerDivEK6size_t"></span><span id="CollapseCoupling::GetControllerDiv__sC"></span><span class="target" id="classCollapseCoupling_1a01acf49f9ff646dcdf8dc146cf4cd429"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../web/api/Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetControllerDiv</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16CollapseCoupling16GetControllerDivEK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the controller at the given index. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling13GetTargetDivsEv">
+<span id="_CPPv3N16CollapseCoupling13GetTargetDivsEv"></span><span id="_CPPv2N16CollapseCoupling13GetTargetDivsEv"></span><span id="CollapseCoupling::GetTargetDivs"></span><span class="target" id="classCollapseCoupling_1ac108b3708005f033153d9c76fb8e48f5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../web/api/Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetTargetDivs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16CollapseCoupling13GetTargetDivsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the vector of all targets associated with this CollapseCouple. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling12GetTargetDivEK6size_t">
+<span id="_CPPv3N16CollapseCoupling12GetTargetDivEK6size_t"></span><span id="_CPPv2N16CollapseCoupling12GetTargetDivEK6size_t"></span><span id="CollapseCoupling::GetTargetDiv__sC"></span><span class="target" id="classCollapseCoupling_1a20158999138c3a03378d47f582a0416d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../web/api/Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetTargetDiv</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16CollapseCoupling12GetTargetDivEK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the target at the given index. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling7targetsE">
+<span id="_CPPv3N16CollapseCoupling7targetsE"></span><span id="_CPPv2N16CollapseCoupling7targetsE"></span><span id="CollapseCoupling::targets__vector:Widget:"></span><span class="target" id="classCollapseCoupling_1a5cab57ae9c816281cb409fbf217d790e"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../web/api/Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">targets</span></span></span><a class="headerlink" href="#_CPPv4N16CollapseCoupling7targetsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling11controllersE">
+<span id="_CPPv3N16CollapseCoupling11controllersE"></span><span id="_CPPv2N16CollapseCoupling11controllersE"></span><span id="CollapseCoupling::controllers__vector:Widget:"></span><span class="target" id="classCollapseCoupling_1acd62e4e7edc449ba9efcf756e0a0f15a"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../web/api/Widget.html#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">controllers</span></span></span><a class="headerlink" href="#_CPPv4N16CollapseCoupling11controllersE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling12target_classE">
+<span id="_CPPv3N16CollapseCoupling12target_classE"></span><span id="_CPPv2N16CollapseCoupling12target_classE"></span><span id="CollapseCoupling::target_class__ss"></span><span class="target" id="classCollapseCoupling_1a3443456a5ed5a90078c0443936816c1d"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">target_class</span></span></span><a class="headerlink" href="#_CPPv4N16CollapseCoupling12target_classE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-static-attributes">Private Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16CollapseCoupling7counterE">
+<span id="_CPPv3N16CollapseCoupling7counterE"></span><span id="_CPPv2N16CollapseCoupling7counterE"></span><span id="CollapseCoupling::counter__i"></span><span class="target" id="classCollapseCoupling_1a43d2daef0873f460675bc6ce8596d5b2"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">counter</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N16CollapseCoupling7counterE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="CodeBlock.html" class="btn btn-neutral float-left" title="CodeBlock.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="CommentBox.html" class="btn btn-neutral float-right" title="CommentBox.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

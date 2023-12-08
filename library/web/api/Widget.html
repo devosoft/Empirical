@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Widget.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/web/api/Widget.84501f7d-a84c-4081-a568-330b65cdb0d6.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="WidgetExtras.hpp" href="WidgetExtras.html" />
+    <link rel="prev" title="UrlParams.hpp" href="UrlParams.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../web.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Animate.html">Animate.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Attributes.html">Attributes.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Button.html">Button.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Canvas.html">Canvas.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasAction.html">CanvasAction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasShape.html">CanvasShape.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Div.html">Div.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DocuExtras.html">DocuExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Document.html">Document.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Element.html">Element.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FileInput.html">FileInput.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Font.html">Font.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Image.html">Image.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Input.html">Input.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="JSWrap.html">JSWrap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="KeypressManager.html">KeypressManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Listeners.html">Listeners.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NodeDomShim.html">NodeDomShim.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RawImage.html">RawImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Selector.html">Selector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style.html">Style.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Table.html">Table.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Text.html">Text.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextArea.html">TextArea.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextFeed.html">TextFeed.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tween.html">Tween.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UrlParams.html">UrlParams.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Widget.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv46Widget"><code class="docutils literal notranslate"><span class="pre">Widget</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="WidgetExtras.html">WidgetExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="canvas_utils.html">canvas_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="color_map.html">color_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html">commands.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emfunctions.html">emfunctions.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="events.html">events.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="init.html">init.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="js_utils.html">js_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="web.html">web.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../web.html">Web Tools (for use with Emscripten)</a></li>
+      <li class="breadcrumb-item active">Widget.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="widget-hpp">
+<h1>Widget.hpp<a class="headerlink" href="#widget-hpp" title="Link to this heading"></a></h1>
+<p>Widgets maintain individual components on a web page and link to Elements. </p>
+<p>Each HTML Widget has all of its details stored in a WidgetInfo object; Multiple Widgets can be attached to the same WidgetInfo, simplifying the usage. All the library user needs to worry about is the Widget object itself; the WidgetInfo will be managed behind the scenes.</p>
+<p>WidgetInfo contains the basic information for all Widgets Widget is a generic base class, with a shared pointer to WidgetInfo WidgetFacet is a template that allows Set* methods to return derived return-type.</p>
+<p>In other files, Widgets will be used to define specific elements. ELEMENTInfo maintains information about the specific widget (derived from WidgetInfo) ELEMENT interfaces to ELEMENTInfo so multiple elements use same core; derived from WidgetFacet</p>
+<p>Library users should not need to access Widgets directly, only specific derived types.</p>
+<p>Tips for using widgets:</p>
+<p><ol class="arabic simple">
+<li><p>If you are about to make a lot of changes at once, run Freeze(), make the changes, and then run Activate() again. Freeze prevents widgets from being updated immediately.</p></li>
+<li><p>Trust the Widget to handle all of the manipulation behind the scenes </p></li>
+</ol>
+</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv46Widget">
+<span id="_CPPv36Widget"></span><span id="_CPPv26Widget"></span><span id="Widget"></span><span class="target" id="classWidget"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Widget</span></span></span><a class="headerlink" href="#_CPPv46Widget" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Widget.hpp&gt;</em></div>
+<p>Widget is effectively a smart pointer to a WidgetInfo object, plus some basic accessors. </p>
+<p>Subclassed by DocuExtras</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget6WidgetERKNSt6stringE">
+<span id="_CPPv3N6Widget6WidgetERKNSt6stringE"></span><span id="_CPPv2N6Widget6WidgetERKNSt6stringE"></span><span id="Widget::Widget__ssCR"></span><span class="target" id="classWidget_1a30e75d9aa2bb7aa68785bb272954253b"></span><span class="sig-name descname"><span class="n"><span class="pre">Widget</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget6WidgetERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>When Widgets are first created, they should be provided with an ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget6WidgetEP10WidgetInfo">
+<span id="_CPPv3N6Widget6WidgetEP10WidgetInfo"></span><span id="_CPPv2N6Widget6WidgetEP10WidgetInfo"></span><span id="Widget::Widget__WidgetInfoP"></span><span class="target" id="classWidget_1a3bfade0df8c30c98304e20cc5771f5f0"></span><span class="sig-name descname"><span class="n"><span class="pre">Widget</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WidgetInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in_info</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget6WidgetEP10WidgetInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget6WidgetERK6Widget">
+<span id="_CPPv3N6Widget6WidgetERK6Widget"></span><span id="_CPPv2N6Widget6WidgetERK6Widget"></span><span id="Widget::Widget__WidgetCR"></span><span class="target" id="classWidget_1a7fd2eaefada244285982fdf3dada4c1c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Widget</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6Widget6WidgetERK6Widget" title="Widget::Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget6WidgetERK6Widget" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6WidgetaSERK6Widget">
+<span id="_CPPv3N6WidgetaSERK6Widget"></span><span id="_CPPv2N6WidgetaSERK6Widget"></span><span id="Widget::assign-operator__WidgetCR"></span><span class="target" id="classWidget_1acfaa936e72a59fd92e5fc7f12218e922"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6WidgetaSERK6Widget" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6WidgetD0Ev">
+<span id="_CPPv3N6WidgetD0Ev"></span><span id="_CPPv2N6WidgetD0Ev"></span><span id="Widget::~Widget"></span><span class="target" id="classWidget_1aa24f66bcbaaec6d458b0980e8c8eae65"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Widget</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6WidgetD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget6IsNullEv">
+<span id="_CPPv3NK6Widget6IsNullEv"></span><span id="_CPPv2NK6Widget6IsNullEv"></span><span id="Widget::IsNullC"></span><span class="target" id="classWidget_1a4190acaec704ad14d65c178426526e12"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsNull</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget6IsNullEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if this widget is valid. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget15GetInfoTypeNameEv">
+<span id="_CPPv3NK6Widget15GetInfoTypeNameEv"></span><span id="_CPPv2NK6Widget15GetInfoTypeNameEv"></span><span id="Widget::GetInfoTypeNameC"></span><span class="target" id="classWidget_1a873a1bbef087d9ad08742c18ac9ae930"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetInfoTypeName</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget15GetInfoTypeNameEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Some debugging helpers… </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget10IsInactiveEv">
+<span id="_CPPv3NK6Widget10IsInactiveEv"></span><span id="_CPPv2NK6Widget10IsInactiveEv"></span><span id="Widget::IsInactiveC"></span><span class="target" id="classWidget_1a4066734500f7b35cfda907fd1e3820c4"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsInactive</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget10IsInactiveEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if the activity state of this widget is currently INACTIVE. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget9IsWaitingEv">
+<span id="_CPPv3NK6Widget9IsWaitingEv"></span><span id="_CPPv2NK6Widget9IsWaitingEv"></span><span id="Widget::IsWaitingC"></span><span class="target" id="classWidget_1aa51674c926f5792d87963e6a2bccac13"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsWaiting</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget9IsWaitingEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if the activity state of this widget is currently WAITING. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget8IsFrozenEv">
+<span id="_CPPv3NK6Widget8IsFrozenEv"></span><span id="_CPPv2NK6Widget8IsFrozenEv"></span><span id="Widget::IsFrozenC"></span><span class="target" id="classWidget_1ad04ca6b1f0d62e812624301f2f46c1c6"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsFrozen</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget8IsFrozenEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if the activity state of this widget is currently FROZEN. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget8IsActiveEv">
+<span id="_CPPv3NK6Widget8IsActiveEv"></span><span id="_CPPv2NK6Widget8IsActiveEv"></span><span id="Widget::IsActiveC"></span><span class="target" id="classWidget_1a3135eebd451c627cdba4a637e49985bc"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsActive</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget8IsActiveEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if the activity state of this widget is currently ACTIVE. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget8AppendOKEv">
+<span id="_CPPv3NK6Widget8AppendOKEv"></span><span id="_CPPv2NK6Widget8AppendOKEv"></span><span id="Widget::AppendOKC"></span><span class="target" id="classWidget_1a12d942a5922b310578b10f8fa16eb21a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AppendOK</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget8AppendOKEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Is it okay to add more internal Widgets into this one? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget13PreventAppendEv">
+<span id="_CPPv3N6Widget13PreventAppendEv"></span><span id="_CPPv2N6Widget13PreventAppendEv"></span><span id="Widget::PreventAppend"></span><span class="target" id="classWidget_1abe5d38ae5a8a85e2994f306a0468dcd3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PreventAppend</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget13PreventAppendEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Disallow further appending to this Widget. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget8IsButtonEv">
+<span id="_CPPv3NK6Widget8IsButtonEv"></span><span id="_CPPv2NK6Widget8IsButtonEv"></span><span id="Widget::IsButtonC"></span><span class="target" id="classWidget_1a198da6853116ba8c2e104f0f592c1251"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsButton</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget8IsButtonEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget8IsCanvasEv">
+<span id="_CPPv3NK6Widget8IsCanvasEv"></span><span id="_CPPv2NK6Widget8IsCanvasEv"></span><span id="Widget::IsCanvasC"></span><span class="target" id="classWidget_1a936c664bb4c9848123ca4adff5cfbdbf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsCanvas</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget8IsCanvasEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget5IsDivEv">
+<span id="_CPPv3NK6Widget5IsDivEv"></span><span id="_CPPv2NK6Widget5IsDivEv"></span><span id="Widget::IsDivC"></span><span class="target" id="classWidget_1a4095a5ae4504a078d4a0f2a6a24a788c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsDiv</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget5IsDivEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget7IsImageEv">
+<span id="_CPPv3NK6Widget7IsImageEv"></span><span id="_CPPv2NK6Widget7IsImageEv"></span><span id="Widget::IsImageC"></span><span class="target" id="classWidget_1a7c65444fe746d61c3eb337e775ee69d3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsImage</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget7IsImageEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget7IsInputEv">
+<span id="_CPPv3NK6Widget7IsInputEv"></span><span id="_CPPv2NK6Widget7IsInputEv"></span><span id="Widget::IsInputC"></span><span class="target" id="classWidget_1a7a559de031a99016d17842b958f10006"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsInput</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget7IsInputEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget10IsSelectorEv">
+<span id="_CPPv3NK6Widget10IsSelectorEv"></span><span id="_CPPv2NK6Widget10IsSelectorEv"></span><span id="Widget::IsSelectorC"></span><span class="target" id="classWidget_1a6b35701a79553d11cf4922e975973fba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsSelector</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget10IsSelectorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget7IsTableEv">
+<span id="_CPPv3NK6Widget7IsTableEv"></span><span id="_CPPv2NK6Widget7IsTableEv"></span><span id="Widget::IsTableC"></span><span class="target" id="classWidget_1a76cad23c61b98bd8a87d7222198d918e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsTable</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget7IsTableEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget6IsTextEv">
+<span id="_CPPv3NK6Widget6IsTextEv"></span><span id="_CPPv2NK6Widget6IsTextEv"></span><span id="Widget::IsTextC"></span><span class="target" id="classWidget_1ac614558ae7ae223433e7b662b13422f6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsText</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget6IsTextEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget10IsTextAreaEv">
+<span id="_CPPv3NK6Widget10IsTextAreaEv"></span><span id="_CPPv2NK6Widget10IsTextAreaEv"></span><span id="Widget::IsTextAreaC"></span><span class="target" id="classWidget_1a2a3ebbb81b7a5952eae630b0b6d2e50e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsTextArea</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget10IsTextAreaEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget10IsTextFeedEv">
+<span id="_CPPv3NK6Widget10IsTextFeedEv"></span><span id="_CPPv2NK6Widget10IsTextFeedEv"></span><span id="Widget::IsTextFeedC"></span><span class="target" id="classWidget_1a1659a0950bfe964cd0d509a5728d5cc5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsTextFeed</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget10IsTextFeedEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget17IsD3VisualizationEv">
+<span id="_CPPv3NK6Widget17IsD3VisualizationEv"></span><span id="_CPPv2NK6Widget17IsD3VisualizationEv"></span><span id="Widget::IsD3VisualizationC"></span><span class="target" id="classWidget_1afbdb2654595b188e9861483a55942809"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsD3Visualization</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget17IsD3VisualizationEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget5GetIDEv">
+<span id="_CPPv3NK6Widget5GetIDEv"></span><span id="_CPPv2NK6Widget5GetIDEv"></span><span id="Widget::GetIDC"></span><span class="target" id="classWidget_1a4fadeb2d1a9afff785fc48cc790d184d"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetID</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget5GetIDEv" title="Link to this definition"></a><br /></dt>
+<dd><p>What is the HTML string ID for this Widget? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget6GetCSSERKNSt6stringE">
+<span id="_CPPv3NK6Widget6GetCSSERKNSt6stringE"></span><span id="_CPPv2NK6Widget6GetCSSERKNSt6stringE"></span><span id="Widget::GetCSS__ssCRC"></span><span class="target" id="classWidget_1a517b82f8ae9c6750ddba606f8a13a9fb"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetCSS</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget6GetCSSERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Retrieve a specific CSS trait associated with this Widget. Note: CSS-related options may be overridden in derived classes that have multiple styles. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget6HasCSSERKNSt6stringE">
+<span id="_CPPv3N6Widget6HasCSSERKNSt6stringE"></span><span id="_CPPv2N6Widget6HasCSSERKNSt6stringE"></span><span id="Widget::HasCSS__ssCR"></span><span class="target" id="classWidget_1aef50d8e32cfb054b47677be26c1b21e3"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasCSS</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget6HasCSSERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine is a CSS trait has been set on this Widget. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget7GetAttrERKNSt6stringE">
+<span id="_CPPv3NK6Widget7GetAttrERKNSt6stringE"></span><span id="_CPPv2NK6Widget7GetAttrERKNSt6stringE"></span><span id="Widget::GetAttr__ssCRC"></span><span class="target" id="classWidget_1abd80845a906a98457221aae650cb8404"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetAttr</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget7GetAttrERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Retrieve a specific attribute associated with this Widget. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget7HasAttrERKNSt6stringE">
+<span id="_CPPv3N6Widget7HasAttrERKNSt6stringE"></span><span id="_CPPv2N6Widget7HasAttrERKNSt6stringE"></span><span id="Widget::HasAttr__ssCR"></span><span class="target" id="classWidget_1ae172a78edab77ec3e2af1d9624296487"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasAttr</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">setting</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget7HasAttrERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine is an attribute has been set on this Widget. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6WidgeteqERK6Widget">
+<span id="_CPPv3NK6WidgeteqERK6Widget"></span><span id="_CPPv2NK6WidgeteqERK6Widget"></span><span id="Widget::eq-operator__WidgetCRC"></span><span class="target" id="classWidget_1ad5fe3d67401334f280e2844c4ed3ae6f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6WidgeteqERK6Widget" title="Link to this definition"></a><br /></dt>
+<dd><p>Are two Widgets refering to the same HTML object? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6WidgetneERK6Widget">
+<span id="_CPPv3NK6WidgetneERK6Widget"></span><span id="_CPPv2NK6WidgetneERK6Widget"></span><span id="Widget::neq-operator__WidgetCRC"></span><span class="target" id="classWidget_1a9fd57c53ecf215dfdb19989c4fc774f4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6WidgetneERK6Widget" title="Link to this definition"></a><br /></dt>
+<dd><p>Are two Widgets refering to different HTML objects? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6WidgetcvbEv">
+<span id="_CPPv3NK6WidgetcvbEv"></span><span id="_CPPv2NK6WidgetcvbEv"></span><span id="Widget::castto-b-operatorC"></span><span class="target" id="classWidget_1a5e668baf9f5423c195ff7a2d07d7b479"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6WidgetcvbEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Conver Widget to bool (I.e., is this Widget active?) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget8GetTitleEv">
+<span id="_CPPv3NK6Widget8GetTitleEv"></span><span id="_CPPv2NK6Widget8GetTitleEv"></span><span id="Widget::GetTitleC"></span><span class="target" id="classWidget_1a37789871b0df770fa099e03de6c9583e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetTitle</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget8GetTitleEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget7GetXPosEv">
+<span id="_CPPv3N6Widget7GetXPosEv"></span><span id="_CPPv2N6Widget7GetXPosEv"></span><span id="Widget::GetXPos"></span><span class="target" id="classWidget_1a279c3ce83ceaa3a34641d6ee9e30a843"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetXPos</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget7GetXPosEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get current tooltip on this widget. </p>
+<p>Get the X-position of this Widget within its parent. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget7GetYPosEv">
+<span id="_CPPv3N6Widget7GetYPosEv"></span><span id="_CPPv2N6Widget7GetYPosEv"></span><span id="Widget::GetYPos"></span><span class="target" id="classWidget_1aadd5c25e5e5d166d47ff5812259d42a4"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetYPos</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget7GetYPosEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the Y-position of this Widget within its parent. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget8GetWidthEv">
+<span id="_CPPv3N6Widget8GetWidthEv"></span><span id="_CPPv2N6Widget8GetWidthEv"></span><span id="Widget::GetWidth"></span><span class="target" id="classWidget_1a444d3ad48d2821b2b76f6ef1c561e5dd"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetWidth</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget8GetWidthEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the width of this Widget on screen. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget9GetHeightEv">
+<span id="_CPPv3N6Widget9GetHeightEv"></span><span id="_CPPv2N6Widget9GetHeightEv"></span><span id="Widget::GetHeight"></span><span class="target" id="classWidget_1a35d11a6b6ea3ec90880a7a1c78589ec5"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetHeight</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget9GetHeightEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the height of this Widget on screen. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget13GetInnerWidthEv">
+<span id="_CPPv3N6Widget13GetInnerWidthEv"></span><span id="_CPPv2N6Widget13GetInnerWidthEv"></span><span id="Widget::GetInnerWidth"></span><span class="target" id="classWidget_1a0232a1724780769f0839cbe85a8d7ccd"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetInnerWidth</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget13GetInnerWidthEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the width of this Widget not including padding. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget14GetInnerHeightEv">
+<span id="_CPPv3N6Widget14GetInnerHeightEv"></span><span id="_CPPv2N6Widget14GetInnerHeightEv"></span><span id="Widget::GetInnerHeight"></span><span class="target" id="classWidget_1a2e43d8ead5489740cf9dec45a3f031c3"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetInnerHeight</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget14GetInnerHeightEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the height of this Widget not including padding. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget13GetOuterWidthEv">
+<span id="_CPPv3N6Widget13GetOuterWidthEv"></span><span id="_CPPv2N6Widget13GetOuterWidthEv"></span><span id="Widget::GetOuterWidth"></span><span class="target" id="classWidget_1a5e272b45fd0a4c62e88cd97353f6d6f8"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetOuterWidth</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget13GetOuterWidthEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the width of this Widget including all padding. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget14GetOuterHeightEv">
+<span id="_CPPv3N6Widget14GetOuterHeightEv"></span><span id="_CPPv2N6Widget14GetOuterHeightEv"></span><span id="Widget::GetOuterHeight"></span><span class="target" id="classWidget_1ac91204be71f03041d032d68311ab7cdf"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetOuterHeight</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget14GetOuterHeightEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the height of this Widget including all padding. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget8ActivateEv">
+<span id="_CPPv3N6Widget8ActivateEv"></span><span id="_CPPv2N6Widget8ActivateEv"></span><span id="Widget::Activate"></span><span class="target" id="classWidget_1ad2ec351aac309f0a2036ff622ff3a5f6"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Activate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget8ActivateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Make this widget live, so changes occur immediately (once document is ready) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget6FreezeEv">
+<span id="_CPPv3N6Widget6FreezeEv"></span><span id="_CPPv2N6Widget6FreezeEv"></span><span id="Widget::Freeze"></span><span class="target" id="classWidget_1a346f60f7afdcf8302128c5bd9d20dbd0"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Freeze</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget6FreezeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Record changes internally, but keep static screen until Activate() is called. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget10DeactivateEb">
+<span id="_CPPv3N6Widget10DeactivateEb"></span><span id="_CPPv2N6Widget10DeactivateEb"></span><span id="Widget::Deactivate__b"></span><span class="target" id="classWidget_1a2ed32f815ca36991aa0e30b682968129"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Deactivate</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">top_level</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget10DeactivateEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Record changes internally and REMOVE from screen until Activate is called. (Argument is for recursive, internal use only.) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget12ToggleActiveEv">
+<span id="_CPPv3N6Widget12ToggleActiveEv"></span><span id="_CPPv2N6Widget12ToggleActiveEv"></span><span id="Widget::ToggleActive"></span><span class="target" id="classWidget_1adb1a8d9d3ee2134175f7529fe407b42a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToggleActive</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget12ToggleActiveEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Toggle between Active and Deactivated. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget6RedrawEv">
+<span id="_CPPv3N6Widget6RedrawEv"></span><span id="_CPPv2N6Widget6RedrawEv"></span><span id="Widget::Redraw"></span><span class="target" id="classWidget_1af60b607c8f1a76b52c7416594b7f0a55"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Redraw</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget6RedrawEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Clear and redraw the current widget on the screen. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget4FindERKNSt6stringE">
+<span id="_CPPv3N6Widget4FindERKNSt6stringE"></span><span id="_CPPv2N6Widget4FindERKNSt6stringE"></span><span id="Widget::Find__ssCR"></span><span class="target" id="classWidget_1ad54d66b31576dff49d66ed7490ba6e71"></span><a class="reference internal" href="#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Find</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">test_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget4FindERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Look up previously created elements, by type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget12AddDependantERK6Widget">
+<span id="_CPPv3N6Widget12AddDependantERK6Widget"></span><span id="_CPPv2N6Widget12AddDependantERK6Widget"></span><span id="Widget::AddDependant__WidgetCR"></span><span class="target" id="classWidget_1a8a607689cbf42f9df3482e7f32740b8c"></span><a class="reference internal" href="#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">AddDependant</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">w</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget12AddDependantERK6Widget" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a dependant to this Widget that should be redrawn when it is. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget13PrepareAppendEv">
+<span id="_CPPv3N6Widget13PrepareAppendEv"></span><span id="_CPPv2N6Widget13PrepareAppendEv"></span><span id="Widget::PrepareAppend"></span><span class="target" id="classWidget_1a3c401eca632018633ab7ab021ca818d3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrepareAppend</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget13PrepareAppendEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Setup &lt;&lt; operator to redirect to Append; option preparation can be overridden. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN6WidgetlsE6WidgetRR7IN_TYPE">
+<span id="_CPPv3I0EN6WidgetlsERR7IN_TYPE"></span><span id="_CPPv2I0EN6WidgetlsERR7IN_TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IN_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classWidget_1a792cf0e70b6f0735aa018f356e7f140a"></span><a class="reference internal" href="#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;&lt;</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN6WidgetlsE6WidgetRR7IN_TYPE" title="Widget::operator&lt;&lt;::IN_TYPE"><span class="n"><span class="pre">IN_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN6WidgetlsE6WidgetRR7IN_TYPE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6Widget11GetInfoTypeEv">
+<span id="_CPPv3NK6Widget11GetInfoTypeEv"></span><span id="_CPPv2NK6Widget11GetInfoTypeEv"></span><span id="Widget::GetInfoTypeC"></span><span class="target" id="classWidget_1aa6d76696902e060eb2b922ebfe75c701"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetInfoType</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6Widget11GetInfoTypeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Debug… </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-types">Protected Types</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget13ActivityStateE">
+<span id="_CPPv3N6Widget13ActivityStateE"></span><span id="_CPPv2N6Widget13ActivityStateE"></span><span class="target" id="classWidget_1a0e068ec8a9aaf802c8a4dd14dab3a7f1"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActivityState</span></span></span><a class="headerlink" href="#_CPPv4N6Widget13ActivityStateE" title="Link to this definition"></a><br /></dt>
+<dd><p>Four activity states for any widget: INACTIVE - Not be in DOM at all. WAITING - Will become active once the page finishes loading. FROZEN - Part of DOM, but not updating on the screen. ACTIVE - Fully active; changes are reflected as they happen. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget13ActivityState8INACTIVEE">
+<span id="_CPPv3N6Widget13ActivityState8INACTIVEE"></span><span id="_CPPv2N6Widget13ActivityState8INACTIVEE"></span><span class="target" id="classWidget_1a0e068ec8a9aaf802c8a4dd14dab3a7f1ab53a294699cef26352e55afe37d21c30"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">INACTIVE</span></span></span><a class="headerlink" href="#_CPPv4N6Widget13ActivityState8INACTIVEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget13ActivityState7WAITINGE">
+<span id="_CPPv3N6Widget13ActivityState7WAITINGE"></span><span id="_CPPv2N6Widget13ActivityState7WAITINGE"></span><span class="target" id="classWidget_1a0e068ec8a9aaf802c8a4dd14dab3a7f1a5307bf80a698c773532874bed996281f"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WAITING</span></span></span><a class="headerlink" href="#_CPPv4N6Widget13ActivityState7WAITINGE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget13ActivityState6FROZENE">
+<span id="_CPPv3N6Widget13ActivityState6FROZENE"></span><span id="_CPPv2N6Widget13ActivityState6FROZENE"></span><span class="target" id="classWidget_1a0e068ec8a9aaf802c8a4dd14dab3a7f1a36f4bcf2b5da5967ba2ee7783fb6a49d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FROZEN</span></span></span><a class="headerlink" href="#_CPPv4N6Widget13ActivityState6FROZENE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget13ActivityState6ACTIVEE">
+<span id="_CPPv3N6Widget13ActivityState6ACTIVEE"></span><span id="_CPPv2N6Widget13ActivityState6ACTIVEE"></span><span class="target" id="classWidget_1a0e068ec8a9aaf802c8a4dd14dab3a7f1a8a88957c9eaa1eead7d15bd29c286b8a"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ACTIVE</span></span></span><a class="headerlink" href="#_CPPv4N6Widget13ActivityState6ACTIVEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN6Widget13ForwardAppendER6WidgetRR8FWD_TYPE">
+<span id="_CPPv3I0EN6Widget13ForwardAppendERR8FWD_TYPE"></span><span id="_CPPv2I0EN6Widget13ForwardAppendERR8FWD_TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FWD_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classWidget_1af28ed5c8599257eb6726a259a4a28e6e"></span><a class="reference internal" href="#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">ForwardAppend</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN6Widget13ForwardAppendER6WidgetRR8FWD_TYPE" title="Widget::ForwardAppend::FWD_TYPE"><span class="n"><span class="pre">FWD_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN6Widget13ForwardAppendER6WidgetRR8FWD_TYPE" title="Link to this definition"></a><br /></dt>
+<dd><p>If an Append doesn’t work with current class, forward it to the parent and try there. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget7SetInfoEP10WidgetInfo">
+<span id="_CPPv3N6Widget7SetInfoEP10WidgetInfo"></span><span id="_CPPv2N6Widget7SetInfoEP10WidgetInfo"></span><span id="Widget::SetInfo__WidgetInfoP"></span><span class="target" id="classWidget_1a4bf6023641ebe7127596e394cb568409"></span><a class="reference internal" href="#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">SetInfo</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WidgetInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in_info</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget7SetInfoEP10WidgetInfo" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the information associated with this widget. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6WidgetptEv">
+<span id="_CPPv3N6WidgetptEv"></span><span id="_CPPv2N6WidgetptEv"></span><span id="Widget::pointer-operator"></span><span class="target" id="classWidget_1ac9b23e50149eb2ede5fa5b5bc02e516c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">WidgetInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">-&gt;</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6WidgetptEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Internally, we can treat a Widget as a pointer to its WidgetInfo. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget4infoE">
+<span id="_CPPv3N6Widget4infoE"></span><span id="_CPPv2N6Widget4infoE"></span><span id="Widget::info__WidgetInfoP"></span><span class="target" id="classWidget_1a114096b7a572baef900ecaf403709350"></span><span class="n"><span class="pre">WidgetInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">info</span></span></span><a class="headerlink" href="#_CPPv4N6Widget4infoE" title="Link to this definition"></a><br /></dt>
+<dd><p>Information associated with this widget. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-static-functions">Protected Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget4InfoERK6Widget">
+<span id="_CPPv3N6Widget4InfoERK6Widget"></span><span id="_CPPv2N6Widget4InfoERK6Widget"></span><span id="Widget::Info__WidgetCR"></span><span class="target" id="classWidget_1a6e6b2f605cca887ef0f281ef26a35edb"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">WidgetInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Info</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46Widget" title="Widget"><span class="n"><span class="pre">Widget</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">w</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6Widget4InfoERK6Widget" title="Link to this definition"></a><br /></dt>
+<dd><p>Give derived classes the ability to access widget info. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-static-attributes">Protected Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6Widget7no_nameE">
+<span id="_CPPv3N6Widget7no_nameE"></span><span id="_CPPv2N6Widget7no_nameE"></span><span id="Widget::no_name__ssC"></span><span class="target" id="classWidget_1aea49ccc7231f22936ea21340330b8a41"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">no_name</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;(none)&quot;</span></span><a class="headerlink" href="#_CPPv4N6Widget7no_nameE" title="Link to this definition"></a><br /></dt>
+<dd><p>Default name for un-initialized widgets. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="UrlParams.html" class="btn btn-neutral float-left" title="UrlParams.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="WidgetExtras.html" class="btn btn-neutral float-right" title="WidgetExtras.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>canvas_utils.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/web/api/canvas_utils.16e39677-0162-46f2-82c6-a40b2ab6bbae.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="color_map.hpp" href="color_map.html" />
+    <link rel="prev" title="WidgetExtras.hpp" href="WidgetExtras.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../web.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Animate.html">Animate.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Attributes.html">Attributes.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Button.html">Button.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Canvas.html">Canvas.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasAction.html">CanvasAction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CanvasShape.html">CanvasShape.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Div.html">Div.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DocuExtras.html">DocuExtras.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Document.html">Document.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Element.html">Element.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FileInput.html">FileInput.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Font.html">Font.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Image.html">Image.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Input.html">Input.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="JSWrap.html">JSWrap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="KeypressManager.html">KeypressManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Listeners.html">Listeners.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NodeDomShim.html">NodeDomShim.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RawImage.html">RawImage.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Selector.html">Selector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Style.html">Style.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Table.html">Table.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Text.html">Text.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextArea.html">TextArea.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TextFeed.html">TextFeed.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Tween.html">Tween.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UrlParams.html">UrlParams.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Widget.html">Widget.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WidgetExtras.html">WidgetExtras.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">canvas_utils.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv44Draw6CanvasRK6CircleRKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE4Drawv6CanvasRK9BitMatrixI4COLS4ROWSEdd"><code class="docutils literal notranslate"><span class="pre">Draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE4Drawv6CanvasRK7SurfaceIDp10BODY_TYPESERK6vectorINSt6stringEE"><code class="docutils literal notranslate"><span class="pre">Draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE4Drawv6CanvasRK7SurfaceIDp10BODY_TYPESE6size_t"><code class="docutils literal notranslate"><span class="pre">Draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E4Drawv6CanvasRK9Surface2DI9BODY_TYPEERK6vectorINSt6stringEE"><code class="docutils literal notranslate"><span class="pre">Draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E4Drawv6CanvasRK9Surface2DI9BODY_TYPEE6size_t"><code class="docutils literal notranslate"><span class="pre">Draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv44Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringEdddd"><code class="docutils literal notranslate"><span class="pre">Draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv44Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringEdd"><code class="docutils literal notranslate"><span class="pre">Draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv44Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringE"><code class="docutils literal notranslate"><span class="pre">Draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv44Draw6CanvasRK6vectorI6size_tE6size_tRK6vectorINSt6stringEENSt6stringEdddd"><code class="docutils literal notranslate"><span class="pre">Draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv44Draw6CanvasRK9StateGridRK6vectorINSt6stringEENSt6stringE"><code class="docutils literal notranslate"><span class="pre">Draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410DrawGridBG6Canvas6size_t6size_tRKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DrawGridBG()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I000E10DrawPointsv6CanvasRR11CONTAINER_TdRR11POINT_FUN_TRR11COLOR_FUN_TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DrawPoints()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="color_map.html">color_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html">commands.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emfunctions.html">emfunctions.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="events.html">events.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="init.html">init.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="js_utils.html">js_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="web.html">web.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../web.html">Web Tools (for use with Emscripten)</a></li>
+      <li class="breadcrumb-item active">canvas_utils.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="canvas-utils-hpp">
+<h1>canvas_utils.hpp<a class="headerlink" href="#canvas-utils-hpp" title="Link to this heading"></a></h1>
+<p>Various versions of the Draw() function to draw images onto a canvas. </p>
+<p>Each version of Draw() takes a canvas widget and some form of data to be drawn on the widget, such as a circle, a bit matrix, or a geometric surface. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv44Draw6CanvasRK6CircleRKNSt6stringERKNSt6stringE">
+<span id="_CPPv34Draw6CanvasRK6CircleRKNSt6stringERKNSt6stringE"></span><span id="_CPPv24Draw6CanvasRK6CircleRKNSt6stringERKNSt6stringE"></span><span id="Draw__Canvas.CircleCR.ssCR.ssCR"></span><span class="target" id="canvas__utils_8hpp_1a622d4ac0dbebeeecf104f1c0fc81d2cd"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Canvas.html#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">canvas</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../geometry/api/Circle2D.html#_CPPv46Circle" title="Circle"><span class="n"><span class="pre">Circle</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">circle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fill</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">line</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv44Draw6CanvasRK6CircleRKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a Circle onto the canvas. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>canvas</strong> – The Canvas to draw on. </p></li>
+<li><p><strong>circle</strong> – The circle to draw </p></li>
+<li><p><strong>fill</strong> – The color to fill the circle with </p></li>
+<li><p><strong>line</strong> – The color of the circle’s outline </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_t_6size_tE4Drawv6CanvasRK9BitMatrixI4COLS4ROWSEdd">
+<span id="_CPPv3I_6size_t_6size_tE4Draw6CanvasRK9BitMatrixI4COLS4ROWSEdd"></span><span id="_CPPv2I_6size_t_6size_tE4Draw6CanvasRK9BitMatrixI4COLS4ROWSEdd"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">COLS</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ROWS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="canvas__utils_8hpp_1aaffc820c62b75723acc7907132ab45b0"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Canvas.html#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">canvas</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/BitMatrix.html#_CPPv4I_6size_t_6size_tE9BitMatrix" title="BitMatrix"><span class="n"><span class="pre">BitMatrix</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE4Drawv6CanvasRK9BitMatrixI4COLS4ROWSEdd" title="Draw::COLS"><span class="n"><span class="pre">COLS</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t_6size_tE4Drawv6CanvasRK9BitMatrixI4COLS4ROWSEdd" title="Draw::ROWS"><span class="n"><span class="pre">ROWS</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">matrix</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">w</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">h</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_6size_t_6size_tE4Drawv6CanvasRK9BitMatrixI4COLS4ROWSEdd" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a BitMatrix onto a canvas using black and white squares (can specify cell width and height) Draw a Circle onto the canvas. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>canvas</strong> – The Canvas to draw on. </p></li>
+<li><p><strong>matrix</strong> – The matrix to draw </p></li>
+<li><p><strong>w</strong> – The width of the matrix (number of columns) </p></li>
+<li><p><strong>h</strong> – The height of the matrix (number of rows) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE4Drawv6CanvasRK7SurfaceIDp10BODY_TYPESERK6vectorINSt6stringEE">
+<span id="_CPPv3IDpE4Draw6CanvasRK7SurfaceIDp10BODY_TYPESERK6vectorINSt6stringEE"></span><span id="_CPPv2IDpE4Draw6CanvasRK7SurfaceIDp10BODY_TYPESERK6vectorINSt6stringEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">BODY_TYPES</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="canvas__utils_8hpp_1a907de00802915f5fc1ae919ad0e7d000"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Canvas.html#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">canvas</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../geometry/api/Surface.html#_CPPv4IDpE7Surface" title="Surface"><span class="n"><span class="pre">Surface</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpE4Drawv6CanvasRK7SurfaceIDp10BODY_TYPESERK6vectorINSt6stringEE" title="Draw::BODY_TYPES"><span class="n"><span class="pre">BODY_TYPES</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">surface</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">color_map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpE4Drawv6CanvasRK7SurfaceIDp10BODY_TYPESERK6vectorINSt6stringEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a Surface, specifying the full colormap to be used. The surface has a range of circle bodies, each with a color id. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>canvas</strong> – The Canvas to draw on. </p></li>
+<li><p><strong>surface</strong> – A surface containing a set of shapes to draw. </p></li>
+<li><p><strong>color_map</strong> – Mapping of values to the colors with which they should be associated. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE4Drawv6CanvasRK7SurfaceIDp10BODY_TYPESE6size_t">
+<span id="_CPPv3IDpE4Draw6CanvasRK7SurfaceIDp10BODY_TYPESE6size_t"></span><span id="_CPPv2IDpE4Draw6CanvasRK7SurfaceIDp10BODY_TYPESE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">BODY_TYPES</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="canvas__utils_8hpp_1aefc50c3b646caec9501c2f73a7280a2f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Canvas.html#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">canvas</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../geometry/api/Surface.html#_CPPv4IDpE7Surface" title="Surface"><span class="n"><span class="pre">Surface</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpE4Drawv6CanvasRK7SurfaceIDp10BODY_TYPESE6size_t" title="Draw::BODY_TYPES"><span class="n"><span class="pre">BODY_TYPES</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">surface</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_colors</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpE4Drawv6CanvasRK7SurfaceIDp10BODY_TYPESE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a Surface, just specifying the number of colors (and using a generated hue map). The surface has a range of circle bodies, each with a color id. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>canvas</strong> – The Canvas to draw on. </p></li>
+<li><p><strong>surface</strong> – A surface containing a set of shapes to draw. </p></li>
+<li><p><strong>num_colors</strong> – The number of distinct colors to use in visualization. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E4Drawv6CanvasRK9Surface2DI9BODY_TYPEERK6vectorINSt6stringEE">
+<span id="_CPPv3I0E4Draw6CanvasRK9Surface2DI9BODY_TYPEERK6vectorINSt6stringEE"></span><span id="_CPPv2I0E4Draw6CanvasRK9Surface2DI9BODY_TYPEERK6vectorINSt6stringEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BODY_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="canvas__utils_8hpp_1a201b657a2958370d603de26691193a61"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Canvas.html#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">canvas</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../geometry/api/Surface2D.html#_CPPv4I0E9Surface2D" title="Surface2D"><span class="n"><span class="pre">Surface2D</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E4Drawv6CanvasRK9Surface2DI9BODY_TYPEERK6vectorINSt6stringEE" title="Draw::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">surface</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">color_map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E4Drawv6CanvasRK9Surface2DI9BODY_TYPEERK6vectorINSt6stringEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a Surface2D, specifying the full colormap to be used. The surface has a range of circle bodies, each with a color id. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>canvas</strong> – The Canvas to draw on. </p></li>
+<li><p><strong>surface</strong> – A surface containing a set of shapes to draw. </p></li>
+<li><p><strong>color_map</strong> – Mapping of values to the colors with which they should be associated. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E4Drawv6CanvasRK9Surface2DI9BODY_TYPEE6size_t">
+<span id="_CPPv3I0E4Draw6CanvasRK9Surface2DI9BODY_TYPEE6size_t"></span><span id="_CPPv2I0E4Draw6CanvasRK9Surface2DI9BODY_TYPEE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BODY_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="canvas__utils_8hpp_1a86fae816af6feb8542599272f6ec62fe"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Canvas.html#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">canvas</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../geometry/api/Surface2D.html#_CPPv4I0E9Surface2D" title="Surface2D"><span class="n"><span class="pre">Surface2D</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E4Drawv6CanvasRK9Surface2DI9BODY_TYPEE6size_t" title="Draw::BODY_TYPE"><span class="n"><span class="pre">BODY_TYPE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">surface</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_colors</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E4Drawv6CanvasRK9Surface2DI9BODY_TYPEE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a Surface2D, just specifying the number of colors (and using a generated hue map). The surface has a range of circle bodies, each with a color id. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>canvas</strong> – The Canvas to draw on. </p></li>
+<li><p><strong>surface</strong> – A surface containing a set of shapes to draw. </p></li>
+<li><p><strong>num_colors</strong> – The number of distinct colors to use in visualization. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv44Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringEdddd">
+<span id="_CPPv34Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringEdddd"></span><span id="_CPPv24Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringEdddd"></span><span id="Draw__Canvas.vector:vector:s::CR.vector:ss:CR.ss.double.double.double.double"></span><span class="target" id="canvas__utils_8hpp_1a31d4db16ae559c50166fe47fcc10feae"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Canvas.html#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">canvas</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">grid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">color_map</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line_color</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cell_width</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cell_height</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset_x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset_y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv44Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringEdddd" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a grid onto a canvas. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>canvas</strong> – The Canvas to draw on. </p></li>
+<li><p><strong>grid</strong> – A vector of vectors of color IDs. </p></li>
+<li><p><strong>color_map</strong> – Mapping of values to the colors with which they should be associated. </p></li>
+<li><p><strong>line_color</strong> – The background line color for the grid. </p></li>
+<li><p><strong>cell_width</strong> – How many pixels wide is each cell to draw? </p></li>
+<li><p><strong>cell_height</strong> – How many pixels tall is each cell to draw? </p></li>
+<li><p><strong>offset_x</strong> – How far should we shift the grid relative to the left side of the canvas? </p></li>
+<li><p><strong>offset_y</strong> – How far should we shift the grid relative to the top of the canvas? </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv44Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringEdd">
+<span id="_CPPv34Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringEdd"></span><span id="_CPPv24Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringEdd"></span><span id="Draw__Canvas.vector:vector:s::CR.vector:ss:CR.ss.double.double"></span><span class="target" id="canvas__utils_8hpp_1ad86ef7445237f0be879c392493c47585"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Canvas.html#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">canvas</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">grid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">color_map</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line_color</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cell_w</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cell_h</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv44Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringEdd" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a grid onto a canvas, but without offsets provided &amp;#8212; the grid is centered. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>canvas</strong> – The Canvas to draw on. </p></li>
+<li><p><strong>grid</strong> – A vector of vectors of color IDs. </p></li>
+<li><p><strong>color_map</strong> – Mapping of values to the colors with which they should be associated. </p></li>
+<li><p><strong>line_color</strong> – The background line color for the grid. </p></li>
+<li><p><strong>cell_w</strong> – How many pixels wide is each cell to draw? </p></li>
+<li><p><strong>cell_h</strong> – How many pixels tall is each cell to draw? </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv44Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringE">
+<span id="_CPPv34Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringE"></span><span id="_CPPv24Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringE"></span><span id="Draw__Canvas.vector:vector:s::CR.vector:ss:CR.ss"></span><span class="target" id="canvas__utils_8hpp_1ab6ded17e55e4bf941fe756ba90d3e690"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Canvas.html#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">canvas</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">grid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">color_map</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line_color</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;black&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv44Draw6CanvasRK6vectorI6vectorI6size_tEERK6vectorINSt6stringEENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a grid onto a canvas, but without cell size provided &amp;#8212; maximize to fill the canvas! </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>canvas</strong> – The Canvas to draw on. </p></li>
+<li><p><strong>grid</strong> – A vector of vectors of color IDs. </p></li>
+<li><p><strong>color_map</strong> – Mapping of values to the colors with which they should be associated. </p></li>
+<li><p><strong>line_color</strong> – The background line color for the grid. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv44Draw6CanvasRK6vectorI6size_tE6size_tRK6vectorINSt6stringEENSt6stringEdddd">
+<span id="_CPPv34Draw6CanvasRK6vectorI6size_tE6size_tRK6vectorINSt6stringEENSt6stringEdddd"></span><span id="_CPPv24Draw6CanvasRK6vectorI6size_tE6size_tRK6vectorINSt6stringEENSt6stringEdddd"></span><span id="Draw__Canvas.vector:s:CR.s.vector:ss:CR.ss.double.double.double.double"></span><span class="target" id="canvas__utils_8hpp_1ae620a87b38a10021f18019b350baced4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Canvas.html#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">canvas</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">grid</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">grid_cols</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">color_map</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line_color</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cell_width</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cell_height</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset_x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset_y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv44Draw6CanvasRK6vectorI6size_tE6size_tRK6vectorINSt6stringEENSt6stringEdddd" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a vector onto a canvas as a grid. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>canvas</strong> – The Canvas to draw on. </p></li>
+<li><p><strong>grid</strong> – A vector of vectors of color IDs </p></li>
+<li><p><strong>grid_cols</strong> – Number of columns in the grid </p></li>
+<li><p><strong>color_map</strong> – Mapping of values to the colors with which they should be associated. </p></li>
+<li><p><strong>line_color</strong> – The background line color for the grid </p></li>
+<li><p><strong>cell_width</strong> – How many pixels wide is each cell to draw? </p></li>
+<li><p><strong>cell_height</strong> – How many pixels tall is each cell to draw? </p></li>
+<li><p><strong>offset_x</strong> – How far should we shift the grid relative to the left side of the canvas? </p></li>
+<li><p><strong>offset_y</strong> – How far should we shift the grid relative to the top of the canvas? </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv44Draw6CanvasRK9StateGridRK6vectorINSt6stringEENSt6stringE">
+<span id="_CPPv34Draw6CanvasRK9StateGridRK6vectorINSt6stringEENSt6stringE"></span><span id="_CPPv24Draw6CanvasRK9StateGridRK6vectorINSt6stringEENSt6stringE"></span><span id="Draw__Canvas.StateGridCR.vector:ss:CR.ss"></span><span class="target" id="canvas__utils_8hpp_1a85d731d539b97d00c40d98b5c4b11a0b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Draw</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Canvas.html#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">canvas</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../evolve/api/StateGrid.html#_CPPv49StateGrid" title="StateGrid"><span class="n"><span class="pre">StateGrid</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">state_grid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">color_map</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line_color</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;black&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv44Draw6CanvasRK9StateGridRK6vectorINSt6stringEENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a state grid onto a canvas. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>canvas</strong> – The Canvas to draw on. </p></li>
+<li><p><strong>state_grid</strong> – A StateGrid object. </p></li>
+<li><p><strong>color_map</strong> – Mapping of values to the colors with which they should be associated. </p></li>
+<li><p><strong>line_color</strong> – The background line color for the grid. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410DrawGridBG6Canvas6size_t6size_tRKNSt6stringERKNSt6stringE">
+<span id="_CPPv310DrawGridBG6Canvas6size_t6size_tRKNSt6stringERKNSt6stringE"></span><span id="_CPPv210DrawGridBG6Canvas6size_t6size_tRKNSt6stringERKNSt6stringE"></span><span id="DrawGridBG__Canvas.s.s.ssCR.ssCR"></span><span class="target" id="canvas__utils_8hpp_1a4d31af9ad55e7fd34e21eb36a2e47f24"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DrawGridBG</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Canvas.html#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">canvas</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rows</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cols</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">bg_color</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">line_color</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410DrawGridBG6Canvas6size_t6size_tRKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Draw a grid as the background of a canvas. Since this is a BG, clear the canvas first. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>canvas</strong> – The Canvas to draw on. </p></li>
+<li><p><strong>rows</strong> – Number of rows to draw in the grid. </p></li>
+<li><p><strong>cols</strong> – Number of columns to draw in the grid. </p></li>
+<li><p><strong>bg_color</strong> – The background color for the grid. </p></li>
+<li><p><strong>line_color</strong> – The color of the liens on the grid. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I000E10DrawPointsv6CanvasRR11CONTAINER_TdRR11POINT_FUN_TRR11COLOR_FUN_TRKNSt6stringE">
+<span id="_CPPv3I000E10DrawPoints6CanvasRR11CONTAINER_TdRR11POINT_FUN_TRR11COLOR_FUN_TRKNSt6stringE"></span><span id="_CPPv2I000E10DrawPoints6CanvasRR11CONTAINER_TdRR11POINT_FUN_TRR11COLOR_FUN_TRKNSt6stringE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CONTAINER_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">POINT_FUN_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">COLOR_FUN_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="canvas__utils_8hpp_1a09ebcfa840cf8fcbdf70824d2f4a096f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DrawPoints</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Canvas.html#_CPPv46Canvas" title="Canvas"><span class="n"><span class="pre">Canvas</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">canvas</span></span>, <a class="reference internal" href="#_CPPv4I000E10DrawPointsv6CanvasRR11CONTAINER_TdRR11POINT_FUN_TRR11COLOR_FUN_TRKNSt6stringE" title="DrawPoints::CONTAINER_T"><span class="n"><span class="pre">CONTAINER_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">container</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span>, <a class="reference internal" href="#_CPPv4I000E10DrawPointsv6CanvasRR11CONTAINER_TdRR11POINT_FUN_TRR11COLOR_FUN_TRKNSt6stringE" title="DrawPoints::POINT_FUN_T"><span class="n"><span class="pre">POINT_FUN_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">point_fun</span></span>, <a class="reference internal" href="#_CPPv4I000E10DrawPointsv6CanvasRR11CONTAINER_TdRR11POINT_FUN_TRR11COLOR_FUN_TRKNSt6stringE" title="DrawPoints::COLOR_FUN_T"><span class="n"><span class="pre">COLOR_FUN_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">color_fun</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">line_color</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;black&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I000E10DrawPointsv6CanvasRR11CONTAINER_TdRR11POINT_FUN_TRR11COLOR_FUN_TRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="WidgetExtras.html" class="btn btn-neutral float-left" title="WidgetExtras.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="color_map.html" class="btn btn-neutral float-right" title="color_map.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

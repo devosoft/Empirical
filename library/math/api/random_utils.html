@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>random_utils.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/math/api/random_utils.4361ad27-12af-41d2-b933-ba295ccda20f.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="sequence_utils.hpp" href="sequence_utils.html" />
+    <link rel="prev" title="math.hpp" href="math.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../math.html">Math</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../math.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="CombinedBinomialDistribution.html">CombinedBinomialDistribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Distribution.html">Distribution.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DistributionSet.html">DistributionSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Fraction.html">Fraction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Random.html">Random.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Range.html">Range.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RangeSet.html">RangeSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="combos.html">combos.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="constants.html">constants.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="distances.html">distances.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="info_theory.html">info_theory.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="math.html">math.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">random_utils.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E12SelectRandomDaR6RandomRK1T"><code class="docutils literal notranslate"><span class="pre">SelectRandom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E7ShufflevR6RandomR6vectorI1TE6size_t"><code class="docutils literal notranslate"><span class="pre">Shuffle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E7ShufflevR6RandomR6vectorI1TE"><code class="docutils literal notranslate"><span class="pre">Shuffle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E12ShuffleRangevR6RandomR6vectorI1TE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">ShuffleRange()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414GetPermutationR6Random6size_t"><code class="docutils literal notranslate"><span class="pre">GetPermutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv46ChooseR6Random6size_t6size_tRNSt6vectorI6size_tEE"><code class="docutils literal notranslate"><span class="pre">Choose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv46ChooseR6Random6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">Choose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415RandomBitVectorR6Random6size_td"><code class="docutils literal notranslate"><span class="pre">RandomBitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv418RandomDoubleVectorR6Random6size_tdd"><code class="docutils literal notranslate"><span class="pre">RandomDoubleVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416RandomUIntVectorR6Random6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RandomUIntVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E12RandomVector6vectorI1TER6Random6size_t1T1T"><code class="docutils literal notranslate"><span class="pre">RandomVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv418RandomizeBitVectorR9BitVectorR6Randomd"><code class="docutils literal notranslate"><span class="pre">RandomizeBitVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E15RandomizeVectorvR6vectorI1TER6Random1T1T"><code class="docutils literal notranslate"><span class="pre">RandomizeVector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415CountRngTouchesNSt8functionIFvR6RandomEEE"><code class="docutils literal notranslate"><span class="pre">CountRngTouches()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sequence_utils.html">sequence_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spatial_stats.html">spatial_stats.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stats.html">stats.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../math.html">Math</a></li>
+      <li class="breadcrumb-item active">random_utils.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="random-utils-hpp">
+<h1>random_utils.hpp<a class="headerlink" href="#random-utils-hpp" title="Link to this heading"></a></h1>
+<p>Helper functions for Random for common random tasks. Status: RELEASE. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E12SelectRandomDaR6RandomRK1T">
+<span id="_CPPv3I0E12SelectRandomR6RandomRK1T"></span><span id="_CPPv2I0E12SelectRandomR6RandomRK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="random__utils_8hpp_1acd91a8487e14e4f8cb5605c5c63893bb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SelectRandom</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E12SelectRandomDaR6RandomRK1T" title="SelectRandom::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">container</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E12SelectRandomDaR6RandomRK1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Choose a random element from an indexable container. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E7ShufflevR6RandomR6vectorI1TE6size_t">
+<span id="_CPPv3I0E7ShuffleR6RandomR6vectorI1TE6size_t"></span><span id="_CPPv2I0E7ShuffleR6RandomR6vectorI1TE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="random__utils_8hpp_1a4b7b0bfd899fb201859834cd2b722ad6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Shuffle</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E7ShufflevR6RandomR6vectorI1TE6size_t" title="Shuffle::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E7ShufflevR6RandomR6vectorI1TE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Randomly reorder all of the elements in a vector. If max_count is provided, just make sure that the first max_count entries are randomly drawn from entire vector. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E7ShufflevR6RandomR6vectorI1TE">
+<span id="_CPPv3I0E7ShuffleR6RandomR6vectorI1TE"></span><span id="_CPPv2I0E7ShuffleR6RandomR6vectorI1TE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="random__utils_8hpp_1a1c488a12f6ca7638d902b2952fc1a5cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Shuffle</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E7ShufflevR6RandomR6vectorI1TE" title="Shuffle::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E7ShufflevR6RandomR6vectorI1TE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E12ShuffleRangevR6RandomR6vectorI1TE6size_t6size_t">
+<span id="_CPPv3I0E12ShuffleRangeR6RandomR6vectorI1TE6size_t6size_t"></span><span id="_CPPv2I0E12ShuffleRangeR6RandomR6vectorI1TE6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="random__utils_8hpp_1a91b27e340770ad83fc715d8da3c3e51d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShuffleRange</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E12ShuffleRangevR6RandomR6vectorI1TE6size_t6size_t" title="ShuffleRange::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">first</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">last</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E12ShuffleRangevR6RandomR6vectorI1TE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414GetPermutationR6Random6size_t">
+<span id="_CPPv314GetPermutationR6Random6size_t"></span><span id="_CPPv214GetPermutationR6Random6size_t"></span><span id="GetPermutation__RandomR.s"></span><span class="target" id="random__utils_8hpp_1ac1b7e8c5da1cd3716fd6c58ac1f735c5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPermutation</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414GetPermutationR6Random6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Return an vector&lt;int&gt; numbered 0 through size-1 in a random order. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv46ChooseR6Random6size_t6size_tRNSt6vectorI6size_tEE">
+<span id="_CPPv36ChooseR6Random6size_t6size_tRNSt6vectorI6size_tEE"></span><span id="_CPPv26ChooseR6Random6size_t6size_tRNSt6vectorI6size_tEE"></span><span id="Choose__RandomR.s.s.std::vector:s:R"></span><span class="target" id="random__utils_8hpp_1a7b8950de5666cb2df814bfee9d246224"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Choose</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">N</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">K</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">choices</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv46ChooseR6Random6size_t6size_tRNSt6vectorI6size_tEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Choose K positions from N possibilities. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv46ChooseR6Random6size_t6size_t">
+<span id="_CPPv36ChooseR6Random6size_t6size_t"></span><span id="_CPPv26ChooseR6Random6size_t6size_t"></span><span id="Choose__RandomR.s.s"></span><span class="target" id="random__utils_8hpp_1a14ae0d70253c2f770c2a36cabb9ab5e2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Choose</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">N</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">K</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv46ChooseR6Random6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415RandomBitVectorR6Random6size_td">
+<span id="_CPPv315RandomBitVectorR6Random6size_td"></span><span id="_CPPv215RandomBitVectorR6Random6size_td"></span><span id="RandomBitVector__RandomR.s.double"></span><span class="target" id="random__utils_8hpp_1a30ff98e925590494f265c74561adddda"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandomBitVector</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.5</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415RandomBitVectorR6Random6size_td" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a random BitVector of the specified size. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418RandomDoubleVectorR6Random6size_tdd">
+<span id="_CPPv318RandomDoubleVectorR6Random6size_tdd"></span><span id="_CPPv218RandomDoubleVectorR6Random6size_tdd"></span><span id="RandomDoubleVector__RandomR.s.double.double"></span><span class="target" id="random__utils_8hpp_1ab561c6dae9a8bf8c1d4cf7d962a148ad"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandomDoubleVector</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418RandomDoubleVectorR6Random6size_tdd" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a random double vector in the specified range. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416RandomUIntVectorR6Random6size_t6size_t6size_t">
+<span id="_CPPv316RandomUIntVectorR6Random6size_t6size_t6size_t"></span><span id="_CPPv216RandomUIntVectorR6Random6size_t6size_t6size_t"></span><span id="RandomUIntVector__RandomR.s.s.s"></span><span class="target" id="random__utils_8hpp_1a3f910d809c0067ba1d4d7ed832854f38"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandomUIntVector</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416RandomUIntVectorR6Random6size_t6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a random size_t vector in the specified range. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E12RandomVector6vectorI1TER6Random6size_t1T1T">
+<span id="_CPPv3I0E12RandomVectorR6Random6size_t1T1T"></span><span id="_CPPv2I0E12RandomVectorR6Random6size_t1T1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="random__utils_8hpp_1a0da9230ff83d394d182e5c71b1b2a0ce"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E12RandomVector6vectorI1TER6Random6size_t1T1T" title="RandomVector::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandomVector</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <a class="reference internal" href="#_CPPv4I0E12RandomVector6vectorI1TER6Random6size_t1T1T" title="RandomVector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <a class="reference internal" href="#_CPPv4I0E12RandomVector6vectorI1TER6Random6size_t1T1T" title="RandomVector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E12RandomVector6vectorI1TER6Random6size_t1T1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a random vector in the specified type and range. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418RandomizeBitVectorR9BitVectorR6Randomd">
+<span id="_CPPv318RandomizeBitVectorR9BitVectorR6Randomd"></span><span id="_CPPv218RandomizeBitVectorR9BitVectorR6Randomd"></span><span id="RandomizeBitVector__BitVectorR.RandomR.double"></span><span class="target" id="random__utils_8hpp_1af4009dc3cf02b7b0f2cd60363c9d91df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandomizeBitVector</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">bits</span></span>, <a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.5</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418RandomizeBitVectorR9BitVectorR6Randomd" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a random BitVector of the specified size. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E15RandomizeVectorvR6vectorI1TER6Random1T1T">
+<span id="_CPPv3I0E15RandomizeVectorR6vectorI1TER6Random1T1T"></span><span id="_CPPv2I0E15RandomizeVectorR6vectorI1TER6Random1T1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="random__utils_8hpp_1a43584e0bc6f7a69568a4a18941cddcc0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandomizeVector</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E15RandomizeVectorvR6vectorI1TER6Random1T1T" title="RandomizeVector::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vals</span></span>, <a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span>, <a class="reference internal" href="#_CPPv4I0E15RandomizeVectorvR6vectorI1TER6Random1T1T" title="RandomizeVector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">min</span></span>, <a class="reference internal" href="#_CPPv4I0E15RandomizeVectorvR6vectorI1TER6Random1T1T" title="RandomizeVector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E15RandomizeVectorvR6vectorI1TER6Random1T1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a random vector in the specified type and range. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415CountRngTouchesNSt8functionIFvR6RandomEEE">
+<span id="_CPPv315CountRngTouchesNSt8functionIFvR6RandomEEE"></span><span id="_CPPv215CountRngTouchesNSt8functionIFvR6RandomEEE"></span><span class="target" id="random__utils_8hpp_1af8df9276445796eae95359ce891ce46f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountRngTouches</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">routine</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415CountRngTouchesNSt8functionIFvR6RandomEEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="math.html" class="btn btn-neutral float-left" title="math.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="sequence_utils.html" class="btn btn-neutral float-right" title="sequence_utils.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

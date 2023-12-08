@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hello World &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../_static/tippy/QuickStartGuides/1-HelloWorld.86c0efe8-1826-4229-84d7-f2bce35840be.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Base Tools" href="2-BaseTools.html" />
+    <link rel="prev" title="Overview" href="0-Overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Quick Start Guides</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="0-Overview.html">Overview</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Hello World</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#install-native-c-compiler">Install: Native C++ Compiler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compile-run-command-line">Compile &amp; Run: Command Line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-web-c-compiler">Install: Web C++ Compiler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compile-run-web-browser">Compile &amp; Run: Web Browser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extending-the-project-template">Extending the Project Template</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="2-BaseTools.html">Base Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3-WebTools.html">Web Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4-UsingProjectTemplate.html">Using the Project Template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="todos/todo.html">Work In Progress</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../library/base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../library/web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Quick Start Guides</a></li>
+      <li class="breadcrumb-item active">Hello World</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hello-world">
+<h1>Hello World<a class="headerlink" href="#hello-world" title="Link to this heading"></a></h1>
+<p>Empirical allows you to compile your C++ to target</p>
+<ul class="simple">
+<li><p>running at the command line (e.g., native machine code) and</p></li>
+<li><p>running in the web browser (e.g., javascript assembly code).</p></li>
+</ul>
+<p>This how-to aims to walk you through all the nitty gritty required to
+successfully compile a simple “Hello World” for both targets.</p>
+<section id="install-native-c-compiler">
+<h2>Install: Native C++ Compiler<a class="headerlink" href="#install-native-c-compiler" title="Link to this heading"></a></h2>
+<p>In the Unix-verse (e.g., Linux / macOS) commonly used compilers include
+<code class="docutils literal notranslate"><span class="pre">gcc</span></code> and <code class="docutils literal notranslate"><span class="pre">clang</span></code>. From this point onwards, we assume that you’re
+working with <code class="docutils literal notranslate"><span class="pre">gcc</span></code>. Unless you really know what you’re doing, you’ll
+want to have <code class="docutils literal notranslate"><span class="pre">gcc</span></code> installed. The good news is: you might already!</p>
+<p>Bring up a terminal and try entering:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>which<span class="w"> </span>gcc
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">which</span></code> spits out a path, then you have <code class="docutils literal notranslate"><span class="pre">gcc</span></code> installed! If <code class="docutils literal notranslate"><span class="pre">which</span></code>
+says “not found,” you’ll need to go ahead and install <code class="docutils literal notranslate"><span class="pre">gcc</span></code>. For
+Linux users, your package manager (e.g., <code class="docutils literal notranslate"><span class="pre">yum</span></code>, <code class="docutils literal notranslate"><span class="pre">apt</span></code>, etc.) is probably
+the way to go about this. For macOS users, you’ll need to get Apple’s
+“Command Line Tools for Xcode.” Either way, give it a quick web search
+(e.g., “install gcc on [my operating system]”) and there should be
+plenty of how-to guides that walk you through step-by-step.</p>
+<p>TODO Windows… Maybe you should try git for Windows (e.g.,
+“GitBash”)?</p>
+</section>
+<section id="compile-run-command-line">
+<h2>Compile &amp; Run: Command Line<a class="headerlink" href="#compile-run-command-line" title="Link to this heading"></a></h2>
+<p>Assuming you haven’t already pulled down a clone of Empirical, let’s
+get your working environment all set.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/devosoft/Empirical
+<span class="nb">cd</span><span class="w"> </span>Empirical/examples/ProjectTemplate
+</pre></div>
+</div>
+<p>Let’s take a look at what we want to compile.</p>
+<p><code class="docutils literal notranslate"><span class="pre">source/native/project_name.cc</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// This is the main function for the NATIVE version of this project.</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;emp/base/vector.hpp&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;emp/config/command_line.hpp&quot;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">emp</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emp</span><span class="o">::</span><span class="n">cl</span><span class="o">::</span><span class="n">args_to_strings</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">);</span>
+
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Hello World!&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This part is where Empirical source is brought in.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;emp/base/vector.hpp&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;emp/config/command_line.hpp&quot;</span>
+</pre></div>
+</div>
+<p>The main function uses Empirical’s vector and argument parsing tools to
+process command line options, but doesn’t do anything with them. Then,
+we print “Hello World!”.</p>
+<p>Let’s compile!</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make
+</pre></div>
+</div>
+<p>If you <code class="docutils literal notranslate"><span class="pre">ls</span></code>, you should now see the executable <code class="docutils literal notranslate"><span class="pre">project_name</span></code> has been
+created. Let’s run!</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>./project_name
+</pre></div>
+</div>
+</section>
+<section id="install-web-c-compiler">
+<h2>Install: Web C++ Compiler<a class="headerlink" href="#install-web-c-compiler" title="Link to this heading"></a></h2>
+<p>In order to compile for web, you’ll need the <a class="reference external" href="https://emscripten.org">emscripten LLVM-to-Web
+Compiler</a>. If you’re a new user, you (probably)
+don’t have this set up so we’ll walk you through step-by-step.</p>
+<p>We aim for Empirical to track the current release of emscripten. As of
+mid-February 2019, Empirical is compatible with emscripten’s
+contemporary release, version <code class="docutils literal notranslate"><span class="pre">v1.38.27</span></code>. Your best bet for compiling
+with Empirical is to install the latest version of emscripten. However,
+if you run into roadblocks later on and think it might be because of
+breaking changes in emscripten that Empirical hasn’t tracked, let us
+know by posting on <a class="reference external" href="https://github.com/devosoft/Empirical/issues">our issue
+tracker</a>!</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/emscripten-core/emsdk.git
+<span class="nb">cd</span><span class="w"> </span>emsdk
+./emsdk<span class="w"> </span>install<span class="w"> </span>latest
+./emsdk<span class="w"> </span>activate<span class="w"> </span>latest
+</pre></div>
+</div>
+<p>When you want to use the emscripten compiler, you’ll want to hop over
+to the <code class="docutils literal notranslate"><span class="pre">emsdk</span></code> directory and run</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>./emsdk_env.sh
+</pre></div>
+</div>
+<p>in order to load emscripten’s odds and ends into your <code class="docutils literal notranslate"><span class="pre">PATH</span></code>. You only
+need to do this once per terminal session (e.g., the first time you want
+to use emscripten in a terminal session).</p>
+</section>
+<section id="compile-run-web-browser">
+<h2>Compile &amp; Run: Web Browser<a class="headerlink" href="#compile-run-web-browser" title="Link to this heading"></a></h2>
+<p>Assuming your working directory is still
+<code class="docutils literal notranslate"><span class="pre">Empirical/examples/ProjectTemplate</span></code> and you have loaded up emscripten
+(e.g., <code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">./emsdk_env.sh</span></code>), compiling for web is a snap!</p>
+<p>Let’s take a look at what we want to compile first, though.</p>
+<p><code class="docutils literal notranslate"><span class="pre">source/web/project_name-web.cc</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">//  This file is part of Project Name</span>
+<span class="c1">//  Copyright (C) Michigan State University, 2017.</span>
+<span class="c1">//  Released under the MIT Software license; see doc/LICENSE</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;emp/web/web.hpp&quot;</span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">UI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nn">emp</span><span class="o">::</span><span class="nn">web</span><span class="p">;</span>
+
+<span class="n">UI</span><span class="o">::</span><span class="n">Document</span><span class="w"> </span><span class="n">doc</span><span class="p">(</span><span class="s">&quot;emp_base&quot;</span><span class="p">);</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">doc</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;&lt;h1&gt;Hello, world!&lt;/h1&gt;&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The line</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;emp/web/web.hpp&quot;</span>
+</pre></div>
+</div>
+<p>brings in Empirical’s web tools, which provide a convenient interface
+for C++ code to interact with browser-y bits like html and Javascript.</p>
+<p>The line</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">UI</span><span class="o">::</span><span class="n">Document</span><span class="w"> </span><span class="n">doc</span><span class="p">(</span><span class="s">&quot;emp_base&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>creates a persistent <code class="docutils literal notranslate"><span class="pre">UI::Document</span></code> object (e.g., outside the scope of
+the <code class="docutils literal notranslate"><span class="pre">main</span></code> function) that hooks into the <code class="docutils literal notranslate"><span class="pre">&quot;emp_base&quot;</span></code> div in
+<code class="docutils literal notranslate"><span class="pre">web/project_name.html</span></code>.</p>
+<p>Then, in <code class="docutils literal notranslate"><span class="pre">main</span></code>, we write our message to the <code class="docutils literal notranslate"><span class="pre">&quot;emp_base&quot;</span></code> div (wrapped
+in some html markup formatting… e.g., <code class="docutils literal notranslate"><span class="pre">&lt;h1&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;/h1&gt;</span></code>).</p>
+<p>You can find a more comprehensive explanation of the contents of this
+<em>.cpp</em> file in our <a class="reference internal" href="3-WebTools.html"><span class="doc std std-doc">Quick Start Guide for Web
+Tools</span></a>.</p>
+<p>Let’s compile</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>web
+</pre></div>
+</div>
+<p>We should now have <code class="docutils literal notranslate"><span class="pre">web/project_name.js</span></code> and <code class="docutils literal notranslate"><span class="pre">web/project_name.js.mem</span></code>
+ready to go. You can verify this by entering <code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">web</span></code> at your command
+line.</p>
+<p>We’ll need to locally serve our working directory in order to view our
+compiled product in a web browser. Python provides a handy, no-hassle
+tool for this.</p>
+<p>Try running</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>http.server
+</pre></div>
+</div>
+<p>at your command line. If it starts up, then great! Just leave it running
+for now.</p>
+<p>If you only have Python 2 installed, try running</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>SimpleHTTPServer
+</pre></div>
+</div>
+<p>at your command line.</p>
+<p>If you don’t have any Python installed, a step-by-step guide for your
+operating system is probably only a quick web search away.
+Alternatively, go ahead and use your web serving tool of choice.</p>
+<p>Pop open your favorite browser and point the address bar to
+<a class="reference external" href="http://localhost:8000/web/project_name.html">http://localhost:8000/web/project_name.html</a>.</p>
+<p>Voila!</p>
+<p>You can end your web serving process by closing the terminal window
+you’re working in or entering <code class="docutils literal notranslate"><span class="pre">&lt;ctrl&gt;-c</span></code> a the command line.</p>
+</section>
+<section id="extending-the-project-template">
+<h2>Extending the Project Template<a class="headerlink" href="#extending-the-project-template" title="Link to this heading"></a></h2>
+<p>We’ve used the project template to run some simple “hello world” code
+natively and in the browser.</p>
+<p>If you’re wondering how to extend the project template, we have a quick
+start guide on exactly that <a class="reference internal" href="4-UsingProjectTemplate.html"><span class="doc std std-doc">here</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="0-Overview.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="2-BaseTools.html" class="btn btn-neutral float-right" title="Base Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

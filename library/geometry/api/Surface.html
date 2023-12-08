@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Surface.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/geometry/api/Surface.3837c549-060a-4d4c-a483-94291c513475.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Surface2D.hpp" href="Surface2D.html" />
+    <link rel="prev" title="Point2D.hpp" href="Point2D.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../geometry.html">Geometry</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../geometry.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Angle2D.html">Angle2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Body2D.html">Body2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Circle2D.html">Circle2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Physics2D.html">Physics2D.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Point2D.html">Point2D.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Surface.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IDpE7Surface"><code class="docutils literal notranslate"><span class="pre">Surface</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Surface2D.html">Surface2D.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../geometry.html">Geometry</a></li>
+      <li class="breadcrumb-item active">Surface.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="surface-hpp">
+<h1>Surface.hpp<a class="headerlink" href="#surface-hpp" title="Link to this heading"></a></h1>
+<p>This file defines a templated class to represent a 2D suface capable of maintaining data about which 2D bodies are currently on that surface and rapidly identifying if they are overlapping. </p>
+<p>BODY_TYPE is the class that represents the body geometry.</p>
+<p>Developer Notes:<ul class="simple">
+<li><p>Should add enums to control boundary conditions (INFINITE, TOROIDAL, BOUNDED)</p></li>
+<li><p>Incorporate physics? Can have various plug-in modules. </p></li>
+</ul>
+</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE7Surface">
+<span id="_CPPv3IDpE7Surface"></span><span id="_CPPv2IDpE7Surface"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">BODY_TYPES</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSurface"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Surface</span></span></span><a class="headerlink" href="#_CPPv4IDpE7Surface" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Surface.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface10body_typesE">
+<span id="_CPPv3N7Surface10body_typesE"></span><span id="_CPPv2N7Surface10body_typesE"></span><span class="target" id="classSurface_1ac170fe76d93f19f6064db2835f88574a"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">body_types</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../meta/api/TypePack.html#_CPPv4IDpE8TypePack" title="TypePack"><span class="n"><span class="pre">TypePack</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpE7Surface" title="Surface::BODY_TYPES"><span class="n"><span class="pre">BODY_TYPES</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N7Surface10body_typesE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8sector_tE">
+<span id="_CPPv3N7Surface8sector_tE"></span><span id="_CPPv2N7Surface8sector_tE"></span><span class="target" id="classSurface_1a5496844c3629bd771a10d4bfde76e759"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sector_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N7Surface8sector_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface7SurfaceE5Point">
+<span id="_CPPv3N7Surface7SurfaceE5Point"></span><span id="_CPPv2N7Surface7SurfaceE5Point"></span><span id="Surface::Surface__Point"></span><span class="target" id="classSurface_1a3a6c62e33af02f66f456a7a55dc99194"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Surface</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface7SurfaceE5Point" title="Link to this definition"></a><br /></dt>
+<dd><p>Create a surface providing maxumum size. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7SurfaceD0Ev">
+<span id="_CPPv3N7SurfaceD0Ev"></span><span id="_CPPv2N7SurfaceD0Ev"></span><span id="Surface::~Surface"></span><span class="target" id="classSurface_1aef9b9206d60e70f1407ae848105f2b1e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Surface</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7SurfaceD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Surface8GetWidthEv">
+<span id="_CPPv3NK7Surface8GetWidthEv"></span><span id="_CPPv2NK7Surface8GetWidthEv"></span><span id="Surface::GetWidthC"></span><span class="target" id="classSurface_1a94367300e19f27d5d3c868c4c81e1f16"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetWidth</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Surface8GetWidthEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Surface9GetHeightEv">
+<span id="_CPPv3NK7Surface9GetHeightEv"></span><span id="_CPPv2NK7Surface9GetHeightEv"></span><span id="Surface::GetHeightC"></span><span class="target" id="classSurface_1ae1e20cac17595af815159ae0d9992c9e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetHeight</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Surface9GetHeightEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Surface14GetMaxPositionEv">
+<span id="_CPPv3NK7Surface14GetMaxPositionEv"></span><span id="_CPPv2NK7Surface14GetMaxPositionEv"></span><span id="Surface::GetMaxPositionC"></span><span class="target" id="classSurface_1a244ed3e1316101bab4c74f0ae2f31479"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetMaxPosition</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Surface14GetMaxPositionEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Surface10GetBodySetEv">
+<span id="_CPPv3NK7Surface10GetBodySetEv"></span><span id="_CPPv2NK7Surface10GetBodySetEv"></span><span id="Surface::GetBodySetC"></span><span class="target" id="classSurface_1a7a2c1b306797c93f18da1e4d011effb9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfoE" title="Surface::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetBodySet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Surface10GetBodySetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Surface8IsActiveE6size_t">
+<span id="_CPPv3NK7Surface8IsActiveE6size_t"></span><span id="_CPPv2NK7Surface8IsActiveE6size_t"></span><span id="Surface::IsActive__sC"></span><span class="target" id="classSurface_1a4ea4f14017d3ab3d38db9da56f697196"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsActive</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Surface8IsActiveE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if an id represents an active body on a surface. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK7Surface6GetPtrE3PtrI10ORIGINAL_TE6size_t">
+<span id="_CPPv3I0ENK7Surface6GetPtrE6size_t"></span><span id="_CPPv2I0ENK7Surface6GetPtrE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORIGINAL_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSurface_1a272df0e5fb9613f977a674509e89db25"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK7Surface6GetPtrE3PtrI10ORIGINAL_TE6size_t" title="Surface::GetPtr::ORIGINAL_T"><span class="n"><span class="pre">ORIGINAL_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPtr</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK7Surface6GetPtrE3PtrI10ORIGINAL_TE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Surface9GetCenterE6size_t">
+<span id="_CPPv3NK7Surface9GetCenterE6size_t"></span><span id="_CPPv2NK7Surface9GetCenterE6size_t"></span><span id="Surface::GetCenter__sC"></span><span class="target" id="classSurface_1ad0b85c973a2a4af93955661d251a5c16"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetCenter</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Surface9GetCenterE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Surface9GetRadiusE6size_t">
+<span id="_CPPv3NK7Surface9GetRadiusE6size_t"></span><span id="_CPPv2NK7Surface9GetRadiusE6size_t"></span><span id="Surface::GetRadius__sC"></span><span class="target" id="classSurface_1a79c13516a15efe491cfa4acf0045940d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRadius</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Surface9GetRadiusE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Surface8GetColorE6size_t">
+<span id="_CPPv3NK7Surface8GetColorE6size_t"></span><span id="_CPPv2NK7Surface8GetColorE6size_t"></span><span id="Surface::GetColor__sC"></span><span class="target" id="classSurface_1a9a1470e4b60418ea552543da3e56f07c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetColor</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Surface8GetColorE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface9SetCenterE6size_t5Point">
+<span id="_CPPv3N7Surface9SetCenterE6size_t5Point"></span><span id="_CPPv2N7Surface9SetCenterE6size_t5Point"></span><span id="Surface::SetCenter__s.Point"></span><span class="target" id="classSurface_1a6270a117fff5698b5c51632464af704c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetCenter</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface9SetCenterE6size_t5Point" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface9TranslateE6size_t5Point">
+<span id="_CPPv3N7Surface9TranslateE6size_t5Point"></span><span id="_CPPv2N7Surface9TranslateE6size_t5Point"></span><span id="Surface::Translate__s.Point"></span><span class="target" id="classSurface_1aee77470da2fa4cd3a9e33db936589cf2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Translate</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">translation</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface9TranslateE6size_t5Point" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface13TranslateWrapE6size_t5Point">
+<span id="_CPPv3N7Surface13TranslateWrapE6size_t5Point"></span><span id="_CPPv2N7Surface13TranslateWrapE6size_t5Point"></span><span id="Surface::TranslateWrap__s.Point"></span><span class="target" id="classSurface_1a506c48788afd68ae48fc71778422df2d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TranslateWrap</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">translation</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface13TranslateWrapE6size_t5Point" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface9SetRadiusE6size_td">
+<span id="_CPPv3N7Surface9SetRadiusE6size_td"></span><span id="_CPPv2N7Surface9SetRadiusE6size_td"></span><span id="Surface::SetRadius__s.double"></span><span class="target" id="classSurface_1a3e518f1a0cc7ea2600fded27cc897b70"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRadius</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface9SetRadiusE6size_td" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface11ScaleRadiusE6size_td">
+<span id="_CPPv3N7Surface11ScaleRadiusE6size_td"></span><span id="_CPPv2N7Surface11ScaleRadiusE6size_td"></span><span id="Surface::ScaleRadius__s.double"></span><span class="target" id="classSurface_1a9fb1053488d8bd7639152c454eb270b4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScaleRadius</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">scale</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface11ScaleRadiusE6size_td" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8SetColorE6size_t6size_t">
+<span id="_CPPv3N7Surface8SetColorE6size_t6size_t"></span><span id="_CPPv2N7Surface8SetColorE6size_t6size_t"></span><span id="Surface::SetColor__s.s"></span><span class="target" id="classSurface_1a3c7d4f789173c31319e3454f542a5498"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetColor</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface8SetColorE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface10RemoveBodyE6size_t">
+<span id="_CPPv3N7Surface10RemoveBodyE6size_t"></span><span id="_CPPv2N7Surface10RemoveBodyE6size_t"></span><span id="Surface::RemoveBody__s"></span><span class="target" id="classSurface_1ac6d05259b2527614d5faea42d76706da"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RemoveBody</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface10RemoveBodyE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7Surface7AddBodyE6size_t3PtrI6BODY_TE5Pointd6size_t">
+<span id="_CPPv3I0EN7Surface7AddBodyE3PtrI6BODY_TE5Pointd6size_t"></span><span id="_CPPv2I0EN7Surface7AddBodyE3PtrI6BODY_TE5Pointd6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BODY_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSurface_1ae4a569398d90f344ddda52400e311900"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddBody</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN7Surface7AddBodyE6size_t3PtrI6BODY_TE5Pointd6size_t" title="Surface::AddBody::BODY_T"><span class="n"><span class="pre">BODY_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_body</span></span>, <a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_center</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_radius</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_color</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7Surface7AddBodyE6size_t3PtrI6BODY_TE5Pointd6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a single body; return its unique ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7Surface7AddBodyE6size_tP6BODY_T5Pointd6size_t">
+<span id="_CPPv3I0EN7Surface7AddBodyEP6BODY_T5Pointd6size_t"></span><span id="_CPPv2I0EN7Surface7AddBodyEP6BODY_T5Pointd6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BODY_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSurface_1ac32db807cd265596c098aa30c26005ec"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddBody</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN7Surface7AddBodyE6size_tP6BODY_T5Pointd6size_t" title="Surface::AddBody::BODY_T"><span class="n"><span class="pre">BODY_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">_body</span></span>, <a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_center</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_radius</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_color</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7Surface7AddBodyE6size_tP6BODY_T5Pointd6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Allow bodies to be provided as raw pointers as well. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface5ClearEv">
+<span id="_CPPv3N7Surface5ClearEv"></span><span id="_CPPv2N7Surface5ClearEv"></span><span id="Surface::Clear"></span><span class="target" id="classSurface_1a639732bcb6e898592374d0580b325815"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpE7Surface" title="Surface"><span class="n"><span class="pre">Surface</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove all bodies from the surface. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN7Surface13AddOverlapFunEvRKNSt8functionIFvR7BODY1_TR7BODY2_TEEE">
+<span id="_CPPv3I00EN7Surface13AddOverlapFunERKNSt8functionIFvR7BODY1_TR7BODY2_TEEE"></span><span id="_CPPv2I00EN7Surface13AddOverlapFunERKNSt8functionIFvR7BODY1_TR7BODY2_TEEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BODY1_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BODY2_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSurface_1adc95c775d75a4612b1b1fbdd714cdf76"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddOverlapFun</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I00EN7Surface13AddOverlapFunEvRKNSt8functionIFvR7BODY1_TR7BODY2_TEEE" title="Surface::AddOverlapFun::BODY1_T"><span class="n"><span class="pre">BODY1_T</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN7Surface13AddOverlapFunEvRKNSt8functionIFvR7BODY1_TR7BODY2_TEEE" title="Surface::AddOverlapFun::BODY2_T"><span class="n"><span class="pre">BODY2_T</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">overlap_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN7Surface13AddOverlapFunEvRKNSt8functionIFvR7BODY1_TR7BODY2_TEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a function to call in the case of overlaps (using an std::function object) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN7Surface13AddOverlapFunEvPFvR7BODY1_TR7BODY2_TE">
+<span id="_CPPv3I00EN7Surface13AddOverlapFunEPFvR7BODY1_TR7BODY2_TE"></span><span id="_CPPv2I00EN7Surface13AddOverlapFunEPFvR7BODY1_TR7BODY2_TE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BODY1_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BODY2_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSurface_1ab107a82686874d4ab452273b07f07cf7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddOverlapFun</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">overlap_fun</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I00EN7Surface13AddOverlapFunEvPFvR7BODY1_TR7BODY2_TE" title="Surface::AddOverlapFun::BODY1_T"><span class="n"><span class="pre">BODY1_T</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN7Surface13AddOverlapFunEvPFvR7BODY1_TR7BODY2_TE" title="Surface::AddOverlapFun::BODY2_T"><span class="n"><span class="pre">BODY2_T</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN7Surface13AddOverlapFunEvPFvR7BODY1_TR7BODY2_TE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a function to call in the case of overlaps (using a function pointer) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7Surface13AddOverlapFunEvRK8LAMBDA_T">
+<span id="_CPPv3I0EN7Surface13AddOverlapFunERK8LAMBDA_T"></span><span id="_CPPv2I0EN7Surface13AddOverlapFunERK8LAMBDA_T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LAMBDA_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSurface_1a625c5deaf36939b619c2c694c479f5ad"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddOverlapFun</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN7Surface13AddOverlapFunEvRK8LAMBDA_T" title="Surface::AddOverlapFun::LAMBDA_T"><span class="n"><span class="pre">LAMBDA_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7Surface13AddOverlapFunEvRK8LAMBDA_T" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a to call a lambda function in the case of overlaps (using a function pointer) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface18FindSectorOverlapsER8BodyInfo6size_t6size_t">
+<span id="_CPPv3N7Surface18FindSectorOverlapsER8BodyInfo6size_t6size_t"></span><span id="_CPPv2N7Surface18FindSectorOverlapsER8BodyInfo6size_t6size_t"></span><span id="Surface::FindSectorOverlaps__BodyInfoR.s.s"></span><span class="target" id="classSurface_1ad4581480ccbe96ea0c4bce01e1fc028d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindSectorOverlaps</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfoE" title="Surface::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">body1</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sector_id</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface18FindSectorOverlapsER8BodyInfo6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface12FindOverlapsEv">
+<span id="_CPPv3N7Surface12FindOverlapsEv"></span><span id="_CPPv2N7Surface12FindOverlapsEv"></span><span id="Surface::FindOverlaps"></span><span class="target" id="classSurface_1ac9c2c30f4d554c8a463e36f21297e9f2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindOverlaps</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface12FindOverlapsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface11FindOverlapER8BodyInfo">
+<span id="_CPPv3N7Surface11FindOverlapER8BodyInfo"></span><span id="_CPPv2N7Surface11FindOverlapER8BodyInfo"></span><span id="Surface::FindOverlap__BodyInfoR"></span><span class="target" id="classSurface_1af6ccc412aeba6a8bfead7c44d99f4f7b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindOverlap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfoE" title="Surface::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">body</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface11FindOverlapER8BodyInfo" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if there are any overlaps with a single provided body (that may or may not be on surface). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface11FindOverlapE6size_t">
+<span id="_CPPv3N7Surface11FindOverlapE6size_t"></span><span id="_CPPv2N7Surface11FindOverlapE6size_t"></span><span id="Surface::FindOverlap__s"></span><span class="target" id="classSurface_1a4911e63a94e80d17934d77a9385c5762"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindOverlap</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">body_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface11FindOverlapE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface11FindOverlapE5Pointd">
+<span id="_CPPv3N7Surface11FindOverlapE5Pointd"></span><span id="_CPPv2N7Surface11FindOverlapE5Pointd"></span><span id="Surface::FindOverlap__Point.double"></span><span class="target" id="classSurface_1ab1527cf960ec4a5bb656e1e799cdc12e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindOverlap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">center</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface11FindOverlapE5Pointd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface11TestOverlapERK8BodyInfoRK8BodyInfo">
+<span id="_CPPv3N7Surface11TestOverlapERK8BodyInfoRK8BodyInfo"></span><span id="_CPPv2N7Surface11TestOverlapERK8BodyInfoRK8BodyInfo"></span><span id="Surface::TestOverlap__BodyInfoCR.BodyInfoCR"></span><span class="target" id="classSurface_1ab2602d09f7141f48afc432e3ace84894"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TestOverlap</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfoE" title="Surface::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">body1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfoE" title="Surface::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">body2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface11TestOverlapERK8BodyInfoRK8BodyInfo" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if two bodies overlap. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface11InitSectorsEv">
+<span id="_CPPv3N7Surface11InitSectorsEv"></span><span id="_CPPv2N7Surface11InitSectorsEv"></span><span id="Surface::InitSectors"></span><span class="target" id="classSurface_1a5878f9040564b24d7c21e47691c013e3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InitSectors</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface11InitSectorsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface12TestBodySizeER8BodyInfo">
+<span id="_CPPv3N7Surface12TestBodySizeER8BodyInfo"></span><span id="_CPPv2N7Surface12TestBodySizeER8BodyInfo"></span><span id="Surface::TestBodySize__BodyInfoR"></span><span class="target" id="classSurface_1ae94325096db76066aa88b70f0a7bd59c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TestBodySize</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfoE" title="Surface::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">body</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface12TestBodySizeER8BodyInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface15RefreshBodySizeEv">
+<span id="_CPPv3N7Surface15RefreshBodySizeEv"></span><span id="_CPPv2N7Surface15RefreshBodySizeEv"></span><span id="Surface::RefreshBodySize"></span><span class="target" id="classSurface_1a5a924c494b8e233e69e9172c05df5c39"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RefreshBodySize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface15RefreshBodySizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface10FindSectorE5Point">
+<span id="_CPPv3N7Surface10FindSectorE5Point"></span><span id="_CPPv2N7Surface10FindSectorE5Point"></span><span id="Surface::FindSector__Point"></span><span class="target" id="classSurface_1a28d4a4900df81015d549d96d2f1ea58b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FindSector</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">point</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface10FindSectorE5Point" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface9PlaceBodyER8BodyInfo">
+<span id="_CPPv3N7Surface9PlaceBodyER8BodyInfo"></span><span id="_CPPv2N7Surface9PlaceBodyER8BodyInfo"></span><span id="Surface::PlaceBody__BodyInfoR"></span><span class="target" id="classSurface_1a2c3c09160e8363d5faa2fa90cb8dc86b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PlaceBody</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfoE" title="Surface::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">body</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface9PlaceBodyER8BodyInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8ActivateEv">
+<span id="_CPPv3N7Surface8ActivateEv"></span><span id="_CPPv2N7Surface8ActivateEv"></span><span id="Surface::Activate"></span><span class="target" id="classSurface_1a12a0107bb296d7b202ae7625d2587b1a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Activate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface8ActivateEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface12type_trackerE">
+<span id="_CPPv3N7Surface12type_trackerE"></span><span id="_CPPv2N7Surface12type_trackerE"></span><span id="Surface::type_tracker__TypeTracker:Ptr:BODY_TYPES:Dp:"></span><span class="target" id="classSurface_1a9a817b1e294293ac44685eb28670dd69"></span><a class="reference internal" href="../../tools/api/TypeTracker.html#_CPPv4IDpE11TypeTracker" title="TypeTracker"><span class="n"><span class="pre">TypeTracker</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpE7Surface" title="Surface::BODY_TYPES"><span class="n"><span class="pre">BODY_TYPES</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type_tracker</span></span></span><a class="headerlink" href="#_CPPv4N7Surface12type_trackerE" title="Link to this definition"></a><br /></dt>
+<dd><p>The TypeTracker manages pointers to arbitrary surface objects. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface7max_posE">
+<span id="_CPPv3N7Surface7max_posE"></span><span id="_CPPv2N7Surface7max_posE"></span><span id="Surface::max_pos__PointC"></span><span class="target" id="classSurface_1a5458189fcf6e6634fa0cc0987845de10"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_pos</span></span></span><a class="headerlink" href="#_CPPv4N7Surface7max_posE" title="Link to this definition"></a><br /></dt>
+<dd><p>Lower-left corner of the surface. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8body_setE">
+<span id="_CPPv3N7Surface8body_setE"></span><span id="_CPPv2N7Surface8body_setE"></span><span id="Surface::body_set__vector:BodyInfo:"></span><span class="target" id="classSurface_1ab8fde43fc8a05cf7efa034489d5bfe9d"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfoE" title="Surface::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">body_set</span></span></span><a class="headerlink" href="#_CPPv4N7Surface8body_setE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set of all bodies on surface. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8open_idsE">
+<span id="_CPPv3N7Surface8open_idsE"></span><span id="_CPPv2N7Surface8open_idsE"></span><span id="Surface::open_ids__vector:s:"></span><span class="target" id="classSurface_1add4629d0690e2a2b03d6c589472acd13"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">open_ids</span></span></span><a class="headerlink" href="#_CPPv4N7Surface8open_idsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set of body_set positions ready for re-use. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface11data_activeE">
+<span id="_CPPv3N7Surface11data_activeE"></span><span id="_CPPv2N7Surface11data_activeE"></span><span id="Surface::data_active__b"></span><span class="target" id="classSurface_1a7910660ce883270148b7d92e7e8752ae"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">data_active</span></span></span><a class="headerlink" href="#_CPPv4N7Surface11data_activeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Are we trying to keep data up-to-date? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface10max_radiusE">
+<span id="_CPPv3N7Surface10max_radiusE"></span><span id="_CPPv2N7Surface10max_radiusE"></span><span id="Surface::max_radius__double"></span><span class="target" id="classSurface_1a9e39060e537f036f16f157f504420857"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_radius</span></span></span><a class="headerlink" href="#_CPPv4N7Surface10max_radiusE" title="Link to this definition"></a><br /></dt>
+<dd><p>Largest radius of any body. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8num_colsE">
+<span id="_CPPv3N7Surface8num_colsE"></span><span id="_CPPv2N7Surface8num_colsE"></span><span id="Surface::num_cols__s"></span><span class="target" id="classSurface_1af3b1e832785e4fcc60a33ae73158c63c"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_cols</span></span></span><a class="headerlink" href="#_CPPv4N7Surface8num_colsE" title="Link to this definition"></a><br /></dt>
+<dd><p>How many cols of sectors are there? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8num_rowsE">
+<span id="_CPPv3N7Surface8num_rowsE"></span><span id="_CPPv2N7Surface8num_rowsE"></span><span id="Surface::num_rows__s"></span><span class="target" id="classSurface_1ad3f562e9e33c3bf7324bf451726c9db9"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_rows</span></span></span><a class="headerlink" href="#_CPPv4N7Surface8num_rowsE" title="Link to this definition"></a><br /></dt>
+<dd><p>How many rows of sectors are there? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface11num_sectorsE">
+<span id="_CPPv3N7Surface11num_sectorsE"></span><span id="_CPPv2N7Surface11num_sectorsE"></span><span id="Surface::num_sectors__s"></span><span class="target" id="classSurface_1a946b30d82cb57b15fc237cabffc7a8a3"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_sectors</span></span></span><a class="headerlink" href="#_CPPv4N7Surface11num_sectorsE" title="Link to this definition"></a><br /></dt>
+<dd><p>How many total sectors are there? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface12sector_widthE">
+<span id="_CPPv3N7Surface12sector_widthE"></span><span id="_CPPv2N7Surface12sector_widthE"></span><span id="Surface::sector_width__double"></span><span class="target" id="classSurface_1a8aafcd86209b9ba4227d03673b7be50c"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sector_width</span></span></span><a class="headerlink" href="#_CPPv4N7Surface12sector_widthE" title="Link to this definition"></a><br /></dt>
+<dd><p>How wide is each sector? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface13sector_heightE">
+<span id="_CPPv3N7Surface13sector_heightE"></span><span id="_CPPv2N7Surface13sector_heightE"></span><span id="Surface::sector_height__double"></span><span class="target" id="classSurface_1a578d7a207419b82a90a9cdcf37f9c93b"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sector_height</span></span></span><a class="headerlink" href="#_CPPv4N7Surface13sector_heightE" title="Link to this definition"></a><br /></dt>
+<dd><p>How tall is each sector? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface7sectorsE">
+<span id="_CPPv3N7Surface7sectorsE"></span><span id="_CPPv2N7Surface7sectorsE"></span><span id="Surface::sectors__vector:sector_t:"></span><span class="target" id="classSurface_1ac0a50412e97a20735612f9d8e26905b1"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N7Surface8sector_tE" title="Surface::sector_t"><span class="n"><span class="pre">sector_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sectors</span></span></span><a class="headerlink" href="#_CPPv4N7Surface7sectorsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Which bodies are in each sector? </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfoE">
+<span id="_CPPv3N7Surface8BodyInfoE"></span><span id="_CPPv2N7Surface8BodyInfoE"></span><span id="Surface::BodyInfo"></span><span class="target" id="classSurface_1_1BodyInfo"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BodyInfo</span></span></span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfoE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Surface.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo8BodyInfoERR10TrackedVar6size_t5Pointd6size_t">
+<span id="_CPPv3N7Surface8BodyInfo8BodyInfoERR10TrackedVar6size_t5Pointd6size_t"></span><span id="_CPPv2N7Surface8BodyInfo8BodyInfoERR10TrackedVar6size_t5Pointd6size_t"></span><span id="Surface::BodyInfo::BodyInfo__TrackedVarRR.s.Point.double.s"></span><span class="target" id="classSurface_1_1BodyInfo_1a05acef924564a2b7ce73a8b755de44f5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BodyInfo</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/TypeTracker.html#_CPPv410TrackedVar" title="TrackedVar"><span class="n"><span class="pre">TrackedVar</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_id</span></span>, <a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_center</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_radius</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_color</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo8BodyInfoERR10TrackedVar6size_t5Pointd6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo8BodyInfoE6size_t5Pointd">
+<span id="_CPPv3N7Surface8BodyInfo8BodyInfoE6size_t5Pointd"></span><span id="_CPPv2N7Surface8BodyInfo8BodyInfoE6size_t5Pointd"></span><span id="Surface::BodyInfo::BodyInfo__s.Point.double"></span><span class="target" id="classSurface_1_1BodyInfo_1aa461e2c5cb6118e6f661c136179d1745"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BodyInfo</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">)</span></span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span>, <a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_center</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_radius</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo8BodyInfoE6size_t5Pointd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo8BodyInfoERK8BodyInfo">
+<span id="_CPPv3N7Surface8BodyInfo8BodyInfoERK8BodyInfo"></span><span id="_CPPv2N7Surface8BodyInfo8BodyInfoERK8BodyInfo"></span><span id="Surface::BodyInfo::BodyInfo__BodyInfoCR"></span><span class="target" id="classSurface_1_1BodyInfo_1a9c942deb7f64f4e78de40b62223e882c"></span><span class="sig-name descname"><span class="n"><span class="pre">BodyInfo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfo8BodyInfoERK8BodyInfo" title="Surface::BodyInfo::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo8BodyInfoERK8BodyInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo8BodyInfoERR8BodyInfo">
+<span id="_CPPv3N7Surface8BodyInfo8BodyInfoERR8BodyInfo"></span><span id="_CPPv2N7Surface8BodyInfo8BodyInfoERR8BodyInfo"></span><span id="Surface::BodyInfo::BodyInfo__BodyInfoRR"></span><span class="target" id="classSurface_1_1BodyInfo_1aca8c9cbf050a56d94b4a809803067a65"></span><span class="sig-name descname"><span class="n"><span class="pre">BodyInfo</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfo8BodyInfoERR8BodyInfo" title="Surface::BodyInfo::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo8BodyInfoERR8BodyInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo10GetBodyPtrEv">
+<span id="_CPPv3N7Surface8BodyInfo10GetBodyPtrEv"></span><span id="_CPPv2N7Surface8BodyInfo10GetBodyPtrEv"></span><span id="Surface::BodyInfo::GetBodyPtr"></span><span class="target" id="classSurface_1_1BodyInfo_1a3b179fcb649fa89d250d70b53d7260f6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/TypeTracker.html#_CPPv410TrackedVar" title="TrackedVar"><span class="n"><span class="pre">TrackedVar</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetBodyPtr</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo10GetBodyPtrEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Surface8BodyInfo5GetIDEv">
+<span id="_CPPv3NK7Surface8BodyInfo5GetIDEv"></span><span id="_CPPv2NK7Surface8BodyInfo5GetIDEv"></span><span id="Surface::BodyInfo::GetIDC"></span><span class="target" id="classSurface_1_1BodyInfo_1af57ba1a27e53c2d78485060d3c211fe1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetID</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Surface8BodyInfo5GetIDEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Surface8BodyInfo9GetCenterEv">
+<span id="_CPPv3NK7Surface8BodyInfo9GetCenterEv"></span><span id="_CPPv2NK7Surface8BodyInfo9GetCenterEv"></span><span id="Surface::BodyInfo::GetCenterC"></span><span class="target" id="classSurface_1_1BodyInfo_1a91988c0ca2c62e8ce42f4fc66d5e4225"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetCenter</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Surface8BodyInfo9GetCenterEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Surface8BodyInfo9GetRadiusEv">
+<span id="_CPPv3NK7Surface8BodyInfo9GetRadiusEv"></span><span id="_CPPv2NK7Surface8BodyInfo9GetRadiusEv"></span><span id="Surface::BodyInfo::GetRadiusC"></span><span class="target" id="classSurface_1_1BodyInfo_1a170f92b987bd59bfefe43fab7b12e8ff"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRadius</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Surface8BodyInfo9GetRadiusEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Surface8BodyInfo8GetColorEv">
+<span id="_CPPv3NK7Surface8BodyInfo8GetColorEv"></span><span id="_CPPv2NK7Surface8BodyInfo8GetColorEv"></span><span id="Surface::BodyInfo::GetColorC"></span><span class="target" id="classSurface_1_1BodyInfo_1a0b238ff4f76e1f038ca86e880325e558"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetColor</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Surface8BodyInfo8GetColorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo9SetCenterE5Point">
+<span id="_CPPv3N7Surface8BodyInfo9SetCenterE5Point"></span><span id="_CPPv2N7Surface8BodyInfo9SetCenterE5Point"></span><span id="Surface::BodyInfo::SetCenter__Point"></span><span class="target" id="classSurface_1_1BodyInfo_1a86efb04b2ad1ebefd40b488f471d9241"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetCenter</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo9SetCenterE5Point" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo9SetRadiusEd">
+<span id="_CPPv3N7Surface8BodyInfo9SetRadiusEd"></span><span id="_CPPv2N7Surface8BodyInfo9SetRadiusEd"></span><span id="Surface::BodyInfo::SetRadius__double"></span><span class="target" id="classSurface_1_1BodyInfo_1a9d360159862b3eaaa6145134e533df1b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRadius</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo9SetRadiusEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo8SetColorE6size_t">
+<span id="_CPPv3N7Surface8BodyInfo8SetColorE6size_t"></span><span id="_CPPv2N7Surface8BodyInfo8SetColorE6size_t"></span><span id="Surface::BodyInfo::SetColor__s"></span><span class="target" id="classSurface_1_1BodyInfo_1aba8966d752059b52c4a9148de8c70f77"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetColor</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo8SetColorE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfoaSERK8BodyInfo">
+<span id="_CPPv3N7Surface8BodyInfoaSERK8BodyInfo"></span><span id="_CPPv2N7Surface8BodyInfoaSERK8BodyInfo"></span><span id="Surface::BodyInfo::assign-operator__BodyInfoCR"></span><span class="target" id="classSurface_1_1BodyInfo_1a83c73b6fb42fb32380d5562fea38ecba"></span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfoE" title="Surface::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfoE" title="Surface::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfoaSERK8BodyInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfoaSERR8BodyInfo">
+<span id="_CPPv3N7Surface8BodyInfoaSERR8BodyInfo"></span><span id="_CPPv2N7Surface8BodyInfoaSERR8BodyInfo"></span><span id="Surface::BodyInfo::assign-operator__BodyInfoRR"></span><span class="target" id="classSurface_1_1BodyInfo_1a4874e7c6b325731e3d30a02962cb41ad"></span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfoE" title="Surface::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N7Surface8BodyInfoE" title="Surface::BodyInfo"><span class="n"><span class="pre">BodyInfo</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfoaSERR8BodyInfo" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Surface8BodyInfo8IsActiveEv">
+<span id="_CPPv3NK7Surface8BodyInfo8IsActiveEv"></span><span id="_CPPv2NK7Surface8BodyInfo8IsActiveEv"></span><span id="Surface::BodyInfo::IsActiveC"></span><span class="target" id="classSurface_1_1BodyInfo_1a2935ecf7a5cda8340b6e5ad2d538d2ea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsActive</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Surface8BodyInfo8IsActiveEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo10DeactivateEv">
+<span id="_CPPv3N7Surface8BodyInfo10DeactivateEv"></span><span id="_CPPv2N7Surface8BodyInfo10DeactivateEv"></span><span id="Surface::BodyInfo::Deactivate"></span><span class="target" id="classSurface_1_1BodyInfo_1a7d290171763be81136e4bfb137ee2b12"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Deactivate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo10DeactivateEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo8body_ptrE">
+<span id="_CPPv3N7Surface8BodyInfo8body_ptrE"></span><span id="_CPPv2N7Surface8BodyInfo8body_ptrE"></span><span id="Surface::BodyInfo::body_ptr__TrackedVar"></span><span class="target" id="classSurface_1_1BodyInfo_1abf000c7ff2807ca5087f97bc41740b0d"></span><a class="reference internal" href="../../tools/api/TypeTracker.html#_CPPv410TrackedVar" title="TrackedVar"><span class="n"><span class="pre">TrackedVar</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">body_ptr</span></span></span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo8body_ptrE" title="Link to this definition"></a><br /></dt>
+<dd><p>Pointer to the bodies. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo2idE">
+<span id="_CPPv3N7Surface8BodyInfo2idE"></span><span id="_CPPv2N7Surface8BodyInfo2idE"></span><span id="Surface::BodyInfo::id__s"></span><span class="target" id="classSurface_1_1BodyInfo_1ab054477cae785f1b72a09b35fdc26f5b"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id</span></span></span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo2idE" title="Link to this definition"></a><br /></dt>
+<dd><p>Index in body_set to find body info. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo6centerE">
+<span id="_CPPv3N7Surface8BodyInfo6centerE"></span><span id="_CPPv2N7Surface8BodyInfo6centerE"></span><span id="Surface::BodyInfo::center__Point"></span><span class="target" id="classSurface_1_1BodyInfo_1a9541ba6322acdf85c0b40155342705be"></span><a class="reference internal" href="Point2D.html#_CPPv45Point" title="Point"><span class="n"><span class="pre">Point</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">center</span></span></span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo6centerE" title="Link to this definition"></a><br /></dt>
+<dd><p>Center position of this body on surface. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo6radiusE">
+<span id="_CPPv3N7Surface8BodyInfo6radiusE"></span><span id="_CPPv2N7Surface8BodyInfo6radiusE"></span><span id="Surface::BodyInfo::radius__double"></span><span class="target" id="classSurface_1_1BodyInfo_1aaa38661e0a733a84b611f16de8caf5df"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">radius</span></span></span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo6radiusE" title="Link to this definition"></a><br /></dt>
+<dd><p>Size of this body. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Surface8BodyInfo5colorE">
+<span id="_CPPv3N7Surface8BodyInfo5colorE"></span><span id="_CPPv2N7Surface8BodyInfo5colorE"></span><span id="Surface::BodyInfo::color__s"></span><span class="target" id="classSurface_1_1BodyInfo_1a86c22aeec4cf7b77c303eea2b3b46df4"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">color</span></span></span><a class="headerlink" href="#_CPPv4N7Surface8BodyInfo5colorE" title="Link to this definition"></a><br /></dt>
+<dd><p>Color of this body. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Point2D.html" class="btn btn-neutral float-left" title="Point2D.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Surface2D.html" class="btn btn-neutral float-right" title="Surface2D.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimpleParser.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/data/api/SimpleParser.fa48ea9f-24a3-4089-a44f-a9850c3efbb7.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Trait.hpp" href="Trait.html" />
+    <link rel="prev" title="MemoryImage.hpp" href="MemoryImage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../data.html">Data Collection and Recording Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../data.html#data-tools-api">Data Tools API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AnnotatedType.html">AnnotatedType.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataFile.html">DataFile.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataInterface.html">DataInterface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataLayout.html">DataLayout.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataLog.html">DataLog.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataManager.html">DataManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataMap.html">DataMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DataNode.html">DataNode.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Datum.html">Datum.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="MemoryImage.html">MemoryImage.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">SimpleParser.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412SimpleParser"><code class="docutils literal notranslate"><span class="pre">SimpleParser</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N12SimpleParser19PhonyNameDueToError5map_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::map_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N12SimpleParser19PhonyNameDueToError5arg_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::arg_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N12SimpleParser19PhonyNameDueToError5fun_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::fun_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N12SimpleParser19PhonyNameDueToError7value_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::value_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N12SimpleParser19PhonyNameDueToError11SymbolTableERK6ra_mapINSt6stringE7VALUE_TE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::SymbolTable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK12SimpleParser19PhonyNameDueToError17MakeDatumAccessorERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::MakeDatumAccessor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK12SimpleParser19PhonyNameDueToError10AsFunctionER9ValueTypeI5arg_tE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::AsFunction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N12SimpleParser19PhonyNameDueToError6layoutE"><code class="docutils literal notranslate"><span class="pre">SimpleParser::PhonyNameDueToError::layout</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Trait.html">Trait.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="VarMap.html">VarMap.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../data.html">Data Collection and Recording Tools</a></li>
+      <li class="breadcrumb-item active">SimpleParser.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="simpleparser-hpp">
+<h1>SimpleParser.hpp<a class="headerlink" href="#simpleparser-hpp" title="Link to this heading"></a></h1>
+<p>Parser to convert function descriptions to lambdas using maps for variable lookup. </p>
+<p>
+A fully functional parser that will convert a string-description of a function to a C++ lambda. A map-typed object should be passed in to provide values associated with variables. Allowed map types include std::map&lt;std::string,T&gt;, std::unordered_map&lt;std::string,T&gt;, DataMap, and (soon) derivations from AnnotatedType. For standard maps, T must be convertable to Datum.</p>
+<p>Developer TODO:<ul class="simple">
+<li><p>Setup operator RegEx to be built dynamically</p></li>
+<li><p>Setup LVALUES as a type, and allow assignment</p></li>
+<li><p>Allow types other than Datum (string and double)? </p></li>
+</ul>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA</p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv412SimpleParser">
+<span id="_CPPv312SimpleParser"></span><span id="_CPPv212SimpleParser"></span><span id="SimpleParser"></span><span class="target" id="classSimpleParser"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SimpleParser</span></span></span><a class="headerlink" href="#_CPPv412SimpleParser" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;SimpleParser.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser12SimpleParserEb">
+<span id="_CPPv3N12SimpleParser12SimpleParserEb"></span><span id="_CPPv2N12SimpleParser12SimpleParserEb"></span><span id="SimpleParser::SimpleParser__b"></span><span class="target" id="classSimpleParser_1adf7be954295d1fae682735563e42887a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SimpleParser</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_defaults</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser12SimpleParserEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser12SimpleParserEbR6Random">
+<span id="_CPPv3N12SimpleParser12SimpleParserEbR6Random"></span><span id="_CPPv2N12SimpleParser12SimpleParserEbR6Random"></span><span id="SimpleParser::SimpleParser__b.RandomR"></span><span class="target" id="classSimpleParser_1a505d5833a817d8c6f786322ff0db872f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SimpleParser</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">use_defaults</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser12SimpleParserEbR6Random" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct with a random number generator to automatically include random functions. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser12GetNamesUsedEv">
+<span id="_CPPv3NK12SimpleParser12GetNamesUsedEv"></span><span id="_CPPv2NK12SimpleParser12GetNamesUsedEv"></span><span id="SimpleParser::GetNamesUsedC"></span><span class="target" id="classSimpleParser_1ac462b7a0e31df123c6aef3876f7b7976"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetNamesUsed</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser12GetNamesUsedEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the set of variable names that the most recently generated function used. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser12GetNamesUsedERKNSt6stringE">
+<span id="_CPPv3N12SimpleParser12GetNamesUsedERKNSt6stringE"></span><span id="_CPPv2N12SimpleParser12GetNamesUsedERKNSt6stringE"></span><span id="SimpleParser::GetNamesUsed__ssCR"></span><span class="target" id="classSimpleParser_1a1abb35dd9b29454b293a4b19cf187ad7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetNamesUsed</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">expression</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser12GetNamesUsedERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the set of names used in the provided equation. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser5AddOpERKNSt6stringENSt8functionIF5Datum5DatumEEE">
+<span id="_CPPv3N12SimpleParser5AddOpERKNSt6stringENSt8functionIF5Datum5DatumEEE"></span><span id="_CPPv2N12SimpleParser5AddOpERKNSt6stringENSt8functionIF5Datum5DatumEEE"></span><span class="target" id="classSimpleParser_1a319bcabaa88eb48b979882065d0415f0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddOp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">op</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser5AddOpERKNSt6stringENSt8functionIF5Datum5DatumEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a unary operator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser5AddOpERKNSt6stringE6size_tNSt8functionIF5Datum5Datum5DatumEEE">
+<span id="_CPPv3N12SimpleParser5AddOpERKNSt6stringE6size_tNSt8functionIF5Datum5Datum5DatumEEE"></span><span id="_CPPv2N12SimpleParser5AddOpERKNSt6stringE6size_tNSt8functionIF5Datum5Datum5DatumEEE"></span><span class="target" id="classSimpleParser_1a0aaa0b2864d0ecc4708d09825c02ba1a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddOp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">op</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">prec</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser5AddOpERKNSt6stringE6size_tNSt8functionIF5Datum5Datum5DatumEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a binary operator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser19AddDefaultOperatorsEv">
+<span id="_CPPv3N12SimpleParser19AddDefaultOperatorsEv"></span><span id="_CPPv2N12SimpleParser19AddDefaultOperatorsEv"></span><span id="SimpleParser::AddDefaultOperators"></span><span class="target" id="classSimpleParser_1a1563458cc34e473f6336cf1cea8d4264"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddDefaultOperators</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser19AddDefaultOperatorsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser19AddDefaultFunctionsEv">
+<span id="_CPPv3N12SimpleParser19AddDefaultFunctionsEv"></span><span id="_CPPv2N12SimpleParser19AddDefaultFunctionsEv"></span><span id="SimpleParser::AddDefaultFunctions"></span><span class="target" id="classSimpleParser_1a363f851a94882bcf4ae1d2536aea845a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddDefaultFunctions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser19AddDefaultFunctionsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser18AddRandomFunctionsER6Random">
+<span id="_CPPv3N12SimpleParser18AddRandomFunctionsER6Random"></span><span id="_CPPv2N12SimpleParser18AddRandomFunctionsER6Random"></span><span id="SimpleParser::AddRandomFunctions__RandomR"></span><span class="target" id="classSimpleParser_1af64243afe26bfa248ac09d0e2450b63e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddRandomFunctions</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">random</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser18AddRandomFunctionsER6Random" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN12SimpleParser10ParseValueEN9SYMBOLS_T7value_tERK9SYMBOLS_TR5pos_t">
+<span id="_CPPv3I0EN12SimpleParser10ParseValueERK9SYMBOLS_TR5pos_t"></span><span id="_CPPv2I0EN12SimpleParser10ParseValueERK9SYMBOLS_TR5pos_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SYMBOLS_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSimpleParser_1acdff0f19b43eb0cd90d98a61ed59c1d1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser10ParseValueEN9SYMBOLS_T7value_tERK9SYMBOLS_TR5pos_t" title="SimpleParser::ParseValue::SYMBOLS_T"><span class="n"><span class="pre">SYMBOLS_T</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ParseValue</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser10ParseValueEN9SYMBOLS_T7value_tERK9SYMBOLS_TR5pos_t" title="SimpleParser::ParseValue::SYMBOLS_T"><span class="n"><span class="pre">SYMBOLS_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">symbols</span></span>, <a class="reference internal" href="#_CPPv4N12SimpleParser5pos_tE" title="SimpleParser::pos_t"><span class="n"><span class="pre">pos_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN12SimpleParser10ParseValueEN9SYMBOLS_T7value_tERK9SYMBOLS_TR5pos_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Helpers for parsing. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN12SimpleParser9ParseMathEN9SYMBOLS_T7value_tERK9SYMBOLS_TR5pos_t6size_t">
+<span id="_CPPv3I0EN12SimpleParser9ParseMathERK9SYMBOLS_TR5pos_t6size_t"></span><span id="_CPPv2I0EN12SimpleParser9ParseMathERK9SYMBOLS_TR5pos_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SYMBOLS_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSimpleParser_1ad8ff44deb76efc8c680c598a81410543"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ParseMathEN9SYMBOLS_T7value_tERK9SYMBOLS_TR5pos_t6size_t" title="SimpleParser::ParseMath::SYMBOLS_T"><span class="n"><span class="pre">SYMBOLS_T</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ParseMath</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ParseMathEN9SYMBOLS_T7value_tERK9SYMBOLS_TR5pos_t6size_t" title="SimpleParser::ParseMath::SYMBOLS_T"><span class="n"><span class="pre">SYMBOLS_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">symbols</span></span>, <a class="reference internal" href="#_CPPv4N12SimpleParser5pos_tE" title="SimpleParser::pos_t"><span class="n"><span class="pre">pos_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pos</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">prec_limit</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN12SimpleParser9ParseMathEN9SYMBOLS_T7value_tERK9SYMBOLS_TR5pos_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpEN12SimpleParser17SetupStaticValuesEv2T1Dp2Ts">
+<span id="_CPPv3I0DpEN12SimpleParser17SetupStaticValuesE2T1Dp2Ts"></span><span id="_CPPv2I0DpEN12SimpleParser17SetupStaticValuesE2T1Dp2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSimpleParser_1a70ba9c254c61fa010fe60483c07688a2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetupStaticValues</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpEN12SimpleParser17SetupStaticValuesEv2T1Dp2Ts" title="SimpleParser::SetupStaticValues::T1"><span class="n"><span class="pre">T1</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">arg1</span></span>, <a class="reference internal" href="#_CPPv4I0DpEN12SimpleParser17SetupStaticValuesEv2T1Dp2Ts" title="SimpleParser::SetupStaticValues::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN12SimpleParser17SetupStaticValuesEv2T1Dp2Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Take a set of variables and use them to replace $0, $1, etc. in any function. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser17SetupStaticValuesEv">
+<span id="_CPPv3N12SimpleParser17SetupStaticValuesEv"></span><span id="_CPPv2N12SimpleParser17SetupStaticValuesEv"></span><span id="SimpleParser::SetupStaticValues"></span><span class="target" id="classSimpleParser_1acd7af27de05f23187052b39ac40103e1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetupStaticValues</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser17SetupStaticValuesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>If there are no input args, just clear external values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpEN12SimpleParser17BuildMathFunctionEDaRK5MAP_TRKNSt6stringEDp8EXTRA_Ts">
+<span id="_CPPv3I0DpEN12SimpleParser17BuildMathFunctionERK5MAP_TRKNSt6stringEDp8EXTRA_Ts"></span><span id="_CPPv2I0DpEN12SimpleParser17BuildMathFunctionERK5MAP_TRKNSt6stringEDp8EXTRA_Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAP_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">EXTRA_Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSimpleParser_1a4835f2d0d20b6ffdce18de3dfc9c375d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BuildMathFunction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpEN12SimpleParser17BuildMathFunctionEDaRK5MAP_TRKNSt6stringEDp8EXTRA_Ts" title="SimpleParser::BuildMathFunction::MAP_T"><span class="n"><span class="pre">MAP_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">symbol_map</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">expression</span></span>, <a class="reference internal" href="#_CPPv4I0DpEN12SimpleParser17BuildMathFunctionEDaRK5MAP_TRKNSt6stringEDp8EXTRA_Ts" title="SimpleParser::BuildMathFunction::EXTRA_Ts"><span class="n"><span class="pre">EXTRA_Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">extra_args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN12SimpleParser17BuildMathFunctionEDaRK5MAP_TRKNSt6stringEDp8EXTRA_Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Parse a function description that will take a map and return the results. For example, if the string “foo * 2 + bar” is passed in, a function will be returned that takes a map (of the proper type) loads in the values of “foo” and “bar”, and returns the result of the above equation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol_map</strong> – The map or layout to use, specifying variables. </p></li>
+<li><p><strong>expression</strong> – The primary expression to convert. </p></li>
+<li><p><strong>extra_args</strong> – Extra value arguments (accessed as $1, $2, etc.) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpEN12SimpleParser15RunMathFunctionE5DatumRK5MAP_TDp6ARG_Ts">
+<span id="_CPPv3I0DpEN12SimpleParser15RunMathFunctionERK5MAP_TDp6ARG_Ts"></span><span id="_CPPv2I0DpEN12SimpleParser15RunMathFunctionERK5MAP_TDp6ARG_Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAP_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARG_Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSimpleParser_1ac8c2863d363ef9be83174adfd18beda8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RunMathFunction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpEN12SimpleParser15RunMathFunctionE5DatumRK5MAP_TDp6ARG_Ts" title="SimpleParser::RunMathFunction::MAP_T"><span class="n"><span class="pre">MAP_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">symbol_map</span></span>, <a class="reference internal" href="#_CPPv4I0DpEN12SimpleParser15RunMathFunctionE5DatumRK5MAP_TDp6ARG_Ts" title="SimpleParser::RunMathFunction::ARG_Ts"><span class="n"><span class="pre">ARG_Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN12SimpleParser15RunMathFunctionE5DatumRK5MAP_TDp6ARG_Ts" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a temporary math function and immediately run it on the provided arguments. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol_map</strong> – The map containing the required variables. </p></li>
+<li><p><strong>expression</strong> – The mathematical expression to be run on the data map. </p></li>
+<li><p><strong>extras</strong> – Any extra values to fill in a $0, $1, etc. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser13ApproxCompareEdd">
+<span id="_CPPv3N12SimpleParser13ApproxCompareEdd"></span><span id="_CPPv2N12SimpleParser13ApproxCompareEdd"></span><span id="SimpleParser::ApproxCompare__double.double"></span><span class="target" id="classSimpleParser_1ac7a1183ee185e94d834ae18546971cfb"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ApproxCompare</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser13ApproxCompareEdd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser5pos_tE">
+<span id="_CPPv3N12SimpleParser5pos_tE"></span><span id="_CPPv2N12SimpleParser5pos_tE"></span><span class="target" id="classSimpleParser_1adead30975ad77ec98f689dfb6f5643ca"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pos_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../compiler/api/Lexer.html#_CPPv411TokenStream" title="TokenStream"><span class="n"><span class="pre">TokenStream</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../compiler/api/Lexer.html#_CPPv4N11TokenStream8IteratorE" title="TokenStream::Iterator"><span class="n"><span class="pre">Iterator</span></span></a><a class="headerlink" href="#_CPPv4N12SimpleParser5pos_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN12SimpleParser10ParseErrorE6size_tDpRR2Ts">
+<span id="_CPPv3IDpEN12SimpleParser10ParseErrorEDpRR2Ts"></span><span id="_CPPv2IDpEN12SimpleParser10ParseErrorEDpRR2Ts"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classSimpleParser_1a2516c1c70200ac11beca74d44fad9660"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ParseError</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN12SimpleParser10ParseErrorE6size_tDpRR2Ts" title="SimpleParser::ParseError::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN12SimpleParser10ParseErrorE6size_tDpRR2Ts" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser5lexerE">
+<span id="_CPPv3N12SimpleParser5lexerE"></span><span id="_CPPv2N12SimpleParser5lexerE"></span><span id="SimpleParser::lexer__MapLexer"></span><span class="target" id="classSimpleParser_1a83f312200978f4b32869935fe56acef4"></span><a class="reference internal" href="#_CPPv4N12SimpleParser8MapLexerE" title="SimpleParser::MapLexer"><span class="n"><span class="pre">MapLexer</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lexer</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser5lexerE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9unary_opsE">
+<span id="_CPPv3N12SimpleParser9unary_opsE"></span><span id="_CPPv2N12SimpleParser9unary_opsE"></span><span class="target" id="classSimpleParser_1a75d5ce0df28b6c1a990b7ddcbe1d5e71"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">unary_ops</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser9unary_opsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser10binary_opsE">
+<span id="_CPPv3N12SimpleParser10binary_opsE"></span><span id="_CPPv2N12SimpleParser10binary_opsE"></span><span id="SimpleParser::binary_ops__std::unordered_map:ss.BinaryOperator:"></span><span class="target" id="classSimpleParser_1a9b03d619f6d16f33937c120fea252991"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SimpleParser14BinaryOperatorE" title="SimpleParser::BinaryOperator"><span class="n"><span class="pre">BinaryOperator</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">binary_ops</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser10binary_opsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9functionsE">
+<span id="_CPPv3N12SimpleParser9functionsE"></span><span id="_CPPv2N12SimpleParser9functionsE"></span><span id="SimpleParser::functions__std::unordered_map:ss.Function:"></span><span class="target" id="classSimpleParser_1ac6f22ff80cd410d95546bbafa019a1ce"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SimpleParser8FunctionE" title="SimpleParser::Function"><span class="n"><span class="pre">Function</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">functions</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser9functionsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser13external_valsE">
+<span id="_CPPv3N12SimpleParser13external_valsE"></span><span id="_CPPv2N12SimpleParser13external_valsE"></span><span id="SimpleParser::external_vals__vector:Datum:"></span><span class="target" id="classSimpleParser_1a6a5fc555ba8a31957a6aaca479b58b21"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">external_vals</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser13external_valsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9var_namesE">
+<span id="_CPPv3N12SimpleParser9var_namesE"></span><span id="_CPPv2N12SimpleParser9var_namesE"></span><span id="SimpleParser::var_names__std::set:ss:"></span><span class="target" id="classSimpleParser_1af9786f956ec6ab934a4d79b681e3a003"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">var_names</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser9var_namesE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-static-attributes">Private Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser7verboseE">
+<span id="_CPPv3N12SimpleParser7verboseE"></span><span id="_CPPv2N12SimpleParser7verboseE"></span><span id="SimpleParser::verbose__bC"></span><span class="target" id="classSimpleParser_1a361f2fb860f079b75179d5ac6bb1affa"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">verbose</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser7verboseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser14BinaryOperatorE">
+<span id="_CPPv3N12SimpleParser14BinaryOperatorE"></span><span id="_CPPv2N12SimpleParser14BinaryOperatorE"></span><span id="SimpleParser::BinaryOperator"></span><span class="target" id="structSimpleParser_1_1BinaryOperator"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BinaryOperator</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser14BinaryOperatorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser14BinaryOperator5fun_tE">
+<span id="_CPPv3N12SimpleParser14BinaryOperator5fun_tE"></span><span id="_CPPv2N12SimpleParser14BinaryOperator5fun_tE"></span><span class="target" id="structSimpleParser_1_1BinaryOperator_1aad33eb1ede9b88f2a73ee8b8568a98f2"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser14BinaryOperator5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser14BinaryOperator3SetE6size_t5fun_t">
+<span id="_CPPv3N12SimpleParser14BinaryOperator3SetE6size_t5fun_t"></span><span id="_CPPv2N12SimpleParser14BinaryOperator3SetE6size_t5fun_t"></span><span id="SimpleParser::BinaryOperator::Set__s.fun_t"></span><span class="target" id="structSimpleParser_1_1BinaryOperator_1ad6d20e8db21c4b4a1586460f76d6791d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_prec</span></span>, <a class="reference internal" href="#_CPPv4N12SimpleParser14BinaryOperator5fun_tE" title="SimpleParser::BinaryOperator::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser14BinaryOperator3SetE6size_t5fun_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser14BinaryOperator4precE">
+<span id="_CPPv3N12SimpleParser14BinaryOperator4precE"></span><span id="_CPPv2N12SimpleParser14BinaryOperator4precE"></span><span id="SimpleParser::BinaryOperator::prec__s"></span><span class="target" id="structSimpleParser_1_1BinaryOperator_1ae1f43f37eeaf8ab4122f4f180c4eab21"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">prec</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser14BinaryOperator4precE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser14BinaryOperator3funE">
+<span id="_CPPv3N12SimpleParser14BinaryOperator3funE"></span><span id="_CPPv2N12SimpleParser14BinaryOperator3funE"></span><span id="SimpleParser::BinaryOperator::fun__fun_t"></span><span class="target" id="structSimpleParser_1_1BinaryOperator_1ae9903b9e43266c10c01b3fa07e72daf2"></span><a class="reference internal" href="#_CPPv4N12SimpleParser14BinaryOperator5fun_tE" title="SimpleParser::BinaryOperator::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser14BinaryOperator3funE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8FunctionE">
+<span id="_CPPv3N12SimpleParser8FunctionE"></span><span id="_CPPv2N12SimpleParser8FunctionE"></span><span id="SimpleParser::Function"></span><span class="target" id="structSimpleParser_1_1Function"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Function</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8FunctionE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8Function6fun0_tE">
+<span id="_CPPv3N12SimpleParser8Function6fun0_tE"></span><span id="_CPPv2N12SimpleParser8Function6fun0_tE"></span><span class="target" id="structSimpleParser_1_1Function_1aea4801ae93d66437423c2a6d87679c06"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun0_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8Function6fun0_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8Function6fun1_tE">
+<span id="_CPPv3N12SimpleParser8Function6fun1_tE"></span><span id="_CPPv2N12SimpleParser8Function6fun1_tE"></span><span class="target" id="structSimpleParser_1_1Function_1a20b77ab765d042dff0fc826f3a000264"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun1_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8Function6fun1_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8Function6fun2_tE">
+<span id="_CPPv3N12SimpleParser8Function6fun2_tE"></span><span id="_CPPv2N12SimpleParser8Function6fun2_tE"></span><span class="target" id="structSimpleParser_1_1Function_1a0ad8c9dafb738de88ae97cb328df115d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun2_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8Function6fun2_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8Function6fun3_tE">
+<span id="_CPPv3N12SimpleParser8Function6fun3_tE"></span><span id="_CPPv2N12SimpleParser8Function6fun3_tE"></span><span class="target" id="structSimpleParser_1_1Function_1afe462b93814b862af8354a25a4511603"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun3_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8Function6fun3_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8Function4Set0E6fun0_t">
+<span id="_CPPv3N12SimpleParser8Function4Set0E6fun0_t"></span><span id="_CPPv2N12SimpleParser8Function4Set0E6fun0_t"></span><span id="SimpleParser::Function::Set0__fun0_t"></span><span class="target" id="structSimpleParser_1_1Function_1ae57389badb8573051d066463d021e73d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set0</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N12SimpleParser8Function6fun0_tE" title="SimpleParser::Function::fun0_t"><span class="n"><span class="pre">fun0_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser8Function4Set0E6fun0_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8Function4Set1E6fun1_t">
+<span id="_CPPv3N12SimpleParser8Function4Set1E6fun1_t"></span><span id="_CPPv2N12SimpleParser8Function4Set1E6fun1_t"></span><span id="SimpleParser::Function::Set1__fun1_t"></span><span class="target" id="structSimpleParser_1_1Function_1a05c52923d3f41b53ff8740214436ef94"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set1</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N12SimpleParser8Function6fun1_tE" title="SimpleParser::Function::fun1_t"><span class="n"><span class="pre">fun1_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser8Function4Set1E6fun1_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8Function4Set2E6fun2_t">
+<span id="_CPPv3N12SimpleParser8Function4Set2E6fun2_t"></span><span id="_CPPv2N12SimpleParser8Function4Set2E6fun2_t"></span><span id="SimpleParser::Function::Set2__fun2_t"></span><span class="target" id="structSimpleParser_1_1Function_1ae8601a1f5653429588071f2c4282f463"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set2</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N12SimpleParser8Function6fun2_tE" title="SimpleParser::Function::fun2_t"><span class="n"><span class="pre">fun2_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser8Function4Set2E6fun2_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8Function4Set3E6fun3_t">
+<span id="_CPPv3N12SimpleParser8Function4Set3E6fun3_t"></span><span id="_CPPv2N12SimpleParser8Function4Set3E6fun3_t"></span><span id="SimpleParser::Function::Set3__fun3_t"></span><span class="target" id="structSimpleParser_1_1Function_1ad53ebf936d35e5a3f422900eb2fff93b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set3</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N12SimpleParser8Function6fun3_tE" title="SimpleParser::Function::fun3_t"><span class="n"><span class="pre">fun3_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser8Function4Set3E6fun3_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8Function8num_argsE">
+<span id="_CPPv3N12SimpleParser8Function8num_argsE"></span><span id="_CPPv2N12SimpleParser8Function8num_argsE"></span><span id="SimpleParser::Function::num_args__s"></span><span class="target" id="structSimpleParser_1_1Function_1a7db0d0b859f06f5313093afa63b634b7"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_args</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8Function8num_argsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8Function4fun0E">
+<span id="_CPPv3N12SimpleParser8Function4fun0E"></span><span id="_CPPv2N12SimpleParser8Function4fun0E"></span><span id="SimpleParser::Function::fun0__fun0_t"></span><span class="target" id="structSimpleParser_1_1Function_1a61c7a0d1853af81d46019234178841af"></span><a class="reference internal" href="#_CPPv4N12SimpleParser8Function6fun0_tE" title="SimpleParser::Function::fun0_t"><span class="n"><span class="pre">fun0_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun0</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8Function4fun0E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8Function4fun1E">
+<span id="_CPPv3N12SimpleParser8Function4fun1E"></span><span id="_CPPv2N12SimpleParser8Function4fun1E"></span><span id="SimpleParser::Function::fun1__fun1_t"></span><span class="target" id="structSimpleParser_1_1Function_1a49d2337e597d315f45858c26f4f38795"></span><a class="reference internal" href="#_CPPv4N12SimpleParser8Function6fun1_tE" title="SimpleParser::Function::fun1_t"><span class="n"><span class="pre">fun1_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun1</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8Function4fun1E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8Function4fun2E">
+<span id="_CPPv3N12SimpleParser8Function4fun2E"></span><span id="_CPPv2N12SimpleParser8Function4fun2E"></span><span id="SimpleParser::Function::fun2__fun2_t"></span><span class="target" id="structSimpleParser_1_1Function_1ad721be4b603c9798fcf2eb02f758664a"></span><a class="reference internal" href="#_CPPv4N12SimpleParser8Function6fun2_tE" title="SimpleParser::Function::fun2_t"><span class="n"><span class="pre">fun2_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun2</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8Function4fun2E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8Function4fun3E">
+<span id="_CPPv3N12SimpleParser8Function4fun3E"></span><span id="_CPPv2N12SimpleParser8Function4fun3E"></span><span id="SimpleParser::Function::fun3__fun3_t"></span><span class="target" id="structSimpleParser_1_1Function_1a0556c8e9fe766fe77db179d3715f78c7"></span><a class="reference internal" href="#_CPPv4N12SimpleParser8Function6fun3_tE" title="SimpleParser::Function::fun3_t"><span class="n"><span class="pre">fun3_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun3</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8Function4fun3E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8MapLexerE">
+<span id="_CPPv3N12SimpleParser8MapLexerE"></span><span id="_CPPv2N12SimpleParser8MapLexerE"></span><span id="SimpleParser::MapLexer"></span><span class="target" id="classSimpleParser_1_1MapLexer"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MapLexer</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../../compiler/api/Lexer.html#_CPPv45Lexer" title="Lexer"><span class="n"><span class="pre">Lexer</span></span></a><a class="headerlink" href="#_CPPv4N12SimpleParser8MapLexerE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8MapLexer8MapLexerEv">
+<span id="_CPPv3N12SimpleParser8MapLexer8MapLexerEv"></span><span id="_CPPv2N12SimpleParser8MapLexer8MapLexerEv"></span><span id="SimpleParser::MapLexer::MapLexer"></span><span class="target" id="classSimpleParser_1_1MapLexer_1adfc520da045ab6d2d4d39860691985ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MapLexer</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser8MapLexer8MapLexerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser8MapLexer4IsIDERK5Token">
+<span id="_CPPv3NK12SimpleParser8MapLexer4IsIDERK5Token"></span><span id="_CPPv2NK12SimpleParser8MapLexer4IsIDERK5Token"></span><span id="SimpleParser::MapLexer::IsID__TokenCRC"></span><span class="target" id="classSimpleParser_1_1MapLexer_1ae45edc97c3e728c9fb0b03e4cdb1bbaf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsID</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../compiler/api/Lexer.html#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">token</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser8MapLexer4IsIDERK5Token" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser8MapLexer8IsNumberERK5Token">
+<span id="_CPPv3NK12SimpleParser8MapLexer8IsNumberERK5Token"></span><span id="_CPPv2NK12SimpleParser8MapLexer8IsNumberERK5Token"></span><span id="SimpleParser::MapLexer::IsNumber__TokenCRC"></span><span class="target" id="classSimpleParser_1_1MapLexer_1a18d79e30cba60a82f5e14f5fd16e21c8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsNumber</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../compiler/api/Lexer.html#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">token</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser8MapLexer8IsNumberERK5Token" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser8MapLexer8IsStringERK5Token">
+<span id="_CPPv3NK12SimpleParser8MapLexer8IsStringERK5Token"></span><span id="_CPPv2NK12SimpleParser8MapLexer8IsStringERK5Token"></span><span id="SimpleParser::MapLexer::IsString__TokenCRC"></span><span class="target" id="classSimpleParser_1_1MapLexer_1abdc4d368378b78310189123fc9287ff4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsString</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../compiler/api/Lexer.html#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">token</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser8MapLexer8IsStringERK5Token" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser8MapLexer6IsCharERK5Token">
+<span id="_CPPv3NK12SimpleParser8MapLexer6IsCharERK5Token"></span><span id="_CPPv2NK12SimpleParser8MapLexer6IsCharERK5Token"></span><span id="SimpleParser::MapLexer::IsChar__TokenCRC"></span><span class="target" id="classSimpleParser_1_1MapLexer_1aac7cc8283a2fc7005e9ab938b3daea11"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsChar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../compiler/api/Lexer.html#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">token</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser8MapLexer6IsCharERK5Token" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser8MapLexer10IsExternalERK5Token">
+<span id="_CPPv3NK12SimpleParser8MapLexer10IsExternalERK5Token"></span><span id="_CPPv2NK12SimpleParser8MapLexer10IsExternalERK5Token"></span><span id="SimpleParser::MapLexer::IsExternal__TokenCRC"></span><span class="target" id="classSimpleParser_1_1MapLexer_1a0d99c3063489a162234c43f4cf7992d8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsExternal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../compiler/api/Lexer.html#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">token</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser8MapLexer10IsExternalERK5Token" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser8MapLexer8IsSymbolERK5Token">
+<span id="_CPPv3NK12SimpleParser8MapLexer8IsSymbolERK5Token"></span><span id="_CPPv2NK12SimpleParser8MapLexer8IsSymbolERK5Token"></span><span id="SimpleParser::MapLexer::IsSymbol__TokenCRC"></span><span class="target" id="classSimpleParser_1_1MapLexer_1ab6137936d796751b5a3810e3cef77793"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsSymbol</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../compiler/api/Lexer.html#_CPPv45Token" title="Token"><span class="n"><span class="pre">Token</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">token</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser8MapLexer8IsSymbolERK5Token" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8MapLexer16token_identifierE">
+<span id="_CPPv3N12SimpleParser8MapLexer16token_identifierE"></span><span id="_CPPv2N12SimpleParser8MapLexer16token_identifierE"></span><span id="SimpleParser::MapLexer::token_identifier__i"></span><span class="target" id="classSimpleParser_1_1MapLexer_1a8295d78183fa9533413f869803fd4591"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">token_identifier</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8MapLexer16token_identifierE" title="Link to this definition"></a><br /></dt>
+<dd><p>Token id for identifiers. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8MapLexer12token_numberE">
+<span id="_CPPv3N12SimpleParser8MapLexer12token_numberE"></span><span id="_CPPv2N12SimpleParser8MapLexer12token_numberE"></span><span id="SimpleParser::MapLexer::token_number__i"></span><span class="target" id="classSimpleParser_1_1MapLexer_1a8745f74a98a99dfb9409096d8bd8c381"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">token_number</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8MapLexer12token_numberE" title="Link to this definition"></a><br /></dt>
+<dd><p>Token id for literal numbers. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8MapLexer12token_stringE">
+<span id="_CPPv3N12SimpleParser8MapLexer12token_stringE"></span><span id="_CPPv2N12SimpleParser8MapLexer12token_stringE"></span><span id="SimpleParser::MapLexer::token_string__i"></span><span class="target" id="classSimpleParser_1_1MapLexer_1ace831090eaec9540636bf87e05c5a2ba"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">token_string</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8MapLexer12token_stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Token id for literal strings. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8MapLexer10token_charE">
+<span id="_CPPv3N12SimpleParser8MapLexer10token_charE"></span><span id="_CPPv2N12SimpleParser8MapLexer10token_charE"></span><span id="SimpleParser::MapLexer::token_char__i"></span><span class="target" id="classSimpleParser_1_1MapLexer_1af8de37c53196ced7616e122d63aaacc1"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">token_char</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8MapLexer10token_charE" title="Link to this definition"></a><br /></dt>
+<dd><p>Token id for literal characters. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8MapLexer14token_externalE">
+<span id="_CPPv3N12SimpleParser8MapLexer14token_externalE"></span><span id="_CPPv2N12SimpleParser8MapLexer14token_externalE"></span><span id="SimpleParser::MapLexer::token_external__i"></span><span class="target" id="classSimpleParser_1_1MapLexer_1acf7821e2cf940bb9b1181e33f9930c4c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">token_external</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8MapLexer14token_externalE" title="Link to this definition"></a><br /></dt>
+<dd><p>Token id for an external value that was passed in. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser8MapLexer12token_symbolE">
+<span id="_CPPv3N12SimpleParser8MapLexer12token_symbolE"></span><span id="_CPPv2N12SimpleParser8MapLexer12token_symbolE"></span><span id="SimpleParser::MapLexer::token_symbol__i"></span><span class="target" id="classSimpleParser_1_1MapLexer_1af8b43826350157171863972e30f2e5a6"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">token_symbol</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser8MapLexer12token_symbolE" title="Link to this definition"></a><br /></dt>
+<dd><p>Token id for other symbols. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN12SimpleParser11SymbolTableE">
+<span id="_CPPv3I00EN12SimpleParser11SymbolTableE"></span><span id="_CPPv2I00EN12SimpleParser11SymbolTableE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAP_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DUMMY_T</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structSimpleParser_1_1SymbolTable"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SymbolTable</span></span></span><a class="headerlink" href="#_CPPv4I00EN12SimpleParser11SymbolTableE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTable5arg_tE">
+<span id="_CPPv3N12SimpleParser11SymbolTable5arg_tE"></span><span id="_CPPv2N12SimpleParser11SymbolTable5arg_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_1abeed0bb14e67e1dd8c53f1ebc2d2e08e"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">arg_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN12SimpleParser11SymbolTableE" title="SimpleParser::SymbolTable::MAP_T"><span class="n"><span class="pre">MAP_T</span></span></a><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTable5arg_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTable5fun_tE">
+<span id="_CPPv3N12SimpleParser11SymbolTable5fun_tE"></span><span id="_CPPv2N12SimpleParser11SymbolTable5fun_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_1a80e1f52d407c2b0f30249cac67ae447d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTable5arg_tE" title="SimpleParser::SymbolTable::arg_t"><span class="n"><span class="pre">arg_t</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTable5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTable7value_tE">
+<span id="_CPPv3N12SimpleParser11SymbolTable7value_tE"></span><span id="_CPPv2N12SimpleParser11SymbolTable7value_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_1af496c80e750a0258a94780f468e34d37"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTable5arg_tE" title="SimpleParser::SymbolTable::arg_t"><span class="n"><span class="pre">arg_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTable7value_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTable11SymbolTableEv">
+<span id="_CPPv3N12SimpleParser11SymbolTable11SymbolTableEv"></span><span id="_CPPv2N12SimpleParser11SymbolTable11SymbolTableEv"></span><span id="SimpleParser::SymbolTable::SymbolTable"></span><span class="target" id="structSimpleParser_1_1SymbolTable_1a0d5870eceb92881b20b5eca9c11e7e6b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SymbolTable</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTable11SymbolTableEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTable11SymbolTableE5arg_t">
+<span id="_CPPv3N12SimpleParser11SymbolTable11SymbolTableE5arg_t"></span><span id="_CPPv2N12SimpleParser11SymbolTable11SymbolTableE5arg_t"></span><span id="SimpleParser::SymbolTable::SymbolTable__arg_t"></span><span class="target" id="structSimpleParser_1_1SymbolTable_1a9ce4ec018f9bfdd7bccd5312810d2cbb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SymbolTable</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTable5arg_tE" title="SimpleParser::SymbolTable::arg_t"><span class="n"><span class="pre">arg_t</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTable11SymbolTableE5arg_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser11SymbolTable10AsFunctionER9ValueTypeI5arg_tE">
+<span id="_CPPv3NK12SimpleParser11SymbolTable10AsFunctionER9ValueTypeI5arg_tE"></span><span id="_CPPv2NK12SimpleParser11SymbolTable10AsFunctionER9ValueTypeI5arg_tE"></span><span id="SimpleParser::SymbolTable::AsFunction__ValueType:arg_t:RC"></span><span class="target" id="structSimpleParser_1_1SymbolTable_1aeff6053540b474b6589f5b65467f3bdf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsFunction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTable5arg_tE" title="SimpleParser::SymbolTable::arg_t"><span class="n"><span class="pre">arg_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser11SymbolTable10AsFunctionER9ValueTypeI5arg_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>By default, let the value handle its own converstion to a function. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTable17MakeDatumAccessorERKNSt6stringE">
+<span id="_CPPv3N12SimpleParser11SymbolTable17MakeDatumAccessorERKNSt6stringE"></span><span id="_CPPv2N12SimpleParser11SymbolTable17MakeDatumAccessorERKNSt6stringE"></span><span id="SimpleParser::SymbolTable::MakeDatumAccessor__ssCR"></span><span class="target" id="structSimpleParser_1_1SymbolTable_1a976a825ef5661a32dc5b54abb18b9865"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTable5fun_tE" title="SimpleParser::SymbolTable::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MakeDatumAccessor</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTable17MakeDatumAccessorERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN12SimpleParser11SymbolTableI10DataLayout7DUMMY_TEE">
+<span id="_CPPv3I0EN12SimpleParser11SymbolTableI10DataLayout7DUMMY_TEE"></span><span id="_CPPv2I0EN12SimpleParser11SymbolTableI10DataLayout7DUMMY_TEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DUMMY_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structSimpleParser_1_1SymbolTable_3_01DataLayout_00_01DUMMY__T_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SymbolTable</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="DataLayout.html#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser11SymbolTableI10DataLayout7DUMMY_TEE" title="SimpleParser::SymbolTable&lt;DataLayout, DUMMY_T&gt;::DUMMY_T"><span class="n"><span class="pre">DUMMY_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN12SimpleParser11SymbolTableI10DataLayout7DUMMY_TEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Specialty implementation for DataLayouts. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE5arg_tE">
+<span id="_CPPv3N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE5arg_tE"></span><span id="_CPPv2N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE5arg_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01DataLayout_00_01DUMMY__T_01_4_1a898ecf6d3c93e3659a1c7e714a795668"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">arg_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="DataMap.html#_CPPv47DataMap" title="DataMap"><span class="n"><span class="pre">DataMap</span></span></a><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE5arg_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE5fun_tE">
+<span id="_CPPv3N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE5fun_tE"></span><span id="_CPPv2N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE5fun_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01DataLayout_00_01DUMMY__T_01_4_1a7f5aa03927dba98dcb6be6f8f4f5f6a0"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE5arg_tE" title="SimpleParser::SymbolTable&lt;DataLayout, DUMMY_T&gt;::arg_t"><span class="n"><span class="pre">arg_t</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE7value_tE">
+<span id="_CPPv3N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE7value_tE"></span><span id="_CPPv2N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE7value_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01DataLayout_00_01DUMMY__T_01_4_1a7b4bccca8101460df0ca32ce0b177eab"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE5arg_tE" title="SimpleParser::SymbolTable&lt;DataLayout, DUMMY_T&gt;::arg_t"><span class="n"><span class="pre">arg_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE7value_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE11SymbolTableERK10DataLayout">
+<span id="_CPPv3N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE11SymbolTableERK10DataLayout"></span><span id="_CPPv2N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE11SymbolTableERK10DataLayout"></span><span id="SimpleParser::SymbolTable:DataLayout.DUMMY_T:::SymbolTable__DataLayoutCR"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01DataLayout_00_01DUMMY__T_01_4_1af842f23e794a44d8d60f45b7fcc3bf38"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SymbolTable</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="DataLayout.html#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_layout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE11SymbolTableERK10DataLayout" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE17MakeDatumAccessorERKNSt6stringE">
+<span id="_CPPv3NK12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE17MakeDatumAccessorERKNSt6stringE"></span><span id="_CPPv2NK12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE17MakeDatumAccessorERKNSt6stringE"></span><span id="SimpleParser::SymbolTable:DataLayout.DUMMY_T:::MakeDatumAccessor__ssCRC"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01DataLayout_00_01DUMMY__T_01_4_1a8d09b367be457566c3730782a6dbc936"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MakeDatumAccessor</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE17MakeDatumAccessorERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE10AsFunctionER9ValueTypeI5arg_tE">
+<span id="_CPPv3NK12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE10AsFunctionER9ValueTypeI5arg_tE"></span><span id="_CPPv2NK12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE10AsFunctionER9ValueTypeI5arg_tE"></span><span id="SimpleParser::SymbolTable:DataLayout.DUMMY_T:::AsFunction__ValueType:arg_t:RC"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01DataLayout_00_01DUMMY__T_01_4_1a8a07dea6b9a090704d9079b40ca1b982"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsFunction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE5arg_tE" title="SimpleParser::SymbolTable&lt;DataLayout, DUMMY_T&gt;::arg_t"><span class="n"><span class="pre">arg_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE10AsFunctionER9ValueTypeI5arg_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE6layoutE">
+<span id="_CPPv3N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE6layoutE"></span><span id="_CPPv2N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE6layoutE"></span><span id="SimpleParser::SymbolTable:DataLayout.DUMMY_T:::layout__DataLayoutCR"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01DataLayout_00_01DUMMY__T_01_4_1a79b8591831545a9f31c077b27ae9b386"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="DataLayout.html#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">layout</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTableI10DataLayout7DUMMY_TE6layoutE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN12SimpleParser11SymbolTableI7DataMap7DUMMY_TEE">
+<span id="_CPPv3I0EN12SimpleParser11SymbolTableI7DataMap7DUMMY_TEE"></span><span id="_CPPv2I0EN12SimpleParser11SymbolTableI7DataMap7DUMMY_TEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DUMMY_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structSimpleParser_1_1SymbolTable_3_01DataMap_00_01DUMMY__T_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SymbolTable</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="DataMap.html#_CPPv47DataMap" title="DataMap"><span class="n"><span class="pre">DataMap</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser11SymbolTableI7DataMap7DUMMY_TEE" title="SimpleParser::SymbolTable&lt;DataMap, DUMMY_T&gt;::DUMMY_T"><span class="n"><span class="pre">DUMMY_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412SimpleParser" title="SimpleParser"><span class="n"><span class="pre">SimpleParser</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I00EN12SimpleParser11SymbolTableE" title="SimpleParser::SymbolTable"><span class="n"><span class="pre">SymbolTable</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="DataLayout.html#_CPPv410DataLayout" title="DataLayout"><span class="n"><span class="pre">DataLayout</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN12SimpleParser11SymbolTableI7DataMap7DUMMY_TEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Special DataMap implementation that just converts to underlying layout. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTableI7DataMap7DUMMY_TE11SymbolTableERK7DataMap">
+<span id="_CPPv3N12SimpleParser11SymbolTableI7DataMap7DUMMY_TE11SymbolTableERK7DataMap"></span><span id="_CPPv2N12SimpleParser11SymbolTableI7DataMap7DUMMY_TE11SymbolTableERK7DataMap"></span><span id="SimpleParser::SymbolTable:DataMap.DUMMY_T:::SymbolTable__DataMapCR"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01DataMap_00_01DUMMY__T_01_4_1aec42999d828303890c3780871416aee2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SymbolTable</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="DataMap.html#_CPPv47DataMap" title="DataMap"><span class="n"><span class="pre">DataMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dm</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTableI7DataMap7DUMMY_TE11SymbolTableERK7DataMap" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp">
+<span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4"></span><span class="sig-name descname"><span class="pre">template&lt;typename</span> <span class="pre">VALUE_T,</span> <span class="pre">typename</span> <span class="pre">DUMMY_T&gt;</span> <span class="pre">string,</span> <span class="pre">VALUE_T</span> <span class="pre">&gt;,</span> <span class="pre">DUMMY_T</span> <span class="pre">&gt;</span></span></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser19PhonyNameDueToError5map_tE">
+<span id="_CPPv3N12SimpleParser19PhonyNameDueToError5map_tE"></span><span id="_CPPv2N12SimpleParser19PhonyNameDueToError5map_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1a19f63df8406e4e42baa0b255ae729eba"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">map_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../datastructs/api/ra_map.html#_CPPv4I00000E6ra_map" title="ra_map"><span class="n"><span class="pre">ra_map</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">VALUE_T</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser19PhonyNameDueToError5map_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser19PhonyNameDueToError5arg_tE">
+<span id="_CPPv3N12SimpleParser19PhonyNameDueToError5arg_tE"></span><span id="_CPPv2N12SimpleParser19PhonyNameDueToError5arg_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1a9e135faec55df056d5f30846e480a85c"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">arg_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SimpleParser19PhonyNameDueToError5map_tE" title="SimpleParser::PhonyNameDueToError::map_t"><span class="n"><span class="pre">map_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser19PhonyNameDueToError5arg_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser19PhonyNameDueToError5fun_tE">
+<span id="_CPPv3N12SimpleParser19PhonyNameDueToError5fun_tE"></span><span id="_CPPv2N12SimpleParser19PhonyNameDueToError5fun_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1a2738993a6d2691b86c8e4e8018481912"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N12SimpleParser19PhonyNameDueToError5arg_tE" title="SimpleParser::PhonyNameDueToError::arg_t"><span class="n"><span class="pre">arg_t</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser19PhonyNameDueToError5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser19PhonyNameDueToError7value_tE">
+<span id="_CPPv3N12SimpleParser19PhonyNameDueToError7value_tE"></span><span id="_CPPv2N12SimpleParser19PhonyNameDueToError7value_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1a41833a56d5604246bf7b7b123484354a"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12SimpleParser19PhonyNameDueToError5arg_tE" title="SimpleParser::PhonyNameDueToError::arg_t"><span class="n"><span class="pre">arg_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser19PhonyNameDueToError7value_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser19PhonyNameDueToError11SymbolTableERK6ra_mapINSt6stringE7VALUE_TE">
+<span id="_CPPv3N12SimpleParser19PhonyNameDueToError11SymbolTableERK6ra_mapINSt6stringE7VALUE_TE"></span><span id="_CPPv2N12SimpleParser19PhonyNameDueToError11SymbolTableERK6ra_mapINSt6stringE7VALUE_TE"></span><span id="SimpleParser::PhonyNameDueToError::SymbolTable__ra_map:ss.VALUE_T:CR"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1aa7edc25a18d31bff73c604c8e121bc90"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SymbolTable</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../datastructs/api/ra_map.html#_CPPv4I00000E6ra_map" title="ra_map"><span class="n"><span class="pre">ra_map</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">VALUE_T</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser19PhonyNameDueToError11SymbolTableERK6ra_mapINSt6stringE7VALUE_TE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser19PhonyNameDueToError17MakeDatumAccessorERKNSt6stringE">
+<span id="_CPPv3NK12SimpleParser19PhonyNameDueToError17MakeDatumAccessorERKNSt6stringE"></span><span id="_CPPv2NK12SimpleParser19PhonyNameDueToError17MakeDatumAccessorERKNSt6stringE"></span><span id="SimpleParser::PhonyNameDueToError::MakeDatumAccessor__ssCRC"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1a9dfb8f816489823dd885b01d75c86230"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SimpleParser19PhonyNameDueToError5fun_tE" title="SimpleParser::PhonyNameDueToError::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MakeDatumAccessor</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser19PhonyNameDueToError17MakeDatumAccessorERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser19PhonyNameDueToError10AsFunctionER9ValueTypeI5arg_tE">
+<span id="_CPPv3NK12SimpleParser19PhonyNameDueToError10AsFunctionER9ValueTypeI5arg_tE"></span><span id="_CPPv2NK12SimpleParser19PhonyNameDueToError10AsFunctionER9ValueTypeI5arg_tE"></span><span id="SimpleParser::PhonyNameDueToError::AsFunction__ValueType:arg_t:RC"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1a05feace752c776336aa6a73685e94066"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsFunction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12SimpleParser19PhonyNameDueToError5arg_tE" title="SimpleParser::PhonyNameDueToError::arg_t"><span class="n"><span class="pre">arg_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser19PhonyNameDueToError10AsFunctionER9ValueTypeI5arg_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>By default, let the value handle its own converstion to a function. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser19PhonyNameDueToError6layoutE">
+<span id="_CPPv3N12SimpleParser19PhonyNameDueToError6layoutE"></span><span id="_CPPv2N12SimpleParser19PhonyNameDueToError6layoutE"></span><span id="SimpleParser::PhonyNameDueToError::layout__map_t::layout_tCR"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1ae990875bc6e9f5814a95d1a54c77cd91"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SimpleParser19PhonyNameDueToError5map_tE" title="SimpleParser::PhonyNameDueToError::map_t"><span class="n"><span class="pre">map_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">layout_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">layout</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser19PhonyNameDueToError6layoutE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN12SimpleParser9ValueTypeE">
+<span id="_CPPv3I0EN12SimpleParser9ValueTypeE"></span><span id="_CPPv2I0EN12SimpleParser9ValueTypeE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ARG_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structSimpleParser_1_1ValueType"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValueType</span></span></span><a class="headerlink" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType6type_tE">
+<span id="_CPPv3N12SimpleParser9ValueType6type_tE"></span><span id="_CPPv2N12SimpleParser9ValueType6type_tE"></span><span class="target" id="structSimpleParser_1_1ValueType_1aa3c8696964922b7736f0f22e9641a02b"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type_t</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType6type_tE" title="Link to this definition"></a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType6type_t5ERRORE">
+<span id="_CPPv3N12SimpleParser9ValueType6type_t5ERRORE"></span><span id="_CPPv2N12SimpleParser9ValueType6type_t5ERRORE"></span><span class="target" id="structSimpleParser_1_1ValueType_1aa3c8696964922b7736f0f22e9641a02baf47629a1cf80c01f1149ab359323637d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ERROR</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType6type_t5ERRORE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType6type_t5VALUEE">
+<span id="_CPPv3N12SimpleParser9ValueType6type_t5VALUEE"></span><span id="_CPPv2N12SimpleParser9ValueType6type_t5VALUEE"></span><span class="target" id="structSimpleParser_1_1ValueType_1aa3c8696964922b7736f0f22e9641a02ba9f9331ea18c8e5d3b92b61cc76fc5dce"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VALUE</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType6type_t5VALUEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType6type_t8FUNCTIONE">
+<span id="_CPPv3N12SimpleParser9ValueType6type_t8FUNCTIONE"></span><span id="_CPPv2N12SimpleParser9ValueType6type_t8FUNCTIONE"></span><span class="target" id="structSimpleParser_1_1ValueType_1aa3c8696964922b7736f0f22e9641a02ba933e31a5f02266f8e09b4f2360ec256a"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FUNCTION</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType6type_t8FUNCTIONE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType5fun_tE">
+<span id="_CPPv3N12SimpleParser9ValueType5fun_tE"></span><span id="_CPPv2N12SimpleParser9ValueType5fun_tE"></span><span class="target" id="structSimpleParser_1_1ValueType_1a66e37df3a68f3e3ce6a5fe7970d23120"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType::ARG_T"><span class="n"><span class="pre">ARG_T</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType9ValueTypeEv">
+<span id="_CPPv3N12SimpleParser9ValueType9ValueTypeEv"></span><span id="_CPPv2N12SimpleParser9ValueType9ValueTypeEv"></span><span id="SimpleParser::ValueType::ValueType"></span><span class="target" id="structSimpleParser_1_1ValueType_1ac23c45e89e8fd0c1c70d5003ffb881f9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValueType</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType9ValueTypeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType9ValueTypeERK9ValueType">
+<span id="_CPPv3N12SimpleParser9ValueType9ValueTypeERK9ValueType"></span><span id="_CPPv2N12SimpleParser9ValueType9ValueTypeERK9ValueType"></span><span id="SimpleParser::ValueType::ValueType__ValueTypeCR"></span><span class="target" id="structSimpleParser_1_1ValueType_1a85ca6e857ea718736fee023b10c8454c"></span><span class="sig-name descname"><span class="n"><span class="pre">ValueType</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SimpleParser9ValueType9ValueTypeERK9ValueType" title="SimpleParser::ValueType::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType9ValueTypeERK9ValueType" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType9ValueTypeEd">
+<span id="_CPPv3N12SimpleParser9ValueType9ValueTypeEd"></span><span id="_CPPv2N12SimpleParser9ValueType9ValueTypeEd"></span><span id="SimpleParser::ValueType::ValueType__double"></span><span class="target" id="structSimpleParser_1_1ValueType_1a25f3b08d5028867f9b9ed39a8d3c48df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValueType</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType9ValueTypeEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType9ValueTypeENSt6stringE">
+<span id="_CPPv3N12SimpleParser9ValueType9ValueTypeENSt6stringE"></span><span id="_CPPv2N12SimpleParser9ValueType9ValueTypeENSt6stringE"></span><span id="SimpleParser::ValueType::ValueType__ss"></span><span class="target" id="structSimpleParser_1_1ValueType_1a4d3085ce94c7d328ff970e812fd9ba75"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValueType</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType9ValueTypeENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType9ValueTypeE5Datum">
+<span id="_CPPv3N12SimpleParser9ValueType9ValueTypeE5Datum"></span><span id="_CPPv2N12SimpleParser9ValueType9ValueTypeE5Datum"></span><span id="SimpleParser::ValueType::ValueType__Datum"></span><span class="target" id="structSimpleParser_1_1ValueType_1a99e6fe08b6e4774c0098fad04f8c8e8b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValueType</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType9ValueTypeE5Datum" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType9ValueTypeE5fun_t">
+<span id="_CPPv3N12SimpleParser9ValueType9ValueTypeE5fun_t"></span><span id="_CPPv2N12SimpleParser9ValueType9ValueTypeE5fun_t"></span><span id="SimpleParser::ValueType::ValueType__fun_t"></span><span class="target" id="structSimpleParser_1_1ValueType_1a75bf8b5ab14deb9bbbd428cf7c462bb2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValueType</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N12SimpleParser9ValueType5fun_tE" title="SimpleParser::ValueType::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType9ValueTypeE5fun_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueTypeaSERK9ValueType">
+<span id="_CPPv3N12SimpleParser9ValueTypeaSERK9ValueType"></span><span id="_CPPv2N12SimpleParser9ValueTypeaSERK9ValueType"></span><span id="SimpleParser::ValueType::assign-operator__ValueTypeCR"></span><span class="target" id="structSimpleParser_1_1ValueType_1aef72ccbdcfd7350426240eac217d437c"></span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueTypeaSERK9ValueType" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueTypeaSE5Datum">
+<span id="_CPPv3N12SimpleParser9ValueTypeaSE5Datum"></span><span id="_CPPv2N12SimpleParser9ValueTypeaSE5Datum"></span><span id="SimpleParser::ValueType::assign-operator__Datum"></span><span class="target" id="structSimpleParser_1_1ValueType_1aa3f340773f24ce821e6ddb7c4c943aea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueTypeaSE5Datum" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueTypeaSEd">
+<span id="_CPPv3N12SimpleParser9ValueTypeaSEd"></span><span id="_CPPv2N12SimpleParser9ValueTypeaSEd"></span><span id="SimpleParser::ValueType::assign-operator__double"></span><span class="target" id="structSimpleParser_1_1ValueType_1a19bb3f1b4ebc414219da418aa9b5e6ed"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueTypeaSEd" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueTypeaSERKNSt6stringE">
+<span id="_CPPv3N12SimpleParser9ValueTypeaSERKNSt6stringE"></span><span id="_CPPv2N12SimpleParser9ValueTypeaSERKNSt6stringE"></span><span id="SimpleParser::ValueType::assign-operator__ssCR"></span><span class="target" id="structSimpleParser_1_1ValueType_1ad8d46e5c60349881ad3ae6fd8e98de26"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueTypeaSERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueTypeaSE5fun_t">
+<span id="_CPPv3N12SimpleParser9ValueTypeaSE5fun_t"></span><span id="_CPPv2N12SimpleParser9ValueTypeaSE5fun_t"></span><span id="SimpleParser::ValueType::assign-operator__fun_t"></span><span class="target" id="structSimpleParser_1_1ValueType_1aeb32cbd63561dca7d1018b1f67b954ee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N12SimpleParser9ValueType5fun_tE" title="SimpleParser::ValueType::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueTypeaSE5fun_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType10AsFunctionEv">
+<span id="_CPPv3N12SimpleParser9ValueType10AsFunctionEv"></span><span id="_CPPv2N12SimpleParser9ValueType10AsFunctionEv"></span><span id="SimpleParser::ValueType::AsFunction"></span><span class="target" id="structSimpleParser_1_1ValueType_1adccfebd887eda6ddf96552ff9873ff82"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SimpleParser9ValueType5fun_tE" title="SimpleParser::ValueType::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsFunction</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType10AsFunctionEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType4typeE">
+<span id="_CPPv3N12SimpleParser9ValueType4typeE"></span><span id="_CPPv2N12SimpleParser9ValueType4typeE"></span><span id="SimpleParser::ValueType::type__type_t"></span><span class="target" id="structSimpleParser_1_1ValueType_1ab3b5fe8e92109547120c3803118280d6"></span><a class="reference internal" href="#_CPPv4N12SimpleParser9ValueType6type_tE" title="SimpleParser::ValueType::type_t"><span class="n"><span class="pre">type_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType4typeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType5valueE">
+<span id="_CPPv3N12SimpleParser9ValueType5valueE"></span><span id="_CPPv2N12SimpleParser9ValueType5valueE"></span><span id="SimpleParser::ValueType::value__Datum"></span><span class="target" id="structSimpleParser_1_1ValueType_1a4ad4e58ecd7fb7d504f4e9389e68f939"></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType5valueE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser9ValueType3funE">
+<span id="_CPPv3N12SimpleParser9ValueType3funE"></span><span id="_CPPv2N12SimpleParser9ValueType3funE"></span><span id="SimpleParser::ValueType::fun__fun_t"></span><span class="target" id="structSimpleParser_1_1ValueType_1ac889c99f0d0dc2e0e8b942eaddf40745"></span><a class="reference internal" href="#_CPPv4N12SimpleParser9ValueType5fun_tE" title="SimpleParser::ValueType::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser9ValueType3funE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TEE">
+<span id="_CPPv3I00EN12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TEE"></span><span id="_CPPv2I00EN12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VALUE_T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DUMMY_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SymbolTable</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../datastructs/api/ra_map.html#_CPPv4I00000E6ra_map" title="ra_map"><span class="n"><span class="pre">ra_map</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TEE" title="SimpleParser::SymbolTable&lt;ra_map&lt;std::string, VALUE_T&gt;, DUMMY_T&gt;::VALUE_T"><span class="n"><span class="pre">VALUE_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TEE" title="SimpleParser::SymbolTable&lt;ra_map&lt;std::string, VALUE_T&gt;, DUMMY_T&gt;::DUMMY_T"><span class="n"><span class="pre">DUMMY_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I00EN12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5map_tE">
+<span id="_CPPv3N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5map_tE"></span><span id="_CPPv2N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5map_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1a19f63df8406e4e42baa0b255ae729eba"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">map_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../datastructs/api/ra_map.html#_CPPv4I00000E6ra_map" title="ra_map"><span class="n"><span class="pre">ra_map</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TEE" title="SimpleParser::SymbolTable&lt;ra_map&lt;std::string, VALUE_T&gt;, DUMMY_T&gt;::VALUE_T"><span class="n"><span class="pre">VALUE_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5map_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5arg_tE">
+<span id="_CPPv3N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5arg_tE"></span><span id="_CPPv2N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5arg_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1a9e135faec55df056d5f30846e480a85c"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">arg_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5map_tE" title="SimpleParser::SymbolTable&lt;ra_map&lt;std::string, VALUE_T&gt;, DUMMY_T&gt;::map_t"><span class="n"><span class="pre">map_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5arg_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5fun_tE">
+<span id="_CPPv3N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5fun_tE"></span><span id="_CPPv2N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5fun_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1a2738993a6d2691b86c8e4e8018481912"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="Datum.html#_CPPv45Datum" title="Datum"><span class="n"><span class="pre">Datum</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5arg_tE" title="SimpleParser::SymbolTable&lt;ra_map&lt;std::string, VALUE_T&gt;, DUMMY_T&gt;::arg_t"><span class="n"><span class="pre">arg_t</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE7value_tE">
+<span id="_CPPv3N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE7value_tE"></span><span id="_CPPv2N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE7value_tE"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1a41833a56d5604246bf7b7b123484354a"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5arg_tE" title="SimpleParser::SymbolTable&lt;ra_map&lt;std::string, VALUE_T&gt;, DUMMY_T&gt;::arg_t"><span class="n"><span class="pre">arg_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE7value_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE11SymbolTableERK6ra_mapINSt6stringE7VALUE_TE">
+<span id="_CPPv3N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE11SymbolTableERK6ra_mapINSt6stringE7VALUE_TE"></span><span id="_CPPv2N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE11SymbolTableERK6ra_mapINSt6stringE7VALUE_TE"></span><span id="SimpleParser::SymbolTable:ra_map:ss.VALUE_T:.DUMMY_T:::SymbolTable__ra_map:ss.VALUE_T:CR"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1aa7edc25a18d31bff73c604c8e121bc90"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SymbolTable</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../datastructs/api/ra_map.html#_CPPv4I00000E6ra_map" title="ra_map"><span class="n"><span class="pre">ra_map</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TEE" title="SimpleParser::SymbolTable&lt;ra_map&lt;std::string, VALUE_T&gt;, DUMMY_T&gt;::VALUE_T"><span class="n"><span class="pre">VALUE_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE11SymbolTableERK6ra_mapINSt6stringE7VALUE_TE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE17MakeDatumAccessorERKNSt6stringE">
+<span id="_CPPv3NK12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE17MakeDatumAccessorERKNSt6stringE"></span><span id="_CPPv2NK12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE17MakeDatumAccessorERKNSt6stringE"></span><span id="SimpleParser::SymbolTable:ra_map:ss.VALUE_T:.DUMMY_T:::MakeDatumAccessor__ssCRC"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1a9dfb8f816489823dd885b01d75c86230"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5fun_tE" title="SimpleParser::SymbolTable&lt;ra_map&lt;std::string, VALUE_T&gt;, DUMMY_T&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MakeDatumAccessor</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE17MakeDatumAccessorERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE10AsFunctionER9ValueTypeI5arg_tE">
+<span id="_CPPv3NK12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE10AsFunctionER9ValueTypeI5arg_tE"></span><span id="_CPPv2NK12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE10AsFunctionER9ValueTypeI5arg_tE"></span><span id="SimpleParser::SymbolTable:ra_map:ss.VALUE_T:.DUMMY_T:::AsFunction__ValueType:arg_t:RC"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1a05feace752c776336aa6a73685e94066"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsFunction</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN12SimpleParser9ValueTypeE" title="SimpleParser::ValueType"><span class="n"><span class="pre">ValueType</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5arg_tE" title="SimpleParser::SymbolTable&lt;ra_map&lt;std::string, VALUE_T&gt;, DUMMY_T&gt;::arg_t"><span class="n"><span class="pre">arg_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE10AsFunctionER9ValueTypeI5arg_tE" title="Link to this definition"></a><br /></dt>
+<dd><p>By default, let the value handle its own converstion to a function. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE6layoutE">
+<span id="_CPPv3N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE6layoutE"></span><span id="_CPPv2N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE6layoutE"></span><span id="SimpleParser::SymbolTable:ra_map:ss.VALUE_T:.DUMMY_T:::layout__map_t::layout_tCR"></span><span class="target" id="structSimpleParser_1_1SymbolTable_3_01ra__map_3_01std_1_1string_00_01VALUE__T_01_4_00_01DUMMY__T_01_4_1ae990875bc6e9f5814a95d1a54c77cd91"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE5map_tE" title="SimpleParser::SymbolTable&lt;ra_map&lt;std::string, VALUE_T&gt;, DUMMY_T&gt;::map_t"><span class="n"><span class="pre">map_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">layout_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">layout</span></span></span><a class="headerlink" href="#_CPPv4N12SimpleParser11SymbolTableI6ra_mapINSt6stringE7VALUE_TE7DUMMY_TE6layoutE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="MemoryImage.html" class="btn btn-neutral float-left" title="MemoryImage.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Trait.html" class="btn btn-neutral float-right" title="Trait.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

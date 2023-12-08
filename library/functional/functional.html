@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Functional &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/functional/functional.2aa82e43-bfd3-4c50-9e71-d49315700439.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="AnyFunction.hpp" href="api/AnyFunction.html" />
+    <link rel="prev" title="World_structure.hpp" href="../evolve/api/World_structure.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Functional</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html">AnyFunction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html">FunctionSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html">GenericFunction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html">flex_function.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html">memo_function.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Functional</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="functional">
+<h1>Functional<a class="headerlink" href="#functional" title="Link to this heading"></a></h1>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/AnyFunction.html">AnyFunction.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/AnyFunction.html#_CPPv412BaseFunction"><code class="docutils literal notranslate"><span class="pre">BaseFunction</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N12BaseFunctionD0Ev"><code class="docutils literal notranslate"><span class="pre">BaseFunction::~BaseFunction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4NK12BaseFunction7NumArgsEv"><code class="docutils literal notranslate"><span class="pre">BaseFunction::NumArgs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0DpEN12BaseFunction4CallEDaDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">BaseFunction::Call()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0DpEN12BaseFunction6CallOKEbDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">BaseFunction::CallOK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0DpEN12BaseFunction10CallTypeOKEbv"><code class="docutils literal notranslate"><span class="pre">BaseFunction::CallTypeOK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0DpEN12BaseFunctionclEDaDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">BaseFunction::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0EN12BaseFunction7ConvertEDav"><code class="docutils literal notranslate"><span class="pre">BaseFunction::Convert()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0EN12BaseFunction9ConvertOKEbv"><code class="docutils literal notranslate"><span class="pre">BaseFunction::ConvertOK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N12BaseFunction5CloneEv"><code class="docutils literal notranslate"><span class="pre">BaseFunction::Clone()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/AnyFunction.html#_CPPv4IDpE15DerivedFunction"><code class="docutils literal notranslate"><span class="pre">DerivedFunction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0DpE15DerivedFunctionIF6RETURNDp6PARAMSEE"><code class="docutils literal notranslate"><span class="pre">DerivedFunction</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0EN15DerivedFunctionIF6RETURNDp6PARAMSEE15DerivedFunctionE1T"><code class="docutils literal notranslate"><span class="pre">DerivedFunction::DerivedFunction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4NK15DerivedFunctionIF6RETURNDp6PARAMSEE7NumArgsEv"><code class="docutils literal notranslate"><span class="pre">DerivedFunction::NumArgs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4IDpEN15DerivedFunctionIF6RETURNDp6PARAMSEE4CallE6RETURNDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">DerivedFunction::Call()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4IDpEN15DerivedFunctionIF6RETURNDp6PARAMSEEclE6RETURNDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">DerivedFunction::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4NK15DerivedFunctionIF6RETURNDp6PARAMSEE11GetFunctionEv"><code class="docutils literal notranslate"><span class="pre">DerivedFunction::GetFunction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N15DerivedFunctionIF6RETURNDp6PARAMSEE5CloneEv"><code class="docutils literal notranslate"><span class="pre">DerivedFunction::Clone()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N15DerivedFunctionIF6RETURNDp6PARAMSEE5fun_tE"><code class="docutils literal notranslate"><span class="pre">DerivedFunction::fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N15DerivedFunctionIF6RETURNDp6PARAMSEE3funE"><code class="docutils literal notranslate"><span class="pre">DerivedFunction::fun</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/AnyFunction.html#_CPPv411AnyFunction"><code class="docutils literal notranslate"><span class="pre">AnyFunction</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N11AnyFunction11AnyFunctionEv"><code class="docutils literal notranslate"><span class="pre">AnyFunction::AnyFunction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N11AnyFunction11AnyFunctionERK11AnyFunction"><code class="docutils literal notranslate"><span class="pre">AnyFunction::AnyFunction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N11AnyFunction11AnyFunctionERR11AnyFunction"><code class="docutils literal notranslate"><span class="pre">AnyFunction::AnyFunction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N11AnyFunctionaSERK11AnyFunction"><code class="docutils literal notranslate"><span class="pre">AnyFunction::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N11AnyFunctionaSERR11AnyFunction"><code class="docutils literal notranslate"><span class="pre">AnyFunction::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0EN11AnyFunction11AnyFunctionE1T"><code class="docutils literal notranslate"><span class="pre">AnyFunction::AnyFunction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N11AnyFunctionD0Ev"><code class="docutils literal notranslate"><span class="pre">AnyFunction::~AnyFunction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N11AnyFunction5ClearEv"><code class="docutils literal notranslate"><span class="pre">AnyFunction::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4NK11AnyFunction7NumArgsEv"><code class="docutils literal notranslate"><span class="pre">AnyFunction::NumArgs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4NK11AnyFunction9CloneFuncEv"><code class="docutils literal notranslate"><span class="pre">AnyFunction::CloneFunc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N11AnyFunctioncvbEv"><code class="docutils literal notranslate"><span class="pre">AnyFunction::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0EN11AnyFunction3SetEvNSt8functionI1TEE"><code class="docutils literal notranslate"><span class="pre">AnyFunction::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0DpEN11AnyFunction4CallEDaDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">AnyFunction::Call()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0DpEN11AnyFunction6CallOKEbDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">AnyFunction::CallOK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0DpEN11AnyFunction10CallTypeOKEbv"><code class="docutils literal notranslate"><span class="pre">AnyFunction::CallTypeOK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0DpEN11AnyFunctionclEDaDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">AnyFunction::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0EN11AnyFunction7ConvertEDav"><code class="docutils literal notranslate"><span class="pre">AnyFunction::Convert()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0EN11AnyFunction9ConvertOKEbv"><code class="docutils literal notranslate"><span class="pre">AnyFunction::ConvertOK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4I0EN11AnyFunction7MakePtrEDa1T"><code class="docutils literal notranslate"><span class="pre">AnyFunction::MakePtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AnyFunction.html#_CPPv4N11AnyFunction3funE"><code class="docutils literal notranslate"><span class="pre">AnyFunction::fun</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/FunctionSet.html">FunctionSet.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/FunctionSet.html#_CPPv4I0E11FunctionSet"><code class="docutils literal notranslate"><span class="pre">FunctionSet</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/FunctionSet.html#_CPPv4I0DpE11FunctionSetIF8RETURN_TDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">FunctionSet</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE6base_tE"><code class="docutils literal notranslate"><span class="pre">FunctionSet::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE10value_typeE"><code class="docutils literal notranslate"><span class="pre">FunctionSet::value_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE8return_tE"><code class="docutils literal notranslate"><span class="pre">FunctionSet::return_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE11FunctionSetEv"><code class="docutils literal notranslate"><span class="pre">FunctionSet::FunctionSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEED0Ev"><code class="docutils literal notranslate"><span class="pre">FunctionSet::~FunctionSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">FunctionSet::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE3AddERK10value_type"><code class="docutils literal notranslate"><span class="pre">FunctionSet::Add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE6RemoveE6size_t"><code class="docutils literal notranslate"><span class="pre">FunctionSet::Remove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE3RunEDp4ARGS"><code class="docutils literal notranslate"><span class="pre">FunctionSet::Run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE3RunEDp4ARGSNSt8functionIF8RETURN_T8RETURN_T8RETURN_TEEE8RETURN_T"><code class="docutils literal notranslate"><span class="pre">FunctionSet::Run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindMaxEDp4ARGS8RETURN_T"><code class="docutils literal notranslate"><span class="pre">FunctionSet::FindMax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindMinEDp4ARGS8RETURN_T"><code class="docutils literal notranslate"><span class="pre">FunctionSet::FindMin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE7FindSumEDp4ARGS8RETURN_T"><code class="docutils literal notranslate"><span class="pre">FunctionSet::FindSum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4NK11FunctionSetIF8RETURN_TDp4ARGSEE11FindProductEDp4ARGS8RETURN_T"><code class="docutils literal notranslate"><span class="pre">FunctionSet::FindProduct()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIF8RETURN_TDp4ARGSEE11return_valsE"><code class="docutils literal notranslate"><span class="pre">FunctionSet::return_vals</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/FunctionSet.html#_CPPv4IDpE11FunctionSetIFvDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">FunctionSet</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIFvDp4ARGSEE6base_tE"><code class="docutils literal notranslate"><span class="pre">FunctionSet::base_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIFvDp4ARGSEE10value_typeE"><code class="docutils literal notranslate"><span class="pre">FunctionSet::value_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIFvDp4ARGSEE8return_tE"><code class="docutils literal notranslate"><span class="pre">FunctionSet::return_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIFvDp4ARGSEE11FunctionSetEv"><code class="docutils literal notranslate"><span class="pre">FunctionSet::FunctionSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIFvDp4ARGSEED0Ev"><code class="docutils literal notranslate"><span class="pre">FunctionSet::~FunctionSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4NK11FunctionSetIFvDp4ARGSEE7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">FunctionSet::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIFvDp4ARGSEE3AddERKNSt8functionIFvDp4ARGSEEE"><code class="docutils literal notranslate"><span class="pre">FunctionSet::Add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4N11FunctionSetIFvDp4ARGSEE6RemoveE6size_t"><code class="docutils literal notranslate"><span class="pre">FunctionSet::Remove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FunctionSet.html#_CPPv4NK11FunctionSetIFvDp4ARGSEE3RunEDp4ARGS"><code class="docutils literal notranslate"><span class="pre">FunctionSet::Run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/GenericFunction.html">GenericFunction.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/GenericFunction.html#_CPPv415GenericFunction"><code class="docutils literal notranslate"><span class="pre">GenericFunction</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4N15GenericFunctionD0Ev"><code class="docutils literal notranslate"><span class="pre">GenericFunction::~GenericFunction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4NK15GenericFunction7NumArgsEv"><code class="docutils literal notranslate"><span class="pre">GenericFunction::NumArgs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4I0DpEN15GenericFunction4CallEDaDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">GenericFunction::Call()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4I0DpEN15GenericFunction6CallOKEbDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">GenericFunction::CallOK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4I0DpEN15GenericFunction10CallTypeOKEbv"><code class="docutils literal notranslate"><span class="pre">GenericFunction::CallTypeOK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4I0DpEN15GenericFunctionclEDaDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">GenericFunction::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4I0EN15GenericFunction7ConvertEDav"><code class="docutils literal notranslate"><span class="pre">GenericFunction::Convert()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4I0EN15GenericFunction9ConvertOKEbv"><code class="docutils literal notranslate"><span class="pre">GenericFunction::ConvertOK()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/GenericFunction.html#_CPPv4IDpE8Function"><code class="docutils literal notranslate"><span class="pre">Function</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/GenericFunction.html#_CPPv4I0DpE8FunctionIF6RETURNDp6PARAMSEE"><code class="docutils literal notranslate"><span class="pre">Function</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4IDpEN8FunctionIF6RETURNDp6PARAMSEE8FunctionEDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Function::Function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4NK8FunctionIF6RETURNDp6PARAMSEE7NumArgsEv"><code class="docutils literal notranslate"><span class="pre">Function::NumArgs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4IDpEN8FunctionIF6RETURNDp6PARAMSEE4CallE6RETURNDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Function::Call()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4IDpEN8FunctionIF6RETURNDp6PARAMSEEclE6RETURNDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">Function::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4NK8FunctionIF6RETURNDp6PARAMSEE11GetFunctionEv"><code class="docutils literal notranslate"><span class="pre">Function::GetFunction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4N8FunctionIF6RETURNDp6PARAMSEE5fun_tE"><code class="docutils literal notranslate"><span class="pre">Function::fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/GenericFunction.html#_CPPv4N8FunctionIF6RETURNDp6PARAMSEE3funE"><code class="docutils literal notranslate"><span class="pre">Function::fun</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/flex_function.html">flex_function.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/flex_function.html#_CPPv4I0E13flex_function"><code class="docutils literal notranslate"><span class="pre">flex_function</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/flex_function.html#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">flex_function</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEE6size_tE"><code class="docutils literal notranslate"><span class="pre">flex_function::size_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEE8return_tE"><code class="docutils literal notranslate"><span class="pre">flex_function::return_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEE5fun_tE"><code class="docutils literal notranslate"><span class="pre">flex_function::fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEE6this_tE"><code class="docutils literal notranslate"><span class="pre">flex_function::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEE7tuple_tE"><code class="docutils literal notranslate"><span class="pre">flex_function::tuple_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4I0EN13flex_functionIF1RDp4ARGSEE13flex_functionERR1T"><code class="docutils literal notranslate"><span class="pre">flex_function::flex_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEE13flex_functionERK6this_t"><code class="docutils literal notranslate"><span class="pre">flex_function::flex_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEE13flex_functionERR6this_t"><code class="docutils literal notranslate"><span class="pre">flex_function::flex_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEE13flex_functionEv"><code class="docutils literal notranslate"><span class="pre">flex_function::flex_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEEaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">flex_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEEaSERR6this_t"><code class="docutils literal notranslate"><span class="pre">flex_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEEaSERK5fun_t"><code class="docutils literal notranslate"><span class="pre">flex_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEEaSERR5fun_t"><code class="docutils literal notranslate"><span class="pre">flex_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4I0EN13flex_functionIF1RDp4ARGSEEaSER6this_tRR1T"><code class="docutils literal notranslate"><span class="pre">flex_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4I_iEN13flex_functionIF1RDp4ARGSEE10SetDefaultEvR7pack_idI2IDDp4ARGSE"><code class="docutils literal notranslate"><span class="pre">flex_function::SetDefault()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEE11SetDefaultsEDp4ARGS"><code class="docutils literal notranslate"><span class="pre">flex_function::SetDefaults()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4NK13flex_functionIF1RDp4ARGSEEclEDp4ARGS"><code class="docutils literal notranslate"><span class="pre">flex_function::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4IDpENK13flex_functionIF1RDp4ARGSEEclE8return_tDpRR7IN_ARGS"><code class="docutils literal notranslate"><span class="pre">flex_function::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4NK13flex_functionIF1RDp4ARGSEEcvbEv"><code class="docutils literal notranslate"><span class="pre">flex_function::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEE8num_argsE"><code class="docutils literal notranslate"><span class="pre">flex_function::num_args</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEE3funE"><code class="docutils literal notranslate"><span class="pre">flex_function::fun</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flex_function.html#_CPPv4N13flex_functionIF1RDp4ARGSEE12default_argsE"><code class="docutils literal notranslate"><span class="pre">flex_function::default_args</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/memo_function.html">memo_function.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/memo_function.html#_CPPv4I0E13memo_function"><code class="docutils literal notranslate"><span class="pre">memo_function</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/memo_function.html#_CPPv4I00E13memo_functionIF1R3ARGEE"><code class="docutils literal notranslate"><span class="pre">memo_function</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEE6size_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::size_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEE8return_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::return_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEE7index_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::index_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEE5fun_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEE6this_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4I0EN13memo_functionIF1R3ARGEE13memo_functionERR1T"><code class="docutils literal notranslate"><span class="pre">memo_function::memo_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEE13memo_functionERK6this_t"><code class="docutils literal notranslate"><span class="pre">memo_function::memo_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEE13memo_functionERR6this_t"><code class="docutils literal notranslate"><span class="pre">memo_function::memo_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEE13memo_functionEv"><code class="docutils literal notranslate"><span class="pre">memo_function::memo_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEEaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEEaSERR6this_t"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEEaSERK5fun_t"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEEaSERR5fun_t"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4I0EN13memo_functionIF1R3ARGEEaSER6this_tRR1T"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4NK13memo_functionIF1R3ARGEE4sizeEv"><code class="docutils literal notranslate"><span class="pre">memo_function::size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4NK13memo_functionIF1R3ARGEE3HasERK3ARG"><code class="docutils literal notranslate"><span class="pre">memo_function::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEE5ClearEv"><code class="docutils literal notranslate"><span class="pre">memo_function::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEE5EraseERK3ARG"><code class="docutils literal notranslate"><span class="pre">memo_function::Erase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4I0ENK13memo_functionIF1R3ARGEEclE8return_tRR3KEY"><code class="docutils literal notranslate"><span class="pre">memo_function::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4NK13memo_functionIF1R3ARGEEcvbEv"><code class="docutils literal notranslate"><span class="pre">memo_function::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEEcvNSt8functionIF1R3ARGEEEEv"><code class="docutils literal notranslate"><span class="pre">memo_function::operator</span> <span class="pre">std::function&lt;R(ARG)&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEE11to_functionEv"><code class="docutils literal notranslate"><span class="pre">memo_function::to_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEE9cache_mapE"><code class="docutils literal notranslate"><span class="pre">memo_function::cache_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R3ARGEE3funE"><code class="docutils literal notranslate"><span class="pre">memo_function::fun</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/memo_function.html#_CPPv4I000DpE13memo_functionIF1R2A12A2Dp5EXTRAEE"><code class="docutils literal notranslate"><span class="pre">memo_function</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6size_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::size_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE8return_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::return_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE5fun_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6hash_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::hash_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE6this_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE7tuple_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::tuple_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4IDpEN13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionEDpRR2Ts"><code class="docutils literal notranslate"><span class="pre">memo_function::memo_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionERK13memo_function"><code class="docutils literal notranslate"><span class="pre">memo_function::memo_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE13memo_functionERR13memo_function"><code class="docutils literal notranslate"><span class="pre">memo_function::memo_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERR6this_t"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERK5fun_t"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEaSERR5fun_t"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4I0EN13memo_functionIF1R2A12A2Dp5EXTRAEEaSER6this_tRR1T"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEE4sizeEv"><code class="docutils literal notranslate"><span class="pre">memo_function::size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEE3HasERK2A1RK2A2DpRK5EXTRA"><code class="docutils literal notranslate"><span class="pre">memo_function::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE5ClearEv"><code class="docutils literal notranslate"><span class="pre">memo_function::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE5EraseERK2A1RK2A2DpRK5EXTRA"><code class="docutils literal notranslate"><span class="pre">memo_function::Erase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEEclERK2A1RK2A2DpRK5EXTRA"><code class="docutils literal notranslate"><span class="pre">memo_function::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEEcvbEv"><code class="docutils literal notranslate"><span class="pre">memo_function::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEEcvNSt8functionIF1R2A12A2Dp5EXTRAEEEEv"><code class="docutils literal notranslate"><span class="pre">memo_function::operator</span> <span class="pre">std::function&lt;R(A1,</span> <span class="pre">A2,</span> <span class="pre">EXTRA...)&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4NK13memo_functionIF1R2A12A2Dp5EXTRAEE11to_functionEv"><code class="docutils literal notranslate"><span class="pre">memo_function::to_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE4HashERK2A1RK2A2DpRK5EXTRA"><code class="docutils literal notranslate"><span class="pre">memo_function::Hash()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE9cache_mapE"><code class="docutils literal notranslate"><span class="pre">memo_function::cache_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1R2A12A2Dp5EXTRAEE3funE"><code class="docutils literal notranslate"><span class="pre">memo_function::fun</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/memo_function.html#_CPPv4I0E13memo_functionIF1RvEE"><code class="docutils literal notranslate"><span class="pre">memo_function</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE6size_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::size_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE8return_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::return_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE7index_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::index_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE5fun_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE6this_tE"><code class="docutils literal notranslate"><span class="pre">memo_function::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4I0EN13memo_functionIF1RvEE13memo_functionERR1T"><code class="docutils literal notranslate"><span class="pre">memo_function::memo_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE13memo_functionERK6this_t"><code class="docutils literal notranslate"><span class="pre">memo_function::memo_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE13memo_functionERR6this_t"><code class="docutils literal notranslate"><span class="pre">memo_function::memo_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE13memo_functionEv"><code class="docutils literal notranslate"><span class="pre">memo_function::memo_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEEaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEEaSERR6this_t"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEEaSERK5fun_t"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEEaSERR5fun_t"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4I0EN13memo_functionIF1RvEEaSER6this_tRR1T"><code class="docutils literal notranslate"><span class="pre">memo_function::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4NK13memo_functionIF1RvEE4sizeEv"><code class="docutils literal notranslate"><span class="pre">memo_function::size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4NK13memo_functionIF1RvEE3HasEv"><code class="docutils literal notranslate"><span class="pre">memo_function::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE5ClearEv"><code class="docutils literal notranslate"><span class="pre">memo_function::Clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE5EraseEv"><code class="docutils literal notranslate"><span class="pre">memo_function::Erase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEEclEv"><code class="docutils literal notranslate"><span class="pre">memo_function::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEEcvbEv"><code class="docutils literal notranslate"><span class="pre">memo_function::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEEcvNSt8functionIF1RvEEEEv"><code class="docutils literal notranslate"><span class="pre">memo_function::operator</span> <span class="pre">std::function&lt;R()&gt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE11to_functionEv"><code class="docutils literal notranslate"><span class="pre">memo_function::to_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE12cached_valueE"><code class="docutils literal notranslate"><span class="pre">memo_function::cached_value</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE9has_cacheE"><code class="docutils literal notranslate"><span class="pre">memo_function::has_cache</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/memo_function.html#_CPPv4N13memo_functionIF1RvEE3funE"><code class="docutils literal notranslate"><span class="pre">memo_function::fun</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../evolve/api/World_structure.html" class="btn btn-neutral float-left" title="World_structure.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/AnyFunction.html" class="btn btn-neutral float-right" title="AnyFunction.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

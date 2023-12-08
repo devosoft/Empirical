@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Card.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/prefab/api/Card.56eb382b-4715-4ff6-8c66-f8cfb890b2c0.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="CodeBlock.hpp" href="CodeBlock.html" />
+    <link rel="prev" title="Prefab" href="../prefab.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../prefab.html">Prefab</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../prefab.html#api">API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Card.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv44Card"><code class="docutils literal notranslate"><span class="pre">Card</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="CodeBlock.html">CodeBlock.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Collapse.html">Collapse.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CommentBox.html">CommentBox.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ConfigPanel.html">ConfigPanel.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FontAwesomeIcon.html">FontAwesomeIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LoadingIcon.html">LoadingIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LoadingModal.html">LoadingModal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Modal.html">Modal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ReadoutPanel.html">ReadoutPanel.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ToggleSwitch.html">ToggleSwitch.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ValueBox.html">ValueBox.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../prefab.html">Prefab</a></li>
+      <li class="breadcrumb-item active">Card.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="card-hpp">
+<h1>Card.hpp<a class="headerlink" href="#card-hpp" title="Link to this heading"></a></h1>
+<p>Wraps a Bootstrap card. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv44Card">
+<span id="_CPPv34Card"></span><span id="_CPPv24Card"></span><span id="Card"></span><span class="target" id="classCard"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Card</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><a class="headerlink" href="#_CPPv44Card" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Card.hpp&gt;</em></div>
+<p>Use Card class to create Bootstrap style cards. </p>
+<p>Subclassed by ReadoutPanel</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Card4CardERKNSt6stringERKbRKNSt6stringE">
+<span id="_CPPv3N4Card4CardERKNSt6stringERKbRKNSt6stringE"></span><span id="_CPPv2N4Card4CardERKNSt6stringERKbRKNSt6stringE"></span><span id="Card::Card__ssCR.bCR.ssCR"></span><span class="target" id="classCard_1ae78c161e1eb26106d4e591e084143018"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Card</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">state</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;STATIC&quot;</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">show_glyphs</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Card4CardERKNSt6stringERKbRKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> – indicate whether card should be STATIC, INIT_OPEN, or INIT_CLOSED (default STATIC) </p></li>
+<li><p><strong>show_glyphs</strong> – should toggle icons show in collapsible card header? (default true) </p></li>
+<li><p><strong>id</strong> – user defined ID for card Div, (default emscripten generated) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4Card16AddHeaderContentEv1TKb">
+<span id="_CPPv3I0EN4Card16AddHeaderContentE1TKb"></span><span id="_CPPv2I0EN4Card16AddHeaderContentE1TKb"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCard_1a9d156bc7f3c8a2c7d23204a29d150ad0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddHeaderContent</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN4Card16AddHeaderContentEv1TKb" title="Card::AddHeaderContent::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">link_content</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4Card16AddHeaderContentEv1TKb" title="Link to this definition"></a><br /></dt>
+<dd><p>Add content to header section of card.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>val</strong> – content to be added to header, can be a web element or primitive type </p></li>
+<li><p><strong>link_content</strong> – indicates whether the content should have Bootstrap link properties (default false) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4Card14AddBodyContentEv1T">
+<span id="_CPPv3I0EN4Card14AddBodyContentE1T"></span><span id="_CPPv2I0EN4Card14AddBodyContentE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCard_1a7915aae72edc49451bbf63e9051b1e4b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddBodyContent</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN4Card14AddBodyContentEv1T" title="Card::AddBodyContent::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4Card14AddBodyContentEv1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Add content to body section of card.</p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Deprecated:</span></em></dt>
+<dd><p>Use stream operator instead </p>
+</dd></dl>
+
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – can be a web element or primitive type </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4CardlsER4CardRR7IN_TYPE">
+<span id="_CPPv3I0EN4CardlsERR7IN_TYPE"></span><span id="_CPPv2I0EN4CardlsERR7IN_TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IN_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classCard_1a79fdb08b61c57cc38d33e02c5c7ecade"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44Card" title="Card"><span class="n"><span class="pre">Card</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;&lt;</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN4CardlsER4CardRR7IN_TYPE" title="Card::operator&lt;&lt;::IN_TYPE"><span class="n"><span class="pre">IN_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4CardlsER4CardRR7IN_TYPE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add content to the body section of the card.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>in_val</strong> – can be a web element or primitive type </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Card11SetOnToggleE15on_toggle_fun_t">
+<span id="_CPPv3N4Card11SetOnToggleE15on_toggle_fun_t"></span><span id="_CPPv2N4Card11SetOnToggleE15on_toggle_fun_t"></span><span id="Card::SetOnToggle__on_toggle_fun_t"></span><span class="target" id="classCard_1ab89fb378e5819c211ddbd0dc005c61c1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetOnToggle</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4Card15on_toggle_fun_tE" title="Card::on_toggle_fun_t"><span class="n"><span class="pre">on_toggle_fun_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">on_toggle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Card11SetOnToggleE15on_toggle_fun_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets the on-toggle function for this component. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>on_toggle</strong> – the function to be called whenever the card’s state is toggled open or closed </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Card11GetOnToggleEv">
+<span id="_CPPv3N4Card11GetOnToggleEv"></span><span id="_CPPv2N4Card11GetOnToggleEv"></span><span id="Card::GetOnToggle"></span><span class="target" id="classCard_1ac9e6c3a579f952c06f069424ae54a5e2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4Card15on_toggle_fun_tE" title="Card::on_toggle_fun_t"><span class="n"><span class="pre">on_toggle_fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetOnToggle</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Card11GetOnToggleEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the on-toggle function for this component. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the function to be called whenever the card’s state is toggled open or closed </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Card12AddBootstrapEv">
+<span id="_CPPv3N4Card12AddBootstrapEv"></span><span id="_CPPv2N4Card12AddBootstrapEv"></span><span id="Card::AddBootstrap"></span><span class="target" id="classCard_1a8190496633a5f7538183effab15a23c8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddBootstrap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Card12AddBootstrapEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Card4CardERKNSt6stringERKbPN8internal8CardInfoE">
+<span id="_CPPv3N4Card4CardERKNSt6stringERKbPN8internal8CardInfoE"></span><span id="_CPPv2N4Card4CardERKNSt6stringERKbPN8internal8CardInfoE"></span><span id="Card::Card__ssCR.bCR.internal::CardInfoP"></span><span class="target" id="classCard_1a74d98007594f532348ac2c4f5c8a5a29"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Card</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">state</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">show_glyphs</span></span>, <span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">CardInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in_info</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Card4CardERKNSt6stringERKbPN8internal8CardInfoE" title="Link to this definition"></a><br /></dt>
+<dd><p>A protected constructor for a Card. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> – indicate whether card should be STATIC, INIT_OPEN, or INIT_CLOSED (default STATIC) </p></li>
+<li><p><strong>show_glyphs</strong> – should toggle icons show in collapsible card header? (default true) </p></li>
+<li><p><strong>in_info</strong> – a pointer to the underlying ReadoutPanelInfo object for this ReadoutPanel or a pointer to a derived info object (simulating inheritance) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Card9card_baseE">
+<span id="_CPPv3N4Card9card_baseE"></span><span id="_CPPv2N4Card9card_baseE"></span><span id="Card::card_base__ss"></span><span class="target" id="classCard_1a19483495c3dd0d0b06c31c670b2b3ab7"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">card_base</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">this</span></span><span class="o"><span class="pre">-&gt;</span></span><span class="n"><span class="pre">GetID</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N4Card9card_baseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Card11card_headerE">
+<span id="_CPPv3N4Card11card_headerE"></span><span id="_CPPv2N4Card11card_headerE"></span><span id="Card::card_header__Div"></span><span class="target" id="classCard_1afd5961b209c6052754823ce8417512ce"></span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">card_header</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="../../tools/api/string_utils.html#_CPPv4IDpE9to_stringNSt6stringEDpRK2Ts" title="to_string"><span class="n"><span class="pre">to_string</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N4Card9card_baseE" title="Card::card_base"><span class="n"><span class="pre">card_base</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;_card_header&quot;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N4Card11card_headerE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4Card9card_bodyE">
+<span id="_CPPv3N4Card9card_bodyE"></span><span id="_CPPv2N4Card9card_bodyE"></span><span id="Card::card_body__Div"></span><span class="target" id="classCard_1a2bb4a9d3008de9c2722ac08628d0c58b"></span><a class="reference internal" href="../../web/api/Div.html#_CPPv43Div" title="Div"><span class="n"><span class="pre">Div</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">card_body</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="../../tools/api/string_utils.html#_CPPv4IDpE9to_stringNSt6stringEDpRK2Ts" title="to_string"><span class="n"><span class="pre">to_string</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N4Card9card_baseE" title="Card::card_base"><span class="n"><span class="pre">card_base</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;_card_body&quot;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N4Card9card_bodyE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N4Card15on_toggle_fun_tE">
+<span id="_CPPv3N4Card15on_toggle_fun_tE"></span><span id="_CPPv2N4Card15on_toggle_fun_tE"></span><span class="target" id="classCard_1aeb615308c01e7dbfcb03d1ddec0777ed"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">on_toggle_fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">CardInfo</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">on_toggle_fun_t</span></span><a class="headerlink" href="#_CPPv4N4Card15on_toggle_fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4Card4InfoEv">
+<span id="_CPPv3N4Card4InfoEv"></span><span id="_CPPv2N4Card4InfoEv"></span><span id="Card::Info"></span><span class="target" id="classCard_1a64ae59c21a02514e7cae10d0138e78d6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">CardInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Info</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4Card4InfoEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get shared info pointer, cast to Card-specific type. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cast pointer </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4Card4InfoEv">
+<span id="_CPPv3NK4Card4InfoEv"></span><span id="_CPPv2NK4Card4InfoEv"></span><span id="Card::InfoC"></span><span class="target" id="classCard_1a3feeb2f67cd3f672c6beeaa8923b7848"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">CardInfo</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Info</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4Card4InfoEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get shared info pointer, cast to const Card-specific type. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cast pointer </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../prefab.html" class="btn btn-neutral float-left" title="Prefab" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="CodeBlock.html" class="btn btn-neutral float-right" title="CodeBlock.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

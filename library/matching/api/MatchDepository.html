@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MatchDepository.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/matching/api/MatchDepository.3a5ffa78-f43c-4340-8542-1bb3292af056.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="matchbin_metrics.hpp" href="matchbin_metrics.html" />
+    <link rel="prev" title="MatchBin.hpp" href="MatchBin.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../matching.html">Matching</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../matching.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="MatchBin.html">MatchBin.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">MatchDepository.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository"><code class="docutils literal notranslate"><span class="pre">MatchDepository</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="matchbin_metrics.html">matchbin_metrics.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="matchbin_regulators.html">matchbin_regulators.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="matchbin_selectors.html">matchbin_selectors.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="matchbin_utils.html">matchbin_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../matching.html">Matching</a></li>
+      <li class="breadcrumb-item active">MatchDepository.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="matchdepository-hpp">
+<h1>MatchDepository.hpp<a class="headerlink" href="#matchdepository-hpp" title="Link to this heading"></a></h1>
+<p>A container for tag-based lookup, optimized for situations where tags are not removed from the lookup set. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0000_6size_t_6size_tE15MatchDepository">
+<span id="_CPPv3I0000_6size_t_6size_tE15MatchDepository"></span><span id="_CPPv2I0000_6size_t_6size_tE15MatchDepository"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Val</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Metric</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Selector</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Regulator</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RawCacheSize</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RegulatedCacheSize</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classMatchDepository"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MatchDepository</span></span></span><a class="headerlink" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;MatchDepository.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository7query_tE">
+<span id="_CPPv3N15MatchDepository7query_tE"></span><span id="_CPPv2N15MatchDepository7query_tE"></span><span class="target" id="classMatchDepository_1a6c46be7e3487ce9e6ae311434aab25fc"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">query_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Metric"><span class="n"><span class="pre">Metric</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">query_t</span></span><a class="headerlink" href="#_CPPv4N15MatchDepository7query_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository5tag_tE">
+<span id="_CPPv3N15MatchDepository5tag_tE"></span><span id="_CPPv2N15MatchDepository5tag_tE"></span><span class="target" id="classMatchDepository_1a0afc6d725ccfaf5c03586247ce876582"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tag_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Metric"><span class="n"><span class="pre">Metric</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">tag_t</span></span><a class="headerlink" href="#_CPPv4N15MatchDepository5tag_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository5uid_tE">
+<span id="_CPPv3N15MatchDepository5uid_tE"></span><span id="_CPPv2N15MatchDepository5uid_tE"></span><span class="target" id="classMatchDepository_1a8561e9729f6bbef9e9d52e7cfb0220b4"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uid_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><a class="headerlink" href="#_CPPv4N15MatchDepository5uid_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository5res_tE">
+<span id="_CPPv3N15MatchDepository5res_tE"></span><span id="_CPPv2N15MatchDepository5res_tE"></span><span class="target" id="classMatchDepository_1aab59c2b8a6bdda67af03bc8960a9a5aa"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">res_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Selector"><span class="n"><span class="pre">Selector</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">res_t</span></span><a class="headerlink" href="#_CPPv4N15MatchDepository5res_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository5adj_tE">
+<span id="_CPPv3N15MatchDepository5adj_tE"></span><span id="_CPPv2N15MatchDepository5adj_tE"></span><span class="target" id="classMatchDepository_1a3933804241e8e61333e482c9eb7a1029"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">adj_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">adj_t</span></span><a class="headerlink" href="#_CPPv4N15MatchDepository5adj_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository5set_tE">
+<span id="_CPPv3N15MatchDepository5set_tE"></span><span id="_CPPv2N15MatchDepository5set_tE"></span><span class="target" id="classMatchDepository_1a26e3cb282344bd3829f1ae57897b9568"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set_t</span></span><a class="headerlink" href="#_CPPv4N15MatchDepository5set_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository6view_tE">
+<span id="_CPPv3N15MatchDepository6view_tE"></span><span id="_CPPv2N15MatchDepository6view_tE"></span><span class="target" id="classMatchDepository_1a17aea4792460c79d1dc1afcf5c8d7bb0"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">view_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">view_t</span></span><a class="headerlink" href="#_CPPv4N15MatchDepository6view_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK15MatchDepository6GetValEK6size_t">
+<span id="_CPPv3NK15MatchDepository6GetValEK6size_t"></span><span id="_CPPv2NK15MatchDepository6GetValEK6size_t"></span><span id="MatchDepository::GetVal__sCC"></span><span class="target" id="classMatchDepository_1af3065a568f3b4faa9e5ec3dd23cafeab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetVal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK15MatchDepository6GetValEK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Access a reference to a single stored value by uid. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository3PutERK3ValRK5tag_t">
+<span id="_CPPv3N15MatchDepository3PutERK3ValRK5tag_t"></span><span id="_CPPv2N15MatchDepository3PutERK3ValRK5tag_t"></span><span id="MatchDepository::Put__ValCR.tag_tCR"></span><span class="target" id="classMatchDepository_1a62d36314467331b201255c1c8f06f121"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5uid_tE" title="MatchDepository::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Put</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5tag_tE" title="MatchDepository::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15MatchDepository3PutERK3ValRK5tag_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Store a value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK15MatchDepository7GetSizeEv">
+<span id="_CPPv3NK15MatchDepository7GetSizeEv"></span><span id="_CPPv2NK15MatchDepository7GetSizeEv"></span><span id="MatchDepository::GetSizeC"></span><span class="target" id="classMatchDepository_1ac3f994ff74f200a757b6ac6c19de7d56"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK15MatchDepository7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get number of stored values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository5ClearEv">
+<span id="_CPPv3N15MatchDepository5ClearEv"></span><span id="_CPPv2N15MatchDepository5ClearEv"></span><span id="MatchDepository::Clear"></span><span class="target" id="classMatchDepository_1a16c980f731eca0e4b33a1149a628c2f0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15MatchDepository5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Clear stored values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository12AdjRegulatorEK5uid_tK5adj_t">
+<span id="_CPPv3N15MatchDepository12AdjRegulatorEK5uid_tK5adj_t"></span><span id="_CPPv2N15MatchDepository12AdjRegulatorEK5uid_tK5adj_t"></span><span id="MatchDepository::AdjRegulator__uid_tC.adj_tC"></span><span class="target" id="classMatchDepository_1ae87c15a6608fd667075fc44a5da9db1a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdjRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5uid_tE" title="MatchDepository::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5adj_tE" title="MatchDepository::adj_t"><span class="n"><span class="pre">adj_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">amt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15MatchDepository12AdjRegulatorEK5uid_tK5adj_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository12SetRegulatorEK5uid_tK5set_t">
+<span id="_CPPv3N15MatchDepository12SetRegulatorEK5uid_tK5set_t"></span><span id="_CPPv2N15MatchDepository12SetRegulatorEK5uid_tK5set_t"></span><span id="MatchDepository::SetRegulator__uid_tC.set_tC"></span><span class="target" id="classMatchDepository_1a081e28b236d09b0f07d822fbb829b13e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5uid_tE" title="MatchDepository::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5set_tE" title="MatchDepository::set_t"><span class="n"><span class="pre">set_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">set</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15MatchDepository12SetRegulatorEK5uid_tK5set_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository12SetRegulatorEK5uid_tRK9Regulator">
+<span id="_CPPv3N15MatchDepository12SetRegulatorEK5uid_tRK9Regulator"></span><span id="_CPPv2N15MatchDepository12SetRegulatorEK5uid_tRK9Regulator"></span><span id="MatchDepository::SetRegulator__uid_tC.RegulatorCR"></span><span class="target" id="classMatchDepository_1a6b0353c42593ca5750f46ca5139e9455"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5uid_tE" title="MatchDepository::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">set</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15MatchDepository12SetRegulatorEK5uid_tRK9Regulator" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository12GetRegulatorEK5uid_t">
+<span id="_CPPv3N15MatchDepository12GetRegulatorEK5uid_t"></span><span id="_CPPv2N15MatchDepository12GetRegulatorEK5uid_t"></span><span id="MatchDepository::GetRegulator__uid_tC"></span><span class="target" id="classMatchDepository_1ae59bf21429ea204d35b21ab4d401a8e6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5uid_tE" title="MatchDepository::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15MatchDepository12GetRegulatorEK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK15MatchDepository13ViewRegulatorEK5uid_t">
+<span id="_CPPv3NK15MatchDepository13ViewRegulatorEK5uid_t"></span><span id="_CPPv2NK15MatchDepository13ViewRegulatorEK5uid_t"></span><span id="MatchDepository::ViewRegulator__uid_tCC"></span><span class="target" id="classMatchDepository_1a5820980ae1ed4a813612027f1a0b11f5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository6view_tE" title="MatchDepository::view_t"><span class="n"><span class="pre">view_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">ViewRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5uid_tE" title="MatchDepository::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK15MatchDepository13ViewRegulatorEK5uid_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository14DecayRegulatorEK5uid_tKi">
+<span id="_CPPv3N15MatchDepository14DecayRegulatorEK5uid_tKi"></span><span id="_CPPv2N15MatchDepository14DecayRegulatorEK5uid_tKi"></span><span id="MatchDepository::DecayRegulator__uid_tC.iC"></span><span class="target" id="classMatchDepository_1a58247f9873d57e3d073f7d7a97edc143"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecayRegulator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5uid_tE" title="MatchDepository::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">uid</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15MatchDepository14DecayRegulatorEK5uid_tKi" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply decay to a regulator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository15DecayRegulatorsEKi">
+<span id="_CPPv3N15MatchDepository15DecayRegulatorsEKi"></span><span id="_CPPv2N15MatchDepository15DecayRegulatorsEKi"></span><span id="MatchDepository::DecayRegulators__iC"></span><span class="target" id="classMatchDepository_1a63a263fa092316ecea728c584cd9a49f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DecayRegulators</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">steps</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15MatchDepository15DecayRegulatorsEKi" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply decay to all regulators. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK15MatchDepository6HasValERK3Val">
+<span id="_CPPv3NK15MatchDepository6HasValERK3Val"></span><span id="_CPPv2NK15MatchDepository6HasValERK3Val"></span><span id="MatchDepository::HasVal__ValCRC"></span><span class="target" id="classMatchDepository_1aeae4ed0e3132671929728a9db7a0647f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasVal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK15MatchDepository6HasValERK3Val" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK15MatchDepository6GetUidERK3Val">
+<span id="_CPPv3NK15MatchDepository6GetUidERK3Val"></span><span id="_CPPv2NK15MatchDepository6GetUidERK3Val"></span><span id="MatchDepository::GetUid__ValCRC"></span><span class="target" id="classMatchDepository_1a77dfe91ea0978d606986001683a10f42"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5uid_tE" title="MatchDepository::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetUid</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Val"><span class="n"><span class="pre">Val</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK15MatchDepository6GetUidERK3Val" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK15MatchDepository6GetUidERK5tag_t">
+<span id="_CPPv3NK15MatchDepository6GetUidERK5tag_t"></span><span id="_CPPv2NK15MatchDepository6GetUidERK5tag_t"></span><span id="MatchDepository::GetUid__tag_tCRC"></span><span class="target" id="classMatchDepository_1ae3fb9377bd64f7f43909b0d46201f7fd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5uid_tE" title="MatchDepository::uid_t"><span class="n"><span class="pre">uid_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetUid</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5tag_tE" title="MatchDepository::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">tag</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK15MatchDepository6GetUidERK5tag_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository16DoRegulatedMatchERK7query_t">
+<span id="_CPPv3N15MatchDepository16DoRegulatedMatchERK7query_t"></span><span id="_CPPv2N15MatchDepository16DoRegulatedMatchERK7query_t"></span><span id="MatchDepository::DoRegulatedMatch__query_tCR"></span><span class="target" id="classMatchDepository_1a75dc46dc6d61ad9d5f79cbe3194cbf65"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5res_tE" title="MatchDepository::res_t"><span class="n"><span class="pre">res_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoRegulatedMatch</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository7query_tE" title="MatchDepository::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">query</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15MatchDepository16DoRegulatedMatchERK7query_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Perform matching with regulation. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository17DoRegulatedLookupERK7query_t">
+<span id="_CPPv3N15MatchDepository17DoRegulatedLookupERK7query_t"></span><span id="_CPPv2N15MatchDepository17DoRegulatedLookupERK7query_t"></span><span id="MatchDepository::DoRegulatedLookup__query_tCR"></span><span class="target" id="classMatchDepository_1a2a4dbbdb45c7885bb6c508bd07c07e55"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5res_tE" title="MatchDepository::res_t"><span class="n"><span class="pre">res_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">DoRegulatedLookup</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository7query_tE" title="MatchDepository::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">query</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15MatchDepository17DoRegulatedLookupERK7query_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Return ptr to cached regulated result on success, nullptr on failure. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository10DoRawMatchERK7query_t">
+<span id="_CPPv3N15MatchDepository10DoRawMatchERK7query_t"></span><span id="_CPPv2N15MatchDepository10DoRawMatchERK7query_t"></span><span id="MatchDepository::DoRawMatch__query_tCR"></span><span class="target" id="classMatchDepository_1a86f99786e623840f7260f6358dca44e0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5res_tE" title="MatchDepository::res_t"><span class="n"><span class="pre">res_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoRawMatch</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository7query_tE" title="MatchDepository::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">query</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15MatchDepository10DoRawMatchERK7query_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Perform matching without regulation. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository11DoRawLookupERK7query_t">
+<span id="_CPPv3N15MatchDepository11DoRawLookupERK7query_t"></span><span id="_CPPv2N15MatchDepository11DoRawLookupERK7query_t"></span><span id="MatchDepository::DoRawLookup__query_tCR"></span><span class="target" id="classMatchDepository_1a6ac0a635136e208e5fa873eec8b9c0d7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5res_tE" title="MatchDepository::res_t"><span class="n"><span class="pre">res_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">DoRawLookup</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository7query_tE" title="MatchDepository::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">query</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15MatchDepository11DoRawLookupERK7query_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Return ptr to cached raw result on success, nullptr on failure. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository10ClearCacheEv">
+<span id="_CPPv3N15MatchDepository10ClearCacheEv"></span><span id="_CPPv2N15MatchDepository10ClearCacheEv"></span><span id="MatchDepository::ClearCache"></span><span class="target" id="classMatchDepository_1ae6843f296bd0c5e20f9d389deb7d5edd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClearCache</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15MatchDepository10ClearCacheEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Clear cached raw, regulated results. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository4dataE">
+<span id="_CPPv3N15MatchDepository4dataE"></span><span id="_CPPv2N15MatchDepository4dataE"></span><span id="MatchDepository::data__vector:internal::DepositoryEntry:Val.tag_t.Regulator::"></span><span class="target" id="classMatchDepository_1a3a1f4627ad06d16bc515373c0fc82d7b"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">DepositoryEntry</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Val"><span class="n"><span class="pre">Val</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5tag_tE" title="MatchDepository::tag_t"><span class="n"><span class="pre">tag_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::Regulator"><span class="n"><span class="pre">Regulator</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><a class="headerlink" href="#_CPPv4N15MatchDepository4dataE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository9cache_rawE">
+<span id="_CPPv3N15MatchDepository9cache_rawE"></span><span id="_CPPv2N15MatchDepository9cache_rawE"></span><span id="MatchDepository::cache_raw__SmallFifoMap:query_t.res_t.RawCacheSize:"></span><span class="target" id="classMatchDepository_1a35f2079cfc39c7f63d127610a979d5c8"></span><a class="reference internal" href="../../datastructs/api/SmallFifoMap.html#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap"><span class="n"><span class="pre">SmallFifoMap</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N15MatchDepository7query_tE" title="MatchDepository::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5res_tE" title="MatchDepository::res_t"><span class="n"><span class="pre">res_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::RawCacheSize"><span class="n"><span class="pre">RawCacheSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cache_raw</span></span></span><a class="headerlink" href="#_CPPv4N15MatchDepository9cache_rawE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15MatchDepository15cache_regulatedE">
+<span id="_CPPv3N15MatchDepository15cache_regulatedE"></span><span id="_CPPv2N15MatchDepository15cache_regulatedE"></span><span id="MatchDepository::cache_regulated__SmallFifoMap:query_t.res_t.RegulatedCacheSize:"></span><span class="target" id="classMatchDepository_1a5f4c25eb4126eaf912a849f025783967"></span><a class="reference internal" href="../../datastructs/api/SmallFifoMap.html#_CPPv4I00_6size_tE12SmallFifoMap" title="SmallFifoMap"><span class="n"><span class="pre">SmallFifoMap</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N15MatchDepository7query_tE" title="MatchDepository::query_t"><span class="n"><span class="pre">query_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N15MatchDepository5res_tE" title="MatchDepository::res_t"><span class="n"><span class="pre">res_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000_6size_t_6size_tE15MatchDepository" title="MatchDepository::RegulatedCacheSize"><span class="n"><span class="pre">RegulatedCacheSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cache_regulated</span></span></span><a class="headerlink" href="#_CPPv4N15MatchDepository15cache_regulatedE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="MatchBin.html" class="btn btn-neutral float-left" title="MatchBin.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="matchbin_metrics.html" class="btn btn-neutral float-right" title="matchbin_metrics.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

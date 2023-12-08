@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Othello8.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/games/api/Othello8.e30fd75d-675c-4383-82fa-753b6c03760c.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="PayoffMatrix.hpp" href="PayoffMatrix.html" />
+    <link rel="prev" title="Othello.hpp" href="Othello.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../games.html">Games</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../games.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Mancala.html">Mancala.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Othello.html">Othello.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Othello8.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv48Othello8"><code class="docutils literal notranslate"><span class="pre">Othello8</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="PayoffMatrix.html">PayoffMatrix.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../games.html">Games</a></li>
+      <li class="breadcrumb-item active">Othello8.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="othello8-hpp">
+<h1>Othello8.hpp<a class="headerlink" href="#othello8-hpp" title="Link to this heading"></a></h1>
+<p>A simple Othello game state handler limited to an 8x8 board. </p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Add Hash for boards to be able to cachce moves. </p>
+<p>Setup OPTIONAL caching of expensive board measures. </p>
+</dd></dl>
+
+</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv48Othello8">
+<span id="_CPPv38Othello8"></span><span id="_CPPv28Othello8"></span><span id="Othello8"></span><span class="target" id="classOthello8"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Othello8</span></span></span><a class="headerlink" href="#_CPPv48Othello8" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Othello8.hpp&gt;</em></div>
+<p>Class for size-8 othello games. </p>
+<p>NOTE: This game could be made more black-box.<ul class="simple">
+<li><p>Hide almost everything. Only give users access to game-advancing functions (don’t allow willy-nilly board manipulation, etc). This would let us make lots of assumptions about calculating flip lists, scores, etc, which would speed up asking for flip lists, etc. multiple times during a turn. </p></li>
+</ul>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86PlayerE">
+<span id="_CPPv3N8Othello86PlayerE"></span><span id="_CPPv2N8Othello86PlayerE"></span><span class="target" id="classOthello8_1a175ca62f2f08e011bf123291df7b2b1d"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Player</span></span></span><a class="headerlink" href="#_CPPv4N8Othello86PlayerE" title="Link to this definition"></a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86Player4DARKE">
+<span id="_CPPv3N8Othello86Player4DARKE"></span><span id="_CPPv2N8Othello86Player4DARKE"></span><span class="target" id="classOthello8_1a175ca62f2f08e011bf123291df7b2b1da60063c6856b5101e4cea7dcd5792f9fb"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DARK</span></span></span><a class="headerlink" href="#_CPPv4N8Othello86Player4DARKE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86Player5LIGHTE">
+<span id="_CPPv3N8Othello86Player5LIGHTE"></span><span id="_CPPv2N8Othello86Player5LIGHTE"></span><span class="target" id="classOthello8_1a175ca62f2f08e011bf123291df7b2b1da0fd1479d8fadc280b60c4de94664cc4f"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LIGHT</span></span></span><a class="headerlink" href="#_CPPv4N8Othello86Player5LIGHTE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86Player4NONEE">
+<span id="_CPPv3N8Othello86Player4NONEE"></span><span id="_CPPv2N8Othello86Player4NONEE"></span><span class="target" id="classOthello8_1a175ca62f2f08e011bf123291df7b2b1da132f43bc7bd5875f166f951a3adddfb5"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NONE</span></span></span><a class="headerlink" href="#_CPPv4N8Othello86Player4NONEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86FacingE">
+<span id="_CPPv3N8Othello86FacingE"></span><span id="_CPPv2N8Othello86FacingE"></span><span class="target" id="classOthello8_1a0da1eb7f407a48c1866ca6e508f8737f"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Facing</span></span></span><a class="headerlink" href="#_CPPv4N8Othello86FacingE" title="Link to this definition"></a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86Facing1NE">
+<span id="_CPPv3N8Othello86Facing1NE"></span><span id="_CPPv2N8Othello86Facing1NE"></span><span class="target" id="classOthello8_1a0da1eb7f407a48c1866ca6e508f8737fa94b43e76258d2b7e2b807dab82bde09c"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">N</span></span></span><a class="headerlink" href="#_CPPv4N8Othello86Facing1NE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86Facing2NEE">
+<span id="_CPPv3N8Othello86Facing2NEE"></span><span id="_CPPv2N8Othello86Facing2NEE"></span><span class="target" id="classOthello8_1a0da1eb7f407a48c1866ca6e508f8737fad43fe6877a719ed4c8ca831d67cb0271"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NE</span></span></span><a class="headerlink" href="#_CPPv4N8Othello86Facing2NEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86Facing1EE">
+<span id="_CPPv3N8Othello86Facing1EE"></span><span id="_CPPv2N8Othello86Facing1EE"></span><span class="target" id="classOthello8_1a0da1eb7f407a48c1866ca6e508f8737fa4ee16dcf5b38f9e664326ec025a62a2a"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><a class="headerlink" href="#_CPPv4N8Othello86Facing1EE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86Facing2SEE">
+<span id="_CPPv3N8Othello86Facing2SEE"></span><span id="_CPPv2N8Othello86Facing2SEE"></span><span class="target" id="classOthello8_1a0da1eb7f407a48c1866ca6e508f8737faf9a184a148b1a11ea24fa62364bea45f"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SE</span></span></span><a class="headerlink" href="#_CPPv4N8Othello86Facing2SEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86Facing1SE">
+<span id="_CPPv3N8Othello86Facing1SE"></span><span id="_CPPv2N8Othello86Facing1SE"></span><span class="target" id="classOthello8_1a0da1eb7f407a48c1866ca6e508f8737fa2cedca5b139506bb9443a8e12a60e241"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">S</span></span></span><a class="headerlink" href="#_CPPv4N8Othello86Facing1SE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86Facing2SWE">
+<span id="_CPPv3N8Othello86Facing2SWE"></span><span id="_CPPv2N8Othello86Facing2SWE"></span><span class="target" id="classOthello8_1a0da1eb7f407a48c1866ca6e508f8737fa81423574193b00abcd651ac170aee5f3"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SW</span></span></span><a class="headerlink" href="#_CPPv4N8Othello86Facing2SWE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86Facing1WE">
+<span id="_CPPv3N8Othello86Facing1WE"></span><span id="_CPPv2N8Othello86Facing1WE"></span><span class="target" id="classOthello8_1a0da1eb7f407a48c1866ca6e508f8737fa6c865a31826eb1e903575568009513da"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">W</span></span></span><a class="headerlink" href="#_CPPv4N8Othello86Facing1WE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86Facing2NWE">
+<span id="_CPPv3N8Othello86Facing2NWE"></span><span id="_CPPv2N8Othello86Facing2NWE"></span><span class="target" id="classOthello8_1a0da1eb7f407a48c1866ca6e508f8737fa9ddf7d1a1a8619c478dd638610ba3b68"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NW</span></span></span><a class="headerlink" href="#_CPPv4N8Othello86Facing2NWE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86this_tE">
+<span id="_CPPv3N8Othello86this_tE"></span><span id="_CPPv2N8Othello86this_tE"></span><span class="target" id="classOthello8_1ab4d1a09c4c7062d94567436ba4a46fb7"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48Othello8" title="Othello8"><span class="n"><span class="pre">Othello8</span></span></a><a class="headerlink" href="#_CPPv4N8Othello86this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello88Othello8Ev">
+<span id="_CPPv3N8Othello88Othello8Ev"></span><span id="_CPPv2N8Othello88Othello8Ev"></span><span id="Othello8::Othello8"></span><span class="target" id="classOthello8_1aaacf72f3f6f2687fb15f2884b048cb2c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Othello8</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello88Othello8Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello8D0Ev">
+<span id="_CPPv3N8Othello8D0Ev"></span><span id="_CPPv2N8Othello8D0Ev"></span><span id="Othello8::~Othello8"></span><span class="target" id="classOthello8_1a346360fa448de85381b3a76c46f3da16"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Othello8</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello8D0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85ResetEv">
+<span id="_CPPv3N8Othello85ResetEv"></span><span id="_CPPv2N8Othello85ResetEv"></span><span id="Othello8::Reset"></span><span class="target" id="classOthello8_1aa9fcb3b27e4af51183937d1f90075aa0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Reset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello85ResetEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset the board to the starting condition. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Othello811GetNumCellsEv">
+<span id="_CPPv3NK8Othello811GetNumCellsEv"></span><span id="_CPPv2NK8Othello811GetNumCellsEv"></span><span id="Othello8::GetNumCellsC"></span><span class="target" id="classOthello8_1a4ea0f3da1da6370e2dba2066de5be0ee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumCells</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Othello811GetNumCellsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Othello812GetCurPlayerEv">
+<span id="_CPPv3NK8Othello812GetCurPlayerEv"></span><span id="_CPPv2NK8Othello812GetCurPlayerEv"></span><span id="Othello8::GetCurPlayerC"></span><span class="target" id="classOthello8_1a278dbc8b47a0a44229c3c51538ba0edf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetCurPlayer</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Othello812GetCurPlayerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Othello87GetHashEv">
+<span id="_CPPv3NK8Othello87GetHashEv"></span><span id="_CPPv2NK8Othello87GetHashEv"></span><span id="Othello8::GetHashC"></span><span class="target" id="classOthello8_1a78a948882dfcfed569e3b80009b21c26"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetHash</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Othello87GetHashEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Othello811GetOpponentE6Player">
+<span id="_CPPv3NK8Othello811GetOpponentE6Player"></span><span id="_CPPv2NK8Othello811GetOpponentE6Player"></span><span id="Othello8::GetOpponent__PlayerC"></span><span class="target" id="classOthello8_1abe566044c470e9fe76d282875a28676e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetOpponent</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Othello811GetOpponentE6Player" title="Link to this definition"></a><br /></dt>
+<dd><p>Get opponent ID of give player ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Othello813IsValidPlayerE6Player">
+<span id="_CPPv3NK8Othello813IsValidPlayerE6Player"></span><span id="_CPPv2NK8Othello813IsValidPlayerE6Player"></span><span id="Othello8::IsValidPlayer__PlayerC"></span><span class="target" id="classOthello8_1a1e2432a9201017748fb6b0c00edbe19f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsValidPlayer</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Othello813IsValidPlayerE6Player" title="Link to this definition"></a><br /></dt>
+<dd><p>Is the given player ID a valid player? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello811GetNeighborE5Index6Facing">
+<span id="_CPPv3N8Othello811GetNeighborE5Index6Facing"></span><span id="_CPPv2N8Othello811GetNeighborE5Index6Facing"></span><span id="Othello8::GetNeighbor__Index.Facing"></span><span class="target" id="classOthello8_1a2696c1c76216df1603d558602cdd2a06"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNeighbor</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <a class="reference internal" href="#_CPPv4N8Othello86FacingE" title="Othello8::Facing"><span class="n"><span class="pre">Facing</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dir</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello811GetNeighborE5Index6Facing" title="Link to this definition"></a><br /></dt>
+<dd><p>Get location adjacent to ID in direction dir. GetNeighbor function is save with garbage ID values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Othello811GetPosOwnerE5Index">
+<span id="_CPPv3NK8Othello811GetPosOwnerE5Index"></span><span id="_CPPv2NK8Othello811GetPosOwnerE5Index"></span><span id="Othello8::GetPosOwner__IndexC"></span><span class="target" id="classOthello8_1a91068ef31a76206602ac7cf8ae8dd14f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetPosOwner</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Othello811GetPosOwnerE5Index" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the value (light, dark, or open) at a position on the board. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello88GetBoardEv">
+<span id="_CPPv3N8Othello88GetBoardEv"></span><span id="_CPPv2N8Othello88GetBoardEv"></span><span id="Othello8::GetBoard"></span><span class="target" id="classOthello8_1a8a66b099f217c7b3149dd7f8fe23113d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello85BoardE" title="Othello8::Board"><span class="n"><span class="pre">Board</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetBoard</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello88GetBoardEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Othello88GetBoardEv">
+<span id="_CPPv3NK8Othello88GetBoardEv"></span><span id="_CPPv2NK8Othello88GetBoardEv"></span><span id="Othello8::GetBoardC"></span><span class="target" id="classOthello8_1a22339d8a546ed5805a34a2731c94572f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello85BoardE" title="Othello8::Board"><span class="n"><span class="pre">Board</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetBoard</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Othello88GetBoardEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello811IsValidMoveE6Player5Index">
+<span id="_CPPv3N8Othello811IsValidMoveE6Player5Index"></span><span id="_CPPv2N8Othello811IsValidMoveE6Player5Index"></span><span id="Othello8::IsValidMove__Player.Index"></span><span class="target" id="classOthello8_1af97785ef60acba3ea456e0fab13d0c5d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsValidMove</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span>, <a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello811IsValidMoveE6Player5Index" title="Link to this definition"></a><br /></dt>
+<dd><p>Is given move valid? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Othello86IsOverEv">
+<span id="_CPPv3NK8Othello86IsOverEv"></span><span id="_CPPv2NK8Othello86IsOverEv"></span><span id="Othello8::IsOverC"></span><span class="target" id="classOthello8_1ae2c2034c2df65a7b9d66531e25b21f4d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsOver</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Othello86IsOverEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello810SetupCacheEv">
+<span id="_CPPv3N8Othello810SetupCacheEv"></span><span id="_CPPv2N8Othello810SetupCacheEv"></span><span id="Othello8::SetupCache"></span><span class="target" id="classOthello8_1afad9647dbef31b8ef1a2ccf1175d7581"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetupCache</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello810SetupCacheEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello811GetFlipListE6Player5Index">
+<span id="_CPPv3N8Othello811GetFlipListE6Player5Index"></span><span id="_CPPv2N8Othello811GetFlipListE6Player5Index"></span><span id="Othello8::GetFlipList__Player.Index"></span><span class="target" id="classOthello8_1afc07c9a77bc66281303f0d547e08219b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetFlipList</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span>, <a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello811GetFlipListE6Player5Index" title="Link to this definition"></a><br /></dt>
+<dd><p>Get positions that would flip if a player (player) made a particular move (pos). Note: May be called before or after piece is placed. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello812GetFlipCountE6Player5Index">
+<span id="_CPPv3N8Othello812GetFlipCountE6Player5Index"></span><span id="_CPPv2N8Othello812GetFlipCountE6Player5Index"></span><span id="Othello8::GetFlipCount__Player.Index"></span><span class="target" id="classOthello8_1a4ba3b0257a411370d424c3ba8b5b62a9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetFlipCount</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span>, <a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello812GetFlipCountE6Player5Index" title="Link to this definition"></a><br /></dt>
+<dd><p>Count the number of positions that would flip if we placed a piece at a specific location. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello813HasValidFlipsE6Player5Index">
+<span id="_CPPv3N8Othello813HasValidFlipsE6Player5Index"></span><span id="_CPPv2N8Othello813HasValidFlipsE6Player5Index"></span><span id="Othello8::HasValidFlips__Player.Index"></span><span class="target" id="classOthello8_1a7e213c76177a47aba39e3b81134a4a48"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasValidFlips</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span>, <a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello813HasValidFlipsE6Player5Index" title="Link to this definition"></a><br /></dt>
+<dd><p>Are there any valid flips from this position? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello814GetMoveOptionsE6Player">
+<span id="_CPPv3N8Othello814GetMoveOptionsE6Player"></span><span id="_CPPv2N8Othello814GetMoveOptionsE6Player"></span><span id="Othello8::GetMoveOptions__Player"></span><span class="target" id="classOthello8_1ab37fa181221041756cbb1549439a5416"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetMoveOptions</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello814GetMoveOptionsE6Player" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a list of valid move options for given player. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello814GetMoveOptionsEv">
+<span id="_CPPv3N8Othello814GetMoveOptionsEv"></span><span id="_CPPv2N8Othello814GetMoveOptionsEv"></span><span id="Othello8::GetMoveOptions"></span><span class="target" id="classOthello8_1a91a955c000666fecad7140c812b285fd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetMoveOptions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello814GetMoveOptionsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>GetMoveOptions() without a specified player used current player. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello814HasMoveOptionsE6Player">
+<span id="_CPPv3N8Othello814HasMoveOptionsE6Player"></span><span id="_CPPv2N8Othello814HasMoveOptionsE6Player"></span><span id="Othello8::HasMoveOptions__Player"></span><span class="target" id="classOthello8_1a0709659926ebfb782d4f2e04f2288257"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasMoveOptions</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello814HasMoveOptionsE6Player" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if there are any move options for given player. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello88GetScoreE6Player">
+<span id="_CPPv3N8Othello88GetScoreE6Player"></span><span id="_CPPv2N8Othello88GetScoreE6Player"></span><span id="Othello8::GetScore__Player"></span><span class="target" id="classOthello8_1ad28e9bf5e4c430b1940d578ecc23993b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetScore</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello88GetScoreE6Player" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the current score for a given player. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello816CountFrontierPosE6Player">
+<span id="_CPPv3N8Othello816CountFrontierPosE6Player"></span><span id="_CPPv2N8Othello816CountFrontierPosE6Player"></span><span id="Othello8::CountFrontierPos__Player"></span><span class="target" id="classOthello8_1a30b5f96f0eac3aa6deadab81c9a50cdf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CountFrontierPos</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello816CountFrontierPosE6Player" title="Link to this definition"></a><br /></dt>
+<dd><p>Count the number of empty squares adjacent to a player’s pieces (frontier size) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello812IsAdjacentToE5Index6Player">
+<span id="_CPPv3N8Othello812IsAdjacentToE5Index6Player"></span><span id="_CPPv2N8Othello812IsAdjacentToE5Index6Player"></span><span id="Othello8::IsAdjacentTo__Index.Player"></span><span class="target" id="classOthello8_1a830b4e83414789961d0a940d025df904"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsAdjacentTo</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span>, <a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">owner</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello812IsAdjacentToE5Index6Player" title="Link to this definition"></a><br /></dt>
+<dd><p>Is position given by ID adjacent to the given owner? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86SetPosE5Index6Player">
+<span id="_CPPv3N8Othello86SetPosE5Index6Player"></span><span id="_CPPv2N8Othello86SetPosE5Index6Player"></span><span id="Othello8::SetPos__Index.Player"></span><span class="target" id="classOthello8_1afe88c4b2fb8be01914b5dcc204b0bb99"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetPos</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span>, <a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello86SetPosE5Index6Player" title="Link to this definition"></a><br /></dt>
+<dd><p>Set board position (ID) to given space value. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello88ClearPosE5Index">
+<span id="_CPPv3N8Othello88ClearPosE5Index"></span><span id="_CPPv2N8Othello88ClearPosE5Index"></span><span id="Othello8::ClearPos__Index"></span><span class="target" id="classOthello8_1a55b779818c81510fef7eccd1eaf242e5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClearPos</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello88ClearPosE5Index" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello812SetPositionsE6vectorI5IndexE6Player">
+<span id="_CPPv3N8Othello812SetPositionsE6vectorI5IndexE6Player"></span><span id="_CPPv2N8Othello812SetPositionsE6vectorI5IndexE6Player"></span><span id="Othello8::SetPositions__vector:Index:.Player"></span><span class="target" id="classOthello8_1a2a999de64542d9c36bbffc25d96303e8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetPositions</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ids</span></span>, <a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello812SetPositionsE6vectorI5IndexE6Player" title="Link to this definition"></a><br /></dt>
+<dd><p>Set positions given by ids to be owned by the given player. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello88SetBoardERK5Board">
+<span id="_CPPv3N8Othello88SetBoardERK5Board"></span><span id="_CPPv2N8Othello88SetBoardERK5Board"></span><span id="Othello8::SetBoard__BoardCR"></span><span class="target" id="classOthello8_1aa411438b87d3af7e5d80e53d038cf134"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetBoard</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello85BoardE" title="Othello8::Board"><span class="n"><span class="pre">Board</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other_board</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello88SetBoardERK5Board" title="Link to this definition"></a><br /></dt>
+<dd><p>Configure board as given by copy_board input. copy_board size must match game_board’s size. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello88SetBoardERK6this_t">
+<span id="_CPPv3N8Othello88SetBoardERK6this_t"></span><span id="_CPPv2N8Othello88SetBoardERK6this_t"></span><span id="Othello8::SetBoard__this_tCR"></span><span class="target" id="classOthello8_1ab5fcaaca856f2eac2a549a2f53f97375"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetBoard</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello86this_tE" title="Othello8::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other_othello</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello88SetBoardERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set current board to be the same as board from other othello game. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello812SetCurPlayerE6Player">
+<span id="_CPPv3N8Othello812SetCurPlayerE6Player"></span><span id="_CPPv2N8Othello812SetCurPlayerE6Player"></span><span id="Othello8::SetCurPlayer__Player"></span><span class="target" id="classOthello8_1afb7c7b9bbe8ee7f3ff6756192d4e8880"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetCurPlayer</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello812SetCurPlayerE6Player" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the current player. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello810DoNextMoveE5Index">
+<span id="_CPPv3N8Othello810DoNextMoveE5Index"></span><span id="_CPPv2N8Othello810DoNextMoveE5Index"></span><span id="Othello8::DoNextMove__Index"></span><span class="target" id="classOthello8_1afb46470185be46cb9e10bea17edfdee4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoNextMove</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello810DoNextMoveE5Index" title="Link to this definition"></a><br /></dt>
+<dd><p>Do current player’s move (moveID). Return bool indicating whether current player goes again. (false=new cur player or game over) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello86DoMoveE6Player5Index">
+<span id="_CPPv3N8Othello86DoMoveE6Player5Index"></span><span id="_CPPv2N8Othello86DoMoveE6Player5Index"></span><span id="Othello8::DoMove__Player.Index"></span><span class="target" id="classOthello8_1aecb7126662b378d9556418ee90c8285b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoMove</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span>, <a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello86DoMoveE6Player5Index" title="Link to this definition"></a><br /></dt>
+<dd><p>Do move (at pos) for specified player. Return bool whether player can go again. After making move, update current player. NOTE: Does not verify validity. Will switch cur_player from player to Opp(player) if opponent has a move to make. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello87DoFlipsE6Player5Index">
+<span id="_CPPv3N8Othello87DoFlipsE6Player5Index"></span><span id="_CPPv2N8Othello87DoFlipsE6Player5Index"></span><span id="Othello8::DoFlips__Player.Index"></span><span class="target" id="classOthello8_1a0f8400731a090a78fcdcea64277d47a6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoFlips</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span>, <a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello87DoFlipsE6Player5Index" title="Link to this definition"></a><br /></dt>
+<dd><p>NOTE: does not check for move validity. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85PrintERNSt7ostreamENSt6stringENSt6stringENSt6stringE">
+<span id="_CPPv3N8Othello85PrintERNSt7ostreamENSt6stringENSt6stringENSt6stringE"></span><span id="_CPPv2N8Othello85PrintERNSt7ostreamENSt6stringENSt6stringENSt6stringE"></span><span id="Othello8::Print__osR.ss.ss.ss"></span><span class="target" id="classOthello8_1a2df8849119aa62905db96cf3635ad2d1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dark_token</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;D&quot;</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">light_token</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;L&quot;</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">open_space</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;O&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello85PrintERNSt7ostreamENSt6stringENSt6stringENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Print board state to given ostream. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello88GetIndexE6size_t6size_t">
+<span id="_CPPv3N8Othello88GetIndexE6size_t6size_t"></span><span id="_CPPv2N8Othello88GetIndexE6size_t6size_t"></span><span id="Othello8::GetIndex__s.sCE"></span><span class="target" id="classOthello8_1a089c24538a10461167d8ffa5305ebe1e"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetIndex</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello88GetIndexE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello813GetBoardWidthEv">
+<span id="_CPPv3N8Othello813GetBoardWidthEv"></span><span id="_CPPv2N8Othello813GetBoardWidthEv"></span><span id="Othello8::GetBoardWidthCE"></span><span class="target" id="classOthello8_1a049446653576d792ee960a11bef8878a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBoardWidth</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello813GetBoardWidthEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello814NUM_DIRECTIONSE">
+<span id="_CPPv3N8Othello814NUM_DIRECTIONSE"></span><span id="_CPPv2N8Othello814NUM_DIRECTIONSE"></span><span id="Othello8::NUM_DIRECTIONS__s"></span><span class="target" id="classOthello8_1ac2fb05872f47135f221d565adb754813"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NUM_DIRECTIONS</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">8</span></span><a class="headerlink" href="#_CPPv4N8Othello814NUM_DIRECTIONSE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of neighbors each board space has. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello810BOARD_SIZEE">
+<span id="_CPPv3N8Othello810BOARD_SIZEE"></span><span id="_CPPv2N8Othello810BOARD_SIZEE"></span><span id="Othello8::BOARD_SIZE__s"></span><span class="target" id="classOthello8_1a39fabf959fe941c93a6b7e4c2387ea5c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BOARD_SIZE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">8</span></span><a class="headerlink" href="#_CPPv4N8Othello810BOARD_SIZEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Size of a side of the board. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello89NUM_CELLSE">
+<span id="_CPPv3N8Othello89NUM_CELLSE"></span><span id="_CPPv2N8Othello89NUM_CELLSE"></span><span id="Othello8::NUM_CELLS__s"></span><span class="target" id="classOthello8_1aa30f86959be03b66688c39f4a2b7a908"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NUM_CELLS</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">64</span></span><a class="headerlink" href="#_CPPv4N8Othello89NUM_CELLSE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of cells on total board. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-types">Protected Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello811flip_list_tE">
+<span id="_CPPv3N8Othello811flip_list_tE"></span><span id="_CPPv2N8Othello811flip_list_tE"></span><span class="target" id="classOthello8_1a7fc426c72bc1ed1fe1c7bde50eb8317d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">flip_list_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N8Othello811flip_list_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello84overE">
+<span id="_CPPv3N8Othello84overE"></span><span id="_CPPv2N8Othello84overE"></span><span id="Othello8::over__b"></span><span class="target" id="classOthello8_1af45c11e27ea37706fd90789efb44e3e1"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">over</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N8Othello84overE" title="Link to this definition"></a><br /></dt>
+<dd><p>Is the game over? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello810cur_playerE">
+<span id="_CPPv3N8Othello810cur_playerE"></span><span id="_CPPv2N8Othello810cur_playerE"></span><span id="Othello8::cur_player__Player"></span><span class="target" id="classOthello8_1a963a5ec44e25f51ea50f13f83fc8eafb"></span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cur_player</span></span></span><a class="headerlink" href="#_CPPv4N8Othello810cur_playerE" title="Link to this definition"></a><br /></dt>
+<dd><p>Who is the current player set to move next? </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello810game_boardE">
+<span id="_CPPv3N8Othello810game_boardE"></span><span id="_CPPv2N8Othello810game_boardE"></span><span id="Othello8::game_board__Board"></span><span class="target" id="classOthello8_1a6caaf68600a2846f85d01fefd0a1273d"></span><a class="reference internal" href="#_CPPv4N8Othello85BoardE" title="Othello8::Board"><span class="n"><span class="pre">Board</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">game_board</span></span></span><a class="headerlink" href="#_CPPv4N8Othello810game_boardE" title="Link to this definition"></a><br /></dt>
+<dd><p>Game board. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello811light_flipsE">
+<span id="_CPPv3N8Othello811light_flipsE"></span><span id="_CPPv2N8Othello811light_flipsE"></span><span id="Othello8::light_flips__std::array:flip_list_t.NUM_CELLS:"></span><span class="target" id="classOthello8_1a7daece4fbf16b6e20526e170d01b1d30"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8Othello811flip_list_tE" title="Othello8::flip_list_t"><span class="n"><span class="pre">flip_list_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello89NUM_CELLSE" title="Othello8::NUM_CELLS"><span class="n"><span class="pre">NUM_CELLS</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">light_flips</span></span></span><a class="headerlink" href="#_CPPv4N8Othello811light_flipsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello810dark_flipsE">
+<span id="_CPPv3N8Othello810dark_flipsE"></span><span id="_CPPv2N8Othello810dark_flipsE"></span><span id="Othello8::dark_flips__std::array:flip_list_t.NUM_CELLS:"></span><span class="target" id="classOthello8_1a27a2f445289adde16527c93fcbe19957"></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N8Othello811flip_list_tE" title="Othello8::flip_list_t"><span class="n"><span class="pre">flip_list_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello89NUM_CELLSE" title="Othello8::NUM_CELLS"><span class="n"><span class="pre">NUM_CELLS</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dark_flips</span></span></span><a class="headerlink" href="#_CPPv4N8Othello810dark_flipsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello88cache_okE">
+<span id="_CPPv3N8Othello88cache_okE"></span><span id="_CPPv2N8Othello88cache_okE"></span><span id="Othello8::cache_ok__b"></span><span class="target" id="classOthello8_1a33159c8514988d0e45b7468ebf2da722"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cache_ok</span></span></span><a class="headerlink" href="#_CPPv4N8Othello88cache_okE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-static-functions">Protected Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello814ALL_DIRECTIONSEv">
+<span id="_CPPv3N8Othello814ALL_DIRECTIONSEv"></span><span id="_CPPv2N8Othello814ALL_DIRECTIONSEv"></span><span id="Othello8::ALL_DIRECTIONS"></span><span class="target" id="classOthello8_1a0abbde5f43ef4f039ba7c7d50af5235d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">ALL_DIRECTIONS</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello814ALL_DIRECTIONSEv" title="Link to this definition"></a><br /></dt>
+<dd><p>All eight cardinal directions. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello816GetNeighborIndexE5Index6Facing">
+<span id="_CPPv3N8Othello816GetNeighborIndexE5Index6Facing"></span><span id="_CPPv2N8Othello816GetNeighborIndexE5Index6Facing"></span><span id="Othello8::GetNeighborIndex__Index.Facing"></span><span class="target" id="classOthello8_1a6a7e02724632df27632ec4dca0c0bba5"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNeighborIndex</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span>, <a class="reference internal" href="#_CPPv4N8Othello86FacingE" title="Othello8::Facing"><span class="n"><span class="pre">Facing</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dir</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello816GetNeighborIndexE5Index6Facing" title="Link to this definition"></a><br /></dt>
+<dd><p>Internal function for accessing the neighbors vector. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello89NEIGHBORSEv">
+<span id="_CPPv3N8Othello89NEIGHBORSEv"></span><span id="_CPPv2N8Othello89NEIGHBORSEv"></span><span id="Othello8::NEIGHBORS"></span><span class="target" id="classOthello8_1acdb0f143d089aa71facdfae889973b32"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">NEIGHBORS</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello89NEIGHBORSEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Precalculated neighbors. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85BoardE">
+<span id="_CPPv3N8Othello85BoardE"></span><span id="_CPPv2N8Othello85BoardE"></span><span id="Othello8::Board"></span><span class="target" id="structOthello8_1_1Board"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Board</span></span></span><a class="headerlink" href="#_CPPv4N8Othello85BoardE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Othello8.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Board5ClearEv">
+<span id="_CPPv3N8Othello85Board5ClearEv"></span><span id="_CPPv2N8Othello85Board5ClearEv"></span><span id="Othello8::Board::Clear"></span><span class="target" id="structOthello8_1_1Board_1a2f049b21820a7d0019ac93baaa9164fd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello85Board5ClearEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Board5ClearE5Index">
+<span id="_CPPv3N8Othello85Board5ClearE5Index"></span><span id="_CPPv2N8Othello85Board5ClearE5Index"></span><span id="Othello8::Board::Clear__Index"></span><span class="target" id="structOthello8_1_1Board_1aa6e38f5fa008f9cef07d88569bd4731a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Clear</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello85Board5ClearE5Index" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Othello85Board5OwnerE5Index">
+<span id="_CPPv3NK8Othello85Board5OwnerE5Index"></span><span id="_CPPv2NK8Othello85Board5OwnerE5Index"></span><span id="Othello8::Board::Owner__IndexC"></span><span class="target" id="structOthello8_1_1Board_1afc2b2f063f46457c0b996cf674f425db"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Owner</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Othello85Board5OwnerE5Index" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Board8SetOwnerE5Index6Player">
+<span id="_CPPv3N8Othello85Board8SetOwnerE5Index6Player"></span><span id="_CPPv2N8Othello85Board8SetOwnerE5Index6Player"></span><span id="Othello8::Board::SetOwner__Index.Player"></span><span class="target" id="structOthello8_1_1Board_1a5801d55c10a9ad76aa1038338da222dc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetOwner</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span>, <a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">owner</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello85Board8SetOwnerE5Index6Player" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Board8OccupiedE5Index">
+<span id="_CPPv3N8Othello85Board8OccupiedE5Index"></span><span id="_CPPv2N8Othello85Board8OccupiedE5Index"></span><span id="Othello8::Board::Occupied__Index"></span><span class="target" id="structOthello8_1_1Board_1a76c2234bf70aa274d728876dc4bd99c6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Occupied</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello85Board8OccupiedE5Index" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Board5ScoreE6Player">
+<span id="_CPPv3N8Othello85Board5ScoreE6Player"></span><span id="_CPPv2N8Othello85Board5ScoreE6Player"></span><span id="Othello8::Board::Score__Player"></span><span class="target" id="structOthello8_1_1Board_1a1a61e38d1d27946c9bb76c130d7149cf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Score</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86PlayerE" title="Othello8::Player"><span class="n"><span class="pre">Player</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">owner</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello85Board5ScoreE6Player" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Board8occupiedE">
+<span id="_CPPv3N8Othello85Board8occupiedE"></span><span id="_CPPv2N8Othello85Board8occupiedE"></span><span id="Othello8::Board::occupied__uint64_t"></span><span class="target" id="structOthello8_1_1Board_1abb1edce3a8838f4750438e2ef9f518a8"></span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">occupied</span></span></span><a class="headerlink" href="#_CPPv4N8Othello85Board8occupiedE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Board6playerE">
+<span id="_CPPv3N8Othello85Board6playerE"></span><span id="_CPPv2N8Othello85Board6playerE"></span><span id="Othello8::Board::player__uint64_t"></span><span class="target" id="structOthello8_1_1Board_1ab5d16047a4c71e0e201b815a1a227523"></span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">player</span></span></span><a class="headerlink" href="#_CPPv4N8Othello85Board6playerE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85IndexE">
+<span id="_CPPv3N8Othello85IndexE"></span><span id="_CPPv2N8Othello85IndexE"></span><span id="Othello8::Index"></span><span class="target" id="structOthello8_1_1Index"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Index</span></span></span><a class="headerlink" href="#_CPPv4N8Othello85IndexE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Othello8.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Index5IndexEv">
+<span id="_CPPv3N8Othello85Index5IndexEv"></span><span id="_CPPv2N8Othello85Index5IndexEv"></span><span id="Othello8::Index::IndexCE"></span><span class="target" id="structOthello8_1_1Index_1aa609876ee115a0c79b3bc790dc0ec676"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Index</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello85Index5IndexEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Index5IndexE6size_t">
+<span id="_CPPv3N8Othello85Index5IndexE6size_t"></span><span id="_CPPv2N8Othello85Index5IndexE6size_t"></span><span id="Othello8::Index::Index__sCE"></span><span class="target" id="structOthello8_1_1Index_1aab4b4209ccb95652019357386a39fba6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Index</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello85Index5IndexE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Index5IndexE6size_t6size_t">
+<span id="_CPPv3N8Othello85Index5IndexE6size_t6size_t"></span><span id="_CPPv2N8Othello85Index5IndexE6size_t6size_t"></span><span id="Othello8::Index::Index__s.sCE"></span><span class="target" id="structOthello8_1_1Index_1a2d2e7dee1043c48d94dfc7f07e0ac98d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Index</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello85Index5IndexE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Index5IndexERK5Index">
+<span id="_CPPv3N8Othello85Index5IndexERK5Index"></span><span id="_CPPv2N8Othello85Index5IndexERK5Index"></span><span id="Othello8::Index::Index__IndexCRCE"></span><span class="target" id="structOthello8_1_1Index_1ac53fc5d0073fa90c0463b4ffb59b14c7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Index</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello85Index5IndexERK5Index" title="Othello8::Index::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello85Index5IndexERK5Index" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Othello85Indexcv6size_tEv">
+<span id="_CPPv3NK8Othello85Indexcv6size_tEv"></span><span id="_CPPv2NK8Othello85Indexcv6size_tEv"></span><span id="Othello8::Index::castto-s-operatorCCE"></span><span class="target" id="structOthello8_1_1Index_1af3abb1a15fda5085400c3c480748e2f3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Othello85Indexcv6size_tEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Othello85Index1xEv">
+<span id="_CPPv3NK8Othello85Index1xEv"></span><span id="_CPPv2NK8Othello85Index1xEv"></span><span id="Othello8::Index::xCCE"></span><span class="target" id="structOthello8_1_1Index_1ac4029b5eec8a24dd50bb20240511b6f7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">x</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Othello85Index1xEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Othello85Index1yEv">
+<span id="_CPPv3NK8Othello85Index1yEv"></span><span id="_CPPv2NK8Othello85Index1yEv"></span><span id="Othello8::Index::yCCE"></span><span class="target" id="structOthello8_1_1Index_1acaf4798029312f38d1248cf363837370"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">y</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Othello85Index1yEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Index3SetE6size_t6size_t">
+<span id="_CPPv3N8Othello85Index3SetE6size_t6size_t"></span><span id="_CPPv2N8Othello85Index3SetE6size_t6size_t"></span><span id="Othello8::Index::Set__s.sCE"></span><span class="target" id="structOthello8_1_1Index_1a725f3c9d0496a29a12aed4614284031d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello85Index3SetE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK8Othello85Index7IsValidEv">
+<span id="_CPPv3NK8Othello85Index7IsValidEv"></span><span id="_CPPv2NK8Othello85Index7IsValidEv"></span><span id="Othello8::Index::IsValidCCE"></span><span class="target" id="structOthello8_1_1Index_1a9503d89acc571248feac284aa008b73a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsValid</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK8Othello85Index7IsValidEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Index12CalcNeighborE6Facing">
+<span id="_CPPv3N8Othello85Index12CalcNeighborE6Facing"></span><span id="_CPPv2N8Othello85Index12CalcNeighborE6Facing"></span><span id="Othello8::Index::CalcNeighbor__Facing"></span><span class="target" id="structOthello8_1_1Index_1ae5f5d2b94839167342e2ac95ab294862"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N8Othello85IndexE" title="Othello8::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CalcNeighbor</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N8Othello86FacingE" title="Othello8::Facing"><span class="n"><span class="pre">Facing</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dir</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8Othello85Index12CalcNeighborE6Facing" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8Othello85Index3posE">
+<span id="_CPPv3N8Othello85Index3posE"></span><span id="_CPPv2N8Othello85Index3posE"></span><span id="Othello8::Index::pos__s"></span><span class="target" id="structOthello8_1_1Index_1a1458bccb6a2e176d0fb809ff421c4c58"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pos</span></span></span><a class="headerlink" href="#_CPPv4N8Othello85Index3posE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Othello.html" class="btn btn-neutral float-left" title="Othello.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="PayoffMatrix.html" class="btn btn-neutral float-right" title="PayoffMatrix.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

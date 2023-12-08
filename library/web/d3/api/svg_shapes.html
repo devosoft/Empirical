@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>svg_shapes.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../../_static/tippy/library/web/d3/api/svg_shapes.aaf6c8a0-daf6-46c8-8260-9abde2a813fc.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="utils.hpp" href="utils.html" />
+    <link rel="prev" title="selection.hpp" href="selection.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../web.html">Web Tools (for use with Emscripten)</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../web.html#d3-data-visualization-tools">D3 Data Visualization Tools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../d3.html">D3 Wrapper</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../d3-intro.html">Using Empirica’s D3.js Wrapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../d3-contents.html">D3 Wrapper API</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../d3.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../web.html#api">API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../web.html">Web Tools (for use with Emscripten)</a></li>
+          <li class="breadcrumb-item"><a href="../d3.html">D3 Wrapper</a></li>
+      <li class="breadcrumb-item active">svg_shapes.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="svg-shapes-hpp">
+<h1>svg_shapes.hpp<a class="headerlink" href="#svg-shapes-hpp" title="Link to this heading"></a></h1>
+<p>Tools to build common SVG shapes. </p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv42D3">
+<span id="_CPPv32D3"></span><span id="_CPPv22D3"></span><span id="D3"></span><span class="target" id="namespaceD3"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">D3</span></span></span><br /></dt>
+<dd><dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D312ArcGeneratorE">
+<span id="_CPPv3N2D312ArcGeneratorE"></span><span id="_CPPv2N2D312ArcGeneratorE"></span><span id="D3::ArcGenerator"></span><span class="target" id="classD3_1_1ArcGenerator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ArcGenerator</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D319RadialAreaGeneratorE" title="D3::RadialAreaGenerator"><span class="n"><span class="pre">RadialAreaGenerator</span></span></a><a class="headerlink" href="#_CPPv4N2D312ArcGeneratorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;svg_shapes.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D312ArcGenerator12ArcGeneratorEv">
+<span id="_CPPv3N2D312ArcGenerator12ArcGeneratorEv"></span><span id="_CPPv2N2D312ArcGenerator12ArcGeneratorEv"></span><span id="D3::ArcGenerator::ArcGenerator"></span><span class="target" id="classD3_1_1ArcGenerator_1a2823253aac2b52dc42b7d4803dc29947"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ArcGenerator</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D312ArcGenerator12ArcGeneratorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D312ArcGenerator15SetCornerRadiusEf">
+<span id="_CPPv3N2D312ArcGenerator15SetCornerRadiusEf"></span><span id="_CPPv2N2D312ArcGenerator15SetCornerRadiusEf"></span><span id="D3::ArcGenerator::SetCornerRadius__float"></span><span class="target" id="classD3_1_1ArcGenerator_1a1b8348ed3bedafcc2b682d1e037654b5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetCornerRadius</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D312ArcGenerator15SetCornerRadiusEf" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D312ArcGenerator15SetCornerRadiusENSt6stringE">
+<span id="_CPPv3N2D312ArcGenerator15SetCornerRadiusENSt6stringE"></span><span id="_CPPv2N2D312ArcGenerator15SetCornerRadiusENSt6stringE"></span><span id="D3::ArcGenerator::SetCornerRadius__ss"></span><span class="target" id="classD3_1_1ArcGenerator_1a4729abcc7e58510a03be17a5aec8b487"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetCornerRadius</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D312ArcGenerator15SetCornerRadiusENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D312ArcGenerator12SetPadRadiusEf">
+<span id="_CPPv3N2D312ArcGenerator12SetPadRadiusEf"></span><span id="_CPPv2N2D312ArcGenerator12SetPadRadiusEf"></span><span id="D3::ArcGenerator::SetPadRadius__float"></span><span class="target" id="classD3_1_1ArcGenerator_1ad6ac31d59daee12a619ce547ba51841b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetPadRadius</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D312ArcGenerator12SetPadRadiusEf" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D312ArcGenerator12SetPadRadiusENSt6stringE">
+<span id="_CPPv3N2D312ArcGenerator12SetPadRadiusENSt6stringE"></span><span id="_CPPv2N2D312ArcGenerator12SetPadRadiusENSt6stringE"></span><span id="D3::ArcGenerator::SetPadRadius__ss"></span><span class="target" id="classD3_1_1ArcGenerator_1a1ac775cd0ffca027923e5d763ef2ad10"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetPadRadius</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D312ArcGenerator12SetPadRadiusENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D312ArcGenerator11SetPadAngleEf">
+<span id="_CPPv3N2D312ArcGenerator11SetPadAngleEf"></span><span id="_CPPv2N2D312ArcGenerator11SetPadAngleEf"></span><span id="D3::ArcGenerator::SetPadAngle__float"></span><span class="target" id="classD3_1_1ArcGenerator_1a77a5f2e009b47ba0095435a089716463"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetPadAngle</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">angle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D312ArcGenerator11SetPadAngleEf" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D312ArcGenerator11SetPadAngleENSt6stringE">
+<span id="_CPPv3N2D312ArcGenerator11SetPadAngleENSt6stringE"></span><span id="_CPPv2N2D312ArcGenerator11SetPadAngleENSt6stringE"></span><span id="D3::ArcGenerator::SetPadAngle__ss"></span><span class="target" id="classD3_1_1ArcGenerator_1a2d313e1174ecb5148cbf51644442a340"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetPadAngle</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">angle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D312ArcGenerator11SetPadAngleENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313AreaGeneratorE">
+<span id="_CPPv3N2D313AreaGeneratorE"></span><span id="_CPPv2N2D313AreaGeneratorE"></span><span id="D3::AreaGenerator"></span><span class="target" id="classD3_1_1AreaGenerator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AreaGenerator</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D313LineGeneratorE" title="D3::LineGenerator"><span class="n"><span class="pre">LineGenerator</span></span></a><a class="headerlink" href="#_CPPv4N2D313AreaGeneratorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;svg_shapes.hpp&gt;</em></div>
+<p>An area is defined by two lines, with the area in between shaded. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313AreaGenerator13AreaGeneratorEv">
+<span id="_CPPv3N2D313AreaGenerator13AreaGeneratorEv"></span><span id="_CPPv2N2D313AreaGenerator13AreaGeneratorEv"></span><span id="D3::AreaGenerator::AreaGenerator"></span><span class="target" id="classD3_1_1AreaGenerator_1aa12395a837afc2e7f2d7c756145a5876"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AreaGenerator</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313AreaGenerator13AreaGeneratorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D313AreaGenerator5SetX0Ev1T">
+<span id="_CPPv3I0EN2D313AreaGenerator5SetX0E1T"></span><span id="_CPPv2I0EN2D313AreaGenerator5SetX0E1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1AreaGenerator_1a783b610dc62b73e59e31adb47ae9f92f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetX0</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D313AreaGenerator5SetX0Ev1T" title="D3::AreaGenerator::SetX0::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D313AreaGenerator5SetX0Ev1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D313AreaGenerator5SetY0Ev1T">
+<span id="_CPPv3I0EN2D313AreaGenerator5SetY0E1T"></span><span id="_CPPv2I0EN2D313AreaGenerator5SetY0E1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1AreaGenerator_1a007c1d167812102080d2467432e22a4e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetY0</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D313AreaGenerator5SetY0Ev1T" title="D3::AreaGenerator::SetY0::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D313AreaGenerator5SetY0Ev1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313AreaGenerator5SetX0ENSt6stringE">
+<span id="_CPPv3N2D313AreaGenerator5SetX0ENSt6stringE"></span><span id="_CPPv2N2D313AreaGenerator5SetX0ENSt6stringE"></span><span id="D3::AreaGenerator::SetX0__ss"></span><span class="target" id="classD3_1_1AreaGenerator_1a65664fe902bf96b6a2ab463d7d244d36"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetX0</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313AreaGenerator5SetX0ENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313AreaGenerator5SetY0ENSt6stringE">
+<span id="_CPPv3N2D313AreaGenerator5SetY0ENSt6stringE"></span><span id="_CPPv2N2D313AreaGenerator5SetY0ENSt6stringE"></span><span id="D3::AreaGenerator::SetY0__ss"></span><span class="target" id="classD3_1_1AreaGenerator_1a344d55e048f0ccd4a53f3e3c854adb43"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetY0</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313AreaGenerator5SetY0ENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D313AreaGenerator5SetX1Ev1T">
+<span id="_CPPv3I0EN2D313AreaGenerator5SetX1E1T"></span><span id="_CPPv2I0EN2D313AreaGenerator5SetX1E1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1AreaGenerator_1af830bbe4ec5bac2640f6c3a20530c642"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetX1</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D313AreaGenerator5SetX1Ev1T" title="D3::AreaGenerator::SetX1::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D313AreaGenerator5SetX1Ev1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D313AreaGenerator5SetY1Ev1T">
+<span id="_CPPv3I0EN2D313AreaGenerator5SetY1E1T"></span><span id="_CPPv2I0EN2D313AreaGenerator5SetY1E1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1AreaGenerator_1a50dd41fafbc1f36843dee60fd15e4b80"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetY1</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D313AreaGenerator5SetY1Ev1T" title="D3::AreaGenerator::SetY1::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D313AreaGenerator5SetY1Ev1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313AreaGenerator5SetX1ENSt6stringE">
+<span id="_CPPv3N2D313AreaGenerator5SetX1ENSt6stringE"></span><span id="_CPPv2N2D313AreaGenerator5SetX1ENSt6stringE"></span><span id="D3::AreaGenerator::SetX1__ss"></span><span class="target" id="classD3_1_1AreaGenerator_1a325690a909015ffd45f02914e2dccc9a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetX1</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313AreaGenerator5SetX1ENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313AreaGenerator5SetY1ENSt6stringE">
+<span id="_CPPv3N2D313AreaGenerator5SetY1ENSt6stringE"></span><span id="_CPPv2N2D313AreaGenerator5SetY1ENSt6stringE"></span><span id="D3::AreaGenerator::SetY1__ss"></span><span class="target" id="classD3_1_1AreaGenerator_1ad95be4e5f41d014f1345278e515ce292"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetY1</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313AreaGenerator5SetY1ENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D317BaseLineGeneratorE">
+<span id="_CPPv3N2D317BaseLineGeneratorE"></span><span id="_CPPv2N2D317BaseLineGeneratorE"></span><span id="D3::BaseLineGenerator"></span><span class="target" id="classD3_1_1BaseLineGenerator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BaseLineGenerator</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D317SvgShapeGeneratorE" title="D3::SvgShapeGenerator"><span class="n"><span class="pre">SvgShapeGenerator</span></span></a><a class="headerlink" href="#_CPPv4N2D317BaseLineGeneratorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;svg_shapes.hpp&gt;</em></div>
+<p>Base class for generating both cartesian and radial lines You don’t normally want to instantiate this - use LineGenerator or RadialLineGenerator instead. </p>
+<p>Subclassed by D3::LineGenerator, D3::RadialLineGenerator</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D317BaseLineGenerator17BaseLineGeneratorEv">
+<span id="_CPPv3N2D317BaseLineGenerator17BaseLineGeneratorEv"></span><span id="_CPPv2N2D317BaseLineGenerator17BaseLineGeneratorEv"></span><span id="D3::BaseLineGenerator::BaseLineGenerator"></span><span class="target" id="classD3_1_1BaseLineGenerator_1abc7e84dd8cc09c734f6e9a663a9824ed"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BaseLineGenerator</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D317BaseLineGenerator17BaseLineGeneratorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D317BaseLineGenerator8SetCurveENSt6stringE">
+<span id="_CPPv3N2D317BaseLineGenerator8SetCurveENSt6stringE"></span><span id="_CPPv2N2D317BaseLineGenerator8SetCurveENSt6stringE"></span><span id="D3::BaseLineGenerator::SetCurve__ss"></span><span class="target" id="classD3_1_1BaseLineGenerator_1ac457d76f1e2e393e6281f3574037e522"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetCurve</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">curve</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D317BaseLineGenerator8SetCurveENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the method used to interpolate a curve between points in the line. For allowed options, see the <a class="reference external" href="https://github.com/d3/d3-3.x-api-reference/blob/master/SVG-Shapes.md#line_interpolate">d3 documntation</a></p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D317BaseLineGenerator10SetTensionEf">
+<span id="_CPPv3N2D317BaseLineGenerator10SetTensionEf"></span><span id="_CPPv2N2D317BaseLineGenerator10SetTensionEf"></span><span id="D3::BaseLineGenerator::SetTension__float"></span><span class="target" id="classD3_1_1BaseLineGenerator_1a19b2ddf855cfc507e24aea36adaf5f16"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetTension</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tension</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D317BaseLineGenerator10SetTensionEf" title="Link to this definition"></a><br /></dt>
+<dd><p>If interpolation is “bundle”, “cardinal”, “cardinal-open”, or “cardinal-closed”, a tension parameter is used. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D317BaseLineGenerator10SetDefinedENSt6stringE">
+<span id="_CPPv3N2D317BaseLineGenerator10SetDefinedENSt6stringE"></span><span id="_CPPv2N2D317BaseLineGenerator10SetDefinedENSt6stringE"></span><span id="D3::BaseLineGenerator::SetDefined__ss"></span><span class="target" id="classD3_1_1BaseLineGenerator_1aa8fbfbc3ff2cd0cdf7c6320aefd924ff"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetDefined</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">defined</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D317BaseLineGenerator10SetDefinedENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set a function indicating where the line is defined (i.e. valid) Can be a C++ function or a string indicating a Javascript function </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D314ChordGeneratorE">
+<span id="_CPPv3N2D314ChordGeneratorE"></span><span id="_CPPv2N2D314ChordGeneratorE"></span><span id="D3::ChordGenerator"></span><span class="target" id="classD3_1_1ChordGenerator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ChordGenerator</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D319RadialAreaGeneratorE" title="D3::RadialAreaGenerator"><span class="n"><span class="pre">RadialAreaGenerator</span></span></a><a class="headerlink" href="#_CPPv4N2D314ChordGeneratorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;svg_shapes.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D314ChordGenerator14ChordGeneratorEv">
+<span id="_CPPv3N2D314ChordGenerator14ChordGeneratorEv"></span><span id="_CPPv2N2D314ChordGenerator14ChordGeneratorEv"></span><span id="D3::ChordGenerator::ChordGenerator"></span><span class="target" id="classD3_1_1ChordGenerator_1a0b508e3d1096117937d0d05afcb62c3a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ChordGenerator</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D314ChordGenerator14ChordGeneratorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D314ChordGenerator9SetSourceEv1T">
+<span id="_CPPv3I0EN2D314ChordGenerator9SetSourceE1T"></span><span id="_CPPv2I0EN2D314ChordGenerator9SetSourceE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1ChordGenerator_1ab1904f91466c378985cbe9c38fc5abf8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetSource</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D314ChordGenerator9SetSourceEv1T" title="D3::ChordGenerator::SetSource::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">source</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D314ChordGenerator9SetSourceEv1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D314ChordGenerator9SetSourceENSt6stringE">
+<span id="_CPPv3N2D314ChordGenerator9SetSourceENSt6stringE"></span><span id="_CPPv2N2D314ChordGenerator9SetSourceENSt6stringE"></span><span id="D3::ChordGenerator::SetSource__ss"></span><span class="target" id="classD3_1_1ChordGenerator_1a2a500cbe5e960922844c36670fea5f1c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetSource</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">source</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D314ChordGenerator9SetSourceENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D314ChordGenerator9SetTargetEv1T">
+<span id="_CPPv3I0EN2D314ChordGenerator9SetTargetE1T"></span><span id="_CPPv2I0EN2D314ChordGenerator9SetTargetE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1ChordGenerator_1ab6e260d7a47503912307be7f92a4c8a5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetTarget</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D314ChordGenerator9SetTargetEv1T" title="D3::ChordGenerator::SetTarget::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D314ChordGenerator9SetTargetEv1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D314ChordGenerator9SetTargetENSt6stringE">
+<span id="_CPPv3N2D314ChordGenerator9SetTargetENSt6stringE"></span><span id="_CPPv2N2D314ChordGenerator9SetTargetENSt6stringE"></span><span id="D3::ChordGenerator::SetTarget__ss"></span><span class="target" id="classD3_1_1ChordGenerator_1a63b47214ce87d06c26c833e0a686c2f3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetTarget</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D314ChordGenerator9SetTargetENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313LineGeneratorE">
+<span id="_CPPv3N2D313LineGeneratorE"></span><span id="_CPPv2N2D313LineGeneratorE"></span><span id="D3::LineGenerator"></span><span class="target" id="classD3_1_1LineGenerator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LineGenerator</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D317BaseLineGeneratorE" title="D3::BaseLineGenerator"><span class="n"><span class="pre">BaseLineGenerator</span></span></a><a class="headerlink" href="#_CPPv4N2D313LineGeneratorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;svg_shapes.hpp&gt;</em></div>
+<p>Generator for regular old (cartesian) lines. </p>
+<p>Subclassed by D3::AreaGenerator, D3::LinkGenerator</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313LineGenerator13LineGeneratorEv">
+<span id="_CPPv3N2D313LineGenerator13LineGeneratorEv"></span><span id="_CPPv2N2D313LineGenerator13LineGeneratorEv"></span><span id="D3::LineGenerator::LineGenerator"></span><span class="target" id="classD3_1_1LineGenerator_1ab21cee4ab7f0741500ebf2d675c1eac7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LineGenerator</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313LineGenerator13LineGeneratorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D313LineGenerator9AddXScaleEvR12X_SCALE_TYPE">
+<span id="_CPPv3I0EN2D313LineGenerator9AddXScaleER12X_SCALE_TYPE"></span><span id="_CPPv2I0EN2D313LineGenerator9AddXScaleER12X_SCALE_TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">X_SCALE_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1LineGenerator_1ab2729f1ca83ed9efa58edc7cc6095fab"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddXScale</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D313LineGenerator9AddXScaleEvR12X_SCALE_TYPE" title="D3::LineGenerator::AddXScale::X_SCALE_TYPE"><span class="n"><span class="pre">X_SCALE_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">scale</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D313LineGenerator9AddXScaleEvR12X_SCALE_TYPE" title="Link to this definition"></a><br /></dt>
+<dd><p>Often, when you’re drawing cartesion lines, you want to use a scale to transform numbers from range of your data to the range of pixels on your screen. Adding an X scale will cause the x-coordinates of all points on the line to be passed through that scale function. This stacks on top of whatever the current function for accessing x is (which means scales will also stack). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN2D313LineGenerator9AddYScaleEvR12Y_SCALE_TYPE">
+<span id="_CPPv3I0EN2D313LineGenerator9AddYScaleER12Y_SCALE_TYPE"></span><span id="_CPPv2I0EN2D313LineGenerator9AddYScaleER12Y_SCALE_TYPE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Y_SCALE_TYPE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1LineGenerator_1af86816b62bb5ee8d012934eff05ccc53"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddYScale</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN2D313LineGenerator9AddYScaleEvR12Y_SCALE_TYPE" title="D3::LineGenerator::AddYScale::Y_SCALE_TYPE"><span class="n"><span class="pre">Y_SCALE_TYPE</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">scale</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN2D313LineGenerator9AddYScaleEvR12Y_SCALE_TYPE" title="Link to this definition"></a><br /></dt>
+<dd><p>Often, when you’re drawing cartesion lines, you want to use a scale to transform numbers from range of your data to the range of pixels on your screen. Adding a Y scale will cause the y-coordinates of all points on the line to be passed through that scale function. This stacks on top of whatever the current function for accessing y is (which means scales will also stack). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313LineGenerator4SetXENSt6stringE">
+<span id="_CPPv3N2D313LineGenerator4SetXENSt6stringE"></span><span id="_CPPv2N2D313LineGenerator4SetXENSt6stringE"></span><span id="D3::LineGenerator::SetX__ss"></span><span class="target" id="classD3_1_1LineGenerator_1a0db11e02350a2002a23fc79439c57140"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetX</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313LineGenerator4SetXENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>If the data that you are generating lines from is anything more complicated than a sequence of pairs of numbers, representing x and y (in that order), you need to tell the line generator how it should figure out what the x coordinate of a point in the line is. The parameter you pass to SetX should be instructions for doing so. It can either be a function (as a string indicating a Javascript function or as a literal C++ function) that accepts an element of the data sequence you are generating the line from, or it can be a constant, in which case the x coordinate of every point will be that constant.</p>
+<p>Note: This function will re-set any scales that you’ve added to the X coordinate</p>
+<p>As an example, the default function expects data like this (array of arrays): [[0,0], [1,1], [2,2]] And has (a Javascript equivalent of) this accessor: int x(array&lt;int, 2&gt; d) {return d[0];}</p>
+<p>If your data instead looked like this (array of Javascript objects with x and y values): [{x:0, y:0}, {x:1, y:1}, {x:2, y:2}] You might want to use an accessor like this: int x(JSONObject d) {return d.x();} Where JSONObject is a struct designed to hold necessary data from the Javascript object: struct JSONObject { EMP_BUILD_INTROSPECTIVE_TUPLE( int, x, int, y ) }; </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313LineGenerator4SetYENSt6stringE">
+<span id="_CPPv3N2D313LineGenerator4SetYENSt6stringE"></span><span id="_CPPv2N2D313LineGenerator4SetYENSt6stringE"></span><span id="D3::LineGenerator::SetY__ss"></span><span class="target" id="classD3_1_1LineGenerator_1af255781a22e2a210943855bb039de62f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetY</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313LineGenerator4SetYENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>If the data that you are generating lines from is anything more complicated than a sequence of pairs of numbers, representing x and y (in that order), you need to tell the line generator how it should figure out what the y coordinate of a point in the line is. The parameter you pass to SetY should be instructions for doing so. It can either be a function (as a string indicating a Javascript function or as a literal C++ function) that accepts an element of the data sequence you are generating the line from, or it can be a constant, in which case the y coordinate of every point will be that constant.</p>
+<p>Note: This function will re-set any scales that you’ve added to the Y coordinate</p>
+<p>As an example, the default function expects data like this (array of arrays): [[0,0], [1,1], [2,2]] And has (a Javascript equivalent of) this accessor: int x(array&lt;int, 2&gt; d) {return d[1];}</p>
+<p>If your data instead looked like this (array of Javascript objects with x and y values): [{x:0, y:0}, {x:1, y:1}, {x:2, y:2}] You might want to use an accessor like this: int x(JSONObject d) {return d.y();} Where JSONObject is a struct designed to hold necessary data from the Javascript object: struct JSONObject { EMP_BUILD_INTROSPECTIVE_TUPLE( int, x, int, y ) }; </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313LinkGeneratorE">
+<span id="_CPPv3N2D313LinkGeneratorE"></span><span id="_CPPv2N2D313LinkGeneratorE"></span><span id="D3::LinkGenerator"></span><span class="target" id="classD3_1_1LinkGenerator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LinkGenerator</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D313LineGeneratorE" title="D3::LineGenerator"><span class="n"><span class="pre">LineGenerator</span></span></a><a class="headerlink" href="#_CPPv4N2D313LinkGeneratorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;svg_shapes.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313LinkGenerator13LinkGeneratorENSt6stringE">
+<span id="_CPPv3N2D313LinkGenerator13LinkGeneratorENSt6stringE"></span><span id="_CPPv2N2D313LinkGenerator13LinkGeneratorENSt6stringE"></span><span id="D3::LinkGenerator::LinkGenerator__ss"></span><span class="target" id="classD3_1_1LinkGenerator_1acc666d5d6443bc2bf882c259646acd45"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LinkGenerator</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313LinkGenerator13LinkGeneratorENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313LinkGenerator9SetSourceENSt6stringE">
+<span id="_CPPv3N2D313LinkGenerator9SetSourceENSt6stringE"></span><span id="_CPPv2N2D313LinkGenerator9SetSourceENSt6stringE"></span><span id="D3::LinkGenerator::SetSource__ss"></span><span class="target" id="classD3_1_1LinkGenerator_1a7f13b3ba7f37360b506c8a13b0c21fa0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetSource</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">source</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313LinkGenerator9SetSourceENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D313LinkGenerator9SetTargetENSt6stringE">
+<span id="_CPPv3N2D313LinkGenerator9SetTargetENSt6stringE"></span><span id="_CPPv2N2D313LinkGenerator9SetTargetENSt6stringE"></span><span id="D3::LinkGenerator::SetTarget__ss"></span><span class="target" id="classD3_1_1LinkGenerator_1a749580dc0d480e53f9f535bc36c28485"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetTarget</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D313LinkGenerator9SetTargetENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialAreaGeneratorE">
+<span id="_CPPv3N2D319RadialAreaGeneratorE"></span><span id="_CPPv2N2D319RadialAreaGeneratorE"></span><span id="D3::RadialAreaGenerator"></span><span class="target" id="classD3_1_1RadialAreaGenerator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RadialAreaGenerator</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D319RadialLineGeneratorE" title="D3::RadialLineGenerator"><span class="n"><span class="pre">RadialLineGenerator</span></span></a><a class="headerlink" href="#_CPPv4N2D319RadialAreaGeneratorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;svg_shapes.hpp&gt;</em></div>
+<p>Subclassed by D3::ArcGenerator, D3::ChordGenerator</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialAreaGenerator19RadialAreaGeneratorEv">
+<span id="_CPPv3N2D319RadialAreaGenerator19RadialAreaGeneratorEv"></span><span id="_CPPv2N2D319RadialAreaGenerator19RadialAreaGeneratorEv"></span><span id="D3::RadialAreaGenerator::RadialAreaGenerator"></span><span class="target" id="classD3_1_1RadialAreaGenerator_1a0dba42d7748f99dd56e8f3d7ba26b3f7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RadialAreaGenerator</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialAreaGenerator19RadialAreaGeneratorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialAreaGenerator14SetInnerRadiusEf">
+<span id="_CPPv3N2D319RadialAreaGenerator14SetInnerRadiusEf"></span><span id="_CPPv2N2D319RadialAreaGenerator14SetInnerRadiusEf"></span><span id="D3::RadialAreaGenerator::SetInnerRadius__float"></span><span class="target" id="classD3_1_1RadialAreaGenerator_1a2deb593a854545ee89bffad98f251789"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetInnerRadius</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialAreaGenerator14SetInnerRadiusEf" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialAreaGenerator14SetInnerRadiusENSt6stringE">
+<span id="_CPPv3N2D319RadialAreaGenerator14SetInnerRadiusENSt6stringE"></span><span id="_CPPv2N2D319RadialAreaGenerator14SetInnerRadiusENSt6stringE"></span><span id="D3::RadialAreaGenerator::SetInnerRadius__ss"></span><span class="target" id="classD3_1_1RadialAreaGenerator_1a002655c993fcdd8e3bcb47582667206b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetInnerRadius</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialAreaGenerator14SetInnerRadiusENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialAreaGenerator14SetOuterRadiusEf">
+<span id="_CPPv3N2D319RadialAreaGenerator14SetOuterRadiusEf"></span><span id="_CPPv2N2D319RadialAreaGenerator14SetOuterRadiusEf"></span><span id="D3::RadialAreaGenerator::SetOuterRadius__float"></span><span class="target" id="classD3_1_1RadialAreaGenerator_1ad00423d5fb504a971c8c3451a78b612f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetOuterRadius</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialAreaGenerator14SetOuterRadiusEf" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialAreaGenerator14SetOuterRadiusENSt6stringE">
+<span id="_CPPv3N2D319RadialAreaGenerator14SetOuterRadiusENSt6stringE"></span><span id="_CPPv2N2D319RadialAreaGenerator14SetOuterRadiusENSt6stringE"></span><span id="D3::RadialAreaGenerator::SetOuterRadius__ss"></span><span class="target" id="classD3_1_1RadialAreaGenerator_1a5d9c130606afd5ef123158968c7b7b15"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetOuterRadius</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialAreaGenerator14SetOuterRadiusENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialAreaGenerator13SetStartAngleEf">
+<span id="_CPPv3N2D319RadialAreaGenerator13SetStartAngleEf"></span><span id="_CPPv2N2D319RadialAreaGenerator13SetStartAngleEf"></span><span id="D3::RadialAreaGenerator::SetStartAngle__float"></span><span class="target" id="classD3_1_1RadialAreaGenerator_1a4108e1d35438d14e90ba9a90ea89b726"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetStartAngle</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">angle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialAreaGenerator13SetStartAngleEf" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialAreaGenerator13SetStartAngleENSt6stringE">
+<span id="_CPPv3N2D319RadialAreaGenerator13SetStartAngleENSt6stringE"></span><span id="_CPPv2N2D319RadialAreaGenerator13SetStartAngleENSt6stringE"></span><span id="D3::RadialAreaGenerator::SetStartAngle__ss"></span><span class="target" id="classD3_1_1RadialAreaGenerator_1affec9af9b6d7b9237f6f5979620c7a5a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetStartAngle</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">angle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialAreaGenerator13SetStartAngleENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialAreaGenerator11SetEndAngleEf">
+<span id="_CPPv3N2D319RadialAreaGenerator11SetEndAngleEf"></span><span id="_CPPv2N2D319RadialAreaGenerator11SetEndAngleEf"></span><span id="D3::RadialAreaGenerator::SetEndAngle__float"></span><span class="target" id="classD3_1_1RadialAreaGenerator_1a7225c1d4761ca0c10d95ef375d9ea591"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetEndAngle</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">angle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialAreaGenerator11SetEndAngleEf" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialAreaGenerator11SetEndAngleENSt6stringE">
+<span id="_CPPv3N2D319RadialAreaGenerator11SetEndAngleENSt6stringE"></span><span id="_CPPv2N2D319RadialAreaGenerator11SetEndAngleENSt6stringE"></span><span id="D3::RadialAreaGenerator::SetEndAngle__ss"></span><span class="target" id="classD3_1_1RadialAreaGenerator_1a8b9c19f7575b68f809f5033f3da268df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetEndAngle</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">angle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialAreaGenerator11SetEndAngleENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialLineGeneratorE">
+<span id="_CPPv3N2D319RadialLineGeneratorE"></span><span id="_CPPv2N2D319RadialLineGeneratorE"></span><span id="D3::RadialLineGenerator"></span><span class="target" id="classD3_1_1RadialLineGenerator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RadialLineGenerator</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D317BaseLineGeneratorE" title="D3::BaseLineGenerator"><span class="n"><span class="pre">BaseLineGenerator</span></span></a><a class="headerlink" href="#_CPPv4N2D319RadialLineGeneratorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;svg_shapes.hpp&gt;</em></div>
+<p>Subclassed by D3::RadialAreaGenerator</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialLineGenerator19RadialLineGeneratorEv">
+<span id="_CPPv3N2D319RadialLineGenerator19RadialLineGeneratorEv"></span><span id="_CPPv2N2D319RadialLineGenerator19RadialLineGeneratorEv"></span><span id="D3::RadialLineGenerator::RadialLineGenerator"></span><span class="target" id="classD3_1_1RadialLineGenerator_1a01af0ce6fd9e350f7a5e1832f211cb61"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RadialLineGenerator</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialLineGenerator19RadialLineGeneratorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialLineGenerator9SetRadiusEf">
+<span id="_CPPv3N2D319RadialLineGenerator9SetRadiusEf"></span><span id="_CPPv2N2D319RadialLineGenerator9SetRadiusEf"></span><span id="D3::RadialLineGenerator::SetRadius__float"></span><span class="target" id="classD3_1_1RadialLineGenerator_1a07137a56cc0ec3fa1145db1839374f35"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRadius</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialLineGenerator9SetRadiusEf" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialLineGenerator9SetRadiusENSt6stringE">
+<span id="_CPPv3N2D319RadialLineGenerator9SetRadiusENSt6stringE"></span><span id="_CPPv2N2D319RadialLineGenerator9SetRadiusENSt6stringE"></span><span id="D3::RadialLineGenerator::SetRadius__ss"></span><span class="target" id="classD3_1_1RadialLineGenerator_1a50193ba9af914aa751270e38c85a83c3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetRadius</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">radius</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialLineGenerator9SetRadiusENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialLineGenerator8SetAngleEf">
+<span id="_CPPv3N2D319RadialLineGenerator8SetAngleEf"></span><span id="_CPPv2N2D319RadialLineGenerator8SetAngleEf"></span><span id="D3::RadialLineGenerator::SetAngle__float"></span><span class="target" id="classD3_1_1RadialLineGenerator_1a3abff416c0df3da3f33f2115710fdc5e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetAngle</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">angle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialLineGenerator8SetAngleEf" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D319RadialLineGenerator8SetAngleENSt6stringE">
+<span id="_CPPv3N2D319RadialLineGenerator8SetAngleENSt6stringE"></span><span id="_CPPv2N2D319RadialLineGenerator8SetAngleENSt6stringE"></span><span id="D3::RadialLineGenerator::SetAngle__ss"></span><span class="target" id="classD3_1_1RadialLineGenerator_1a5a96bf0d0d4a6f0857d2d56d09bd8f3b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetAngle</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">angle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D319RadialLineGenerator8SetAngleENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D317SvgShapeGeneratorE">
+<span id="_CPPv3N2D317SvgShapeGeneratorE"></span><span id="_CPPv2N2D317SvgShapeGeneratorE"></span><span id="D3::SvgShapeGenerator"></span><span class="target" id="classD3_1_1SvgShapeGenerator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SvgShapeGenerator</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="d3_init.html#_CPPv4N2D37D3_BaseE" title="D3::D3_Base"><span class="n"><span class="pre">D3_Base</span></span></a><a class="headerlink" href="#_CPPv4N2D317SvgShapeGeneratorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;svg_shapes.hpp&gt;</em></div>
+<p>A few particularly common shapes (circles, rectangles, and ellipses) have corresponding SVG elements that you can create directly. All other shapes (including lines) must be created by specifying a “path” describing their outline. Paths are defined with <a class="reference external" href="https://www.w3.org/TR/SVG/paths.html#PathData">a mini-language</a> that describes how you would draw the shape with a pen. You could write them by hand, but that’s rarely desirable (especially when you’re trying to systematically represent data). So d3 provides functions for generating functions that will convert data to paths. This is a base clase for all objects that manage such functions to inherit from. You probably want to instantiate derived versions, rather than this class directly. </p>
+<p>Subclassed by D3::BaseLineGenerator, D3::SymbolGenerator</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0_6size_tEN2D317SvgShapeGenerator8GenerateENSt6stringER5arrayI5arrayI1TXL2EEE4SIZEE">
+<span id="_CPPv3I0_6size_tEN2D317SvgShapeGenerator8GenerateER5arrayI5arrayI1TXL2EEE4SIZEE"></span><span id="_CPPv2I0_6size_tEN2D317SvgShapeGenerator8GenerateER5arrayI5arrayI1TX2EE4SIZEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIZE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1SvgShapeGenerator_1ae6c43395be70b8c2388d9424b8c52b64"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Generate</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_6size_tEN2D317SvgShapeGenerator8GenerateENSt6stringER5arrayI5arrayI1TXL2EEE4SIZEE" title="D3::SvgShapeGenerator::Generate::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_6size_tEN2D317SvgShapeGenerator8GenerateENSt6stringER5arrayI5arrayI1TXL2EEE4SIZEE" title="D3::SvgShapeGenerator::Generate::SIZE"><span class="n"><span class="pre">SIZE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_6size_tEN2D317SvgShapeGenerator8GenerateENSt6stringER5arrayI5arrayI1TXL2EEE4SIZEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate the string describing the path associated with [data] Assumes [data] is an array of 2-element arrays describing (x,y) coordinates and makes the line that connects them </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0_NSt6size_tEEN2D317SvgShapeGenerator9DrawShapeE9SelectionR5arrayI5arrayI1TXL2EEE4SIZEER9Selection">
+<span id="_CPPv3I0_NSt6size_tEEN2D317SvgShapeGenerator9DrawShapeER5arrayI5arrayI1TXL2EEE4SIZEER9Selection"></span><span id="_CPPv2I0_NSt6size_tEEN2D317SvgShapeGenerator9DrawShapeER5arrayI5arrayI1TX2EE4SIZEER9Selection"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIZE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1SvgShapeGenerator_1a574f90b2578c1da74a0e11034e03a8e9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="selection.html#_CPPv4N2D39SelectionE" title="D3::Selection"><span class="n"><span class="pre">Selection</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DrawShape</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN2D317SvgShapeGenerator9DrawShapeE9SelectionR5arrayI5arrayI1TXL2EEE4SIZEER9Selection" title="D3::SvgShapeGenerator::DrawShape::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN2D317SvgShapeGenerator9DrawShapeE9SelectionR5arrayI5arrayI1TXL2EEE4SIZEER9Selection" title="D3::SvgShapeGenerator::DrawShape::SIZE"><span class="n"><span class="pre">SIZE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span>, <a class="reference internal" href="selection.html#_CPPv4N2D39SelectionE" title="D3::Selection"><span class="n"><span class="pre">Selection</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_NSt6size_tEEN2D317SvgShapeGenerator9DrawShapeE9SelectionR5arrayI5arrayI1TXL2EEE4SIZEER9Selection" title="Link to this definition"></a><br /></dt>
+<dd><p>Draws the path associated with [data] onto the [s] selection (must contain a single SVG) element). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D317SvgShapeGenerator9DrawShapeE7Dataset9Selection">
+<span id="_CPPv3N2D317SvgShapeGenerator9DrawShapeE7Dataset9Selection"></span><span id="_CPPv2N2D317SvgShapeGenerator9DrawShapeE7Dataset9Selection"></span><span id="D3::SvgShapeGenerator::DrawShape__Dataset.Selection"></span><span class="target" id="classD3_1_1SvgShapeGenerator_1ae7bd73360bc8acc3b6f739709d41cdaa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="selection.html#_CPPv4N2D39SelectionE" title="D3::Selection"><span class="n"><span class="pre">Selection</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DrawShape</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="dataset.html#_CPPv4N2D37DatasetE" title="D3::Dataset"><span class="n"><span class="pre">Dataset</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">data</span></span>, <a class="reference internal" href="selection.html#_CPPv4N2D39SelectionE" title="D3::Selection"><span class="n"><span class="pre">Selection</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">s</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D317SvgShapeGenerator9DrawShapeE7Dataset9Selection" title="Link to this definition"></a><br /></dt>
+<dd><p>DrawShape will also accept a D3::Dataset. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0_NSt6size_tE_NSt6size_tEEN2D317SvgShapeGenerator9DrawShapeE9SelectionR5arrayI5arrayI5arrayI1TXL2EEE4SIZEE5SIZE2E">
+<span id="_CPPv3I0_NSt6size_tE_NSt6size_tEEN2D317SvgShapeGenerator9DrawShapeER5arrayI5arrayI5arrayI1TXL2EEE4SIZEE5SIZE2E"></span><span id="_CPPv2I0_NSt6size_tE_NSt6size_tEEN2D317SvgShapeGenerator9DrawShapeER5arrayI5arrayI5arrayI1TX2EE4SIZEE5SIZE2E"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIZE</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIZE2</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classD3_1_1SvgShapeGenerator_1a421306034e21f7bc32c96a4994ab4ac2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="selection.html#_CPPv4N2D39SelectionE" title="D3::Selection"><span class="n"><span class="pre">Selection</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DrawShape</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_NSt6size_tE_NSt6size_tEEN2D317SvgShapeGenerator9DrawShapeE9SelectionR5arrayI5arrayI5arrayI1TXL2EEE4SIZEE5SIZE2E" title="D3::SvgShapeGenerator::DrawShape::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_NSt6size_tE_NSt6size_tEEN2D317SvgShapeGenerator9DrawShapeE9SelectionR5arrayI5arrayI5arrayI1TXL2EEE4SIZEE5SIZE2E" title="D3::SvgShapeGenerator::DrawShape::SIZE"><span class="n"><span class="pre">SIZE</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_NSt6size_tE_NSt6size_tEEN2D317SvgShapeGenerator9DrawShapeE9SelectionR5arrayI5arrayI5arrayI1TXL2EEE4SIZEE5SIZE2E" title="D3::SvgShapeGenerator::DrawShape::SIZE2"><span class="n"><span class="pre">SIZE2</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_NSt6size_tE_NSt6size_tEEN2D317SvgShapeGenerator9DrawShapeE9SelectionR5arrayI5arrayI5arrayI1TXL2EEE4SIZEE5SIZE2E" title="Link to this definition"></a><br /></dt>
+<dd><p>If you pass a triple-nested array, it will be treated as an array of paths. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D317SvgShapeGenerator17SvgShapeGeneratorEv">
+<span id="_CPPv3N2D317SvgShapeGenerator17SvgShapeGeneratorEv"></span><span id="_CPPv2N2D317SvgShapeGenerator17SvgShapeGeneratorEv"></span><span id="D3::SvgShapeGenerator::SvgShapeGenerator"></span><span class="target" id="classD3_1_1SvgShapeGenerator_1a7d3c66b2c17991a56b25faaccc2b56e8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SvgShapeGenerator</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D317SvgShapeGenerator17SvgShapeGeneratorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2D315SymbolGeneratorE">
+<span id="_CPPv3N2D315SymbolGeneratorE"></span><span id="_CPPv2N2D315SymbolGeneratorE"></span><span id="D3::SymbolGenerator"></span><span class="target" id="classD3_1_1SymbolGenerator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SymbolGenerator</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="axis.html#_CPPv42D3" title="D3"><span class="n"><span class="pre">D3</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N2D317SvgShapeGeneratorE" title="D3::SvgShapeGenerator"><span class="n"><span class="pre">SvgShapeGenerator</span></span></a><a class="headerlink" href="#_CPPv4N2D315SymbolGeneratorE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;svg_shapes.hpp&gt;</em></div>
+<p>Generate symbols (“circle”, “cross” “diamond”, “square”, “triangle-down”, “triangle-up”). Often useful for making scatter plots. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D315SymbolGenerator15SymbolGeneratorEv">
+<span id="_CPPv3N2D315SymbolGenerator15SymbolGeneratorEv"></span><span id="_CPPv2N2D315SymbolGenerator15SymbolGeneratorEv"></span><span id="D3::SymbolGenerator::SymbolGenerator"></span><span class="target" id="classD3_1_1SymbolGenerator_1a8bac49b4c8b8d0b6dab0918e9bec1ce7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SymbolGenerator</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D315SymbolGenerator15SymbolGeneratorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D315SymbolGenerator7SetTypeENSt6stringE">
+<span id="_CPPv3N2D315SymbolGenerator7SetTypeENSt6stringE"></span><span id="_CPPv2N2D315SymbolGenerator7SetTypeENSt6stringE"></span><span id="D3::SymbolGenerator::SetType__ss"></span><span class="target" id="classD3_1_1SymbolGenerator_1a8ddf31f493ef7fa65f42aa479452973a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetType</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D315SymbolGenerator7SetTypeENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the type of symbol generated. Must be a C++ function, a string containing the name of a Javascript function (in the current window, d3, or emp namespaces), or a string specifying a type (“circle”, “cross” “diamond”, “square”, “triangle-down”, “triangle-up”). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2D315SymbolGenerator7SetSizeEi">
+<span id="_CPPv3N2D315SymbolGenerator7SetSizeEi"></span><span id="_CPPv2N2D315SymbolGenerator7SetSizeEi"></span><span id="D3::SymbolGenerator::SetSize__i"></span><span class="target" id="classD3_1_1SymbolGenerator_1aa027f1d77e5ce700dcfae82f2d62985f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetSize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2D315SymbolGenerator7SetSizeEi" title="Link to this definition"></a><br /></dt>
+<dd><p>Set size in pixels to [size] - can be an int, a C++ function, or string naming a Javascript function in the current window, the emp namespace, or the d3 namespace. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="selection.html" class="btn btn-neutral float-left" title="selection.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="utils.html" class="btn btn-neutral float-right" title="utils.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

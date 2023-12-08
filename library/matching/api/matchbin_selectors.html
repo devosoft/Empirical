@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>matchbin_selectors.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/matching/api/matchbin_selectors.69bf81bb-6e18-4b9d-9336-ef4cd639ab23.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="matchbin_utils.hpp" href="matchbin_utils.html" />
+    <link rel="prev" title="matchbin_regulators.hpp" href="matchbin_regulators.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../matching.html">Matching</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../matching.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="MatchBin.html">MatchBin.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="MatchDepository.html">MatchDepository.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="matchbin_metrics.html">matchbin_metrics.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="matchbin_regulators.html">matchbin_regulators.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">matchbin_selectors.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414CacheStateBase"><code class="docutils literal notranslate"><span class="pre">CacheStateBase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv418RouletteCacheState"><code class="docutils literal notranslate"><span class="pre">RouletteCacheState</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415SieveCacheState"><code class="docutils literal notranslate"><span class="pre">SieveCacheState</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416RankedCacheState"><code class="docutils literal notranslate"><span class="pre">RankedCacheState</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E12SelectorBase"><code class="docutils literal notranslate"><span class="pre">SelectorBase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0_6size_tE14RankedSelector"><code class="docutils literal notranslate"><span class="pre">RankedSelector</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I000_6size_tE16RouletteSelector"><code class="docutils literal notranslate"><span class="pre">RouletteSelector</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00000_6size_tE19ExpRouletteSelector"><code class="docutils literal notranslate"><span class="pre">ExpRouletteSelector</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I00_6size_tE13SieveSelector"><code class="docutils literal notranslate"><span class="pre">SieveSelector</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="matchbin_utils.html">matchbin_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../matching.html">Matching</a></li>
+      <li class="breadcrumb-item active">matchbin_selectors.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="matchbin-selectors-hpp">
+<h1>matchbin_selectors.hpp<a class="headerlink" href="#matchbin-selectors-hpp" title="Link to this heading"></a></h1>
+<p>Selector structs that can be plugged into MatchBin. </p>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv414CacheStateBase">
+<span id="_CPPv314CacheStateBase"></span><span id="_CPPv214CacheStateBase"></span><span id="CacheStateBase"></span><span class="target" id="structCacheStateBase"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CacheStateBase</span></span></span><a class="headerlink" href="#_CPPv414CacheStateBase" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;matchbin_selectors.hpp&gt;</em></div>
+<p>Subclassed by RankedCacheState, RouletteCacheState, SieveCacheState</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14CacheStateBase14CacheStateBaseEv">
+<span id="_CPPv3N14CacheStateBase14CacheStateBaseEv"></span><span id="_CPPv2N14CacheStateBase14CacheStateBaseEv"></span><span id="CacheStateBase::CacheStateBase"></span><span class="target" id="structCacheStateBase_1ab125816bd33a1ccb97f0c75b3f0264b9"></span><span class="sig-name descname"><span class="n"><span class="pre">CacheStateBase</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N14CacheStateBase14CacheStateBaseEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14CacheStateBaseD0Ev">
+<span id="_CPPv3N14CacheStateBaseD0Ev"></span><span id="_CPPv2N14CacheStateBaseD0Ev"></span><span id="CacheStateBase::~CacheStateBase"></span><span class="target" id="structCacheStateBase_1ace43ea661131921276dc0939761e4251"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~CacheStateBase</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14CacheStateBaseD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14CacheStateBaseclE6size_t">
+<span id="_CPPv3N14CacheStateBaseclE6size_t"></span><span id="_CPPv2N14CacheStateBaseclE6size_t"></span><span id="CacheStateBase::call-operator__s"></span><span class="target" id="structCacheStateBase_1a7c401bfadab3b7d53ef68ed1b7cda395"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/optional.html#_CPPv4I0E8optional" title="optional"><span class="n"><span class="pre">optional</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N14CacheStateBaseclE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv418RouletteCacheState">
+<span id="_CPPv318RouletteCacheState"></span><span id="_CPPv218RouletteCacheState"></span><span id="RouletteCacheState"></span><span class="target" id="structRouletteCacheState"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RouletteCacheState</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414CacheStateBase" title="CacheStateBase"><span class="n"><span class="pre">CacheStateBase</span></span></a><a class="headerlink" href="#_CPPv418RouletteCacheState" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;matchbin_selectors.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18RouletteCacheState18RouletteCacheStateEv">
+<span id="_CPPv3N18RouletteCacheState18RouletteCacheStateEv"></span><span id="_CPPv2N18RouletteCacheState18RouletteCacheStateEv"></span><span id="RouletteCacheState::RouletteCacheState"></span><span class="target" id="structRouletteCacheState_1a61f47b63771f7159be9b36b17d631b26"></span><span class="sig-name descname"><span class="n"><span class="pre">RouletteCacheState</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N18RouletteCacheState18RouletteCacheStateEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18RouletteCacheState18RouletteCacheStateER8IndexMap6vectorI6size_tER6RandomK6size_t">
+<span id="_CPPv3N18RouletteCacheState18RouletteCacheStateER8IndexMap6vectorI6size_tER6RandomK6size_t"></span><span id="_CPPv2N18RouletteCacheState18RouletteCacheStateER8IndexMap6vectorI6size_tER6RandomK6size_t"></span><span id="RouletteCacheState::RouletteCacheState__IndexMapR.vector:s:.RandomR.sC"></span><span class="target" id="structRouletteCacheState_1ad79f6bd14dbddf79c94922e4f60501f0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RouletteCacheState</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../datastructs/api/IndexMap.html#_CPPv48IndexMap" title="IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">im</span></span>, <a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ids</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">default_n_</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18RouletteCacheState18RouletteCacheStateER8IndexMap6vectorI6size_tER6RandomK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N18RouletteCacheStateclE6size_t">
+<span id="_CPPv3N18RouletteCacheStateclE6size_t"></span><span id="_CPPv2N18RouletteCacheStateclE6size_t"></span><span id="RouletteCacheState::call-operator__s"></span><span class="target" id="structRouletteCacheState_1aac25ef2e19980091186677bc7ac9e0cf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/optional.html#_CPPv4I0E8optional" title="optional"><span class="n"><span class="pre">optional</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N18RouletteCacheStateclE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N18RouletteCacheState8indexMapE">
+<span id="_CPPv3N18RouletteCacheState8indexMapE"></span><span id="_CPPv2N18RouletteCacheState8indexMapE"></span><span id="RouletteCacheState::indexMap__IndexMap"></span><span class="target" id="structRouletteCacheState_1a2d5c4d6b9c6d43ef8bb8e3ed508fe212"></span><a class="reference internal" href="../../datastructs/api/IndexMap.html#_CPPv48IndexMap" title="IndexMap"><span class="n"><span class="pre">IndexMap</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">indexMap</span></span></span><a class="headerlink" href="#_CPPv4N18RouletteCacheState8indexMapE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N18RouletteCacheState4uidsE">
+<span id="_CPPv3N18RouletteCacheState4uidsE"></span><span id="_CPPv2N18RouletteCacheState4uidsE"></span><span id="RouletteCacheState::uids__vector:s:"></span><span class="target" id="structRouletteCacheState_1a3b7efb0fe051f1a604d7f9b9ee2bf6b0"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uids</span></span></span><a class="headerlink" href="#_CPPv4N18RouletteCacheState4uidsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N18RouletteCacheState4randE">
+<span id="_CPPv3N18RouletteCacheState4randE"></span><span id="_CPPv2N18RouletteCacheState4randE"></span><span id="RouletteCacheState::rand__RandomP"></span><span class="target" id="structRouletteCacheState_1abdadbe338eda2f36848378f49caa386b"></span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">rand</span></span></span><a class="headerlink" href="#_CPPv4N18RouletteCacheState4randE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N18RouletteCacheState9default_nE">
+<span id="_CPPv3N18RouletteCacheState9default_nE"></span><span id="_CPPv2N18RouletteCacheState9default_nE"></span><span id="RouletteCacheState::default_n__s"></span><span class="target" id="structRouletteCacheState_1a48ca2a52fcfc17d60e46e4f042f12ccb"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_n</span></span></span><a class="headerlink" href="#_CPPv4N18RouletteCacheState9default_nE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv415SieveCacheState">
+<span id="_CPPv315SieveCacheState"></span><span id="_CPPv215SieveCacheState"></span><span id="SieveCacheState"></span><span class="target" id="structSieveCacheState"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SieveCacheState</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414CacheStateBase" title="CacheStateBase"><span class="n"><span class="pre">CacheStateBase</span></span></a><a class="headerlink" href="#_CPPv415SieveCacheState" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;matchbin_selectors.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15SieveCacheState15SieveCacheStateEv">
+<span id="_CPPv3N15SieveCacheState15SieveCacheStateEv"></span><span id="_CPPv2N15SieveCacheState15SieveCacheStateEv"></span><span id="SieveCacheState::SieveCacheState"></span><span class="target" id="structSieveCacheState_1ac96ace9ac907ef8b64cc7ba7320cc657"></span><span class="sig-name descname"><span class="n"><span class="pre">SieveCacheState</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N15SieveCacheState15SieveCacheStateEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15SieveCacheState15SieveCacheStateE6vectorI6size_tERK6vectorIdER6RandomK6size_t">
+<span id="_CPPv3N15SieveCacheState15SieveCacheStateE6vectorI6size_tERK6vectorIdER6RandomK6size_t"></span><span id="_CPPv2N15SieveCacheState15SieveCacheStateE6vectorI6size_tERK6vectorIdER6RandomK6size_t"></span><span id="SieveCacheState::SieveCacheState__vector:s:.vector:double:CR.RandomR.sC"></span><span class="target" id="structSieveCacheState_1adfae0380c04b4f5ba3c097b7cf5d457b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SieveCacheState</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">uids_</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">probs_</span></span>, <a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">default_n_</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15SieveCacheState15SieveCacheStateE6vectorI6size_tERK6vectorIdER6RandomK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N15SieveCacheStateclE6size_t">
+<span id="_CPPv3N15SieveCacheStateclE6size_t"></span><span id="_CPPv2N15SieveCacheStateclE6size_t"></span><span id="SieveCacheState::call-operator__s"></span><span class="target" id="structSieveCacheState_1a4b757f668df15e7402db680cc8d50155"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/optional.html#_CPPv4I0E8optional" title="optional"><span class="n"><span class="pre">optional</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N15SieveCacheStateclE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15SieveCacheState4uidsE">
+<span id="_CPPv3N15SieveCacheState4uidsE"></span><span id="_CPPv2N15SieveCacheState4uidsE"></span><span id="SieveCacheState::uids__vector:s:"></span><span class="target" id="structSieveCacheState_1a9fd3e3cbe45ef31d1c171dd92d365b8c"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uids</span></span></span><a class="headerlink" href="#_CPPv4N15SieveCacheState4uidsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15SieveCacheState5probsE">
+<span id="_CPPv3N15SieveCacheState5probsE"></span><span id="_CPPv2N15SieveCacheState5probsE"></span><span id="SieveCacheState::probs__vector:double:"></span><span class="target" id="structSieveCacheState_1a133a451903f8b8d7e91c8ad4bf0b26f9"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">probs</span></span></span><a class="headerlink" href="#_CPPv4N15SieveCacheState5probsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15SieveCacheState4randE">
+<span id="_CPPv3N15SieveCacheState4randE"></span><span id="_CPPv2N15SieveCacheState4randE"></span><span id="SieveCacheState::rand__RandomP"></span><span class="target" id="structSieveCacheState_1a904e55cc55e189a213618a9d027eda71"></span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">rand</span></span></span><a class="headerlink" href="#_CPPv4N15SieveCacheState4randE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15SieveCacheState9default_nE">
+<span id="_CPPv3N15SieveCacheState9default_nE"></span><span id="_CPPv2N15SieveCacheState9default_nE"></span><span id="SieveCacheState::default_n__s"></span><span class="target" id="structSieveCacheState_1aa249bab8ab086ffdbed33f996d69908e"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_n</span></span></span><a class="headerlink" href="#_CPPv4N15SieveCacheState9default_nE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv416RankedCacheState">
+<span id="_CPPv316RankedCacheState"></span><span id="_CPPv216RankedCacheState"></span><span id="RankedCacheState"></span><span class="target" id="structRankedCacheState"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RankedCacheState</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414CacheStateBase" title="CacheStateBase"><span class="n"><span class="pre">CacheStateBase</span></span></a><a class="headerlink" href="#_CPPv416RankedCacheState" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;matchbin_selectors.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16RankedCacheState16RankedCacheStateEv">
+<span id="_CPPv3N16RankedCacheState16RankedCacheStateEv"></span><span id="_CPPv2N16RankedCacheState16RankedCacheStateEv"></span><span id="RankedCacheState::RankedCacheState"></span><span class="target" id="structRankedCacheState_1aeb7357b58b8c8d87daf350d6d5d7d0ad"></span><span class="sig-name descname"><span class="n"><span class="pre">RankedCacheState</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N16RankedCacheState16RankedCacheStateEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16RankedCacheState16RankedCacheStateE6vectorI6size_tE6size_t6size_t">
+<span id="_CPPv3N16RankedCacheState16RankedCacheStateE6vectorI6size_tE6size_t6size_t"></span><span id="_CPPv2N16RankedCacheState16RankedCacheStateE6vectorI6size_tE6size_t6size_t"></span><span id="RankedCacheState::RankedCacheState__vector:s:.s.s"></span><span class="target" id="structRankedCacheState_1ac1f580847048d89ab6346b65c3151d75"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RankedCacheState</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">uids_</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">default_n_</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16RankedCacheState16RankedCacheStateE6vectorI6size_tE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16RankedCacheStateclE6size_t">
+<span id="_CPPv3N16RankedCacheStateclE6size_t"></span><span id="_CPPv2N16RankedCacheStateclE6size_t"></span><span id="RankedCacheState::call-operator__s"></span><span class="target" id="structRankedCacheState_1aff0cc8a364b268359ade936b41b0cd98"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/optional.html#_CPPv4I0E8optional" title="optional"><span class="n"><span class="pre">optional</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N16RankedCacheStateclE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16RankedCacheState4uidsE">
+<span id="_CPPv3N16RankedCacheState4uidsE"></span><span id="_CPPv2N16RankedCacheState4uidsE"></span><span id="RankedCacheState::uids__vector:s:"></span><span class="target" id="structRankedCacheState_1a546fb33cb15c06b254a6303381698beb"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uids</span></span></span><a class="headerlink" href="#_CPPv4N16RankedCacheState4uidsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16RankedCacheState11requestSizeE">
+<span id="_CPPv3N16RankedCacheState11requestSizeE"></span><span id="_CPPv2N16RankedCacheState11requestSizeE"></span><span id="RankedCacheState::requestSize__s"></span><span class="target" id="structRankedCacheState_1a849734a12adcc8a7a84fe0a91c1e7bb2"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">requestSize</span></span></span><a class="headerlink" href="#_CPPv4N16RankedCacheState11requestSizeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16RankedCacheState9default_nE">
+<span id="_CPPv3N16RankedCacheState9default_nE"></span><span id="_CPPv2N16RankedCacheState9default_nE"></span><span id="RankedCacheState::default_n__s"></span><span class="target" id="structRankedCacheState_1a904de54c3a4e6d1a06feee8ade646734"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_n</span></span></span><a class="headerlink" href="#_CPPv4N16RankedCacheState9default_nE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0E12SelectorBase">
+<span id="_CPPv3I0E12SelectorBase"></span><span id="_CPPv2I0E12SelectorBase"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CacheType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structSelectorBase"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SelectorBase</span></span></span><a class="headerlink" href="#_CPPv4I0E12SelectorBase" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;matchbin_selectors.hpp&gt;</em></div>
+<p>Abstract base class for selectors. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SelectorBaseD0Ev">
+<span id="_CPPv3N12SelectorBaseD0Ev"></span><span id="_CPPv2N12SelectorBaseD0Ev"></span><span id="SelectorBase::~SelectorBase"></span><span class="target" id="structSelectorBase_1a15db1d84dcf0192a069df2f2f040b192"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~SelectorBase</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12SelectorBaseD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12SelectorBaseclE6vectorINSt4pairI6size_tdEEE6size_t">
+<span id="_CPPv3N12SelectorBaseclE6vectorINSt4pairI6size_tdEEE6size_t"></span><span id="_CPPv2N12SelectorBaseclE6vectorINSt4pairI6size_tdEEE6size_t"></span><span id="SelectorBase::call-operator__vector:std::pair:s.double::.s"></span><span class="target" id="structSelectorBase_1a7f0420ae156252d7a1ea620750de903e"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E12SelectorBase" title="SelectorBase::CacheType"><span class="n"><span class="pre">CacheType</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">scores</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12SelectorBaseclE6vectorINSt4pairI6size_tdEEE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12SelectorBase4nameEv">
+<span id="_CPPv3NK12SelectorBase4nameEv"></span><span id="_CPPv2NK12SelectorBase4nameEv"></span><span id="SelectorBase::nameC"></span><span class="target" id="structSelectorBase_1a6c8bd45dea3e27508662b4051495882a"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK12SelectorBase4nameEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0_6size_tE14RankedSelector">
+<span id="_CPPv3I0_6size_tE14RankedSelector"></span><span id="_CPPv2I0_6size_tE14RankedSelector"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ThreshRatio</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">&lt;</span></span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DefaultN</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structRankedSelector"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RankedSelector</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E12SelectorBase" title="SelectorBase"><span class="n"><span class="pre">SelectorBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv416RankedCacheState" title="RankedCacheState"><span class="n"><span class="pre">RankedCacheState</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0_6size_tE14RankedSelector" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;matchbin_selectors.hpp&gt;</em></div>
+<p>Returns matches within the threshold ThreshRatio sorted by match quality. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N14RankedSelector13cache_state_tE">
+<span id="_CPPv3N14RankedSelector13cache_state_tE"></span><span id="_CPPv2N14RankedSelector13cache_state_tE"></span><span class="target" id="structRankedSelector_1a3650e7959af835f75fc115cbd6a64ef8"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cache_state_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv416RankedCacheState" title="RankedCacheState"><span class="n"><span class="pre">RankedCacheState</span></span></a><a class="headerlink" href="#_CPPv4N14RankedSelector13cache_state_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14RankedSelector14RankedSelectorEv">
+<span id="_CPPv3N14RankedSelector14RankedSelectorEv"></span><span id="_CPPv2N14RankedSelector14RankedSelectorEv"></span><span id="RankedSelector::RankedSelector"></span><span class="target" id="structRankedSelector_1aaf32d148a8970e5c0dc6684974e3576b"></span><span class="sig-name descname"><span class="n"><span class="pre">RankedSelector</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N14RankedSelector14RankedSelectorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14RankedSelector14RankedSelectorER6Random">
+<span id="_CPPv3N14RankedSelector14RankedSelectorER6Random"></span><span id="_CPPv2N14RankedSelector14RankedSelectorER6Random"></span><span id="RankedSelector::RankedSelector__RandomR"></span><span class="target" id="structRankedSelector_1ad8a42c1dd46e2c78ea2ea6d57c9a03ad"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RankedSelector</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14RankedSelector14RankedSelectorER6Random" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK14RankedSelector4nameEv">
+<span id="_CPPv3NK14RankedSelector4nameEv"></span><span id="_CPPv2NK14RankedSelector4nameEv"></span><span id="RankedSelector::nameC"></span><span class="target" id="structRankedSelector_1a6b0eff94326e48c88e69523a435fca34"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK14RankedSelector4nameEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14RankedSelectorclE6vectorINSt4pairI6size_tdEEE6size_t">
+<span id="_CPPv3N14RankedSelectorclE6vectorINSt4pairI6size_tdEEE6size_t"></span><span id="_CPPv2N14RankedSelectorclE6vectorINSt4pairI6size_tdEEE6size_t"></span><span id="RankedSelector::call-operator__vector:std::pair:s.double::.s"></span><span class="target" id="structRankedSelector_1ab2c2ea4187aabe4d8c8ad72af2e2344c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv416RankedCacheState" title="RankedCacheState"><span class="n"><span class="pre">RankedCacheState</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">scores</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N14RankedSelectorclE6vectorINSt4pairI6size_tdEEE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I000_6size_tE16RouletteSelector">
+<span id="_CPPv3I000_6size_tE16RouletteSelector"></span><span id="_CPPv2I000_6size_tE16RouletteSelector"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ThreshRatio</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">&lt;</span></span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SkewRatio</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">10</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaxBaselineRatio</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DefaultN</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structRouletteSelector"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RouletteSelector</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E12SelectorBase" title="SelectorBase"><span class="n"><span class="pre">SelectorBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv418RouletteCacheState" title="RouletteCacheState"><span class="n"><span class="pre">RouletteCacheState</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I000_6size_tE16RouletteSelector" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;matchbin_selectors.hpp&gt;</em></div>
+<p>Selector chooses probabilistically based on match quality with replacement. ThreshRatio: what is the raw maximum score to even be considered to match SkewRatio: how much more heavily should the best matches be weighted in terms of match probability; must be greater than 0 (close to zero: very heavily, large: mostly even weighting) MaxBaselineRatio: maximum score that all scores will be normalized to baseline = min(min_score, MaxBaselineRatio) normalized_score = score - baseline … overall, p_match ~ 1 / (skew + score - baseline) </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N16RouletteSelector13cache_state_tE">
+<span id="_CPPv3N16RouletteSelector13cache_state_tE"></span><span id="_CPPv2N16RouletteSelector13cache_state_tE"></span><span class="target" id="structRouletteSelector_1a3214f24681dbd31c21c14a1145902536"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cache_state_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv418RouletteCacheState" title="RouletteCacheState"><span class="n"><span class="pre">RouletteCacheState</span></span></a><a class="headerlink" href="#_CPPv4N16RouletteSelector13cache_state_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16RouletteSelector16RouletteSelectorER6Random">
+<span id="_CPPv3N16RouletteSelector16RouletteSelectorER6Random"></span><span id="_CPPv2N16RouletteSelector16RouletteSelectorER6Random"></span><span id="RouletteSelector::RouletteSelector__RandomR"></span><span class="target" id="structRouletteSelector_1aee76aaefbca90deb59fbdcb60c36cade"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RouletteSelector</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rand_</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16RouletteSelector16RouletteSelectorER6Random" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16RouletteSelector4nameEv">
+<span id="_CPPv3NK16RouletteSelector4nameEv"></span><span id="_CPPv2NK16RouletteSelector4nameEv"></span><span id="RouletteSelector::nameC"></span><span class="target" id="structRouletteSelector_1a7a193e08ba513a04a7111ad1ce798d2a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK16RouletteSelector4nameEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16RouletteSelectorclE6vectorINSt4pairI6size_tdEEE6size_t">
+<span id="_CPPv3N16RouletteSelectorclE6vectorINSt4pairI6size_tdEEE6size_t"></span><span id="_CPPv2N16RouletteSelectorclE6vectorINSt4pairI6size_tdEEE6size_t"></span><span id="RouletteSelector::call-operator__vector:std::pair:s.double::.s"></span><span class="target" id="structRouletteSelector_1ad47543a4336a261383f1c9ac994d58b8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv418RouletteCacheState" title="RouletteCacheState"><span class="n"><span class="pre">RouletteCacheState</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">scores</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N16RouletteSelectorclE6vectorINSt4pairI6size_tdEEE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16RouletteSelector4randE">
+<span id="_CPPv3N16RouletteSelector4randE"></span><span id="_CPPv2N16RouletteSelector4randE"></span><span id="RouletteSelector::rand__RandomR"></span><span class="target" id="structRouletteSelector_1ac6b42e87eae9fe8bcfd4e1a56c2df7e5"></span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">rand</span></span></span><a class="headerlink" href="#_CPPv4N16RouletteSelector4randE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I00000_6size_tE19ExpRouletteSelector">
+<span id="_CPPv3I00000_6size_tE19ExpRouletteSelector"></span><span id="_CPPv2I00000_6size_tE19ExpRouletteSelector"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ThreshRatio</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">13</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">10</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BRatio</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">100</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CRatio</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ZRatio</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaxBaselineRatio</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">5</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DefaultN</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structExpRouletteSelector"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExpRouletteSelector</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E12SelectorBase" title="SelectorBase"><span class="n"><span class="pre">SelectorBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv418RouletteCacheState" title="RouletteCacheState"><span class="n"><span class="pre">RouletteCacheState</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I00000_6size_tE19ExpRouletteSelector" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;matchbin_selectors.hpp&gt;</em></div>
+<p>Selector chooses probabilistically based on match quality with replacement using exponentially. ThreshRatio: what is the minimum probability of matching to even be considered for a match BRatio, CRatio, ZRatio: p_match ~ b ^ (c * normalized_score) ^ z MaxBaselineRatio: maximum score that all scores will be normalized to baseline = min(min_score, MaxBaselineRatio) normalized_score = score - baseline </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N19ExpRouletteSelector13cache_state_tE">
+<span id="_CPPv3N19ExpRouletteSelector13cache_state_tE"></span><span id="_CPPv2N19ExpRouletteSelector13cache_state_tE"></span><span class="target" id="structExpRouletteSelector_1a0bc6be774e4e9d58c6bfdb49b82be218"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cache_state_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv418RouletteCacheState" title="RouletteCacheState"><span class="n"><span class="pre">RouletteCacheState</span></span></a><a class="headerlink" href="#_CPPv4N19ExpRouletteSelector13cache_state_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N19ExpRouletteSelector19ExpRouletteSelectorER6Random">
+<span id="_CPPv3N19ExpRouletteSelector19ExpRouletteSelectorER6Random"></span><span id="_CPPv2N19ExpRouletteSelector19ExpRouletteSelectorER6Random"></span><span id="ExpRouletteSelector::ExpRouletteSelector__RandomR"></span><span class="target" id="structExpRouletteSelector_1ad8dcbec69bd7e34bc107c3b88db3ee9b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExpRouletteSelector</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rand_</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19ExpRouletteSelector19ExpRouletteSelectorER6Random" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK19ExpRouletteSelector4nameEv">
+<span id="_CPPv3NK19ExpRouletteSelector4nameEv"></span><span id="_CPPv2NK19ExpRouletteSelector4nameEv"></span><span id="ExpRouletteSelector::nameC"></span><span class="target" id="structExpRouletteSelector_1a131ba5a1b10d65fa1f77589eacfa083b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK19ExpRouletteSelector4nameEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N19ExpRouletteSelectorclE6vectorINSt4pairI6size_tdEEE6size_t">
+<span id="_CPPv3N19ExpRouletteSelectorclE6vectorINSt4pairI6size_tdEEE6size_t"></span><span id="_CPPv2N19ExpRouletteSelectorclE6vectorINSt4pairI6size_tdEEE6size_t"></span><span id="ExpRouletteSelector::call-operator__vector:std::pair:s.double::.s"></span><span class="target" id="structExpRouletteSelector_1aaaac5951df61359be05e30ac1cbc6947"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv418RouletteCacheState" title="RouletteCacheState"><span class="n"><span class="pre">RouletteCacheState</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">scores</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N19ExpRouletteSelectorclE6vectorINSt4pairI6size_tdEEE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N19ExpRouletteSelector4randE">
+<span id="_CPPv3N19ExpRouletteSelector4randE"></span><span id="_CPPv2N19ExpRouletteSelector4randE"></span><span id="ExpRouletteSelector::rand__RandomR"></span><span class="target" id="structExpRouletteSelector_1a9deb24267fe6e3d50eef936c30047945"></span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">rand</span></span></span><a class="headerlink" href="#_CPPv4N19ExpRouletteSelector4randE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I00_6size_tE13SieveSelector">
+<span id="_CPPv3I00_6size_tE13SieveSelector"></span><span id="_CPPv2I00_6size_tE13SieveSelector"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StochasticRatio</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">10</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LockInRatio</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">&lt;</span></span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DefaultN</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">numeric_limits</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">max</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structSieveSelector"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SieveSelector</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E12SelectorBase" title="SelectorBase"><span class="n"><span class="pre">SelectorBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv415SieveCacheState" title="SieveCacheState"><span class="n"><span class="pre">SieveCacheState</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I00_6size_tE13SieveSelector" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;matchbin_selectors.hpp&gt;</em></div>
+<p>Selector treats each element of the MatchBin independently. As match distance increases, each element passes through a regime where selection is guaranteed, a regime where selection is stochastic, and then a regime where non-selection is guaranteed. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13SieveSelector13cache_state_tE">
+<span id="_CPPv3N13SieveSelector13cache_state_tE"></span><span id="_CPPv2N13SieveSelector13cache_state_tE"></span><span class="target" id="structSieveSelector_1ab884af397d2302e78c3094e6fa7875ed"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cache_state_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415SieveCacheState" title="SieveCacheState"><span class="n"><span class="pre">SieveCacheState</span></span></a><a class="headerlink" href="#_CPPv4N13SieveSelector13cache_state_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SieveSelector13SieveSelectorER6Random">
+<span id="_CPPv3N13SieveSelector13SieveSelectorER6Random"></span><span id="_CPPv2N13SieveSelector13SieveSelectorER6Random"></span><span id="SieveSelector::SieveSelector__RandomR"></span><span class="target" id="structSieveSelector_1aa436e8823dfb6bc8bace4d727e051caa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SieveSelector</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rand_</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13SieveSelector13SieveSelectorER6Random" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13SieveSelector4nameEv">
+<span id="_CPPv3NK13SieveSelector4nameEv"></span><span id="_CPPv2NK13SieveSelector4nameEv"></span><span id="SieveSelector::nameC"></span><span class="target" id="structSieveSelector_1acc6906ae9253f228f25829b798121256"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK13SieveSelector4nameEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13SieveSelectorclE6vectorINSt4pairI6size_tdEEE6size_t">
+<span id="_CPPv3N13SieveSelectorclE6vectorINSt4pairI6size_tdEEE6size_t"></span><span id="_CPPv2N13SieveSelectorclE6vectorINSt4pairI6size_tdEEE6size_t"></span><span id="SieveSelector::call-operator__vector:std::pair:s.double::.s"></span><span class="target" id="structSieveSelector_1ab3f8ac7d7bbdd0690469b9358b3ea1ca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415SieveCacheState" title="SieveCacheState"><span class="n"><span class="pre">SieveCacheState</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">scores</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N13SieveSelectorclE6vectorINSt4pairI6size_tdEEE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13SieveSelector4randE">
+<span id="_CPPv3N13SieveSelector4randE"></span><span id="_CPPv2N13SieveSelector4randE"></span><span id="SieveSelector::rand__RandomR"></span><span class="target" id="structSieveSelector_1a6c43ed27a7a353f4100adcd49aae6be6"></span><a class="reference internal" href="../../math/api/Random.html#_CPPv46Random" title="Random"><span class="n"><span class="pre">Random</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">rand</span></span></span><a class="headerlink" href="#_CPPv4N13SieveSelector4randE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="matchbin_regulators.html" class="btn btn-neutral float-left" title="matchbin_regulators.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="matchbin_utils.html" class="btn btn-neutral float-right" title="matchbin_utils.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

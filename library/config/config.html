@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Config &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/config/config.84493b18-a5a2-467f-b7a3-204bacabebb5.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ArgManager.hpp" href="api/ArgManager.html" />
+    <link rel="prev" title="regex_utils.hpp" href="../compiler/api/regex_utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Config</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html">ArgManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html">ConfigManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html">FlagManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html">SettingCombos.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html">SettingConfig.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/command_line.html">command_line.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html">config.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_utils.html">config_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html">config_web_interface.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Config</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="config">
+<h1>Config<a class="headerlink" href="#config" title="Link to this heading"></a></h1>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/ArgManager.html">ArgManager.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/ArgManager.html#_CPPv4eqRK7ArgSpecRK7ArgSpec"><code class="docutils literal notranslate"><span class="pre">operator==()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/ArgManager.html#_CPPv47ArgSpec"><code class="docutils literal notranslate"><span class="pre">ArgSpec</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N7ArgSpec7ArgSpecEK6size_tKNSt6stringEKNSt13unordered_setINSt6stringEEEKNSt8functionIFv8optionalI6vectorINSt6stringEEEEEEKbKb"><code class="docutils literal notranslate"><span class="pre">ArgSpec::ArgSpec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N7ArgSpec7ArgSpecEK6size_tK6size_tKNSt6stringEKNSt13unordered_setINSt6stringEEEKNSt8functionIFv8optionalI6vectorINSt6stringEEEEEEKbKb"><code class="docutils literal notranslate"><span class="pre">ArgSpec::ArgSpec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N7ArgSpec10most_quotaE"><code class="docutils literal notranslate"><span class="pre">ArgSpec::most_quota</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N7ArgSpec11least_quotaE"><code class="docutils literal notranslate"><span class="pre">ArgSpec::least_quota</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N7ArgSpec11descriptionE"><code class="docutils literal notranslate"><span class="pre">ArgSpec::description</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N7ArgSpec7aliasesE"><code class="docutils literal notranslate"><span class="pre">ArgSpec::aliases</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N7ArgSpec8callbackE"><code class="docutils literal notranslate"><span class="pre">ArgSpec::callback</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N7ArgSpec12gobble_flagsE"><code class="docutils literal notranslate"><span class="pre">ArgSpec::gobble_flags</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N7ArgSpec7flattenE"><code class="docutils literal notranslate"><span class="pre">ArgSpec::flatten</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/ArgManager.html#_CPPv410ArgManager"><code class="docutils literal notranslate"><span class="pre">ArgManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager6pack_tE"><code class="docutils literal notranslate"><span class="pre">ArgManager::pack_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager10pack_map_tE"><code class="docutils literal notranslate"><span class="pre">ArgManager::pack_map_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager10spec_map_tE"><code class="docutils literal notranslate"><span class="pre">ArgManager::spec_map_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager10ArgManagerEiA_PcRK10spec_map_t"><code class="docutils literal notranslate"><span class="pre">ArgManager::ArgManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager10ArgManagerEK6pack_tRK10spec_map_t"><code class="docutils literal notranslate"><span class="pre">ArgManager::ArgManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager10ArgManagerERK10pack_map_tRK10spec_map_t"><code class="docutils literal notranslate"><span class="pre">ArgManager::ArgManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManagerD0Ev"><code class="docutils literal notranslate"><span class="pre">ArgManager::~ArgManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager11CallbackArgERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ArgManager::CallbackArg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager12UseCallbacksEv"><code class="docutils literal notranslate"><span class="pre">ArgManager::UseCallbacks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager6UseArgERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ArgManager::UseArg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4NK10ArgManager7ViewArgERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ArgManager::ViewArg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager14ProcessBuiltinEK3PtrI6ConfigERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">ArgManager::ProcessBuiltin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4NK10ArgManager15PrintDiagnosticERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">ArgManager::PrintDiagnostic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4NK10ArgManager9PrintHelpERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">ArgManager::PrintHelp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4NK10ArgManager9HasUnusedERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">ArgManager::HasUnused()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager15args_to_stringsEiA_Pc"><code class="docutils literal notranslate"><span class="pre">ArgManager::args_to_strings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager5parseE6pack_tRK10spec_map_t"><code class="docutils literal notranslate"><span class="pre">ArgManager::parse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager18make_builtin_specsEK3PtrI6ConfigE"><code class="docutils literal notranslate"><span class="pre">ArgManager::make_builtin_specs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager12DealiasSpecsE10spec_map_t"><code class="docutils literal notranslate"><span class="pre">ArgManager::DealiasSpecs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager5packsE"><code class="docutils literal notranslate"><span class="pre">ArgManager::packs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N10ArgManager5specsE"><code class="docutils literal notranslate"><span class="pre">ArgManager::specs</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/ArgManager.html#_CPPv4N2cl10ArgManagerE"><code class="docutils literal notranslate"><span class="pre">ArgManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N2cl10ArgManager10ArgManagerEv"><code class="docutils literal notranslate"><span class="pre">ArgManager::ArgManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N2cl10ArgManager10ArgManagerEiA_Pc"><code class="docutils literal notranslate"><span class="pre">ArgManager::ArgManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N2cl10ArgManagerD0Ev"><code class="docutils literal notranslate"><span class="pre">ArgManager::~ArgManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4I0EN2cl10ArgManager6UseArgEiRKNSt6stringER1TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ArgManager::UseArg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N2cl10ArgManager6UseArgERKNSt6stringER6ConfigRKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ArgManager::UseArg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N2cl10ArgManager7UseFlagERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ArgManager::UseFlag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4NK2cl10ArgManager9PrintHelpERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">ArgManager::PrintHelp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4NK2cl10ArgManager10HasUnknownERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">ArgManager::HasUnknown()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4NK2cl10ArgManager11TestUnknownERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">ArgManager::TestUnknown()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N2cl10ArgManager20ProcessConfigOptionsER6ConfigRNSt7ostreamERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ArgManager::ProcessConfigOptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N2cl10ArgManager8parent_tE"><code class="docutils literal notranslate"><span class="pre">ArgManager::parent_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N2cl10ArgManager9arg_namesE"><code class="docutils literal notranslate"><span class="pre">ArgManager::arg_names</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ArgManager.html#_CPPv4N2cl10ArgManager9arg_descsE"><code class="docutils literal notranslate"><span class="pre">ArgManager::arg_descs</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/ConfigManager.html">ConfigManager.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/ConfigManager.html#_CPPv418ConfigManager_Base"><code class="docutils literal notranslate"><span class="pre">ConfigManager_Base</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N18ConfigManager_Base18ConfigManager_BaseERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigManager_Base::ConfigManager_Base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N18ConfigManager_BaseD0Ev"><code class="docutils literal notranslate"><span class="pre">ConfigManager_Base::~ConfigManager_Base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4NK18ConfigManager_Base14GetTypeKeywordEv"><code class="docutils literal notranslate"><span class="pre">ConfigManager_Base::GetTypeKeyword()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4NK18ConfigManager_Base17GetCommandKeywordEv"><code class="docutils literal notranslate"><span class="pre">ConfigManager_Base::GetCommandKeyword()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N18ConfigManager_Base9NewObjectERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigManager_Base::NewObject()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N18ConfigManager_Base9UseObjectERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigManager_Base::UseObject()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N18ConfigManager_Base15CommandCallbackERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigManager_Base::CommandCallback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N18ConfigManager_Base12type_keywordE"><code class="docutils literal notranslate"><span class="pre">ConfigManager_Base::type_keyword</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N18ConfigManager_Base15command_keywordE"><code class="docutils literal notranslate"><span class="pre">ConfigManager_Base::command_keyword</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/ConfigManager.html#_CPPv4I0E13ConfigManager"><code class="docutils literal notranslate"><span class="pre">ConfigManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N13ConfigManager13ConfigManagerERKNSt6stringERKNSt6stringENSt8functionIFbR12MANAGED_TYPENSt6stringEEEE"><code class="docutils literal notranslate"><span class="pre">ConfigManager::ConfigManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N13ConfigManagerD0Ev"><code class="docutils literal notranslate"><span class="pre">ConfigManager::~ConfigManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N13ConfigManager9HasObjectERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigManager::HasObject()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N13ConfigManager9NewObjectERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigManager::NewObject()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N13ConfigManager9UseObjectERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigManager::UseObject()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N13ConfigManager15CommandCallbackERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigManager::CommandCallback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N13ConfigManager8name_mapE"><code class="docutils literal notranslate"><span class="pre">ConfigManager::name_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N13ConfigManager7cur_objE"><code class="docutils literal notranslate"><span class="pre">ConfigManager::cur_obj</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigManager.html#_CPPv4N13ConfigManager12callback_funE"><code class="docutils literal notranslate"><span class="pre">ConfigManager::callback_fun</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/FlagManager.html">FlagManager.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/FlagManager.html#_CPPv411FlagManager"><code class="docutils literal notranslate"><span class="pre">FlagManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager11FlagManagerEv"><code class="docutils literal notranslate"><span class="pre">FlagManager::FlagManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager11FlagManagerEiA_Pc"><code class="docutils literal notranslate"><span class="pre">FlagManager::FlagManager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManagerixE6size_t"><code class="docutils literal notranslate"><span class="pre">FlagManager::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4NK11FlagManagerixE6size_t"><code class="docutils literal notranslate"><span class="pre">FlagManager::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4NK11FlagManager9GetExtrasEv"><code class="docutils literal notranslate"><span class="pre">FlagManager::GetExtras()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4NK11FlagManager4FindE6String"><code class="docutils literal notranslate"><span class="pre">FlagManager::Find()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4NK11FlagManager3HasE6String"><code class="docutils literal notranslate"><span class="pre">FlagManager::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager3UseE6String"><code class="docutils literal notranslate"><span class="pre">FlagManager::Use()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager9AddOptionE6String6String"><code class="docutils literal notranslate"><span class="pre">FlagManager::AddOption()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager9AddOptionE6StringNSt8functionIFvvEEE6String"><code class="docutils literal notranslate"><span class="pre">FlagManager::AddOption()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager9AddOptionE6StringNSt8functionIFv6StringEEE6String"><code class="docutils literal notranslate"><span class="pre">FlagManager::AddOption()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager9AddOptionE6StringNSt8functionIFv6String6StringEEE6String"><code class="docutils literal notranslate"><span class="pre">FlagManager::AddOption()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager9AddOptionE6StringNSt8functionIFvRK6vectorI6StringEEEE6size_t6size_t6String"><code class="docutils literal notranslate"><span class="pre">FlagManager::AddOption()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4I0EN11FlagManager9AddOptionEvc6String5FUN_T6String"><code class="docutils literal notranslate"><span class="pre">FlagManager::AddOption()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager8AddFlagsEiA_Pc"><code class="docutils literal notranslate"><span class="pre">FlagManager::AddFlags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager10ProcessArgE6String6size_t"><code class="docutils literal notranslate"><span class="pre">FlagManager::ProcessArg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager10ProcessArgEc6size_t"><code class="docutils literal notranslate"><span class="pre">FlagManager::ProcessArg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager14ProcessFlagSetE6String6size_t"><code class="docutils literal notranslate"><span class="pre">FlagManager::ProcessFlagSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager7ProcessEv"><code class="docutils literal notranslate"><span class="pre">FlagManager::Process()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4NK11FlagManager12PrintOptionsERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">FlagManager::PrintOptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager4nposE"><code class="docutils literal notranslate"><span class="pre">FlagManager::npos</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager4argsE"><code class="docutils literal notranslate"><span class="pre">FlagManager::args</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager6extrasE"><code class="docutils literal notranslate"><span class="pre">FlagManager::extras</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager12flag_optionsE"><code class="docutils literal notranslate"><span class="pre">FlagManager::flag_options</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager9shortcutsE"><code class="docutils literal notranslate"><span class="pre">FlagManager::shortcuts</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager8FlagInfoE"><code class="docutils literal notranslate"><span class="pre">FlagManager::FlagInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager8FlagInfo4descE"><code class="docutils literal notranslate"><span class="pre">FlagManager::FlagInfo::desc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager8FlagInfo8min_argsE"><code class="docutils literal notranslate"><span class="pre">FlagManager::FlagInfo::min_args</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager8FlagInfo8max_argsE"><code class="docutils literal notranslate"><span class="pre">FlagManager::FlagInfo::max_args</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager8FlagInfo3funE"><code class="docutils literal notranslate"><span class="pre">FlagManager::FlagInfo::fun</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/FlagManager.html#_CPPv4N11FlagManager8FlagInfo8shortcutE"><code class="docutils literal notranslate"><span class="pre">FlagManager::FlagInfo::shortcut</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/SettingCombos.html">SettingCombos.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/SettingCombos.html#_CPPv413SettingCombos"><code class="docutils literal notranslate"><span class="pre">SettingCombos</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos13SettingCombosEv"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingCombos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombosD0Ev"><code class="docutils literal notranslate"><span class="pre">SettingCombos::~SettingCombos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4NK13SettingCombos10GetComboIDEv"><code class="docutils literal notranslate"><span class="pre">SettingCombos::GetComboID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos5ResetEv"><code class="docutils literal notranslate"><span class="pre">SettingCombos::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4I0ENK13SettingCombos8GetValueERK1TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::GetValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4I0ENK13SettingCombos8MaxValueE1TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::MaxValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4I0EN13SettingCombos10AddSettingER6vectorI1TERKNSt6stringERKNSt6stringEKc"><code class="docutils literal notranslate"><span class="pre">SettingCombos::AddSetting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4I0EN13SettingCombos10AddSettingER6vectorI1TERKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE6size_t"><code class="docutils literal notranslate"><span class="pre">SettingCombos::AddSetting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4I0EN13SettingCombos16AddSingleSettingER6vectorI1TERKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::AddSingleSetting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos9AddActionERKNSt6stringERKNSt6stringEKcNSt8functionIFvvEEE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4I0EN13SettingCombos6ValuesER6vectorI1TERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::Values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4I0EN13SettingCombos8AddValueEvRKNSt6stringERR1T"><code class="docutils literal notranslate"><span class="pre">SettingCombos::AddValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4I0DpEN13SettingCombos9SetValuesEvRKNSt6stringERR2T1DpRR2Ts"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SetValues()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11CountCombosEv"><code class="docutils literal notranslate"><span class="pre">SettingCombos::CountCombos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos4NextEv"><code class="docutils literal notranslate"><span class="pre">SettingCombos::Next()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos10GetHeadersERKNSt6stringEb"><code class="docutils literal notranslate"><span class="pre">SettingCombos::GetHeaders()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4NK13SettingCombos9CurStringERKNSt6stringEb"><code class="docutils literal notranslate"><span class="pre">SettingCombos::CurString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos15FindOptionMatchERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::FindOptionMatch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos13FindFlagMatchEKc"><code class="docutils literal notranslate"><span class="pre">SettingCombos::FindFlagMatch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos14ProcessOptionsERK6vectorINSt6stringEE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::ProcessOptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4IDpENK13SettingCombos9PrintHelpEvDpRK2Ts"><code class="docutils literal notranslate"><span class="pre">SettingCombos::PrintHelp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos8exe_nameE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::exe_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos8settingsE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::settings</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11setting_mapE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::setting_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos10action_mapE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::action_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos9cur_comboE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::cur_combo</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos8combo_idE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::combo_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos10ActionFlagE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::ActionFlag</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos10ActionFlag4nameE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::ActionFlag::name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos10ActionFlag4descE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::ActionFlag::desc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos10ActionFlag4flagE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::ActionFlag::flag</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos10ActionFlag3funE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::ActionFlag::fun</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingBaseE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingBase11SettingBaseERKNSt6stringERKNSt6stringEKcRKNSt6stringEK6size_t"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::SettingBase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingBaseD0Ev"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::~SettingBase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4NK13SettingCombos11SettingBase7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4NK13SettingCombos11SettingBase8AsStringEv"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::AsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4NK13SettingCombos11SettingBase8AsStringE6size_t"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::AsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingBase10FromStringERKNSt11string_viewE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::FromString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingBase10SetValueIDE6size_t"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::SetValueID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4NK13SettingCombos11SettingBase2OKEv"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::OK()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4NK13SettingCombos11SettingBase13IsOptionMatchERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::IsOptionMatch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4NK13SettingCombos11SettingBase11IsFlagMatchEKc"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::IsFlagMatch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingBase2idE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingBase4nameE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingBase4descE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::desc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingBase4flagE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::flag</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingBase6optionE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::option</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingBase10args_labelE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::args_label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingBase3capE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingBase::cap</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingCombos.html#_CPPv4I0EN13SettingCombos11SettingInfoE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingInfo11SettingInfoERKNSt6stringERKNSt6stringEKcRKNSt6stringEK6size_t3PtrI1TE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingInfo::SettingInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4NK13SettingCombos11SettingInfo7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingInfo::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4NK13SettingCombos11SettingInfo8AsStringEv"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingInfo::AsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4NK13SettingCombos11SettingInfo8AsStringE6size_t"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingInfo::AsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4NK13SettingCombos11SettingInfo2OKEv"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingInfo::OK()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingInfo10FromStringERKNSt11string_viewE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingInfo::FromString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingInfo10SetValueIDE6size_t"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingInfo::SetValueID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingInfo6valuesE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingInfo::values</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingCombos.html#_CPPv4N13SettingCombos11SettingInfo7var_ptrE"><code class="docutils literal notranslate"><span class="pre">SettingCombos::SettingInfo::var_ptr</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/SettingConfig.html">SettingConfig.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/SettingConfig.html#_CPPv413SettingConfig"><code class="docutils literal notranslate"><span class="pre">SettingConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig13SettingConfigEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingConfig()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfigD0Ev"><code class="docutils literal notranslate"><span class="pre">SettingConfig::~SettingConfig()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig10GetExeNameEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::GetExeName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig10GetComboIDEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::GetComboID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig13GetUnusedArgsEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::GetUnusedArgs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig9GetErrorsEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::GetErrors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig13HasUnusedArgsEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::HasUnusedArgs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig9HasErrorsEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::HasErrors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4I0ENK13SettingConfig8GetValueERK1TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::GetValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4I0ENK13SettingConfig8MaxValueE1TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::MaxValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4I0EN13SettingConfig10AddSettingER1TRKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::AddSetting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4I0EN13SettingConfig15AddComboSettingER6vectorI1TERKNSt6stringERKNSt6stringEKc"><code class="docutils literal notranslate"><span class="pre">SettingConfig::AddComboSetting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4I0EN13SettingConfig15AddComboSettingER6vectorI1TERKNSt6stringERKNSt6stringEKcR1TRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::AddComboSetting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig9AddActionERKNSt6stringERKNSt6stringEKcNSt8functionIFvvEEE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::AddAction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4I0EN13SettingConfig11ComboValuesER6vectorI1TERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ComboValues()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11ResetCombosEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ResetCombos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4I0EN13SettingConfig13AddComboValueEvRKNSt6stringERR1T"><code class="docutils literal notranslate"><span class="pre">SettingConfig::AddComboValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4I0DpEN13SettingConfig14SetComboValuesEvRKNSt6stringERR2T1DpRR2Ts"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SetComboValues()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11CountCombosEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::CountCombos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig9NextComboEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::NextCombo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig17GetSettingHeadersERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::GetSettingHeaders()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig11CurSettingsERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::CurSettings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig15GetComboHeadersERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::GetComboHeaders()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig14CurComboStringERKNSt6stringEbb"><code class="docutils literal notranslate"><span class="pre">SettingConfig::CurComboString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig15FindOptionMatchERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::FindOptionMatch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig13FindFlagMatchEKc"><code class="docutils literal notranslate"><span class="pre">SettingConfig::FindFlagMatch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig14ProcessOptionsERK6vectorINSt6stringEE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ProcessOptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig14ProcessOptionsEiA_Pc"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ProcessOptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4IDpENK13SettingConfig9PrintHelpEvDpRK2Ts"><code class="docutils literal notranslate"><span class="pre">SettingConfig::PrintHelp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig8exe_nameE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::exe_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11setting_mapE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::setting_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig10action_mapE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::action_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig14combo_settingsE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::combo_settings</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig9cur_comboE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::cur_combo</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig8combo_idE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::combo_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11unused_argsE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::unused_args</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig6errorsE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::errors</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig10ActionFlagE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ActionFlag</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig10ActionFlag4nameE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ActionFlag::name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig10ActionFlag4descE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ActionFlag::desc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig10ActionFlag4flagE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ActionFlag::flag</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig10ActionFlag3funE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ActionFlag::fun</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4I0EN13SettingConfig16ComboSettingInfoE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ComboSettingInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig16ComboSettingInfo16ComboSettingInfoERKNSt6stringERKNSt6stringEKcRKNSt6stringE3PtrI1TE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ComboSettingInfo::ComboSettingInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig16ComboSettingInfo7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ComboSettingInfo::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig16ComboSettingInfo8AsStringEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ComboSettingInfo::AsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig16ComboSettingInfo8AsStringE6size_t"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ComboSettingInfo::AsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig16ComboSettingInfo10FromStringERKNSt11string_viewE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ComboSettingInfo::FromString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig16ComboSettingInfo10SetValueIDE6size_t"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ComboSettingInfo::SetValueID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig16ComboSettingInfo14IsComboSettingEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ComboSettingInfo::IsComboSetting()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig16ComboSettingInfo5GetIDEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ComboSettingInfo::GetID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig16ComboSettingInfo6valuesE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ComboSettingInfo::values</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig16ComboSettingInfo7var_ptrE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ComboSettingInfo::var_ptr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig16ComboSettingInfo2idE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::ComboSettingInfo::id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11SettingBaseE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11SettingBase11SettingBaseERKNSt6stringERKNSt6stringEKcRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase::SettingBase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11SettingBaseD0Ev"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase::~SettingBase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig11SettingBase7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig11SettingBase8AsStringEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase::AsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig11SettingBase8AsStringE6size_t"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase::AsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11SettingBase10FromStringERKNSt11string_viewE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase::FromString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig11SettingBase13IsOptionMatchERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase::IsOptionMatch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig11SettingBase11IsFlagMatchEKc"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase::IsFlagMatch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11SettingBase4nameE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase::name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11SettingBase4descE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase::desc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11SettingBase4flagE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase::flag</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11SettingBase6optionE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase::option</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11SettingBase10args_labelE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingBase::args_label</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/SettingConfig.html#_CPPv4I0EN13SettingConfig11SettingInfoE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11SettingInfo11SettingInfoERKNSt6stringERKNSt6stringEKcRKNSt6stringE3PtrI1TE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingInfo::SettingInfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig11SettingInfo7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingInfo::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig11SettingInfo8AsStringEv"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingInfo::AsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4NK13SettingConfig11SettingInfo8AsStringE6size_t"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingInfo::AsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11SettingInfo10FromStringERKNSt11string_viewE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingInfo::FromString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11SettingInfo5valueE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingInfo::value</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/SettingConfig.html#_CPPv4N13SettingConfig11SettingInfo7var_ptrE"><code class="docutils literal notranslate"><span class="pre">SettingConfig::SettingInfo::var_ptr</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/command_line.html">command_line.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/command_line.html#_CPPv42cl"><code class="docutils literal notranslate"><span class="pre">cl</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/command_line.html#_CPPv4N2cl15args_to_stringsEiA_Pc"><code class="docutils literal notranslate"><span class="pre">cl::args_to_strings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/command_line.html#_CPPv4I0EN2cl12read_arg_posE1TRK6vectorINSt6stringEE6size_t1T"><code class="docutils literal notranslate"><span class="pre">cl::read_arg_pos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/command_line.html#_CPPv4N2cl8find_argERK6vectorINSt6stringEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">cl::find_arg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/command_line.html#_CPPv4N2cl7has_argERK6vectorINSt6stringEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">cl::has_arg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/command_line.html#_CPPv4N2cl7use_argER6vectorINSt6stringEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">cl::use_arg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/command_line.html#_CPPv4I0EN2cl13get_arg_valueEiR6vectorINSt6stringEERKNSt6stringER1T"><code class="docutils literal notranslate"><span class="pre">cl::get_arg_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/command_line.html#_CPPv4N2cl13get_arg_valueER6vectorINSt6stringEERKNSt6stringERNSt6stringERNSt6stringE"><code class="docutils literal notranslate"><span class="pre">cl::get_arg_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/command_line.html#_CPPv4IDpEN2cl13use_arg_valueEiR6vectorINSt6stringEERKNSt6stringEDpR2Ts"><code class="docutils literal notranslate"><span class="pre">cl::use_arg_value()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/config.html">config.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/config.html#_CPPv411ConfigEntry"><code class="docutils literal notranslate"><span class="pre">ConfigEntry</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry11ConfigEntryEKNSt6stringEKNSt6stringEKNSt6stringEKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::ConfigEntry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntryD0Ev"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::~ConfigEntry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK11ConfigEntry7GetNameEv"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK11ConfigEntry7GetTypeEv"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::GetType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK11ConfigEntry10GetDefaultEv"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::GetDefault()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK11ConfigEntry14GetDescriptionEv"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::GetDescription()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry7SetNameERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::SetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry7SetTypeERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::SetType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry10SetDefaultERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::SetDefault()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry14SetDescriptionERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::SetDescription()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry8AddAliasERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::AddAlias()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry8HasAliasERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::HasAlias()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry7IsMatchERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::IsMatch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry10GetAliasesEv"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::GetAliases()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK11ConfigEntry8GetValueEv"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::GetValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK11ConfigEntry15GetLiteralValueEv"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::GetLiteralValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry8SetValueERKNSt6stringERNSt12stringstreamE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::SetValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK11ConfigEntry7IsConstEv"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::IsConst()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry4nameE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry4typeE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry11default_valE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::default_val</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry4descE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::desc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N11ConfigEntry9alias_setE"><code class="docutils literal notranslate"><span class="pre">ConfigEntry::alias_set</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/config.html#_CPPv46Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config6ConfigERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::Config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6ConfigD0Ev"><code class="docutils literal notranslate"><span class="pre">Config::~Config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6ConfigixERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config5beginEv"><code class="docutils literal notranslate"><span class="pre">Config::begin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config3endEv"><code class="docutils literal notranslate"><span class="pre">Config::end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK6ConfigixERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::operator[]()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config6cbeginEv"><code class="docutils literal notranslate"><span class="pre">Config::cbegin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config4cendEv"><code class="docutils literal notranslate"><span class="pre">Config::cend()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK6Config5beginEv"><code class="docutils literal notranslate"><span class="pre">Config::begin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK6Config3endEv"><code class="docutils literal notranslate"><span class="pre">Config::end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config11SetExpandOKEb"><code class="docutils literal notranslate"><span class="pre">Config::SetExpandOK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK6Config3HasERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::Has()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK6Config12ResolveAliasERNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::ResolveAlias()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config3GetENSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config3SetENSt6stringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::Set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6ConfigclERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6ConfigclERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::operator()()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config8AddAliasERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::AddAlias()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK6Config5WriteERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Config::Write()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK6Config5WriteENSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::Write()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK6Config19WriteUrlQueryStringERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Config::WriteUrlQueryString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK6Config11WriteMacrosERNSt7ostreamEb"><code class="docutils literal notranslate"><span class="pre">Config::WriteMacros()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4NK6Config11WriteMacrosENSt6stringEb"><code class="docutils literal notranslate"><span class="pre">Config::WriteMacros()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config4ReadERNSt7istreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::Read()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config4ReadENSt6stringEb"><code class="docutils literal notranslate"><span class="pre">Config::Read()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config12AddNameSpaceER6ConfigRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::AddNameSpace()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config10AddCommandERKNSt6stringENSt8functionIFbNSt6stringEEEE"><code class="docutils literal notranslate"><span class="pre">Config::AddCommand()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config14AddNewCallbackERKNSt6stringENSt8functionIFbNSt6stringEEEE"><code class="docutils literal notranslate"><span class="pre">Config::AddNewCallback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config14AddUseCallbackERKNSt6stringENSt8functionIFbNSt6stringEEEE"><code class="docutils literal notranslate"><span class="pre">Config::AddUseCallback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4I0EN6Config14AddManagedTypeEvRKNSt6stringERKNSt6stringENSt8functionIFbR12MANAGED_TYPENSt6stringEEEE"><code class="docutils literal notranslate"><span class="pre">Config::AddManagedType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config11GetGroupSetEv"><code class="docutils literal notranslate"><span class="pre">Config::GetGroupSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config14GetActiveGroupEv"><code class="docutils literal notranslate"><span class="pre">Config::GetActiveGroup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config14GetActiveEntryEv"><code class="docutils literal notranslate"><span class="pre">Config::GetActiveEntry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config9IsVarCharEKc"><code class="docutils literal notranslate"><span class="pre">Config::IsVarChar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config11ProcessLineERNSt6stringERNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::ProcessLine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config11class_namesE"><code class="docutils literal notranslate"><span class="pre">Config::class_names</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config7var_mapE"><code class="docutils literal notranslate"><span class="pre">Config::var_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config10version_idE"><code class="docutils literal notranslate"><span class="pre">Config::version_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config9group_setE"><code class="docutils literal notranslate"><span class="pre">Config::group_set</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config8warningsE"><code class="docutils literal notranslate"><span class="pre">Config::warnings</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config14delay_warningsE"><code class="docutils literal notranslate"><span class="pre">Config::delay_warnings</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config9alias_mapE"><code class="docutils literal notranslate"><span class="pre">Config::alias_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config13namespace_mapE"><code class="docutils literal notranslate"><span class="pre">Config::namespace_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config16type_manager_mapE"><code class="docutils literal notranslate"><span class="pre">Config::type_manager_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config11command_mapE"><code class="docutils literal notranslate"><span class="pre">Config::command_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config7new_mapE"><code class="docutils literal notranslate"><span class="pre">Config::new_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config7use_mapE"><code class="docutils literal notranslate"><span class="pre">Config::use_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config9expand_okE"><code class="docutils literal notranslate"><span class="pre">Config::expand_ok</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config11ConfigGroupE"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config11ConfigGroup11ConfigGroupERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::ConfigGroup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config11ConfigGroupD0Ev"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::~ConfigGroup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config11ConfigGroup7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config11ConfigGroup7GetNameEv"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::GetName()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config11ConfigGroup7GetDescEv"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::GetDesc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config11ConfigGroup8GetEntryE6size_t"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::GetEntry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config11ConfigGroup12GetLastEntryEv"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::GetLastEntry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config11ConfigGroup3AddEP11ConfigEntry"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::Add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config11ConfigGroup5WriteERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::Write()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config11ConfigGroup19WriteUrlQueryStringERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::WriteUrlQueryString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config11ConfigGroup11WriteMacrosERNSt7ostreamEb"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::WriteMacros()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config11ConfigGroup4nameE"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config11ConfigGroup4descE"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::desc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config11ConfigGroup9entry_setE"><code class="docutils literal notranslate"><span class="pre">Config::ConfigGroup::entry_set</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4N6Config15ConfigLiveEntryE"><code class="docutils literal notranslate"><span class="pre">Config::ConfigLiveEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config15ConfigLiveEntry15ConfigLiveEntryEKNSt6stringEKNSt6stringEKNSt6stringEKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Config::ConfigLiveEntry::ConfigLiveEntry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config15ConfigLiveEntryD0Ev"><code class="docutils literal notranslate"><span class="pre">Config::ConfigLiveEntry::~ConfigLiveEntry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config15ConfigLiveEntry8GetValueEv"><code class="docutils literal notranslate"><span class="pre">Config::ConfigLiveEntry::GetValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config15ConfigLiveEntry15GetLiteralValueEv"><code class="docutils literal notranslate"><span class="pre">Config::ConfigLiveEntry::GetLiteralValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config15ConfigLiveEntry8SetValueERKNSt6stringERNSt12stringstreamE"><code class="docutils literal notranslate"><span class="pre">Config::ConfigLiveEntry::SetValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config15ConfigLiveEntry7IsConstEv"><code class="docutils literal notranslate"><span class="pre">Config::ConfigLiveEntry::IsConst()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4I0EN6Config17tConfigConstEntryE"><code class="docutils literal notranslate"><span class="pre">Config::tConfigConstEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config17tConfigConstEntry17tConfigConstEntryEKNSt6stringEKNSt6stringEKNSt6stringEKNSt6stringERK8VAR_TYPE"><code class="docutils literal notranslate"><span class="pre">Config::tConfigConstEntry::tConfigConstEntry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config17tConfigConstEntryD0Ev"><code class="docutils literal notranslate"><span class="pre">Config::tConfigConstEntry::~tConfigConstEntry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config17tConfigConstEntry8GetValueEv"><code class="docutils literal notranslate"><span class="pre">Config::tConfigConstEntry::GetValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config17tConfigConstEntry15GetLiteralValueEv"><code class="docutils literal notranslate"><span class="pre">Config::tConfigConstEntry::GetLiteralValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config17tConfigConstEntry8SetValueERKNSt6stringERNSt12stringstreamE"><code class="docutils literal notranslate"><span class="pre">Config::tConfigConstEntry::SetValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config17tConfigConstEntry7IsConstEv"><code class="docutils literal notranslate"><span class="pre">Config::tConfigConstEntry::IsConst()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config17tConfigConstEntry11literal_valE"><code class="docutils literal notranslate"><span class="pre">Config::tConfigConstEntry::literal_val</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/config.html#_CPPv4I0EN6Config12tConfigEntryE"><code class="docutils literal notranslate"><span class="pre">Config::tConfigEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config12tConfigEntry12tConfigEntryEKNSt6stringEKNSt6stringEKNSt6stringEKNSt6stringER8VAR_TYPE"><code class="docutils literal notranslate"><span class="pre">Config::tConfigEntry::tConfigEntry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config12tConfigEntryD0Ev"><code class="docutils literal notranslate"><span class="pre">Config::tConfigEntry::~tConfigEntry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config12tConfigEntry8GetValueEv"><code class="docutils literal notranslate"><span class="pre">Config::tConfigEntry::GetValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config12tConfigEntry15GetLiteralValueEv"><code class="docutils literal notranslate"><span class="pre">Config::tConfigEntry::GetLiteralValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config12tConfigEntry8SetValueERKNSt6stringERNSt12stringstreamE"><code class="docutils literal notranslate"><span class="pre">Config::tConfigEntry::SetValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4NK6Config12tConfigEntry7IsConstEv"><code class="docutils literal notranslate"><span class="pre">Config::tConfigEntry::IsConst()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/config.html#_CPPv4N6Config12tConfigEntry9entry_refE"><code class="docutils literal notranslate"><span class="pre">Config::tConfigEntry::entry_ref</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/config.html#_CPPv4NSt12placeholdersE"><code class="docutils literal notranslate"><span class="pre">placeholders</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/config_utils.html">config_utils.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/config_utils.html#_CPPv414GetEmptyConfigv"><code class="docutils literal notranslate"><span class="pre">GetEmptyConfig()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/config_web_interface.html">config_web_interface.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/config_web_interface.html#_CPPv411ConfigWebUI"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html#_CPPv4N11ConfigWebUI11ConfigWebUIER6ConfigRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI::ConfigWebUI()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html#_CPPv4N11ConfigWebUI14SetOnChangeFunENSt8functionIFvRKNSt6stringEEEE"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI::SetOnChangeFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html#_CPPv4I0EN11ConfigWebUI28SetDefaultRangeFloatingPointEvR5Input1T"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI::SetDefaultRangeFloatingPoint()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html#_CPPv4N11ConfigWebUI25SetDefaultRangeFixedPointER5Inputi"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI::SetDefaultRangeFixedPoint()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html#_CPPv4N11ConfigWebUI13ExcludeConfigENSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI::ExcludeConfig()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html#_CPPv4N11ConfigWebUI5SetupERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI::Setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html#_CPPv4N11ConfigWebUI6GetDivEv"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI::GetDiv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html#_CPPv4N11ConfigWebUI6configE"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI::config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html#_CPPv4N11ConfigWebUI12settings_divE"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI::settings_div</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html#_CPPv4N11ConfigWebUI7excludeE"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI::exclude</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html#_CPPv4N11ConfigWebUI10group_divsE"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI::group_divs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html#_CPPv4N11ConfigWebUI9input_mapE"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI::input_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/config_web_interface.html#_CPPv4N11ConfigWebUI13numeric_typesE"><code class="docutils literal notranslate"><span class="pre">ConfigWebUI::numeric_types</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../compiler/api/regex_utils.html" class="btn btn-neutral float-left" title="regex_utils.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/ArgManager.html" class="btn btn-neutral float-right" title="ArgManager.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StaticString.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/tools/api/StaticString.0f364861-cb31-4557-b60d-77ed5c7788e9.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="String.hpp" href="String.html" />
+    <link rel="prev" title="SolveState.hpp" href="SolveState.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tools.html">Other Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../tools.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="MemoryFactory.html">MemoryFactory.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SolveState.html">SolveState.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">StaticString.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411ShortString"><code class="docutils literal notranslate"><span class="pre">ShortString</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString"><code class="docutils literal notranslate"><span class="pre">StaticString</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="String.html">String.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypeTracker.html">TypeTracker.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="attrs.html">attrs.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="char_utils.html">char_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hash_namify.html">hash_namify.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="keyname_utils.html">keyname_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="string_utils.html">string_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timing.html">timing.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unique.html">unique.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="value_utils.html">value_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tools.html">Other Tools</a></li>
+      <li class="breadcrumb-item active">StaticString.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="staticstring-hpp">
+<h1>StaticString.hpp<a class="headerlink" href="#staticstring-hpp" title="Link to this heading"></a></h1>
+<p>String substitute with a fixed max character count and always in place. </p>
+<p>
+A fixed number of chars are reserved for the string; errors will trigger for longer attempts. The last allocated byte stores the number of unused positions in the string; this naturally becomes zero (the final character in a string) when all positions are used. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA</p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv411ShortString">
+<span id="_CPPv311ShortString"></span><span id="_CPPv211ShortString"></span><span class="target" id="StaticString_8hpp_1ad40e8d35e3b11c572d3fed5dbdfa1257"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ShortString</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">31</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv411ShortString" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_t0E12StaticString">
+<span id="_CPPv3I_6size_t0E12StaticString"></span><span id="_CPPv2I_6size_t0E12StaticString"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NUM_CHARS</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CHAR_T</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStaticString"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StaticString</span></span></span><a class="headerlink" href="#_CPPv4I_6size_t0E12StaticString" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;StaticString.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString12StaticStringEv">
+<span id="_CPPv3N12StaticString12StaticStringEv"></span><span id="_CPPv2N12StaticString12StaticStringEv"></span><span id="StaticString::StaticString"></span><span class="target" id="classStaticString_1ae844091813ed006b581613832212de64"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StaticString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticString12StaticStringEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString12StaticStringERK12StaticString">
+<span id="_CPPv3N12StaticString12StaticStringERK12StaticString"></span><span id="_CPPv2N12StaticString12StaticStringERK12StaticString"></span><span id="StaticString::StaticString__StaticStringCR"></span><span class="target" id="classStaticString_1a966fe7daa1ca038637254ce98f3d665b"></span><span class="sig-name descname"><span class="n"><span class="pre">StaticString</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12StaticString12StaticStringERK12StaticString" title="StaticString::StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N12StaticString12StaticStringERK12StaticString" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString12StaticStringERKNSt6stringE">
+<span id="_CPPv3N12StaticString12StaticStringERKNSt6stringE"></span><span id="_CPPv2N12StaticString12StaticStringERKNSt6stringE"></span><span id="StaticString::StaticString__ssCR"></span><span class="target" id="classStaticString_1a4ef1d0dce3c5c6476f55bd8bd82cfcca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StaticString</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticString12StaticStringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString12StaticStringEPK6CHAR_T">
+<span id="_CPPv3N12StaticString12StaticStringEPK6CHAR_T"></span><span id="_CPPv2N12StaticString12StaticStringEPK6CHAR_T"></span><span id="StaticString::StaticString__CHAR_TCP"></span><span class="target" id="classStaticString_1a6d4bc841d5b1ec9b0b7fea771b2968e3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StaticString</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticString12StaticStringEPK6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_tEN12StaticString12StaticStringEA4SIZE_6CHAR_T">
+<span id="_CPPv3I_6size_tEN12StaticString12StaticStringEA4SIZE_6CHAR_T"></span><span id="_CPPv2I_6size_tEN12StaticString12StaticStringEASIZE_6CHAR_T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIZE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStaticString_1a3ae05da912c80963310e7ba3708da245"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StaticString</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#_CPPv4I_6size_tEN12StaticString12StaticStringEA4SIZE_6CHAR_T" title="StaticString::StaticString::SIZE"><span class="n"><span class="pre">SIZE</span></span></a><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_6size_tEN12StaticString12StaticStringEA4SIZE_6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticStringaSERK12StaticString">
+<span id="_CPPv3N12StaticStringaSERK12StaticString"></span><span id="_CPPv2N12StaticStringaSERK12StaticString"></span><span id="StaticString::assign-operator__StaticStringCR"></span><span class="target" id="classStaticString_1a8692db6e20775f4b5edfdb74d93cec4e"></span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N12StaticStringaSERK12StaticString" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticStringaSERKNSt6stringE">
+<span id="_CPPv3N12StaticStringaSERKNSt6stringE"></span><span id="_CPPv2N12StaticStringaSERKNSt6stringE"></span><span id="StaticString::assign-operator__ssCR"></span><span class="target" id="classStaticString_1af272478cec6403c42ca4a46ed31f851b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticStringaSERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticStringaSEPK6CHAR_T">
+<span id="_CPPv3N12StaticStringaSEPK6CHAR_T"></span><span id="_CPPv2N12StaticStringaSEPK6CHAR_T"></span><span id="StaticString::assign-operator__CHAR_TCP"></span><span class="target" id="classStaticString_1a2cd0fee2ee25546ac75792d7378a15d5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticStringaSEPK6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_tEN12StaticStringaSER12StaticStringA4SIZE_6CHAR_T">
+<span id="_CPPv3I_6size_tEN12StaticStringaSEA4SIZE_6CHAR_T"></span><span id="_CPPv2I_6size_tEN12StaticStringaSEASIZE_6CHAR_T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIZE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStaticString_1a6337c2ce5c35986fc5694df85789c3f6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#_CPPv4I_6size_tEN12StaticStringaSER12StaticStringA4SIZE_6CHAR_T" title="StaticString::operator=::SIZE"><span class="n"><span class="pre">SIZE</span></span></a><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_6size_tEN12StaticStringaSER12StaticStringA4SIZE_6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString4dataEv">
+<span id="_CPPv3N12StaticString4dataEv"></span><span id="_CPPv2N12StaticString4dataEv"></span><span id="StaticString::data"></span><span class="target" id="classStaticString_1a3ed761214691f90490bc13e54a0d62cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticString4dataEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12StaticString4dataEv">
+<span id="_CPPv3NK12StaticString4dataEv"></span><span id="_CPPv2NK12StaticString4dataEv"></span><span id="StaticString::dataC"></span><span class="target" id="classStaticString_1a898c2b3c74aacdd74d56b1c1bfa36a97"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12StaticString4dataEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12StaticString4sizeEv">
+<span id="_CPPv3NK12StaticString4sizeEv"></span><span id="_CPPv2NK12StaticString4sizeEv"></span><span id="StaticString::sizeC"></span><span class="target" id="classStaticString_1a7aec7ee06b9db46bc3c60ffd273ae31d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12StaticString4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString6resizeE6size_t">
+<span id="_CPPv3N12StaticString6resizeE6size_t"></span><span id="_CPPv2N12StaticString6resizeE6size_t"></span><span id="StaticString::resize__s"></span><span class="target" id="classStaticString_1a639035d1389c266ff5b16257b12f599a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticString6resizeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString6resizeE6size_t6CHAR_T">
+<span id="_CPPv3N12StaticString6resizeE6size_t6CHAR_T"></span><span id="_CPPv2N12StaticString6resizeE6size_t6CHAR_T"></span><span id="StaticString::resize__s.CHAR_T"></span><span class="target" id="classStaticString_1a2bd05d04708e830bbc3a1592f49d5bc3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_size</span></span>, <a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">filler</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticString6resizeE6size_t6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticStringixE6size_t">
+<span id="_CPPv3N12StaticStringixE6size_t"></span><span id="_CPPv2N12StaticStringixE6size_t"></span><span id="StaticString::subscript-operator__s"></span><span class="target" id="classStaticString_1a6a121df82e53b18efb27f5cde38b6907"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticStringixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12StaticStringixE6size_t">
+<span id="_CPPv3NK12StaticStringixE6size_t"></span><span id="_CPPv2NK12StaticStringixE6size_t"></span><span id="StaticString::subscript-operator__sC"></span><span class="target" id="classStaticString_1a696ae18634352d79b5e9d50df429402a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12StaticStringixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK12StaticStringeqEbRK1T">
+<span id="_CPPv3I0ENK12StaticStringeqERK1T"></span><span id="_CPPv2I0ENK12StaticStringeqERK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStaticString_1a47ee455e63457442306f4b4b16be3d75"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK12StaticStringeqEbRK1T" title="StaticString::operator==::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK12StaticStringeqEbRK1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK12StaticStringneEbRK1T">
+<span id="_CPPv3I0ENK12StaticStringneERK1T"></span><span id="_CPPv2I0ENK12StaticStringneERK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStaticString_1a53ff91613cf18e76710434f4d03d57ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK12StaticStringneEbRK1T" title="StaticString::operator!=::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK12StaticStringneEbRK1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK12StaticStringltEbRK1T">
+<span id="_CPPv3I0ENK12StaticStringltERK1T"></span><span id="_CPPv2I0ENK12StaticStringltERK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStaticString_1ac6f2f8334966404136c068ceb162fbfe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK12StaticStringltEbRK1T" title="StaticString::operator&lt;::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK12StaticStringltEbRK1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK12StaticStringleEbRK1T">
+<span id="_CPPv3I0ENK12StaticStringleERK1T"></span><span id="_CPPv2I0ENK12StaticStringleERK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStaticString_1afc2d2bcc062351040fb7c276786d54dc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK12StaticStringleEbRK1T" title="StaticString::operator&lt;=::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK12StaticStringleEbRK1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK12StaticStringgtEbRK1T">
+<span id="_CPPv3I0ENK12StaticStringgtERK1T"></span><span id="_CPPv2I0ENK12StaticStringgtERK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStaticString_1ab080442a0eed70ca6585973d385c80f4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK12StaticStringgtEbRK1T" title="StaticString::operator&gt;::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK12StaticStringgtEbRK1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK12StaticStringgeEbRK1T">
+<span id="_CPPv3I0ENK12StaticStringgeERK1T"></span><span id="_CPPv2I0ENK12StaticStringgeERK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStaticString_1ae61ba871ad47ee1f51dd0d72635dcfae"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0ENK12StaticStringgeEbRK1T" title="StaticString::operator&gt;=::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK12StaticStringgeEbRK1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12StaticStringeqEPK6CHAR_T">
+<span id="_CPPv3NK12StaticStringeqEPK6CHAR_T"></span><span id="_CPPv2NK12StaticStringeqEPK6CHAR_T"></span><span id="StaticString::eq-operator__CHAR_TCPC"></span><span class="target" id="classStaticString_1a46b1ce129bea150e3ecce209b4c1b7cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12StaticStringeqEPK6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12StaticStringneEPK6CHAR_T">
+<span id="_CPPv3NK12StaticStringneEPK6CHAR_T"></span><span id="_CPPv2NK12StaticStringneEPK6CHAR_T"></span><span id="StaticString::neq-operator__CHAR_TCPC"></span><span class="target" id="classStaticString_1a5978001e8d985374e967fc1b8248b1e4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12StaticStringneEPK6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12StaticStringltEPK6CHAR_T">
+<span id="_CPPv3NK12StaticStringltEPK6CHAR_T"></span><span id="_CPPv2NK12StaticStringltEPK6CHAR_T"></span><span id="StaticString::lt-operator__CHAR_TCPC"></span><span class="target" id="classStaticString_1a5f26bb7adda016299bbbdb63c2f5d5aa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12StaticStringltEPK6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12StaticStringleEPK6CHAR_T">
+<span id="_CPPv3NK12StaticStringleEPK6CHAR_T"></span><span id="_CPPv2NK12StaticStringleEPK6CHAR_T"></span><span id="StaticString::lte-operator__CHAR_TCPC"></span><span class="target" id="classStaticString_1a744b1ab89eb72c9d7fe4778fae2789b6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12StaticStringleEPK6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12StaticStringgtEPK6CHAR_T">
+<span id="_CPPv3NK12StaticStringgtEPK6CHAR_T"></span><span id="_CPPv2NK12StaticStringgtEPK6CHAR_T"></span><span id="StaticString::gt-operator__CHAR_TCPC"></span><span class="target" id="classStaticString_1a56bd52f2021a6938c2fe61858a094e00"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12StaticStringgtEPK6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12StaticStringgeEPK6CHAR_T">
+<span id="_CPPv3NK12StaticStringgeEPK6CHAR_T"></span><span id="_CPPv2NK12StaticStringgeEPK6CHAR_T"></span><span id="StaticString::gte-operator__CHAR_TCPC"></span><span class="target" id="classStaticString_1a21607168a538921544cfbadfadfddac7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12StaticStringgeEPK6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticStringcvP6CHAR_TEv">
+<span id="_CPPv3N12StaticStringcvP6CHAR_TEv"></span><span id="_CPPv2N12StaticStringcvP6CHAR_TEv"></span><span id="StaticString::castto-CHAR_TP-operator"></span><span class="target" id="classStaticString_1a0f3838ce2d90f670018793764e9df378"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="p"><span class="pre">*</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticStringcvP6CHAR_TEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12StaticStringcvPK6CHAR_TEv">
+<span id="_CPPv3NK12StaticStringcvPK6CHAR_TEv"></span><span id="_CPPv2NK12StaticStringcvPK6CHAR_TEv"></span><span id="StaticString::castto-CHAR_TCP-operatorC"></span><span class="target" id="classStaticString_1aea79a47101bee7dc460db9832506ea02"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="p"><span class="pre">*</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12StaticStringcvPK6CHAR_TEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12StaticStringcvNSt6stringEEv">
+<span id="_CPPv3NK12StaticStringcvNSt6stringEEv"></span><span id="_CPPv2NK12StaticStringcvNSt6stringEEv"></span><span id="StaticString::castto-ss-operatorC"></span><span class="target" id="classStaticString_1aa05f580ec3acf8bccf93c2155a052125"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12StaticStringcvNSt6stringEEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12StaticString8AsStringEv">
+<span id="_CPPv3NK12StaticString8AsStringEv"></span><span id="_CPPv2NK12StaticString8AsStringEv"></span><span id="StaticString::AsStringC"></span><span class="target" id="classStaticString_1ad1e67235f45488b383f688b281e4f151"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12StaticString8AsStringEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString9push_backE6CHAR_T">
+<span id="_CPPv3N12StaticString9push_backE6CHAR_T"></span><span id="_CPPv2N12StaticString9push_backE6CHAR_T"></span><span id="StaticString::push_back__CHAR_T"></span><span class="target" id="classStaticString_1a6c376b5b4258e5914d90830ae50ef398"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">push_back</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticString9push_backE6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString6appendEPK6CHAR_T6size_t">
+<span id="_CPPv3N12StaticString6appendEPK6CHAR_T6size_t"></span><span id="_CPPv2N12StaticString6appendEPK6CHAR_T6size_t"></span><span id="StaticString::append__CHAR_TCP.s"></span><span class="target" id="classStaticString_1a9a7fd625d4c596cdbd77d7a205932031"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">append</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in_str</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticString6appendEPK6CHAR_T6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString6appendERKNSt6stringE">
+<span id="_CPPv3N12StaticString6appendERKNSt6stringE"></span><span id="_CPPv2N12StaticString6appendERKNSt6stringE"></span><span id="StaticString::append__ssCR"></span><span class="target" id="classStaticString_1a7602ef4e44e3c656e767820c6fd0e0b4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">append</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_str</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticString6appendERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_tEN12StaticString6appendER12StaticStringA4SIZE_6CHAR_T">
+<span id="_CPPv3I_6size_tEN12StaticString6appendEA4SIZE_6CHAR_T"></span><span id="_CPPv2I_6size_tEN12StaticString6appendEASIZE_6CHAR_T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIZE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStaticString_1ae925fdf7d2053eb3ffcabd85bd1b358e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">append</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">in_str</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#_CPPv4I_6size_tEN12StaticString6appendER12StaticStringA4SIZE_6CHAR_T" title="StaticString::append::SIZE"><span class="n"><span class="pre">SIZE</span></span></a><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_6size_tEN12StaticString6appendER12StaticStringA4SIZE_6CHAR_T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_6size_tEN12StaticString6appendER12StaticString12StaticStringI10NUM_CHARS26CHAR_TE">
+<span id="_CPPv3I_6size_tEN12StaticString6appendE12StaticStringI10NUM_CHARS26CHAR_TE"></span><span id="_CPPv2I_6size_tEN12StaticString6appendE12StaticStringI10NUM_CHARS26CHAR_TE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NUM_CHARS2</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classStaticString_1a3ac3af62eae4c93cae7aa28b751e7f93"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">append</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_tEN12StaticString6appendER12StaticString12StaticStringI10NUM_CHARS26CHAR_TE" title="StaticString::append::NUM_CHARS2"><span class="n"><span class="pre">NUM_CHARS2</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_str</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_6size_tEN12StaticString6appendER12StaticString12StaticStringI10NUM_CHARS26CHAR_TE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString9ss_size_tE">
+<span id="_CPPv3N12StaticString9ss_size_tE"></span><span id="_CPPv2N12StaticString9ss_size_tE"></span><span class="target" id="classStaticString_1ae3ee64a169734448f64ea50f87c58009"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ss_size_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">conditional_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::NUM_CHARS"><span class="n"><span class="pre">NUM_CHARS</span></span></a><span class="w"> </span><span class="o"><span class="pre">&lt;=</span></span><span class="w"> </span><span class="m"><span class="pre">256</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint16_t</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N12StaticString9ss_size_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString8CopyFromEPK6CHAR_T6size_t">
+<span id="_CPPv3N12StaticString8CopyFromEPK6CHAR_T6size_t"></span><span id="_CPPv2N12StaticString8CopyFromEPK6CHAR_T6size_t"></span><span id="StaticString::CopyFrom__CHAR_TCP.s"></span><span class="target" id="classStaticString_1a84386c51be796aab67e64905064e65a9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString"><span class="n"><span class="pre">StaticString</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">CopyFrom</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12StaticString8CopyFromEPK6CHAR_T6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12StaticString7CompareEPK6CHAR_T6size_t">
+<span id="_CPPv3NK12StaticString7CompareEPK6CHAR_T6size_t"></span><span id="_CPPv2NK12StaticString7CompareEPK6CHAR_T6size_t"></span><span id="StaticString::Compare__CHAR_TCP.sC"></span><span class="target" id="classStaticString_1a8671aab8104b04b59de24c80533e4646"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Compare</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">len</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12StaticString7CompareEPK6CHAR_T6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString6stringE">
+<span id="_CPPv3N12StaticString6stringE"></span><span id="_CPPv2N12StaticString6stringE"></span><span id="StaticString::string__array:CHAR_T.NUM_CHARS:"></span><span class="target" id="classStaticString_1ae8b502bc457b9a11b868e654589b6ac1"></span><a class="reference internal" href="../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::CHAR_T"><span class="n"><span class="pre">CHAR_T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::NUM_CHARS"><span class="n"><span class="pre">NUM_CHARS</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">string</span></span></span><a class="headerlink" href="#_CPPv4N12StaticString6stringE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString8str_sizeE">
+<span id="_CPPv3N12StaticString8str_sizeE"></span><span id="_CPPv2N12StaticString8str_sizeE"></span><span id="StaticString::str_size__ss_size_t"></span><span class="target" id="classStaticString_1aec95230541fbc5c18fd46207d7e9697f"></span><a class="reference internal" href="#_CPPv4N12StaticString9ss_size_tE" title="StaticString::ss_size_t"><span class="n"><span class="pre">ss_size_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">str_size</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12StaticString8str_sizeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-static-attributes">Private Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12StaticString9MAX_CHARSE">
+<span id="_CPPv3N12StaticString9MAX_CHARSE"></span><span id="_CPPv2N12StaticString9MAX_CHARSE"></span><span id="StaticString::MAX_CHARS__sC"></span><span class="target" id="classStaticString_1af3f579b97740dc3748f86f762fb2b897"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_CHARS</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_6size_t0E12StaticString" title="StaticString::NUM_CHARS"><span class="n"><span class="pre">NUM_CHARS</span></span></a><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N12StaticString9MAX_CHARSE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="SolveState.html" class="btn btn-neutral float-left" title="SolveState.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="String.html" class="btn btn-neutral float-right" title="String.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

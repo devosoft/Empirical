@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>flex_function.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/functional/api/flex_function.bb82f37f-6839-46c1-a0d4-43af5f0096a5.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="memo_function.hpp" href="memo_function.html" />
+    <link rel="prev" title="GenericFunction.hpp" href="GenericFunction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../functional.html">Functional</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../functional.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="AnyFunction.html">AnyFunction.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FunctionSet.html">FunctionSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="GenericFunction.html">GenericFunction.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">flex_function.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E13flex_function"><code class="docutils literal notranslate"><span class="pre">flex_function</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE"><code class="docutils literal notranslate"><span class="pre">flex_function</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="memo_function.html">memo_function.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../functional.html">Functional</a></li>
+      <li class="breadcrumb-item active">flex_function.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="flex-function-hpp">
+<h1>flex_function.hpp<a class="headerlink" href="#flex-function-hpp" title="Link to this heading"></a></h1>
+<p>Based on std::function, but holds default parameter values for calls with fewer args. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: ALPHA </p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E13flex_function">
+<span id="_CPPv3I0E13flex_function"></span><span id="_CPPv2I0E13flex_function"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classflex__function"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">flex_function</span></span></span><a class="headerlink" href="#_CPPv4I0E13flex_function" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;flex_function.hpp&gt;</em></div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE">
+<span id="_CPPv3I0DpE13flex_functionIF1RDp4ARGSEE"></span><span id="_CPPv2I0DpE13flex_functionIF1RDp4ARGSEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">R</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">flex_function</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE" title="flex_function&lt;R(ARGS...)&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE" title="flex_function&lt;R(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;flex_function.hpp&gt;</em></div>
+<p>A functon class that is almost identical to std::function, but is provided with default values for all parameters so that it can be called with fewer arguments, as needed. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEE6size_tE">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEE6size_tE"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEE6size_tE"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1ab2891a2292e8d0cf74db736c23881f4d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE6size_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEE8return_tE">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEE8return_tE"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEE8return_tE"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a22bbec12d3572dea0bcc47c45df733a0"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">return_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE" title="flex_function&lt;R(ARGS...)&gt;::R"><span class="n"><span class="pre">R</span></span></a><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE8return_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEE5fun_tE">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEE5fun_tE"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEE5fun_tE"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a3bb88b95677c7e08b4f2ce389aa484fc"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE" title="flex_function&lt;R(ARGS...)&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE" title="flex_function&lt;R(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE5fun_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEE6this_tE">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEE6this_tE"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEE6this_tE"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1ac63c3f103810073f5d0019d12efb3cf5"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN13flex_functionIF1RDp4ARGSEE13flex_functionERR1T" title="flex_function&lt;R(ARGS...)&gt;::flex_function"><span class="n"><span class="pre">flex_function</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE" title="flex_function&lt;R(ARGS...)&gt;::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE" title="flex_function&lt;R(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEE7tuple_tE">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEE7tuple_tE"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEE7tuple_tE"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a837fef335c08a621b7ec1da7eaf06563"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tuple_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">tuple</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE" title="flex_function&lt;R(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE7tuple_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13flex_functionIF1RDp4ARGSEE13flex_functionERR1T">
+<span id="_CPPv3I0EN13flex_functionIF1RDp4ARGSEE13flex_functionERR1T"></span><span id="_CPPv2I0EN13flex_functionIF1RDp4ARGSEE13flex_functionERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a8fbb05fef360d45cac123b8d69d51c27"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">flex_function</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN13flex_functionIF1RDp4ARGSEE13flex_functionERR1T" title="flex_function&lt;R(ARGS...)&gt;::flex_function::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun_info</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13flex_functionIF1RDp4ARGSEE13flex_functionERR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEE13flex_functionERK6this_t">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEE13flex_functionERK6this_t"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEE13flex_functionERK6this_t"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1acad3eb807df3e664a361433c4a6d9385"></span><span class="sig-name descname"><span class="n"><span class="pre">flex_function</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE6this_tE" title="flex_function&lt;R(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE13flex_functionERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEE13flex_functionERR6this_t">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEE13flex_functionERR6this_t"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEE13flex_functionERR6this_t"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1afe535fd444892a97e73af97292ad142d"></span><span class="sig-name descname"><span class="n"><span class="pre">flex_function</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE6this_tE" title="flex_function&lt;R(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE13flex_functionERR6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEE13flex_functionEv">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEE13flex_functionEv"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEE13flex_functionEv"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a0783c235fd930c83cbc60e456d4c79dd"></span><span class="sig-name descname"><span class="n"><span class="pre">flex_function</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE13flex_functionEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEEaSERK6this_t">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEEaSERK6this_t"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEEaSERK6this_t"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1aa9063b1098bdb014ea1b980b42997933"></span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE6this_tE" title="flex_function&lt;R(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE6this_tE" title="flex_function&lt;R(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEEaSERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEEaSERR6this_t">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEEaSERR6this_t"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEEaSERR6this_t"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1ab7d11dabcd205574e12638e513c3e817"></span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE6this_tE" title="flex_function&lt;R(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE6this_tE" title="flex_function&lt;R(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEEaSERR6this_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEEaSERK5fun_t">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEEaSERK5fun_t"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEEaSERK5fun_t"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1abf495b9d1c77cee1ede18943deb976d9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE6this_tE" title="flex_function&lt;R(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE5fun_tE" title="flex_function&lt;R(ARGS...)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEEaSERK5fun_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEEaSERR5fun_t">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEEaSERR5fun_t"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEEaSERR5fun_t"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a40aead71903b1ba262e72adb4473b294"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE6this_tE" title="flex_function&lt;R(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE5fun_tE" title="flex_function&lt;R(ARGS...)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEEaSERR5fun_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN13flex_functionIF1RDp4ARGSEEaSER6this_tRR1T">
+<span id="_CPPv3I0EN13flex_functionIF1RDp4ARGSEEaSERR1T"></span><span id="_CPPv2I0EN13flex_functionIF1RDp4ARGSEEaSERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a7eedb3cf491ebafda5a35d7f4a1f7513"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE6this_tE" title="flex_function&lt;R(ARGS...)&gt;::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN13flex_functionIF1RDp4ARGSEEaSER6this_tRR1T" title="flex_function&lt;R(ARGS...)&gt;::operator=::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN13flex_functionIF1RDp4ARGSEEaSER6this_tRR1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_iEN13flex_functionIF1RDp4ARGSEE10SetDefaultEvR7pack_idI2IDDp4ARGSE">
+<span id="_CPPv3I_iEN13flex_functionIF1RDp4ARGSEE10SetDefaultER7pack_idI2IDDp4ARGSE"></span><span id="_CPPv2I_iEN13flex_functionIF1RDp4ARGSEE10SetDefaultER7pack_idI2IDDp4ARGSE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ID</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a1d94c678b936968dfdef2deefa23d1a5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetDefault</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../meta/api/meta.html#_CPPv4I_6size_tDpE7pack_id" title="pack_id"><span class="n"><span class="pre">pack_id</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_iEN13flex_functionIF1RDp4ARGSEE10SetDefaultEvR7pack_idI2IDDp4ARGSE" title="flex_function&lt;R(ARGS...)&gt;::SetDefault::ID"><span class="n"><span class="pre">ID</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE" title="flex_function&lt;R(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_default</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_iEN13flex_functionIF1RDp4ARGSEE10SetDefaultEvR7pack_idI2IDDp4ARGSE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the default value for a specific parameter. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEE11SetDefaultsEDp4ARGS">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEE11SetDefaultsEDp4ARGS"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEE11SetDefaultsEDp4ARGS"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a83c55485f4086b1ac153c740351e52e4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetDefaults</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE" title="flex_function&lt;R(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE11SetDefaultsEDp4ARGS" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the default values for all parameters. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13flex_functionIF1RDp4ARGSEEclEDp4ARGS">
+<span id="_CPPv3NK13flex_functionIF1RDp4ARGSEEclEDp4ARGS"></span><span id="_CPPv2NK13flex_functionIF1RDp4ARGSEEclEDp4ARGS"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a8069b52823d948cdc6997406b21a3845"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE8return_tE" title="flex_function&lt;R(ARGS...)&gt;::return_t"><span class="n"><span class="pre">return_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE" title="flex_function&lt;R(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">k</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13flex_functionIF1RDp4ARGSEEclEDp4ARGS" title="Link to this definition"></a><br /></dt>
+<dd><p>Allow the function to be called with all args. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpENK13flex_functionIF1RDp4ARGSEEclE8return_tDpRR7IN_ARGS">
+<span id="_CPPv3IDpENK13flex_functionIF1RDp4ARGSEEclEDpRR7IN_ARGS"></span><span id="_CPPv2IDpENK13flex_functionIF1RDp4ARGSEEclEDpRR7IN_ARGS"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">IN_ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a4d243af1399cc95e28ebe8aa572e700d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE8return_tE" title="flex_function&lt;R(ARGS...)&gt;::return_t"><span class="n"><span class="pre">return_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpENK13flex_functionIF1RDp4ARGSEEclE8return_tDpRR7IN_ARGS" title="flex_function&lt;R(ARGS...)&gt;::operator()::IN_ARGS"><span class="n"><span class="pre">IN_ARGS</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">k</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4IDpENK13flex_functionIF1RDp4ARGSEEclE8return_tDpRR7IN_ARGS" title="Link to this definition"></a><br /></dt>
+<dd><p>All the function to be called with a subset of arguments (and the rest set to defaults) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13flex_functionIF1RDp4ARGSEEcvbEv">
+<span id="_CPPv3NK13flex_functionIF1RDp4ARGSEEcvbEv"></span><span id="_CPPv2NK13flex_functionIF1RDp4ARGSEEcvbEv"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a273e934d21c8423e85bb4483bb5266de"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13flex_functionIF1RDp4ARGSEEcvbEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine whether this function has been set. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEE8num_argsE">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEE8num_argsE"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEE8num_argsE"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a0eb24d61f7ba8d79396b534e58ef96dc"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_args</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">sizeof</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0DpE13flex_functionIF1RDp4ARGSEE" title="flex_function&lt;R(ARGS...)&gt;::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE8num_argsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEE3funE">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEE3funE"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEE3funE"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1ab3b9c3e249e92d16ad1fee8cc353ae17"></span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE5fun_tE" title="flex_function&lt;R(ARGS...)&gt;::fun_t"><span class="n"><span class="pre">fun_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fun</span></span></span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE3funE" title="Link to this definition"></a><br /></dt>
+<dd><p>Function to be called. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13flex_functionIF1RDp4ARGSEE12default_argsE">
+<span id="_CPPv3N13flex_functionIF1RDp4ARGSEE12default_argsE"></span><span id="_CPPv2N13flex_functionIF1RDp4ARGSEE12default_argsE"></span><span class="target" id="classflex__function_3_01R_07ARGS_8_8_8_08_4_1a1893b11d05d7eb551f9546dc8c717b8d"></span><a class="reference internal" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE7tuple_tE" title="flex_function&lt;R(ARGS...)&gt;::tuple_t"><span class="n"><span class="pre">tuple_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_args</span></span></span><a class="headerlink" href="#_CPPv4N13flex_functionIF1RDp4ARGSEE12default_argsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Arguments to be used if not enough are provided in call. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="GenericFunction.html" class="btn btn-neutral float-left" title="GenericFunction.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="memo_function.html" class="btn btn-neutral float-right" title="memo_function.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

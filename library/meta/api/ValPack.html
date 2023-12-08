@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ValPack.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/meta/api/ValPack.afe696eb-ab6b-4a9a-a76d-56e3d85e066a.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="macro_math.hpp" href="macro_math.html" />
+    <link rel="prev" title="TypePack.hpp" href="TypePack.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../meta.html">Meta</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../meta.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ConceptWrapper.html">ConceptWrapper.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="FunInfo.html">FunInfo.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypeID.html">TypeID.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypePack.html">TypePack.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ValPack.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_Da_Da_DaE12ValPackRange"><code class="docutils literal notranslate"><span class="pre">ValPackRange</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_DaE12ValPackCount"><code class="docutils literal notranslate"><span class="pre">ValPackCount</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_DpDaE7ValPack"><code class="docutils literal notranslate"><span class="pre">ValPack</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack"><code class="docutils literal notranslate"><span class="pre">ValPack</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4IE7ValPackIE"><code class="docutils literal notranslate"><span class="pre">ValPack</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv44pack"><code class="docutils literal notranslate"><span class="pre">pack</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="macro_math.html">macro_math.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="macros.html">macros.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="meta.html">meta.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reflection.html">reflection.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="type_traits.html">type_traits.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../meta.html">Meta</a></li>
+      <li class="breadcrumb-item active">ValPack.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="valpack-hpp">
+<h1>ValPack.hpp<a class="headerlink" href="#valpack-hpp" title="Link to this heading"></a></h1>
+<p>A set of values that can be manipulated at compile time (good for metaprogramming) </p>
+<p>Any built-in type can be added to ValPack to be manipulated at compile time. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_Da_Da_DaE12ValPackRange">
+<span id="_CPPv3I_Da_Da_DaE12ValPackRange"></span><span id="_CPPv2I_Da_Da_DaE12ValPackRange"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">START</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">END</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">STEP</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="ValPack_8hpp_1a6cb1aa78c0e05bc7aa236575c67860ec"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValPackRange</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vp_range</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I_Da_Da_DaE12ValPackRange" title="ValPackRange::START"><span class="n"><span class="pre">START</span></span></a><span class="w"> </span><span class="o"><span class="pre">&gt;=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_Da_DaE12ValPackRange" title="ValPackRange::END"><span class="n"><span class="pre">END</span></span></a><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_Da_DaE12ValPackRange" title="ValPackRange::START"><span class="n"><span class="pre">START</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_Da_DaE12ValPackRange" title="ValPackRange::END"><span class="n"><span class="pre">END</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_Da_DaE12ValPackRange" title="ValPackRange::STEP"><span class="n"><span class="pre">STEP</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><a class="headerlink" href="#_CPPv4I_Da_Da_DaE12ValPackRange" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a ValPack with a specified range of values. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_DaE12ValPackCount">
+<span id="_CPPv3I_DaE12ValPackCount"></span><span id="_CPPv2I_DaE12ValPackCount"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">COUNT</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="ValPack_8hpp_1a52ebb9c92665923a30770799503ff5fc"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValPackCount</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_Da_DaE12ValPackRange" title="ValPackRange"><span class="n"><span class="pre">ValPackRange</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_DaE12ValPackCount" title="ValPackCount::COUNT"><span class="n"><span class="pre">COUNT</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I_DaE12ValPackCount" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a count from 0 to COUNT-1 (so a total of COUNT values) </p>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I_DpDaE7ValPack">
+<span id="_CPPv3I_DpDaE7ValPack"></span><span id="_CPPv2I_DpDaE7ValPack"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValPack</span></span></span><a class="headerlink" href="#_CPPv4I_DpDaE7ValPack" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ValPack.hpp&gt;</em></div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I_Da_DpDaE7ValPack">
+<span id="_CPPv3I_Da_DpDaE7ValPack"></span><span id="_CPPv2I_Da_DpDaE7ValPack"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Vs</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValPack</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack::V1"><span class="n"><span class="pre">V1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack::Vs"><span class="n"><span class="pre">Vs</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I_Da_DpDaE7ValPack" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ValPack.hpp&gt;</em></div>
+<p>ValPack with at least one value. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack6this_tE">
+<span id="_CPPv3N7ValPack6this_tE"></span><span id="_CPPv2N7ValPack6this_tE"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a04cd7ad2d75579880a3191423d448d77"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack"><span class="n"><span class="pre">ValPack</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack::V1"><span class="n"><span class="pre">V1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack::Vs"><span class="n"><span class="pre">Vs</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N7ValPack6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack3popE">
+<span id="_CPPv3N7ValPack3popE"></span><span id="_CPPv2N7ValPack3popE"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a551e2ab841e674220d40adfbe73731b0"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pop</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack"><span class="n"><span class="pre">ValPack</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack::Vs"><span class="n"><span class="pre">Vs</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N7ValPack3popE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_DaEN7ValPack4pushE">
+<span id="_CPPv3I_DaEN7ValPack4pushE"></span><span id="_CPPv2I_DaEN7ValPack4pushE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a46022d5959ba61468485292fa26c2889"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">push</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack"><span class="n"><span class="pre">ValPack</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_DaEN7ValPack4pushE" title="ValPack::push::V"><span class="n"><span class="pre">V</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack::V1"><span class="n"><span class="pre">V1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack::Vs"><span class="n"><span class="pre">Vs</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I_DaEN7ValPack4pushE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a value to the front of an ValPack. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_DaEN7ValPack9push_backE">
+<span id="_CPPv3I_DaEN7ValPack9push_backE"></span><span id="_CPPv2I_DaEN7ValPack9push_backE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a1bb2fde6c9656c8940101c357cde9275"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">push_back</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack"><span class="n"><span class="pre">ValPack</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack::V1"><span class="n"><span class="pre">V1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack::Vs"><span class="n"><span class="pre">Vs</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_DaEN7ValPack9push_backE" title="ValPack::push_back::V"><span class="n"><span class="pre">V</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I_DaEN7ValPack9push_backE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a value to the back of an ValPack. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_Da_DaEN7ValPack11push_if_notE">
+<span id="_CPPv3I_Da_DaEN7ValPack11push_if_notE"></span><span id="_CPPv2I_Da_DaEN7ValPack11push_if_notE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">X</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a8f39139f7a5cf41c7461e880cd9bf0b2"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">push_if_not</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vp_push_if_not</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_Da_DaEN7ValPack11push_if_notE" title="ValPack::push_if_not::V"><span class="n"><span class="pre">V</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DaEN7ValPack11push_if_notE" title="ValPack::push_if_not::X"><span class="n"><span class="pre">X</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7ValPack6this_tE" title="ValPack::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">result</span></span><a class="headerlink" href="#_CPPv4I_Da_DaEN7ValPack11push_if_notE" title="Link to this definition"></a><br /></dt>
+<dd><p>Push V onto front of an ValPack if it does not equal X. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_Da_DaEN7ValPack16push_back_if_notE">
+<span id="_CPPv3I_Da_DaEN7ValPack16push_back_if_notE"></span><span id="_CPPv2I_Da_DaEN7ValPack16push_back_if_notE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">X</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1aeb8f2438ce30759ffab951cda547a66a"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">push_back_if_not</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vp_push_if_not</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_Da_DaEN7ValPack16push_back_if_notE" title="ValPack::push_back_if_not::V"><span class="n"><span class="pre">V</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DaEN7ValPack16push_back_if_notE" title="ValPack::push_back_if_not::X"><span class="n"><span class="pre">X</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7ValPack6this_tE" title="ValPack::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">back</span></span><a class="headerlink" href="#_CPPv4I_Da_DaEN7ValPack16push_back_if_notE" title="Link to this definition"></a><br /></dt>
+<dd><p>Push V onto back of an ValPack if it does not equal X. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_DaEN7ValPack7pop_valE">
+<span id="_CPPv3I_DaEN7ValPack7pop_valE"></span><span id="_CPPv2I_DaEN7ValPack7pop_valE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1acb7e339074947ecfed5448faf31f8125"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pop_val</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vp_loop</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N7ValPack6this_tE" title="ValPack::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack"><span class="n"><span class="pre">ValPack</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="k"><span class="pre">template</span></span><span class="w"> </span><span class="n"><span class="pre">pop_val</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_DaEN7ValPack7pop_valE" title="ValPack::pop_val::V"><span class="n"><span class="pre">V</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I_DaEN7ValPack7pop_valE" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove the first time value V appears from an ValPack. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_DaEN7ValPack6removeE">
+<span id="_CPPv3I_DaEN7ValPack6removeE"></span><span id="_CPPv2I_DaEN7ValPack6removeE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a0b3a07730c78a814f757267e0a33815a"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">remove</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vp_loop</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N7ValPack6this_tE" title="ValPack::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack"><span class="n"><span class="pre">ValPack</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="k"><span class="pre">template</span></span><span class="w"> </span><span class="n"><span class="pre">remove</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_DaEN7ValPack6removeE" title="ValPack::remove::V"><span class="n"><span class="pre">V</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I_DaEN7ValPack6removeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove the all appearances of value V from an ValPack. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7ValPack6appendE">
+<span id="_CPPv3I0EN7ValPack6appendE"></span><span id="_CPPv2I0EN7ValPack6appendE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1ab8d5360d4bf463bfa626b68300216e84"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">append</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vp_concat</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N7ValPack6this_tE" title="ValPack::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN7ValPack6appendE" title="ValPack::append::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">result</span></span><a class="headerlink" href="#_CPPv4I0EN7ValPack6appendE" title="Link to this definition"></a><br /></dt>
+<dd><p>Append one whole ValPack to the end of another. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4II_DpiE0EN7ValPack5applyE">
+<span id="_CPPv3II_DpiE0EN7ValPack5applyE"></span><span id="_CPPv2II_DpiE0EN7ValPack5applyE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TEMPLATE</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1add81593e9d00321ca6077a6cf716bd82"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">apply</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4II_DpiE0EN7ValPack5applyE" title="ValPack::apply::TEMPLATE"><span class="n"><span class="pre">TEMPLATE</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack::V1"><span class="n"><span class="pre">V1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack::Vs"><span class="n"><span class="pre">Vs</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4II_DpiE0EN7ValPack5applyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply to a specified template with ValPack as template arguments. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7ValPack3HasEb1T">
+<span id="_CPPv3I0EN7ValPack3HasE1T"></span><span id="_CPPv2I0EN7ValPack3HasE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a2379647111dd4f2513360e4501e3d792"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN7ValPack3HasEb1T" title="ValPack::Has::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7ValPack3HasEb1T" title="Link to this definition"></a><br /></dt>
+<dd><p>&amp;#8212;=== Member Functions ===&amp;#8212; </p>
+<p>Return wheter an ValPack contains the value V. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7ValPack5CountE6size_t1T">
+<span id="_CPPv3I0EN7ValPack5CountE1T"></span><span id="_CPPv2I0EN7ValPack5CountE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a4dc7a4306d8e1cebb74b10d64b6e7e8e"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Count</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN7ValPack5CountE6size_t1T" title="ValPack::Count::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7ValPack5CountE6size_t1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Count the number of occurances of value V in ValPack. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7ValPack5GetIDEi1T">
+<span id="_CPPv3I0EN7ValPack5GetIDE1T"></span><span id="_CPPv2I0EN7ValPack5GetIDE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a38a95b8b5eec2e6d764702e75b4ed8e4"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetID</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN7ValPack5GetIDEi1T" title="ValPack::GetID::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7ValPack5GetIDEi1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine the position at which V appears in ValPack. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack7GetSizeEv">
+<span id="_CPPv3N7ValPack7GetSizeEv"></span><span id="_CPPv2N7ValPack7GetSizeEv"></span><span id="ValPack::GetSizeCE"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a210ccf0d140c88393276c07e037de48d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPack7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Function to retrieve number of elements in ValPack. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack7IsEmptyEv">
+<span id="_CPPv3N7ValPack7IsEmptyEv"></span><span id="_CPPv2N7ValPack7IsEmptyEv"></span><span id="ValPack::IsEmptyCE"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1aafb9c554fc53afbf07dac47f2fa6095c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsEmpty</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPack7IsEmptyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if there are NO value in an ValPack. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack8IsUniqueEv">
+<span id="_CPPv3N7ValPack8IsUniqueEv"></span><span id="_CPPv2N7ValPack8IsUniqueEv"></span><span id="ValPack::IsUniqueCE"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a0f7ae8b946d338485d4900cb8aeec0fc"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsUnique</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPack8IsUniqueEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if all values in ValPack are different from each other. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack3SumEv">
+<span id="_CPPv3N7ValPack3SumEv"></span><span id="_CPPv2N7ValPack3SumEv"></span><span id="ValPack::SumCE"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a433c844b64f711f19b1cf46c81b59583"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sum</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPack3SumEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Add up all values in an ValPack. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack7ProductEv">
+<span id="_CPPv3N7ValPack7ProductEv"></span><span id="_CPPv2N7ValPack7ProductEv"></span><span id="ValPack::ProductCE"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a7ae9d13347041d1757220177e68aab5f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Product</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPack7ProductEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Multiply together all value in an ValPack. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7ValPack3MinEDa1T">
+<span id="_CPPv3I0EN7ValPack3MinE1T"></span><span id="_CPPv2I0EN7ValPack3MinE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a4a613a69b50d52804379ebda694b6c79"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Min</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN7ValPack3MinEDa1T" title="ValPack::Min::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">cap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7ValPack3MinEDa1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Find the smallest value in an ValPack, to a maximum of cap. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack3MinEv">
+<span id="_CPPv3N7ValPack3MinEv"></span><span id="_CPPv2N7ValPack3MinEv"></span><span id="ValPack::MinCE"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1adc641cefebe7426927abf8b9c2fc4d6b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Min</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPack3MinEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Find the overall smallest value in an ValPack. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7ValPack3MaxEDa1T">
+<span id="_CPPv3I0EN7ValPack3MaxE1T"></span><span id="_CPPv2I0EN7ValPack3MaxE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1aba11a8f7eb285c3fef816a75512338cd"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Max</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN7ValPack3MaxEDa1T" title="ValPack::Max::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">floor</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7ValPack3MaxEDa1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Find the maximum value in an ValPack, to a minimum of floor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack3MaxEv">
+<span id="_CPPv3N7ValPack3MaxEv"></span><span id="_CPPv2N7ValPack3MaxEv"></span><span id="ValPack::MaxCE"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a6a93684c5300b94a85494215429ac867"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Max</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPack3MaxEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Find the overall maximum value in an ValPack. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack8IsSortedEv">
+<span id="_CPPv3N7ValPack8IsSortedEv"></span><span id="_CPPv2N7ValPack8IsSortedEv"></span><span id="ValPack::IsSortedCE"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1aa9a7144215735cd6e34b200e6fb0a42d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsSorted</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPack8IsSortedEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if the pack is sorted. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7ValPack10ApplyIndexEDaRR1T">
+<span id="_CPPv3I0EN7ValPack10ApplyIndexERR1T"></span><span id="_CPPv2I0EN7ValPack10ApplyIndexERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a695aabc66424a3f4f0052fa573d58ff4"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ApplyIndex</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN7ValPack10ApplyIndexEDaRR1T" title="ValPack::ApplyIndex::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">container</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7ValPack10ApplyIndexEDaRR1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Use each value in an ValPack as an index and return results as a tuple. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack8ToStringEv">
+<span id="_CPPv3N7ValPack8ToStringEv"></span><span id="_CPPv2N7ValPack8ToStringEv"></span><span id="ValPack::ToString"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a722c9a9a6765494b81fd831baca53681"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPack8ToStringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert all values from an ValPack into a string, treating each as a char. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack9PrintValsERNSt7ostreamE">
+<span id="_CPPv3N7ValPack9PrintValsERNSt7ostreamE"></span><span id="_CPPv2N7ValPack9PrintValsERNSt7ostreamE"></span><span id="ValPack::PrintVals__osR"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1a4471a1c5c913de3ae6c7636b40a47ca9"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintVals</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPack9PrintValsERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Print all values in an ValPack into a stream. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack5firstE">
+<span id="_CPPv3N7ValPack5firstE"></span><span id="_CPPv2N7ValPack5firstE"></span><span id="ValPack::first__auto"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1aaeedb9c20325cfb988f43ad97c4cad77"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">first</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack::V1"><span class="n"><span class="pre">V1</span></span></a><a class="headerlink" href="#_CPPv4N7ValPack5firstE" title="Link to this definition"></a><br /></dt>
+<dd><p>First value in ValPack. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPack4SIZEE">
+<span id="_CPPv3N7ValPack4SIZEE"></span><span id="_CPPv2N7ValPack4SIZEE"></span><span id="ValPack::SIZE__s"></span><span class="target" id="structValPack_3_01V1_00_01Vs_8_8_8_01_4_1ae6915d59905f00c0ac4d0c8e4398a238"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIZE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="w"> </span><span class="o"><span class="pre">+</span></span><span class="w"> </span><span class="k"><span class="pre">sizeof</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I_Da_DpDaE7ValPack" title="ValPack::Vs"><span class="n"><span class="pre">Vs</span></span></a><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N7ValPack4SIZEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of values in ValPack. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4IE7ValPackIE">
+<span id="_CPPv3IE7ValPackIE"></span><span id="_CPPv2IE7ValPackIE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_4"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ValPack</span></span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IE7ValPackIE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ValPack.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPackIE6this_tE">
+<span id="_CPPv3N7ValPackIE6this_tE"></span><span id="_CPPv2N7ValPackIE6this_tE"></span><span class="target" id="structValPack_3_4_1a9284d3f3c7ae755f35bc4b7c85134e5c"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IE7ValPackIE" title="ValPack&lt;&gt;"><span class="n"><span class="pre">ValPack</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N7ValPackIE6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_DaEN7ValPackIE4pushE">
+<span id="_CPPv3I_DaEN7ValPackIE4pushE"></span><span id="_CPPv2I_DaEN7ValPackIE4pushE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_4_1a08b06158a8d5c2cc285c0ce5ac106f70"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">push</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">ValPack</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_DaEN7ValPackIE4pushE" title="ValPack&lt;&gt;::push::V"><span class="n"><span class="pre">V</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I_DaEN7ValPackIE4pushE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_DaEN7ValPackIE9push_backE">
+<span id="_CPPv3I_DaEN7ValPackIE9push_backE"></span><span id="_CPPv2I_DaEN7ValPackIE9push_backE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_4_1a96e3d12d3445d10d4698054375343c4d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">push_back</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">ValPack</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_DaEN7ValPackIE9push_backE" title="ValPack&lt;&gt;::push_back::V"><span class="n"><span class="pre">V</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I_DaEN7ValPackIE9push_backE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_Da_DaEN7ValPackIE11push_if_notE">
+<span id="_CPPv3I_Da_DaEN7ValPackIE11push_if_notE"></span><span id="_CPPv2I_Da_DaEN7ValPackIE11push_if_notE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">X</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_4_1a36b7cb441691f75657dede6ca62957c1"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">push_if_not</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vp_push_if_not</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_Da_DaEN7ValPackIE11push_if_notE" title="ValPack&lt;&gt;::push_if_not::V"><span class="n"><span class="pre">V</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DaEN7ValPackIE11push_if_notE" title="ValPack&lt;&gt;::push_if_not::X"><span class="n"><span class="pre">X</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IE7ValPackIE" title="ValPack&lt;&gt;"><span class="n"><span class="pre">ValPack</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">result</span></span><a class="headerlink" href="#_CPPv4I_Da_DaEN7ValPackIE11push_if_notE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_Da_DaEN7ValPackIE16push_back_if_notE">
+<span id="_CPPv3I_Da_DaEN7ValPackIE16push_back_if_notE"></span><span id="_CPPv2I_Da_DaEN7ValPackIE16push_back_if_notE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">X</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_4_1a2be6f6bb14c901d027def6b647aadd4d"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">push_back_if_not</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vp_push_if_not</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_Da_DaEN7ValPackIE16push_back_if_notE" title="ValPack&lt;&gt;::push_back_if_not::V"><span class="n"><span class="pre">V</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_Da_DaEN7ValPackIE16push_back_if_notE" title="ValPack&lt;&gt;::push_back_if_not::X"><span class="n"><span class="pre">X</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IE7ValPackIE" title="ValPack&lt;&gt;"><span class="n"><span class="pre">ValPack</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">back</span></span><a class="headerlink" href="#_CPPv4I_Da_DaEN7ValPackIE16push_back_if_notE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_DaEN7ValPackIE7pop_valE">
+<span id="_CPPv3I_DaEN7ValPackIE7pop_valE"></span><span id="_CPPv2I_DaEN7ValPackIE7pop_valE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_4_1a101496b180458d1029bd240291830e6f"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pop_val</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IE7ValPackIE" title="ValPack&lt;&gt;"><span class="n"><span class="pre">ValPack</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I_DaEN7ValPackIE7pop_valE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I_DaEN7ValPackIE6removeE">
+<span id="_CPPv3I_DaEN7ValPackIE6removeE"></span><span id="_CPPv2I_DaEN7ValPackIE6removeE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_4_1a2598f277e16187ed0f8e1dc9b3ac6817"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">remove</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IE7ValPackIE" title="ValPack&lt;&gt;"><span class="n"><span class="pre">ValPack</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I_DaEN7ValPackIE6removeE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7ValPackIE6appendE">
+<span id="_CPPv3I0EN7ValPackIE6appendE"></span><span id="_CPPv2I0EN7ValPackIE6appendE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_4_1a6a52c3fcf6eee6ce76d0810241b83c24"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">append</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN7ValPackIE6appendE" title="ValPack&lt;&gt;::append::T"><span class="n"><span class="pre">T</span></span></a><a class="headerlink" href="#_CPPv4I0EN7ValPackIE6appendE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7ValPackIE3HasEb1T">
+<span id="_CPPv3I0EN7ValPackIE3HasE1T"></span><span id="_CPPv2I0EN7ValPackIE3HasE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_4_1a957ae2d64bbfcb2ea5289e391e99c364"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Has</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN7ValPackIE3HasEb1T" title="ValPack&lt;&gt;::Has::T"><span class="n"><span class="pre">T</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7ValPackIE3HasEb1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7ValPackIE5CountE6size_t1T">
+<span id="_CPPv3I0EN7ValPackIE5CountE1T"></span><span id="_CPPv2I0EN7ValPackIE5CountE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_4_1a3755ec551dd57073712c9674ca79afcf"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Count</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN7ValPackIE5CountE6size_t1T" title="ValPack&lt;&gt;::Count::T"><span class="n"><span class="pre">T</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7ValPackIE5CountE6size_t1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7ValPackIE5GetIDEi1T">
+<span id="_CPPv3I0EN7ValPackIE5GetIDE1T"></span><span id="_CPPv2I0EN7ValPackIE5GetIDE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_4_1a584be1c9007386f7e399f343a7224d4a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetID</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN7ValPackIE5GetIDEi1T" title="ValPack&lt;&gt;::GetID::T"><span class="n"><span class="pre">T</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7ValPackIE5GetIDEi1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPackIE7GetSizeEv">
+<span id="_CPPv3N7ValPackIE7GetSizeEv"></span><span id="_CPPv2N7ValPackIE7GetSizeEv"></span><span id="ValPack::::GetSizeCE"></span><span class="target" id="structValPack_3_4_1a4e268f90aa1a4031396d5ea58b6b9e05"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPackIE7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPackIE7IsEmptyEv">
+<span id="_CPPv3N7ValPackIE7IsEmptyEv"></span><span id="_CPPv2N7ValPackIE7IsEmptyEv"></span><span id="ValPack::::IsEmptyCE"></span><span class="target" id="structValPack_3_4_1aea07208fa7ff35fd603fd5ef32a07917"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsEmpty</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPackIE7IsEmptyEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPackIE8IsUniqueEv">
+<span id="_CPPv3N7ValPackIE8IsUniqueEv"></span><span id="_CPPv2N7ValPackIE8IsUniqueEv"></span><span id="ValPack::::IsUniqueCE"></span><span class="target" id="structValPack_3_4_1a3d3c77d1c81e781338eed1bf6a4dca2d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsUnique</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPackIE8IsUniqueEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPackIE3SumEv">
+<span id="_CPPv3N7ValPackIE3SumEv"></span><span id="_CPPv2N7ValPackIE3SumEv"></span><span id="ValPack::::SumCE"></span><span class="target" id="structValPack_3_4_1a08dd2f4c46c96c9bb9389188b1de7f45"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sum</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPackIE3SumEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPackIE7ProductEv">
+<span id="_CPPv3N7ValPackIE7ProductEv"></span><span id="_CPPv2N7ValPackIE7ProductEv"></span><span id="ValPack::::ProductCE"></span><span class="target" id="structValPack_3_4_1a59312cd5ffaade02813b43deb4d3dee0"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Product</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPackIE7ProductEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7ValPackIE3MinEDa1T">
+<span id="_CPPv3I0EN7ValPackIE3MinE1T"></span><span id="_CPPv2I0EN7ValPackIE3MinE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_4_1a356b924f929f40f35cd5cc71067f7067"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Min</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN7ValPackIE3MinEDa1T" title="ValPack&lt;&gt;::Min::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">cap</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7ValPackIE3MinEDa1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN7ValPackIE3MaxEDa1T">
+<span id="_CPPv3I0EN7ValPackIE3MaxE1T"></span><span id="_CPPv2I0EN7ValPackIE3MaxE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structValPack_3_4_1a63aadcbdd0a65ac2315c92747f3f2f3f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Max</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN7ValPackIE3MaxEDa1T" title="ValPack&lt;&gt;::Max::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">floor</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN7ValPackIE3MaxEDa1T" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPackIE8IsSortedEv">
+<span id="_CPPv3N7ValPackIE8IsSortedEv"></span><span id="_CPPv2N7ValPackIE8IsSortedEv"></span><span id="ValPack::::IsSortedCE"></span><span class="target" id="structValPack_3_4_1a2b85c00ed9e61e6fbbc290f69dfa9a23"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsSorted</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPackIE8IsSortedEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPackIE8ToStringEv">
+<span id="_CPPv3N7ValPackIE8ToStringEv"></span><span id="_CPPv2N7ValPackIE8ToStringEv"></span><span id="ValPack::::ToString"></span><span class="target" id="structValPack_3_4_1a5ef91458c3d548b34583c78223072b1f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPackIE8ToStringEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPackIE9PrintValsERNSt7ostreamE">
+<span id="_CPPv3N7ValPackIE9PrintValsERNSt7ostreamE"></span><span id="_CPPv2N7ValPackIE9PrintValsERNSt7ostreamE"></span><span id="ValPack::::PrintVals__osR"></span><span class="target" id="structValPack_3_4_1aff220c87c0b2f5c1fab5aa4c9cdbaa7d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintVals</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="p"><span class="pre">&amp;</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7ValPackIE9PrintValsERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7ValPackIE4SIZEE">
+<span id="_CPPv3N7ValPackIE4SIZEE"></span><span id="_CPPv2N7ValPackIE4SIZEE"></span><span id="ValPack::::SIZE__s"></span><span class="target" id="structValPack_3_4_1a45c0742202826591030c4427eac77b47"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIZE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N7ValPackIE4SIZEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv44pack">
+<span id="_CPPv34pack"></span><span id="_CPPv24pack"></span><span id="pack"></span><span class="target" id="namespacepack"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pack</span></span></span><a class="headerlink" href="#_CPPv44pack" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4pack7reverseE">
+<span id="_CPPv3I0EN4pack7reverseE"></span><span id="_CPPv2I0EN4pack7reverseE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacepack_1a1cd69c6ffc33c295f8b7cc3396199f7b"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reverse</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vp_reverse</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4pack7reverseE" title="pack::reverse::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">result</span></span><a class="headerlink" href="#_CPPv4I0EN4pack7reverseE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4pack4uniqE">
+<span id="_CPPv3I0EN4pack4uniqE"></span><span id="_CPPv2I0EN4pack4uniqE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacepack_1afd5cc2cb3b1882c3aa92589180fa06c5"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uniq</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vp_uniq</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4pack4uniqE" title="pack::uniq::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">result</span></span><a class="headerlink" href="#_CPPv4I0EN4pack4uniqE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4pack4sortE">
+<span id="_CPPv3I0EN4pack4sortE"></span><span id="_CPPv2I0EN4pack4sortE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacepack_1a372a5abfb32c8587ba15e770b1389b62"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sort</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">internal</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vp_sort</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4pack4sortE" title="pack::sort::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">result</span></span><a class="headerlink" href="#_CPPv4I0EN4pack4sortE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4pack5RsortE">
+<span id="_CPPv3I0EN4pack5RsortE"></span><span id="_CPPv2I0EN4pack5RsortE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacepack_1abd73d65861805512694ae182e95e8fd7"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Rsort</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN4pack7reverseE" title="pack::reverse"><span class="n"><span class="pre">reverse</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4pack4sortE" title="pack::sort"><span class="n"><span class="pre">sort</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4pack5RsortE" title="pack::Rsort::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN4pack5RsortE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4pack5UsortE">
+<span id="_CPPv3I0EN4pack5UsortE"></span><span id="_CPPv2I0EN4pack5UsortE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacepack_1af834386faac95853f6d752ec9c7331b6"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Usort</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN4pack4uniqE" title="pack::uniq"><span class="n"><span class="pre">uniq</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4pack4sortE" title="pack::sort"><span class="n"><span class="pre">sort</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4pack5UsortE" title="pack::Usort::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN4pack5UsortE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4pack6RUsortE">
+<span id="_CPPv3I0EN4pack6RUsortE"></span><span id="_CPPv2I0EN4pack6RUsortE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacepack_1a6c7bd9c62d290c321f8f0d8985360324"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RUsort</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN4pack7reverseE" title="pack::reverse"><span class="n"><span class="pre">reverse</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4pack5UsortE" title="pack::Usort"><span class="n"><span class="pre">Usort</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4pack6RUsortE" title="pack::RUsort::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN4pack6RUsortE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="TypePack.html" class="btn btn-neutral float-left" title="TypePack.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="macro_math.html" class="btn btn-neutral float-right" title="macro_math.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

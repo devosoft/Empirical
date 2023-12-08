@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mancala.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/games/api/Mancala.ed1a0e44-3a09-45f9-b01b-1cabaed16be9.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Othello.hpp" href="Othello.html" />
+    <link rel="prev" title="Games" href="../games.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../games.html">Games</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../games.html#api">API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Mancala.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv47Mancala"><code class="docutils literal notranslate"><span class="pre">Mancala</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Othello.html">Othello.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Othello8.html">Othello8.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PayoffMatrix.html">PayoffMatrix.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../games.html">Games</a></li>
+      <li class="breadcrumb-item active">Mancala.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mancala-hpp">
+<h1>Mancala.hpp<a class="headerlink" href="#mancala-hpp" title="Link to this heading"></a></h1>
+<p>A simple Malcala game state handler. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv47Mancala">
+<span id="_CPPv37Mancala"></span><span id="_CPPv27Mancala"></span><span id="Mancala"></span><span class="target" id="classMancala"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mancala</span></span></span><a class="headerlink" href="#_CPPv47Mancala" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Mancala.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala6move_tE">
+<span id="_CPPv3N7Mancala6move_tE"></span><span id="_CPPv2N7Mancala6move_tE"></span><span class="target" id="classMancala_1a11773c304e0018a9b58033902facbcc9"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">move_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><a class="headerlink" href="#_CPPv4N7Mancala6move_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala7MancalaEb">
+<span id="_CPPv3N7Mancala7MancalaEb"></span><span id="_CPPv2N7Mancala7MancalaEb"></span><span id="Mancala::Mancala__b"></span><span class="target" id="classMancala_1aa2a6ccfbe1b338128e2ddc04034ec22c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mancala</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">A_first</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala7MancalaEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7MancalaD0Ev">
+<span id="_CPPv3N7MancalaD0Ev"></span><span id="_CPPv2N7MancalaD0Ev"></span><span id="Mancala::~Mancala"></span><span class="target" id="classMancala_1aa5674054ff53360ecc38676121bd65b8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Mancala</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7MancalaD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala5ResetEb">
+<span id="_CPPv3N7Mancala5ResetEb"></span><span id="_CPPv2N7Mancala5ResetEb"></span><span id="Mancala::Reset__b"></span><span class="target" id="classMancala_1accb4bebe664ed4bdb9e7ba9e70e50623"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Reset</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">A_first</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala5ResetEb" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala4GetAE6size_t">
+<span id="_CPPv3NK7Mancala4GetAE6size_t"></span><span id="_CPPv2NK7Mancala4GetAE6size_t"></span><span id="Mancala::GetA__sC"></span><span class="target" id="classMancala_1ab84e04c9328dc20fbc3b95906092c519"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetA</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala4GetAE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala4GetBE6size_t">
+<span id="_CPPv3NK7Mancala4GetBE6size_t"></span><span id="_CPPv2NK7Mancala4GetBE6size_t"></span><span id="Mancala::GetB__sC"></span><span class="target" id="classMancala_1af73c6bc3c91bb0c1b1c9a8a83dd5414e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetB</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala4GetBE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala8GetSideAEv">
+<span id="_CPPv3NK7Mancala8GetSideAEv"></span><span id="_CPPv2NK7Mancala8GetSideAEv"></span><span id="Mancala::GetSideAC"></span><span class="target" id="classMancala_1a1854eafdf6f69eab5bf9e26b1b2e1481"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Mancala6side_tE" title="Mancala::side_t"><span class="n"><span class="pre">side_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetSideA</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala8GetSideAEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala8GetSideBEv">
+<span id="_CPPv3NK7Mancala8GetSideBEv"></span><span id="_CPPv2NK7Mancala8GetSideBEv"></span><span id="Mancala::GetSideBC"></span><span class="target" id="classMancala_1a727644ef2187c09ac73b73467c15a507"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Mancala6side_tE" title="Mancala::side_t"><span class="n"><span class="pre">side_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetSideB</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala8GetSideBEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala10GetCurSideEv">
+<span id="_CPPv3NK7Mancala10GetCurSideEv"></span><span id="_CPPv2NK7Mancala10GetCurSideEv"></span><span id="Mancala::GetCurSideC"></span><span class="target" id="classMancala_1a3b06fe6ed24447c3774e8be4486ebe9e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Mancala6side_tE" title="Mancala::side_t"><span class="n"><span class="pre">side_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetCurSide</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala10GetCurSideEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala12GetOtherSideEv">
+<span id="_CPPv3NK7Mancala12GetOtherSideEv"></span><span id="_CPPv2NK7Mancala12GetOtherSideEv"></span><span id="Mancala::GetOtherSideC"></span><span class="target" id="classMancala_1a33f8f50ed7e39ae6d1a90c71c11799cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Mancala6side_tE" title="Mancala::side_t"><span class="n"><span class="pre">side_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetOtherSide</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala12GetOtherSideEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala8GetSideAEv">
+<span id="_CPPv3N7Mancala8GetSideAEv"></span><span id="_CPPv2N7Mancala8GetSideAEv"></span><span id="Mancala::GetSideA"></span><span class="target" id="classMancala_1acc5864128e6edc7763870269f8e257ee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Mancala6side_tE" title="Mancala::side_t"><span class="n"><span class="pre">side_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetSideA</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala8GetSideAEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala8GetSideBEv">
+<span id="_CPPv3N7Mancala8GetSideBEv"></span><span id="_CPPv2N7Mancala8GetSideBEv"></span><span id="Mancala::GetSideB"></span><span class="target" id="classMancala_1aa516271facf6b3e568c55dcc72e0b688"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Mancala6side_tE" title="Mancala::side_t"><span class="n"><span class="pre">side_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetSideB</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala8GetSideBEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala10GetCurSideEv">
+<span id="_CPPv3N7Mancala10GetCurSideEv"></span><span id="_CPPv2N7Mancala10GetCurSideEv"></span><span id="Mancala::GetCurSide"></span><span class="target" id="classMancala_1ae1def3965a45211178379d2fffef623f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Mancala6side_tE" title="Mancala::side_t"><span class="n"><span class="pre">side_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetCurSide</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala10GetCurSideEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala12GetOtherSideEv">
+<span id="_CPPv3N7Mancala12GetOtherSideEv"></span><span id="_CPPv2N7Mancala12GetOtherSideEv"></span><span id="Mancala::GetOtherSide"></span><span class="target" id="classMancala_1a1736a9675cb3b8effdcd84fe9f182964"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7Mancala6side_tE" title="Mancala::side_t"><span class="n"><span class="pre">side_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetOtherSide</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala12GetOtherSideEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala7AsInputE6size_t">
+<span id="_CPPv3NK7Mancala7AsInputE6size_t"></span><span id="_CPPv2NK7Mancala7AsInputE6size_t"></span><span id="Mancala::AsInput__sC"></span><span class="target" id="classMancala_1a278846bbb702ec5a9f26de4b80b4f2b4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsInput</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">player_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala7AsInputE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala13AsVectorInputE6size_t">
+<span id="_CPPv3NK7Mancala13AsVectorInputE6size_t"></span><span id="_CPPv2NK7Mancala13AsVectorInputE6size_t"></span><span id="Mancala::AsVectorInput__sC"></span><span class="target" id="classMancala_1aa71dcb950acefdb0c6fdc3d241590490"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsVectorInput</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">player_id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala13AsVectorInputE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala6DoMoveE6move_t">
+<span id="_CPPv3N7Mancala6DoMoveE6move_t"></span><span id="_CPPv2N7Mancala6DoMoveE6move_t"></span><span id="Mancala::DoMove__move_t"></span><span class="target" id="classMancala_1a0797270835c1edfe76af86d5ca32685d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoMove</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N7Mancala6move_tE" title="Mancala::move_t"><span class="n"><span class="pre">move_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">cell</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala6DoMoveE6move_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala6DoMoveE6size_t6move_t">
+<span id="_CPPv3N7Mancala6DoMoveE6size_t6move_t"></span><span id="_CPPv2N7Mancala6DoMoveE6size_t6move_t"></span><span id="Mancala::DoMove__s.move_t"></span><span class="target" id="classMancala_1afee69e4dd3909bfbdc3a551caf8624dd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoMove</span></span></span><span class="sig-paren">(</span><span class="p"><span class="pre">[[</span></span><span class="pre">maybe_unused</span><span class="p"><span class="pre">]]</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span>, <a class="reference internal" href="#_CPPv4N7Mancala6move_tE" title="Mancala::move_t"><span class="n"><span class="pre">move_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">cell</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala6DoMoveE6size_t6move_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala8SetBoardE6side_t6side_t">
+<span id="_CPPv3N7Mancala8SetBoardE6side_t6side_t"></span><span id="_CPPv2N7Mancala8SetBoardE6side_t6side_t"></span><span id="Mancala::SetBoard__side_t.side_t"></span><span class="target" id="classMancala_1af7fc6ba1c0ce211b9495b7933d68d643"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetBoard</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N7Mancala6side_tE" title="Mancala::side_t"><span class="n"><span class="pre">side_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">a</span></span>, <a class="reference internal" href="#_CPPv4N7Mancala6side_tE" title="Mancala::side_t"><span class="n"><span class="pre">side_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala8SetBoardE6side_t6side_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala6IsDoneEv">
+<span id="_CPPv3NK7Mancala6IsDoneEv"></span><span id="_CPPv2NK7Mancala6IsDoneEv"></span><span id="Mancala::IsDoneC"></span><span class="target" id="classMancala_1a5ecdd085f26d7fcab83eebf0614bd149"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsDone</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala6IsDoneEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala11IsMoveValidE6size_t">
+<span id="_CPPv3NK7Mancala11IsMoveValidE6size_t"></span><span id="_CPPv2NK7Mancala11IsMoveValidE6size_t"></span><span id="Mancala::IsMoveValid__sC"></span><span class="target" id="classMancala_1a99a4818a9946d246140dfaf359945a75"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsMoveValid</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">move</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala11IsMoveValidE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala14GetMoveOptionsEv">
+<span id="_CPPv3N7Mancala14GetMoveOptionsEv"></span><span id="_CPPv2N7Mancala14GetMoveOptionsEv"></span><span id="Mancala::GetMoveOptions"></span><span class="target" id="classMancala_1ab1b889151ed84c2eb1523bbbb5bd0969"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N7Mancala6move_tE" title="Mancala::move_t"><span class="n"><span class="pre">move_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetMoveOptions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala14GetMoveOptionsEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala10PrintSmallERKNSt6stringERNSt7ostreamE">
+<span id="_CPPv3N7Mancala10PrintSmallERKNSt6stringERNSt7ostreamE"></span><span id="_CPPv2N7Mancala10PrintSmallERKNSt6stringERNSt7ostreamE"></span><span id="Mancala::PrintSmall__ssCR.osR"></span><span class="target" id="classMancala_1ab03d5530cc9b00bbfe5811b64a261e4f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintSmall</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">title</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala10PrintSmallERKNSt6stringERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala5PrintERNSt7ostreamE">
+<span id="_CPPv3N7Mancala5PrintERNSt7ostreamE"></span><span id="_CPPv2N7Mancala5PrintERNSt7ostreamE"></span><span id="Mancala::Print__osR"></span><span class="target" id="classMancala_1a2e50ce1de658f72fcfa562346ca2b0ee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala12GetCurPlayerEv">
+<span id="_CPPv3NK7Mancala12GetCurPlayerEv"></span><span id="_CPPv2NK7Mancala12GetCurPlayerEv"></span><span id="Mancala::GetCurPlayerC"></span><span class="target" id="classMancala_1a8a0f693bd0c530f5d055a1f8accdec86"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetCurPlayer</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala12GetCurPlayerEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala7IsTurnAEv">
+<span id="_CPPv3NK7Mancala7IsTurnAEv"></span><span id="_CPPv2NK7Mancala7IsTurnAEv"></span><span id="Mancala::IsTurnAC"></span><span class="target" id="classMancala_1ad2b84d8a65920ccd4088fb527a856302"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsTurnA</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala7IsTurnAEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala7IsTurnBEv">
+<span id="_CPPv3NK7Mancala7IsTurnBEv"></span><span id="_CPPv2NK7Mancala7IsTurnBEv"></span><span id="Mancala::IsTurnBC"></span><span class="target" id="classMancala_1a3937cb67c6a5f99f4a4498f83399aedb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsTurnB</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala7IsTurnBEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala6ScoreAEv">
+<span id="_CPPv3NK7Mancala6ScoreAEv"></span><span id="_CPPv2NK7Mancala6ScoreAEv"></span><span id="Mancala::ScoreAC"></span><span class="target" id="classMancala_1ad6f825c538f7f44751033e598413c586"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScoreA</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala6ScoreAEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7Mancala6ScoreBEv">
+<span id="_CPPv3NK7Mancala6ScoreBEv"></span><span id="_CPPv2NK7Mancala6ScoreBEv"></span><span id="Mancala::ScoreBC"></span><span class="target" id="classMancala_1a9e89a4b03e2c4633cefb0a64ca1d9cdd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScoreB</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7Mancala6ScoreBEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala8GetScoreE6size_t">
+<span id="_CPPv3N7Mancala8GetScoreE6size_t"></span><span id="_CPPv2N7Mancala8GetScoreE6size_t"></span><span id="Mancala::GetScore__s"></span><span class="target" id="classMancala_1a1d47a34c981854e7268bf45bf7092dfb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetScore</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">player</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala8GetScoreE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala6side_tE">
+<span id="_CPPv3N7Mancala6side_tE"></span><span id="_CPPv2N7Mancala6side_tE"></span><span class="target" id="classMancala_1a5076734f9225e9984cd65bb2462ec0cc"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">side_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/array.html#_CPPv4I0_6size_tE5array" title="array"><span class="n"><span class="pre">array</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">7</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N7Mancala6side_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala8TestOverEv">
+<span id="_CPPv3N7Mancala8TestOverEv"></span><span id="_CPPv2N7Mancala8TestOverEv"></span><span id="Mancala::TestOver"></span><span class="target" id="classMancala_1aecd77d7e4a54fdeae9a1cbe326e703ea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TestOver</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Mancala8TestOverEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala6boardAE">
+<span id="_CPPv3N7Mancala6boardAE"></span><span id="_CPPv2N7Mancala6boardAE"></span><span id="Mancala::boardA__side_t"></span><span class="target" id="classMancala_1aa8aa333a559d0f3f4d8104bdb0521c1a"></span><a class="reference internal" href="#_CPPv4N7Mancala6side_tE" title="Mancala::side_t"><span class="n"><span class="pre">side_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boardA</span></span></span><a class="headerlink" href="#_CPPv4N7Mancala6boardAE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala6boardBE">
+<span id="_CPPv3N7Mancala6boardBE"></span><span id="_CPPv2N7Mancala6boardBE"></span><span id="Mancala::boardB__side_t"></span><span class="target" id="classMancala_1af27f32afb317e34a752bec05269c1af0"></span><a class="reference internal" href="#_CPPv4N7Mancala6side_tE" title="Mancala::side_t"><span class="n"><span class="pre">side_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boardB</span></span></span><a class="headerlink" href="#_CPPv4N7Mancala6boardBE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala10turn_countE">
+<span id="_CPPv3N7Mancala10turn_countE"></span><span id="_CPPv2N7Mancala10turn_countE"></span><span id="Mancala::turn_count__s"></span><span class="target" id="classMancala_1a63777a7a853c8f55d005f5c1193e4fd6"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">turn_count</span></span></span><a class="headerlink" href="#_CPPv4N7Mancala10turn_countE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala4overE">
+<span id="_CPPv3N7Mancala4overE"></span><span id="_CPPv2N7Mancala4overE"></span><span id="Mancala::over__b"></span><span class="target" id="classMancala_1af1c7c04634d6291b8732d3bdb9e56842"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">over</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N7Mancala4overE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Mancala9is_A_turnE">
+<span id="_CPPv3N7Mancala9is_A_turnE"></span><span id="_CPPv2N7Mancala9is_A_turnE"></span><span id="Mancala::is_A_turn__b"></span><span class="target" id="classMancala_1a63bfece6eb216cbdb05ed8ac6be53ea1"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_A_turn</span></span></span><a class="headerlink" href="#_CPPv4N7Mancala9is_A_turnE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../games.html" class="btn btn-neutral float-left" title="Games" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Othello.html" class="btn btn-neutral float-right" title="Othello.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

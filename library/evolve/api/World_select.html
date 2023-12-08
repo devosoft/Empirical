@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World_select.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/evolve/api/World_select.249db39c-9c12-4507-85ba-fe0fca0a4bc0.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="World_structure.hpp" href="World_structure.html" />
+    <link rel="prev" title="World_reflect.hpp" href="World_reflect.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../evolve.html">Evolution tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../evolve.html#phylotracklib-systematics-manager">Phylotracklib (Systematics Manager)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../evolve.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="NK.html">NK.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NK-const.html">NK-const.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="OEE.html">OEE.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="OrgInterface.html">OrgInterface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Resource.html">Resource.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StateGrid.html">StateGrid.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Systematics.html">Systematics.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SystematicsAnalysis.html">SystematicsAnalysis.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World.html">World.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_iterator.html">World_iterator.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_output.html">World_output.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_reflect.html">World_reflect.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">World_select.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E11EliteSelectvR5WorldI3ORGE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">EliteSelect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E12RandomSelectvR5WorldI3ORGE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RandomSelect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E16TournamentSelectvR5WorldI3ORGE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">TournamentSelect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E21LocalTournamentSelectvR5WorldI3ORGE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">LocalTournamentSelect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E14RouletteSelectvR5WorldI3ORGE6size_t"><code class="docutils literal notranslate"><span class="pre">RouletteSelect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE31EMPCall_TriggerOnLexicaseSelectv10bool_decoyIDTadN1T23TriggerOnLexicaseSelectEEER1TDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">EMPCall_TriggerOnLexicaseSelect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE31EMPCall_TriggerOnLexicaseSelectviR1TDp4ARGS"><code class="docutils literal notranslate"><span class="pre">EMPCall_TriggerOnLexicaseSelect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0DpE23TriggerOnLexicaseSelectvR1TDpRR4ARGS"><code class="docutils literal notranslate"><span class="pre">TriggerOnLexicaseSelect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E14LexicaseSelectvR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">LexicaseSelect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E23OptimizedLexicaseSelectvR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">OptimizedLexicaseSelect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E9EcoSelectvR5WorldI3ORGERK6vectorINSt8functionIFdR3ORGEEEERK6vectorIdE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">EcoSelect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E9EcoSelectvR5WorldI3ORGERK6vectorIN5WorldI3ORGE18fun_calc_fitness_tEEd6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">EcoSelect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv450ignore_semicolon_to_follow_TriggerOnLexicaseSelect"><code class="docutils literal notranslate"><span class="pre">ignore_semicolon_to_follow_TriggerOnLexicaseSelect</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E5World"><code class="docutils literal notranslate"><span class="pre">World</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="World_structure.html">World_structure.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../evolve.html">Evolution tools</a></li>
+      <li class="breadcrumb-item active">World_select.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="world-select-hpp">
+<h1>World_select.hpp<a class="headerlink" href="#world-select-hpp" title="Link to this heading"></a></h1>
+<p>Functions for popular selection methods applied to worlds. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E11EliteSelectvR5WorldI3ORGE6size_t6size_t">
+<span id="_CPPv3I0E11EliteSelectR5WorldI3ORGE6size_t6size_t"></span><span id="_CPPv2I0E11EliteSelectR5WorldI3ORGE6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__select_8hpp_1a82bd5f0f1d51af6ea4b5f041b5ef2fbc"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EliteSelect</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E11EliteSelectvR5WorldI3ORGE6size_t6size_t" title="EliteSelect::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">e_count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">copy_count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E11EliteSelectvR5WorldI3ORGE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>==ELITE== Selection picks a set of the most fit individuals from the population to move to the next generation. Find top e_count individuals and make copy_count copies of each. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>world</strong> – The World object with the organisms to be selected. </p></li>
+<li><p><strong>e_count</strong> – How many distinct organisms should be chosen, starting from the most fit. </p></li>
+<li><p><strong>copy_count</strong> – How many copies should be made of each elite organism? </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E12RandomSelectvR5WorldI3ORGE6size_t6size_t">
+<span id="_CPPv3I0E12RandomSelectR5WorldI3ORGE6size_t6size_t"></span><span id="_CPPv2I0E12RandomSelectR5WorldI3ORGE6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__select_8hpp_1ac06178a1106d7a239f4106bd8e3ca06f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RandomSelect</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E12RandomSelectvR5WorldI3ORGE6size_t6size_t" title="RandomSelect::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">copy_count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E12RandomSelectvR5WorldI3ORGE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>==RANDOM== Selection picks an organism with uniform-random probability form the populaiton. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>world</strong> – The World object with the organisms to be selected. </p></li>
+<li><p><strong>r_count</strong> – How many distinct organisms should be chosen? </p></li>
+<li><p><strong>copy_count</strong> – How many copies should be made of each chosen organism? </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E16TournamentSelectvR5WorldI3ORGE6size_t6size_t">
+<span id="_CPPv3I0E16TournamentSelectR5WorldI3ORGE6size_t6size_t"></span><span id="_CPPv2I0E16TournamentSelectR5WorldI3ORGE6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__select_8hpp_1aae21b194aec2caf5d078452db81f6885"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TournamentSelect</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E16TournamentSelectvR5WorldI3ORGE6size_t6size_t" title="TournamentSelect::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">t_size</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tourny_count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E16TournamentSelectvR5WorldI3ORGE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>==TOURNAMENT== Selection creates a tournament with a random sub-set of organisms, finds the one with the highest fitness, and moves it to the next generation. User provides the world (with a fitness function), the tournament size, and (optionally) the number of tournaments to run. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>world</strong> – The World object with the organisms to be selected. </p></li>
+<li><p><strong>t_size</strong> – How many organisms should be placed in each tournament? </p></li>
+<li><p><strong>tourny_count</strong> – How many tournaments should be run? (with replacement of organisms) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E21LocalTournamentSelectvR5WorldI3ORGE6size_t6size_t">
+<span id="_CPPv3I0E21LocalTournamentSelectR5WorldI3ORGE6size_t6size_t"></span><span id="_CPPv2I0E21LocalTournamentSelectR5WorldI3ORGE6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__select_8hpp_1a730f4d0c77c1be0935d94ff774952a3e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LocalTournamentSelect</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E21LocalTournamentSelectvR5WorldI3ORGE6size_t6size_t" title="LocalTournamentSelect::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">t_size</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tourny_count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E21LocalTournamentSelectvR5WorldI3ORGE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>==LOCAL TOURNAMENT== Selection creates a tournament with a random sub-set of organisms that are neighbor to a random organism, finds the one with the highest fitness, and moves it to the next generation. User provides the world (with a fitness function), the tournament size, and (optionally) the number of tournaments to run. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>world</strong> – The World object with the organisms to be selected. </p></li>
+<li><p><strong>t_size</strong> – How many organisms should be placed in each tournament? </p></li>
+<li><p><strong>tourny_count</strong> – How many tournaments should be run? (with replacement of organisms) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E14RouletteSelectvR5WorldI3ORGE6size_t">
+<span id="_CPPv3I0E14RouletteSelectR5WorldI3ORGE6size_t"></span><span id="_CPPv2I0E14RouletteSelectR5WorldI3ORGE6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__select_8hpp_1a4018e506c61574684ae59913a8fff14b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RouletteSelect</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E14RouletteSelectvR5WorldI3ORGE6size_t" title="RouletteSelect::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E14RouletteSelectvR5WorldI3ORGE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>==ROULETTE== Selection (aka Fitness-Proportional Selection) chooses organisms to reproduce based on their current fitness. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>world</strong> – The World object with the organisms to be selected. </p></li>
+<li><p><strong>count</strong> – How many organims should be selected for replication? (with replacement) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE31EMPCall_TriggerOnLexicaseSelectv10bool_decoyIDTadN1T23TriggerOnLexicaseSelectEEER1TDpRR4ARGS">
+<span id="_CPPv3I0DpE31EMPCall_TriggerOnLexicaseSelect10bool_decoyIDTadN1T23TriggerOnLexicaseSelectEEER1TDpRR4ARGS"></span><span id="_CPPv2I0DpE31EMPCall_TriggerOnLexicaseSelect10bool_decoyIDTadN1T23TriggerOnLexicaseSelectEEER1TDpRR4ARGS"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__select_8hpp_1a11b5ccd3c71a324256f64b97b18d46dc"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EMPCall_TriggerOnLexicaseSelect</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../meta/api/meta.html#_CPPv4I0E10bool_decoy" title="bool_decoy"><span class="n"><span class="pre">bool_decoy</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><span class="o"><span class="pre">&amp;</span></span><a class="reference internal" href="#_CPPv4I0DpE31EMPCall_TriggerOnLexicaseSelectv10bool_decoyIDTadN1T23TriggerOnLexicaseSelectEEER1TDpRR4ARGS" title="EMPCall_TriggerOnLexicaseSelect::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">TriggerOnLexicaseSelect</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span>, <a class="reference internal" href="#_CPPv4I0DpE31EMPCall_TriggerOnLexicaseSelectv10bool_decoyIDTadN1T23TriggerOnLexicaseSelectEEER1TDpRR4ARGS" title="EMPCall_TriggerOnLexicaseSelect::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span>, <a class="reference internal" href="#_CPPv4I0DpE31EMPCall_TriggerOnLexicaseSelectv10bool_decoyIDTadN1T23TriggerOnLexicaseSelectEEER1TDpRR4ARGS" title="EMPCall_TriggerOnLexicaseSelect::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE31EMPCall_TriggerOnLexicaseSelectv10bool_decoyIDTadN1T23TriggerOnLexicaseSelectEEER1TDpRR4ARGS" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE31EMPCall_TriggerOnLexicaseSelectviR1TDp4ARGS">
+<span id="_CPPv3I0DpE31EMPCall_TriggerOnLexicaseSelectiR1TDp4ARGS"></span><span id="_CPPv2I0DpE31EMPCall_TriggerOnLexicaseSelectiR1TDp4ARGS"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__select_8hpp_1a62b5262ff041ba2f374b0778792e85df"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EMPCall_TriggerOnLexicaseSelect</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span>, <a class="reference internal" href="#_CPPv4I0DpE31EMPCall_TriggerOnLexicaseSelectviR1TDp4ARGS" title="EMPCall_TriggerOnLexicaseSelect::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&amp;</span></span>, <a class="reference internal" href="#_CPPv4I0DpE31EMPCall_TriggerOnLexicaseSelectviR1TDp4ARGS" title="EMPCall_TriggerOnLexicaseSelect::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE31EMPCall_TriggerOnLexicaseSelectviR1TDp4ARGS" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE23TriggerOnLexicaseSelectvR1TDpRR4ARGS">
+<span id="_CPPv3I0DpE23TriggerOnLexicaseSelectR1TDpRR4ARGS"></span><span id="_CPPv2I0DpE23TriggerOnLexicaseSelectR1TDpRR4ARGS"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">ARGS</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__select_8hpp_1ad2519232d5ca8392e207b897a3b11217"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TriggerOnLexicaseSelect</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE23TriggerOnLexicaseSelectvR1TDpRR4ARGS" title="TriggerOnLexicaseSelect::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">target</span></span>, <a class="reference internal" href="#_CPPv4I0DpE23TriggerOnLexicaseSelectvR1TDpRR4ARGS" title="TriggerOnLexicaseSelect::ARGS"><span class="n"><span class="pre">ARGS</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE23TriggerOnLexicaseSelectvR1TDpRR4ARGS" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E14LexicaseSelectvR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t">
+<span id="_CPPv3I0E14LexicaseSelectR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t"></span><span id="_CPPv2I0E14LexicaseSelectR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__select_8hpp_1a1126fc827c6efcd6a8fa842049d36efd"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LexicaseSelect</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E14LexicaseSelectvR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t" title="LexicaseSelect::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E14LexicaseSelectvR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t" title="LexicaseSelect::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fit_funs</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">repro_count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_funs</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E14LexicaseSelectvR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>==LEXICASE== Selection runs through multiple fitness functions in a random order for EACH offspring produced. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>world</strong> – The World object with the organisms to be selected. </p></li>
+<li><p><strong>fit_funs</strong> – The set of fitness functions to shuffle for each organism reproduced. </p></li>
+<li><p><strong>repro_count</strong> – How many rounds of replication should we do. (default 1) </p></li>
+<li><p><strong>max_funs</strong> – The maximum number of fitness functions to use. (use 0 for all; default) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E23OptimizedLexicaseSelectvR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t">
+<span id="_CPPv3I0E23OptimizedLexicaseSelectR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t"></span><span id="_CPPv2I0E23OptimizedLexicaseSelectR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__select_8hpp_1a33cd0cc2a2c9d4db48b785d45ab7d6b5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OptimizedLexicaseSelect</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E23OptimizedLexicaseSelectvR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t" title="OptimizedLexicaseSelect::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E23OptimizedLexicaseSelectvR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t" title="OptimizedLexicaseSelect::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fit_funs</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">repro_count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_funs</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E23OptimizedLexicaseSelectvR5WorldI3ORGERK6vectorINSt8functionIFdRK3ORGEEEE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>==OPTIMIZED LEXICASE== Is the same as regular lexicase, but determines how many unique genotypes there are </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>world</strong> – The World object with the organisms to be selected. </p></li>
+<li><p><strong>fit_funs</strong> – The set of fitness functions to shuffle for each organism reproduced. </p></li>
+<li><p><strong>repro_count</strong> – How many rounds of repliction should we do. (default 1) </p></li>
+<li><p><strong>max_funs</strong> – The maximum number of fitness functions to use. (use 0 for all; default) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E9EcoSelectvR5WorldI3ORGERK6vectorINSt8functionIFdR3ORGEEEERK6vectorIdE6size_t6size_t">
+<span id="_CPPv3I0E9EcoSelectR5WorldI3ORGERK6vectorINSt8functionIFdR3ORGEEEERK6vectorIdE6size_t6size_t"></span><span id="_CPPv2I0E9EcoSelectR5WorldI3ORGERK6vectorINSt8functionIFdR3ORGEEEERK6vectorIdE6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__select_8hpp_1a5dfc0d976cc2238a394c1b6bea6dcada"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EcoSelect</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9EcoSelectvR5WorldI3ORGERK6vectorINSt8functionIFdR3ORGEEEERK6vectorIdE6size_t6size_t" title="EcoSelect::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0E9EcoSelectvR5WorldI3ORGERK6vectorINSt8functionIFdR3ORGEEEERK6vectorIdE6size_t6size_t" title="EcoSelect::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">extra_funs</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pool_sizes</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">t_size</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tourny_count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E9EcoSelectvR5WorldI3ORGERK6vectorINSt8functionIFdR3ORGEEEERK6vectorIdE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E9EcoSelectvR5WorldI3ORGERK6vectorIN5WorldI3ORGE18fun_calc_fitness_tEEd6size_t6size_t">
+<span id="_CPPv3I0E9EcoSelectR5WorldI3ORGERK6vectorIN5WorldI3ORGE18fun_calc_fitness_tEEd6size_t6size_t"></span><span id="_CPPv2I0E9EcoSelectR5WorldI3ORGERK6vectorIN5WorldI3ORGE18fun_calc_fitness_tEEd6size_t6size_t"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="World__select_8hpp_1af7546244de5f8637960c60ad5385c0b7"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EcoSelect</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9EcoSelectvR5WorldI3ORGERK6vectorIN5WorldI3ORGE18fun_calc_fitness_tEEd6size_t6size_t" title="EcoSelect::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">world</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="World.html#_CPPv4I0E5World" title="World"><span class="n"><span class="pre">World</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0E9EcoSelectvR5WorldI3ORGERK6vectorIN5WorldI3ORGE18fun_calc_fitness_tEEd6size_t6size_t" title="EcoSelect::ORG"><span class="n"><span class="pre">ORG</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">fun_calc_fitness_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">extra_funs</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pool_sizes</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">t_size</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tourny_count</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E9EcoSelectvR5WorldI3ORGERK6vectorIN5WorldI3ORGE18fun_calc_fitness_tEEd6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>EcoSelect can be provided a single value if all pool sizes are identical. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-variables">Variables</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv450ignore_semicolon_to_follow_TriggerOnLexicaseSelect">
+<span id="_CPPv350ignore_semicolon_to_follow_TriggerOnLexicaseSelect"></span><span id="_CPPv250ignore_semicolon_to_follow_TriggerOnLexicaseSelect"></span><span id="ignore_semicolon_to_follow_TriggerOnLexicaseSelect__i"></span><span class="target" id="World__select_8hpp_1ad2030f72e8e7e0e0b5cb79d19186417c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ignore_semicolon_to_follow_TriggerOnLexicaseSelect</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv450ignore_semicolon_to_follow_TriggerOnLexicaseSelect" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E5World">
+<span id="_CPPv3I0E5World"></span><span id="_CPPv2I0E5World"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ORG</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classWorld"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">World</span></span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;World_structure.hpp&gt;</em></div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="World_reflect.html" class="btn btn-neutral float-left" title="World_reflect.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="World_structure.html" class="btn btn-neutral float-right" title="World_structure.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graph.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/datastructs/api/Graph.eaf7ef98-7823-4897-a141-d904c793a582.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="IndexMap.hpp" href="IndexMap.html" />
+    <link rel="prev" title="DynamicString.hpp" href="DynamicString.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../datastructs.html">Data structures</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../datastructs.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BloomFilter.html">BloomFilter.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Bool.html">Bool.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Cache.html">Cache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DynamicString.html">DynamicString.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Graph.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv45Graph"><code class="docutils literal notranslate"><span class="pre">Graph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413WeightedGraph"><code class="docutils literal notranslate"><span class="pre">WeightedGraph</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="IndexMap.html">IndexMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="IndexSet.html">IndexSet.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="QueueCache.html">QueueCache.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallFifoMap.html">SmallFifoMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SmallVector.html">SmallVector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StringMap.html">StringMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TimeQueue.html">TimeQueue.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TypeMap.html">TypeMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UnorderedIndexMap.html">UnorderedIndexMap.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="graph_utils.html">graph_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hash_utils.html">hash_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="map_utils.html">map_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_map.html">ra_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra_set.html">ra_set.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference_vector.html">reference_vector.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="set_utils.html">set_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_utils.html">span_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_struct.html">tuple_struct.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tuple_utils.html">tuple_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="valsort_map.html">valsort_map.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector_utils.html">vector_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../datastructs.html">Data structures</a></li>
+      <li class="breadcrumb-item active">Graph.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="graph-hpp">
+<h1>Graph.hpp<a class="headerlink" href="#graph-hpp" title="Link to this heading"></a></h1>
+<p>A simple, fast class for managing vertices (nodes) and edges. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA </p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv45Graph">
+<span id="_CPPv35Graph"></span><span id="_CPPv25Graph"></span><span id="Graph"></span><span class="target" id="classGraph"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Graph</span></span></span><a class="headerlink" href="#_CPPv45Graph" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Graph.hpp&gt;</em></div>
+<p>A graph class that maintains a set of vertices (nodes) and edges (connecting pairs of nodes) </p>
+<p>Subclassed by WeightedGraph</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph5GraphE6size_t">
+<span id="_CPPv3N5Graph5GraphE6size_t"></span><span id="_CPPv2N5Graph5GraphE6size_t"></span><span id="Graph::Graph__s"></span><span class="target" id="classGraph_1a67565a4b7bb447fdaffc4b791625ae52"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Graph</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_nodes</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph5GraphE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new graph with the specified number of nodes. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph5GraphERK5Graph">
+<span id="_CPPv3N5Graph5GraphERK5Graph"></span><span id="_CPPv2N5Graph5GraphERK5Graph"></span><span id="Graph::Graph__GraphCR"></span><span class="target" id="classGraph_1ae27796a1bff123803484bffafe48dfa1"></span><span class="sig-name descname"><span class="n"><span class="pre">Graph</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5Graph5GraphERK5Graph" title="Graph::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5Graph5GraphERK5Graph" title="Link to this definition"></a><br /></dt>
+<dd><p>Copy constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph5GraphERR5Graph">
+<span id="_CPPv3N5Graph5GraphERR5Graph"></span><span id="_CPPv2N5Graph5GraphERR5Graph"></span><span id="Graph::Graph__GraphRR"></span><span class="target" id="classGraph_1ade809d353b640b9c2773d71d4f57d57d"></span><span class="sig-name descname"><span class="n"><span class="pre">Graph</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5Graph5GraphERR5Graph" title="Graph::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5Graph5GraphERR5Graph" title="Link to this definition"></a><br /></dt>
+<dd><p>Move constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5GraphD0Ev">
+<span id="_CPPv3N5GraphD0Ev"></span><span id="_CPPv2N5GraphD0Ev"></span><span id="Graph::~Graph"></span><span class="target" id="classGraph_1a902c5b3eacb66d60752525ab23297a95"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Graph</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5GraphD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5GraphaSERK5Graph">
+<span id="_CPPv3N5GraphaSERK5Graph"></span><span id="_CPPv2N5GraphaSERK5Graph"></span><span id="Graph::assign-operator__GraphCR"></span><span class="target" id="classGraph_1aabe264c0b08786631890f7ca7096e35a"></span><a class="reference internal" href="#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5GraphaSERK5Graph" title="Link to this definition"></a><br /></dt>
+<dd><p>Copy operator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5GraphaSERR5Graph">
+<span id="_CPPv3N5GraphaSERR5Graph"></span><span id="_CPPv2N5GraphaSERR5Graph"></span><span id="Graph::assign-operator__GraphRR"></span><span class="target" id="classGraph_1a14da756c7e346c651e8cf14df2437d4a"></span><a class="reference internal" href="#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5GraphaSERR5Graph" title="Link to this definition"></a><br /></dt>
+<dd><p>Move operator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Graph7GetSizeEv">
+<span id="_CPPv3NK5Graph7GetSizeEv"></span><span id="_CPPv2NK5Graph7GetSizeEv"></span><span id="Graph::GetSizeC"></span><span class="target" id="classGraph_1adb1a2e6f369607faa11b625c537e9c18"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Graph7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get number of vertices in this graph. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Graph12GetEdgeCountEv">
+<span id="_CPPv3NK5Graph12GetEdgeCountEv"></span><span id="_CPPv2NK5Graph12GetEdgeCountEv"></span><span id="Graph::GetEdgeCountC"></span><span class="target" id="classGraph_1a32d04d9ffdb2e903bed69afc221f0e1c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetEdgeCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Graph12GetEdgeCountEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the total number of edges in this graph. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph7GetNodeEi">
+<span id="_CPPv3N5Graph7GetNodeEi"></span><span id="_CPPv2N5Graph7GetNodeEi"></span><span id="Graph::GetNode__i"></span><span class="target" id="classGraph_1a780a879710cd980019e79054092efa01"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNode</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph7GetNodeEi" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the <code class="docutils literal notranslate"><span class="pre">i</span></code> th node in the graph </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph8GetNodesEv">
+<span id="_CPPv3N5Graph8GetNodesEv"></span><span id="_CPPv2N5Graph8GetNodesEv"></span><span id="Graph::GetNodes"></span><span class="target" id="classGraph_1aeb60f2552c512e8b6e755a3a3f5810ff"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Node</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNodes</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph8GetNodesEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a vector of all nodes in the graph </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph6ResizeE6size_t">
+<span id="_CPPv3N5Graph6ResizeE6size_t"></span><span id="_CPPv2N5Graph6ResizeE6size_t"></span><span id="Graph::Resize__s"></span><span class="target" id="classGraph_1a171c1de7d235ed9aec42e588a9f40f29"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph6ResizeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Change the number of vertices in this graph. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Graph10GetEdgeSetE6size_t">
+<span id="_CPPv3NK5Graph10GetEdgeSetE6size_t"></span><span id="_CPPv2NK5Graph10GetEdgeSetE6size_t"></span><span id="Graph::GetEdgeSet__sC"></span><span class="target" id="classGraph_1addaa88a45859706b347f4950df88b351"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetEdgeSet</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Graph10GetEdgeSetE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the set of nodes that a specified node is connected to. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Graph9GetDegreeE6size_t">
+<span id="_CPPv3NK5Graph9GetDegreeE6size_t"></span><span id="_CPPv2NK5Graph9GetDegreeE6size_t"></span><span id="Graph::GetDegree__sC"></span><span class="target" id="classGraph_1a2645e621dfa1cf412d95f29bf711f286"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetDegree</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Graph9GetDegreeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the degree of a specified node. For directed graphs, this is the out-degree </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Graph11GetInDegreeE6size_t">
+<span id="_CPPv3NK5Graph11GetInDegreeE6size_t"></span><span id="_CPPv2NK5Graph11GetInDegreeE6size_t"></span><span id="Graph::GetInDegree__sC"></span><span class="target" id="classGraph_1a47db7c71b12cd73fe7610cc3dafcbc63"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetInDegree</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Graph11GetInDegreeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the in-degree (number of incoming edges) of the node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> – This should only be used for directed graphs (for undirected graphs, GetDegree() is equivalent and faster) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Graph15GetMaskedDegreeE6size_tRK9BitVector">
+<span id="_CPPv3NK5Graph15GetMaskedDegreeE6size_tRK9BitVector"></span><span id="_CPPv2NK5Graph15GetMaskedDegreeE6size_tRK9BitVector"></span><span id="Graph::GetMaskedDegree__s.BitVectorCRC"></span><span class="target" id="classGraph_1a12fc3810371c51305c1007e73e495872"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetMaskedDegree</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv49BitVector" title="BitVector"><span class="n"><span class="pre">BitVector</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mask</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Graph15GetMaskedDegreeE6size_tRK9BitVector" title="Link to this definition"></a><br /></dt>
+<dd><p>Get how many of a set of nodes that a specified node is connected to. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph8SetLabelE6size_tNSt6stringE">
+<span id="_CPPv3N5Graph8SetLabelE6size_tNSt6stringE"></span><span id="_CPPv2N5Graph8SetLabelE6size_tNSt6stringE"></span><span id="Graph::SetLabel__s.ss"></span><span class="target" id="classGraph_1ae3d8ae5ed5d9f894bb26f0feed620848"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetLabel</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lab</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph8SetLabelE6size_tNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set label of node. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – to</p></li>
+<li><p><strong>lab</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph8GetLabelE6size_t">
+<span id="_CPPv3N5Graph8GetLabelE6size_t"></span><span id="_CPPv2N5Graph8GetLabelE6size_t"></span><span id="Graph::GetLabel__s"></span><span class="target" id="classGraph_1af70106de8dd60f757cac2ebd94956ca9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetLabel</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph8GetLabelE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get label of node. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Graph7HasEdgeE6size_t6size_t">
+<span id="_CPPv3NK5Graph7HasEdgeE6size_t6size_t"></span><span id="_CPPv2NK5Graph7HasEdgeE6size_t6size_t"></span><span id="Graph::HasEdge__s.sC"></span><span class="target" id="classGraph_1a6debfeb8549dafdd90f9e84722ffb315"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasEdge</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Graph7HasEdgeE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if a specific edge is included in this graph. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph7AddEdgeE6size_t6size_t">
+<span id="_CPPv3N5Graph7AddEdgeE6size_t6size_t"></span><span id="_CPPv2N5Graph7AddEdgeE6size_t6size_t"></span><span id="Graph::AddEdge__s.s"></span><span class="target" id="classGraph_1a35a092eb611342b548390ebc0658d91d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddEdge</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph7AddEdgeE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a specified edge into this graph. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph10RemoveEdgeE6size_t6size_t">
+<span id="_CPPv3N5Graph10RemoveEdgeE6size_t6size_t"></span><span id="_CPPv2N5Graph10RemoveEdgeE6size_t6size_t"></span><span id="Graph::RemoveEdge__s.s"></span><span class="target" id="classGraph_1a8036b9675e13b81e28c52a5172d41a27"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RemoveEdge</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph10RemoveEdgeE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove a specified edge from this graph. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph7SetEdgeE6size_t6size_tb">
+<span id="_CPPv3N5Graph7SetEdgeE6size_t6size_tb"></span><span id="_CPPv2N5Graph7SetEdgeE6size_t6size_tb"></span><span id="Graph::SetEdge__s.s.b"></span><span class="target" id="classGraph_1a06766565fec34bdee05011f33e8d3275"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetEdge</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph7SetEdgeE6size_t6size_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the status of a specified edge as to whether or not it should be in the graph. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5Graph11HasEdgePairE6size_t6size_t">
+<span id="_CPPv3NK5Graph11HasEdgePairE6size_t6size_t"></span><span id="_CPPv2NK5Graph11HasEdgePairE6size_t6size_t"></span><span id="Graph::HasEdgePair__s.sC"></span><span class="target" id="classGraph_1a71372a38343c244b1f0ff1109618ef2a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasEdgePair</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5Graph11HasEdgePairE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if edges exist in both directions between a pair of vertices. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph11AddEdgePairE6size_t6size_t">
+<span id="_CPPv3N5Graph11AddEdgePairE6size_t6size_t"></span><span id="_CPPv2N5Graph11AddEdgePairE6size_t6size_t"></span><span id="Graph::AddEdgePair__s.s"></span><span class="target" id="classGraph_1a5379f8408d06126d644cbde846796ad6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddEdgePair</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph11AddEdgePairE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a pair of edges between two vertices (in both directions) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph14RemoveEdgePairE6size_t6size_t">
+<span id="_CPPv3N5Graph14RemoveEdgePairE6size_t6size_t"></span><span id="_CPPv2N5Graph14RemoveEdgePairE6size_t6size_t"></span><span id="Graph::RemoveEdgePair__s.s"></span><span class="target" id="classGraph_1aa125f3da61e5d534f928ec376dacdc6d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RemoveEdgePair</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph14RemoveEdgePairE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove edges in both directions between a pair of vertices. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph12SetEdgePairsE6size_t6size_tb">
+<span id="_CPPv3N5Graph12SetEdgePairsE6size_t6size_tb"></span><span id="_CPPv2N5Graph12SetEdgePairsE6size_t6size_tb"></span><span id="Graph::SetEdgePairs__s.s.b"></span><span class="target" id="classGraph_1a7131baf81950bb8a4e353474e7840965"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetEdgePairs</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph12SetEdgePairsE6size_t6size_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the status as to whether a pair of edges (in both direction) exist. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph5MergeERK5Graph">
+<span id="_CPPv3N5Graph5MergeERK5Graph"></span><span id="_CPPv2N5Graph5MergeERK5Graph"></span><span id="Graph::Merge__GraphCR"></span><span class="target" id="classGraph_1a42b78f23fd73f69172c42d4463be03da"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Merge</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_graph</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph5MergeERK5Graph" title="Link to this definition"></a><br /></dt>
+<dd><p>Merge a second graph into this one. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph8PrintSymERNSt7ostreamE">
+<span id="_CPPv3N5Graph8PrintSymERNSt7ostreamE"></span><span id="_CPPv2N5Graph8PrintSymERNSt7ostreamE"></span><span id="Graph::PrintSym__osR"></span><span class="target" id="classGraph_1adf495a5ea1b7f95e62d79a81f3a7376b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintSym</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph8PrintSymERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Print a symmetric graph to the provided output stream (defaulting to standard out) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph13PrintDirectedERNSt7ostreamE">
+<span id="_CPPv3N5Graph13PrintDirectedERNSt7ostreamE"></span><span id="_CPPv2N5Graph13PrintDirectedERNSt7ostreamE"></span><span id="Graph::PrintDirected__osR"></span><span class="target" id="classGraph_1a740e64eb1179b370159e11eada6b35ee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintDirected</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Graph13PrintDirectedERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Print a directed graph to the provided output stream (defaulting to standard out) </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Graph5nodesE">
+<span id="_CPPv3N5Graph5nodesE"></span><span id="_CPPv2N5Graph5nodesE"></span><span id="Graph::nodes__vector:Node:"></span><span class="target" id="classGraph_1a71b5e16eb9e0670fea3ecee3526abb41"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Node</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nodes</span></span></span><a class="headerlink" href="#_CPPv4N5Graph5nodesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set of vertices in this graph. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv413WeightedGraph">
+<span id="_CPPv313WeightedGraph"></span><span id="_CPPv213WeightedGraph"></span><span id="WeightedGraph"></span><span class="target" id="classWeightedGraph"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WeightedGraph</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45Graph" title="Graph"><span class="n"><span class="pre">Graph</span></span></a><a class="headerlink" href="#_CPPv413WeightedGraph" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;Graph.hpp&gt;</em></div>
+<p>A graph class that maintains a set of vertices (nodes), edges (connecting pairs of nodes), and edge weights </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraph13WeightedGraphE6size_t">
+<span id="_CPPv3N13WeightedGraph13WeightedGraphE6size_t"></span><span id="_CPPv2N13WeightedGraph13WeightedGraphE6size_t"></span><span id="WeightedGraph::WeightedGraph__s"></span><span class="target" id="classWeightedGraph_1a57bc66c1db7af073e6fbcc62a0c6cc79"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WeightedGraph</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_nodes</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WeightedGraph13WeightedGraphE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>The weight of each edge in the graph. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraph13WeightedGraphERK13WeightedGraph">
+<span id="_CPPv3N13WeightedGraph13WeightedGraphERK13WeightedGraph"></span><span id="_CPPv2N13WeightedGraph13WeightedGraphERK13WeightedGraph"></span><span id="WeightedGraph::WeightedGraph__WeightedGraphCR"></span><span class="target" id="classWeightedGraph_1ac4d6ddd3813457e4d1ce689c81a890c8"></span><span class="sig-name descname"><span class="n"><span class="pre">WeightedGraph</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N13WeightedGraph13WeightedGraphERK13WeightedGraph" title="WeightedGraph::WeightedGraph"><span class="n"><span class="pre">WeightedGraph</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13WeightedGraph13WeightedGraphERK13WeightedGraph" title="Link to this definition"></a><br /></dt>
+<dd><p>Copy constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraph13WeightedGraphERR13WeightedGraph">
+<span id="_CPPv3N13WeightedGraph13WeightedGraphERR13WeightedGraph"></span><span id="_CPPv2N13WeightedGraph13WeightedGraphERR13WeightedGraph"></span><span id="WeightedGraph::WeightedGraph__WeightedGraphRR"></span><span class="target" id="classWeightedGraph_1acdca48b522e8ec3f8ff93022e0f778f5"></span><span class="sig-name descname"><span class="n"><span class="pre">WeightedGraph</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N13WeightedGraph13WeightedGraphERR13WeightedGraph" title="WeightedGraph::WeightedGraph"><span class="n"><span class="pre">WeightedGraph</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13WeightedGraph13WeightedGraphERR13WeightedGraph" title="Link to this definition"></a><br /></dt>
+<dd><p>Move constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraphD0Ev">
+<span id="_CPPv3N13WeightedGraphD0Ev"></span><span id="_CPPv2N13WeightedGraphD0Ev"></span><span id="WeightedGraph::~WeightedGraph"></span><span class="target" id="classWeightedGraph_1ad7b4a5c8206772f9f4fb5906c0d64923"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~WeightedGraph</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WeightedGraphD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraphaSERK13WeightedGraph">
+<span id="_CPPv3N13WeightedGraphaSERK13WeightedGraph"></span><span id="_CPPv2N13WeightedGraphaSERK13WeightedGraph"></span><span id="WeightedGraph::assign-operator__WeightedGraphCR"></span><span class="target" id="classWeightedGraph_1a14fba8c7513bf98f239650bf759eb7c1"></span><a class="reference internal" href="#_CPPv413WeightedGraph" title="WeightedGraph"><span class="n"><span class="pre">WeightedGraph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413WeightedGraph" title="WeightedGraph"><span class="n"><span class="pre">WeightedGraph</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13WeightedGraphaSERK13WeightedGraph" title="Link to this definition"></a><br /></dt>
+<dd><p>Copy operator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraphaSERR13WeightedGraph">
+<span id="_CPPv3N13WeightedGraphaSERR13WeightedGraph"></span><span id="_CPPv2N13WeightedGraphaSERR13WeightedGraph"></span><span id="WeightedGraph::assign-operator__WeightedGraphRR"></span><span class="target" id="classWeightedGraph_1a09e3e4043733f4743e92b69f08653f72"></span><a class="reference internal" href="#_CPPv413WeightedGraph" title="WeightedGraph"><span class="n"><span class="pre">WeightedGraph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413WeightedGraph" title="WeightedGraph"><span class="n"><span class="pre">WeightedGraph</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N13WeightedGraphaSERR13WeightedGraph" title="Link to this definition"></a><br /></dt>
+<dd><p>Move operator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraph6ResizeE6size_t">
+<span id="_CPPv3N13WeightedGraph6ResizeE6size_t"></span><span id="_CPPv2N13WeightedGraph6ResizeE6size_t"></span><span id="WeightedGraph::Resize__s"></span><span class="target" id="classWeightedGraph_1a62bb65ac35384856f74eeb5d1376a2cf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WeightedGraph6ResizeE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK13WeightedGraph9GetWeightE6size_t6size_t">
+<span id="_CPPv3NK13WeightedGraph9GetWeightE6size_t6size_t"></span><span id="_CPPv2NK13WeightedGraph9GetWeightE6size_t6size_t"></span><span id="WeightedGraph::GetWeight__s.sC"></span><span class="target" id="classWeightedGraph_1af72f122ca99f54d89d7f7c9f72ebbddb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetWeight</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK13WeightedGraph9GetWeightE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine weight of a specific edge in this graph. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraph7AddEdgeE6size_t6size_td">
+<span id="_CPPv3N13WeightedGraph7AddEdgeE6size_t6size_td"></span><span id="_CPPv2N13WeightedGraph7AddEdgeE6size_t6size_td"></span><span id="WeightedGraph::AddEdge__s.s.double"></span><span class="target" id="classWeightedGraph_1a351aa02e270925d590b0b584e0dcce83"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddEdge</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WeightedGraph7AddEdgeE6size_t6size_td" title="Link to this definition"></a><br /></dt>
+<dd><p>When Adding an edge, must also provide a weight. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraph11AddEdgePairE6size_t6size_td">
+<span id="_CPPv3N13WeightedGraph11AddEdgePairE6size_t6size_td"></span><span id="_CPPv2N13WeightedGraph11AddEdgePairE6size_t6size_td"></span><span id="WeightedGraph::AddEdgePair__s.s.double"></span><span class="target" id="classWeightedGraph_1a2f47d1e19134c712bf0feea36ec951ba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddEdgePair</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">from</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">to</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">weight</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WeightedGraph11AddEdgePairE6size_t6size_td" title="Link to this definition"></a><br /></dt>
+<dd><p>When Adding an edge pair, must also provide a weight. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraph5MergeERK13WeightedGraph">
+<span id="_CPPv3N13WeightedGraph5MergeERK13WeightedGraph"></span><span id="_CPPv2N13WeightedGraph5MergeERK13WeightedGraph"></span><span id="WeightedGraph::Merge__WeightedGraphCR"></span><span class="target" id="classWeightedGraph_1abfa1454cc14ae26289a5d438634bb690"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Merge</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413WeightedGraph" title="WeightedGraph"><span class="n"><span class="pre">WeightedGraph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_graph</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WeightedGraph5MergeERK13WeightedGraph" title="Link to this definition"></a><br /></dt>
+<dd><p>Merge two WeightedGraphs into one. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraph8PrintSymERNSt7ostreamE">
+<span id="_CPPv3N13WeightedGraph8PrintSymERNSt7ostreamE"></span><span id="_CPPv2N13WeightedGraph8PrintSymERNSt7ostreamE"></span><span id="WeightedGraph::PrintSym__osR"></span><span class="target" id="classWeightedGraph_1aa4364a0c460035540c26c8e0e29fd51e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintSym</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WeightedGraph8PrintSymERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Print a symmetric graph to the provided output stream (defaulting to standard out) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraph13PrintDirectedERNSt7ostreamE">
+<span id="_CPPv3N13WeightedGraph13PrintDirectedERNSt7ostreamE"></span><span id="_CPPv2N13WeightedGraph13PrintDirectedERNSt7ostreamE"></span><span id="WeightedGraph::PrintDirected__osR"></span><span class="target" id="classWeightedGraph_1a190a766dbe1781b1bb94021ab09b3ba6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PrintDirected</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WeightedGraph13PrintDirectedERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Print a directed graph to the provided output stream (defaulting to standard out) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraph10GetWeightsEv">
+<span id="_CPPv3N13WeightedGraph10GetWeightsEv"></span><span id="_CPPv2N13WeightedGraph10GetWeightsEv"></span><span id="WeightedGraph::GetWeights"></span><span class="target" id="classWeightedGraph_1a9e84453b9b6d47332f224fd133007aa3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetWeights</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13WeightedGraph10GetWeightsEv" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the weights for all edges in the graph </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13WeightedGraph7weightsE">
+<span id="_CPPv3N13WeightedGraph7weightsE"></span><span id="_CPPv2N13WeightedGraph7weightsE"></span><span id="WeightedGraph::weights__vector:vector:double::"></span><span class="target" id="classWeightedGraph_1a1fb82744357d5505751afc6f51288c78"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">weights</span></span></span><a class="headerlink" href="#_CPPv4N13WeightedGraph7weightsE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="DynamicString.html" class="btn btn-neutral float-left" title="DynamicString.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="IndexMap.html" class="btn btn-neutral float-right" title="IndexMap.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

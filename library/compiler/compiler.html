@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compiler &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/compiler/compiler.7f221e64-5b59-4107-b0b5-033af9561042.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="DFA.hpp" href="api/DFA.html" />
+    <link rel="prev" title="bitset_utils.hpp" href="../bits/api/bitset_utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Compiler</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html">DFA.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html">Lexer.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html">NFA.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html">RegEx.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lexer_utils.html">lexer_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/regex_utils.html">regex_utils.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Compiler</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="compiler">
+<h1>Compiler<a class="headerlink" href="#compiler" title="Link to this heading"></a></h1>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/DFA.html">DFA.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/DFA.html#_CPPv43DFA"><code class="docutils literal notranslate"><span class="pre">DFA</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/DFA.html#_CPPv4I_i0E4tDFA"><code class="docutils literal notranslate"><span class="pre">tDFA</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFA6stop_tE"><code class="docutils literal notranslate"><span class="pre">tDFA::stop_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFA4tDFAE6size_t"><code class="docutils literal notranslate"><span class="pre">tDFA::tDFA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFA4tDFAERK6this_t"><code class="docutils literal notranslate"><span class="pre">tDFA::tDFA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFA4tDFAERR6this_t"><code class="docutils literal notranslate"><span class="pre">tDFA::tDFA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFAD0Ev"><code class="docutils literal notranslate"><span class="pre">tDFA::~tDFA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFAaSERK6this_t"><code class="docutils literal notranslate"><span class="pre">tDFA::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFAaSERR6this_t"><code class="docutils literal notranslate"><span class="pre">tDFA::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4NK4tDFA7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">tDFA::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFA6ResizeE6size_t"><code class="docutils literal notranslate"><span class="pre">tDFA::Resize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4NK4tDFA14GetTransitionsE6size_t"><code class="docutils literal notranslate"><span class="pre">tDFA::GetTransitions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFA13SetTransitionE6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">tDFA::SetTransition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFA7SetStopE6size_t6stop_t"><code class="docutils literal notranslate"><span class="pre">tDFA::SetStop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFA7AddStopE6size_t6stop_t"><code class="docutils literal notranslate"><span class="pre">tDFA::AddStop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4NK4tDFA7GetStopEi"><code class="docutils literal notranslate"><span class="pre">tDFA::GetStop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4NK4tDFA8IsActiveEi"><code class="docutils literal notranslate"><span class="pre">tDFA::IsActive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4NK4tDFA6IsStopEi"><code class="docutils literal notranslate"><span class="pre">tDFA::IsStop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4NK4tDFA7GetStopE6size_t"><code class="docutils literal notranslate"><span class="pre">tDFA::GetStop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4NK4tDFA8IsActiveE6size_t"><code class="docutils literal notranslate"><span class="pre">tDFA::IsActive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4NK4tDFA6IsStopE6size_t"><code class="docutils literal notranslate"><span class="pre">tDFA::IsStop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4NK4tDFA4NextEi6size_t"><code class="docutils literal notranslate"><span class="pre">tDFA::Next()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4NK4tDFA4NextEiNSt6stringE"><code class="docutils literal notranslate"><span class="pre">tDFA::Next()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4NK4tDFA4TestERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">tDFA::Test()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFA5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">tDFA::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFA6this_tE"><code class="docutils literal notranslate"><span class="pre">tDFA::this_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFA11transitionsE"><code class="docutils literal notranslate"><span class="pre">tDFA::transitions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/DFA.html#_CPPv4N4tDFA7is_stopE"><code class="docutils literal notranslate"><span class="pre">tDFA::is_stop</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Lexer.html">Lexer.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Lexer.html#_CPPv49TokenInfo"><code class="docutils literal notranslate"><span class="pre">TokenInfo</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N9TokenInfo9TokenInfoEv"><code class="docutils literal notranslate"><span class="pre">TokenInfo::TokenInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N9TokenInfo9TokenInfoERKNSt6stringERKNSt6stringEibbRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">TokenInfo::TokenInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N9TokenInfo9TokenInfoERK9TokenInfo"><code class="docutils literal notranslate"><span class="pre">TokenInfo::TokenInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N9TokenInfo9TokenInfoERR9TokenInfo"><code class="docutils literal notranslate"><span class="pre">TokenInfo::TokenInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N9TokenInfoaSERK9TokenInfo"><code class="docutils literal notranslate"><span class="pre">TokenInfo::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N9TokenInfoaSERR9TokenInfo"><code class="docutils literal notranslate"><span class="pre">TokenInfo::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK9TokenInfo5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">TokenInfo::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N9TokenInfo4nameE"><code class="docutils literal notranslate"><span class="pre">TokenInfo::name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N9TokenInfo4descE"><code class="docutils literal notranslate"><span class="pre">TokenInfo::desc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N9TokenInfo5regexE"><code class="docutils literal notranslate"><span class="pre">TokenInfo::regex</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N9TokenInfo2idE"><code class="docutils literal notranslate"><span class="pre">TokenInfo::id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N9TokenInfo11save_lexemeE"><code class="docutils literal notranslate"><span class="pre">TokenInfo::save_lexeme</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N9TokenInfo10save_tokenE"><code class="docutils literal notranslate"><span class="pre">TokenInfo::save_token</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Lexer.html#_CPPv45Token"><code class="docutils literal notranslate"><span class="pre">Token</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Token5TokenEiRKNSt6stringE6size_t"><code class="docutils literal notranslate"><span class="pre">Token::Token()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Token5TokenERK5Token"><code class="docutils literal notranslate"><span class="pre">Token::Token()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Token5TokenERR5Token"><code class="docutils literal notranslate"><span class="pre">Token::Token()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5TokenaSERK5Token"><code class="docutils literal notranslate"><span class="pre">Token::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5TokenaSERR5Token"><code class="docutils literal notranslate"><span class="pre">Token::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5TokencviEv"><code class="docutils literal notranslate"><span class="pre">Token::operator</span> <span class="pre">int()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5TokencvRKNSt6stringEEv"><code class="docutils literal notranslate"><span class="pre">Token::operator</span> <span class="pre">const</span> <span class="pre">std::string&amp;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Token2idE"><code class="docutils literal notranslate"><span class="pre">Token::id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Token6lexemeE"><code class="docutils literal notranslate"><span class="pre">Token::lexeme</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Token7line_idE"><code class="docutils literal notranslate"><span class="pre">Token::line_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Lexer.html#_CPPv411TokenStream"><code class="docutils literal notranslate"><span class="pre">TokenStream</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream11TokenStreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">TokenStream::TokenStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream11TokenStreamERK11TokenStream"><code class="docutils literal notranslate"><span class="pre">TokenStream::TokenStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream11TokenStreamERR11TokenStream"><code class="docutils literal notranslate"><span class="pre">TokenStream::TokenStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream11TokenStreamERK6vectorI5TokenERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">TokenStream::TokenStream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStreamaSERK11TokenStream"><code class="docutils literal notranslate"><span class="pre">TokenStream::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStreamaSERR11TokenStream"><code class="docutils literal notranslate"><span class="pre">TokenStream::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream4sizeEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream3GetE6size_t"><code class="docutils literal notranslate"><span class="pre">TokenStream::Get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream6GetPtrE6size_t"><code class="docutils literal notranslate"><span class="pre">TokenStream::GetPtr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream7GetNameEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::GetName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream5beginEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::begin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream3endEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::end()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream4backEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream9push_backERK5Token"><code class="docutils literal notranslate"><span class="pre">TokenStream::push_back()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">TokenStream::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream4nameE"><code class="docutils literal notranslate"><span class="pre">TokenStream::name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream6tokensE"><code class="docutils literal notranslate"><span class="pre">TokenStream::tokens</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream8IteratorE"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream8Iterator8IteratorERK8Iterator"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::Iterator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream8Iterator8IteratorERK11TokenStream6size_t"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::Iterator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream8IteratoraSERK8Iterator"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8Iterator14GetTokenStreamEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::GetTokenStream()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8Iterator8GetIndexEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::GetIndex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8Iterator5ToPtrEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::ToPtr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8IteratormlEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator*()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8IteratorptEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator-&gt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8IteratoreqERK8Iterator"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator==()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8IteratorneERK8Iterator"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator!=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8IteratorltERK8Iterator"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator&lt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8IteratorleERK8Iterator"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator&lt;=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8IteratorgtERK8Iterator"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator&gt;()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8IteratorgeERK8Iterator"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator&gt;=()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream8IteratorppEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator++()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream8IteratorppEi"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator++()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream8IteratormmEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator--()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream8IteratormmEi"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator--()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8Iterator7IsValidEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::IsValid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8Iterator5AtEndEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::AtEnd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4NK11TokenStream8IteratorcvbEv"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::operator</span> <span class="pre">bool()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream8Iterator2tsE"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/Lexer.html#_CPPv4N11TokenStream8Iterator3posE"><code class="docutils literal notranslate"><span class="pre">TokenStream::Iterator::pos</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/Lexer.html#_CPPv45Lexer"><code class="docutils literal notranslate"><span class="pre">Lexer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer5LexerEv"><code class="docutils literal notranslate"><span class="pre">Lexer::Lexer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer5LexerERK5Lexer"><code class="docutils literal notranslate"><span class="pre">Lexer::Lexer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer5LexerERR5Lexer"><code class="docutils literal notranslate"><span class="pre">Lexer::Lexer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5LexerD0Ev"><code class="docutils literal notranslate"><span class="pre">Lexer::~Lexer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5LexeraSERK5Lexer"><code class="docutils literal notranslate"><span class="pre">Lexer::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5LexeraSERR5Lexer"><code class="docutils literal notranslate"><span class="pre">Lexer::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer12GetNumTokensEv"><code class="docutils literal notranslate"><span class="pre">Lexer::GetNumTokens()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer5ResetEv"><code class="docutils literal notranslate"><span class="pre">Lexer::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer7TokenOKEi"><code class="docutils literal notranslate"><span class="pre">Lexer::TokenOK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer8AddTokenERKNSt6stringERKNSt6stringEbbRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Lexer::AddToken()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer11IgnoreTokenERKNSt6stringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Lexer::IgnoreToken()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer10GetTokenIDERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Lexer::GetTokenID()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer12GetTokenInfoEi"><code class="docutils literal notranslate"><span class="pre">Lexer::GetTokenInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer12GetTokenNameEi"><code class="docutils literal notranslate"><span class="pre">Lexer::GetTokenName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer12GetSaveTokenEi"><code class="docutils literal notranslate"><span class="pre">Lexer::GetSaveToken()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer8GenerateEv"><code class="docutils literal notranslate"><span class="pre">Lexer::Generate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer7ProcessERNSt7istreamE"><code class="docutils literal notranslate"><span class="pre">Lexer::Process()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer7ProcessERNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Lexer::Process()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer7ToTokenENSt11string_viewE"><code class="docutils literal notranslate"><span class="pre">Lexer::ToToken()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer8TokenizeERNSt7istreamERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Lexer::Tokenize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer8TokenizeENSt11string_viewERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Lexer::Tokenize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer8TokenizeERK6vectorINSt6stringEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Lexer::Tokenize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer9GetLexemeEv"><code class="docutils literal notranslate"><span class="pre">Lexer::GetLexeme()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">Lexer::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer11DebugStringENSt6stringE"><code class="docutils literal notranslate"><span class="pre">Lexer::DebugString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4NK5Lexer10DebugTokenEi"><code class="docutils literal notranslate"><span class="pre">Lexer::DebugToken()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer9token_setE"><code class="docutils literal notranslate"><span class="pre">Lexer::token_set</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer9token_mapE"><code class="docutils literal notranslate"><span class="pre">Lexer::token_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer12cur_token_idE"><code class="docutils literal notranslate"><span class="pre">Lexer::cur_token_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer14generate_lexerE"><code class="docutils literal notranslate"><span class="pre">Lexer::generate_lexer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer9lexer_dfaE"><code class="docutils literal notranslate"><span class="pre">Lexer::lexer_dfa</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer6lexemeE"><code class="docutils literal notranslate"><span class="pre">Lexer::lexeme</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer11ERROR_TOKENEv"><code class="docutils literal notranslate"><span class="pre">Lexer::ERROR_TOKEN()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer6MAX_IDE"><code class="docutils literal notranslate"><span class="pre">Lexer::MAX_ID</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Lexer.html#_CPPv4N5Lexer8ERROR_IDE"><code class="docutils literal notranslate"><span class="pre">Lexer::ERROR_ID</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/NFA.html">NFA.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/NFA.html#_CPPv43NFA"><code class="docutils literal notranslate"><span class="pre">NFA</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/NFA.html#_CPPv49NFA_State"><code class="docutils literal notranslate"><span class="pre">NFA_State</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/NFA.html#_CPPv4I_6size_t0E4tNFA"><code class="docutils literal notranslate"><span class="pre">tNFA</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA6opts_tE"><code class="docutils literal notranslate"><span class="pre">tNFA::opts_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA6stop_tE"><code class="docutils literal notranslate"><span class="pre">tNFA::stop_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA4tNFAE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">tNFA::tNFA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA4tNFAERK4tNFAI1S9STOP_TYPEE"><code class="docutils literal notranslate"><span class="pre">tNFA::tNFA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFAD0Ev"><code class="docutils literal notranslate"><span class="pre">tNFA::~tNFA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFAaSERK4tNFAI1S9STOP_TYPEE"><code class="docutils literal notranslate"><span class="pre">tNFA::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK4tNFA7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">tNFA::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK4tNFA8GetStartEv"><code class="docutils literal notranslate"><span class="pre">tNFA::GetStart()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK4tNFA7GetNextE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">tNFA::GetNext()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK4tNFA7GetNextE6size_tKNSt3setI6size_tEE"><code class="docutils literal notranslate"><span class="pre">tNFA::GetNext()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK4tNFA18HasFreeTransitionsE6size_t"><code class="docutils literal notranslate"><span class="pre">tNFA::HasFreeTransitions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK4tNFA17HasSymTransitionsE6size_t"><code class="docutils literal notranslate"><span class="pre">tNFA::HasSymTransitions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK4tNFA16GetSymbolOptionsERKNSt3setI6size_tEE"><code class="docutils literal notranslate"><span class="pre">tNFA::GetSymbolOptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA6ResizeE6size_t"><code class="docutils literal notranslate"><span class="pre">tNFA::Resize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA11AddNewStateEv"><code class="docutils literal notranslate"><span class="pre">tNFA::AddNewState()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA19AddTransitionSymbolE6size_t6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">tNFA::AddTransitionSymbol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA13AddTransitionE6size_t6size_tKc"><code class="docutils literal notranslate"><span class="pre">tNFA::AddTransition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA13AddTransitionE6size_t6size_tRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">tNFA::AddTransition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA13AddTransitionE6size_t6size_tPKc"><code class="docutils literal notranslate"><span class="pre">tNFA::AddTransition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA13AddTransitionE6size_t6size_tRK6BitSetI11NUM_SYMBOLSE"><code class="docutils literal notranslate"><span class="pre">tNFA::AddTransition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA17AddFreeTransitionE6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">tNFA::AddFreeTransition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4I0EN4tNFA7SetStopEv6size_t1T"><code class="docutils literal notranslate"><span class="pre">tNFA::SetStop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK4tNFA7GetStopE6size_t"><code class="docutils literal notranslate"><span class="pre">tNFA::GetStop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK4tNFA7IsStartE6size_t"><code class="docutils literal notranslate"><span class="pre">tNFA::IsStart()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK4tNFA6IsStopE6size_t"><code class="docutils literal notranslate"><span class="pre">tNFA::IsStop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK4tNFA7IsEmptyE6size_t"><code class="docutils literal notranslate"><span class="pre">tNFA::IsEmpty()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA5MergeERK4tNFAI11NUM_SYMBOLS9STOP_TYPEE"><code class="docutils literal notranslate"><span class="pre">tNFA::Merge()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK4tNFA5PrintEv"><code class="docutils literal notranslate"><span class="pre">tNFA::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA14PrintFreeMovesEv"><code class="docutils literal notranslate"><span class="pre">tNFA::PrintFreeMoves()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA11NUM_SYMBOLSE"><code class="docutils literal notranslate"><span class="pre">tNFA::NUM_SYMBOLS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA6statesE"><code class="docutils literal notranslate"><span class="pre">tNFA::states</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA5startE"><code class="docutils literal notranslate"><span class="pre">tNFA::start</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA7is_stopE"><code class="docutils literal notranslate"><span class="pre">tNFA::is_stop</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA5StateE"><code class="docutils literal notranslate"><span class="pre">tNFA::State</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA5State5StateEv"><code class="docutils literal notranslate"><span class="pre">tNFA::State::State()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA5State5transE"><code class="docutils literal notranslate"><span class="pre">tNFA::State::trans</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA5State7free_toE"><code class="docutils literal notranslate"><span class="pre">tNFA::State::free_to</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA5State9free_fromE"><code class="docutils literal notranslate"><span class="pre">tNFA::State::free_from</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA10TransitionE"><code class="docutils literal notranslate"><span class="pre">tNFA::Transition</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA10Transition10TransitionEv"><code class="docutils literal notranslate"><span class="pre">tNFA::Transition::Transition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/NFA.html#_CPPv4N4tNFA10Transition7symbolsE"><code class="docutils literal notranslate"><span class="pre">tNFA::Transition::symbols</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/NFA.html#_CPPv4I_6size_t0E10tNFA_State"><code class="docutils literal notranslate"><span class="pre">tNFA_State</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N10tNFA_State10tNFA_StateERK4tNFAI11NUM_SYMBOLS9STOP_TYPEE"><code class="docutils literal notranslate"><span class="pre">tNFA_State::tNFA_State()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N10tNFA_StateD0Ev"><code class="docutils literal notranslate"><span class="pre">tNFA_State::~tNFA_State()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK10tNFA_State6GetNFAEv"><code class="docutils literal notranslate"><span class="pre">tNFA_State::GetNFA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK10tNFA_State11GetStateSetEv"><code class="docutils literal notranslate"><span class="pre">tNFA_State::GetStateSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK10tNFA_State8IsActiveEv"><code class="docutils literal notranslate"><span class="pre">tNFA_State::IsActive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4NK10tNFA_State6IsStopEv"><code class="docutils literal notranslate"><span class="pre">tNFA_State::IsStop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N10tNFA_State8HasStateE6size_t"><code class="docutils literal notranslate"><span class="pre">tNFA_State::HasState()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N10tNFA_State7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">tNFA_State::GetSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N10tNFA_State11SetStateSetERKNSt3setI6size_tEE"><code class="docutils literal notranslate"><span class="pre">tNFA_State::SetStateSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N10tNFA_State5ResetEv"><code class="docutils literal notranslate"><span class="pre">tNFA_State::Reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N10tNFA_State4NextE6size_t"><code class="docutils literal notranslate"><span class="pre">tNFA_State::Next()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N10tNFA_State4NextERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">tNFA_State::Next()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N10tNFA_State5PrintEv"><code class="docutils literal notranslate"><span class="pre">tNFA_State::Print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N10tNFA_State3nfaE"><code class="docutils literal notranslate"><span class="pre">tNFA_State::nfa</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/NFA.html#_CPPv4N10tNFA_State9state_setE"><code class="docutils literal notranslate"><span class="pre">tNFA_State::state_set</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/RegEx.html">RegEx.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/RegEx.html#_CPPv46to_NFARK5RegEx6size_t"><code class="docutils literal notranslate"><span class="pre">to_NFA()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/RegEx.html#_CPPv46to_DFARK5RegEx"><code class="docutils literal notranslate"><span class="pre">to_DFA()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/RegEx.html#_CPPv45RegEx"><code class="docutils literal notranslate"><span class="pre">RegEx</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx5RegExEv"><code class="docutils literal notranslate"><span class="pre">RegEx::RegEx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx5RegExERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">RegEx::RegEx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx5RegExERK5RegEx"><code class="docutils literal notranslate"><span class="pre">RegEx::RegEx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegExD0Ev"><code class="docutils literal notranslate"><span class="pre">RegEx::~RegEx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegExaSERK5RegEx"><code class="docutils literal notranslate"><span class="pre">RegEx::operator=()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx8AsStringEv"><code class="docutils literal notranslate"><span class="pre">RegEx::AsString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx8AddToNFAER3NFA6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RegEx::AddToNFA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx8GenerateEv"><code class="docutils literal notranslate"><span class="pre">RegEx::Generate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx4TestERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">RegEx::Test()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx13PrintInternalEv"><code class="docutils literal notranslate"><span class="pre">RegEx::PrintInternal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx10PrintNotesEv"><code class="docutils literal notranslate"><span class="pre">RegEx::PrintNotes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx10PrintDebugEv"><code class="docutils literal notranslate"><span class="pre">RegEx::PrintDebug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx6opts_tE"><code class="docutils literal notranslate"><span class="pre">RegEx::opts_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4IDpEN5RegEx5ErrorEvDpRR1T"><code class="docutils literal notranslate"><span class="pre">RegEx::Error()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx10EnsureNextEc"><code class="docutils literal notranslate"><span class="pre">RegEx::EnsureNext()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx12ConstructSetEv"><code class="docutils literal notranslate"><span class="pre">RegEx::ConstructSet()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx15ConstructStringEv"><code class="docutils literal notranslate"><span class="pre">RegEx::ConstructString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx16ConstructSegmentEv"><code class="docutils literal notranslate"><span class="pre">RegEx::ConstructSegment()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx7ProcessE3PtrI8re_blockE"><code class="docutils literal notranslate"><span class="pre">RegEx::Process()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx5regexE"><code class="docutils literal notranslate"><span class="pre">RegEx::regex</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx5notesE"><code class="docutils literal notranslate"><span class="pre">RegEx::notes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx5validE"><code class="docutils literal notranslate"><span class="pre">RegEx::valid</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx3posE"><code class="docutils literal notranslate"><span class="pre">RegEx::pos</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx3dfaE"><code class="docutils literal notranslate"><span class="pre">RegEx::dfa</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9dfa_readyE"><code class="docutils literal notranslate"><span class="pre">RegEx::dfa_ready</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx4headE"><code class="docutils literal notranslate"><span class="pre">RegEx::head</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx11NUM_SYMBOLSE"><code class="docutils literal notranslate"><span class="pre">RegEx::NUM_SYMBOLS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx7re_baseE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_base</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx7re_baseD0Ev"><code class="docutils literal notranslate"><span class="pre">RegEx::re_base::~re_base()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx7re_base5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_base::Print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx7re_base7AsBlockEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_base::AsBlock()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx7re_base9AsCharSetEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_base::AsCharSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx7re_base8AsParentEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_base::AsParent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx7re_base8AsStringEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_base::AsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx7re_base7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_base::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx7re_base8SimplifyEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_base::Simplify()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx7re_base8AddToNFAER3NFA6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RegEx::re_base::AddToNFA()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx8re_blockE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_block</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx8re_block5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_block::Print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx8re_block7AsBlockEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_block::AsBlock()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx8re_block8SimplifyEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_block::Simplify()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx8re_block8AddToNFAER3NFA6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RegEx::re_block::AddToNFA()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx10re_charsetE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_charset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx10re_charset10re_charsetEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_charset::re_charset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx10re_charset10re_charsetEcb"><code class="docutils literal notranslate"><span class="pre">RegEx::re_charset::re_charset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx10re_charset10re_charsetERKNSt6stringEb"><code class="docutils literal notranslate"><span class="pre">RegEx::re_charset::re_charset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx10re_charset5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_charset::Print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx10re_charset9AsCharSetEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_charset::AsCharSet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx10re_charset7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_charset::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx10re_charset5FirstEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_charset::First()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx10re_charset8AddToNFAER3NFA6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RegEx::re_charset::AddToNFA()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx10re_charset8char_setE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_charset::char_set</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx5re_orE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_or</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx5re_or5re_orE3PtrI7re_baseE3PtrI7re_baseE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_or::re_or()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx5re_or5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_or::Print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx5re_or8AddToNFAER3NFA6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RegEx::re_or::AddToNFA()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_parentE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_parent</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_parent9re_parentEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_parent::re_parent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_parentD0Ev"><code class="docutils literal notranslate"><span class="pre">RegEx::re_parent::~re_parent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_parent5ClearEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_parent::Clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_parent4pushE3PtrI7re_baseE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_parent::push()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_parent3popEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_parent::pop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx9re_parent7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_parent::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_parent8AsParentEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_parent::AsParent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_parent8SimplifyEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_parent::Simplify()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_parent5nodesE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_parent::nodes</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx7re_plusE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_plus</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx7re_plus7re_plusE3PtrI7re_baseE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_plus::re_plus()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx7re_plus5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_plus::Print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx7re_plus8AddToNFAER3NFA6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RegEx::re_plus::AddToNFA()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx5re_qmE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_qm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx5re_qm5re_qmE3PtrI7re_baseE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_qm::re_qm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx5re_qm5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_qm::Print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx5re_qm8AddToNFAER3NFA6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RegEx::re_qm::AddToNFA()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx7re_starE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_star</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx7re_star7re_starE3PtrI7re_baseE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_star::re_star()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx7re_star5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_star::Print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx7re_star8AddToNFAER3NFA6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RegEx::re_star::AddToNFA()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_stringE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_string</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_string9re_stringEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_string::re_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_string9re_stringEc"><code class="docutils literal notranslate"><span class="pre">RegEx::re_string::re_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_string9re_stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_string::re_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx9re_string5PrintERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_string::Print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_string8AsStringEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_string::AsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx9re_string7GetSizeEv"><code class="docutils literal notranslate"><span class="pre">RegEx::re_string::GetSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4NK5RegEx9re_string8AddToNFAER3NFA6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">RegEx::re_string::AddToNFA()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/RegEx.html#_CPPv4N5RegEx9re_string3strE"><code class="docutils literal notranslate"><span class="pre">RegEx::re_string::str</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/lexer_utils.html">lexer_utils.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/lexer_utils.html#_CPPv46to_DFARK3DFA"><code class="docutils literal notranslate"><span class="pre">to_DFA()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lexer_utils.html#_CPPv46to_NFARK3NFA"><code class="docutils literal notranslate"><span class="pre">to_NFA()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lexer_utils.html#_CPPv46to_DFARK3NFAi"><code class="docutils literal notranslate"><span class="pre">to_DFA()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lexer_utils.html#_CPPv46to_NFARK3DFA"><code class="docutils literal notranslate"><span class="pre">to_NFA()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lexer_utils.html#_CPPv4I0E8MergeNFA3NFARR2T1"><code class="docutils literal notranslate"><span class="pre">MergeNFA()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lexer_utils.html#_CPPv4I00DpE8MergeNFA3NFARR2T1RR2T2DpRR2Ts"><code class="docutils literal notranslate"><span class="pre">MergeNFA()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lexer_utils.html#_CPPv4I00DpE8MergeDFA3DFARR2T1RR2T2DpRR2Ts"><code class="docutils literal notranslate"><span class="pre">MergeDFA()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lexer_utils.html#_CPPv411FindExampleRK3DFAK6size_t"><code class="docutils literal notranslate"><span class="pre">FindExample()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lexer_utils.html#_CPPv49DFAStatus"><code class="docutils literal notranslate"><span class="pre">DFAStatus</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/lexer_utils.html#_CPPv4N9DFAStatus9DFAStatusE6size_tRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">DFAStatus::DFAStatus()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lexer_utils.html#_CPPv4N9DFAStatus5stateE"><code class="docutils literal notranslate"><span class="pre">DFAStatus::state</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lexer_utils.html#_CPPv4N9DFAStatus8sequenceE"><code class="docutils literal notranslate"><span class="pre">DFAStatus::sequence</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/regex_utils.html">regex_utils.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/regex_utils.html#_CPPv412regex_nestedcc6size_tb"><code class="docutils literal notranslate"><span class="pre">regex_nested()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/regex_utils.html#_CPPv4NSt15string_literalsE"><code class="docutils literal notranslate"><span class="pre">string_literals</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../bits/api/bitset_utils.html" class="btn btn-neutral float-left" title="bitset_utils.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/DFA.html" class="btn btn-neutral float-right" title="DFA.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ContiguousStream.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/io/api/ContiguousStream.b2785855-68d3-4188-b0dd-3bf1c93a4ebd.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="File.hpp" href="File.html" />
+    <link rel="prev" title="IO" href="../io.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../io.html">IO</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../io.html#api">API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ContiguousStream.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416ContiguousBuffer"><code class="docutils literal notranslate"><span class="pre">ContiguousBuffer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416ContiguousStream"><code class="docutils literal notranslate"><span class="pre">ContiguousStream</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="File.html">File.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="MemoryIStream.html">MemoryIStream.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NullStream.html">NullStream.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StreamManager.html">StreamManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ascii_utils.html">ascii_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="serialize.html">serialize.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="serialize_macros.html">serialize_macros.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../io.html">IO</a></li>
+      <li class="breadcrumb-item active">ContiguousStream.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="contiguousstream-hpp">
+<h1>ContiguousStream.hpp<a class="headerlink" href="#contiguousstream-hpp" title="Link to this heading"></a></h1>
+<p>Useful for streaming data to contiguous memory. Status: RELEASE. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv416ContiguousBuffer">
+<span id="_CPPv316ContiguousBuffer"></span><span id="_CPPv216ContiguousBuffer"></span><span id="ContiguousBuffer"></span><span class="target" id="classContiguousBuffer"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ContiguousBuffer</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">streambuf</span></span><a class="headerlink" href="#_CPPv416ContiguousBuffer" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ContiguousStream.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N16ContiguousBuffer14const_iteratorE">
+<span id="_CPPv3N16ContiguousBuffer14const_iteratorE"></span><span id="_CPPv2N16ContiguousBuffer14const_iteratorE"></span><span class="target" id="classContiguousBuffer_1ae9adcf5af4562fec5ac02620d2394adc"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">const_iterator</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N16ContiguousBuffer18uninitialized_charE" title="ContiguousBuffer::uninitialized_char"><span class="n"><span class="pre">uninitialized_char</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">const_iterator</span></span><a class="headerlink" href="#_CPPv4N16ContiguousBuffer14const_iteratorE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16ContiguousBuffer16ContiguousBufferEK6size_t">
+<span id="_CPPv3N16ContiguousBuffer16ContiguousBufferEK6size_t"></span><span id="_CPPv2N16ContiguousBuffer16ContiguousBufferEK6size_t"></span><span id="ContiguousBuffer::ContiguousBuffer__sC"></span><span class="target" id="classContiguousBuffer_1a99be8b0b80cdd1a8937322261181b5a3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ContiguousBuffer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">init_size</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1024</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16ContiguousBuffer16ContiguousBufferEK6size_t" title="Link to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>init_size</strong> – num bytes to reserve initially </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16ContiguousBuffer5ResetEv">
+<span id="_CPPv3N16ContiguousBuffer5ResetEv"></span><span id="_CPPv2N16ContiguousBuffer5ResetEv"></span><span id="ContiguousBuffer::Reset"></span><span class="target" id="classContiguousBuffer_1a9f72864c659564b25e7d245544370acb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Reset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16ContiguousBuffer5ResetEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset stream pointers while retaining underlying memory allocation. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16ContiguousBuffer7GetDataEv">
+<span id="_CPPv3NK16ContiguousBuffer7GetDataEv"></span><span id="_CPPv2NK16ContiguousBuffer7GetDataEv"></span><span id="ContiguousBuffer::GetDataC"></span><span class="target" id="classContiguousBuffer_1a3a193a94c07c3f0cf345b1f30e7acde2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetData</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16ContiguousBuffer7GetDataEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a pointer to contiguous memory storing streamed data. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16ContiguousBuffer7GetSizeEv">
+<span id="_CPPv3NK16ContiguousBuffer7GetSizeEv"></span><span id="_CPPv2NK16ContiguousBuffer7GetSizeEv"></span><span id="ContiguousBuffer::GetSizeC"></span><span class="target" id="classContiguousBuffer_1aba2f7bc9a6142dd269af2d94606a1f9a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16ContiguousBuffer7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of bytes currently stored. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16ContiguousBuffer5PrintERNSt7ostreamE">
+<span id="_CPPv3NK16ContiguousBuffer5PrintERNSt7ostreamE"></span><span id="_CPPv2NK16ContiguousBuffer5PrintERNSt7ostreamE"></span><span id="ContiguousBuffer::Print__osRC"></span><span class="target" id="classContiguousBuffer_1a612811751efcb85c04a2e770b3df12eb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16ContiguousBuffer5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Copy stored data into an ostream. Useful for degugging. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16ContiguousBuffer6cbeginEv">
+<span id="_CPPv3NK16ContiguousBuffer6cbeginEv"></span><span id="_CPPv2NK16ContiguousBuffer6cbeginEv"></span><span id="ContiguousBuffer::cbeginC"></span><span class="target" id="classContiguousBuffer_1a280f02edf48c459475d11009f8aa409a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16ContiguousBuffer14const_iteratorE" title="ContiguousBuffer::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cbegin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16ContiguousBuffer6cbeginEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Begin iterator on stored data. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16ContiguousBuffer4cendEv">
+<span id="_CPPv3NK16ContiguousBuffer4cendEv"></span><span id="_CPPv2NK16ContiguousBuffer4cendEv"></span><span id="ContiguousBuffer::cendC"></span><span class="target" id="classContiguousBuffer_1a6e61914ccdfb6660b9eb4c894f5341a3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16ContiguousBuffer14const_iteratorE" title="ContiguousBuffer::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cend</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16ContiguousBuffer4cendEv" title="Link to this definition"></a><br /></dt>
+<dd><p>End iterator on stored data. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16ContiguousBuffer7GetDataEv">
+<span id="_CPPv3N16ContiguousBuffer7GetDataEv"></span><span id="_CPPv2N16ContiguousBuffer7GetDataEv"></span><span id="ContiguousBuffer::GetData"></span><span class="target" id="classContiguousBuffer_1ab5e6a728b135be02309ccb740b502ed0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetData</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16ContiguousBuffer7GetDataEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16ContiguousBuffer11GetCapacityEv">
+<span id="_CPPv3NK16ContiguousBuffer11GetCapacityEv"></span><span id="_CPPv2NK16ContiguousBuffer11GetCapacityEv"></span><span id="ContiguousBuffer::GetCapacityC"></span><span class="target" id="classContiguousBuffer_1a6e10c8aa448b9897c52a36cd15211e6b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetCapacity</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16ContiguousBuffer11GetCapacityEv" title="Link to this definition"></a><br /></dt>
+<dd><p>return buffer’s capacity, in bytes </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16ContiguousBuffer8overflowE8int_type">
+<span id="_CPPv3N16ContiguousBuffer8overflowE8int_type"></span><span id="_CPPv2N16ContiguousBuffer8overflowE8int_type"></span><span id="ContiguousBuffer::overflow__int_type"></span><span class="target" id="classContiguousBuffer_1ac49b01f2c24b32610152ebb4ce044499"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">int_type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">overflow</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int_type</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N16ContiguousBuffer8overflowE8int_type" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16ContiguousBuffer6bufferE">
+<span id="_CPPv3N16ContiguousBuffer6bufferE"></span><span id="_CPPv2N16ContiguousBuffer6bufferE"></span><span id="ContiguousBuffer::buffer__vector:uninitialized_char:"></span><span class="target" id="classContiguousBuffer_1adfa48b0b16d320614c1c4b4c021764f7"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N16ContiguousBuffer18uninitialized_charE" title="ContiguousBuffer::uninitialized_char"><span class="n"><span class="pre">uninitialized_char</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">buffer</span></span></span><a class="headerlink" href="#_CPPv4N16ContiguousBuffer6bufferE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N16ContiguousBuffer18uninitialized_charE">
+<span id="_CPPv3N16ContiguousBuffer18uninitialized_charE"></span><span id="_CPPv2N16ContiguousBuffer18uninitialized_charE"></span><span id="ContiguousBuffer::uninitialized_char"></span><span class="target" id="structContiguousBuffer_1_1uninitialized__char"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uninitialized_char</span></span></span><a class="headerlink" href="#_CPPv4N16ContiguousBuffer18uninitialized_charE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16ContiguousBuffer18uninitialized_char18uninitialized_charEv">
+<span id="_CPPv3N16ContiguousBuffer18uninitialized_char18uninitialized_charEv"></span><span id="_CPPv2N16ContiguousBuffer18uninitialized_char18uninitialized_charEv"></span><span id="ContiguousBuffer::uninitialized_char::uninitialized_char"></span><span class="target" id="structContiguousBuffer_1_1uninitialized__char_1ab3a9bee220fcdc747e7ebae36f6d4e63"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uninitialized_char</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16ContiguousBuffer18uninitialized_char18uninitialized_charEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16ContiguousBuffer18uninitialized_charcvcEv">
+<span id="_CPPv3NK16ContiguousBuffer18uninitialized_charcvcEv"></span><span id="_CPPv2NK16ContiguousBuffer18uninitialized_charcvcEv"></span><span id="ContiguousBuffer::uninitialized_char::castto-c-operatorC"></span><span class="target" id="structContiguousBuffer_1_1uninitialized__char_1a3f57ada368cff2cfa0770a52237e62c1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16ContiguousBuffer18uninitialized_charcvcEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16ContiguousBuffer18uninitialized_char3valE">
+<span id="_CPPv3N16ContiguousBuffer18uninitialized_char3valE"></span><span id="_CPPv2N16ContiguousBuffer18uninitialized_char3valE"></span><span id="ContiguousBuffer::uninitialized_char::val__c"></span><span class="target" id="structContiguousBuffer_1_1uninitialized__char_1a2bacf41454ce638ceea20c256969e199"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">val</span></span></span><a class="headerlink" href="#_CPPv4N16ContiguousBuffer18uninitialized_char3valE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv416ContiguousStream">
+<span id="_CPPv316ContiguousStream"></span><span id="_CPPv216ContiguousStream"></span><span id="ContiguousStream"></span><span class="target" id="classContiguousStream"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ContiguousStream</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><a class="headerlink" href="#_CPPv416ContiguousStream" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ContiguousStream.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N16ContiguousStream14const_iteratorE">
+<span id="_CPPv3N16ContiguousStream14const_iteratorE"></span><span id="_CPPv2N16ContiguousStream14const_iteratorE"></span><span class="target" id="classContiguousStream_1a137d4bcbf860e34bb31475a6a7053d0a"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">const_iterator</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv416ContiguousBuffer" title="ContiguousBuffer"><span class="n"><span class="pre">ContiguousBuffer</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N16ContiguousBuffer14const_iteratorE" title="ContiguousBuffer::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><a class="headerlink" href="#_CPPv4N16ContiguousStream14const_iteratorE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16ContiguousStream16ContiguousStreamEK6size_t">
+<span id="_CPPv3N16ContiguousStream16ContiguousStreamEK6size_t"></span><span id="_CPPv2N16ContiguousStream16ContiguousStreamEK6size_t"></span><span id="ContiguousStream::ContiguousStream__sC"></span><span class="target" id="classContiguousStream_1afc50fd9d0900ae1faec128383ce3aff3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ContiguousStream</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">init_size</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1024</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16ContiguousStream16ContiguousStreamEK6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N16ContiguousStream5ResetEv">
+<span id="_CPPv3N16ContiguousStream5ResetEv"></span><span id="_CPPv2N16ContiguousStream5ResetEv"></span><span id="ContiguousStream::Reset"></span><span class="target" id="classContiguousStream_1adfd5c2977fed9c9019618662880f9e43"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Reset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16ContiguousStream5ResetEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Reset stream pointers while retaining underlying memory allocation. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16ContiguousStream7GetDataEv">
+<span id="_CPPv3NK16ContiguousStream7GetDataEv"></span><span id="_CPPv2NK16ContiguousStream7GetDataEv"></span><span id="ContiguousStream::GetDataC"></span><span class="target" id="classContiguousStream_1a7f4363f1d47721c19de040af6ed492f3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetData</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16ContiguousStream7GetDataEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a pointer to contiguous memory storing streamed data. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16ContiguousStream7GetSizeEv">
+<span id="_CPPv3NK16ContiguousStream7GetSizeEv"></span><span id="_CPPv2NK16ContiguousStream7GetSizeEv"></span><span id="ContiguousStream::GetSizeC"></span><span class="target" id="classContiguousStream_1aa28d410bd47ccb42319ab0fc79b98da3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16ContiguousStream7GetSizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of bytes currently stored. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16ContiguousStream5PrintERNSt7ostreamE">
+<span id="_CPPv3NK16ContiguousStream5PrintERNSt7ostreamE"></span><span id="_CPPv2NK16ContiguousStream5PrintERNSt7ostreamE"></span><span id="ContiguousStream::Print__osRC"></span><span class="target" id="classContiguousStream_1aa072d31f18bb96750e5ee3ef00ed69aa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Print</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16ContiguousStream5PrintERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Copy stored data into an ostream. Useful for degugging. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16ContiguousStream6cbeginEv">
+<span id="_CPPv3NK16ContiguousStream6cbeginEv"></span><span id="_CPPv2NK16ContiguousStream6cbeginEv"></span><span id="ContiguousStream::cbeginC"></span><span class="target" id="classContiguousStream_1a5e85ca3d7709b9d783b800428659eece"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16ContiguousStream14const_iteratorE" title="ContiguousStream::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cbegin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16ContiguousStream6cbeginEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Begin iterator on stored data. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK16ContiguousStream4cendEv">
+<span id="_CPPv3NK16ContiguousStream4cendEv"></span><span id="_CPPv2NK16ContiguousStream4cendEv"></span><span id="ContiguousStream::cendC"></span><span class="target" id="classContiguousStream_1aa9d04e8d9c3af5e49f8a20a12e1cf3d7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N16ContiguousStream14const_iteratorE" title="ContiguousStream::const_iterator"><span class="n"><span class="pre">const_iterator</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cend</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK16ContiguousStream4cendEv" title="Link to this definition"></a><br /></dt>
+<dd><p>End iterator on stored data. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16ContiguousStream6bufferE">
+<span id="_CPPv3N16ContiguousStream6bufferE"></span><span id="_CPPv2N16ContiguousStream6bufferE"></span><span id="ContiguousStream::buffer__ContiguousBuffer"></span><span class="target" id="classContiguousStream_1a7063373881c6d214b70721d77fd000cb"></span><a class="reference internal" href="#_CPPv416ContiguousBuffer" title="ContiguousBuffer"><span class="n"><span class="pre">ContiguousBuffer</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">buffer</span></span></span><a class="headerlink" href="#_CPPv4N16ContiguousStream6bufferE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../io.html" class="btn btn-neutral float-left" title="IO" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="File.html" class="btn btn-neutral float-right" title="File.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>File.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/io/api/File.c2488b22-01ea-4d09-af0e-554987f8f868.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="MemoryIStream.hpp" href="MemoryIStream.html" />
+    <link rel="prev" title="ContiguousStream.hpp" href="ContiguousStream.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../io.html">IO</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../io.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ContiguousStream.html">ContiguousStream.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">File.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv44File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="MemoryIStream.html">MemoryIStream.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NullStream.html">NullStream.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StreamManager.html">StreamManager.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ascii_utils.html">ascii_utils.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="serialize.html">serialize.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="serialize_macros.html">serialize_macros.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../io.html">IO</a></li>
+      <li class="breadcrumb-item active">File.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="file-hpp">
+<h1>File.hpp<a class="headerlink" href="#file-hpp" title="Link to this heading"></a></h1>
+<p>The File object maintains a simple, in-memory file. </p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>We need to modify this code so that File can work with Emscripten.</p>
+</dd></dl>
+
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Status: BETA</p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv44File">
+<span id="_CPPv34File"></span><span id="_CPPv24File"></span><span id="File"></span><span class="target" id="classFile"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">File</span></span></span><a class="headerlink" href="#_CPPv44File" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;File.hpp&gt;</em></div>
+<p>A class to maintain files for loading, writing, storing, and easy access to components. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4FileEv">
+<span id="_CPPv3N4File4FileEv"></span><span id="_CPPv2N4File4FileEv"></span><span id="File::File"></span><span class="target" id="classFile_1ae039af5807fc385f41b60644725d15d0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">File</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4FileEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4FileERNSt7istreamE">
+<span id="_CPPv3N4File4FileERNSt7istreamE"></span><span id="_CPPv2N4File4FileERNSt7istreamE"></span><span id="File::File__isR"></span><span class="target" id="classFile_1abb284c202bd5a14ed7ae42c81040b52b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">File</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">input</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4FileERNSt7istreamE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4FileERK6String">
+<span id="_CPPv3N4File4FileERK6String"></span><span id="_CPPv2N4File4FileERK6String"></span><span id="File::File__StringCR"></span><span class="target" id="classFile_1a1856aba81482c4af6c2170ebee14f663"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">File</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">filename</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4FileERK6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4FileERK4File">
+<span id="_CPPv3N4File4FileERK4File"></span><span id="_CPPv2N4File4FileERK4File"></span><span id="File::File__FileCR"></span><span class="target" id="classFile_1af1eb7efe991e926955c1acf18f1a8b73"></span><span class="sig-name descname"><span class="n"><span class="pre">File</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4File4FileERK4File" title="File::File"><span class="n"><span class="pre">File</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N4File4FileERK4File" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4FileERR4File">
+<span id="_CPPv3N4File4FileERR4File"></span><span id="_CPPv2N4File4FileERR4File"></span><span id="File::File__FileRR"></span><span class="target" id="classFile_1a5a22059907c48e9325d96e558c1c8ada"></span><span class="sig-name descname"><span class="n"><span class="pre">File</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4File4FileERR4File" title="File::File"><span class="n"><span class="pre">File</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N4File4FileERR4File" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4FileD0Ev">
+<span id="_CPPv3N4FileD0Ev"></span><span id="_CPPv2N4FileD0Ev"></span><span id="File::~File"></span><span class="target" id="classFile_1ac704ebdf5f57d7a1c5ddf409d797fb69"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~File</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4FileD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4FileaSERK4File">
+<span id="_CPPv3N4FileaSERK4File"></span><span id="_CPPv2N4FileaSERK4File"></span><span id="File::assign-operator__FileCR"></span><span class="target" id="classFile_1a4028442e4315804d506a8c84e35a9dfd"></span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N4FileaSERK4File" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4FileaSERR4File">
+<span id="_CPPv3N4FileaSERR4File"></span><span id="_CPPv2N4FileaSERR4File"></span><span id="File::assign-operator__FileRR"></span><span class="target" id="classFile_1a261e6cd821239b23fd4ba31ff91ba336"></span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N4FileaSERR4File" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File5beginEv">
+<span id="_CPPv3NK4File5beginEv"></span><span id="_CPPv2NK4File5beginEv"></span><span id="File::beginC"></span><span class="target" id="classFile_1a40ca32ea0f2f6905bfa32aad5f6103dc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File5beginEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return const iterator to beginning of file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File3endEv">
+<span id="_CPPv3NK4File3endEv"></span><span id="_CPPv2NK4File3endEv"></span><span id="File::endC"></span><span class="target" id="classFile_1a00b309077f6f2cf54e1f821e8a564226"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File3endEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return const iterator to end of file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File5beginEv">
+<span id="_CPPv3N4File5beginEv"></span><span id="_CPPv2N4File5beginEv"></span><span id="File::begin"></span><span class="target" id="classFile_1ad7f653c70c9c89fc2488150e92d6011c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File5beginEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return iterator to beginning of file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File3endEv">
+<span id="_CPPv3N4File3endEv"></span><span id="_CPPv2N4File3endEv"></span><span id="File::end"></span><span class="target" id="classFile_1a724e1977678c505cc11a73d358dff8f7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File3endEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return iterator to end of file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File11GetNumLinesEv">
+<span id="_CPPv3NK4File11GetNumLinesEv"></span><span id="_CPPv2NK4File11GetNumLinesEv"></span><span id="File::GetNumLinesC"></span><span class="target" id="classFile_1ad383fa5b283546d837cade2093327a22"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetNumLines</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File11GetNumLinesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>How many lines are in this file? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File4sizeEv">
+<span id="_CPPv3NK4File4sizeEv"></span><span id="_CPPv2NK4File4sizeEv"></span><span id="File::sizeC"></span><span class="target" id="classFile_1a7db57a4132bb250ee7c7c67441fca2de"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File4sizeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Compatibility with size()</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File11GetAllLinesEv">
+<span id="_CPPv3N4File11GetAllLinesEv"></span><span id="_CPPv2N4File11GetAllLinesEv"></span><span id="File::GetAllLines"></span><span class="target" id="classFile_1afb162190f262a740bd17b1635efbf6d2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetAllLines</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File11GetAllLinesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return entire text of the file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4FileixE6size_t">
+<span id="_CPPv3N4FileixE6size_t"></span><span id="_CPPv2N4FileixE6size_t"></span><span id="File::subscript-operator__s"></span><span class="target" id="classFile_1a97580ff535bbe790c4f562bf1b94abd8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4FileixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Index into a specific line in this file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4FileixE6size_t">
+<span id="_CPPv3NK4FileixE6size_t"></span><span id="_CPPv2NK4FileixE6size_t"></span><span id="File::subscript-operator__sC"></span><span class="target" id="classFile_1aec051b63495774f602a08a2dd9a3071f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4FileixE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Const index into a specific line in this file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File5frontEv">
+<span id="_CPPv3N4File5frontEv"></span><span id="_CPPv2N4File5frontEv"></span><span id="File::front"></span><span class="target" id="classFile_1a5a7dca4e214510e51b7b4ff4331e8aae"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">front</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File5frontEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the first line in the file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File5frontEv">
+<span id="_CPPv3NK4File5frontEv"></span><span id="_CPPv2NK4File5frontEv"></span><span id="File::frontC"></span><span class="target" id="classFile_1a23998077b603d4c36749dbcaf0630688"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">front</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File5frontEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a const reference to to the first line in the file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4backEv">
+<span id="_CPPv3N4File4backEv"></span><span id="_CPPv2N4File4backEv"></span><span id="File::back"></span><span class="target" id="classFile_1a3daba564789155cc5812f452fa6247d8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">back</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4backEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the last line in the file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File4backEv">
+<span id="_CPPv3NK4File4backEv"></span><span id="_CPPv2NK4File4backEv"></span><span id="File::backC"></span><span class="target" id="classFile_1a916e441d82257e7f5a65158eed62d401"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">back</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File4backEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a const reference to the last line in the file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File8HasErrorEv">
+<span id="_CPPv3NK4File8HasErrorEv"></span><span id="_CPPv2NK4File8HasErrorEv"></span><span id="File::HasErrorC"></span><span class="target" id="classFile_1ab3679f87690393a2d9fd16121072947a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HasError</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File8HasErrorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File8GetErrorEv">
+<span id="_CPPv3NK4File8GetErrorEv"></span><span id="_CPPv2NK4File8GetErrorEv"></span><span id="File::GetErrorC"></span><span class="target" id="classFile_1a727c99aa1db0b1b3c324591982494e39"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetError</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File8GetErrorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File10ClearErrorEv">
+<span id="_CPPv3N4File10ClearErrorEv"></span><span id="_CPPv2N4File10ClearErrorEv"></span><span id="File::ClearError"></span><span class="target" id="classFile_1ac4aadfd187c16cc47729bd9ae570b059"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClearError</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File10ClearErrorEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File6AppendERK6String">
+<span id="_CPPv3N4File6AppendERK6String"></span><span id="_CPPv2N4File6AppendERK6String"></span><span id="File::Append__StringCR"></span><span class="target" id="classFile_1aa71a8c1f533a885b0ee049433283ced8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Append</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File6AppendERK6String" title="Link to this definition"></a><br /></dt>
+<dd><p>Append a new line to the end of the file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4File6AppendER4FileRK6vectorI1TE">
+<span id="_CPPv3I0EN4File6AppendERK6vectorI1TE"></span><span id="_CPPv2I0EN4File6AppendERK6vectorI1TE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFile_1a72f795a1d9b537e80087f1f2d4baf8c0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Append</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4File6AppendER4FileRK6vectorI1TE" title="File::Append::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_lines</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4File6AppendER4FileRK6vectorI1TE" title="Link to this definition"></a><br /></dt>
+<dd><p>Append a vector of lines to the end of the file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File6AppendERK4File">
+<span id="_CPPv3N4File6AppendERK4File"></span><span id="_CPPv2N4File6AppendERK4File"></span><span id="File::Append__FileCR"></span><span class="target" id="classFile_1a428a4cf68e90d41bc826de5306d11711"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Append</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in_file</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File6AppendERK4File" title="Link to this definition"></a><br /></dt>
+<dd><p>Join two files. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4FilepLER4FileRR1T">
+<span id="_CPPv3I0EN4FilepLERR1T"></span><span id="_CPPv2I0EN4FilepLERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFile_1aea04843bb2d8a27f2726b32ec4373b93"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">+=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN4FilepLER4FileRR1T" title="File::operator+=::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4FilepLER4FileRR1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Append to the end of a file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4FilelsEDaRR1T">
+<span id="_CPPv3I0EN4FilelsERR1T"></span><span id="_CPPv2I0EN4FilelsERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFile_1a019cd4207a2066b1cc2503319bfa671f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;&lt;</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN4FilelsEDaRR1T" title="File::operator&lt;&lt;::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4FilelsEDaRR1T" title="Link to this definition"></a><br /></dt>
+<dd><p>Insert formatted data into file This is exactly the same as operator+= </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4FilersERNSt6stringE">
+<span id="_CPPv3N4FilersERNSt6stringE"></span><span id="_CPPv2N4FilersERNSt6stringE"></span><span id="File::rshift-operator__ssR"></span><span class="target" id="classFile_1a72a9a08b12ff24adcb844fc06a1e3337"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;&gt;</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4FilersERNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Extract first line from file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4FileeqERK4File">
+<span id="_CPPv3NK4FileeqERK4File"></span><span id="_CPPv2NK4FileeqERK4File"></span><span id="File::eq-operator__FileCRC"></span><span class="target" id="classFile_1aa6264315924846750d65e941eb0cff9a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4FileeqERK4File" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if two files are identical. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4FileneERK4File">
+<span id="_CPPv3NK4FileneERK4File"></span><span id="_CPPv2NK4FileneERK4File"></span><span id="File::neq-operator__FileCRC"></span><span class="target" id="classFile_1a966c97eec414258d0e868ea9edf5366a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4FileneERK4File" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if two files are different. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File8LoadLineERNSt7istreamE">
+<span id="_CPPv3N4File8LoadLineERNSt7istreamE"></span><span id="_CPPv2N4File8LoadLineERNSt7istreamE"></span><span id="File::LoadLine__isR"></span><span class="target" id="classFile_1ab8e477c3adc2acc8b0d546b09147cc7b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LoadLine</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">input</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File8LoadLineERNSt7istreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Load a line from an input stream into a file; return whether load was successful. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4LoadERNSt7istreamE">
+<span id="_CPPv3N4File4LoadERNSt7istreamE"></span><span id="_CPPv2N4File4LoadERNSt7istreamE"></span><span id="File::Load__isR"></span><span class="target" id="classFile_1aa13b045d13c17c666dac6ad54eb78582"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Load</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">istream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">input</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4LoadERNSt7istreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Load an entire input stream into a file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4LoadERK6String">
+<span id="_CPPv3N4File4LoadERK6String"></span><span id="_CPPv2N4File4LoadERK6String"></span><span id="File::Load__StringCR"></span><span class="target" id="classFile_1a275271e11917b1e61b80cee1b1b5af67"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Load</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">filename</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4LoadERK6String" title="Link to this definition"></a><br /></dt>
+<dd><p>Load a file from disk using the provided name. If file does not exist, this is a nop </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File5WriteERNSt7ostreamE">
+<span id="_CPPv3N4File5WriteERNSt7ostreamE"></span><span id="_CPPv2N4File5WriteERNSt7ostreamE"></span><span id="File::Write__osR"></span><span class="target" id="classFile_1a58e6100864a3b689a66e9115cf8f8c8f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Write</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">output</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File5WriteERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Write this file to a provided output stream. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File5WriteERK6String">
+<span id="_CPPv3N4File5WriteERK6String"></span><span id="_CPPv2N4File5WriteERK6String"></span><span id="File::Write__StringCR"></span><span class="target" id="classFile_1a898d4de9bfe44069d2e835611222a639"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Write</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">filename</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File5WriteERK6String" title="Link to this definition"></a><br /></dt>
+<dd><p>Write this file to a file of the provided name. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File8ContainsERK6String">
+<span id="_CPPv3NK4File8ContainsERK6String"></span><span id="_CPPv2NK4File8ContainsERK6String"></span><span id="File::Contains__StringCRC"></span><span class="target" id="classFile_1a8b984aba2cb695518d443cdfe14567db"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Contains</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pattern</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File8ContainsERK6String" title="Link to this definition"></a><br /></dt>
+<dd><p>Test if a substring exists on ANY line of a file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File5AsSetEv">
+<span id="_CPPv3NK4File5AsSetEv"></span><span id="_CPPv2NK4File5AsSetEv"></span><span id="File::AsSetC"></span><span class="target" id="classFile_1addbd0d3a9175a15e53f7c2e0ae540f8d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AsSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File5AsSetEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert this file into an std::set of lines (loses line ordering). </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4File5ApplyER4File5FUN_T">
+<span id="_CPPv3I0EN4File5ApplyE5FUN_T"></span><span id="_CPPv2I0EN4File5ApplyE5FUN_T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FUN_T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFile_1abc74bb948bd0b1b713ed7bf344c21752"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Apply</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN4File5ApplyER4File5FUN_T" title="File::Apply::FUN_T"><span class="n"><span class="pre">FUN_T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4File5ApplyER4File5FUN_T" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply a string manipulation function to all lines in the file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File6KeepIfERKNSt8functionIFbRK6StringEEE">
+<span id="_CPPv3N4File6KeepIfERKNSt8functionIFbRK6StringEEE"></span><span id="_CPPv2N4File6KeepIfERKNSt8functionIFbRK6StringEEE"></span><span class="target" id="classFile_1a2d57f0db24c85ecb1c3878cc1803864c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">KeepIf</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File6KeepIfERKNSt8functionIFbRK6StringEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Purge all lines that don’t the criterion function. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File14KeepIfContainsERK6String">
+<span id="_CPPv3N4File14KeepIfContainsERK6String"></span><span id="_CPPv2N4File14KeepIfContainsERK6String"></span><span id="File::KeepIfContains__StringCR"></span><span class="target" id="classFile_1a4f2db68d4804ca749f7c01b22f584332"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">KeepIfContains</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pattern</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File14KeepIfContainsERK6String" title="Link to this definition"></a><br /></dt>
+<dd><p>Keep only strings that contain a specific substring. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File16RemoveIfContainsERK6String">
+<span id="_CPPv3N4File16RemoveIfContainsERK6String"></span><span id="_CPPv2N4File16RemoveIfContainsERK6String"></span><span id="File::RemoveIfContains__StringCR"></span><span class="target" id="classFile_1a11ec5604594c8a495fbc5befbf24b08e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">RemoveIfContains</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pattern</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File16RemoveIfContainsERK6String" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove all strings that contain a specific substring. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File12KeepIfBeginsERK6String">
+<span id="_CPPv3N4File12KeepIfBeginsERK6String"></span><span id="_CPPv2N4File12KeepIfBeginsERK6String"></span><span id="File::KeepIfBegins__StringCR"></span><span class="target" id="classFile_1a9eb1da2ba0750688f9ef4fa2c0407ca2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">KeepIfBegins</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">prefix</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File12KeepIfBeginsERK6String" title="Link to this definition"></a><br /></dt>
+<dd><p>Keep only strings that contain a specific substring. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File14RemoveIfBeginsERK6String">
+<span id="_CPPv3N4File14RemoveIfBeginsERK6String"></span><span id="_CPPv2N4File14RemoveIfBeginsERK6String"></span><span id="File::RemoveIfBegins__StringCR"></span><span class="target" id="classFile_1a76802cdcc7f6cff4d228bbfc460a6dd2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">RemoveIfBegins</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">prefix</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File14RemoveIfBeginsERK6String" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove all strings that contain a specific substring. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File11RemoveEmptyEv">
+<span id="_CPPv3N4File11RemoveEmptyEv"></span><span id="_CPPv2N4File11RemoveEmptyEv"></span><span id="File::RemoveEmpty"></span><span class="target" id="classFile_1a7184746c787e5fe713b850ddb3955a84"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">RemoveEmpty</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File11RemoveEmptyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove all lines that are empty strings. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File18CompressWhitespaceEv">
+<span id="_CPPv3N4File18CompressWhitespaceEv"></span><span id="_CPPv2N4File18CompressWhitespaceEv"></span><span id="File::CompressWhitespace"></span><span class="target" id="classFile_1a963cc4aee21bad51cb585c4658384e2d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">CompressWhitespace</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File18CompressWhitespaceEv" title="Link to this definition"></a><br /></dt>
+<dd><p><p>Any time multiple whitespaces are next to each other, collapse to a single WS char. Prefer ‘</p>
+<p>’ if in whitespace collapsed, otherwise use ‘ ‘.</p>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File16RemoveWhitespaceEb">
+<span id="_CPPv3N4File16RemoveWhitespaceEb"></span><span id="_CPPv2N4File16RemoveWhitespaceEb"></span><span id="File::RemoveWhitespace__b"></span><span class="target" id="classFile_1a6eed4ed0237b5fcb9afbfc3bd6255f11"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">RemoveWhitespace</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">keep_newlines</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File16RemoveWhitespaceEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Delete all whitespace; by default keep newlines. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File14RemoveCommentsERK6Stringb">
+<span id="_CPPv3N4File14RemoveCommentsERK6Stringb"></span><span id="_CPPv2N4File14RemoveCommentsERK6Stringb"></span><span id="File::RemoveComments__StringCR.b"></span><span class="target" id="classFile_1a111c99a6373dd0ea70eac2c8fce92d08"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">RemoveComments</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">marker</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">skip_quotes</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File14RemoveCommentsERK6Stringb" title="Link to this definition"></a><br /></dt>
+<dd><p>A technique to remove all comments in a file. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File14RemoveCommentsEcb">
+<span id="_CPPv3N4File14RemoveCommentsEcb"></span><span id="_CPPv2N4File14RemoveCommentsEcb"></span><span id="File::RemoveComments__c.b"></span><span class="target" id="classFile_1af128b6a71969899beb6a3bef7912a3fd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">RemoveComments</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">marker</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">skip_quotes</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File14RemoveCommentsEcb" title="Link to this definition"></a><br /></dt>
+<dd><p>Allow remove comments to also be specified with a single character. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4File7ProcessE6vectorI1TERKNSt8functionIF1TR6StringEEE">
+<span id="_CPPv3I0EN4File7ProcessERKNSt8functionIF1TR6StringEEE"></span><span id="_CPPv2I0EN4File7ProcessERKNSt8functionIF1TR6StringEEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFile_1a3106739751c78bfd2631db46af530bea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4File7ProcessE6vectorI1TERKNSt8functionIF1TR6StringEEE" title="File::Process::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Process</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4File7ProcessE6vectorI1TERKNSt8functionIF1TR6StringEEE" title="File::Process::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">(</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4File7ProcessE6vectorI1TERKNSt8functionIF1TR6StringEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Run a function on each line of a file and return the results as a vector. Note: Function is allowed to modify string. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File4ReadE6size_t6size_t">
+<span id="_CPPv3NK4File4ReadE6size_t6size_t"></span><span id="_CPPv2NK4File4ReadE6size_t6size_t"></span><span id="File::Read__s.sC"></span><span class="target" id="classFile_1accd98ad76a668f5e0124536802a3d666"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Read</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File4ReadE6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a series of lines. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File9ReadUntilE6size_tDa">
+<span id="_CPPv3NK4File9ReadUntilE6size_tDa"></span><span id="_CPPv2NK4File9ReadUntilE6size_tDa"></span><span id="File::ReadUntil__s.autoC"></span><span class="target" id="classFile_1a39ac8290f86fb3d3ed38599baf6c9e5f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReadUntil</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span>, <span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_fun</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File9ReadUntilE6size_tDa" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a series of lines until a line meets a certain condition. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File9ReadWhileE6size_tDa">
+<span id="_CPPv3NK4File9ReadWhileE6size_tDa"></span><span id="_CPPv2NK4File9ReadWhileE6size_tDa"></span><span id="File::ReadWhile__s.autoC"></span><span class="target" id="classFile_1a76b91cc8c1f29ce2b464fbad8752f6f9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReadWhile</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span>, <span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_fun</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File9ReadWhileE6size_tDa" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a series of lines while lines continue to meet a certain condition. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File10ExtractColEc">
+<span id="_CPPv3N4File10ExtractColEc"></span><span id="_CPPv2N4File10ExtractColEc"></span><span id="File::ExtractCol__c"></span><span class="target" id="classFile_1adc4c828f2261493194402e393049f70c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExtractCol</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">delim</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="sc"><span class="pre">','</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File10ExtractColEc" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove the first column from the file, returning it as a vector of strings. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4File12ExtractColAsE6vectorI1TEc">
+<span id="_CPPv3I0EN4File12ExtractColAsEc"></span><span id="_CPPv2I0EN4File12ExtractColAsEc"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFile_1ac06c01ed8024be4387fc1bff20251e6b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4File12ExtractColAsE6vectorI1TEc" title="File::ExtractColAs::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExtractColAs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">delim</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="sc"><span class="pre">','</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4File12ExtractColAsE6vectorI1TEc" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove the first column from the file, returning it as a vector of a specified type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File13ViewRowSlicesE6size_t6String">
+<span id="_CPPv3N4File13ViewRowSlicesE6size_t6String"></span><span id="_CPPv2N4File13ViewRowSlicesE6size_t6String"></span><span id="File::ViewRowSlices__s.String"></span><span class="target" id="classFile_1ae9a9619b64138748fcc57db8fd81e6f0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../bits/api/Bits.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string_view</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ViewRowSlices</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row_id</span></span>, <a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">delim</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;,&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File13ViewRowSlicesE6size_t6String" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert a row of a file to a vector of string views. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File10ExtractRowE6String">
+<span id="_CPPv3N4File10ExtractRowE6String"></span><span id="_CPPv2N4File10ExtractRowE6String"></span><span id="File::ExtractRow__String"></span><span class="target" id="classFile_1abf74d386b00df04a2db0b5270ba918a3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExtractRow</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">delim</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;,&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File10ExtractRowE6String" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove the first row from the file, returning it as a vector of strings. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN4File12ExtractRowAsE6vectorI1TE6String">
+<span id="_CPPv3I0EN4File12ExtractRowAsE6String"></span><span id="_CPPv2I0EN4File12ExtractRowAsE6String"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFile_1a5d98b640df4df37e9c20b7a773ec793f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4File12ExtractRowAsE6vectorI1TE6String" title="File::ExtractRowAs::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExtractRowAs</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">delim</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;,&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4File12ExtractRowAsE6vectorI1TE6String" title="Link to this definition"></a><br /></dt>
+<dd><p>Remove the first row from the file, returning it as a vector of a specified type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File5ToCSVE6String">
+<span id="_CPPv3NK4File5ToCSVE6String"></span><span id="_CPPv2NK4File5ToCSVE6String"></span><span id="File::ToCSV__StringC"></span><span class="target" id="classFile_1a2aa18de81e91287f28466f5f8e03ddba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToCSV</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">delim</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;,&quot;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File5ToCSVE6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK4File6ToDataE6vectorI6vectorI1TEE6String">
+<span id="_CPPv3I0ENK4File6ToDataE6String"></span><span id="_CPPv2I0ENK4File6ToDataE6String"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classFile_1a01c6cf73d164c0a40fd789bab36a8285"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK4File6ToDataE6vectorI6vectorI1TEE6String" title="File::ToData::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ToData</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">delim</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;,&quot;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK4File6ToDataE6vectorI6vectorI1TEE6String" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File9StartScanE6size_t">
+<span id="_CPPv3NK4File9StartScanE6size_t"></span><span id="_CPPv2NK4File9StartScanE6size_t"></span><span id="File::StartScan__sC"></span><span class="target" id="classFile_1a330e312785bbdf49e4ecdd50904d2178"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4File4ScanE" title="File::Scan"><span class="n"><span class="pre">Scan</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StartScan</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File9StartScanE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4File5linesE">
+<span id="_CPPv3N4File5linesE"></span><span id="_CPPv2N4File5linesE"></span><span id="File::lines__vector:String:"></span><span class="target" id="classFile_1aeaaf4c68c824b659d7467109883c859e"></span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lines</span></span></span><a class="headerlink" href="#_CPPv4N4File5linesE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4File10file_errorE">
+<span id="_CPPv3N4File10file_errorE"></span><span id="_CPPv2N4File10file_errorE"></span><span id="File::file_error__String"></span><span class="target" id="classFile_1a6a96748267aaab52a62684d64ec5b2a3"></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">file_error</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><a class="headerlink" href="#_CPPv4N4File10file_errorE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4ScanE">
+<span id="_CPPv3N4File4ScanE"></span><span id="_CPPv2N4File4ScanE"></span><span id="File::Scan"></span><span class="target" id="classFile_1_1Scan"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Scan</span></span></span><a class="headerlink" href="#_CPPv4N4File4ScanE" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;File.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4Scan4ScanERK4File6size_t">
+<span id="_CPPv3N4File4Scan4ScanERK4File6size_t"></span><span id="_CPPv2N4File4Scan4ScanERK4File6size_t"></span><span id="File::Scan::Scan__FileCR.s"></span><span class="target" id="classFile_1_1Scan_1ae750961d4264ffee0aac241c7f903af3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Scan</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4Scan4ScanERK4File6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4Scan4ScanERK4Scan">
+<span id="_CPPv3N4File4Scan4ScanERK4Scan"></span><span id="_CPPv2N4File4Scan4ScanERK4Scan"></span><span id="File::Scan::Scan__ScanCR"></span><span class="target" id="classFile_1_1Scan_1acfed19c18d2e146c14e5963d7e8c3b8e"></span><span class="sig-name descname"><span class="n"><span class="pre">Scan</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4File4Scan4ScanERK4Scan" title="File::Scan::Scan"><span class="n"><span class="pre">Scan</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N4File4Scan4ScanERK4Scan" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File4Scan7GetFileEv">
+<span id="_CPPv3NK4File4Scan7GetFileEv"></span><span id="_CPPv2NK4File4Scan7GetFileEv"></span><span id="File::Scan::GetFileC"></span><span class="target" id="classFile_1_1Scan_1abe966609ec8695c6ab1ec8f5b60cc78c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">GetFile</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File4Scan7GetFileEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File4Scan7GetLineEv">
+<span id="_CPPv3NK4File4Scan7GetLineEv"></span><span id="_CPPv2NK4File4Scan7GetLineEv"></span><span id="File::Scan::GetLineC"></span><span class="target" id="classFile_1_1Scan_1a56a4f0089f8ecd0bc00e7e3bb3459826"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetLine</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File4Scan7GetLineEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File4Scan7AtStartEv">
+<span id="_CPPv3NK4File4Scan7AtStartEv"></span><span id="_CPPv2NK4File4Scan7AtStartEv"></span><span id="File::Scan::AtStartC"></span><span class="target" id="classFile_1_1Scan_1a02f98c287fec6a9019a0b0fa277051b7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AtStart</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File4Scan7AtStartEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File4Scan5AtEndEv">
+<span id="_CPPv3NK4File4Scan5AtEndEv"></span><span id="_CPPv2NK4File4Scan5AtEndEv"></span><span id="File::Scan::AtEndC"></span><span class="target" id="classFile_1_1Scan_1a564bfadd9357e33f61532cfcbd148ede"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AtEnd</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File4Scan5AtEndEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4File4ScancvbEv">
+<span id="_CPPv3NK4File4ScancvbEv"></span><span id="_CPPv2NK4File4ScancvbEv"></span><span id="File::Scan::castto-b-operatorC"></span><span class="target" id="classFile_1_1Scan_1a6ab539afdcea53fdb1b9e47616f9bed0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4File4ScancvbEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4Scan3SetE6size_t">
+<span id="_CPPv3N4File4Scan3SetE6size_t"></span><span id="_CPPv2N4File4Scan3SetE6size_t"></span><span id="File::Scan::Set__s"></span><span class="target" id="classFile_1_1Scan_1a752e80c44f965c2d4ebbf08e18ca7c01"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in_line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4Scan3SetE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4Scan5ResetEv">
+<span id="_CPPv3N4File4Scan5ResetEv"></span><span id="_CPPv2N4File4Scan5ResetEv"></span><span id="File::Scan::Reset"></span><span class="target" id="classFile_1_1Scan_1af8954a985882e6892dadfa0cf5f8637a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Reset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4Scan5ResetEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4Scan6SetEndEv">
+<span id="_CPPv3N4File4Scan6SetEndEv"></span><span id="_CPPv2N4File4Scan6SetEndEv"></span><span id="File::Scan::SetEnd"></span><span class="target" id="classFile_1_1Scan_1ad7fbdb125c7eb54ac3f56fd22acfbd11"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetEnd</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4Scan6SetEndEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4Scan4ReadEv">
+<span id="_CPPv3N4File4Scan4ReadEv"></span><span id="_CPPv2N4File4Scan4ReadEv"></span><span id="File::Scan::Read"></span><span class="target" id="classFile_1_1Scan_1a1b21ddebdde77978ba7559a4fe0df379"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">Read</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4Scan4ReadEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4Scan6ReadToE6size_t">
+<span id="_CPPv3N4File4Scan6ReadToE6size_t"></span><span id="_CPPv2N4File4Scan6ReadToE6size_t"></span><span id="File::Scan::ReadTo__s"></span><span class="target" id="classFile_1_1Scan_1ae3550e066eca7810028c29653b591167"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReadTo</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4Scan6ReadToE6size_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4Scan9ReadUntilEDa">
+<span id="_CPPv3N4File4Scan9ReadUntilEDa"></span><span id="_CPPv2N4File4Scan9ReadUntilEDa"></span><span id="File::Scan::ReadUntil__auto"></span><span class="target" id="classFile_1_1Scan_1a08dacfdbbacde26540da6f25ad14502c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReadUntil</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4Scan9ReadUntilEDa" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4Scan9ReadWhileEDa">
+<span id="_CPPv3N4File4Scan9ReadWhileEDa"></span><span id="_CPPv2N4File4Scan9ReadWhileEDa"></span><span id="File::Scan::ReadWhile__auto"></span><span class="target" id="classFile_1_1Scan_1ae39afaac9abb6e96117acf5fa1dd4e72"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/vector.html#_CPPv4I0DpE6vector" title="vector"><span class="n"><span class="pre">vector</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../tools/api/String.html#_CPPv46String" title="String"><span class="n"><span class="pre">String</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReadWhile</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">test_fun</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4File4Scan9ReadWhileEDa" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4Scan4fileE">
+<span id="_CPPv3N4File4Scan4fileE"></span><span id="_CPPv2N4File4Scan4fileE"></span><span id="File::Scan::file__FileCR"></span><span class="target" id="classFile_1_1Scan_1a92daf93705dabafbd5c7d8fa87f0c9fa"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">file</span></span></span><a class="headerlink" href="#_CPPv4N4File4Scan4fileE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4File4Scan4lineE">
+<span id="_CPPv3N4File4Scan4lineE"></span><span id="_CPPv2N4File4Scan4lineE"></span><span id="File::Scan::line__s"></span><span class="target" id="classFile_1_1Scan_1ade8f6b40c5a6d46b14107cc166dc6512"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">line</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N4File4Scan4lineE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ContiguousStream.html" class="btn btn-neutral float-left" title="ContiguousStream.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="MemoryIStream.html" class="btn btn-neutral float-right" title="MemoryIStream.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prefab &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../_static/tippy/library/prefab/prefab.d499dd75-60dd-4eac-87de-5861705acac2.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Card.hpp" href="api/Card.html" />
+    <link rel="prev" title="span.hpp" href="../polyfill/api/span.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug/debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evolve/evolve.html">Evolution tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Prefab</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html">Card.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/CodeBlock.html">CodeBlock.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html">Collapse.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/CommentBox.html">CommentBox.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html">ConfigPanel.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/FontAwesomeIcon.html">FontAwesomeIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/LoadingIcon.html">LoadingIcon.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/LoadingModal.html">LoadingModal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Modal.html">Modal.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ReadoutPanel.html">ReadoutPanel.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ToggleSwitch.html">ToggleSwitch.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html">ValueBox.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Prefab</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="prefab">
+<h1>Prefab<a class="headerlink" href="#prefab" title="Link to this heading"></a></h1>
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/Card.html">Card.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Card.html#_CPPv44Card"><code class="docutils literal notranslate"><span class="pre">Card</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4N4Card4CardERKNSt6stringERKbRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Card::Card()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4I0EN4Card16AddHeaderContentEv1TKb"><code class="docutils literal notranslate"><span class="pre">Card::AddHeaderContent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4I0EN4Card14AddBodyContentEv1T"><code class="docutils literal notranslate"><span class="pre">Card::AddBodyContent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4I0EN4CardlsER4CardRR7IN_TYPE"><code class="docutils literal notranslate"><span class="pre">Card::operator&lt;&lt;()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4N4Card11SetOnToggleE15on_toggle_fun_t"><code class="docutils literal notranslate"><span class="pre">Card::SetOnToggle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4N4Card11GetOnToggleEv"><code class="docutils literal notranslate"><span class="pre">Card::GetOnToggle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4N4Card12AddBootstrapEv"><code class="docutils literal notranslate"><span class="pre">Card::AddBootstrap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4N4Card4CardERKNSt6stringERKbPN8internal8CardInfoE"><code class="docutils literal notranslate"><span class="pre">Card::Card()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4N4Card9card_baseE"><code class="docutils literal notranslate"><span class="pre">Card::card_base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4N4Card11card_headerE"><code class="docutils literal notranslate"><span class="pre">Card::card_header</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4N4Card9card_bodyE"><code class="docutils literal notranslate"><span class="pre">Card::card_body</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4N4Card15on_toggle_fun_tE"><code class="docutils literal notranslate"><span class="pre">Card::on_toggle_fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4N4Card4InfoEv"><code class="docutils literal notranslate"><span class="pre">Card::Info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Card.html#_CPPv4NK4Card4InfoEv"><code class="docutils literal notranslate"><span class="pre">Card::Info()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/CodeBlock.html">CodeBlock.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/CodeBlock.html#_CPPv49CodeBlock"><code class="docutils literal notranslate"><span class="pre">CodeBlock</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/CodeBlock.html#_CPPv4N9CodeBlock9CodeBlockEKNSt6stringEKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">CodeBlock::CodeBlock()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/CodeBlock.html#_CPPv4N9CodeBlock4codeE"><code class="docutils literal notranslate"><span class="pre">CodeBlock::code</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Collapse.html">Collapse.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Collapse.html#_CPPv416CollapseCoupling"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling16CollapseCouplingE6Widget6WidgetKbKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::CollapseCoupling()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling16CollapseCouplingE6vectorI6WidgetE6vectorI6WidgetEKbKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::CollapseCoupling()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling16CollapseCouplingEKNSt6stringEKNSt6stringEKbKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::CollapseCoupling()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling13AddControllerE6WidgetKb"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::AddController()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling13AddControllerEKNSt6stringEKb"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::AddController()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling9AddTargetEN8internal13FacetedWidgetEKb"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::AddTarget()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling9AddTargetEKNSt6stringEKb"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::AddTarget()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling14GetTargetClassEv"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::GetTargetClass()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling17GetControllerDivsEv"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::GetControllerDivs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling16GetControllerDivEK6size_t"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::GetControllerDiv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling13GetTargetDivsEv"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::GetTargetDivs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling12GetTargetDivEK6size_t"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::GetTargetDiv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling7targetsE"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::targets</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling11controllersE"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::controllers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling12target_classE"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::target_class</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Collapse.html#_CPPv4N16CollapseCoupling7counterE"><code class="docutils literal notranslate"><span class="pre">CollapseCoupling::counter</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/CommentBox.html">CommentBox.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/CommentBox.html#_CPPv410CommentBox"><code class="docutils literal notranslate"><span class="pre">CommentBox</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/CommentBox.html#_CPPv4N10CommentBox10CommentBoxEKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">CommentBox::CommentBox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/CommentBox.html#_CPPv4I0EN10CommentBox10AddContentEv1T"><code class="docutils literal notranslate"><span class="pre">CommentBox::AddContent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/CommentBox.html#_CPPv4I0EN10CommentBox16AddMobileContentEv1T"><code class="docutils literal notranslate"><span class="pre">CommentBox::AddMobileContent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/CommentBox.html#_CPPv4N10CommentBox8box_baseE"><code class="docutils literal notranslate"><span class="pre">CommentBox::box_base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/CommentBox.html#_CPPv4N10CommentBox8triangleE"><code class="docutils literal notranslate"><span class="pre">CommentBox::triangle</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/CommentBox.html#_CPPv4N10CommentBox11all_contentE"><code class="docutils literal notranslate"><span class="pre">CommentBox::all_content</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/CommentBox.html#_CPPv4N10CommentBox15desktop_contentE"><code class="docutils literal notranslate"><span class="pre">CommentBox::desktop_content</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/CommentBox.html#_CPPv4N10CommentBox14mobile_contentE"><code class="docutils literal notranslate"><span class="pre">CommentBox::mobile_content</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/ConfigPanel.html">ConfigPanel.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/ConfigPanel.html#_CPPv411ConfigPanel"><code class="docutils literal notranslate"><span class="pre">ConfigPanel</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4N11ConfigPanel15on_change_fun_tE"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::on_change_fun_t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4N11ConfigPanel11ConfigPanelER6ConfigbRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::ConfigPanel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4N11ConfigPanel14SetOnChangeFunERK15on_change_fun_t"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::SetOnChangeFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4N11ConfigPanel8SetRangeERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::SetRange()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4N11ConfigPanel13ExcludeConfigERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::ExcludeConfig()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4N11ConfigPanel14ExcludeSettingERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::ExcludeSetting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4N11ConfigPanel12ExcludeGroupERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::ExcludeGroup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4N11ConfigPanel5SetupER6ConfigbRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::Setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4N11ConfigPanel17GetConfigPanelDivEv"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::GetConfigPanelDiv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4N11ConfigPanel9INFO_TYPEE"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::INFO_TYPE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4N11ConfigPanel4InfoEv"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::Info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4NK11ConfigPanel4InfoEv"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::Info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4N11ConfigPanel14GetOnChangeFunEv"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::GetOnChangeFun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ConfigPanel.html#_CPPv4N11ConfigPanel13numeric_typesE"><code class="docutils literal notranslate"><span class="pre">ConfigPanel::numeric_types</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/FontAwesomeIcon.html">FontAwesomeIcon.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/FontAwesomeIcon.html#_CPPv415FontAwesomeIcon"><code class="docutils literal notranslate"><span class="pre">FontAwesomeIcon</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/FontAwesomeIcon.html#_CPPv4N15FontAwesomeIcon15FontAwesomeIconEKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">FontAwesomeIcon::FontAwesomeIcon()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/LoadingIcon.html">LoadingIcon.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/LoadingIcon.html#_CPPv411LoadingIcon"><code class="docutils literal notranslate"><span class="pre">LoadingIcon</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/LoadingIcon.html#_CPPv4N11LoadingIcon11LoadingIconERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">LoadingIcon::LoadingIcon()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/LoadingIcon.html#_CPPv4N11LoadingIcon4iconE"><code class="docutils literal notranslate"><span class="pre">LoadingIcon::icon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/LoadingIcon.html#_CPPv4N11LoadingIcon4textE"><code class="docutils literal notranslate"><span class="pre">LoadingIcon::text</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/LoadingModal.html">LoadingModal.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/LoadingModal.html#_CPPv417CloseLoadingModalv"><code class="docutils literal notranslate"><span class="pre">CloseLoadingModal()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/Modal.html">Modal.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/Modal.html#_CPPv45Modal"><code class="docutils literal notranslate"><span class="pre">Modal</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/Modal.html#_CPPv4N5Modal5ModalERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Modal::Modal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Modal.html#_CPPv4I0EN5Modal16AddHeaderContentEv1T"><code class="docutils literal notranslate"><span class="pre">Modal::AddHeaderContent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Modal.html#_CPPv4I0EN5Modal14AddBodyContentEv1T"><code class="docutils literal notranslate"><span class="pre">Modal::AddBodyContent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Modal.html#_CPPv4I0EN5Modal16AddFooterContentEv1T"><code class="docutils literal notranslate"><span class="pre">Modal::AddFooterContent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Modal.html#_CPPv4N5Modal11AddClosingXEv"><code class="docutils literal notranslate"><span class="pre">Modal::AddClosingX()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Modal.html#_CPPv4N5Modal9AddButtonER6Button"><code class="docutils literal notranslate"><span class="pre">Modal::AddButton()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Modal.html#_CPPv4N5Modal13SetBackgroundEKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">Modal::SetBackground()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Modal.html#_CPPv4N5Modal12modal_dialogE"><code class="docutils literal notranslate"><span class="pre">Modal::modal_dialog</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Modal.html#_CPPv4N5Modal13modal_contentE"><code class="docutils literal notranslate"><span class="pre">Modal::modal_content</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Modal.html#_CPPv4N5Modal12modal_headerE"><code class="docutils literal notranslate"><span class="pre">Modal::modal_header</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Modal.html#_CPPv4N5Modal10modal_bodyE"><code class="docutils literal notranslate"><span class="pre">Modal::modal_body</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/Modal.html#_CPPv4N5Modal12modal_footerE"><code class="docutils literal notranslate"><span class="pre">Modal::modal_footer</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/ReadoutPanel.html">ReadoutPanel.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/ReadoutPanel.html#_CPPv412ReadoutPanel"><code class="docutils literal notranslate"><span class="pre">ReadoutPanel</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ReadoutPanel.html#_CPPv4N12ReadoutPanel12ReadoutPanelERKNSt6stringEKdRKNSt6stringERKbRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ReadoutPanel::ReadoutPanel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ReadoutPanel.html#_CPPv4I0EN12ReadoutPanel8AddValueER12ReadoutPanelRKNSt6stringERKNSt6stringERR10VALUE_TYPE"><code class="docutils literal notranslate"><span class="pre">ReadoutPanel::AddValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ReadoutPanel.html#_CPPv4I0DpEN12ReadoutPanel9AddValuesER12ReadoutPanelRKNSt6stringERKNSt6stringERR10VALUE_TYPEDpRR12OTHER_VALUES"><code class="docutils literal notranslate"><span class="pre">ReadoutPanel::AddValues()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ReadoutPanel.html#_CPPv4N12ReadoutPanel9AddValuesEv"><code class="docutils literal notranslate"><span class="pre">ReadoutPanel::AddValues()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ReadoutPanel.html#_CPPv4N12ReadoutPanel12ReadoutPanelERKNSt6stringEdRKNSt6stringERKbPN8internal16ReadoutPanelInfoE"><code class="docutils literal notranslate"><span class="pre">ReadoutPanel::ReadoutPanel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ReadoutPanel.html#_CPPv4N12ReadoutPanel6valuesE"><code class="docutils literal notranslate"><span class="pre">ReadoutPanel::values</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ReadoutPanel.html#_CPPv4N12ReadoutPanel10FormatNameERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ReadoutPanel::FormatName()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ReadoutPanel.html#_CPPv4N12ReadoutPanel4InfoEv"><code class="docutils literal notranslate"><span class="pre">ReadoutPanel::Info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ReadoutPanel.html#_CPPv4NK12ReadoutPanel4InfoEv"><code class="docutils literal notranslate"><span class="pre">ReadoutPanel::Info()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/ToggleSwitch.html">ToggleSwitch.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/ToggleSwitch.html#_CPPv412ToggleSwitch"><code class="docutils literal notranslate"><span class="pre">ToggleSwitch</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ToggleSwitch.html#_CPPv4N12ToggleSwitch12ToggleSwitchERKNSt8functionIFvNSt6stringEEEERKNSt6stringEKbRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ToggleSwitch::ToggleSwitch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ToggleSwitch.html#_CPPv4I0EN12ToggleSwitch8AddLabelEvK1T"><code class="docutils literal notranslate"><span class="pre">ToggleSwitch::AddLabel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ToggleSwitch.html#_CPPv4N12ToggleSwitch13label_elementE"><code class="docutils literal notranslate"><span class="pre">ToggleSwitch::label_element</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/ValueBox.html">ValueBox.hpp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/ValueBox.html#_CPPv48ValueBox"><code class="docutils literal notranslate"><span class="pre">ValueBox</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html#_CPPv4N8ValueBox8ValueBoxERKNSt6stringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ValueBox::ValueBox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html#_CPPv4N8ValueBox7GetViewEv"><code class="docutils literal notranslate"><span class="pre">ValueBox::GetView()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html#_CPPv4N8ValueBox11descriptionE"><code class="docutils literal notranslate"><span class="pre">ValueBox::description</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html#_CPPv4N8ValueBox4viewE"><code class="docutils literal notranslate"><span class="pre">ValueBox::view</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/ValueBox.html#_CPPv412ValueDisplay"><code class="docutils literal notranslate"><span class="pre">ValueDisplay</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html#_CPPv4N12ValueDisplay12ValueDisplayERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ValueDisplay::ValueDisplay()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/ValueBox.html#_CPPv416LiveValueDisplay"><code class="docutils literal notranslate"><span class="pre">LiveValueDisplay</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html#_CPPv4I0EN16LiveValueDisplay16LiveValueDisplayERKNSt6stringERKNSt6stringERR1TRKbRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">LiveValueDisplay::LiveValueDisplay()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/ValueBox.html#_CPPv412ValueControl"><code class="docutils literal notranslate"><span class="pre">ValueControl</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html#_CPPv4N12ValueControl12ValueControlERKNSt6stringERKNSt6stringERKNSt6stringE5InputRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">ValueControl::ValueControl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html#_CPPv4N12ValueControl8mainCtrlE"><code class="docutils literal notranslate"><span class="pre">ValueControl::mainCtrl</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/ValueBox.html#_CPPv416TextValueControl"><code class="docutils literal notranslate"><span class="pre">TextValueControl</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html#_CPPv4N16TextValueControl16TextValueControlERKNSt6stringERKNSt6stringERKNSt6stringERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">TextValueControl::TextValueControl()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/ValueBox.html#_CPPv416BoolValueControl"><code class="docutils literal notranslate"><span class="pre">BoolValueControl</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html#_CPPv4N16BoolValueControl16BoolValueControlERKNSt6stringERKNSt6stringEKbRKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">BoolValueControl::BoolValueControl()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/ValueBox.html#_CPPv419NumericValueControl"><code class="docutils literal notranslate"><span class="pre">NumericValueControl</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html#_CPPv4N19NumericValueControl19NumericValueControlERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringERKNSt8functionIFvRKNSt6stringEEEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">NumericValueControl::NumericValueControl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html#_CPPv4N19NumericValueControl20setDefaultRangeMakerERK14range_setter_t"><code class="docutils literal notranslate"><span class="pre">NumericValueControl::setDefaultRangeMaker()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/ValueBox.html#_CPPv4N19NumericValueControl14range_setter_tE"><code class="docutils literal notranslate"><span class="pre">NumericValueControl::range_setter_t</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../polyfill/api/span.html" class="btn btn-neutral float-left" title="span.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/Card.html" class="btn btn-neutral float-right" title="Card.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

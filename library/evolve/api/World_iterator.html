@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World_iterator.hpp &mdash; Empirical 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=933cd161"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+        <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+        <script defer="defer" src="../../../_static/tippy/library/evolve/api/World_iterator.ee90fa36-5ff0-41b1-9671-33f920c77f1c.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="World_output.hpp" href="World_output.html" />
+    <link rel="prev" title="World.hpp" href="World.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Empirical
+          </a>
+              <div class="version">
+                0.0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BuiltWithEmpiricalGallery/index.html">Built With Empirical Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../QuickStartGuides/index.html">Quick Start Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using Empirical</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base/base.html">General Purpose Debugging Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bits/bits.html">Bits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/config.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data/data.html">Data Collection and Recording Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datastructs/datastructs.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug/debug.html">Debug</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../evolve.html">Evolution tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../evolve.html#phylotracklib-systematics-manager">Phylotracklib (Systematics Manager)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../evolve.html#api">API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="NK.html">NK.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NK-const.html">NK-const.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="OEE.html">OEE.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="OrgInterface.html">OrgInterface.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Resource.html">Resource.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="StateGrid.html">StateGrid.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Systematics.html">Systematics.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SystematicsAnalysis.html">SystematicsAnalysis.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World.html">World.hpp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">World_iterator.hpp</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0E14World_iterator"><code class="docutils literal notranslate"><span class="pre">World_iterator</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="World_output.html">World_output.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_reflect.html">World_reflect.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_select.html">World_select.hpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="World_structure.html">World_structure.hpp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional/functional.html">Functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/games.html">Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry/geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hardware/hardware.html">Hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../in_progress/in_progress.html">In_progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matching/matching.html">Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../math/math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meta/meta.html">Meta</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../polyfill/polyfill.html">Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prefab/prefab.html">Prefab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scholar/scholar.html">Scholar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../text/text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools/tools.html">Other Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web/web.html">Web Tools (for use with Emscripten)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Empirical</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/empirical-development-practices.html">Empirical Development Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/getting-started.html">Getting started with Empirical development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution-guidelines-and-review.html">Coding guidelines and review checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/adding-documentation.html">Empirical Documentation Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/guide-to-testing.html">Guide to Testing in Empirical</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Empirical</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../evolve.html">Evolution tools</a></li>
+      <li class="breadcrumb-item active">World_iterator.hpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="world-iterator-hpp">
+<h1>World_iterator.hpp<a class="headerlink" href="#world-iterator-hpp" title="Link to this heading"></a></h1>
+<p>This file defines iterators for use with World objects. </p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Add a const interator. </p>
+<p>Currently we do MakeValid after every change AND before many accesses. Pick one? </p>
+<p>Fix operator– which can go off of the beginnig of the world. </p>
+</dd></dl>
+
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Originally called PopulationIterator.h </p>
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0E14World_iterator">
+<span id="_CPPv3I0E14World_iterator"></span><span id="_CPPv2I0E14World_iterator"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WORLD</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classWorld__iterator"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">World_iterator</span></span></span><a class="headerlink" href="#_CPPv4I0E14World_iterator" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;World_iterator.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iterator14World_iteratorE3PtrI7world_tE6size_t">
+<span id="_CPPv3N14World_iterator14World_iteratorE3PtrI7world_tE6size_t"></span><span id="_CPPv2N14World_iterator14World_iteratorE3PtrI7world_tE6size_t"></span><span id="World_iterator::World_iterator__Ptr:world_t:.s"></span><span class="target" id="classWorld__iterator_1a981d38261d8ca423f6eef2a8caad5acf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">World_iterator</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N14World_iterator7world_tE" title="World_iterator::world_t"><span class="n"><span class="pre">world_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_w</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_p</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14World_iterator14World_iteratorE3PtrI7world_tE6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Create an iterator in the specified world pointing to the first occupied cell after the provided start position. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iterator14World_iteratorERK14World_iterator">
+<span id="_CPPv3N14World_iterator14World_iteratorERK14World_iterator"></span><span id="_CPPv2N14World_iterator14World_iteratorERK14World_iterator"></span><span id="World_iterator::World_iterator__World_iteratorCR"></span><span class="target" id="classWorld__iterator_1ac57688e808d4d49bee21696ad7284c96"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">World_iterator</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator14World_iteratorERK14World_iterator" title="World_iterator::World_iterator"><span class="n"><span class="pre">World_iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14World_iterator14World_iteratorERK14World_iterator" title="Link to this definition"></a><br /></dt>
+<dd><p>Create an iterator pointing to the same position as another iterator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iteratoraSERK14World_iterator">
+<span id="_CPPv3N14World_iteratoraSERK14World_iterator"></span><span id="_CPPv2N14World_iteratoraSERK14World_iterator"></span><span id="World_iterator::assign-operator__World_iteratorCR"></span><span class="target" id="classWorld__iterator_1acea9aad53e8843b2350db492a6977754"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator6this_tE" title="World_iterator::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E14World_iterator" title="World_iterator"><span class="n"><span class="pre">World_iterator</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14World_iteratoraSERK14World_iterator" title="Link to this definition"></a><br /></dt>
+<dd><p>Assign this iterator to the position of another iterator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iteratorppEv">
+<span id="_CPPv3N14World_iteratorppEv"></span><span id="_CPPv2N14World_iteratorppEv"></span><span id="World_iterator::inc-operator"></span><span class="target" id="classWorld__iterator_1a2712dc9d8d6a80599943ac0a18eae83a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator6this_tE" title="World_iterator::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">++</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14World_iteratorppEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Advance iterator to the next non-empty cell in the world. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iteratormmEv">
+<span id="_CPPv3N14World_iteratormmEv"></span><span id="_CPPv2N14World_iteratormmEv"></span><span id="World_iterator::dec-operator"></span><span class="target" id="classWorld__iterator_1a94b251c7eb50f17c078959c6229f0125"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator6this_tE" title="World_iterator::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">--</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14World_iteratormmEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Backup iterator to the previos non-empty cell in the world. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK14World_iteratoreqERK6this_t">
+<span id="_CPPv3NK14World_iteratoreqERK6this_t"></span><span id="_CPPv2NK14World_iteratoreqERK6this_t"></span><span id="World_iterator::eq-operator__this_tCRC"></span><span class="target" id="classWorld__iterator_1ad7aa27cce98805250fb77a6f1c040d80"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator6this_tE" title="World_iterator::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rhs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK14World_iteratoreqERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Compare two iterators to determine if they point to identical positions in the world. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK14World_iteratorneERK6this_t">
+<span id="_CPPv3NK14World_iteratorneERK6this_t"></span><span id="_CPPv2NK14World_iteratorneERK6this_t"></span><span id="World_iterator::neq-operator__this_tCRC"></span><span class="target" id="classWorld__iterator_1a75b1af997e65e26b2528c1ba2b4ec39d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator6this_tE" title="World_iterator::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rhs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK14World_iteratorneERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Compare two iterators to determine if they point to different positions in the world. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK14World_iteratorltERK6this_t">
+<span id="_CPPv3NK14World_iteratorltERK6this_t"></span><span id="_CPPv2NK14World_iteratorltERK6this_t"></span><span id="World_iterator::lt-operator__this_tCRC"></span><span class="target" id="classWorld__iterator_1a670f116d0036132ab2350ed7f95ebee4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator6this_tE" title="World_iterator::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rhs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK14World_iteratorltERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if this iterator points to a position in the world BEFORE another iterator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK14World_iteratorleERK6this_t">
+<span id="_CPPv3NK14World_iteratorleERK6this_t"></span><span id="_CPPv2NK14World_iteratorleERK6this_t"></span><span id="World_iterator::lte-operator__this_tCRC"></span><span class="target" id="classWorld__iterator_1a1111644aa0da4df853174321bc6665f4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator6this_tE" title="World_iterator::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rhs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK14World_iteratorleERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if this iterator points to a position in the world BEFORE or the SAME AS another iterator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK14World_iteratorgtERK6this_t">
+<span id="_CPPv3NK14World_iteratorgtERK6this_t"></span><span id="_CPPv2NK14World_iteratorgtERK6this_t"></span><span id="World_iterator::gt-operator__this_tCRC"></span><span class="target" id="classWorld__iterator_1aa360af06d2ea1e3d327ffbe07726947d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator6this_tE" title="World_iterator::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rhs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK14World_iteratorgtERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if this iterator points to a position in the world AFTER another iterator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK14World_iteratorgeERK6this_t">
+<span id="_CPPv3NK14World_iteratorgeERK6this_t"></span><span id="_CPPv2NK14World_iteratorgeERK6this_t"></span><span id="World_iterator::gte-operator__this_tCRC"></span><span class="target" id="classWorld__iterator_1af93a32999094de680dbfd0da7c609e09"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator6this_tE" title="World_iterator::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rhs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK14World_iteratorgeERK6this_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if this iterator points to a position in the world AFTER or the SAME AS another iterator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iteratormlEv">
+<span id="_CPPv3N14World_iteratormlEv"></span><span id="_CPPv2N14World_iteratormlEv"></span><span id="World_iterator::mul-operator"></span><span class="target" id="classWorld__iterator_1a6d553aab3d5a5f4caf4e9e232ae5b333"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator5org_tE" title="World_iterator::org_t"><span class="n"><span class="pre">org_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">*</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14World_iteratormlEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a reference to the organism pointed to by this iterator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK14World_iteratormlEv">
+<span id="_CPPv3NK14World_iteratormlEv"></span><span id="_CPPv2NK14World_iteratormlEv"></span><span id="World_iterator::mul-operatorC"></span><span class="target" id="classWorld__iterator_1a24084d1de5508ec20ff02f962a66e388"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator5org_tE" title="World_iterator::org_t"><span class="n"><span class="pre">org_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">*</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK14World_iteratormlEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a const reference to the organism pointed to by this iterator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK14World_iteratorcvbEv">
+<span id="_CPPv3NK14World_iteratorcvbEv"></span><span id="_CPPv2NK14World_iteratorcvbEv"></span><span id="World_iterator::castto-b-operatorC"></span><span class="target" id="classWorld__iterator_1ae1faa308813f715f8e3d0f31ca7dad8d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK14World_iteratorcvbEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Is this iterator pointing to a valid cell in the world? </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iterator5beginEv">
+<span id="_CPPv3N14World_iterator5beginEv"></span><span id="_CPPv2N14World_iterator5beginEv"></span><span id="World_iterator::begin"></span><span class="target" id="classWorld__iterator_1a9b5daeca926a91c85230eae92ad95011"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator6this_tE" title="World_iterator::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14World_iterator5beginEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return an iterator pointing to the first occupied cell in the world. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK14World_iterator5beginEv">
+<span id="_CPPv3NK14World_iterator5beginEv"></span><span id="_CPPv2NK14World_iterator5beginEv"></span><span id="World_iterator::beginC"></span><span class="target" id="classWorld__iterator_1a1080d409bff893d0a65506cc26803d42"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator6this_tE" title="World_iterator::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">begin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK14World_iterator5beginEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a const iterator pointing to the first occupied cell in the world. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iterator3endEv">
+<span id="_CPPv3N14World_iterator3endEv"></span><span id="_CPPv2N14World_iterator3endEv"></span><span id="World_iterator::end"></span><span class="target" id="classWorld__iterator_1aea32d2e55f46ae1397e5d95dbd813954"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator6this_tE" title="World_iterator::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14World_iterator3endEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return an iterator pointing to just past the end of the world. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK14World_iterator3endEv">
+<span id="_CPPv3NK14World_iterator3endEv"></span><span id="_CPPv2NK14World_iterator3endEv"></span><span id="World_iterator::endC"></span><span class="target" id="classWorld__iterator_1acab80c0ffedd7ef769222106a37bbff0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator6this_tE" title="World_iterator::this_t"><span class="n"><span class="pre">this_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK14World_iterator3endEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return a const iterator pointing to just past the end of the world. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iterator7world_tE">
+<span id="_CPPv3N14World_iterator7world_tE"></span><span id="_CPPv2N14World_iterator7world_tE"></span><span class="target" id="classWorld__iterator_1a8a18ca85bfdf84c157d608aa1f3fc113"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">world_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E14World_iterator" title="World_iterator::WORLD"><span class="n"><span class="pre">WORLD</span></span></a><a class="headerlink" href="#_CPPv4N14World_iterator7world_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iterator5org_tE">
+<span id="_CPPv3N14World_iterator5org_tE"></span><span id="_CPPv2N14World_iterator5org_tE"></span><span class="target" id="classWorld__iterator_1a168fe0dec444bccbd4192b58204e87ca"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">org_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N14World_iterator7world_tE" title="World_iterator::world_t"><span class="n"><span class="pre">world_t</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">org_t</span></span><a class="headerlink" href="#_CPPv4N14World_iterator5org_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iterator6this_tE">
+<span id="_CPPv3N14World_iterator6this_tE"></span><span id="_CPPv2N14World_iterator6this_tE"></span><span class="target" id="classWorld__iterator_1a3ae46b3eeea5117064a50f2499dc77b5"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">this_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0E14World_iterator" title="World_iterator"><span class="n"><span class="pre">World_iterator</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N14World_iterator7world_tE" title="World_iterator::world_t"><span class="n"><span class="pre">world_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N14World_iterator6this_tE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iterator9WorldSizeEv">
+<span id="_CPPv3N14World_iterator9WorldSizeEv"></span><span id="_CPPv2N14World_iterator9WorldSizeEv"></span><span id="World_iterator::WorldSize"></span><span class="target" id="classWorld__iterator_1a0ef44596cf60cca4a5b0ffe3f2b2d564"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WorldSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14World_iterator9WorldSizeEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iterator6OrgPtrEv">
+<span id="_CPPv3N14World_iterator6OrgPtrEv"></span><span id="_CPPv2N14World_iterator6OrgPtrEv"></span><span id="World_iterator::OrgPtr"></span><span class="target" id="classWorld__iterator_1a7aa037c26a5e698c5b0f2353a73d7e62"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N14World_iterator5org_tE" title="World_iterator::org_t"><span class="n"><span class="pre">org_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OrgPtr</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14World_iterator6OrgPtrEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iterator9MakeValidEv">
+<span id="_CPPv3N14World_iterator9MakeValidEv"></span><span id="_CPPv2N14World_iterator9MakeValidEv"></span><span id="World_iterator::MakeValid"></span><span class="target" id="classWorld__iterator_1aa3bb2f13ce198a95556c9562cdcd2d34"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MakeValid</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14World_iterator9MakeValidEv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iterator9world_ptrE">
+<span id="_CPPv3N14World_iterator9world_ptrE"></span><span id="_CPPv2N14World_iterator9world_ptrE"></span><span id="World_iterator::world_ptr__Ptr:world_t:"></span><span class="target" id="classWorld__iterator_1a768cf349d5737b43b080afc8cf742920"></span><a class="reference internal" href="../../base/api/Ptr.html#_CPPv4I0E3Ptr" title="Ptr"><span class="n"><span class="pre">Ptr</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N14World_iterator7world_tE" title="World_iterator::world_t"><span class="n"><span class="pre">world_t</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">world_ptr</span></span></span><a class="headerlink" href="#_CPPv4N14World_iterator9world_ptrE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14World_iterator3posE">
+<span id="_CPPv3N14World_iterator3posE"></span><span id="_CPPv2N14World_iterator3posE"></span><span id="World_iterator::pos__s"></span><span class="target" id="classWorld__iterator_1a90398e134d2df533fbab6e0ec318520b"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pos</span></span></span><a class="headerlink" href="#_CPPv4N14World_iterator3posE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="World.html" class="btn btn-neutral float-left" title="World.hpp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="World_output.html" class="btn btn-neutral float-right" title="World_output.hpp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, Charles Ofria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
