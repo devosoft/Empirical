@@ -22,7 +22,7 @@ jobs:
     name: Test Tidy Enforcement on macOS
     runs-on: macos-11
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - run: git --version
