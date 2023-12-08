@@ -177,10 +177,10 @@ doctest:
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
 coverage:
-    mkdir -p $(BUILDDIR)
-    python3 -m coverxygen --xml-dir doxy*/xml --src-dir .. --format json-summary --output $(BUILDDIR)/doc-coverage.json
-    @echo "Testing of coverage in the sources finished, look at the " \
-              "results in $(BUILDDIR)/doc-coverage.json."
+	mkdir -p $(BUILDDIR)
+	python3 -m coverxygen --xml-dir doxy*/xml --src-dir .. --format json-summary --output $(BUILDDIR)/doc-coverage.json
+	@echo "Testing of coverage in the sources finished, look at the " \
+	          "results in $(BUILDDIR)/doc-coverage.json."
 
 xml:
 	$(SPHINXBUILD) -b xml $(ALLSPHINXOPTS) $(BUILDDIR)/xml
