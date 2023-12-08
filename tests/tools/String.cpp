@@ -6,9 +6,14 @@
  *  @file String.cpp
  */
 
-#include "../third-party/Catch/single_include/catch2/catch.hpp"
+#include <iostream>
+#include <string>
+#include <string_view>
+
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/tools/String.hpp"
+
 
 TEST_CASE("Test String Constructors", "[tools]")
 {
