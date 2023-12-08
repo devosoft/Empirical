@@ -25,16 +25,17 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
-      - run: git --version
-      - run: brew install coreutils findutils gnu-sed gawk grep rename sphinx-doc git
+      - run: |
+          git status --ignored
+          git clean -fxd .
+          git status --ignored
+      - run: brew install coreutils findutils gnu-sed gawk grep rename sphinx-doc
       # adapted from https://stackoverflow.com/a/42878119
       - run: brew link sphinx-doc --force
       # updates PATH to use Homebrew-installed tools first
       # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-system-path
       - run: echo "/usr/local/bin:$PATH" > $GITHUB_PATH
-      - run: |
-          echo $PATH
-          git --version
+      - run: echo $PATH
       - run: ./ci/test_tidy.sh
   test:
     name: Tests
