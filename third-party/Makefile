@@ -15,7 +15,7 @@ download-doxygen:
 	bash download_doxygen.sh
 
 build-doxygen: download-doxygen
-	mkdir -p doxygen/build && cd doxygen/build && cmake -g "Unix makefiles" .. && make
+	mkdir -p doxygen/build && cd doxygen/build && cmake -G "Unix Makefiles" .. && make
 
 prepare-virtualenv:
 	python3 -m virtualenv env

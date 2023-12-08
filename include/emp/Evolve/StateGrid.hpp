@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2018.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018.
- *
- *  @file StateGrid.hpp
+ *  @file
  *  @brief StateGrid maintains a rectilinear grid that agents can traverse.
  *
  *  State grids are a matrix of values, representing states of a 2D environment that an organism

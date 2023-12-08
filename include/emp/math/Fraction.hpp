@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021.
- *
- *  @file Fraction.hpp
+ *  @file
  *  @brief Tools to maintain a more exact fraction (rather than lose precision as a double)
  *  @note Status: ALPHA
  */
@@ -36,11 +37,12 @@ namespace emp {
       denom /= gcd;
     }
   public:
-    Fraction(int64_t in_num=0, int64_t in_denom=1) : num=in_num, denom=in_denom { }
+    Fraction(int64_t in_num=0, int64_t in_denom=1) : num(in_num), denom(in_denom) { }
     Fraction(const Fraction &) = default;
 
     int64_t GetNumerator() const { return num; }
     int64_t GetDenomonator() const { return denom; }
   };
+}
 
 #endif // #ifndef EMP_MATH_FRACTION_HPP_INCLUDE

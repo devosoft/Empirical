@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2019
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2019
- *
- *  @file DocuExtras.hpp
+ *  @file
  *  @brief Control the styling and attributes of an existing div without nuking
 *   the content inside it.
  *
@@ -27,9 +28,9 @@ namespace web {
   protected:
 
     class DocuExtrasInfo : public internal::WidgetInfo {
-
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
       friend DocuExtras;
-
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
       protected:
 
       DocuExtrasInfo(const std::string & in_id)
@@ -61,7 +62,7 @@ namespace web {
 
     }; // end of InputInfo definition
 
-    // Get a properly cast version of indo.
+    // Get a properly cast version of info.
     DocuExtrasInfo * Info() { return (DocuExtrasInfo *) info; }
     const DocuExtrasInfo * Info() const { return (DocuExtrasInfo *) info; }
 

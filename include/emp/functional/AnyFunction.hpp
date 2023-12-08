@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2019
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
- *
- *  @file AnyFunction.hpp
+ *  @file
  *  @brief Based on std::function, but with a generic base class.
  *  @note Status: ALPHA
  *
@@ -164,7 +165,7 @@ namespace emp {
     }
   };
 
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /////////////////////////////////////
   //  Member function implementaions.
 
@@ -198,6 +199,7 @@ namespace emp {
   template <typename T> bool BaseFunction::ConvertOK() {
     return dynamic_cast<DerivedFunction<T> *>(this);
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 }
 

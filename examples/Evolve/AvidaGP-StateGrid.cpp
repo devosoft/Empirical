@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
- *
- *  @file AvidaGP-StateGrid.cpp
+ *  @file
  *  @brief A example of using AvidaGP evolving with a StateGrid.
  *
  *  Example file of AvidaGP-based organisms (called SGOrg here) moving through a state grid,

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2021.
- *
- *  @file StringMap.hpp
+ *  @file
  *  @brief An std::unordered_map wrapper that deals smoothly with strings and fast compile-time optimizations.
  *  @note Status: ALPHA
  *
@@ -11,7 +12,7 @@
  *  desginated type.  It is more powerful than std::unordered_map because it will accept strings wrapped in
  *  the EMP_STRING_ID macro, which is hashed at compile-time instead of run-time.
  *
- *  @CO2:
+ *  \@CO2:
  *  StringMap = PAdictionary   (PA = Perfectly accurate)
  *  StringMap = HIDL (HIDL = having an identification of linking)
  *  SMID = String.Map…e112th][string (SMID = StringMap identification)

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
- *
- *  @file canvas_utils.hpp
+ *  @file
  *  @brief Various versions of the Draw() function to draw images onto a canvas.
  *
  *  Each version of Draw() takes a canvas widget and some form of data to be drawn on the widget,
@@ -28,7 +29,12 @@
 namespace emp {
 namespace web {
 
+
   /// Draw a Circle onto the canvas.
+  /// @param canvas The Canvas to draw on.
+  /// @param circle The circle to draw
+  /// @param fill The color to fill the circle with
+  /// @param line The color of the circle's outline
   void Draw(Canvas canvas, const emp::Circle & circle,
             const std::string & fill="",
             const std::string & line="")
@@ -37,8 +43,12 @@ namespace web {
     canvas.Draw(circle, fill, line);
   }
 
-
   /// Draw a BitMatrix onto a canvas using black and white squares (can specify cell width and height)
+  /// Draw a Circle onto the canvas.
+  /// @param canvas The Canvas to draw on.
+  /// @param matrix The matrix to draw
+  /// @param w The width of the matrix (number of columns)
+  /// @param h The height of the matrix (number of rows)
   template <size_t COLS, size_t ROWS>
   void Draw(Canvas canvas, const BitMatrix<COLS,ROWS> & matrix, double w, double h)
   {
@@ -55,7 +65,6 @@ namespace web {
       }
     }
   }
-
 
   /// Draw a Surface, specifying the full colormap to be used.  The surface has a range of circle
   /// bodies, each with a color id.
@@ -307,6 +316,7 @@ namespace web {
   /// @param line_color The color of the liens on the grid.
   void DrawGridBG(Canvas canvas, size_t rows, size_t cols,
                   const std::string & bg_color, const std::string & line_color) {
+
     canvas.Clear(bg_color);
 
     const double canvas_x = (double) canvas.GetWidth();

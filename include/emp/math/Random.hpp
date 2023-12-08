@@ -1,11 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2021.
- *
- *  @file Random.hpp
+ *  @file
  *  @brief A versatile and non-patterned pseudo-random-number generator.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  */
 
 #ifndef EMP_MATH_RANDOM_HPP_INCLUDE
@@ -26,7 +27,9 @@
 #include "Range.hpp"
 
 namespace emp {
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   using namespace emp;
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   ///  Middle Square Weyl Sequence: A versatile and non-patterned pseudo-random-number
   ///  generator.
@@ -412,7 +415,7 @@ namespace emp {
     /// Generate a random variable drawn from a Poisson distribution.
     inline uint32_t GetRandPoisson(const double n, const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);
-      // Optimizes for speed and calculability using symetry of the distribution
+      // Optimizes for speed and calculability using symmetry of the distribution
       if (p > .5) return (uint32_t) n - GetRandPoisson(n * (1 - p));
       else return GetRandPoisson(n * p);
     }
@@ -447,7 +450,7 @@ namespace emp {
     }
 
     inline uint32_t GetRandGeometric(double p){
-      emp_assert(p >= 0 && p <= 1, "Pobabilities must be between 0 and 1");
+      emp_assert(p >= 0 && p <= 1, "Probabilities must be between 0 and 1");
       // TODO: When we have warnings, add one for passing a really small number to
       // this function. Alternatively, make this function not ludicrously slow with small numbers.
       // Looks like return floor(ln(GetDouble())/ln(1-p)) might be sufficient?

@@ -1,11 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2020.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020.
- *
- *  @file assert.hpp
+ *  @file
  *  @brief A more dynamic replacement for standard library asserts.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *  A replacement for the system-level assert.h, called "emp_assert"
  *  Added functionality:

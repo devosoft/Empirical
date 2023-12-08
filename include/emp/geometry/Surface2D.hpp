@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file Surface2D.hpp
+ *  @file
  *  @brief This file defines a templated class to represent a 2D suface capable of maintaining data
  *  about which 2D bodies are currently on that surface and rapidly identifying if they are
  *  overlapping.

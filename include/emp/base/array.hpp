@@ -1,11 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
- *
- *  @file array.hpp
+ *  @file
  *  @brief A drop-in wrapper for std::array; adds on bounds checking in debug mode.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *  If EMP_NDEBUG is set, emp::array is just an alias for std::array.
  *  Otherwise, every time an array is accessed, tests are done to make sure that the
@@ -204,7 +205,7 @@ struct std::tuple_size<emp::array<T, N>> : public integral_constant<size_t, N> {
 
 #endif // NDEBUG off
 
-
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
   // A crude, generic printing function for arrays.
   template <typename T, size_t N>
@@ -218,7 +219,7 @@ namespace std {
     for (T & x : v) is >> x;
     return is;
   }
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 
 #endif // #ifndef EMP_BASE_ARRAY_HPP_INCLUDE

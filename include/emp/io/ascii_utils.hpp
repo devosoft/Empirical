@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
- *
- *  @file ascii_utils.hpp
+ *  @file
  *  @brief Tools for working with ascii output.
  *  @note  Status: ALPHA
  *
@@ -24,7 +25,7 @@ namespace emp {
 
   /// The following function prints an ascii bar graph on to the screen (or provided stream).
   template <typename T>
-  void AsciiBarGraph( emp::vector<T> data,
+  void AsciiBarGraph( emp::vector<T> data,          ///< Data to graph
                       size_t max_width=80,          ///< What's the widest bars allowed?
                       bool show_scale=true,         ///< Should we show the scale at bottom.
                       bool max_scale_1=true,        ///< Should we limit scaling to 1:1?
@@ -48,7 +49,7 @@ namespace emp {
 
   /// Take the input data, break it into bins, and print it as a bar graph.
   template <typename T>
-  void AsciiHistogram(emp::vector<T> data,
+  void AsciiHistogram(emp::vector<T> data,           ///< Data to graph
                       size_t num_bins=40,            ///< How many bins in histogram?
                       size_t max_width=80,           ///< What's the widest bars allowed?
                       bool show_scale=true,          ///< Should we show the scale at bottom?

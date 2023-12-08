@@ -1,11 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
- *
- *  @file BitSet.hpp
+ *  @file
  *  @brief A drop-in replacement for std::bitset, with additional bit magic features; aliases BitArray.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  */
 

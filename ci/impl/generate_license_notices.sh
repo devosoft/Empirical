@@ -17,20 +17,23 @@ for filename in $(find . -name '*.cpp' -type f ! -path "./third-party/*") $(find
   # stamp in expected boilerplate line-by-line
   # just like file docstrings, but don't require a brief
   # stamp in expected boilerplate line-by-line
-  sed -i '1s|^.*$|/**|' "${filename}"
-  sed -i '2s|^.*$| *  @note This file is part of Empirical, https://github.com/devosoft/Empirical|' "${filename}"
-  sed -i '3s|^.*$| *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md|' "${filename}"
+  sed -i '1s|^.*$|/*|' "${filename}"
+  sed -i '2s|^.*$| *  This file is part of Empirical, https://github.com/devosoft/Empirical|' "${filename}"
+  sed -i '3s|^.*$| *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md|' "${filename}"
   # only match if a @date isn't currently in place
   # if we see @date, "break" (b) sed script for that line
   # adapted from https://stackoverflow.com/a/5334825
   # and https://stackoverflow.com/a/12178023
   # and https://stackoverflow.com/a/9053163
-  sed -i "/^ \*  @date /b; 4s/^.*\$/ *  @date $(date +'%Y')/" "${filename}"
-  sed -i '5s/^.*$/ */' "${filename}"
-  sed -i "6s/^.*\$/ *  @file $(basename "${filename}")/" "${filename}"
+  sed -i "/^ \*  date: /b; 4s/^.*\$/ *  date: $(date +'%Y')/" "${filename}"
+  sed -i '5s|^.*$|*/|' "${filename}"
+  # sed -i "6s/^.*\$/ *  @file $(basename "${filename}")/" "${filename}"
   # only match empty lines
   # add extra * to replace later with */ when constructing fresh
-  sed -i '7s/^$/ */' "${filename}"
+  # sed -i '6s/^$/ */' "${filename}"
+  sed -i '6s|^.*$|/**|' "${filename}"
+  sed -i '7s|^.*$| *  @file|' "${filename}"
+  sed -i "/^ \*  @brief /b; 8s/^.*\$/ *  @brief TODO./" "${filename}"
 
   # close boilerplate file docstring
   # must accomodate possible additional content in docstring

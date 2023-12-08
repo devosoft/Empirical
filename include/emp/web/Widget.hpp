@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2019.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2019.
- *
- *  @file Widget.hpp
+ *  @file
  *  @brief Widgets maintain individual components on a web page and link to Elements
  *
  *  Each HTML Widget has all of its details stored in a WidgetInfo object; Multiple Widgets can
@@ -83,7 +84,9 @@ namespace web {
   class Widget {
     friend internal::WidgetInfo; friend internal::DivInfo; friend internal::TableInfo;
   protected:
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     using WidgetInfo = internal::WidgetInfo;
+    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
     WidgetInfo * info;                        ///< Information associated with this widget.
 
     /// If an Append doesn't work with current class, forward it to the parent and try there.

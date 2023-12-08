@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2020.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020.
- *
- *  @file Ptr.hpp
+ *  @file
  *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
  *  @note Status: BETA
  *
@@ -180,7 +181,7 @@ namespace emp {
       }
 
       if (undeleted_info.size()) {
-        std::cerr << undeleted_info.size() << " undeleted pointers at end of exectution.\n";
+        std::cerr << undeleted_info.size() << " undeleted pointers at end of execution.\n";
         for (size_t i = 0; i < undeleted_info.size() && i < 10; ++i) {
           const auto & info = undeleted_info[i];
           std::cerr << "  PTR=" << info.GetPtr()
@@ -216,7 +217,7 @@ namespace emp {
       return ptr_id.find(ptr) != ptr_id.end();
     }
 
-    /// Retrive the ID associated with a pointer.
+    /// Retrieve the ID associated with a pointer.
     size_t GetCurID(const void * ptr) { emp_assert(HasPtr(ptr)); return ptr_id[ptr]; }
 
     /// Lookup how many pointers are being tracked.
@@ -271,7 +272,7 @@ namespace emp {
       }
 #endif
       if (internal::ptr_debug) std::cout << "New:    " << id << " (" << ptr << ")" << std::endl;
-      // Make sure pointer is not already stored -OR- hase been deleted (since re-use is possible).
+      // Make sure pointer is not already stored -OR- has been deleted (since re-use is possible).
       emp_assert(!HasPtr(ptr) || IsDeleted(GetCurID(ptr)), id);
       id_info.emplace_back(ptr);
       ptr_id[ptr] = id;
@@ -286,14 +287,14 @@ namespace emp {
       return id;
     }
 
-    /// Increment the nuber of Pointers associated with an ID
+    /// Increment the number of Pointers associated with an ID
     void IncID(size_t id) {
       if (id == UNTRACKED_ID) return;   // Not tracked!
       if (internal::ptr_debug) std::cout << "Inc:    " << id << std::endl;
       id_info[id].Inc(id);
     }
 
-    /// Decrement the nuber of Pointers associated with an ID
+    /// Decrement the number of Pointers associated with an ID
     void DecID(size_t id) {
       if (id == UNTRACKED_ID) return;   // Not tracked!
       auto & info = id_info[id];
@@ -437,7 +438,7 @@ namespace emp {
       Tracker().IncID(id);
     }
 
-    /// Construct from a raw pointer of campatable type.
+    /// Construct from a raw pointer of compatable type.
     template <typename T2>
     Ptr(T2 * in_ptr, bool track=false) : BasePtr<TYPE>(in_ptr, UNTRACKED_ID)
     {
@@ -592,7 +593,7 @@ namespace emp {
     /// Delete this pointer (must NOT be an array).
     void Delete() {
       emp_assert(ptr, "Trying to delete null Ptr.");
-      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not resposible for.");
+      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not responsible for.");
       emp_assert(Tracker().IsArrayID(id) == false, id, "Trying to delete array pointer as non-array.");
       emp_assert(Tracker().IsActive(ptr), id, "Trying to delete inactive pointer (already deleted!)");
       if (internal::ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
@@ -603,7 +604,7 @@ namespace emp {
 
     /// Delete this pointer to an array (must be an array).
     void DeleteArray() {
-      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not resposible for.");
+      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not responsible for.");
       emp_assert(ptr, "Trying to delete null Ptr.");
       emp_assert(Tracker().IsArrayID(id), id, "Trying to delete non-array pointer as array.");
       emp_assert(Tracker().IsActive(ptr), id, "Trying to delete inactive pointer (already deleted!)");

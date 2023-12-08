@@ -1,11 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
- *
- *  @file string_utils.hpp
+ *  @file
  *  @brief Simple functions to manipulate strings.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  */
 
 #ifndef EMP_TOOLS_STRING_UTILS_HPP_INCLUDE
@@ -41,7 +42,6 @@ namespace emp {
 
   /// Return a const reference to an empty string.  This function is useful to implement other
   /// functions that need to return a const reference for efficiency, but also need a null response.
-
   static inline const std::string & empty_string() {
     static std::string empty = "";
     return empty;
@@ -1182,7 +1182,7 @@ namespace emp {
     return ANSI_Reverse() + _in + ANSI_NoReverse();
   }
 
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /// Apply sprintf-like formatting to a string.
   /// See https://en.cppreference.com/w/cpp/io/c/fprintf.
   /// Adapted from https://stackoverflow.com/a/26221725.
@@ -1205,7 +1205,7 @@ namespace emp {
     #pragma GCC diagnostic pop
 
   }
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 
 #endif // #ifndef EMP_TOOLS_STRING_UTILS_HPP_INCLUDE

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2021.
- *
- *  @file AvidaGP.hpp
+ *  @file
  *  @brief This is a simple, efficient CPU for and applied version of Avida.
  *
  *  @todo Should we save a copy of the original genome?  (or create a new "memory" member)
@@ -484,6 +485,7 @@ namespace emp {
     of.close();
   }
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename HARDWARE>
   void AvidaCPU_Base<HARDWARE>::PrintSymbols(std::ostream & os) const {
     // Example output: t(12)u()b(A5C)m(8)
@@ -500,6 +502,7 @@ namespace emp {
     }
     os << '\n';
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   template <typename HARDWARE>
   size_t AvidaCPU_Base<HARDWARE>::PredictNextInst() const {
@@ -533,6 +536,7 @@ namespace emp {
     return inst_ptr;
   }
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename HARDWARE>
   void AvidaCPU_Base<HARDWARE>::PrintState(std::ostream & os) const {
     size_t next_inst = PredictNextInst();
@@ -564,6 +568,7 @@ namespace emp {
     // emp::vector<RegBackup> reg_stack;
     // emp::vector<size_t> call_stack;
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   class AvidaGP : public AvidaCPU_Base<AvidaGP> {
   public:
@@ -583,6 +588,7 @@ namespace emp {
   };
 }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
 
   /// operator<< to work with ostream (must be in std to work)
@@ -591,5 +597,6 @@ namespace std {
     return out;
   }
 }
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_HARDWARE_AVIDAGP_HPP_INCLUDE

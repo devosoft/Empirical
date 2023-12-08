@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2019
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
- *
- *  @file MapProxy.hpp
+ *  @file
  *  @brief A proxy for indecies returned from any map type to ensure they are initialized.
  *  @note Status: ALPHA
  */
@@ -107,7 +108,7 @@ namespace emp {
     operator const T&() const { emp_assert(is_init); return value; }
   };
 
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by the enable_ifs
   /// A type trait to determine if a class is a MapProxy
   template <typename> struct is_MapProxy : public std::false_type { };
 
@@ -115,8 +116,7 @@ namespace emp {
   struct is_MapProxy<MapProxy<T>> : public std::true_type { };
 
 
-  // Build externaly binary operators with MapProxy as the second argument.
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by the enable_ifs
+  // Build external binary operators with MapProxy as the second argument.
   template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
   auto operator + (T1 v1, const MapProxy<T2> & v2) { return v1 + v2.emp_GetValue(); }
   template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
@@ -158,6 +158,7 @@ namespace emp {
   #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 // A crude, generic printing function for emp::MapProxy.
 template <typename T>
 std::ostream & operator<<(std::ostream & out, const typename emp::MapProxy<T> & p) {
@@ -170,5 +171,6 @@ std::istream & operator>>(std::istream & is, typename emp::MapProxy<T> & p) {
   is >> p.emp_GetValue();
   return is;
 }
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_BASE_MAPPROXY_HPP_INCLUDE
