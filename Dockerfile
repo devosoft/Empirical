@@ -24,23 +24,15 @@ RUN \
 # remove -backports, -updates, -proposed, -security repositories
 # looks like we have to grab libxxhash0 from -updates now
 RUN \
-  apt-get update -y \
+  for n in $(seq 1 5); do apt-get update -y && sleep 5 && break; done \
     && \
-  apt-get install --no-install-recommends libxxhash0 \
+  apt-get install --no-install-recommends -y libxxhash0 software-properties-common \
     && \
-  apt-get clean \
+  for n in $(seq 1 5); do add-apt-repository -y ppa:ubuntu-toolchain-r/test && sleep 5 && break; done \
     && \
-  rm -rf /var/lib/apt/lists/* \
+  for n in $(seq 1 5); do add-apt-repository -y ppa:deadsnakes/ppa && sleep 5 && break; done \
     && \
-  apt-get update -y \
-    && \
-  apt-get install -y software-properties-common \
-    && \
-  add-apt-repository -y ppa:ubuntu-toolchain-r/test \
-    && \
-  add-apt-repository -y ppa:deadsnakes/ppa \
-    && \
-  apt-get update -y \
+  for n in $(seq 1 5); do apt-get update -y && sleep 5 && break; done \
     && \
   apt-get install --no-install-recommends --allow-downgrades -y \
     build-essential \
