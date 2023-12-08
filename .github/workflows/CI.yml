@@ -198,4 +198,3 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           repository: ghcr.io/devosoft/empirical
           tag_with_ref: true
-
