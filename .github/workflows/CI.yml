@@ -144,7 +144,7 @@ jobs:
           submodules: 'recursive'
       - run: doxygen
       - run: cd doc && python make_md.py
-      - run: cd doc && set -o pipefail && make html coverage | ./headtail.sh && python parse_documentation_coverage.py _build/doc-coverage.json >> doc-coverage.json
+      - run: cd doc && make html coverage | ./headtail.sh && python parse_documentation_coverage.py _build/doc-coverage.json >> doc-coverage.json
       - uses: sylvanld/action-storage@v1
         if: github.ref == 'refs/heads/master'
         with:
