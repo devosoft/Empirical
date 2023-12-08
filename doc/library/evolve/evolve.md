@@ -156,7 +156,8 @@ Once you have created the systematics object, you just need to do two things: 1)
 
 ##### Notifying the systematics object of births
 
-You must notify the systematics manager of births using the {cpp:func}`Systematics::AddOrg` family of functions. These functions require that you provide the newly born organism as well as either the taxon object of its parent or the position of its parent (if the systematics manager is tracking positions).
+You must notify the systematics manager of births using the {cpp:func}`Systematics::AddOrg` family of functions.
+These functions require that you provide the newly born organism as well as either the taxon object of its parent or the position of its parent (if the systematics manager is tracking positions).
 
 Example of tracking taxa as object attributes (assume we're building on our example above, and already have created a {cpp:class}`Systematics` manager called `sys`):
 
