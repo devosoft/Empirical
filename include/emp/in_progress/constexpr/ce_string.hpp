@@ -7,7 +7,7 @@
  *  @file
  *  @brief ce_string defines a limited string object for use within a constexpr class or function.
  *
- *  Status: DESIGN.
+ *  @note Status: DESIGN.
  */
 
 #ifndef EMP_IN_PROGRESS_CONSTEXPR_CE_STRING_HPP_INCLUDE

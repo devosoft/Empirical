@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019-2021.
+ *  date: 2019-2022.
 */
 /**
  *  @file
@@ -16,11 +16,11 @@
 #include <cstdint>
 #include <cstring>
 #include <numeric>
+#include <span>
 #include <stdint.h>
 #include <type_traits>
 
 #include "../base/Ptr.hpp"
-#include "../polyfill/span.hpp"
 
 namespace emp {
 
@@ -108,7 +108,7 @@ namespace emp {
   // helper functions for murmur hash
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
-    constexpr inline uint64_t rotate(const size_t x, const size_t r) noexcept {
+    constexpr inline uint64_t rotate(const uint64_t x, const uint64_t r) noexcept {
       return (x << r) | (x >> (64 - r));
     }
     constexpr inline void fmix64(uint64_t& k) noexcept {
@@ -129,13 +129,13 @@ namespace emp {
   /// @param key Span of bytes to hash.
   /// @param seed Optional seed.
   /// @return Hash of key.
-  constexpr inline size_t murmur_hash(
+  constexpr inline uint64_t murmur_hash(
     const std::span<const std::byte> key,
-    const size_t seed = 0
+    const uint64_t seed = 0
   ) noexcept {
     // define constants
-    const size_t numbytes = key.size();
-    const size_t nblocks = numbytes / 16;
+    const uint64_t numbytes = key.size();
+    const uint64_t nblocks = numbytes / 16;
     const uint64_t c1 = 0x87c37b91114253d5LLU;
     const uint64_t c2 = 0x4cf5ad432745937fLLU;
 

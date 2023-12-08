@@ -5,9 +5,8 @@
 */
 /**
  *  @file
- *  @brief Functions to assist in phylogeny and lineage analysis.
- *  Unlike methods of the @ref Systematics class, these methods take
- *  a single taxon (which is part of the systematics manager) to act on.
+ *  @brief TODO.
+ *
  */
 
 #ifndef EMP_EVOLVE_SYSTEMATICSANALYSIS_HPP_INCLUDE

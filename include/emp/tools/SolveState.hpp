@@ -57,7 +57,7 @@ namespace emp {
 
     /// Test if a particular item is going to be excluded for sure in the current solve state.
     /// (If it has been included -OR- is yet to be decided upon, false will be returned)
-    bool IsOut(size_t id) const { return !(IsIn(id) | IsUnk(id)); }
+    bool IsOut(size_t id) const { return !(IsIn(id) || IsUnk(id)); }
 
     /// Test if all items have been decided upon (none are still in the "unknown" state)
     bool IsFinal() const { return unk_items.None(); }

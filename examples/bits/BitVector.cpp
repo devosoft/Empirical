@@ -46,6 +46,7 @@ int main()
     auto set5 = set3 & set4;
     total += set5.CountOnes();
   }
+  std::cout << "Total = " << total << std::endl;
 
   std::clock_t emp_tot_time = std::clock() - emp_start_time;
   double time = 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC;

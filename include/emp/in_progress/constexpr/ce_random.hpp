@@ -7,7 +7,7 @@
  *  @file
  *  @brief A versatile and non-patterned pseudo-random-number generator.
  *
- *  Status: DESIGN
+ *  @note Status: DESIGN
  *
  *  Constructor:
  *    Random(int _seed=-1)

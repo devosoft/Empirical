@@ -8,7 +8,7 @@
  *  @brief These macros will build a tuple and accessors to that tuple's members inside of a
  * class definintion.
  *
- *  Status: ALPHA
+ *  @note Status: ALPHA
  *
  *  "But WHY???" you ask. Let me explain: Keeping a tuple allows us to easily track the
  *  members in the stuct or class, and makes possible powerful types of reflection

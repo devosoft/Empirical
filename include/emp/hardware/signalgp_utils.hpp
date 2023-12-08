@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018
+ *  date: 2018-2022
 */
 /**
  *  @file
@@ -668,7 +668,7 @@ namespace emp {
         fun_t new_fun(program[fID].GetAffinity());
         size_t expected_func_len = program[fID].GetSize();
         // Compute number and location of insertions.
-        const uint32_t num_ins = rnd.GetRandBinomial(program[fID].GetSize(), INST_INS__PER_INST());
+        const uint32_t num_ins = rnd.GetBinomial(program[fID].GetSize(), INST_INS__PER_INST());
         emp::vector<size_t> ins_locs;
         if (num_ins > 0) {
           ins_locs = emp::RandomUIntVector(rnd, num_ins, 0, program[fID].GetSize());

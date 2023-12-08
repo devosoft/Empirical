@@ -38,22 +38,12 @@ namespace emp {
     }
 
     // so we can use range-based for loops
-    auto begin() -> decltype(std::begin(node_map)) {
-      return std::begin(node_map);
-    }
-    // so we can use range-based for loops
-    auto end() -> decltype(std::end(node_map)) {
-      return std::end(node_map);
-    }
+    auto begin() { return std::begin(node_map); }
+    auto end() { return std::end(node_map); }
 
     // so we can use range-based for loops with const
-    auto begin() const -> const decltype(std::begin(node_map)) {
-      return std::begin(node_map);
-    }
-    // so we can use range-based for loops with const
-    auto end() const -> const decltype(std::end(node_map)) {
-      return std::end(node_map);
-    }
+    auto begin() const { return std::begin(node_map); }
+    auto end() const { return std::end(node_map); }
 
     /// @returns the number of DataNodes in this DataManager
     size_t GetSize() const { return node_map.size(); }
@@ -89,10 +79,10 @@ namespace emp {
     }
 
     /// @returns a reference to the node with the specified name
-    /// Throws an error if there is no node with that name in this manager
     /// @param name the name of the DataNode
     node_t & Get(const std::string & name) {
-      emp_assert(Has(node_map, name), name, emp::to_string(Keys(node_map)));
+      emp_assert(Has(node_map, name), name);
+      emp_assert(node_map[name] != nullptr);
       return *(node_map[name]);
     }
 

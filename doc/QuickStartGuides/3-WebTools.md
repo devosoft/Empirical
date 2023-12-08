@@ -78,13 +78,13 @@ do is compile. The provided Makefile can be run by typing
 `make Example.js`. This will trigger:
 
 ```shell
-emcc -std=c++17 -Wall -Wno-unused-function -I../../include/emp/ -Os -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']" -s TOTAL_MEMORY=67108864 --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1 Example.cc -o Example.js
+emcc -std=c++20 -Wall -Wno-unused-function -I../../include/emp/ -Os -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']" -s TOTAL_MEMORY=67108864 --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1 Example.cc -o Example.js
 ```
 
 -   emscripten uses the `emcc` compiler (or `em++`, since we are using
     C++).
 
--   `-std=c++17` : Empirical requires c++17.
+-   `-std=c++20` : Empirical requires c++20.
 
 -   `-Wall -Wno-unused-function` : turn on all warnings by default
     except for unused functions, since not all library functions are

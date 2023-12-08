@@ -11,6 +11,7 @@
 #ifndef EMP_DATA_DATAFILE_HPP_INCLUDE
 #define EMP_DATA_DATAFILE_HPP_INCLUDE
 
+#include <cstdint>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -142,7 +143,7 @@ namespace emp {
     /// Print a header containing comments describing all of the columns
     virtual void PrintHeaderComment(const std::string & cstart = "# ") {
       for (size_t i = 0; i < keys.size(); i++) {
-        *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << std::endl;
+        *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")\n";
       }
       os->flush();
     }
@@ -618,10 +619,10 @@ namespace emp {
     /// Print a header containing comments describing all of the columns
     void PrintHeaderComment(const std::string & cstart = "# ") override {
       for (size_t i = 0; i < keys.size(); i++) {
-        *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << std::endl;
+        *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")\n";
       }
       for (size_t i = 0; i < container_keys.size(); i++) {
-        *os << cstart << i+keys.size() << ": " << container_descs[i] << " (" << container_keys[i] << ")" << std::endl;
+        *os << cstart << i+keys.size() << ": " << container_descs[i] << " (" << container_keys[i] << ")\n";
       }
 
       os->flush();

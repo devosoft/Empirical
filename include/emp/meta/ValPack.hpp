@@ -28,11 +28,13 @@ namespace emp {
   // Anonymous implementations of ValPack interface.
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
+    // Helper.  DONE arg starts as true, but set to false when sequence finished.
     template <bool DONE, auto START, auto END, auto STEP, auto... VALS>
     struct vp_range {
       static constexpr auto NEXT = START + STEP;
       using type = typename vp_range<(NEXT >= END), NEXT, END, STEP, VALS..., START>::type;
     };
+    // Specialization for when DONE is true.
     template <auto START, auto END, auto STEP, auto... VALS>
     struct vp_range <true, START, END, STEP, VALS...> {
       using type = ValPack<VALS...>;
@@ -202,6 +204,9 @@ namespace emp {
     /// Find the overall maximum value in an ValPack.
     constexpr static auto Max() { return pop::Max(V1); }
 
+    /// Determine if the pack is sorted.
+    constexpr static bool IsSorted() { return V1 <= Min() && pop::IsSorted(); }
+
     /// Use each value in an ValPack as an index and return results as a tuple.
     template <typename T>
     constexpr static auto ApplyIndex(T && container) {
@@ -252,6 +257,8 @@ namespace emp {
     constexpr static auto Min(T cap) { return cap; }
     template <typename T>
     constexpr static auto Max(T floor) { return floor; }
+
+    constexpr static bool IsSorted() { return true; }
 
     static std::string ToString() { return ""; }
 

@@ -1,7 +1,7 @@
 CXX_web := emcc
 # OFLAGS_web := -g4 -Wall
 OFLAGS_web := -oz -DNDEBUG
-CFLAGS_web := -std=c++17 $(OFLAGS_web) -s EXPORTED_FUNCTIONS="['_empLoadString']" -I../../../../include/
+CFLAGS_web := -std=c++20 $(OFLAGS_web) -s EXPORTED_FUNCTIONS="['_empLoadString']" -I../../../../include/
 
 default: web
 

@@ -62,8 +62,8 @@ struct SpeedTester_impl<SIZE1, OTHER_SIZES...> : public SpeedTester_impl<OTHER_S
   // How many objects should we use?
   static constexpr size_t OBJ_COUNT = TEST_BITS / OBJ_BITS;
 
-  emp::array< emp::BitSet<SIZE1>, OBJ_COUNT > bs_objs;
-  emp::array< emp::BitVector, OBJ_COUNT > bv_objs;
+  emp::array< emp::old::BitSet<SIZE1>, OBJ_COUNT > bs_objs;
+  emp::array< emp::old::BitVector, OBJ_COUNT > bv_objs;
 
   using base_t = SpeedTester_impl<OTHER_SIZES...>;
 

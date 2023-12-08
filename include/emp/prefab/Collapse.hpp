@@ -219,13 +219,13 @@ namespace prefab {
       emp::vector<web::Widget> & GetControllerDivs() { return controllers; }
 
       /// Returns the controller at the given index
-      web::Widget & GetControllerDiv(const int index=0) { return controllers[index]; }
+      web::Widget & GetControllerDiv(const size_t index=0) { return controllers[index]; }
 
       /// Returns the vector of all targets associated with this CollapseCouple
       emp::vector<web::Widget> & GetTargetDivs() { return targets; }
 
       /// Returns the target at the given index
-      web::Widget & GetTargetDiv(const int index=0) { return targets[index]; }
+      web::Widget & GetTargetDiv(const size_t index=0) { return targets[index]; }
   };
 }
 }

@@ -8,6 +8,8 @@
  *  @brief Tools for processing a single set of data.
  *  @note  Status: ALPHA
  *
+ *  A DataLog takes in a continuous series of data and allows for easy analysis, both by
+ *  performing calculations on those values and by outputting ascii histograms, etc.
  */
 
 #ifndef EMP_DATA_DATALOG_HPP_INCLUDE

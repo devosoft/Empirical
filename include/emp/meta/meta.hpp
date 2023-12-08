@@ -31,10 +31,59 @@ namespace emp {
   /// Effectively create a function (via constructor) where all args are computed, then ignored.
   struct run_and_ignore { template <typename... T> run_and_ignore(T&&...) {} };
 
+  template <typename... Ts> struct type_index;
+
+  template <> struct type_index<> {
+    using t1 = void;  using t2 = void;  using t3 = void;  using t4 = void;
+  };
+
+  template <typename T1> struct type_index<T1> {
+    using t1 = T1;    using t2 = void;  using t3 = void;  using t4 = void;
+  };
+
+  template <typename T1, typename T2> struct type_index<T1, T2> {
+    using t1 = T1;    using t2 = T2;    using t3 = void;  using t4 = void;
+  };
+
+  template <typename T1, typename T2, typename T3> struct type_index<T1,T2,T3> {
+    using t1 = T1;    using t2 = T2;    using t3 = T3;    using t4 = void;
+  };
+
+  template <typename T1, typename T2, typename T3, typename T4, typename... Ts>
+  struct type_index<T1,T2,T3,T4,Ts...> {
+    using t1 = T1;    using t2 = T2;    using t3 = T3;    using t4 = T4;
+  };
+
+
   /// Trim off a specific type position from a pack.
-  template <typename T1, typename... Ts> using first_type = T1;
-  template <typename T1, typename T2, typename... Ts> using second_type = T2;
-  template <typename T1, typename T2, typename T3, typename... Ts> using third_type = T3;
+  template <typename... Ts> using first_type  = typename type_index<Ts...>::t1;
+  template <typename... Ts> using second_type = typename type_index<Ts...>::t2;
+  template <typename... Ts> using third_type  = typename type_index<Ts...>::t3;
+  template <typename... Ts> using fourth_type = typename type_index<Ts...>::t4;
+
+  // Index into a template parameter pack to grab a specific type.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+  namespace internal {
+    template <size_t ID, typename T, typename... Ts>
+    struct pack_id_impl { using type = typename pack_id_impl<ID-1,Ts...>::type; };
+
+    template <typename T, typename... Ts> struct pack_id_impl<0,T,Ts...> { using type = T; };
+  }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
+
+  /// Pick a specific position from a type pack.
+  template <size_t ID, typename... Ts>
+  using pack_id = typename internal::pack_id_impl<ID,Ts...>::type;
+
+  /// Trim off the last type from a pack.
+  template <typename... Ts> using last_type = pack_id<sizeof...(Ts)-1,Ts...>;
+
+  /// A struct declaration with no definition to show a type name in a compile time error.
+  template <typename...> struct ShowType;
+
+  /// A false type that does NOT resolve in unexecuted if-constexpr branches.
+  /// By Brian Bi; from: https://stackoverflow.com/questions/69501472/best-way-to-trigger-a-compile-time-error-if-no-if-constexprs-succeed
+  template <class T> struct dependent_false : std::false_type {};
 
   /// Create a placeholder template to substitute for a real type.
   template <int> struct PlaceholderType;
@@ -77,23 +126,6 @@ namespace emp {
 
     return out_v;
   }
-
-  // Index into a template parameter pack to grab a specific type.
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  namespace internal {
-    template <size_t ID, typename T, typename... Ts>
-    struct pack_id_impl { using type = typename pack_id_impl<ID-1,Ts...>::type; };
-
-    template <typename T, typename... Ts>
-    struct pack_id_impl<0,T,Ts...> { using type = T; };
-  }
-
-  template <size_t ID, typename... Ts>
-  using pack_id = typename internal::pack_id_impl<ID,Ts...>::type;
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
-
-  // Trim off the last type from a pack.
-  template <typename... Ts> using last_type = pack_id<sizeof...(Ts)-1,Ts...>;
 
   // Trick to call a function using each entry in a parameter pack.
 #define EMP_EXPAND_PPACK(PPACK) ::emp::run_and_ignore{ 0, ((PPACK), void(), 0)... }

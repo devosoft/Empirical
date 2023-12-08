@@ -94,7 +94,7 @@ namespace evo {
     /// Get the fitness of a whole  bitstring
     double GetFitness(const BitSet<N> & genome) const {
       // Create a double-length genome to easily handle wrap-around.
-      BitSet<N*2> genome2( genome.template Export<N*2>() );
+      BitSet<N*2> genome2( genome.template ExportArray<N*2>() );
       genome2 |= (genome2 << N);
 
       double total = 0.0;

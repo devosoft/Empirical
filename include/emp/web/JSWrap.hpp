@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
+ *  date: 2015-2023
 */
 /**
  *  @file
@@ -176,8 +176,7 @@ namespace emp {
       if (emp_i.curr_obj[UTF8ToString($0)] == null){
         emp_i.curr_obj[UTF8ToString($0)] = "undefined";
       }
-      return allocate(intArrayFromString(emp_i.curr_obj[UTF8ToString($0)]),
-                   ALLOC_STACK);
+      return allocate(intArrayFromString(emp_i.curr_obj[UTF8ToString($0)]), ALLOC_STACK);
     }, var.c_str());
     arg_var = tmp_var;   // Free memory here?
   }
@@ -207,7 +206,7 @@ namespace emp {
 
   template <typename JSON_TYPE, int ARG_ID>
   struct LoadTuple<JSON_TYPE, ARG_ID, 0> {
-    static void LoadJSDataArg(JSON_TYPE & arg_var) {
+    static void LoadJSDataArg(JSON_TYPE & /*arg_var*/) {
         MAIN_THREAD_EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
     }
   };
@@ -307,7 +306,7 @@ namespace emp {
 
   template <typename JSON_TYPE>
   struct StoreTuple<JSON_TYPE, 0> {
-    static void StoreJSDataArg(const JSON_TYPE & ret_var) {
+    static void StoreJSDataArg(const JSON_TYPE & /*ret_var*/) {
       MAIN_THREAD_EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
     }
   };

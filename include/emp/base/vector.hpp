@@ -31,7 +31,7 @@
 
 #ifdef EMP_NDEBUG
 
-// Seemlessly translate emp::vector to std::vector
+// Seamlessly translate emp::vector to std::vector
 namespace emp {
   template <typename T, typename... Ts> using vector = std::vector<T, Ts...>;
 }
@@ -78,11 +78,23 @@ namespace emp {
 
       // Debug tools to make sure this iterator is okay.
       static std::string & ErrorCode() { static std::string code="No Errors Found."; return code; }
+      static std::string ErrorStart() {
+        std::string vec_type = std::string("vector<") + typeid(typename stdv_t::value_type).name() + ">";
+        std::string it_type = typeid(ITERATOR_T).name();
+        if constexpr (std::is_same<ITERATOR_T, typename stdv_t::iterator>()) it_type = "iterator";
+        if constexpr (std::is_same<ITERATOR_T, typename stdv_t::const_iterator>()) it_type = "const_iterator";
+        if constexpr (std::is_same<ITERATOR_T, typename stdv_t::reverse_iterator>()) it_type = "reverse_iterator";
+        if constexpr (std::is_same<ITERATOR_T, typename stdv_t::const_reverse_iterator>()) it_type = "const_reverse_iterator";
+        return std::string("Iterator (type = '") + vec_type + "::" + it_type + "') ";
+      }
 
-      bool OK(bool begin_ok=true, bool end_ok=true) const {
+      bool OK(bool begin_ok=true, bool end_ok=true, std::string op="") const {
+        std::string type_name = typeid(ITERATOR_T).name();;
+
         if (v_ptr == nullptr) { ErrorCode() = "Invalid Vector! (set to nullptr)"; return false; }
         if (v_ptr->revision == 0) { ErrorCode() = "Vector deleted! (revision==0)"; return false; }
-        if (revision != v_ptr->revision) { ErrorCode() = "Vector has changed memeory!"; return false; }
+        if (revision != v_ptr->revision) { ErrorCode() = "Vector has changed memory!"; return false; }
+
         int64_t pos = 0;
         if constexpr (std::is_same<ITERATOR_T, typename stdv_t::reverse_iterator>() ||
                       std::is_same<ITERATOR_T, typename stdv_t::const_reverse_iterator>()) {
@@ -94,58 +106,63 @@ namespace emp {
           pos = *((ITERATOR_T *) this) - ((stdv_t *) v_ptr)->begin();
         }
         if (pos < 0 || ((size_t) pos) > v_ptr->size()) {
-          ErrorCode() = "Iterator out of range.";
-          ErrorCode() += " size=";
-          ErrorCode() += std::to_string(v_ptr->size());
-          ErrorCode() += "  pos=";
-          ErrorCode() += std::to_string(pos);
+          ErrorCode() = ErrorStart() + "out of range."
+            + " size=" + std::to_string(v_ptr->size()) + "  pos=" + std::to_string(pos);
           return false;
         }
-        if (!begin_ok && pos == 0) { ErrorCode() = "Iterator not allowed at begin()."; return false; }
-        if (!end_ok && ((size_t) pos) == v_ptr->size()) { ErrorCode() = "Iterator not allowed at end()."; return false; }
+        if (!begin_ok && pos == 0) {
+          ErrorCode() = ErrorStart() + "not allowed at begin() for operation " + op + ".";
+          return false;
+        }
+        if (!end_ok && ((size_t) pos) == v_ptr->size()) {
+          ErrorCode() = ErrorStart() + "not allowed at end() for operation " + op + ".";
+          return false;
+        }
         return true;
       }
 
-      this_t & operator=(const this_t &) = default;
-      this_t & operator=(this_t &&) = default;
+      this_t & operator=(const this_t &) & = default;
+      this_t & operator=(this_t &&) & = default;
 
       operator ITERATOR_T() { return *this; }
       operator const ITERATOR_T() const { return *this; }
 
       auto & operator*() {
-        emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
+        emp_assert(OK(true, false, "dereference"), ErrorCode());
         return wrapped_t::operator*();
       }
       const auto & operator*() const {
-        emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
+        emp_assert(OK(true, false, "const dereference"), ErrorCode());
         return wrapped_t::operator*();
       }
 
       auto operator->() {
-        emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
+//        emp_assert(OK(true, false, "->"), ErrorCode());
+        emp_assert(OK(true, true, "->"), ErrorCode()); // Technically can use -> on end() for memory identification, just can't use result.
         return wrapped_t::operator->();
       }
       auto operator->() const {
-        emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
+//        emp_assert(OK(true, false, "const ->"), ErrorCode());
+        emp_assert(OK(true, true, "const ->"), ErrorCode()); // Technically can use -> on end() for memory identification, just can't use result.
         return wrapped_t::operator->();
       }
 
       this_t & operator++() {
-        emp_assert(OK(true,false), ErrorCode());
+        emp_assert(OK(true,false, "++ (post)"), ErrorCode());
         wrapped_t::operator++();
         return *this;
       }
       this_t operator++(int x) {
-        emp_assert(OK(true,false), ErrorCode());
+        emp_assert(OK(true,false, "++ (pre)"), ErrorCode());
         return this_t(wrapped_t::operator++(x), v_ptr);
       }
       this_t & operator--() {
-        emp_assert(OK(false,true), ErrorCode());
+        emp_assert(OK(false,true, "-- (post)"), ErrorCode());
         wrapped_t::operator--();
         return *this;
       }
       this_t operator--(int x) {
-        emp_assert(OK(false,true), ErrorCode());
+        emp_assert(OK(false,true, "-- (pre)"), ErrorCode());
         return this_t(wrapped_t::operator--(x), v_ptr);
       }
 
@@ -216,7 +233,7 @@ namespace emp {
       stdv_t::resize(new_size, val);
       revision++;
     }
-    this_t & operator=(const this_t &) = default;
+    this_t & operator=(const this_t &) & = default;
 
     T & operator[](size_t pos) {
       emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
@@ -311,7 +328,7 @@ namespace emp {
       emp_assert(new_size < MAX_SIZE, new_size);
       stdv_t::resize(new_size, val);
     }
-    this_t & operator=(const this_t &) = default;
+    this_t & operator=(const this_t &) & = default;
 
     auto operator[](size_t pos) -> decltype(stdv_t::operator[](pos)) {
       emp_assert(pos < stdv_t::size(), pos, stdv_t::size());

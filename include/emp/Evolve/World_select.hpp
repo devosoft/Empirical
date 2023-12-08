@@ -188,7 +188,7 @@ namespace emp {
   /// EACH offspring produced.
   /// @param world The emp::World object with the organisms to be selected.
   /// @param fit_funs The set of fitness functions to shuffle for each organism reproduced.
-  /// @param repro_count How many rounds of repliction should we do. (default 1)
+  /// @param repro_count How many rounds of replication should we do. (default 1)
   /// @param max_funs The maximum number of fitness functions to use. (use 0 for all; default)
   template<typename ORG>
   void LexicaseSelect(World<ORG> & world,
@@ -228,9 +228,9 @@ namespace emp {
 
       // Step through the functions in the proper order.
       cur_orgs = all_orgs;  // Start with all of the organisms.
-      int depth = -1;
+//      int depth = -1;
       for (size_t fit_id : order) {
-        depth++;
+//        depth++;
 
         double max_fit = fitnesses[fit_id][cur_orgs[0]];
         next_orgs.push_back(cur_orgs[0]);

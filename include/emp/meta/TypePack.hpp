@@ -7,10 +7,10 @@
  *  @file
  *  @brief A set of types that can be manipulated at compile time (good for metaprogramming)
  *
- *  TypePacks are static structues that provide a large set of mechanisms to access and adjust
+ *  TypePacks are static structures that provide a large set of mechanisms to access and adjust
  *  the included types.
  *
- *  To create a typepack, just pass in zero or more types into the TypePack template.
+ *  To create a TypePack, just pass in zero or more types into the TypePack template.
  *
  *    using my_pack = emp::TypePack<int, std::string, double>;
  *
@@ -294,7 +294,7 @@ namespace emp {
     /// Rearrange types in TypePack into reverse order.
     using reverse = typename pop::reverse::template push_back<T1>;
 
-    /// Rotate types through typepack by the specified number of steps.
+    /// Rotate types through TypePack by the specified number of steps.
     using rotate = typename pop::template push_back<T1>;
 
     /// Set the type at the specified position to the new type provided.  Return as new TypePack.

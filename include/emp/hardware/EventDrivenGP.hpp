@@ -365,6 +365,7 @@ namespace emp {
           CEREAL_NVP(id)
         );
       }
+      size_t GetIndex() const{ return id; }
 
     };
 

@@ -46,7 +46,7 @@ namespace emp {
 
     template <typename WORLD, typename ORG>
     void SetDefaultFitFun_impl(WORLD & world, ... ) {
-      world.SetFitFun( [](ORG & org){
+      world.SetFitFun( [](ORG & /* org */){
         emp_assert(false, "No default fitness function available");
         return 0.0;
       } );
@@ -72,7 +72,7 @@ namespace emp {
 
     template <typename WORLD, typename ORG>
     void SetDefaultMutFun_impl(WORLD & world, ... ) {
-      world.SetMutFun( [](ORG & org, Random & random) {
+      world.SetMutFun( [](ORG & /* org */, Random & /* random */ ) {
         emp_assert(false, "No default DoMutations available");
         return 0;
       } );
@@ -104,7 +104,7 @@ namespace emp {
 
     template <typename WORLD, typename ORG>
     void SetDefaultPrintFun_impl(WORLD & world, ... ) {
-      world.SetPrintFun( [](ORG & org, std::ostream & os){
+      world.SetPrintFun( [](ORG & /* org */, std::ostream & /* os */){
         emp_assert(false, "No default Print function available");
       } );
     }

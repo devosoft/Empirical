@@ -58,7 +58,7 @@ namespace emp {
     using stack_t = emp::vector<double>;
     using arg_set_t = emp::array<arg_t, INST_ARGS>;
 
-    struct Instruction {
+    struct Instruction : public inst_lib_t::InstructionBase {
       size_t id;
       arg_set_t args;
 
@@ -70,7 +70,7 @@ namespace emp {
       Instruction & operator=(const Instruction &) = default;
       Instruction & operator=(Instruction &&) = default;
       bool operator<(const Instruction & in) const {
-          return std::tie(id, args) < std::tie(in.id, in.args);
+        return (id == in.id) ? (args < in.args) : (id < in.id);
       }
       bool operator==(const Instruction & in) const { return id == in.id && args == in.args; }
       bool operator!=(const Instruction & in) const { return !(*this == in); }
@@ -80,6 +80,10 @@ namespace emp {
 
       void Set(size_t _id, size_t _a0=0, size_t _a1=0, size_t _a2=0)
         { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; }
+
+      size_t GetIndex() const override{
+        return id;
+      }
     };
 
     struct ScopeInfo {

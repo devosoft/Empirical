@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2021.
+ *  date: 2016-2022.
 */
 /**
  *  @file
@@ -21,8 +21,11 @@
 
 #include <array>
 #include <initializer_list>
+#include <iterator>
 #include <stddef.h>
 #include <vector>
+
+#include "../../../third-party/cereal/include/cereal/cereal.hpp"
 
 #include "assert.hpp"
 
@@ -37,130 +40,139 @@ namespace emp {
 
 namespace emp {
 
+  // Pre-declaration of array type.
+  template <typename T, size_t N> struct array;
+
+  /// Setup an iterator wrapper to check validity.
+  template<typename ITERATOR_T, typename ARRAY_T>
+  struct array_iterator {
+    using this_t = array_iterator<ITERATOR_T, ARRAY_T>;
+    using array_t = ARRAY_T;
+
+    // Iterator traits
+    using iterator_category = typename std::iterator_traits<ITERATOR_T>::iterator_category;
+    using value_type = typename std::iterator_traits<ITERATOR_T>::value_type;
+    using difference_type = typename std::iterator_traits<ITERATOR_T>::difference_type;
+    using pointer = typename std::iterator_traits<ITERATOR_T>::pointer;
+    using reference = typename std::iterator_traits<ITERATOR_T>::reference;
+
+    ITERATOR_T it;
+    const array_t * arr_ptr { nullptr }; // Which array was iterator created from?
+
+    array_iterator() { ; }
+
+    array_iterator(ITERATOR_T _in, const array_t * _v) : it(_in), arr_ptr (_v) { ; }
+    array_iterator(const this_t &) = default;
+    array_iterator(this_t &&) = default;
+    ~array_iterator() { ; }
+
+    // Debug tools to make sure this iterator is okay.
+    bool OK(bool begin_ok=true, bool end_ok=true) const {
+      if (arr_ptr  == nullptr) return false;                 // Invalid array
+      if (it < arr_ptr->begin()) return false;               // Iterator before array start.
+      if (it > arr_ptr->end()) return false;                 // Iterator after array end.
+      if (!begin_ok && it == arr_ptr->begin()) return false; // Iterator not allowed at start.
+      if (!end_ok && it == arr_ptr->end()) return false;     // Iterator not allowed at end.
+      return true;
+    }
+
+    this_t & operator=(const this_t &) = default;
+    this_t & operator=(this_t &&) = default;
+
+    operator ITERATOR_T() { return it; }
+    operator const ITERATOR_T() const { return it; }
+
+    auto & operator*() {
+      emp_assert(OK(true, false));  // Ensure array is being pointed to properly.
+      return *it;
+    }
+    const auto & operator*() const {
+      emp_assert(OK(true, false));  // Ensure array is being pointed to properly.
+      return *it;
+    }
+
+    auto operator->() {
+      emp_assert(OK(true, false));  // Ensure array is being pointed to properly.
+      return it;
+    }
+    auto operator->() const {
+      emp_assert(OK(true, false));  // Ensure array is being pointed to properly.
+      return it;
+    }
+
+    this_t & operator++() { emp_assert(OK(true,false)); ++it; return *this; }
+    this_t operator++(int /*x*/) { emp_assert(OK(true,false)); return this_t(it++, arr_ptr); }
+    this_t & operator--() { emp_assert(OK(false,true)); --it; return *this; }
+    this_t operator--(int /*x*/) { emp_assert(OK(false,true)); return this_t(it--, arr_ptr); }
+
+    this_t operator+(int in) { emp_assert(OK()); return this_t(it + in, arr_ptr); }
+    this_t operator-(int in) { emp_assert(OK()); return this_t(it - in, arr_ptr); }
+    ptrdiff_t operator-(const this_t & in) { emp_assert(OK()); return it - in.it; }
+
+    this_t & operator+=(int in) { emp_assert(OK()); it += in; return *this; }
+    this_t & operator-=(int in) { emp_assert(OK()); it -= in; return *this; }
+
+    auto & operator[](int index) { emp_assert(OK()); return it[index]; }
+    const auto & operator[](int index) const { emp_assert(OK()); return it[index]; }
+  };
+
   /// We are in debug mode, so emp::array has the same interface as std::array, but with extra
   /// bounds checking.  Using vector as our base since it has the right pieces and is dynamic.
-  template <typename T, size_t N>
-  class array : public std::vector<T> {
-  private:
+  template <typename T, size_t NUM_ELEMENTS>
+  struct array {
+    static constexpr size_t N = NUM_ELEMENTS;
     using this_t = emp::array<T,N>;
-    using base_t = std::vector<T>;
 
-  public:
-    bool valid;
+    T _data[ N ? N : 1 ];
 
-    /// Setup an iterator wrapper to make sure that they're valid.
-    template<typename ITERATOR_T>
-    struct iterator_wrapper : public ITERATOR_T {
-      using this_t = iterator_wrapper<ITERATOR_T>;
-      using wrapped_t = ITERATOR_T;
-      using vec_t = emp::array<T,N>;
-
-      /// What vector was this iterator created from?
-      const vec_t * v_ptr{ nullptr };
-
-      iterator_wrapper() { ; }
-
-      iterator_wrapper(const ITERATOR_T & _in, const vec_t * _v) : ITERATOR_T(_in), v_ptr(_v) { ; }
-      iterator_wrapper(const this_t &) = default;
-      iterator_wrapper(this_t &&) = default;
-      ~iterator_wrapper() { ; }
-
-      // Debug tools to make sure this iterator is okay.
-      bool OK(bool begin_ok=true, bool end_ok=true) const {
-        if (v_ptr == nullptr) return false;                // Invalid vector
-        if (!v_ptr->valid) return false;                   // Vector has been deleted!
-        size_t pos = (size_t) (*this - v_ptr->begin());
-        if (pos > v_ptr->size()) return false;             // Iterator out of range.
-        if (!begin_ok && pos == 0) return false;           // Iterator not allowed at beginning.
-        if (!end_ok && pos == v_ptr->size()) return false; // Iterator not allowed at end.
-        return true;
-      }
-
-      this_t & operator=(const this_t &) = default;
-      this_t & operator=(this_t &&) = default;
-
-      operator ITERATOR_T() { return *this; }
-      operator const ITERATOR_T() const { return *this; }
-
-      auto & operator*() {
-        emp_assert(OK(true, false));  // Ensure array is being pointed to properly.
-        return wrapped_t::operator*();
-      }
-      const auto & operator*() const {
-        emp_assert(OK(true, false));  // Ensure array is being pointed to properly.
-        return wrapped_t::operator*();
-      }
-
-      auto operator->() {
-        emp_assert(OK(true, false));  // Ensure array is being pointed to properly.
-        return wrapped_t::operator->();
-      }
-      auto operator->() const {
-        emp_assert(OK(true, false));  // Ensure array is being pointed to properly.
-        return wrapped_t::operator->();
-      }
-
-      this_t & operator++() { emp_assert(OK(true,false)); wrapped_t::operator++(); return *this; }
-      this_t operator++(int x) { emp_assert(OK(true,false)); return this_t(wrapped_t::operator++(x), v_ptr); }
-      this_t & operator--() { emp_assert(OK(false,true)); wrapped_t::operator--(); return *this; }
-      this_t operator--(int x) { emp_assert(OK(false,true)); return this_t(wrapped_t::operator--(x), v_ptr); }
-
-      auto operator+(int in) { emp_assert(OK()); return this_t(wrapped_t::operator+(in), v_ptr); }
-      auto operator-(int in) { emp_assert(OK()); return this_t(wrapped_t::operator-(in), v_ptr); }
-      auto operator-(const this_t & in) { emp_assert(OK()); return ((wrapped_t) *this) - (wrapped_t) in; }
-
-      this_t & operator+=(int in) { emp_assert(OK()); wrapped_t::operator+=(in); return *this; }
-      this_t & operator-=(int in) { emp_assert(OK()); wrapped_t::operator-=(in); return *this; }
-      auto & operator[](int offset) { emp_assert(OK()); return wrapped_t::operator[](offset); }
-    };
-
-    using iterator = iterator_wrapper< typename base_t::iterator >;
-    using const_iterator = iterator_wrapper< typename base_t::const_iterator >;
-    using reverse_iterator = iterator_wrapper< typename base_t::reverse_iterator >;
-    using const_reverse_iterator = iterator_wrapper< typename base_t::const_reverse_iterator >;
+    using iterator = array_iterator< T*, this_t >;
+    using const_iterator = array_iterator< const T *, this_t >;
+    using reverse_iterator = array_iterator< std::reverse_iterator<iterator>, this_t >;
+    using const_reverse_iterator = array_iterator< std::reverse_iterator<const_iterator>, this_t >;
     using value_type = T;
-    using size_type = typename base_t::size_type;
-    using reference = typename base_t::reference;
-    using const_reference = typename base_t::const_reference;
+    using size_type = std::size_t;
+    using reference = value_type&;
+    using const_reference = const value_type&;
 
-    array() : base_t(N), valid(true) {};
-    array(const this_t & _in) : base_t(_in), valid(true) { emp_assert(_in.size() == N); };
-    array(std::initializer_list<T> in_list) : base_t(in_list), valid(true) { emp_assert(size() == N); }
-    template <typename InputIt>
-    array(InputIt first, InputIt last) : base_t(first, last), valid(true) { emp_assert(size() == N); }
-    ~array() { valid=false; } // No longer valid when array is deleted.
+    // -- No constructors, destructors, or assignment operators to preserve aggregate type.
 
+    int operator<=>(const array &) const = default;
+
+    // Allow automatic conversion to regular array type.
     operator std::array<T,N>() {
       std::array<T,N> ar;
-      for (size_t i = 0; i < N; i++) ar[i] = base_t::operator[](i);
+      for (size_t i = 0; i < N; i++) ar[i] = _data[i];
       return ar;
     }
 
     constexpr size_t size() const { return N; }
 
-    iterator begin() noexcept { return iterator(base_t::begin(), this); }
-    const_iterator begin() const noexcept { return const_iterator(base_t::begin(), this); }
-    iterator end() noexcept { return iterator(base_t::end(), this); }
-    const_iterator end() const noexcept { return const_iterator(base_t::end(), this); }
+    auto & data() { return _data; }
+    const auto & data() const { return _data; }
 
-    this_t & operator=(const this_t &) = default;
+    iterator begin() noexcept { return iterator(_data, this); }
+    const_iterator begin() const noexcept { return const_iterator(_data, this); }
+    iterator end() noexcept { return iterator(_data + N, this); }
+    const_iterator end() const noexcept { return const_iterator(_data + N, this); }
 
     T & operator[](size_t pos) {
       emp_assert(pos < N, pos, N);
-      return base_t::operator[](pos);
+      return _data[pos];
     }
 
     const T & operator[](size_t pos) const {
       emp_assert(pos < N, pos, N);
-      return base_t::operator[](pos);
+      return _data[pos];
     }
 
-    T & back() { emp_assert(N > 0); return base_t::back(); }
-    const T & back() const { emp_assert(N > 0); return base_t::back(); }
-    T & front() { emp_assert(N > 0); return base_t::front(); }
-    const T & front() const { emp_assert(N > 0); return base_t::front(); }
+    T & back() { emp_assert(N > 0); return _data[N-1]; }
+    const T & back() const { emp_assert(N > 0); return _data[N-1]; }
+    T & front() { emp_assert(N > 0); return _data[0]; }
+    const T & front() const { emp_assert(N > 0); return _data[0]; }
 
-    void fill(const T & val) { this->assign(N, val); }
+    void fill(const T & val) {
+      for (size_t i = 0; i < N; ++i) _data[i] = val;
+    }
 
     // Functions to make sure to throw an error on:
 
@@ -172,27 +184,30 @@ namespace emp {
     void pop_back() { emp_assert(false, "invalid operation for array!"); }
 
     template <typename... ARGS>
-    iterator insert(ARGS &&... args) {
+    iterator insert(ARGS &&... /* args */) {
       emp_assert(false, "invalid operation for array!");
-      return iterator( base_t::insert(std::forward<ARGS>(args)...), this );
+      return end();
     }
 
     template <typename... ARGS>
-    iterator erase(ARGS &&... args) {
+    iterator erase(ARGS &&... /* args */) {
       emp_assert(false, "invalid operation for array!");
-      return iterator( base_t::erase(std::forward<ARGS>(args)...), this );
+      return end();
     }
 
     template <typename... ARGS>
-    iterator emplace(ARGS &&... args) {
+    iterator emplace(ARGS &&... /* args */) {
       emp_assert(false, "invalid operation for array!");
-      return iterator( base_t::emplace(std::forward<ARGS>(args)...), this );
+      return end();
     }
 
     template <typename... ARGS>
     void emplace_back(ARGS &&... /* args */) {
       emp_assert(false, "invalid operation for array!");
     }
+
+    template <class Archive>
+    void serialize( Archive & ar ) { ar(_data); }
   };
 
 

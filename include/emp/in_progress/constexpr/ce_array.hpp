@@ -7,7 +7,7 @@
  *  @file
  *  @brief ce_array defines a limited array object for use within a constexpr class or function.
  *
- * STATUS: ALPHA
+ *  @note STATUS: ALPHA
  *
  */
 

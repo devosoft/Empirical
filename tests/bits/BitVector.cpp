@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
+ *  date: 2021-23
 */
 /**
  *  @file
@@ -20,19 +20,19 @@
 
 TEST_CASE("1: Test BitVector Constructors", "[bits]"){
   // Create a size 50 bit vector, default to all zeros.
-  emp::BitVector bv1(50);
+  emp::old::BitVector bv1(50);
   REQUIRE( bv1.GetSize() == 50 );
   REQUIRE( bv1.CountOnes() == 0 );
   REQUIRE( (~bv1).CountOnes() == 50 );
 
   // Create a size 1000 BitVector, default to all ones.
-  emp::BitVector bv2(1000, true);
+  emp::old::BitVector bv2(1000, true);
   REQUIRE( bv2.GetSize() == 1000 );
   REQUIRE( bv2.CountOnes() == 1000 );
 
   // Try a range of BitVector sizes, from 0 to 200.
   for (size_t bv_size = 0; bv_size <= 200; bv_size++) {
-    emp::BitVector bv3(bv_size);
+    emp::old::BitVector bv3(bv_size);
     REQUIRE( bv3.GetSize() == bv_size );
     REQUIRE( bv3.CountOnes() == 0 );
     for (size_t i = 0; i < bv_size; i++) bv3[i] = true;
@@ -40,62 +40,62 @@ TEST_CASE("1: Test BitVector Constructors", "[bits]"){
   }
 
   // Build a relatively large BitVector.
-  emp::BitVector bv4(1000000);
+  emp::old::BitVector bv4(1000000);
   for (size_t i = 0; i < bv4.GetSize(); i += 100) bv4[i].Toggle();
   REQUIRE( bv4.CountOnes() == 10000 );
 
   // Try out the copy constructor.
-  emp::BitVector bv5(bv4);
+  emp::old::BitVector bv5(bv4);
   REQUIRE( bv5.GetSize() == 1000000 );
   REQUIRE( bv5.CountOnes() == 10000 );
 
   // And the move constructor.
   auto old_ptr = bv5.RawBytes();         // Grab a pointer to where bv5 currently has its bytes.
-  emp::BitVector bv6( std::move(bv5) );  // Move bv5 bytes into bv6.
+  emp::old::BitVector bv6( std::move(bv5) );  // Move bv5 bytes into bv6.
   REQUIRE( bv6.RawBytes() == old_ptr );
   REQUIRE( bv5.RawBytes() == nullptr );
 
   // Construct from std::bitset.
   std::bitset<6> bit_set;
   bit_set[1] = 1;   bit_set[2] = 1;   bit_set[4] = 1;
-  emp::BitVector bv7(bit_set);
+  emp::old::BitVector bv7(bit_set);
   REQUIRE( bv7.GetSize() == 6 );
   REQUIRE( bv7.CountOnes() == 3 );
 
   // Construct from string.
   std::string bit_string = "10011001010000011101";
-  emp::BitVector bv8(bit_string);
+  emp::old::BitVector bv8(bit_string);
   REQUIRE( bv8.GetSize() == 20 );
   REQUIRE( bv8.CountOnes() == 9 );
 
   // Some random BitVectors
   emp::Random random(1);
-  emp::BitVector bv9(1000, random);            // 50/50 chance for each bit.
+  emp::old::BitVector bv9(1000, random);            // 50/50 chance for each bit.
   const size_t bv9_ones = bv9.CountOnes();
   REQUIRE( bv9_ones >= 400 );
   REQUIRE( bv9_ones <= 600 );
 
-  emp::BitVector bv10(1000, random, 0.8);      // 80% chance of ones.
+  emp::old::BitVector bv10(1000, random, 0.8);      // 80% chance of ones.
   const size_t bv10_ones = bv10.CountOnes();
   REQUIRE( bv10_ones >= 750 );
   REQUIRE( bv10_ones <= 850 );
 
-  emp::BitVector bv11(1000, random, 117);      // Exactly 117 ones, randomly placed.
+  emp::old::BitVector bv11(1000, random, 117);      // Exactly 117 ones, randomly placed.
   const size_t bv11_ones = bv11.CountOnes();
   REQUIRE( bv11_ones == 117 );
 
-  emp::BitVector bv12(bv11, 500);              // Construct with just first half of bv11.
+  emp::old::BitVector bv12(bv11, 500);              // Construct with just first half of bv11.
   const size_t bv12_ones = bv12.CountOnes();
   REQUIRE( bv12_ones >= 20 );
   REQUIRE( bv12_ones <= 90 );
 
-  emp::BitVector bv13({1,0,0,0,1,1,1,0,0,0,1,1,1}); // Construct with initializer list.
+  emp::old::BitVector bv13({1,0,0,0,1,1,1,0,0,0,1,1,1}); // Construct with initializer list.
   REQUIRE( bv13.GetSize() == 13 );
   REQUIRE( bv13.CountOnes() == 7 );
 }
 
 TEST_CASE("2: Test BitVector Assignemnts", "[bits]"){
-  emp::vector< emp::BitVector > v;
+  emp::vector< emp::old::BitVector > v;
 
   // Try all BitVector sizes from 0 to 128.
   // Lot's of move operators will trigger as vector grows.
@@ -110,8 +110,8 @@ TEST_CASE("2: Test BitVector Assignemnts", "[bits]"){
   v.emplace_back(1000000);
 
   // Copy each BitVector into bv2 and do some manipulations then copy back.
-  for (emp::BitVector & bv : v) {
-    emp::BitVector bv2 = bv;
+  for (emp::old::BitVector & bv : v) {
+    emp::old::BitVector bv2 = bv;
     for (size_t i = 1; i < bv2.GetSize(); i += 2) {
       bv2[i] = 1;
     }
@@ -119,12 +119,12 @@ TEST_CASE("2: Test BitVector Assignemnts", "[bits]"){
   }
 
   // Now make sure the we constructed bits correctly!
-  for (const emp::BitVector & bv : v) {
+  for (const emp::old::BitVector & bv : v) {
     REQUIRE( bv.CountOnes() == bv.GetSize()/2 );
   }
 
-  emp::vector< emp::BitVector > v2;
-  v2.push_back( emp::BitVector({0,1,0,1,0,1}) );
+  emp::vector< emp::old::BitVector > v2;
+  v2.push_back( emp::old::BitVector({0,1,0,1,0,1}) );
 
   v2 = v; // Copy over all BitVectors.
 
@@ -147,15 +147,15 @@ TEST_CASE("2: Test BitVector Assignemnts", "[bits]"){
 
 
 TEST_CASE("3: Test Simple BitVector Accessors", "[bits]"){
-  emp::BitVector bv0(0);
-  emp::BitVector bv1(1, true);
-  emp::BitVector bv8( "10001101" );
-  emp::BitVector bv32( "10001101100011011000110110001101" );
-  emp::BitVector bv64( "1000110110001101100000011000110000001101100000000000110110001101" );
-  emp::BitVector bv75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
+  emp::old::BitVector bv0(0);
+  emp::old::BitVector bv1(1, true);
+  emp::old::BitVector bv8( "10001101" );
+  emp::old::BitVector bv32( "10001101100011011000110110001101" );
+  emp::old::BitVector bv64( "1000110110001101100000011000110000001101100000000000110110001101" );
+  emp::old::BitVector bv75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
 
   emp::Random random(1);
-  emp::BitVector bv1k(1000, random, 0.75);
+  emp::old::BitVector bv1k(1000, random, 0.75);
 
   // Make sure all sizes are correct.
   REQUIRE( bv0.GetSize() == 0 );
@@ -245,7 +245,7 @@ TEST_CASE("3: Test Simple BitVector Accessors", "[bits]"){
 
 TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   // Make sure range-based accessors still work when there are no bits.
-  emp::BitVector bv0(0);
+  emp::old::BitVector bv0(0);
   bv0.SetRange(0,0);
   bv0.SetAll();
   bv0.Clear();
@@ -255,7 +255,7 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   REQUIRE( bv0.GetSize() == 0 );
 
   // Now try range-based accessors on a single bit.
-  emp::BitVector bv1(1, false);  REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
+  emp::old::BitVector bv1(1, false);  REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
   bv1.Set(0);                    REQUIRE( bv1[0] == true );    REQUIRE( bv1.CountOnes() == 1 );
   bv1.Clear(0);                  REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
   bv1.Toggle(0);                 REQUIRE( bv1[0] == true );    REQUIRE( bv1.CountOnes() == 1 );
@@ -270,7 +270,7 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   bv1.SetRange(1,1);             REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
 
   // Test when a full byte is used.
-  emp::BitVector bv8( "10001101" );   REQUIRE(bv8.GetValue() == 177.0);  // 10110001
+  emp::old::BitVector bv8( "10001101" );   REQUIRE(bv8.GetValue() == 177.0);  // 10110001
   bv8.Set(2);                         REQUIRE(bv8.GetValue() == 181.0);  // 10110101
   bv8.Set(0, 0);                      REQUIRE(bv8.GetValue() == 180.0);  // 10110100
   bv8.SetRange(1, 4);                 REQUIRE(bv8.GetValue() == 190.0);  // 10111110
@@ -287,7 +287,7 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
 
   // Test a full field.
   constexpr double ALL_64 = (double) ((uint64_t) -1);
-  emp::BitVector bv64( "11011000110110001101" ); REQUIRE(bv64.GetValue() == 727835.0);
+  emp::old::BitVector bv64( "11011000110110001101" ); REQUIRE(bv64.GetValue() == 727835.0);
   bv64.Resize(64);      REQUIRE(bv64.GetValue() == 727835.0);        // ...0 010110001101100011011
   bv64.Set(6);          REQUIRE(bv64.GetValue() == 727899.0);        // ...0 010110001101101011011
   bv64.Set(0, 0);       REQUIRE(bv64.GetValue() == 727898.0);        // ...0 010110001101101011010
@@ -303,11 +303,11 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   bv64.Toggle(0,64);    REQUIRE(bv64.GetValue() == 491520.0);        // ...0 001111000000000000000
 
 
-  emp::BitVector bv75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
+  emp::old::BitVector bv75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
 
   // Test a full + partial field.
   constexpr double ALL_88 = ((double) ((uint64_t) -1)) * emp::Pow2(24);
-  emp::BitVector bv88( "11011000110110001101" ); REQUIRE(bv88.GetValue() == 727835.0);
+  emp::old::BitVector bv88( "11011000110110001101" ); REQUIRE(bv88.GetValue() == 727835.0);
   bv88.Resize(88);      REQUIRE(bv88.GetValue() == 727835.0);        // ...0 010110001101100011011
 
   // Start with same tests as last time...
@@ -336,7 +336,7 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
 
   // A larger BitVector with lots of random tests.
   emp::Random random(1);
-  emp::BitVector bv1k(1000, random, 0.65);
+  emp::old::BitVector bv1k(1000, random, 0.65);
   size_t num_ones = bv1k.CountOnes();  REQUIRE(num_ones > 550);
   bv1k.Toggle();                       REQUIRE(bv1k.CountOnes() == 1000 - num_ones);
 
@@ -358,9 +358,9 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   }
 
   // Test Any(), All() and None()
-  emp::BitVector bv_empty("000000");
-  emp::BitVector bv_mixed("010101");
-  emp::BitVector bv_full ("111111");
+  emp::old::BitVector bv_empty("000000");
+  emp::old::BitVector bv_mixed("010101");
+  emp::old::BitVector bv_full ("111111");
 
   REQUIRE(bv_empty.Any() == false);
   REQUIRE(bv_mixed.Any() == true);
@@ -377,7 +377,7 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
 
 TEST_CASE("5: Test Randomize() and variants", "[bits]") {
   emp::Random random(1);
-  emp::BitVector bv(1000);
+  emp::old::BitVector bv(1000);
 
   REQUIRE(bv.None() == true);
 
@@ -499,7 +499,7 @@ TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
   constexpr size_t num_bits = 145;
   constexpr size_t num_bytes = 19;
 
-  emp::BitVector bv(num_bits);
+  emp::old::BitVector bv(num_bits);
   REQUIRE(bv.GetSize() == num_bits);
   REQUIRE(bv.GetNumBytes() == num_bytes);
 
@@ -568,7 +568,7 @@ TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
 
 TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
 
-  emp::BitVector bv = "0001000100001110";
+  emp::old::BitVector bv = "0001000100001110";
 
   REQUIRE(bv.GetSize() == 16);
   REQUIRE(bv.CountOnes() == 5);
@@ -628,7 +628,7 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
 }
 
 TEST_CASE("8: Test printing and string functions.", "[bits]") {
-  emp::BitVector bv6("000111");
+  emp::old::BitVector bv6("000111");
 
   REQUIRE(bv6.ToString() == "000111");
   REQUIRE(bv6.ToBinaryString() == "111000");
@@ -636,7 +636,7 @@ TEST_CASE("8: Test printing and string functions.", "[bits]") {
   REQUIRE(bv6.ToIDString() == "3 4 5");
   REQUIRE(bv6.ToRangeString() == "3-5");
 
-  emp::BitVector bv64("0001110000000000000100000000000001000110000001000001000100000001");
+  emp::old::BitVector bv64("0001110000000000000100000000000001000110000001000001000100000001");
 
   REQUIRE(bv64.ToString()       == "0001110000000000000100000000000001000110000001000001000100000001");
   REQUIRE(bv64.ToBinaryString() == "1000000010001000001000000110001000000000000010000000000000111000");
@@ -644,7 +644,7 @@ TEST_CASE("8: Test printing and string functions.", "[bits]") {
   REQUIRE(bv64.ToIDString(",") == "3,4,5,19,33,37,38,45,51,55,63");
   REQUIRE(bv64.ToRangeString() == "3-5,19,33,37-38,45,51,55,63");
 
-  emp::BitVector bv65("00011110000000000001000000000000010001100000010000010001000000111");
+  emp::old::BitVector bv65("00011110000000000001000000000000010001100000010000010001000000111");
 
   REQUIRE(bv65.ToString()       == "00011110000000000001000000000000010001100000010000010001000000111");
   REQUIRE(bv65.ToBinaryString() == "11100000010001000001000000110001000000000000010000000000001111000");
@@ -654,188 +654,188 @@ TEST_CASE("8: Test printing and string functions.", "[bits]") {
 }
 
 TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
-  const emp::BitVector input1 = "00001111";
-  const emp::BitVector input2 = "00110011";
-  const emp::BitVector input3 = "01010101";
+  const emp::old::BitVector input1 = "00001111";
+  const emp::old::BitVector input2 = "00110011";
+  const emp::old::BitVector input3 = "01010101";
 
   // Test *_SELF() Boolean Logic functions.
-  emp::BitVector bv(8);    REQUIRE(bv == emp::BitVector("00000000"));
-  bv.NOT_SELF();           REQUIRE(bv == emp::BitVector("11111111"));
-  bv.AND_SELF(input1);     REQUIRE(bv == emp::BitVector("00001111"));
-  bv.AND_SELF(input1);     REQUIRE(bv == emp::BitVector("00001111"));
-  bv.AND_SELF(input2);     REQUIRE(bv == emp::BitVector("00000011"));
-  bv.AND_SELF(input3);     REQUIRE(bv == emp::BitVector("00000001"));
+  emp::old::BitVector bv(8);    REQUIRE(bv == emp::old::BitVector("00000000"));
+  bv.NOT_SELF();           REQUIRE(bv == emp::old::BitVector("11111111"));
+  bv.AND_SELF(input1);     REQUIRE(bv == emp::old::BitVector("00001111"));
+  bv.AND_SELF(input1);     REQUIRE(bv == emp::old::BitVector("00001111"));
+  bv.AND_SELF(input2);     REQUIRE(bv == emp::old::BitVector("00000011"));
+  bv.AND_SELF(input3);     REQUIRE(bv == emp::old::BitVector("00000001"));
 
-  bv.OR_SELF(input1);      REQUIRE(bv == emp::BitVector("00001111"));
-  bv.OR_SELF(input1);      REQUIRE(bv == emp::BitVector("00001111"));
-  bv.OR_SELF(input3);      REQUIRE(bv == emp::BitVector("01011111"));
-  bv.OR_SELF(input2);      REQUIRE(bv == emp::BitVector("01111111"));
+  bv.OR_SELF(input1);      REQUIRE(bv == emp::old::BitVector("00001111"));
+  bv.OR_SELF(input1);      REQUIRE(bv == emp::old::BitVector("00001111"));
+  bv.OR_SELF(input3);      REQUIRE(bv == emp::old::BitVector("01011111"));
+  bv.OR_SELF(input2);      REQUIRE(bv == emp::old::BitVector("01111111"));
 
-  bv.NAND_SELF(input1);    REQUIRE(bv == emp::BitVector("11110000"));
-  bv.NAND_SELF(input1);    REQUIRE(bv == emp::BitVector("11111111"));
-  bv.NAND_SELF(input2);    REQUIRE(bv == emp::BitVector("11001100"));
-  bv.NAND_SELF(input3);    REQUIRE(bv == emp::BitVector("10111011"));
+  bv.NAND_SELF(input1);    REQUIRE(bv == emp::old::BitVector("11110000"));
+  bv.NAND_SELF(input1);    REQUIRE(bv == emp::old::BitVector("11111111"));
+  bv.NAND_SELF(input2);    REQUIRE(bv == emp::old::BitVector("11001100"));
+  bv.NAND_SELF(input3);    REQUIRE(bv == emp::old::BitVector("10111011"));
 
-  bv.NOR_SELF(input1);     REQUIRE(bv == emp::BitVector("01000000"));
-  bv.NOR_SELF(input1);     REQUIRE(bv == emp::BitVector("10110000"));
-  bv.NOR_SELF(input2);     REQUIRE(bv == emp::BitVector("01001100"));
-  bv.NOR_SELF(input3);     REQUIRE(bv == emp::BitVector("10100010"));
+  bv.NOR_SELF(input1);     REQUIRE(bv == emp::old::BitVector("01000000"));
+  bv.NOR_SELF(input1);     REQUIRE(bv == emp::old::BitVector("10110000"));
+  bv.NOR_SELF(input2);     REQUIRE(bv == emp::old::BitVector("01001100"));
+  bv.NOR_SELF(input3);     REQUIRE(bv == emp::old::BitVector("10100010"));
 
-  bv.XOR_SELF(input1);     REQUIRE(bv == emp::BitVector("10101101"));
-  bv.XOR_SELF(input1);     REQUIRE(bv == emp::BitVector("10100010"));
-  bv.XOR_SELF(input2);     REQUIRE(bv == emp::BitVector("10010001"));
-  bv.XOR_SELF(input3);     REQUIRE(bv == emp::BitVector("11000100"));
+  bv.XOR_SELF(input1);     REQUIRE(bv == emp::old::BitVector("10101101"));
+  bv.XOR_SELF(input1);     REQUIRE(bv == emp::old::BitVector("10100010"));
+  bv.XOR_SELF(input2);     REQUIRE(bv == emp::old::BitVector("10010001"));
+  bv.XOR_SELF(input3);     REQUIRE(bv == emp::old::BitVector("11000100"));
 
-  bv.EQU_SELF(input1);     REQUIRE(bv == emp::BitVector("00110100"));
-  bv.EQU_SELF(input1);     REQUIRE(bv == emp::BitVector("11000100"));
-  bv.EQU_SELF(input2);     REQUIRE(bv == emp::BitVector("00001000"));
-  bv.EQU_SELF(input3);     REQUIRE(bv == emp::BitVector("10100010"));
+  bv.EQU_SELF(input1);     REQUIRE(bv == emp::old::BitVector("00110100"));
+  bv.EQU_SELF(input1);     REQUIRE(bv == emp::old::BitVector("11000100"));
+  bv.EQU_SELF(input2);     REQUIRE(bv == emp::old::BitVector("00001000"));
+  bv.EQU_SELF(input3);     REQUIRE(bv == emp::old::BitVector("10100010"));
 
-  bv.NOT_SELF();           REQUIRE(bv == emp::BitVector("01011101"));
+  bv.NOT_SELF();           REQUIRE(bv == emp::old::BitVector("01011101"));
 
   // Test regular Boolean Logic functions.
-  bv.Clear();                            REQUIRE(bv == emp::BitVector("00000000"));
-  emp::BitVector bv1 = bv.NOT();         REQUIRE(bv1 == emp::BitVector("11111111"));
+  bv.Clear();                            REQUIRE(bv == emp::old::BitVector("00000000"));
+  emp::old::BitVector bv1 = bv.NOT();         REQUIRE(bv1 == emp::old::BitVector("11111111"));
 
-  bv1 = bv1.AND(input1);                 REQUIRE(bv1 == emp::BitVector("00001111"));
-  emp::BitVector bv2 = bv1.AND(input1);  REQUIRE(bv2 == emp::BitVector("00001111"));
-  emp::BitVector bv3 = bv2.AND(input2);  REQUIRE(bv3 == emp::BitVector("00000011"));
-  emp::BitVector bv4 = bv3.AND(input3);  REQUIRE(bv4 == emp::BitVector("00000001"));
+  bv1 = bv1.AND(input1);                 REQUIRE(bv1 == emp::old::BitVector("00001111"));
+  emp::old::BitVector bv2 = bv1.AND(input1);  REQUIRE(bv2 == emp::old::BitVector("00001111"));
+  emp::old::BitVector bv3 = bv2.AND(input2);  REQUIRE(bv3 == emp::old::BitVector("00000011"));
+  emp::old::BitVector bv4 = bv3.AND(input3);  REQUIRE(bv4 == emp::old::BitVector("00000001"));
 
-  bv1 = bv4.OR(input1);      REQUIRE(bv1 == emp::BitVector("00001111"));
-  bv2 = bv1.OR(input1);      REQUIRE(bv2 == emp::BitVector("00001111"));
-  bv3 = bv2.OR(input3);      REQUIRE(bv3 == emp::BitVector("01011111"));
-  bv4 = bv3.OR(input2);      REQUIRE(bv4 == emp::BitVector("01111111"));
+  bv1 = bv4.OR(input1);      REQUIRE(bv1 == emp::old::BitVector("00001111"));
+  bv2 = bv1.OR(input1);      REQUIRE(bv2 == emp::old::BitVector("00001111"));
+  bv3 = bv2.OR(input3);      REQUIRE(bv3 == emp::old::BitVector("01011111"));
+  bv4 = bv3.OR(input2);      REQUIRE(bv4 == emp::old::BitVector("01111111"));
 
-  bv1 = bv4.NAND(input1);    REQUIRE(bv1 == emp::BitVector("11110000"));
-  bv2 = bv1.NAND(input1);    REQUIRE(bv2 == emp::BitVector("11111111"));
-  bv3 = bv2.NAND(input2);    REQUIRE(bv3 == emp::BitVector("11001100"));
-  bv4 = bv3.NAND(input3);    REQUIRE(bv4 == emp::BitVector("10111011"));
+  bv1 = bv4.NAND(input1);    REQUIRE(bv1 == emp::old::BitVector("11110000"));
+  bv2 = bv1.NAND(input1);    REQUIRE(bv2 == emp::old::BitVector("11111111"));
+  bv3 = bv2.NAND(input2);    REQUIRE(bv3 == emp::old::BitVector("11001100"));
+  bv4 = bv3.NAND(input3);    REQUIRE(bv4 == emp::old::BitVector("10111011"));
 
-  bv1 = bv4.NOR(input1);     REQUIRE(bv1 == emp::BitVector("01000000"));
-  bv2 = bv1.NOR(input1);     REQUIRE(bv2 == emp::BitVector("10110000"));
-  bv3 = bv2.NOR(input2);     REQUIRE(bv3 == emp::BitVector("01001100"));
-  bv4 = bv3.NOR(input3);     REQUIRE(bv4 == emp::BitVector("10100010"));
+  bv1 = bv4.NOR(input1);     REQUIRE(bv1 == emp::old::BitVector("01000000"));
+  bv2 = bv1.NOR(input1);     REQUIRE(bv2 == emp::old::BitVector("10110000"));
+  bv3 = bv2.NOR(input2);     REQUIRE(bv3 == emp::old::BitVector("01001100"));
+  bv4 = bv3.NOR(input3);     REQUIRE(bv4 == emp::old::BitVector("10100010"));
 
-  bv1 = bv4.XOR(input1);     REQUIRE(bv1 == emp::BitVector("10101101"));
-  bv2 = bv1.XOR(input1);     REQUIRE(bv2 == emp::BitVector("10100010"));
-  bv3 = bv2.XOR(input2);     REQUIRE(bv3 == emp::BitVector("10010001"));
-  bv4 = bv3.XOR(input3);     REQUIRE(bv4 == emp::BitVector("11000100"));
+  bv1 = bv4.XOR(input1);     REQUIRE(bv1 == emp::old::BitVector("10101101"));
+  bv2 = bv1.XOR(input1);     REQUIRE(bv2 == emp::old::BitVector("10100010"));
+  bv3 = bv2.XOR(input2);     REQUIRE(bv3 == emp::old::BitVector("10010001"));
+  bv4 = bv3.XOR(input3);     REQUIRE(bv4 == emp::old::BitVector("11000100"));
 
-  bv1 = bv4.EQU(input1);     REQUIRE(bv1 == emp::BitVector("00110100"));
-  bv2 = bv1.EQU(input1);     REQUIRE(bv2 == emp::BitVector("11000100"));
-  bv3 = bv2.EQU(input2);     REQUIRE(bv3 == emp::BitVector("00001000"));
-  bv4 = bv3.EQU(input3);     REQUIRE(bv4 == emp::BitVector("10100010"));
+  bv1 = bv4.EQU(input1);     REQUIRE(bv1 == emp::old::BitVector("00110100"));
+  bv2 = bv1.EQU(input1);     REQUIRE(bv2 == emp::old::BitVector("11000100"));
+  bv3 = bv2.EQU(input2);     REQUIRE(bv3 == emp::old::BitVector("00001000"));
+  bv4 = bv3.EQU(input3);     REQUIRE(bv4 == emp::old::BitVector("10100010"));
 
-  bv = bv4.NOT();            REQUIRE(bv == emp::BitVector("01011101"));
+  bv = bv4.NOT();            REQUIRE(bv == emp::old::BitVector("01011101"));
 
 
   // Test Boolean Logic operators.
-  bv.Clear();               REQUIRE(bv == emp::BitVector("00000000"));
-  bv1 = ~bv;                REQUIRE(bv1 == emp::BitVector("11111111"));
+  bv.Clear();               REQUIRE(bv == emp::old::BitVector("00000000"));
+  bv1 = ~bv;                REQUIRE(bv1 == emp::old::BitVector("11111111"));
 
-  bv1 = bv1 & input1;       REQUIRE(bv1 == emp::BitVector("00001111"));
-  bv2 = bv1 & input1;       REQUIRE(bv2 == emp::BitVector("00001111"));
-  bv3 = bv2 & input2;       REQUIRE(bv3 == emp::BitVector("00000011"));
-  bv4 = bv3 & input3;       REQUIRE(bv4 == emp::BitVector("00000001"));
+  bv1 = bv1 & input1;       REQUIRE(bv1 == emp::old::BitVector("00001111"));
+  bv2 = bv1 & input1;       REQUIRE(bv2 == emp::old::BitVector("00001111"));
+  bv3 = bv2 & input2;       REQUIRE(bv3 == emp::old::BitVector("00000011"));
+  bv4 = bv3 & input3;       REQUIRE(bv4 == emp::old::BitVector("00000001"));
 
-  bv1 = bv4 | input1;       REQUIRE(bv1 == emp::BitVector("00001111"));
-  bv2 = bv1 | input1;       REQUIRE(bv2 == emp::BitVector("00001111"));
-  bv3 = bv2 | input3;       REQUIRE(bv3 == emp::BitVector("01011111"));
-  bv4 = bv3 | input2;       REQUIRE(bv4 == emp::BitVector("01111111"));
+  bv1 = bv4 | input1;       REQUIRE(bv1 == emp::old::BitVector("00001111"));
+  bv2 = bv1 | input1;       REQUIRE(bv2 == emp::old::BitVector("00001111"));
+  bv3 = bv2 | input3;       REQUIRE(bv3 == emp::old::BitVector("01011111"));
+  bv4 = bv3 | input2;       REQUIRE(bv4 == emp::old::BitVector("01111111"));
 
-  bv1 = ~(bv4 & input1);    REQUIRE(bv1 == emp::BitVector("11110000"));
-  bv2 = ~(bv1 & input1);    REQUIRE(bv2 == emp::BitVector("11111111"));
-  bv3 = ~(bv2 & input2);    REQUIRE(bv3 == emp::BitVector("11001100"));
-  bv4 = ~(bv3 & input3);    REQUIRE(bv4 == emp::BitVector("10111011"));
+  bv1 = ~(bv4 & input1);    REQUIRE(bv1 == emp::old::BitVector("11110000"));
+  bv2 = ~(bv1 & input1);    REQUIRE(bv2 == emp::old::BitVector("11111111"));
+  bv3 = ~(bv2 & input2);    REQUIRE(bv3 == emp::old::BitVector("11001100"));
+  bv4 = ~(bv3 & input3);    REQUIRE(bv4 == emp::old::BitVector("10111011"));
 
-  bv1 = ~(bv4 | input1);    REQUIRE(bv1 == emp::BitVector("01000000"));
-  bv2 = ~(bv1 | input1);    REQUIRE(bv2 == emp::BitVector("10110000"));
-  bv3 = ~(bv2 | input2);    REQUIRE(bv3 == emp::BitVector("01001100"));
-  bv4 = ~(bv3 | input3);    REQUIRE(bv4 == emp::BitVector("10100010"));
+  bv1 = ~(bv4 | input1);    REQUIRE(bv1 == emp::old::BitVector("01000000"));
+  bv2 = ~(bv1 | input1);    REQUIRE(bv2 == emp::old::BitVector("10110000"));
+  bv3 = ~(bv2 | input2);    REQUIRE(bv3 == emp::old::BitVector("01001100"));
+  bv4 = ~(bv3 | input3);    REQUIRE(bv4 == emp::old::BitVector("10100010"));
 
-  bv1 = bv4 ^ input1;       REQUIRE(bv1 == emp::BitVector("10101101"));
-  bv2 = bv1 ^ input1;       REQUIRE(bv2 == emp::BitVector("10100010"));
-  bv3 = bv2 ^ input2;       REQUIRE(bv3 == emp::BitVector("10010001"));
-  bv4 = bv3 ^ input3;       REQUIRE(bv4 == emp::BitVector("11000100"));
+  bv1 = bv4 ^ input1;       REQUIRE(bv1 == emp::old::BitVector("10101101"));
+  bv2 = bv1 ^ input1;       REQUIRE(bv2 == emp::old::BitVector("10100010"));
+  bv3 = bv2 ^ input2;       REQUIRE(bv3 == emp::old::BitVector("10010001"));
+  bv4 = bv3 ^ input3;       REQUIRE(bv4 == emp::old::BitVector("11000100"));
 
-  bv1 = ~(bv4 ^ input1);    REQUIRE(bv1 == emp::BitVector("00110100"));
-  bv2 = ~(bv1 ^ input1);    REQUIRE(bv2 == emp::BitVector("11000100"));
-  bv3 = ~(bv2 ^ input2);    REQUIRE(bv3 == emp::BitVector("00001000"));
-  bv4 = ~(bv3 ^ input3);    REQUIRE(bv4 == emp::BitVector("10100010"));
+  bv1 = ~(bv4 ^ input1);    REQUIRE(bv1 == emp::old::BitVector("00110100"));
+  bv2 = ~(bv1 ^ input1);    REQUIRE(bv2 == emp::old::BitVector("11000100"));
+  bv3 = ~(bv2 ^ input2);    REQUIRE(bv3 == emp::old::BitVector("00001000"));
+  bv4 = ~(bv3 ^ input3);    REQUIRE(bv4 == emp::old::BitVector("10100010"));
 
-  bv = ~bv4;                REQUIRE(bv == emp::BitVector("01011101"));
+  bv = ~bv4;                REQUIRE(bv == emp::old::BitVector("01011101"));
 
 
   // Test COMPOUND Boolean Logic operators.
-  bv = "11111111";    REQUIRE(bv == emp::BitVector("11111111"));
+  bv = "11111111";    REQUIRE(bv == emp::old::BitVector("11111111"));
 
-  bv &= input1;       REQUIRE(bv == emp::BitVector("00001111"));
-  bv &= input1;       REQUIRE(bv == emp::BitVector("00001111"));
-  bv &= input2;       REQUIRE(bv == emp::BitVector("00000011"));
-  bv &= input3;       REQUIRE(bv == emp::BitVector("00000001"));
+  bv &= input1;       REQUIRE(bv == emp::old::BitVector("00001111"));
+  bv &= input1;       REQUIRE(bv == emp::old::BitVector("00001111"));
+  bv &= input2;       REQUIRE(bv == emp::old::BitVector("00000011"));
+  bv &= input3;       REQUIRE(bv == emp::old::BitVector("00000001"));
 
-  bv |= input1;       REQUIRE(bv == emp::BitVector("00001111"));
-  bv |= input1;       REQUIRE(bv == emp::BitVector("00001111"));
-  bv |= input3;       REQUIRE(bv == emp::BitVector("01011111"));
-  bv |= input2;       REQUIRE(bv == emp::BitVector("01111111"));
+  bv |= input1;       REQUIRE(bv == emp::old::BitVector("00001111"));
+  bv |= input1;       REQUIRE(bv == emp::old::BitVector("00001111"));
+  bv |= input3;       REQUIRE(bv == emp::old::BitVector("01011111"));
+  bv |= input2;       REQUIRE(bv == emp::old::BitVector("01111111"));
 
-  bv ^= input1;       REQUIRE(bv == emp::BitVector("01110000"));
-  bv ^= input1;       REQUIRE(bv == emp::BitVector("01111111"));
-  bv ^= input2;       REQUIRE(bv == emp::BitVector("01001100"));
-  bv ^= input3;       REQUIRE(bv == emp::BitVector("00011001"));
+  bv ^= input1;       REQUIRE(bv == emp::old::BitVector("01110000"));
+  bv ^= input1;       REQUIRE(bv == emp::old::BitVector("01111111"));
+  bv ^= input2;       REQUIRE(bv == emp::old::BitVector("01001100"));
+  bv ^= input3;       REQUIRE(bv == emp::old::BitVector("00011001"));
 
   // Shifting tests.
-  REQUIRE( (bv << 1) == emp::BitVector("00001100"));
-  REQUIRE( (bv << 2) == emp::BitVector("00000110"));
-  REQUIRE( (bv << 3) == emp::BitVector("00000011"));
-  REQUIRE( (bv << 4) == emp::BitVector("00000001"));
+  REQUIRE( (bv << 1) == emp::old::BitVector("00001100"));
+  REQUIRE( (bv << 2) == emp::old::BitVector("00000110"));
+  REQUIRE( (bv << 3) == emp::old::BitVector("00000011"));
+  REQUIRE( (bv << 4) == emp::old::BitVector("00000001"));
 
-  REQUIRE( (bv >> 1) == emp::BitVector("00110010"));
-  REQUIRE( (bv >> 2) == emp::BitVector("01100100"));
-  REQUIRE( (bv >> 3) == emp::BitVector("11001000"));
-  REQUIRE( (bv >> 4) == emp::BitVector("10010000"));
+  REQUIRE( (bv >> 1) == emp::old::BitVector("00110010"));
+  REQUIRE( (bv >> 2) == emp::old::BitVector("01100100"));
+  REQUIRE( (bv >> 3) == emp::old::BitVector("11001000"));
+  REQUIRE( (bv >> 4) == emp::old::BitVector("10010000"));
 
   // Now some tests with bitvectors longer than one field.
-  const emp::BitVector bvl80 =
+  const emp::old::BitVector bvl80 =
     "00110111000101110001011100010111000101110001011100010111000101110001011100010111";
   REQUIRE( bvl80.GetSize() == 80 );
   REQUIRE( bvl80.CountOnes() == 41 );
   REQUIRE( bvl80 << 1 ==
-           emp::BitVector("00011011100010111000101110001011100010111000101110001011100010111000101110001011")
+           emp::old::BitVector("00011011100010111000101110001011100010111000101110001011100010111000101110001011")
          );
   REQUIRE( bvl80 << 2 ==
-           emp::BitVector("00001101110001011100010111000101110001011100010111000101110001011100010111000101")
+           emp::old::BitVector("00001101110001011100010111000101110001011100010111000101110001011100010111000101")
          );
   REQUIRE( bvl80 << 63 ==
-           emp::BitVector("00000000000000000000000000000000000000000000000000000000000000000110111000101110")
+           emp::old::BitVector("00000000000000000000000000000000000000000000000000000000000000000110111000101110")
          );
   REQUIRE( bvl80 << 64 ==
-           emp::BitVector("00000000000000000000000000000000000000000000000000000000000000000011011100010111")
+           emp::old::BitVector("00000000000000000000000000000000000000000000000000000000000000000011011100010111")
          );
   REQUIRE( bvl80 << 65 ==
-           emp::BitVector("00000000000000000000000000000000000000000000000000000000000000000001101110001011")
+           emp::old::BitVector("00000000000000000000000000000000000000000000000000000000000000000001101110001011")
          );
 
   REQUIRE( bvl80 >> 1 ==
-           emp::BitVector("01101110001011100010111000101110001011100010111000101110001011100010111000101110")
+           emp::old::BitVector("01101110001011100010111000101110001011100010111000101110001011100010111000101110")
          );
   REQUIRE( bvl80 >> 2 ==
-           emp::BitVector("11011100010111000101110001011100010111000101110001011100010111000101110001011100")
+           emp::old::BitVector("11011100010111000101110001011100010111000101110001011100010111000101110001011100")
          );
   REQUIRE( bvl80 >> 63 ==
-           emp::BitVector("10001011100010111000000000000000000000000000000000000000000000000000000000000000")
+           emp::old::BitVector("10001011100010111000000000000000000000000000000000000000000000000000000000000000")
          );
   REQUIRE( bvl80 >> 64 ==
-           emp::BitVector("00010111000101110000000000000000000000000000000000000000000000000000000000000000")
+           emp::old::BitVector("00010111000101110000000000000000000000000000000000000000000000000000000000000000")
          );
   REQUIRE( bvl80 >> 65 ==
-           emp::BitVector("00101110001011100000000000000000000000000000000000000000000000000000000000000000")
+           emp::old::BitVector("00101110001011100000000000000000000000000000000000000000000000000000000000000000")
          );
 }
 
 TEST_CASE("10: Test functions that trigger size changes", "[bits]") {
-  emp::BitVector bv(10);
+  emp::old::BitVector bv(10);
   REQUIRE(bv.GetSize() == 10);
   REQUIRE(bv.CountOnes() == 0);
   REQUIRE(bv.CountZeros() == 10);
@@ -901,7 +901,7 @@ TEST_CASE("Test BitVector", "[bits]")
 {
 
   // Constructor
-  emp::BitVector bv(10);
+  emp::old::BitVector bv(10);
 
   // Get Size
   REQUIRE( (bv.GetSize() == 10) );
@@ -914,12 +914,12 @@ TEST_CASE("Test BitVector", "[bits]")
   REQUIRE(!bv.Get(1));
 
   // Assignment operator
-  emp::BitVector bv1(10);
+  emp::old::BitVector bv1(10);
   bv1 = bv;
   REQUIRE(bv1 == bv);
   REQUIRE(bv1.Get(0));
-  emp::BitVector bv20(20);
-  emp::BitVector bv30(30);
+  emp::old::BitVector bv20(20);
+  emp::old::BitVector bv30(30);
   bv20.Set(1);
   REQUIRE(bv20.Get(1));
   bv20 = bv;
@@ -950,7 +950,7 @@ TEST_CASE("Test BitVector", "[bits]")
   REQUIRE((bv >= bv1));
 
   // Set & Get Byte
-  emp::BitVector bv2(32);
+  emp::old::BitVector bv2(32);
   bv2.SetByte(0, 128);
   bv2.SetByte(1, 255);
   REQUIRE((bv2.GetByte(0) == 128));
@@ -976,7 +976,7 @@ TEST_CASE("Test BitVector", "[bits]")
 
   // Prints
   std::stringstream ss;
-  emp::BitVector bv3(8);
+  emp::old::BitVector bv3(8);
   bv3.SetByte(0,255);
   bv3.Print(ss);
   REQUIRE((ss.str() == "11111111"));
@@ -1017,7 +1017,7 @@ TEST_CASE("Test BitVector", "[bits]")
   REQUIRE((ones[1] == 3));
 
   // Larger BitVector
-  emp::BitVector bv4(96);
+  emp::old::BitVector bv4(96);
   bv4.SetByte(1,1);
   bv4.PrintFields(ss);
   REQUIRE(ss.str() == "00000000000000000000000000000000 0000000000000000000000000000000000000000000000000000000100000000");
@@ -1067,7 +1067,7 @@ TEST_CASE("Test BitVector", "[bits]")
 
 
   // Logic operators
-  emp::BitVector bv5(8);
+  emp::old::BitVector bv5(8);
   bv5.SetByte(0,28);
   REQUIRE((bv3.CountOnes() == 8-((~bv3).CountOnes())));
   REQUIRE(((bv3 & bv5).GetByte(0) == 8));
@@ -1089,9 +1089,9 @@ TEST_CASE("Test BitVector", "[bits]")
   REQUIRE((bv3.GetByte(0) == 32));
 
   // Hash
-  emp::BitVector bv_a(2);
+  emp::old::BitVector bv_a(2);
   bv_a.Set(0);
-  emp::BitVector bv_b(2);
+  emp::old::BitVector bv_b(2);
   bv_b.Set(0);
   REQUIRE(bv_a.Hash() == bv_b.Hash());
   bv_b.Set(0, false);
@@ -1122,9 +1122,9 @@ TEST_CASE("Test BitVector", "[bits]")
   REQUIRE(bv_a.NOT_SELF().all());
 
   // EQU
-  emp::BitVector bv_c(3);
+  emp::old::BitVector bv_c(3);
   bv_c.SetByte(0,2);
-  emp::BitVector bv_d(3);
+  emp::old::BitVector bv_d(3);
   bv_d.SetByte(0,2);
   REQUIRE(bv_c.EQU(bv_d).all());
   REQUIRE(bv_c.GetByte(0) == 2);
@@ -1179,12 +1179,12 @@ TEST_CASE("Test BitVector", "[bits]")
   REQUIRE(bv_c[0] == 0);
 
   // GetUInt SetUInt
-  emp::BitVector bv_e(5);
+  emp::old::BitVector bv_e(5);
   bv_e.SetUInt(0, 16);
   REQUIRE(bv_e.GetUInt(0) == 16);
 
   // Shift Left
-  emp::BitVector bv_f(128);
+  emp::old::BitVector bv_f(128);
   bv_f.SetAll();
   REQUIRE(bv_f.all());
   bv_f <<= 127;
@@ -1205,7 +1205,7 @@ TEST_CASE("Test MaskHigh, MaskLow", "[bits]") {
   // #endif
 
   // Test MaskHigh, MaskLow
-  emp::BitVector a(0);
+  emp::old::BitVector a(0);
   a.Insert(0,true, 7);
   REQUIRE(a.Get(0));
   REQUIRE(a.Get(1));
@@ -1224,7 +1224,7 @@ TEST_CASE("Test PopBack, PushBack, Insert, Delete", "[bits]") {
   // #endif
 
   // Pop Back and Push Back
-  emp::BitVector bv_g(0);    // Empty BitVector
+  emp::old::BitVector bv_g(0);    // Empty BitVector
   bv_g.PushBack(true);       // 1
   bv_g.PushBack(true);       // 11
   bv_g.PushBack(false);      // 110
@@ -1272,19 +1272,19 @@ TEST_CASE("Another Test BitVector", "[bits]") {
   // REQUIRE(emp::assert_last_fail == 0);
   // #endif
 
-  emp::BitVector bv10(10);
-  emp::BitVector bv32(32);
-  emp::BitVector bv50(50);
-  emp::BitVector bv64(64);
-  emp::BitVector bv80(80);
+  emp::old::BitVector bv10(10);
+  emp::old::BitVector bv32(32);
+  emp::old::BitVector bv50(50);
+  emp::old::BitVector bv64(64);
+  emp::old::BitVector bv80(80);
 
   bv80[70] = 1;
-  emp::BitVector bv80c(bv80);
+  emp::old::BitVector bv80c(bv80);
 
   bv80 <<= 1;
 
   for (size_t i = 0; i < 75; i += 2) {
-    emp::BitVector shift_vector = bv80 >> i;
+    emp::old::BitVector shift_vector = bv80 >> i;
     REQUIRE((shift_vector.CountOnes() == 1) == (i <= 71));
   }
 
@@ -1305,11 +1305,11 @@ TEST_CASE("Another Test BitVector", "[bits]") {
 TEST_CASE("Test range of BitVector constructors.", "[bits]")
 // test list initializer
 {
-  emp::BitVector bs_empty{0,0,0};
-  emp::BitVector bs_first{1,0,0};
-  emp::BitVector bs_last{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
-  emp::BitVector bs_two{0,0,1,0,0,0,0,0,0,0,1,0,0};
-  emp::BitVector bs_full{1,1,1,1,1,1,1,1};
+  emp::old::BitVector bs_empty{0,0,0};
+  emp::old::BitVector bs_first{1,0,0};
+  emp::old::BitVector bs_last{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
+  emp::old::BitVector bs_two{0,0,1,0,0,0,0,0,0,0,1,0,0};
+  emp::old::BitVector bs_full{1,1,1,1,1,1,1,1};
 
   REQUIRE(bs_empty.CountOnes() == 0);
   REQUIRE(bs_first.CountOnes() == 1);
@@ -1331,7 +1331,7 @@ TEST_CASE("Test range of BitVector constructors.", "[bits]")
 
 //   for (size_t i = 1; i < 32; ++i) {
 
-//     emp::BitVector vec(i);
+//     emp::old::BitVector vec(i);
 //     REQUIRE(emp::assert_last_fail == 0);
 //     vec.SetUInt(0, std::numeric_limits<uint32_t>::max());
 //     REQUIRE(emp::assert_last_fail);
@@ -1341,7 +1341,7 @@ TEST_CASE("Test range of BitVector constructors.", "[bits]")
 
 //   REQUIRE(emp::assert_last_fail == 0);
 
-//   emp::BitVector vec(32);
+//   emp::old::BitVector vec(32);
 //   vec.SetUInt(0, std::numeric_limits<uint32_t>::max());
 
 //   REQUIRE(emp::assert_last_fail == 0);
@@ -1354,8 +1354,8 @@ TEST_CASE("BitVector regression test for #277", "[bits]") {
   // REQUIRE(emp::assert_last_fail == 0);
   // #endif
 
-  emp::BitVector vec1(4);
-  emp::BitVector vec2(4);
+  emp::old::BitVector vec1(4);
+  emp::old::BitVector vec2(4);
 
   for (size_t i = 0; i < 4; ++i) REQUIRE(!vec1[i]);
   for (size_t i = 0; i < 4; ++i) REQUIRE(!vec2[i]);

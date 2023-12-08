@@ -1,18 +1,38 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2019.
+ *  date: 2016-2023.
 */
 /**
  *  @file
  *  @brief A general-purpose, fast lexer.
- *  @note Status: ALPHA
+ *  @note Status: BETA
+ *
+ *  Build a lexer that can convert input strings or streams into a series of provided tokens.
+ *
+ *  Use AddToken(name, regex) to list out the relevant tokens.
+ *   'name' is the unique name for this token.
+ *   'regex' is the regular expression that describes this token.
+ *  It will return a unique ID associated with this lexeme.
+ *
+ *  IgnoreToken(name, regex) uses the same arguments, but is used for tokens that
+ *  should be skipped over.
+ *
+ *  Names and IDs can be recovered later using GetTokenID(name) and GetTokenName(id).
+ *
+ *  Tokens can be retrieved either one at a time with Process(string) or Process(stream),
+ *  which will return the next (non-ignored) token, removing it from the input.
+ *
+ *  Alternatively, an entire series of tokens can be processed with Tokenize().
+ *
+ *  Finally, GetLexeme() can be used to retrieve the lexeme from the most recent token found.
  */
 
 #ifndef EMP_COMPILER_LEXER_HPP_INCLUDE
 #define EMP_COMPILER_LEXER_HPP_INCLUDE
 
 #include <cstdint>
+#include <iostream>
 #include <map>
 #include <stddef.h>
 #include <string>
@@ -35,9 +55,12 @@ namespace emp {
     bool save_lexeme;    ///< Preserve the lexeme for this token?
     bool save_token;     ///< Keep token at all? (Whitespace and comments are often discarded).
 
+    // Default constructor produces an error token.
+    TokenInfo() : name(""), desc("Unable to parse input!"), regex(""),
+                  id(-1), save_lexeme(true), save_token(true) { }
     TokenInfo(const std::string & _name, const std::string & _regex, int _id,
               bool _save_l=true, bool _save_t=true, const std::string & _desc="")
-      : name(_name), desc(_desc), regex(_regex), id(_id), save_lexeme(_save_l), save_token(_save_t) { ; }
+      : name(_name), desc(_desc), regex(_regex), id(_id), save_lexeme(_save_l), save_token(_save_t) { }
     TokenInfo(const TokenInfo &) = default;
     TokenInfo(TokenInfo &&) = default;
     TokenInfo & operator=(const TokenInfo &) = default;
@@ -56,23 +79,92 @@ namespace emp {
 
   /// Information about a token instance from an input stream.
   struct Token {
-    int token_id;        ///< Which type of token is this?
+    int id;              ///< Which type of token is this?
     std::string lexeme;  ///< Sequence matched by this token (or empty if not saved)
     size_t line_id;      ///< Which line did this token start on?
 
-    Token(int id, const std::string & str="", size_t _line=0)
-      : token_id(id), lexeme(str), line_id(_line) { ; }
+    Token(int _id, const std::string & str="", size_t _line=0)
+      : id(_id), lexeme(str), line_id(_line) { ; }
     Token(const Token &) = default;
     Token(Token &&) = default;
     Token & operator=(const Token &) = default;
     Token & operator=(Token &&) = default;
 
     /// Token will automatically convert to its ID if used as an int.
-    operator int() const { return token_id; }
+    operator int() const { return id; }
 
     /// Token will automatically convert to its matched sequence (lexeme) is used as a string.
     operator const std::string &() const { return lexeme; }
   };
+
+  class TokenStream {
+  private:
+    std::string name = "";
+    emp::vector<Token> tokens;
+
+  public:
+    TokenStream(const std::string & in_name) : name(in_name) { }
+    TokenStream(const TokenStream &) = default;
+    TokenStream(TokenStream &&) = default;
+    TokenStream(const emp::vector<Token> & in_tokens, const std::string & in_name)
+    : name(in_name), tokens(in_tokens) { }
+
+    TokenStream & operator=(const TokenStream &) = default;
+    TokenStream & operator=(TokenStream &&) = default;
+
+    class Iterator {
+    private:
+      emp::Ptr<const TokenStream> ts;
+      size_t pos;
+
+    public:
+      Iterator(const Iterator &) = default;
+      Iterator(const TokenStream & in_ts, size_t in_pos) : ts(&in_ts), pos(in_pos) { }
+      Iterator & operator=(const Iterator &) = default;
+
+      const TokenStream & GetTokenStream() const { return *ts; }
+      size_t GetIndex() const { return pos; }
+      emp::Ptr<const Token> ToPtr() const { return ts->GetPtr(pos); }
+
+      Token operator*() const { return ts->tokens[pos]; }
+      const Token * operator->() const { return &(ts->tokens[pos]); }
+
+      bool operator==(const Iterator & in) const { return ToPtr() == in.ToPtr(); }
+      bool operator!=(const Iterator & in) const { return ToPtr() != in.ToPtr(); }
+      bool operator< (const Iterator & in) const { return ToPtr() <  in.ToPtr(); }
+      bool operator<=(const Iterator & in) const { return ToPtr() <= in.ToPtr(); }
+      bool operator> (const Iterator & in) const { return ToPtr() >  in.ToPtr(); }
+      bool operator>=(const Iterator & in) const { return ToPtr() >= in.ToPtr(); }
+
+      Iterator & operator++() { ++pos; return *this; }
+      Iterator operator++(int) { Iterator old(*this); ++pos; return old; }
+      Iterator & operator--() { --pos; return *this; }
+      Iterator operator--(int) { Iterator old(*this); --pos; return old; }
+
+      bool IsValid() const { return pos < ts->size(); }
+      bool AtEnd() const { return pos == ts->size(); }
+
+      operator bool() const { return IsValid(); }
+    };
+
+    size_t size() const { return tokens.size(); }
+    const Token & Get(size_t pos) const { return tokens[pos]; }
+    emp::Ptr<const Token> GetPtr(size_t pos) const { return &(tokens.data()[pos]); }
+    const std::string & GetName() const { return name; }
+    Iterator begin() const { return Iterator(*this, 0); }
+    Iterator end() const { return Iterator(*this, tokens.size()); }
+    const Token & back() const { return tokens.back(); }
+
+    void push_back(const Token & in) { tokens.push_back(in); }
+
+    void Print(std::ostream & os=std::cout) const {
+      for (auto x : tokens) {
+        os << " [" << x.lexeme << "]";
+      }
+      os << std::endl;
+    }
+  };
+
 
   /// A lexer with a set of token types (and associated regular expressions)
   class Lexer {
@@ -80,28 +172,47 @@ namespace emp {
     static constexpr int MAX_ID = 255;      ///< IDs count down so that first ones have priority.
     static constexpr int ERROR_ID = -1;     ///< Code for unknown token ID.
 
-    emp::vector<TokenInfo> token_set;       ///< List of all active tokens.
+    emp::vector<TokenInfo> token_set;       ///< List of all active tokens types.
     emp::map<std::string, int> token_map;   ///< Map of token names to id.
     int cur_token_id = MAX_ID;              ///< Which ID should the next new token get?
     mutable bool generate_lexer = false;    ///< Do we need to regenerate the lexer?
     mutable DFA lexer_dfa;                  ///< Table driven lexer implementation.
-    std::string lexeme;                     ///< Current state of lexeme being generated.
+    mutable std::string lexeme;             ///< Current state of lexeme being generated.
 
-    const TokenInfo ERROR_TOKEN{"", "", ERROR_ID, true, true, "Unable to parse input!"};
+    static const TokenInfo & ERROR_TOKEN() {
+      static const TokenInfo token;
+      return token;
+    }
 
   public:
-    Lexer() { ; }
-    ~Lexer() { ; }
+    Lexer() = default;
+    Lexer(const Lexer &) = default;
+    Lexer(Lexer &&) = default;
+    ~Lexer() = default;
+
+    Lexer & operator=(const Lexer &) = default;
+    Lexer & operator=(Lexer &&) = default;
 
     /// How many types of tokens can be identified in this Lexer?
     size_t GetNumTokens() const { return token_set.size(); }
+
+    void Reset() {
+      token_set.resize(0);
+      token_map.clear();
+      cur_token_id = MAX_ID;
+      generate_lexer = false;
+    }
 
     bool TokenOK(int id) const { return id >= 0 && id < cur_token_id; }
 
     /// Add a new token, specified by a name and the regex used to identify it.
     /// Note that token ids count down with highest IDs having priority.
-    int AddToken(const std::string & name, const std::string & regex,
-                    bool save_lexeme=true, bool save_token=true, const std::string & desc="") {
+    int AddToken(const std::string & name,
+                 const std::string & regex,
+                 bool save_lexeme = true,
+                 bool save_token = true,
+                 const std::string & desc = "")
+    {
       int id = cur_token_id--;                // Grab the next available token id.
       generate_lexer = true;                  // Indicate the the lexer DFA needs to be rebuilt.
       token_set.emplace_back( name, regex, id, save_lexeme, save_token, desc );
@@ -127,7 +238,7 @@ namespace emp {
 
     /// Get the full information about a token (you provide the id)
     const TokenInfo & GetTokenInfo(int id) const {
-      if (id > MAX_ID || id <= cur_token_id) return ERROR_TOKEN;
+      if (id > MAX_ID || id <= cur_token_id) return ERROR_TOKEN();
       return token_set[(size_t)(MAX_ID - id)];
     }
 
@@ -161,7 +272,7 @@ namespace emp {
     /// longest one we can find.)  Every time we do hit a valid lexeme, store it as the current
     /// "best" and keep going.  Once we hit a point where no other valid lexemes are possible,
     /// stop and return the best we've found so far.
-    Token Process(std::istream & is) {
+    Token Process(std::istream & is) const {
       // If we still need to generate the DFA for the lexer, do so.
       if (generate_lexer) Generate();
 
@@ -174,7 +285,7 @@ namespace emp {
       lexeme.resize(0);
 
       // Keep looking as long as:
-      // 1: We may still be able to contine the current lexeme.
+      // 1: We may still be able to continue the current lexeme.
       // 2: We have not entered an invalid state.
       // 3: Our input stream has more symbols.
       while (cur_stop >= 0 && cur_state >= 0 && is) {
@@ -202,8 +313,8 @@ namespace emp {
       return { best_stop, lexeme };
     }
 
-    /// Shortcut to process a string rather than a stream.
-    Token Process(std::string & in_str) {
+    /// Shortcut to process a string rather than a stream, chopping off one token each time.
+    Token Process(std::string & in_str) const {
       std::stringstream ss;
       ss << in_str;
       auto out_val = Process(ss);
@@ -211,8 +322,16 @@ namespace emp {
       return out_val;
     }
 
+    /// Shortcut to just get a single token.
+    Token ToToken(std::string_view in_str) const {
+      std::stringstream ss;
+      ss << in_str;
+      auto out_val = Process(ss);
+      return out_val;
+    }
+
     /// Turn an input stream of text into a vector of tokens.
-    emp::vector<Token> Tokenize(std::istream & is) {
+    TokenStream Tokenize(std::istream & is, const std::string & name="in_stream") const {
       emp::vector<Token> out_tokens;
       size_t cur_line = 1;
       emp::Token token = Process(is);
@@ -222,28 +341,30 @@ namespace emp {
         if (GetSaveToken(token)) out_tokens.push_back(token);
         token = Process(is);
       }
-      return out_tokens;
+      return TokenStream{out_tokens, name};
     }
 
     /// Turn an input string into a vector of tokens.
-    emp::vector<Token> Tokenize(const std::string & str) {
+    TokenStream Tokenize(std::string_view str, const std::string & name="in_view") const {
       std::stringstream ss;
       ss << str;
-      return Tokenize(ss);
+      return Tokenize(ss, name);
     }
 
     /// Turn a vector of strings into a vector of tokens.
-    emp::vector<Token> Tokenize(const emp::vector<std::string> & str_v) {
+    TokenStream Tokenize(const emp::vector<std::string> & str_v,
+                         const std::string & name="in_string vector") const
+    {
       std::stringstream ss;
       for (auto & str : str_v) {
-        ss << str;
+        ss << str << '\n';
       }
 
-      return Tokenize(ss);
+      return Tokenize(ss, name);
     }
 
     /// Get the lexeme associated with the last token identified.
-    const std::string & GetLexeme() { return lexeme; }
+    const std::string & GetLexeme() const { return lexeme; }
 
     /// Print the full information about this lexer (for debugging)
     void Print(std::ostream & os=std::cout) const {
@@ -253,7 +374,7 @@ namespace emp {
     }
 
     /// Try out the lexer on a string and demonstrate how it's tokenized.
-    void DebugString(std::string test_string) {
+    void DebugString(std::string test_string) const {
       std::stringstream ss;
       ss << test_string;
 

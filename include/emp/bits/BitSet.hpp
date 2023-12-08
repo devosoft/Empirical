@@ -17,10 +17,12 @@
 
 #include "BitArray.hpp"
 
-namespace emp {
+#include "Bits.hpp"  // New version of BitSet is in Bits.hpp
+
+namespace emp::old {
 
   template <size_t NUM_BITS>
-  using BitSet = emp::BitArray<NUM_BITS, false>;
+  using BitSet = emp::old::BitArray<NUM_BITS, false>;
 
 }
 

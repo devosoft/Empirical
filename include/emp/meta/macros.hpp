@@ -90,7 +90,7 @@
 
 /// The below values allow you to have EMP_FAKE_ARG or EMP_FAKE_2ARG as a single argument.
 /// If you prepend it with EMP_CONVERT it will trigger a conversion.  If you prepend anything
-/// else similarly, it wil NOT triggera a conversion (and stay a single argument)
+/// else similarly, it wil NOT trigger a conversion (and stay a single argument)
 #define EMP_CONVERT_ARG_EMP_FAKE_ARG(A) A
 #define EMP_CONVERT_ARG_EMP_FAKE_2ARG(A) ~, A
 
@@ -204,7 +204,7 @@
 /// @cond MACROS
 // S = Size of each pack
 // N = Number of packs
-// P = Pack representatio of number of packs
+// P = Pack representation of number of packs
 #define EMP_ARGS_TO_PACKS_impl(S, N, ...) EMP_ARGS_TO_PACKS_implB(S, EMP_DEC_TO_PACK(N), __VA_ARGS)
 #define EMP_ARGS_TO_PACKS_implB(S, P, ...) @CAO
 

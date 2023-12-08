@@ -22,6 +22,7 @@
 #include <cstring>
 #include <initializer_list>
 #include <iostream>
+#include <span>
 #include <stddef.h>
 
 #include "../base/assert.hpp"
@@ -31,12 +32,13 @@
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
 #include "../meta/type_traits.hpp"
-#include "../polyfill/span.hpp"
 
 #include "_bitset_helpers.hpp"
 #include "bitset_utils.hpp"
 
-namespace emp {
+#include "Bits.hpp"  // New version of BitArray is in Bits.hpp
+
+namespace emp::old {
 
   ///  A fixed-sized (but arbitrarily large) array of bits, and optimizes operations on those bits
   ///  to be as fast as possible.
@@ -173,16 +175,16 @@ namespace emp {
     ~BitArray() = default;
 
     /// Assignment operator (no separate move operator since no resources to move...)
-    BitArray & operator=(const this_t & in_bits) noexcept { return Copy<NUM_FIELDS>(in_bits.bits); }
+    BitArray & operator=(const this_t & in_bits) & noexcept { return Copy<NUM_FIELDS>(in_bits.bits); }
 
     /// Assignment operator from a std::bitset.
-    BitArray & operator=(const std::bitset<NUM_BITS> & bitset);
+    BitArray & operator=(const std::bitset<NUM_BITS> & bitset) &;
 
     /// Assignment operator from a string of '0's and '1's.
-    BitArray & operator=(const std::string & bitstring);
+    BitArray & operator=(const std::string & bitstring) &;
 
     /// Assignment operator from a literal string of '0's and '1's.
-    BitArray & operator=(const char * bitstring) { return operator=(std::string(bitstring)); }
+    BitArray & operator=(const char * bitstring) & { return operator=(std::string(bitstring)); }
 
     /// Assignment from another BitArray of a different size.
     template <size_t FROM_BITS, bool FROM_LEFT>
@@ -1004,7 +1006,7 @@ namespace emp {
   // Assignment operator from a std::bitset.
   template <size_t NUM_BITS, bool ZERO_LEFT>
   BitArray<NUM_BITS,ZERO_LEFT> &
-  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) {
+  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) & {
     for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);
     return *this;
   }
@@ -1012,7 +1014,7 @@ namespace emp {
   // Assignment operator from a string of '0's and '1's.
   template <size_t NUM_BITS, bool ZERO_LEFT>
   BitArray<NUM_BITS,ZERO_LEFT> &
-  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::string & bitstring) {
+  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::string & bitstring) & {
     emp_assert(bitstring.size() <= NUM_BITS);
     Clear();
     if constexpr (ZERO_LEFT) {
@@ -1033,7 +1035,7 @@ namespace emp {
     const size_t from_bit
   ) {
     // Only check for same-ness if the two types are the same.
-    if constexpr (FROM_BITS == NUM_BITS) emp_assert(&from_array != this);
+    if constexpr (FROM_BITS == NUM_BITS) { emp_assert(&from_array != this); }
 
     emp_assert(from_bit < FROM_BITS);
 
@@ -1096,7 +1098,7 @@ namespace emp {
 
   template <size_t NUM_BITS, bool ZERO_LEFT>
   bool BitArray<NUM_BITS,ZERO_LEFT>::Get(size_t index) const {
-    emp_assert(index >= 0 && index < NUM_BITS);
+    emp_assert(index < NUM_BITS);
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
     return (bits[field_id] & (((field_t)1U) << pos_id)) != 0;
@@ -1128,7 +1130,7 @@ namespace emp {
   // Flip a single bit
   template <size_t NUM_BITS, bool ZERO_LEFT>
   BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Toggle(size_t index) {
-    emp_assert(index >= 0 && index < NUM_BITS);
+    emp_assert(index < NUM_BITS);
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
     const field_t pos_mask = FIELD_1 << pos_id;
@@ -2090,9 +2092,9 @@ namespace emp {
 namespace std
 {
     template <size_t N, bool ZERO_LEFT>
-    struct hash<emp::BitArray<N, ZERO_LEFT>>
+    struct hash<emp::old::BitArray<N, ZERO_LEFT>>
     {
-        size_t operator()( const emp::BitArray<N,ZERO_LEFT> & bs ) const noexcept
+        size_t operator()( const emp::old::BitArray<N,ZERO_LEFT> & bs ) const noexcept
         {
           return bs.Hash();
         }
