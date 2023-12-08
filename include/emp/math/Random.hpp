@@ -6,7 +6,7 @@
 /**
  *  @file
  *  @brief A versatile and non-patterned pseudo-random-number generator.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  */
 
 #ifndef EMP_MATH_RANDOM_HPP_INCLUDE

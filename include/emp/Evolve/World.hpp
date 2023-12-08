@@ -15,8 +15,6 @@
  *        whether or not they also affect injected organisms.  (Right now they always do!!)
  *  @todo We should Specialize World so that ANOTHER world can be used as an ORG, with proper
  *        delegation to facilitate demes, pools, islands, etc.
- *  @todo We should be able to have any number of systematics managers, based on various type_trait
- *        information a that we want to track.
  *  @todo Add a signal for DoBirth() for when a birth fails.
  *  @todo Add a signal for population Reset() (and possibly Clear?)
  *  @todo Add a feature to maintain population sorted by each phenotypic trait.  This will allow
@@ -29,6 +27,7 @@
 
 #include <functional>
 #include <map>
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../base/Ptr.hpp"
@@ -368,8 +367,8 @@ namespace emp {
       return *(pop[id]);
     }
 
-    /// Retrieve a const reference to the organsim as the specified x,y coordinates.
-    /// @CAO: Technically, we should set this up with any number of coordinates.
+    /// Retrieve a const reference to the organism as the specified x,y coordinates.
+    // @CAO: Technically, we should set this up with any number of coordinates.
     ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*GetWidth()); }
 
     /// Retrive a pointer to the contents of a specified cell; will be nullptr if the cell is

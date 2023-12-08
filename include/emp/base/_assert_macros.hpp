@@ -6,7 +6,7 @@
 /**
  *  @file
  *  @brief Helper macros for building proper assert commands.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  */
 

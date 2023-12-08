@@ -6,7 +6,7 @@
 /**
  *  @file
  *  @brief A more dynamic replacement for standard library asserts.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *  A replacement for the system-level assert.h, called "emp_assert"
  *  Added functionality:

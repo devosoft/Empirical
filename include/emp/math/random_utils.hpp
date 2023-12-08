@@ -6,7 +6,7 @@
 /**
  *  @file
  *  @brief Helper functions for emp::Random for common random tasks.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  */
 
 #ifndef EMP_MATH_RANDOM_UTILS_HPP_INCLUDE

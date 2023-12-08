@@ -6,7 +6,7 @@
 /**
  *  @file
  *  @brief Generally useful macros that can perform cools tricks.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *
  *  Generally useful macros that can perform cools tricks.  As with all macros, use only

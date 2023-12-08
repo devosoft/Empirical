@@ -197,12 +197,12 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: devosoft/empirical
           tag_with_ref: true
-      - name: Push to GHCR
+      - name: Push to ghcr.io
         uses: docker/build-push-action@v1
         with:
           context: .
           push: true
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          repository: devosoft/empirical
+          repository: ghcr.io/devosoft/empirical
           tag_with_ref: true

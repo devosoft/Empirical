@@ -6,7 +6,7 @@
 /**
  *  @file
  *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *  @note Compile with -O3 and -msse4.2 for fast bit counting.
  *
