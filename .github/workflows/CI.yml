@@ -187,6 +187,9 @@ jobs:
   deploy-container:
     name: Deploy to DockerHub and ghcr.io
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
     if: github.ref == 'refs/heads/master'
     needs:
       - tidy
@@ -207,12 +210,16 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: devosoft/empirical
           tag_with_ref: true
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push to ghcr.io
         uses: docker/build-push-action@v1
         with:
           context: .
           push: true
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
           repository: ghcr.io/devosoft/empirical
           tag_with_ref: true
