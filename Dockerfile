@@ -23,26 +23,31 @@ RUN \
 # xvfb nonsense adapted from https://github.com/samgiles/docker-xvfb
 # remove -backports, -updates, -proposed, -security repositories
 # looks like we have to grab libxxhash0 from -updates now
+# use aptitude to fix intermittent install failure with apt-get
 RUN \
   apt-get update -y \
     && \
-  apt-get install --no-install-recommends libxxhash0 \
+  apt-get install -y aptitude \
     && \
-  apt-get clean \
+  aptitude update -y \
+    && \
+  aptitude install --without-recommends libxxhash0 \
+    && \
+  aptitude clean \
     && \
   rm -rf /var/lib/apt/lists/* \
     && \
-  apt-get update -y \
+  aptitude update -y \
     && \
-  apt-get install -y software-properties-common \
+  aptitude install -y software-properties-common \
     && \
   add-apt-repository -y ppa:ubuntu-toolchain-r/test \
     && \
   add-apt-repository -y ppa:deadsnakes/ppa \
     && \
-  apt-get update -y \
+  aptitude update -y \
     && \
-  apt-get install --no-install-recommends --allow-downgrades -y \
+  aptitude install --without-recommends --allow-downgrades -y \
     build-essential \
     dpkg-dev \
     g++-11 \
