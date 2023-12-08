@@ -7,6 +7,15 @@
  *  @file
  */
 
+#include <iostream>
+#include <string>
+#include <string_view>
+
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
+#include "emp/tools/String.hpp"
+
+
 TEST_CASE("Test String Constructors", "[tools]")
 {
   const emp::String empty_str;
