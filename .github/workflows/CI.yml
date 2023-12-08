@@ -24,13 +24,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # sometimes checkout action doesn't result in clean directory?
+          ref: ${{ github.event.pull_request.head.sha }}
           submodules: 'recursive'
-      # sometimes checkout action doesn't result in clean directory?
-      - run: |
-          git status --ignored
-          git clean -fxd .
-          git stash --all
-          git status --ignored
+      - run: git status --ignored
       - run: brew install coreutils findutils gnu-sed gawk grep rename sphinx-doc
       # adapted from https://stackoverflow.com/a/42878119
       - run: brew link sphinx-doc --force
