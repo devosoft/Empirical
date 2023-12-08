@@ -185,6 +185,8 @@ RUN \
     && \
   python3.10 -m pip install wheel==0.30.0 six==1.16.0 \
     && \
+  python3.10 -m pip install -r /opt/Empirical/third-party/requirements.txt \
+    && \
   python3.10 -m pip install -r /opt/Empirical/doc/requirements.txt \
     && \
   echo "installed documentation build requirements"
@@ -265,13 +267,6 @@ RUN \
   yarn install \
   && \
   echo "installed karma-firefox-launcher"
-
-# @mmore500 10-2021: python3 -m pip fixes UnicodeDecodeError
-# when installing charset-normalizer from github
-RUN \
-  python3 -m pip install -r /opt/Empirical/third-party/requirements.txt \
-    && \
-  echo "installed documentation build requirements"
 
 # Perform any further action as an unprivileged user.
 # adapted from https://stackoverflow.com/a/27703359
