@@ -176,9 +176,9 @@ doctest:
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
-coverage:
-	$(SPHINXBUILD) -b coverage $(ALLSPHINXOPTS) $(BUILDDIR)/coverage
-	python3 -m coverxygen --xml-dir doxyoutput/xml --src-dir .. --format json-summary --output $(BUILDDIR)/doc-coverage.json
+coverage: doxygen/xml
+	mkdir -p $(BUILDDIR)
+	python3 -m coverxygen --xml-dir doxygen/xml --src-dir .. --format json-summary --output $(BUILDDIR)/doc-coverage.json
 	@echo "Testing of coverage in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doc-coverage.json."
 
@@ -195,5 +195,8 @@ pseudoxml:
 .PHONY: help Makefile clean
 
 clean:
-	rm -rf doxyoutput/ api/
+	rm -rf doxygen/ api/
 	@$(SPHINXBUILD) -M clean "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+doxygen/xml:
+	cd .. && doxygen
