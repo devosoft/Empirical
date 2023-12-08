@@ -233,7 +233,8 @@ A {cpp:class}`Systematics` manager object maintains the following information (p
 
 ### Phylogeny metrics
 
-Many different metrics can be used to quantify th topology of a phylogeny. For more information, see {cite:p}`winterPhylogeneticDiversityNature2013,tuckerGuidePhylogeneticMetrics2017,dolsonInterpretingTapeLife2020`.
+Many different metrics can be used to quantify th topology of a phylogeny.
+For more information, see {cite:p}`winterPhylogeneticDiversityNature2013,tuckerGuidePhylogeneticMetrics2017,dolsonInterpretingTapeLife2020`.
 
 The Empirical systematics manager can calculate
 
