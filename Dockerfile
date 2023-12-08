@@ -100,7 +100,7 @@ RUN \
   && \
   update-alternatives --set python3 /usr/bin/python3.10 \
   && \
-  update-alternatives --set python /usr/bin/python3.10
+  ln -s /usr/bin/python3.10 /usr/bin/python
 
 RUN \
   echo $' \n\
