@@ -169,6 +169,9 @@ jobs:
   deploy-container:
     name: Deploy to DockerHub and ghcr.io
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
     if: github.ref == 'refs/heads/master'
     needs:
       - tidy
