@@ -976,6 +976,10 @@ namespace emp {
     return Ptr<T>(ptr, true);
   }
 
+  /// Test if we have a Ptr type.
+  template <typename T> struct is_Ptr : std::false_type {};
+  template <typename T> struct is_Ptr<Ptr<T>> : std::true_type {};
+
   /// Copy an object pointed to and return a Ptr to the copy.
   template <typename T>
   [[nodiscard]] Ptr<T> CopyPtr(Ptr<T> in) { return NewPtr<T>(*in); }
