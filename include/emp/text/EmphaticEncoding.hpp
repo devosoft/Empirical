@@ -29,9 +29,13 @@ namespace emp {
       SetupStyleTags("code",        "``", "``");
       SetupStyleTags("italic",      "`/", "`/");
       SetupStyleTags("strike",      "`~", "`~");
-      SetupStyleTags("subscript",   "~.", "~.");
+      SetupStyleTags("subscript",   "`.", "`.");
       SetupStyleTags("superscript", "`^", "`^");
       SetupStyleTags("underline",   "`_", "`_");
+      SetupStyleTags("center",      "`=", "`=");
+      SetupStyleTags("justify",     "`|", "`|");
+      SetupStyleTags("ljustify",    "`<", "`<");
+      SetupStyleTags("rjustify",    "`>", "`>");
       SetupStyleTags("header:1",    "`#", "`#");
       SetupStyleTags("header:2",    "`##", "`##");
       SetupStyleTags("header:3",    "`###", "`###");
@@ -46,7 +50,7 @@ namespace emp {
       SetupReplaceTag("`-",  ' ', "bullet");
       SetupReplaceTag("`+",  ' ', "ordered");
       SetupReplaceTag("`>",  ' ', "indent");
-      SetupReplaceTag("`\"",  ' ', "blockquote");
+      SetupReplaceTag("`\"", ' ', "blockquote");
 
       // tag_map['|'] = "continue";  // Keep previous lines setup (for set of full-line tags)
 
