@@ -63,21 +63,24 @@ namespace emp {
     }
 
   public:
-    SerialPod(std::ostream & os) : stream_ptr(&os) { ; }
-    SerialPod(std::ostream & _os, std::istream & _is) : os(&_os), is(&_is) { ; }
-    SerialPod(std::iostream & _ios) : SerialPod(_ios, _ios) { ; }
-
-    bool IsLoad() const { return std::holds_alternative<is_ptr>(stream_ptr); }
-    bool IsSave() const { return std::holds_alternative<os_ptr>(stream_ptr); }
-
-    // Move constructor
-    SerialPod(SerialPod && rhs) : os(rhs.os), is(rhs.is), own_os(rhs.own_os), own_is(rhs.own_is) {
-      rhs.own_os = false; rhs.own_is=false;
+    SerialPod(std::ostream & os) : stream_ptr(emp::ToPtr(&os)) { ; }
+    SerialPod(std::istream & is) : stream_ptr(emp::ToPtr(&is)) { ; }
+    SerialPod(std::iostream & ios, bool is_save) {
+      if (is_save) stream_ptr = emp::ToPtr<std::ostream>(&ios);
+      else stream_ptr = emp::ToPtr<std::istream>(&ios);
     }
+
+    /// Move constructor
+    SerialPod(SerialPod && rhs) : stream_ptr(rhs.stream_ptr), own_ptr(rhs.own_ptr) {
+      rhs.own_ptr = false;
+    }
+
+    /// Move operator
     SerialPod & operator=(SerialPod && rhs) {
       ClearData();
-      os = rhs.os;  is = rhs.is;  own_os = rhs.own_os;  own_is = rhs.own_is;
-      rhs.own_os = false; rhs.own_is=false;
+      stream_ptr = rhs.stream_ptr;
+      own_ptr = rhs.own_ptr;
+      rhs.own_ptr = false;
       return *this;
     }
 
@@ -87,8 +90,8 @@ namespace emp {
 
     ~SerialPod() { ClearData(); }
 
-    std::ostream & OStream() { return *os; }
-    std::istream & IStream() { return *is; }
+    bool IsLoad() const { return std::holds_alternative<is_ptr>(stream_ptr); }
+    bool IsSave() const { return std::holds_alternative<os_ptr>(stream_ptr); }
   };
 
 
