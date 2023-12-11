@@ -1,12 +1,13 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021.
- *
- *  @file _emscripten_error_trigger.hpp
+ *  @file
  *  @brief Terminating error trigger implementation.
  *  @note For internal use.
- *  @TODO Reflect error message to browser (e.g., as an alert)
+ *  @todo Reflect error message to browser (e.g., as an alert)
  */
 
 #ifndef EMP_BASE__EMSCRIPTEN_ERROR_TRIGGER_HPP_INCLUDE

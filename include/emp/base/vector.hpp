@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2019.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019.
- *
- *  @file vector.hpp
+ *  @file
  *  @brief A drop-in wrapper for std::vector; adds on bounds checking in debug mode.
  *  @note Status: BETA
  *
@@ -287,8 +288,13 @@ namespace emp {
   };
 
   /// Build a specialized debug wrapper for emp::vector<bool>
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename... Ts>
   class vector<bool, Ts...> : public std::vector<bool,Ts...> {
+  #else
+  template <typename t>
+  class vector<bool> {
+  #endif
   private:
     using this_t = emp::vector<bool,Ts...>;
     using stdv_t = std::vector<bool,Ts...>;

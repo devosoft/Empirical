@@ -1,11 +1,13 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020-23
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020-23.
- *
- *  @file QueueCache.hpp
+ *  @file
  *  @brief A simple implementation of a Least-Recently Used Cache.
- *    It orders elements by access time and removes the stalest ones in case maximum capacity is reached.
+ *    It orders elements by access time and removes the stalest ones in case
+ *    maximum capacity is reached.
  */
 
 #ifndef EMP_DATASTRUCTS_QUEUECACHE_HPP_INCLUDE
@@ -43,6 +45,7 @@
       // maximum number of elements the cache can hold
       size_t capacity;
 
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
       // Put the iterator at the beginning of the list, and returns its value
       // @param it Iterator to element to update
       // @return Reference to value of updated element
@@ -55,6 +58,7 @@
         );
         return it->second;
       }
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
 
       // Shrink cache to its capacity by removing elements at the end of it
       void Shrink() {

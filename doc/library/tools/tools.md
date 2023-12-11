@@ -1,33 +1,12 @@
 # Other Tools
 
-## Timing Functions
+## API
 
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
 ```{eval-rst}
-.. doxygenfile:: emp/tools/timing.hpp
-  :project: Empirical
-  :no-link:
-```
+.. toctree::
+   :glob:
 
-## Branch and Bound Solution States
-
-```{eval-rst}
-.. doxygenfile:: emp/tools/SolveState.hpp
-  :project: Empirical
-  :no-link:
-```
-
-## String Utilities
-
-```{eval-rst}
-.. doxygenfile:: emp/tools/string_utils.hpp
-  :project: Empirical
-  :no-link:
-```
-
-## Type Tracker
-
-```{eval-rst}
-.. doxygenfile:: emp/tools/TypeTracker.hpp
-  :project: Empirical
-  :no-link:
+   api/*
 ```

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
- *
- *  @file TypePack.hpp
+ *  @file
  *  @brief A set of types that can be manipulated at compile time (good for metaprogramming)
  *
  *  TypePacks are static structures that provide a large set of mechanisms to access and adjust

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file Point2D.hpp
+ *  @file
  *  @brief A simple class to track value pairs of any kind, optimized for points in 2D Space.
  *
  * @note For maximal efficiency, prefer SquareMagnitude() and SquareDistance()
@@ -108,6 +109,7 @@ namespace emp {
 
 }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
   // Overload ostream to work with points.
   template <typename TYPE> std::ostream & operator<<(std::ostream & os,
@@ -115,5 +117,6 @@ namespace std {
     return os << "(" << point.GetX() << "," << point.GetY() << ")";
   }
 }
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_GEOMETRY_POINT2D_HPP_INCLUDE

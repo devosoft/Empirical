@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file World.cpp
+ *  @file
  */
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
@@ -19,7 +20,7 @@
 #include "emp/math/Random.hpp"
 #include "emp/tools/string_utils.hpp"
 
-// constexpr size_t K = 3;
+constexpr size_t K = 3;
 constexpr size_t N = 40;
 
 using BitOrg = emp::BitSet<N>;

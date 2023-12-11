@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
- *
- *  @file Signal.hpp
+ *  @file
  *  @brief Allow functions to be bundled (as Actions) and triggered enmasse.
  *  @note Status: Beta
  *
@@ -77,12 +78,13 @@ namespace emp {
     operator bool() { return key_id > 0; }
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Forward declarations.
   class SignalBase;     // ...for pointers to signals.
   class SignalManager;  // ...for setting up as friend.
 
   // Mechanisms for Signals to report to a manager.
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+
   namespace internal {
     struct SignalManager_Base {
       virtual void NotifyConstruct(SignalBase * sig_ptr) = 0;
@@ -361,6 +363,7 @@ namespace emp {
 
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template<typename... ARGS>
   inline void SignalBase::BaseTrigger(ARGS... args) {
     // Make sure this base class is really of the correct derived type (but do so in an
@@ -375,7 +378,7 @@ namespace emp {
     emp_assert(dynamic_cast< Signal<void(ARGS...)> * >(this));
     return ((Signal<void(ARGS...)> *) this)->AddAction(in_fun);
   }
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 
 #endif // #ifndef EMP_CONTROL_SIGNAL_HPP_INCLUDE

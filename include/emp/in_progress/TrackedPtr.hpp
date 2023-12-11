@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022.
- *
- *  @file TrackedPtr.hpp
+ *  @file
  *  @brief Similar to Ptr, but memory is tracked and managed elsewhere, such as smart pointers.
  *  @note Status: ALPHA
  *

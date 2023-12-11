@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2018.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018.
- *
- *  @file init.hpp
+ *  @file
  *  @brief Define Initialize() and other functions to set up Empirical to build Emscripten projects.
  *
  * Init.hpp should always be included if you are compiling Empirical's web tools with Emscripten. It
@@ -232,12 +233,6 @@ namespace emp {
 }
 
 #endif
-
-#else // Let doxygen document a non-confusing version of Live
-
-/// Take a function or variable and set it up so that it can update each time a text box is redrawn.
-template <typename T>
-std::function<std::string()> emp::Live(T && val) {;}
 
 #endif
 

@@ -1,10 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018-2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
- *
- *  @file SystematicsAnalysis.hpp
+ *  @file
  *  @brief TODO.
+ *
  */
 
 #ifndef EMP_EVOLVE_SYSTEMATICSANALYSIS_HPP_INCLUDE
@@ -12,29 +14,24 @@
 
 #include "../base/Ptr.hpp"
 
-// Mutation info functions. Assumes each taxon has a struct containing an unordered map
-// with keys that are strings indicating types of mutations and keys that are numbers
-// indicating the number of that type of mutation that occurred to make this taxon from
-// the parent.
-
 namespace emp {
 
   /// @returns the taxon with the highest fitness out of any active taxon
   /// in the given systematics manager.
+  /// @tparam systematics_t The type of the systematics manager containing the phylogeny to analyze.
   /// @param s the systematics manager to search in. Must have more than 0 active taxa.
   template<typename systematics_t>
   Ptr<typename systematics_t::taxon_t> FindDominant(systematics_t & s) {
-    emp_assert(s.GetNumActive() > 0 && "Trying to call FindDominant on empty population");
-    double best = (*(s.GetActive().begin()))->GetData().GetFitness();
-    Ptr<typename systematics_t::taxon_t> best_tax = (*(s.GetActive().begin()));
+    double best = -999999;
+    Ptr<typename systematics_t::taxon_t> best_tax = nullptr;
     for (Ptr<typename systematics_t::taxon_t> tax : s.GetActive()) {
       double f = tax->GetData().GetFitness();
-        if (f > best) {
-          best = f;
-            best_tax = tax;
-          }
+      if (f > best) {
+        best = f;
+        best_tax = tax;
       }
-      return best_tax;
+    }
+    return best_tax;
   }
 
   /// Returns the total number of ancestor taxa in \c taxon 's lineage.
@@ -56,9 +53,13 @@ namespace emp {
   /// occurred along \c taxon 's lineage. (Different from CountMuts in
   /// that CountMuts sums them whereas CountMutSteps would count two
   /// simultaneous mutations of the same type as one event)
+  /// Assumes each taxon has a struct containing an unordered map
+  /// with keys that are strings indicating types of mutations and keys that are numbers
+  /// indicating the number of that type of mutation that occurred to make this taxon from
+  /// the parent.
   /// @param type string corresponding to a type of mutation.
   /// Must be in the mut_counts dictionary (i.e. the dictionary
-  /// passed in when \ref mut_landscape_info::RecordMutation was called)
+  /// passed in when datastruct::mut_landscape_info::RecordMutation was called)
   /// @param taxon a pointer to a taxon to count mutation steps for.
   /// Must have a DATA_TYPE that supports mutation tracking
   /// (e.g. mut_landscape_info)
@@ -74,8 +75,8 @@ namespace emp {
     return count;
   }
 
-  /// Returns the total number of times a mutation of the types @param types
-  /// that along @param taxon 's lineage. (Different from CountMuts in
+  /// Returns the total number of times a mutation of the types \c types
+  /// that along the given taxon 's lineage. (Different from CountMuts in
   /// that CountMuts sums them whereas CountMutSteps would count two
   /// simultaneous mutations of the same type as one event)
   template <typename taxon_t>
@@ -92,8 +93,8 @@ namespace emp {
     return count;
   }
 
-  /// Returns the total number of mutations of type @param type that occurred
-  /// along @param taxon 's lineage.
+  /// Returns the total number of mutations of type \c type that occurred
+  /// along \c taxon 's lineage.
   template <typename taxon_t>
   int CountMuts(Ptr<taxon_t> taxon, std::string type="substitution") {
     int count = 0;
@@ -106,8 +107,8 @@ namespace emp {
     return count;
   }
 
-  /// Returns the total number of mutations of the types @param types that occurred
-  /// along @param taxon 's lineage.
+  /// Returns the total number of mutations of the types in \c types that occurred
+  /// along the given taxon 's lineage.
   template <typename taxon_t>
   int CountMuts(Ptr<taxon_t> taxon, emp::vector<std::string> types) {
     int count = 0;
@@ -123,7 +124,7 @@ namespace emp {
   }
 
   /// Returns the total number of deleterious mutational steps that occurred
-  /// along @param taxon 's lineage. (a change from parent to child taxon counts
+  /// along the given taxon's lineage. (a change from parent to child taxon counts
   /// as a single step, regardless of the number of mutations that happened at
   /// that time point)
   template <typename taxon_t>
@@ -143,7 +144,7 @@ namespace emp {
   }
 
   /// Returns the total number of changes in phenotype that occurred
-  /// along @param taxon 's lineage.
+  /// along the given taxon's lineage.
   template <typename taxon_t>
   int CountPhenotypeChanges(Ptr<taxon_t> taxon) {
     int count = 0; // Start with current phenotype
@@ -161,7 +162,7 @@ namespace emp {
   }
 
   /// Returns the total number of unique phenotypes that occurred
-  /// along @param taxon 's lineage.
+  /// along the given taxon's lineage.
   template <typename taxon_t>
   int CountUniquePhenotypes(Ptr<taxon_t> taxon) {
     std::set<decltype(taxon->GetData().phenotype)> seen;

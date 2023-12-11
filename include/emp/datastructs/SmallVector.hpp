@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
- *
- *  @file SmallVector.hpp
+ *  @file
  *  @brief A drop-in replacement for std::vector with optimization to handle
  *  small vector sizes without dynamic allocation. It contains some number of
  *  elements in-place, which allows it to avoid heap allocation when the actual
@@ -36,6 +37,7 @@
 namespace emp {
 
 // helpers for AlignedCharArrayUnion
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace detail {
 
 template <typename T, typename... Ts> class AlignerImpl {
@@ -56,6 +58,7 @@ template <typename T, typename... Ts> union SizerImpl {
 
 template <typename T> union SizerImpl<T> { char arr[sizeof(T)]; };
 } // end namespace detail
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 /// A suitably aligned and sized character array member which can hold elements
 /// of any type.
@@ -125,11 +128,13 @@ public:
   }
 };
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 /// Figure out the offset of the first element.
 template <class T, typename = void> struct SmallVectorAlignmentAndSize {
   emp::AlignedCharArrayUnion<SmallVectorBase> Base;
   emp::AlignedCharArrayUnion<T> FirstEl;
 };
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 /// This is the part of SmallVectorTemplateBase which does not depend on whether
 /// the type T is a POD. The extra dummy template argument is used by ArrayRef
@@ -282,6 +287,7 @@ public:
   }
 };
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 // Define this out-of-line to dissuade the C++ compiler from inlining it.
 template <typename T, bool TriviallyCopyable>
 void SmallVectorTemplateBase<T, TriviallyCopyable>::grow(size_t MinSize) {
@@ -307,6 +313,7 @@ void SmallVectorTemplateBase<T, TriviallyCopyable>::grow(size_t MinSize) {
   this->BeginX = NewElts;
   this->Capacity = NewCapacity;
 }
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 /// SmallVectorTemplateBase<TriviallyCopyable = true> - This is where we put
 /// method implementations that are designed to work with POD-like T's.
@@ -362,6 +369,8 @@ public:
 
   void pop_back() { this->set_size(this->size() - 1); }
 };
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 /// This class consists of common code factored out of the SmallVector class to
 /// reduce code duplication based on the SmallVector 'N' template parameter.
@@ -878,6 +887,8 @@ struct SmallVectorStorage {
 /// well-defined.
 template <typename T> struct alignas(alignof(T)) SmallVectorStorage<T, 0> {};
 
+#endif /*DOXYGEN_SHOULD_SKIP_THIS*/
+
 /// This is a 'vector' (really, a variable-sized array), optimized
 /// for the case when the array is small.  It contains some number of elements
 /// in-place, which allows it to avoid heap allocation when the actual number of
@@ -956,6 +967,7 @@ inline size_t capacity_in_bytes(const SmallVector<T, N> &X) {
 
 } // end namespace emp
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
 
   /// Implement std::swap in terms of SmallVector swap.
@@ -973,5 +985,6 @@ namespace std {
   }
 
 } // end namespace std
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_DATASTRUCTS_SMALLVECTOR_HPP_INCLUDE

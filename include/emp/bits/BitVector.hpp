@@ -1,11 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2022.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2022.
- *
- *  @file BitVector.hpp
+ *  @file
  *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *  @note Compile with -O3 and -msse4.2 for fast bit counting.
  *
@@ -51,7 +52,7 @@
 
 namespace emp::old {
 
-  /// @brief A drop-in replacement for std::vector<bool>, but with extra bitwise logic features.
+  /// A drop-in replacement for std::vector<bool>, but with extra bitwise logic features.
   ///
   /// This class stores an arbitrary number of bits in a set of "fields" (typically 32 bits or 64
   /// bits per field, depending on which should be faster.)  Individual bits can be extracted,
@@ -88,7 +89,7 @@ namespace emp::old {
     /// A mask to cut off all of the final bits.
     [[nodiscard]] field_t EndMask() const { return MaskLow<field_t>(NumEndBits()); }
 
-    /// How many felids do we need for the current set of bits?
+    /// How many fields do we need for the current set of bits?
     [[nodiscard]] size_t NumFields() const { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
 
     /// What is the ID of the last occupied field?
@@ -722,7 +723,7 @@ namespace emp::old {
     /// Compound operator for shift right...
     BitVector & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
-    // =========  Standard Library Compatability  ========= //
+    // =========  Standard Library Compatibility  ========= //
     // A set of functions to allow drop-in replacement with std::bitset.
 
     [[nodiscard]] size_t size() const { return num_bits; }
@@ -764,6 +765,8 @@ namespace emp::old {
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = in[i];
   }
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+
   // Move bits from one position in the genome to another; leave old positions unchanged.
   // @CAO: Can speed up by focusing only on the moved fields (i.e., don't shift unused bits).
   void BitVector::RawCopy(const size_t from_start, const size_t from_stop, const size_t to) {
@@ -784,6 +787,8 @@ namespace emp::old {
     move_bits.Clear(to_stop, num_bits);                 // Clear everything AFTER moved bits.
     OR_SELF(move_bits);                                 // Merge bitstrings together.
   }
+
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   template <typename FUN_T>
   BitVector & BitVector::ApplyRange(const FUN_T & fun, size_t start, size_t stop) {
@@ -913,7 +918,7 @@ namespace emp::old {
       field_t & n = bits[0];
       size_t c = shift_size;
 
-      // Mask necessary to surpress shift count overflow warnings.
+      // Mask necessary to suppress shift count overflow warnings.
       c &= FIELD_LOG2_MASK;
       n = (n<<c) | (n>>( (-(c+FIELD_BITS-num_bits)) & FIELD_LOG2_MASK ));
     }
@@ -990,7 +995,7 @@ namespace emp::old {
       field_t & n = bits[0];
       size_t c = shift_size;
 
-      // mask necessary to surpress shift count overflow warnings
+      // mask necessary to suppress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
       n = (n>>c) | (n<<( (num_bits-c) & FIELD_LOG2_MASK ));
 
@@ -1748,11 +1753,11 @@ namespace emp::old {
     if (bit) SetRange(num_bits-num, num_bits);
   }
 
-  /// Insert bit(s) into any index of vector using bit magic.
-  /// Blog post on implementation reasoning: https://devolab.org/?p=2249
-  /// @param index location to insert bit(s).
-  /// @param val value of bit(s) to insert (default true)
-  /// @param num number of bits to insert, default 1.
+  // Insert bit(s) into any index of vector using bit magic.
+  // Blog post on implementation reasoning: https://devolab.org/?p=2249
+  // @param index location to insert bit(s).
+  // @param val value of bit(s) to insert (default true)
+  // @param num number of bits to insert, default 1.
   void BitVector::Insert(const size_t index, const bool val, const size_t num) {
     Resize(num_bits + num);                 // Adjust to new number of bits.
     BitVector low_bits(*this);              // Copy current bits
@@ -1764,9 +1769,9 @@ namespace emp::old {
   }
 
 
-  /// Delete bits from any index in a vector.
-  /// @param index location to delete bit(s).
-  /// @param num number of bits to delete, default 1.
+  // Delete bits from any index in a vector.
+  // @param index location to delete bit(s).
+  // @param num number of bits to delete, default 1.
   void BitVector::Delete(const size_t index, const size_t num) {
     emp_assert(index+num <= GetSize());   // Make sure bits to delete actually exist!
     RawCopy(index+num, num_bits, index);  // Shift positions AFTER delete into place.
@@ -2100,7 +2105,7 @@ namespace emp::old {
       field_t & n = bits[0];
       size_t c = shift_size;
 
-      // mask necessary to surpress shift count overflow warnings
+      // mask necessary to suppress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
       n = (n<<c) | (n>>( (-(c+FIELD_BITS-num_bits)) & FIELD_LOG2_MASK ));
 
@@ -2183,7 +2188,7 @@ namespace emp::old {
       field_t & n = bits[0];
       size_t c = shift_size;
 
-      // mask necessary to surpress shift count overflow warnings
+      // mask necessary to suppress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
       n = (n>>c) | (n<<( (num_bits-c) & FIELD_LOG2_MASK ));
 
@@ -2313,14 +2318,20 @@ namespace emp::old {
 
 // ---------------------- Implementations to work with standard library ----------------------
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
-  /// Hash function to allow BitVector to be used with maps and sets (must be in std).
+#endif // DOXYGEN_SHOULD_SKIP_THIS
+  /// Hash function to allow BitVector to be used with maps and sets.
+  /// This is added to the std namespace so that BitVectors can be used
+  /// in data structures that require hashing (such as unordered_map)
   template <>
   struct hash<emp::old::BitVector> {
     std::size_t operator()(const emp::old::BitVector & bv) const {
       return bv.Hash();
     }
   };
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 }
+#endif
 
 #endif // #ifndef EMP_BITS_BITVECTOR_HPP_INCLUDE

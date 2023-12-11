@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file ConfigPanel.hpp
+ *  @file
  *  @brief Interfaces with emp::config objects to provide UI configuration.
  */
 
@@ -77,7 +78,7 @@ namespace prefab {
    * panel to your web app. Users can interact with the config panel
    * by updating values.
    *
-   * The ConfigPanel is constructed using subcomponents. Groups of
+   * The ConfigPanel is constructed using sub-components. Groups of
    * settings are placed in Cards, and individual settings are represented
    * by ValueControls.
    */
@@ -111,12 +112,15 @@ namespace prefab {
       }
 
       inline static std::set<std::string> numeric_types = {"int", "double", "float", "uint32_t", "uint64_t", "size_t"};
-      // Helper function to get prety names from config values
+
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
+      // Helper function to get pretty names from config values
       inline static std::function<std::string(const std::string &)> format_label = [](
         const std::string & name
       ) {
         return to_titlecase(join(slice(name, '_'), " "));
       };
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
 
       /**
        * Get current on-update callback.
@@ -130,6 +134,8 @@ namespace prefab {
     public:
       /**
        * @param config config object used to construct this panel
+       * @param open Should card for displaying this config default to being open?
+       * @param div_name Name to use for html div id for this panel
        */
       ConfigPanel(
         Config & config,
@@ -311,7 +317,8 @@ namespace prefab {
       /**
        * Arranges config panel based configuration pass to constructor
        * @param config the config object used to create this panel
-       * @param id_prefix string appended to id for each setting (unusued)
+       * @param open should the card for the panel start open?
+       * @param id_prefix string appended to id for each setting (unused)
        * @deprecated No longer necessary for config panel to function.
        * This function was a work around to fix a bug.
        */

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
- *
- *  @file MatchBin.hpp
+ *  @file
  *  @brief A container that supports flexible tag-based lookup. .
  *
  */
@@ -62,6 +63,7 @@ namespace emp::internal {
     using query_t = Query;
     using tag_t = Tag;
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     template <
       typename Val,
       typename Metric,
@@ -69,7 +71,7 @@ namespace emp::internal {
       typename Regulator
     >
     friend class emp::MatchBin;
-
+    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
     struct LogEntry {
       query_t query;

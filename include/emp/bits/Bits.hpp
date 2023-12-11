@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2022-23
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022-23.
- *
- *  @file Bits.hpp
+ *  @file
  *  @brief A generic bit-handler to replace vector<bool>, etc +additional bitwise logic features.
  *  @note Status: RELEASE
  *

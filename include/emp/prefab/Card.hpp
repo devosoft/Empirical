@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file Card.hpp
+ *  @file
  *  @brief Wraps a Bootstrap card.
  */
 
@@ -113,7 +114,7 @@ namespace prefab {
      * A protected constructor for a Card.
      * @param state indicate whether card should be STATIC, INIT_OPEN, or INIT_CLOSED (default STATIC)
      * @param show_glyphs should toggle icons show in collapsible card header? (default true)
-     * @param info_ref a pointer to the underlying ReadoutPanelInfo object for this ReadoutPanel
+     * @param in_info a pointer to the underlying ReadoutPanelInfo object for this ReadoutPanel
      * or a pointer to a derived info object (simulating inheritance)
      */
     Card(

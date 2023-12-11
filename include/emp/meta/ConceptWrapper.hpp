@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2021.
- *
- *  @file ConceptWrapper.hpp
+ *  @file
  *  @brief A template wrapper that will either enforce functionality or provide default functions.
  *
  *  Starting in future versions of C++, a concept is a set of requirements for a class to be used
