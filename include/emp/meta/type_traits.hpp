@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2022.
+ *  @date 2016-2023.
  *
  *  @file type_traits.hpp
  *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
@@ -18,79 +18,11 @@
 #include <type_traits>
 #include <utility>
 
-#include "../base/_is_streamable.hpp"
-//^ provides is_streamable implementation,
-// located in base directory to preserve levelization
-
+#include "../base/concepts.hpp"
 #include "meta.hpp"
 
 
 namespace emp {
-
-  // Predeclarations used below.
-  template <typename TYPE> class Ptr;
-  #ifdef NDEBUG
-  template <typename T, typename... Ts> using vector = std::vector<T, Ts...>;
-  #else
-  template <typename T, typename... Ts> class vector;
-  #endif
-
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this
-  // adapted from https://stackoverflow.com/a/29634934
-  namespace detail {
-
-    // using statements allow Argument-Dependent Lookup (ADL)
-    // with custom begin/end
-    // see https://en.cppreference.com/w/cpp/language/adl
-    using std::begin;
-    using std::end;
-
-    template <typename T>
-    auto is_iterable_impl(int)
-    -> decltype (
-      // begin/end and operator !=
-      begin(std::declval<T&>()) != end(std::declval<T&>()),
-      // Handle evil operator ,
-      void(),
-      // operator ++
-      ++std::declval<decltype(begin(std::declval<T&>()))&>(),
-      // operator*
-      void(*begin(std::declval<T&>())),
-      std::true_type{}
-    );
-
-    template <typename T>
-    std::false_type is_iterable_impl(...);
-  }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
-
-  /// Determine if a type is iterable.
-  template <typename T>
-  using IsIterable = decltype(detail::is_iterable_impl<T>(0));
-
-  // Determine if a type has a ToString() member function.
-  template <typename T, typename=void> struct HasToString : std::false_type { };
-  template<typename T>
-  struct HasToString<emp::decoy_t<T, decltype(std::declval<T>().ToString())>> : std::true_type{};
-
-  // Determine if a type has a ToDouble() member function.
-  template <typename T, typename=void> struct HasToDouble : std::false_type { };
-  template<typename T>
-  struct HasToDouble<emp::decoy_t<T, decltype(std::declval<T>().ToDouble())>> : std::true_type{};
-
-  // Determine if a type has a FromString() member function.
-  template <typename T, typename=void> struct HasFromString : std::false_type { };
-  template<typename T>
-  struct HasFromString<emp::decoy_t<T, decltype(std::declval<T>().FromString(""))>> : std::true_type{};
-
-  // Determine if a type has a FromDouble() member function.
-  template <typename T, typename=void> struct HasFromDouble : std::false_type { };
-  template<typename T>
-  struct HasFromDouble<emp::decoy_t<T, decltype(std::declval<T>().FromDouble(0.0))>> : std::true_type{};
-
-  /// Determine if a type passed in is an std::function type (vs a lambda or a raw function)
-  template <typename> struct is_std_function : std::false_type { };
-  template <typename... Ts> struct is_std_function<std::function<Ts...>> : std::true_type { };
 
   /// Convert std::function to base function type.
   template <typename T> struct remove_std_function_type { using type = T; };
@@ -101,19 +33,6 @@ namespace emp {
   template <typename T> struct element_type { using type = T; };
   template <template <typename...> class TMPL, typename T> struct element_type<TMPL<T>>  { using type = T; };
   template <typename T> using element_t = typename element_type<T>::type;
-  // template<typename T> using element_type_t = std::remove_reference_t<decltype(*std::begin(std::declval<T&>()))>;
-
-  /// Determine if we have an emp::vector.
-  template <typename> struct is_emp_vector : std::false_type { };
-  template <typename T, typename... Ts>
-  struct is_emp_vector<emp::vector<T, Ts...>> : std::true_type { };
-
-  /// Determine if we have a span.
-  template <typename> struct is_span : std::false_type { };
-  template <typename T>
-  struct is_span<std::span<T>> : std::true_type { };
-  // template <typename T, size_t SIZE>
-  // struct is_span<std::span<T,SIZE>> : std::true_type { };
 
   // Customized type traits; for the moment, make sure that emp::Ptr is handled correctly.
   template <typename> struct is_ptr_type : public std::false_type { };
@@ -196,43 +115,6 @@ namespace emp {
     static constexpr bool ConvertOK(T *) { return false; }
   };
 
-  namespace detail {
-    template <typename Fn, typename... Args>
-    struct is_invocable_helper {
-      private:
-      // If U can be invoked with Args... for arguments, then it will have some
-      // return value, and we try to create a pointer to it. Note the use of
-      // decay_t. This will remove any references from the return value, which
-      // would cause SFINAE to fail, since C++ does not allow pointers to
-      // references
-      template <typename U>
-      static std::true_type check(
-        U &&,
-        std::decay_t<decltype(std::declval<U>()(std::declval<Args>()...))> * =
-          nullptr) {
-        return {};
-      }
-
-      // Catchall which handles the cases where U is not callable with Args
-      // arguments
-      template <typename U>
-      static std::false_type check(...) {
-        return {};
-      }
-
-      public:
-      static constexpr decltype(check<Fn>(std::declval<Fn>())) value() {
-        return {};
-      }
-    };
-  }  // namespace detail
-
-  template <typename Fn, typename... Args>
-  struct is_invocable
-    : decltype(detail::is_invocable_helper<Fn, Args...>::value()) {};
-
-  // @todo: It might be a good idea to move these to a separate file
-  // @todo: should these be using the std naming convention?
 
   namespace __impl_variadics_type_traits {
     // General container type which represents a parameter pack
