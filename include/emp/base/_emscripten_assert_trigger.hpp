@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020.
+ *  @date 2020-2023.
  *
  *  @file _emscripten_assert_trigger.hpp
  *  @brief Assert trigger implementation.
@@ -17,7 +17,7 @@
 
 #include <emscripten.h>
 
-#include "_is_streamable.hpp"
+#include "concept.hpp"
 
 namespace emp {
 
