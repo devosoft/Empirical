@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
- *
- *  @file Signal.hpp
+ *  @file
  *  @brief Allow functions to be bundled (as Actions) and triggered enmasse.
  *  @note Status: Beta
  *
@@ -15,7 +16,9 @@
 #define EMP_CONTROL_SIGNAL_HPP_INCLUDE
 
 
+#include <cstdint>
 #include <map>
+#include <stddef.h>
 #include <string>
 
 #include "../datastructs/map_utils.hpp"
@@ -75,12 +78,13 @@ namespace emp {
     operator bool() { return key_id > 0; }
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Forward declarations.
   class SignalBase;     // ...for pointers to signals.
   class SignalManager;  // ...for setting up as friend.
 
   // Mechanisms for Signals to report to a manager.
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+
   namespace internal {
     struct SignalManager_Base {
       virtual void NotifyConstruct(SignalBase * sig_ptr) = 0;
@@ -103,7 +107,7 @@ namespace emp {
 
     std::string name;                          ///< What is the unique name of this signal?
     uint32_t signal_id;                        ///< What is the unique ID of this signal?
-    uint32_t next_link_id;                     ///< What ID shouild the next link have?
+    uint32_t next_link_id;                     ///< What ID should the next link have?
     std::map<SignalKey, size_t> link_key_map;  ///< Map unique link keys to link index for actions.
     emp::vector<man_t *> managers;             ///< What manager is handling this signal?
     man_t * prime_manager;                     ///< Which manager leads deletion? (nullptr for self)
@@ -111,7 +115,7 @@ namespace emp {
     // Helper Functions
     SignalKey NextSignalKey() { return SignalKey(signal_id,++next_link_id); }
 
-    // SignalBase should only be constructable from derrived classes.
+    // SignalBase should only be constructable from derived classes.
     SignalBase(const std::string & n, internal::SignalManager_Base * manager=nullptr)
     : name(n), signal_id(0), next_link_id(0), link_key_map(), managers(), prime_manager(nullptr)
     {
@@ -359,9 +363,10 @@ namespace emp {
 
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template<typename... ARGS>
   inline void SignalBase::BaseTrigger(ARGS... args) {
-    // Make sure this base class is really of the correct derrived type (but do so in an
+    // Make sure this base class is really of the correct derived type (but do so in an
     // assert since triggers may be called frequently and should be fast!)
     emp_assert(dynamic_cast< Signal<void(ARGS...)> * >(this));
     ((Signal<void(ARGS...)> *) this)->Trigger(args...);
@@ -373,7 +378,7 @@ namespace emp {
     emp_assert(dynamic_cast< Signal<void(ARGS...)> * >(this));
     return ((Signal<void(ARGS...)> *) this)->AddAction(in_fun);
   }
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 
 #endif // #ifndef EMP_CONTROL_SIGNAL_HPP_INCLUDE

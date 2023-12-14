@@ -161,19 +161,29 @@ Specific cases include:
 
 ## Checklist
 
-Copy and paste the following into a pull request comment when it is
-ready for review:
+To submit code to Empirical, open a Pull Request on Github. When you are ready for it to be reviewed, add the "Merge Ready" label. Before requesting a review, you should ensure that all checks on Github pass and confirm that the following automatically-checkable things are true:
 
-    - [ ] Is it mergeable?
-    - [ ] Did it pass the tests?
-    - [ ] Does the source code follow the Empirical coding standards?
-    - [ ] Has the code been commented (especially non-intuitive sections)
-    - [ ] Was a spellchecker run on the source code and documentation after
-      changes were made?
+- The code is merge-able into master (checked by Github)
+- All tests pass (checked by Github actions CI)
+- The documentation builds successfully (checked by readthedocs action and Github actions CI)
+
+You should also verify that the following are true. These cannot be manually checked, so copy and paste the following checklist into a pull request comment and check them off as you do them:
+
+    - [ ] The source code follows the Empirical coding standards
+    - [ ] The code been commented (especially non-intuitive sections)
+    - [ ] A spellchecker was run on the source code and documentation after changes were made?
+    - [ ] All newly added/modified code has high-quality tests associated with it (the CodeCov Github Automation will check this, but you should verify it)
+    - [ ] All newly-added functions and classes have doxygen-compatible docstrings
 
 It's expected that before requesting a code review the author of the PR
 will have checked all these things on their own. It's also expected
 that whomever reviews the PR will check these individual items as well.
-Though the CI runs most of these and will pass/fail the PR accordingly
-it is not infallible and the whole point of having a code review process
+The CI is not infallible and the whole point of having a code review process
 is to have human eyes go over the changes to the codebase.
+
+The code reviewer should verify that the above requirements are met, and also that:
+
+  - The code is well-organized
+  - The code is commented appropriately
+  - Any new tests are of acceptable quality
+  - The addition represents an improvement to Empirical

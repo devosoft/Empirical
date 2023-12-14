@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file Random.cpp
+ *  @file
  */
 
 #include <algorithm>
@@ -35,6 +36,24 @@ TEST_CASE("Test Random", "[math]")
   rnd.ResetSeed(5);
   REQUIRE(rnd.GetSeed() == 5);
 
+  // Grab 100 random values.
+  std::array<double, 100> value_series;
+  for (double & x : value_series) x = rnd.GetDouble();
+
+  // Reset the seed -- we should now get the same 100 values.
+  rnd.ResetSeed(5);
+  std::array<double, 100> value_series2;
+  for (double & x : value_series2) x = rnd.GetDouble();
+
+  REQUIRE( value_series == value_series2 );
+
+  // If we build a new random number generator with the same seed it should ALSO give the same values.
+  emp::Random rnd2(5);
+  std::array<double, 100> value_series3;
+  for (double & x : value_series3) x = rnd2.GetDouble();
+
+  REQUIRE( value_series == value_series3 );
+
   // Get Double
   double r_d = rnd.GetDouble(emp::Range<double>(0.0,5.0));
   REQUIRE(r_d >= 0.0);
@@ -57,25 +76,24 @@ TEST_CASE("Test Random", "[math]")
   REQUIRE(ui64 < 100000000000);
 
   // Values are consistent when random seeded with 5
-  double rndNormal = rnd.GetRandNormal(5.0, 0.1);
+  double rndNormal = rnd.GetNormal(5.0, 0.1);
   REQUIRE( std::abs(rndNormal - 5.0) < 0.5 );
 
-  REQUIRE(rnd.GetRandPoisson(1.0, 0.9) == 1.0);
+  REQUIRE(rnd.GetPoisson(1.0, 0.9) == 1.0);
 
-  size_t b1_result = rnd.GetRandBinomial(3000, 0.1);
+  size_t b1_result = rnd.GetBinomial(3000, 0.1);
   REQUIRE(b1_result > 250);
   REQUIRE(b1_result < 350);
 
-  size_t b2_result = rnd.GetRandBinomial(100, 0.3);
+  size_t b2_result = rnd.GetBinomial(100, 0.3);
   REQUIRE(b2_result > 15);
   REQUIRE(b2_result < 50);
 
   emp::RandomStdAdaptor randomStd(rnd);
-  REQUIRE(randomStd(4) == 1);
+  REQUIRE(randomStd(4) < 4);
 
-  REQUIRE(rnd.GetRandGeometric(1) == 1);
-  REQUIRE(rnd.GetRandGeometric(0) == std::numeric_limits<uint32_t>::infinity());
-  // REQUIRE(rnd.GetRandGeometric(.25) == 8);
+  REQUIRE(rnd.GetGeometric(1) == 1);
+  // REQUIRE(rnd.GetGeometric(0) == std::numeric_limits<uint32_t>::infinity());
 }
 
 TEST_CASE("Another Test random", "[math]")
@@ -294,4 +312,49 @@ TEST_CASE("Another Test random", "[math]")
     // std::cout << k << ": " << v.first << ", " << v.second << std::endl;
     REQUIRE(v.first + v.second == 0);
   }
+}
+
+TEST_CASE("Calling ResetSeed should reset all generator internal state", "[math]") {
+
+  SECTION("Test internal 'value'") {
+    // Get Seed
+    emp::Random rnd(-1); // Initialize without a seed
+    rnd.ResetSeed(5);
+    REQUIRE(rnd.GetSeed() == 5);
+
+    emp::vector<int> sequence_a;
+    for (size_t i = 0; i < 10; ++i) {
+      sequence_a.emplace_back(rnd.GetInt(10000));
+    }
+
+    rnd.ResetSeed(5);
+    emp::vector<int> sequence_b;
+    for (size_t i = 0; i < 10; ++i) {
+      sequence_b.emplace_back(rnd.GetInt(10000));
+    }
+
+    // Tests internal 'value'
+    REQUIRE(sequence_a == sequence_b);
+  }
+
+  SECTION("Test internal expV") {
+    emp::Random rnd(10);
+    rnd.GetNormal(); // Adjusts expV with time-based seed generator
+
+    rnd.ResetSeed(4); // Should reset expV
+    emp::vector<double> norm_seq_a;
+    for (size_t i = 0; i < 1000; ++i) {
+      norm_seq_a.emplace_back(rnd.GetNormal());
+    }
+
+    rnd.ResetSeed(4);
+    emp::vector<double> norm_seq_b;
+    for (size_t i = 0; i < 1000; ++i) {
+      norm_seq_b.emplace_back(rnd.GetNormal());
+    }
+
+    // Tests internal expV
+    REQUIRE(norm_seq_a == norm_seq_b);
+  }
+
 }

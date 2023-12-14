@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file MatchBin.cpp
+ *  @file
  */
 
 #include <sstream>
@@ -819,8 +820,8 @@ TEST_CASE("Test MatchBin", "[matchbin]")
   REQUIRE(bitBin64.GetVals(bitBin64.Match(bs9, std::numeric_limits<size_t>::max())) == (emp::vector<std::string> {"nine"}));
   REQUIRE(bitBin64.GetTags(bitBin64.Match(bs9, std::numeric_limits<size_t>::max())) == (emp::vector<emp::BitSet<64>> {bs9}));
 
-  REQUIRE(bitBin64.GetVals(bitBin64.Match(bs9, 5)) == (emp::vector<std::string> {"nine","one","seven"}));
-  REQUIRE(bitBin64.GetTags(bitBin64.Match(bs9, 5)) == (emp::vector<emp::BitSet<64>> {bs9, bs1, bs7}));
+  REQUIRE(bitBin64.GetVals(bitBin64.Match(bs9, 5)) == (emp::vector<std::string> {"nine","seven","one"}));
+  REQUIRE(bitBin64.GetTags(bitBin64.Match(bs9, 5)) == (emp::vector<emp::BitSet<64>> {bs9, bs7, bs1}));
 
   }
   // test ImprintRegulators

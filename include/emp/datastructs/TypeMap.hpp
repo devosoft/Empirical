@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
- *
- *  @file TypeMap.hpp
+ *  @file
  *  @brief A class that will map types to values of a designated type.
  *  @note Status: BETA
  */
@@ -11,6 +12,7 @@
 #ifndef EMP_DATASTRUCTS_TYPEMAP_HPP_INCLUDE
 #define EMP_DATASTRUCTS_TYPEMAP_HPP_INCLUDE
 
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../meta/TypeID.hpp"

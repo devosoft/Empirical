@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
- *
- *  @file graph_utils.hpp
+ *  @file
  *  @brief This file provides a number of tools for manipulating graphs.
  *  @note Status: BETA
  */
@@ -13,6 +14,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <stddef.h>
 #include <string>
 #include <tuple>
 

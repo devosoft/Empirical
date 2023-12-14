@@ -1,24 +1,25 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
- *
- *  @file AvidaCPU_InstLib.hpp
+ *  @file
  *  @brief A specialized version of InstLib to handle AvidaCPU Instructions.
  */
 
 #ifndef EMP_HARDWARE_AVIDACPU_INSTLIB_HPP_INCLUDE
 #define EMP_HARDWARE_AVIDACPU_INSTLIB_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../math/math.hpp"
 
 #include "InstLib.hpp"
 
 namespace emp {
-
   /// AvidaCPU_InstLib is a pure-virtual class that defines a series of instructions that
   /// can be used with AvidaCPU_Base or any of its derived classes.
-
   template <typename HARDWARE_T, typename ARG_T=size_t, size_t ARG_COUNT=3>
   struct AvidaCPU_InstLib : public InstLib<HARDWARE_T, ARG_T, ARG_COUNT> {
     using hardware_t = HARDWARE_T;

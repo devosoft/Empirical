@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2019
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019
- *
- *  @file Citation.hpp
+ *  @file
  *  @brief Information about a citation for a single paper / book / etc.
  */
 
@@ -12,6 +13,7 @@
 
 #include <ostream>
 #include <set>
+#include <stddef.h>
 #include <string>
 
 #include "../base/map.hpp"

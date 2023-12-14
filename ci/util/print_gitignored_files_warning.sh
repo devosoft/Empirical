@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+git status --ignored
+git diff
+
 # adapted from https://stackoverflow.com/a/835561
 # and https://stackoverflow.com/a/4327720
 # and https://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning

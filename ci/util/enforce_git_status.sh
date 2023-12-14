@@ -10,7 +10,7 @@ fi
 
 # refuse to continue if uncommitted changes are present
 # adapted from https://stackoverflow.com/a/40535565
-if ! [[ -z $(git status -s) ]];
+if [ -n "$(git status --porcelain)" ];
 then
   ./ci/util/print_uncommitted_changes_warning.sh
   exit 1

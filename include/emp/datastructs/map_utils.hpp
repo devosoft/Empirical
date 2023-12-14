@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
- *
- *  @file map_utils.hpp
+ *  @file
  *  @brief A set of simple functions to manipulate maps.
  *  @note Status: BETA
  */
@@ -11,7 +12,10 @@
 #ifndef EMP_DATASTRUCTS_MAP_UTILS_HPP_INCLUDE
 #define EMP_DATASTRUCTS_MAP_UTILS_HPP_INCLUDE
 
+#include <algorithm>
 #include <map>
+#include <sstream>
+#include <string>
 #include <unordered_map>
 
 #include "../base/map.hpp"
@@ -19,23 +23,73 @@
 
 namespace emp {
 
+  template <typename MAP_T>
+  std::string MapToString(const MAP_T & in_map) {
+    std::stringstream ss;
+    bool use_comma = false;
+    for (const auto & [key, value] : in_map) {
+      if (use_comma) ss << ",";
+      ss << "{" << key << ":" << value << "}";
+      use_comma = true;
+    }
+    return ss.str();
+  }
+
   /// Take any map type, and run find to determine if a key is present.
   template <class MAP_T, class KEY_T>
   inline bool Has( const MAP_T & in_map, const KEY_T & key ) {
     return in_map.find(key) != in_map.end();
   }
 
+  // Check to see if any of the elements in a map satisfy a function.
+  template <typename KEY_T, typename ELEMENT_T, typename FUN_T>
+  bool AnyOf(const std::map<KEY_T, ELEMENT_T> & c, FUN_T fun) {
+    // If the provided function takes just the element type, that's all we should give it.
+    if constexpr (std::is_invocable_r<bool, FUN_T, ELEMENT_T>()) {
+      return std::any_of(c.begin(), c.end(), [fun](auto x){ return fun(x.second); });
+    }
+
+    // Otherwise provide both key and element.
+    else {
+      return std::any_of(c.begin(), c.end(), [fun](auto x){ return fun(x.first, x.second); });
+    }
+  }
+
+  // Check to see if any of the elements in a map satisfy a function.
+  template <typename KEY_T, typename ELEMENT_T, typename FUN_T>
+  bool AllOf(const std::map<KEY_T, ELEMENT_T> & c, FUN_T fun) {
+    // If the provided function takes just the element type, that's all we should give it.
+    if constexpr (std::is_invocable_r<bool, FUN_T, ELEMENT_T>()) {
+      return std::all_of(c.begin(), c.end(), [fun](auto x){ return fun(x.second); });
+    }
+
+    // Otherwise provide both key and element.
+    else {
+      return std::all_of(c.begin(), c.end(), [fun](auto x){ return fun(x.first, x.second); });
+    }
+  }
+
+  // Check to see if any of the elements in a map satisfy a function.
+  template <typename KEY_T, typename ELEMENT_T, typename FUN_T>
+  bool NoneOf(const std::map<KEY_T, ELEMENT_T> & c, FUN_T fun) {
+    // If the provided function takes just the element type, that's all we should give it.
+    if constexpr (std::is_invocable_r<bool, FUN_T, ELEMENT_T>()) {
+      return std::none_of(c.begin(), c.end(), [fun](auto x){ return fun(x.second); });
+    }
+
+    // Otherwise provide both key and element.
+    else {
+      return std::none_of(c.begin(), c.end(), [fun](auto x){ return fun(x.first, x.second); });
+    }
+  }
 
   template <class MAP_T>
-  inline auto Keys( const MAP_T & in_map) -> emp::vector<typename std::remove_const<decltype(in_map.begin()->first)>::type> {
-    using KEY_T = typename std::remove_const<decltype(in_map.begin()->first)>::type;
-    emp::vector<KEY_T> keys;
+  inline auto Keys( const MAP_T & in_map) {
+    emp::vector<typename MAP_T::key_type> keys;
     for (auto it : in_map) {
       keys.push_back(it.first);
     }
-
     return keys;
-
   }
 
 
@@ -55,6 +109,15 @@ namespace emp {
   inline const auto & FindRef( const MAP_T & in_map, const KEY_T & key, const typename MAP_T::mapped_type & dval) {
     auto val_it = in_map.find(key);
     if (val_it == in_map.end()) return dval;
+    return val_it->second;
+  }
+
+  /// Take any map and element, run find() member function, and return a reference to
+  /// the result found; trip assert if the result is not present.
+  template <class MAP_T, class KEY_T>
+  inline const auto & GetConstRef( const MAP_T & in_map, const KEY_T & key) {
+    auto val_it = in_map.find(key);
+    emp_assert(val_it != in_map.end());
     return val_it->second;
   }
 

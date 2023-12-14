@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2022.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020.
- *
- *  @file Ptr.hpp
+ *  @file
  *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
  *  @note Status: BETA
  *
@@ -15,8 +16,11 @@
  *  intentionally) you can define EMP_NO_PTR_TO_PTR
  *
  *  If you trip an assert, you can re-do the run a track a specific pointer by defining
- *  EMP_ABORT_PTR_NEW or EMP_ABORT_PTR_DELETE to the ID of the pointer in question.  This will
- *  allow you to track the pointer more easily in a debugger.
+ *  EMP_ABORT_PTR_NEW or EMP_ABORT_PTR_DELETE to the ID of the pointer in question.
+ *
+ *  For example: -DEMP_ABORT_PTR_NEW=1691
+ *
+ *  This will allow you to track the pointer more easily in a debugger.
  *
  *  @todo Track information about emp::vector and emp::array objects to make sure we don't
  *    point directly into them? (A resize() could make such pointers invalid!) Or better, warn
@@ -28,6 +32,7 @@
 #define EMP_BASE_PTR_HPP_INCLUDE
 
 #include <cstring>
+#include <stddef.h>
 #include <unordered_map>
 
 #include "assert.hpp"
@@ -82,8 +87,8 @@ namespace emp {
     }
     PtrInfo(const PtrInfo &) = default;
     PtrInfo(PtrInfo &&) = default;
-    PtrInfo & operator=(const PtrInfo &) = default;
-    PtrInfo & operator=(PtrInfo &&) = default;
+    PtrInfo & operator=(const PtrInfo &) & = default;
+    PtrInfo & operator=(PtrInfo &&) & = default;
 
     ~PtrInfo() {
       if (internal::ptr_debug) std::cout << "Deleted info for pointer " << ptr << std::endl;
@@ -179,7 +184,7 @@ namespace emp {
       }
 
       if (undeleted_info.size()) {
-        std::cerr << undeleted_info.size() << " undeleted pointers at end of exectution.\n";
+        std::cerr << undeleted_info.size() << " undeleted pointers at end of execution.\n";
         for (size_t i = 0; i < undeleted_info.size() && i < 10; ++i) {
           const auto & info = undeleted_info[i];
           std::cerr << "  PTR=" << info.GetPtr()
@@ -215,7 +220,7 @@ namespace emp {
       return ptr_id.find(ptr) != ptr_id.end();
     }
 
-    /// Retrive the ID associated with a pointer.
+    /// Retrieve the ID associated with a pointer.
     size_t GetCurID(const void * ptr) { emp_assert(HasPtr(ptr)); return ptr_id[ptr]; }
 
     /// Lookup how many pointers are being tracked.
@@ -270,7 +275,7 @@ namespace emp {
       }
 #endif
       if (internal::ptr_debug) std::cout << "New:    " << id << " (" << ptr << ")" << std::endl;
-      // Make sure pointer is not already stored -OR- hase been deleted (since re-use is possible).
+      // Make sure pointer is not already stored -OR- has been deleted (since re-use is possible).
       emp_assert(!HasPtr(ptr) || IsDeleted(GetCurID(ptr)), id);
       id_info.emplace_back(ptr);
       ptr_id[ptr] = id;
@@ -285,14 +290,14 @@ namespace emp {
       return id;
     }
 
-    /// Increment the nuber of Pointers associated with an ID
+    /// Increment the number of Pointers associated with an ID
     void IncID(size_t id) {
       if (id == UNTRACKED_ID) return;   // Not tracked!
       if (internal::ptr_debug) std::cout << "Inc:    " << id << std::endl;
       id_info[id].Inc(id);
     }
 
-    /// Decrement the nuber of Pointers associated with an ID
+    /// Decrement the number of Pointers associated with an ID
     void DecID(size_t id) {
       if (id == UNTRACKED_ID) return;   // Not tracked!
       auto & info = id_info[id];
@@ -328,7 +333,7 @@ namespace emp {
   namespace {
     // @CAO: Build this for real!
     template <typename FROM, typename TO>
-    bool PtrIsConvertable(FROM * ptr) { (void) ptr; return true; }
+    bool PtrIsConvertible(FROM * ptr) { (void) ptr; return true; }
     // emp_assert( (std::is_same<TYPE,T2>() || dynamic_cast<TYPE*>(in_ptr)) );
 
     // Debug information provided for each pointer type.
@@ -436,12 +441,14 @@ namespace emp {
       Tracker().IncID(id);
     }
 
-    /// Construct from a raw pointer of campatable type.
+    /// Construct from a raw pointer of compatable type.
     template <typename T2>
     Ptr(T2 * in_ptr, bool track=false) : BasePtr<TYPE>(in_ptr, UNTRACKED_ID)
     {
-      if (internal::ptr_debug) std::cout << "raw construct: " << ptr << ". track=" << track << std::endl;
-      emp_assert( (PtrIsConvertable<T2, TYPE>(in_ptr)) );
+      if (internal::ptr_debug) {
+        std::cout << "raw construct: " << ((void *) ptr) << ". track=" << track << std::endl;
+      }
+      emp_assert( (PtrIsConvertible<T2, TYPE>(in_ptr)) );
 
       // If this pointer is already active, link to it.
       if (Tracker().IsActive(ptr)) {
@@ -463,7 +470,7 @@ namespace emp {
       if (internal::ptr_debug) std::cout << "raw ARRAY construct: " << ptr
                                << ". size=" << array_size << "(" << array_bytes
                                << " bytes); track=" << track << std::endl;
-      emp_assert( (PtrIsConvertable<T2, TYPE>(_ptr)) );
+      emp_assert( (PtrIsConvertible<T2, TYPE>(_ptr)) );
 
       // If this pointer is already active, link to it.
       if (Tracker().IsActive(ptr)) {
@@ -482,7 +489,7 @@ namespace emp {
     template <typename T2>
     Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw(), _in.GetID()) {
       if (internal::ptr_debug) std::cout << "inexact copy construct: " << ptr << std::endl;
-      emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())), id );
+      emp_assert( (PtrIsConvertible<T2, TYPE>(_in.Raw())), id );
       Tracker().IncID(id);
     }
 
@@ -495,7 +502,7 @@ namespace emp {
     ~Ptr() {
       if (internal::ptr_debug) {
         std::cout << "destructing Ptr instance ";
-        if (ptr) std::cout << id << " (" << ptr << ")\n";
+        if (ptr) std::cout << id << " (" << ((void *) ptr) << ")\n";
         else std::cout << "(nullptr)\n";
       }
       Tracker().DecID(id);
@@ -591,7 +598,7 @@ namespace emp {
     /// Delete this pointer (must NOT be an array).
     void Delete() {
       emp_assert(ptr, "Trying to delete null Ptr.");
-      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not resposible for.");
+      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not responsible for.");
       emp_assert(Tracker().IsArrayID(id) == false, id, "Trying to delete array pointer as non-array.");
       emp_assert(Tracker().IsActive(ptr), id, "Trying to delete inactive pointer (already deleted!)");
       if (internal::ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
@@ -602,8 +609,8 @@ namespace emp {
 
     /// Delete this pointer to an array (must be an array).
     void DeleteArray() {
-      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not resposible for.");
       emp_assert(ptr, "Trying to delete null Ptr.");
+      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not responsible for.");
       emp_assert(Tracker().IsArrayID(id), id, "Trying to delete non-array pointer as array.");
       emp_assert(Tracker().IsActive(ptr), id, "Trying to delete inactive pointer (already deleted!)");
       if (internal::ptr_debug) std::cout << "Ptr::DeleteArray() : " << ptr << std::endl;
@@ -621,7 +628,7 @@ namespace emp {
     struct hash_t { size_t operator()(const Ptr<TYPE> & t) const noexcept { return t.Hash(); } };
 
     /// Copy assignment
-    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
+    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) & {
       if (internal::ptr_debug) {
         std::cout << "copy assignment from id " << _in.id << " to id " << id
                   << std::endl;
@@ -642,9 +649,9 @@ namespace emp {
     /// Assign to a raw pointer of the correct type; if this is already tracked, hooked in
     /// correctly, otherwise don't track.
     template <typename T2>
-    Ptr<TYPE> & operator=(T2 * _in) {
+    Ptr<TYPE> & operator=(T2 * _in) & {
       if (internal::ptr_debug) std::cout << "raw assignment" << std::endl;
-      emp_assert( (PtrIsConvertable<T2, TYPE>(_in)) );
+      emp_assert( (PtrIsConvertible<T2, TYPE>(_in)) );
 
       Tracker().DecID(id);    // Decrement references to former pointer at this position.
       ptr = _in;              // Update to new pointer.
@@ -662,11 +669,11 @@ namespace emp {
       return *this;
     }
 
-    /// Assign to a convertable Ptr
+    /// Assign to a convertible Ptr
     template <typename T2>
-    Ptr<TYPE> & operator=(Ptr<T2> _in) {
+    Ptr<TYPE> & operator=(Ptr<T2> _in) & {
       if (internal::ptr_debug) std::cout << "convert-copy assignment" << std::endl;
-      emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())), _in.id );
+      emp_assert( (PtrIsConvertible<T2, TYPE>(_in.Raw())), _in.id );
       emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not copy deleted pointers.");
       Tracker().DecID(id);
       ptr = _in.Raw();
@@ -692,42 +699,28 @@ namespace emp {
     /// Does this const pointer exist?
     operator bool() const { return ptr != nullptr; }
 
-    /// Does this Ptr point to the same memory position?
-    bool operator==(const Ptr<TYPE> & in_ptr) const { return ptr == in_ptr.ptr; }
+    template <typename T> bool operator==(const T & in_ptr) const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr == in_ptr.ptr; }
+      else { return ptr == in_ptr; }
+    }
+    template <typename T> bool operator!=(const T & in_ptr) const { return !operator==(in_ptr); }
 
-    /// Does this Ptr point to different memory positions?
-    bool operator!=(const Ptr<TYPE> & in_ptr) const { return ptr != in_ptr.ptr; }
-
-    /// Does this Ptr point to a memory position before another?
-    bool operator<(const Ptr<TYPE> & in_ptr)  const { return ptr < in_ptr.ptr; }
-
-    /// Does this Ptr point to a memory position before or equal to another?
-    bool operator<=(const Ptr<TYPE> & in_ptr) const { return ptr <= in_ptr.ptr; }
-
-    /// Does this Ptr point to a memory position after another?
-    bool operator>(const Ptr<TYPE> & in_ptr)  const { return ptr > in_ptr.ptr; }
-
-    /// Does this Ptr point to a memory position after or equal to another?
-    bool operator>=(const Ptr<TYPE> & in_ptr) const { return ptr >= in_ptr.ptr; }
-
-
-    /// Does this Ptr point to the same memory position as a raw pointer?
-    bool operator==(const TYPE * in_ptr) const { return ptr == in_ptr; }
-
-    /// Does this Ptr point to different memory positions as a raw pointer?
-    bool operator!=(const TYPE * in_ptr) const { return ptr != in_ptr; }
-
-    /// Does this Ptr point to a memory position before a raw pointer?
-    bool operator<(const TYPE * in_ptr)  const { return ptr < in_ptr; }
-
-    /// Does this Ptr point to a memory position before or equal to a raw pointer?
-    bool operator<=(const TYPE * in_ptr) const { return ptr <= in_ptr; }
-
-    /// Does this Ptr point to a memory position after a raw pointer?
-    bool operator>(const TYPE * in_ptr)  const { return ptr > in_ptr; }
-
-    /// Does this Ptr point to a memory position after or equal to a raw pointer?
-    bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
+    template <typename T> bool operator<(const T & in_ptr)  const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr < in_ptr.ptr; }
+      else { return ptr < in_ptr; }
+    }
+    template <typename T> bool operator>(const T & in_ptr)  const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr > in_ptr.ptr; }
+      else { return ptr > in_ptr; }
+    }
+    template <typename T> bool operator<=(const T & in_ptr) const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr <= in_ptr.ptr; }
+      else { return ptr <= in_ptr; }
+    }
+    template <typename T> bool operator>=(const T & in_ptr) const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr >= in_ptr.ptr; }
+      else { return ptr >= in_ptr; }
+    }
 
     [[nodiscard]] Ptr<TYPE> operator+(int value) const { return ptr + value; }
     [[nodiscard]] Ptr<TYPE> operator-(int value) const { return ptr - value; }
@@ -884,11 +877,11 @@ namespace emp {
     struct hash_t { size_t operator()(const Ptr<TYPE> & t) const noexcept { return t.Hash(); } };
 
     // Copy assignments
-    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) { ptr = _in.ptr; return *this; }
+    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) & { ptr = _in.ptr; return *this; }
 
     // Assign to compatible Ptr or raw (non-managed) pointer.
-    template <typename T2> Ptr<TYPE> & operator=(T2 * _in) { ptr = _in; return *this; }
-    template <typename T2> Ptr<TYPE> & operator=(Ptr<T2> _in) { ptr = _in.Raw(); return *this; }
+    template <typename T2> Ptr<TYPE> & operator=(T2 * _in) & { ptr = _in; return *this; }
+    template <typename T2> Ptr<TYPE> & operator=(Ptr<T2> _in) & { ptr = _in.Raw(); return *this; }
 
     // Auto-cast to raw pointer type.
     operator TYPE *() { return ptr; }
@@ -896,21 +889,28 @@ namespace emp {
     operator bool() { return ptr != nullptr; }
     operator bool() const { return ptr != nullptr; }
 
-    // Comparisons to other Ptr objects
-    bool operator==(const Ptr<TYPE> & in_ptr) const { return ptr == in_ptr.ptr; }
-    bool operator!=(const Ptr<TYPE> & in_ptr) const { return ptr != in_ptr.ptr; }
-    bool operator<(const Ptr<TYPE> & in_ptr)  const { return ptr < in_ptr.ptr; }
-    bool operator<=(const Ptr<TYPE> & in_ptr) const { return ptr <= in_ptr.ptr; }
-    bool operator>(const Ptr<TYPE> & in_ptr)  const { return ptr > in_ptr.ptr; }
-    bool operator>=(const Ptr<TYPE> & in_ptr) const { return ptr >= in_ptr.ptr; }
+    template <typename T> bool operator==(const T & in_ptr) const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr == in_ptr.ptr; }
+      else { return ptr == in_ptr; }
+    }
+    template <typename T> bool operator!=(const T & in_ptr) const { return !operator==(in_ptr); }
 
-    // Comparisons to raw pointers.
-    bool operator==(const TYPE * in_ptr) const { return ptr == in_ptr; }
-    bool operator!=(const TYPE * in_ptr) const { return ptr != in_ptr; }
-    bool operator<(const TYPE * in_ptr)  const { return ptr < in_ptr; }
-    bool operator<=(const TYPE * in_ptr) const { return ptr <= in_ptr; }
-    bool operator>(const TYPE * in_ptr)  const { return ptr > in_ptr; }
-    bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
+    template <typename T> bool operator<(const T & in_ptr)  const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr < in_ptr.ptr; }
+      else { return ptr < in_ptr; }
+    }
+    template <typename T> bool operator>(const T & in_ptr)  const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr > in_ptr.ptr; }
+      else { return ptr > in_ptr; }
+    }
+    template <typename T> bool operator<=(const T & in_ptr) const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr <= in_ptr.ptr; }
+      else { return ptr <= in_ptr; }
+    }
+    template <typename T> bool operator>=(const T & in_ptr) const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr >= in_ptr.ptr; }
+      else { return ptr >= in_ptr; }
+    }
 
     [[nodiscard]] Ptr<TYPE> operator+(int value) const { return ptr + value; }
     [[nodiscard]] Ptr<TYPE> operator-(int value) const { return ptr - value; }
@@ -1014,7 +1014,7 @@ namespace emp {
   /// Fill an array with the provided fill_value.
   /// If fill_value is a function, repeatedly call function.
   template <typename T>
-  void FillMemory(emp::Ptr<unsigned char>  mem_ptr, const size_t num_bytes, T fill_value) {
+  void FillMemory(emp::Ptr<unsigned char> mem_ptr, const size_t num_bytes, T fill_value) {
     // If the fill value is a function, call that function for each memory position.
     if constexpr (std::is_invocable_v<T>) {
       FillMemoryFunction(mem_ptr, num_bytes, std::forward<T>(fill_value));
@@ -1058,6 +1058,19 @@ namespace emp {
       fill_value = fill_fun();
       std::memcpy(dest+limit, &fill_value, leftover);
     }
+  }
+
+  /// Copy an array from the provided memory.
+  template <typename T>
+  void CopyMemory(
+    emp::Ptr<T> from_ptr,
+    emp::Ptr<T> to_ptr,
+    const size_t num_items)
+  {
+    constexpr size_t FILL_CHUNK = sizeof(T);
+    const size_t num_bytes = num_items * FILL_CHUNK;
+
+    std::memcpy(to_ptr.Raw(), from_ptr.Raw(), num_bytes);
   }
 
 } // namespace emp

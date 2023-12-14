@@ -1,9 +1,11 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file SampleConfig.hpp
+ *  @file
+ *  @brief TODO.
  *  @note Adapted from Emily's memic_model project
  *  https://github.com/emilydolson/memic_model
  */

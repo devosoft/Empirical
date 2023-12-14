@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2022.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019.
- *
- *  @file RegEx.hpp
+ *  @file
  *  @brief Basic regular expression handler.
  *  @note Status: BETA
  *
@@ -29,8 +30,11 @@
  *    static DFA to_DFA(const RegEx & regex);
  *
  *
- *  @todo Need to implement  ^ and $ (beginning and end of line)
- *  @todo Need to implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respecitvely)
+ *  @todo Implement  ^ and $ (beginning and end of line)
+ *  @todo Implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respectively)
+ *  @todo Implement \d (for digits), \s (for whitespace), etc.
+ *  @todo Consider a separator (maybe backtick?) to divide up a regex expression;
+ *        the result can be returned by each section as a vector of strings.
  */
 
 #ifndef EMP_COMPILER_REGEX_HPP_INCLUDE
@@ -39,6 +43,7 @@
 
 #include <ostream>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 
 #include "../base/Ptr.hpp"
@@ -205,9 +210,11 @@ namespace emp {
           // If blocks are nested, merge them into a single block.
           if (nodes[i]->AsBlock()) {
             auto old_node = nodes[i]->AsBlock();    // Save the old node for merging.
-            nodes.erase(nodes.begin() + (int) i);  // Remove block from nodes.
-            nodes.insert(nodes.begin() + (int) i, old_node->nodes.begin(), old_node->nodes.end());
-            old_node->nodes.resize(0);  // Don't recurse delete since nodes were moved!
+            nodes.erase(nodes.begin() + (int) i);   // Remove block from nodes.
+            if (old_node->nodes.size()) {
+              nodes.insert(nodes.begin() + (int) i, old_node->nodes.begin(), old_node->nodes.end());
+              old_node->nodes.resize(0);  // Don't recurse delete since nodes were moved!
+            }
             old_node.Delete();
             i--;
             modify = true;
@@ -345,7 +352,7 @@ namespace emp {
             case '-':
             case '\\':
             case ']':
-            case '[':
+            case '[': // technically doesn't need to be escaped, but allowed.
             case '^':
               break;
             default:
@@ -455,7 +462,7 @@ namespace emp {
 
     /// Process the input regex into a tree representaion.
     Ptr<re_block> Process(Ptr<re_block> cur_block=nullptr) {
-      emp_assert(pos >= 0 && pos < regex.size(), pos, regex.size());
+      emp_assert(pos < regex.size(), pos, regex.size());
 
       // If caller does not provide current block, create one (and return it.)
       if (cur_block==nullptr) cur_block = NewPtr<re_block>();

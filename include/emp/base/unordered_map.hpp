@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2019-2020.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019-2020.
- *
- *  @file unordered_map.hpp
+ *  @file
  *  @brief A drop-in wrapper for std::unordered_map and unordered_multi_map; makes sure we create vars on access.
  *  @note Status: ALPHA
  */
@@ -12,6 +13,7 @@
 #define EMP_BASE_UNORDERED_MAP_HPP_INCLUDE
 
 #include <initializer_list>
+#include <stddef.h>
 #include <unordered_map>
 
 #include "assert.hpp"

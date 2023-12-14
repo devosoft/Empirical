@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2022.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
- *
- *  @file type_traits.hpp
+ *  @file
  *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
  */
 
@@ -11,7 +12,10 @@
 #define EMP_META_TYPE_TRAITS_HPP_INCLUDE
 
 
+#include <cstdint>       // uint8_t, uint16_t, etc.
 #include <functional>
+#include <span>
+#include <stddef.h>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -21,6 +25,7 @@
 // located in base directory to preserve levelization
 
 #include "meta.hpp"
+
 
 namespace emp {
 
@@ -75,6 +80,7 @@ namespace emp {
   template<typename T>
   struct HasToDouble<emp::decoy_t<T, decltype(std::declval<T>().ToDouble())>> : std::true_type{};
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Determine if a type has a FromString() member function.
   template <typename T, typename=void> struct HasFromString : std::false_type { };
   template<typename T>
@@ -84,6 +90,7 @@ namespace emp {
   template <typename T, typename=void> struct HasFromDouble : std::false_type { };
   template<typename T>
   struct HasFromDouble<emp::decoy_t<T, decltype(std::declval<T>().FromDouble(0.0))>> : std::true_type{};
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Determine if a type passed in is an std::function type (vs a lambda or a raw function)
   template <typename> struct is_std_function : std::false_type { };
@@ -94,7 +101,7 @@ namespace emp {
   template <typename T> struct remove_std_function_type<std::function<T>> { using type = T; };
   template <typename T> using remove_std_function_t = typename remove_std_function_type<T>::type;
 
-  // Collect the reference type for any container.
+  // Collect the reference type for any standard container.
   template <typename T> struct element_type { using type = T; };
   template <template <typename...> class TMPL, typename T> struct element_type<TMPL<T>>  { using type = T; };
   template <typename T> using element_t = typename element_type<T>::type;
@@ -105,14 +112,20 @@ namespace emp {
   template <typename T, typename... Ts>
   struct is_emp_vector<emp::vector<T, Ts...>> : std::true_type { };
 
+  /// Determine if we have a span.
+  template <typename> struct is_span : std::false_type { };
+  template <typename T>
+  struct is_span<std::span<T>> : std::true_type { };
+  // template <typename T, size_t SIZE>
+  // struct is_span<std::span<T,SIZE>> : std::true_type { };
 
   // Customized type traits; for the moment, make sure that emp::Ptr is handled correctly.
   template <typename> struct is_ptr_type : public std::false_type { };
   template <typename T> struct is_ptr_type<T*> : public std::true_type { };
   template <typename T> struct is_ptr_type<T* const> : public std::true_type { };
   template <typename T> struct is_ptr_type<Ptr<T>> : public std::true_type { };
-  template <typename T>
-  constexpr bool is_ptr_type_v(const T&) { return is_ptr_type<T>::value; }
+  template <typename T> constexpr bool is_ptr_type_v() { return is_ptr_type<T>::value; }
+  template <typename T> constexpr bool is_ptr_type_v(const T&) { return is_ptr_type<T>::value; }
   template <typename T> using is_pointer = is_ptr_type<T>;
 
   template <typename T> struct remove_ptr_type         { using type = T; };

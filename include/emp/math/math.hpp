@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
- *
- *  @file math.hpp
+ *  @file
  *  @brief Useful mathematical functions (that are constexpr when possible.)
  *  @note Status: BETA (though new functions are added frequently)
  */
@@ -14,8 +15,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <initializer_list>
 #include <numeric>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../meta/reflection.hpp"
@@ -269,7 +272,7 @@ namespace emp {
     // exclude clang versions with compiler bug https://reviews.llvm.org/D35190
     #if defined(__clang__) && __clang_major__>=9 || defined(__GNUC__) && !defined(__clang__)
     // if base is not known at compile time, use std::pow which is faster
-    if ( !__builtin_constant_p( base ) ) return std::pow(base, exp);
+    if ( !__builtin_constant_p( base ) ) return static_cast<T>(std::pow(base, exp));
     // otherwise, use constexpr-friendly implementations
     else
     #endif

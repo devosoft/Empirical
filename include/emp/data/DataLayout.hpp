@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2019-2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019.
- *
- *  @file DataLayout.hpp
+ *  @file
  *  @brief A mapping of names to variables stored in a MemoryImage.
  *  @note Status: ALPHA
  */
@@ -11,12 +12,14 @@
 #ifndef EMP_DATA_DATALAYOUT_HPP_INCLUDE
 #define EMP_DATA_DATALAYOUT_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 #include <unordered_map>
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
+#include "../math/constants.hpp"
 #include "../meta/TypeID.hpp"
 
 #include "MemoryImage.hpp"
@@ -32,6 +35,7 @@ namespace emp {
       std::string name;   ///< Name of this setting.
       std::string desc;   ///< Full description of this setting.
       std::string notes;  ///< Any additional notes about this setting.
+      size_t count;       ///< Number of objects in this entry.
 
       bool is_log;        ///< Is this setting a current value or a log of all values?
     };
@@ -74,13 +78,55 @@ namespace emp {
     /// Determine if we have an ID.
     bool HasID(size_t id) const { return emp::Has(setting_map, id); }
 
-    /// Detemine if we have the correct type of a specific variable ID.
+    /// Determine if we have the correct type of a specific variable ID.
     template <typename T>
     bool IsType(size_t id) const {
-      emp_assert(Has(setting_map, id), id);
+      emp_assert(emp::Has(setting_map, id), id);
       return setting_map.find(id)->second.type == emp::GetTypeID<T>();
     }
 
+    // Verify type, position, AND count.
+    template <typename T>
+    bool Has(size_t id, size_t count=1) const {
+      auto it = setting_map.find(id);
+      return it != setting_map.end() &&
+             it->second.type == emp::GetTypeID<T>() &&
+             it->second.count == count;
+    }
+
+    // Verify name, position, AND count.
+    template <typename T>
+    bool Has(const std::string & name, size_t count=1) const {
+      auto it = id_map.find(name);
+      return (it != id_map.end()) && Has<T>(it->second, count);
+    }
+
+    template <typename T, typename KEY_T>
+    std::string DiagnoseHas(KEY_T key, size_t count=1) const {
+      size_t id = 0;
+      if constexpr (std::is_arithmetic<KEY_T>()) {
+        id = key;
+      } else { // key is name.
+        auto it = id_map.find(key);
+        if (it == id_map.end()) return emp::to_string("Unknown trait name '", key, "'");
+        id = it->second;
+      }
+
+      auto setting_it = setting_map.find(id);
+      if (setting_it == setting_map.end()) {
+        if (id == emp::MAX_SIZE_T) return emp::to_string("Unknown ID ", id, " (aka -1)");
+        return emp::to_string("Unknown ID ", id);
+      }
+      if (setting_it->second.type != emp::GetTypeID<T>()) {
+        return emp::to_string("Checking for type as ", emp::GetTypeID<T>(),
+                              ", but recorded as ", setting_it->second.type);
+      }
+      if (setting_it->second.count != count) {
+        return emp::to_string("Checking for count of ", count,
+                              ", but recorded as ", setting_it->second.count);
+      }
+      return emp::to_string("Has<", emp::GetTypeID<T>(), ">(", key, ",", count, ") should be true.");
+    }
 
     /// Return the number of bytes in the default image.
     size_t GetImageSize() const { return image_size; }
@@ -97,31 +143,44 @@ namespace emp {
       return setting_map.find(id)->second.type;
     }
 
+    // What is the count associated with a given entry.
+    size_t GetCount(size_t id) const {
+      emp_assert(HasID(id), id);
+      return setting_map.find(id)->second.count;
+    }
+
+    /// Determine is entry is some form of numeric type.
+    bool IsNumeric(size_t id) const {
+      return GetType(id).IsArithmetic();
+    }
+
+    bool IsNumeric(const std::string & name) const {
+      return IsNumeric(GetID(name));
+    }
+
     /// Prevent this layout from being modified.
     void Lock() { is_locked = true; }
 
     /// Add a new variable with a specified type, name and value.
     template <typename T>
-    size_t Add(MemoryImage & base_memory,
-                const std::string & name,
-                const T & default_value,
-                const std::string & desc="",
-                const std::string & notes="") {
-      emp_assert(!HasName(name), name);    // Make sure this doesn't already exist.
-      emp_assert(is_locked == false);      // Cannot add to a locked layout.
+    size_t Add(MemoryImage & base_memory,      // Memory to store prototype objects.
+                const std::string & name,      // Lookup name for this variable.
+                const T & default_value,       // Initial value for each object in this entry.
+                const std::string & desc="",   // Description associated with this variable
+                const std::string & notes="",  // Additional information.
+                const size_t count = 1         // Number of values to store with this entry.
+              ) {
+      emp_assert(!HasName(name), name);        // Make sure this doesn't already exist.
+      emp_assert(count >= 1);                  // Must add at least one instance of an object.
+      emp_assert(is_locked == false);          // Cannot add to a locked layout.
 
-      // std::cout << "\nL: Adding var '" << name
-      //           << "' of type " << emp::GetTypeID<T>()
-      //           << " to DataMap with " << id_map.size() << " elements"
-      //           << " totalling " << image_size << " bytes."
-      //           << std::endl;
-
-      // Analyze the size of the new object and where it will go.
+      // Analyze the size of the new object(s) and where it will go.
       constexpr const size_t obj_size = sizeof(T);
+      const size_t entry_size = obj_size * count;
       const size_t pos = image_size;
 
       // Create a new image with enough room for the new object and move the old data over.
-      MemoryImage new_memory(image_size + obj_size);
+      MemoryImage new_memory(image_size + entry_size);
       MoveImageContents(base_memory, new_memory);
 
       // Now that the data is moved, cleanup the old image and put the new one in place.
@@ -129,18 +188,22 @@ namespace emp {
 
       // Setup this new object.
       image_size = base_memory.GetSize();
-      base_memory.Construct<T>(pos, default_value);
+      for (size_t i = 0; i < count; ++i) {
+        base_memory.Construct<T>(pos + i*obj_size, default_value);
+      }
       base_memory.init_to = image_size;
 
       // Store the information about this object.
       id_map[name] = pos;
-      setting_map[pos] = { emp::GetTypeID<T>(), name, desc, notes, false };
+      setting_map[pos] = { emp::GetTypeID<T>(), name, desc, notes, count, false };
 
       // Store copy constructor if needed.
       if (std::is_trivially_copyable<T>() == false) {
         copy_constructors.push_back(
-          [pos](const MemoryImage & from_image, MemoryImage & to_image) {
-            to_image.CopyObj<T>(pos, from_image);
+          [pos,count](const MemoryImage & from_image, MemoryImage & to_image) {
+            for (size_t i = 0; i < count; ++i) {
+              to_image.CopyObj<T>(pos + i*sizeof(T), from_image);
+            }
           }
         );
       }
@@ -148,15 +211,21 @@ namespace emp {
       // Store destructor if needed.
       if (std::is_trivially_destructible<T>() == false) {
         destructors.push_back(
-          [pos](MemoryImage & image) { image.Destruct<T>(pos); }
+          [pos,count](MemoryImage & image) {
+            for (size_t i = 0; i < count; ++i) {
+              image.Destruct<T>(pos + i*sizeof(T));
+            }
+          }
         );
       }
 
       // Store move constructor if needed.
       if (std::is_trivially_destructible<T>() == false) {
         move_constructors.push_back(
-          [pos](MemoryImage & from_image, MemoryImage & to_image) {
-            to_image.MoveObj<T>(pos, from_image);
+          [pos,count](MemoryImage & from_image, MemoryImage & to_image) {
+            for (size_t i = 0; i < count; ++i) {
+              to_image.MoveObj<T>(pos + i*sizeof(T), from_image);
+            }
           }
         );
       }
@@ -176,7 +245,7 @@ namespace emp {
       image.init_to = 0;
     }
 
-    /// Destruct and delete all memomry assocated with this DataMap.
+    /// Destruct and delete all memory associated in the provided image.
     void ClearImage(MemoryImage & image) const {
       // If this memory image is already clear, stop.
       if (image.GetSize() == 0) return;

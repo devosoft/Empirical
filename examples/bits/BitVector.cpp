@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016
- *
- *  @file BitVector.cpp
+ *  @file
  *  @brief Some example code for using emp::Ptr
  */
 
@@ -45,6 +46,7 @@ int main()
     auto set5 = set3 & set4;
     total += set5.CountOnes();
   }
+  std::cout << "Total = " << total << std::endl;
 
   std::clock_t emp_tot_time = std::clock() - emp_start_time;
   double time = 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC;

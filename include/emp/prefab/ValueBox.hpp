@@ -1,10 +1,11 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file ValueBox.hpp
- *  @brief UI subcomponent for ConfigPanel and ReadoutPanel.
+ *  @file
+ *  @brief UI sub-component for ConfigPanel and ReadoutPanel.
  */
 
 #ifndef EMP_PREFAB_VALUEBOX_HPP_INCLUDE
@@ -164,12 +165,12 @@ namespace emp::prefab {
     ValueControl(
       const std::string & label,
       const std::string & desc,
-      const std::string & inital_value,
+      const std::string & initial_value,
       web::Input input,
       const std::string & id=""
     ) : ValueBox(label, desc, id), mainCtrl(input) {
       view << mainCtrl;
-      mainCtrl.Value(inital_value);
+      mainCtrl.Value(initial_value);
     }
   };
 
@@ -190,7 +191,11 @@ namespace emp::prefab {
       const std::string & label,
       const std::string & desc,
       const std::string & value,
-      const std::function<void(const std::string &)> & onChange = [](const std::string &) { ; },
+      const std::function<void(const std::string &)> & onChange
+        #ifndef DOXYGEN_SHOULD_SKIP_THIS
+        = [](const std::string &) { ; }
+        #endif // DOXYGEN_SHOULD_SKIP_THIS
+        ,
       const std::string & id=""
     ) : ValueControl(label, desc, value, web::Input(onChange, "text", ""), id) {
       mainCtrl.AddAttr("class", "form-control");
@@ -206,7 +211,7 @@ namespace emp::prefab {
     /**
      * @param label name for this value
      * @param desc a more detailed description of what the value means
-     * @param value the initial value
+     * @param is_checked is switch initially on?
      * @param onChange function to be called when the user changes this value
      * @param id user defined ID for BoolValueControl div (default is emscripten generated)
      */
@@ -214,7 +219,11 @@ namespace emp::prefab {
       const std::string & label,
       const std::string & desc,
       const bool is_checked,
-      const std::function<void(const std::string &)> & onChange = [](const std::string &) { ; },
+      const std::function<void(const std::string &)> & onChange
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
+      = [](const std::string & val) { ; }
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
+      ,
       const std::string & id=""
     ) : ValueBox(label, desc, id) {
       prefab::ToggleSwitch toggle(onChange, "", is_checked);
@@ -236,6 +245,7 @@ namespace emp::prefab {
     )>;
 
     // Determine the default range by finding the next highest order of magnitude (base 10)
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     inline static range_setter_t applyDefaultRange = [](
       const std::string & value,
       const std::string & type,
@@ -259,6 +269,7 @@ namespace emp::prefab {
         in.Step(step);
       }
     };
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     public:
     /**
@@ -274,7 +285,11 @@ namespace emp::prefab {
       const std::string & desc,
       const std::string & value,
       const std::string & type,
-      const std::function<void(const std::string & val)> & onChange = [](const std::string & val) { ; },
+      const std::function<void(const std::string & val)> & onChange
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
+      = [](const std::string & val) { ; }
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
+      ,
       const std::string & id=""
     ) : ValueControl(label, desc, value, web::Input([](const std::string & val){ ; }, "range", ""), id) {
       mainCtrl.AddAttr("class", "form-range");

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
- *
- *  @file Angle2D.hpp
+ *  @file
  *  @brief emp::Angle maintains an angle on a 2D surface.
  *
  *  The internal representation uses an int to represent angles.
@@ -15,6 +16,7 @@
 #define EMP_GEOMETRY_ANGLE2D_HPP_INCLUDE
 
 #include <cmath>
+#include <cstdint>
 
 #include "../math/constants.hpp"
 

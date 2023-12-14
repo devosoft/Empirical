@@ -1,11 +1,13 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020-23
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
- *
- *  @file QueueCache.hpp
+ *  @file
  *  @brief A simple implementation of a Least-Recently Used Cache.
- *    It orders elements by access time and removes the stalest ones in case maximum capacity is reached.
+ *    It orders elements by access time and removes the stalest ones in case
+ *    maximum capacity is reached.
  */
 
 #ifndef EMP_DATASTRUCTS_QUEUECACHE_HPP_INCLUDE
@@ -14,11 +16,14 @@
 #include <functional>
 #include <limits>
 #include <list>
+#include <stddef.h>
 #include <stdexcept>
 #include <unordered_map>
 #include <utility>
 
 #include "../base/assert.hpp"
+
+#include "map_utils.hpp"
 
  namespace emp {
   template <
@@ -40,6 +45,7 @@
       // maximum number of elements the cache can hold
       size_t capacity;
 
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
       // Put the iterator at the beginning of the list, and returns its value
       // @param it Iterator to element to update
       // @return Reference to value of updated element
@@ -52,6 +58,7 @@
         );
         return it->second;
       }
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
 
       // Shrink cache to its capacity by removing elements at the end of it
       void Shrink() {
@@ -71,8 +78,8 @@
       // Delete given iterator from cache
       // @param it cache_map iterator to element to be deleted from cache
       void Delete(const typename cache_map_t::iterator it) {
-        cache_map.erase(it);
         cache_list.erase(it->second);
+        cache_map.erase(it);
       }
 
     public:
@@ -103,9 +110,8 @@
       /// Delete element from cache.
       /// @param key Key to delete from cache
       void Delete(const Key& key) {
-        Delete(
-          cache_map.find(key)
-        );
+        emp_assert(emp::Has(cache_map, key));
+        Delete(cache_map.find(key));
       }
 
       /// Does cache contain key?
@@ -120,17 +126,15 @@
       /// @param val Value of element to store
       /// @return Iterator to newly-added element in cache queue
       typename cache_list_t::iterator Put(const Key& key, const Value& val) {
-        // try to find element in map
+        // If the element is already in the cache, delete it.
         const auto found = cache_map.find(key);
         if (found != cache_map.end()) {
           Delete(found);
         }
-        // put element into our cache
-        cache_list.emplace_front(key, val);
-        // add pointer to this element to our map
-        cache_map.emplace(key, cache_list.begin());
-        // make sure we don't have more elements than our capacity
-        Shrink();
+
+        cache_list.emplace_front(key, val);         // Put element into the cache
+        cache_map.emplace(key, cache_list.begin()); // Add element pointer to map
+        Shrink();                                   // Reduce if we are over capacity
 
         return cache_list.begin();
       }

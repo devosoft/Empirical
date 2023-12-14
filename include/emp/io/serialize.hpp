@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2021.
- *
- *  @file serialize.hpp
+ *  @file
  *  @brief Tools to save and load data from classes.
  *  @note Status: ALPHA
  *
@@ -52,6 +53,7 @@
 #ifndef EMP_IO_SERIALIZE_HPP_INCLUDE
 #define EMP_IO_SERIALIZE_HPP_INCLUDE
 
+#include <cstdint>
 #include <iostream>
 
 #include "../base/Ptr.hpp"

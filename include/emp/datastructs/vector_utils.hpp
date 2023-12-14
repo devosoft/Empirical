@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2021.
- *
- *  @file vector_utils.hpp
+ *  @file
  *  @brief A set of simple functions to manipulate emp::vector
  *  @note Status: BETA
  *
@@ -21,17 +22,35 @@
 #include <map>
 #include <numeric>
 #include <set>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 #include "../tools/string_utils.hpp"
 
 namespace emp {
 
+  /// Remove and return the first element of a vector.
+  template <typename T>
+  T PopFront(emp::vector<T> & v) {
+    emp_assert(v.size());
+    T out = v[0];
+    v.erase(v.begin());
+    return out;
+  }
+
+  /// Insert a value at a specified position in a vector.
+  template <typename T>
+  void InsertAt(emp::vector<T> & v, size_t id, T value) {
+    v.insert(v.begin()+id, value);
+  }
+
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /// Base case for Append; we just have a single vector with nothing to append.
   template <typename T>
   emp::vector<T> & Append(emp::vector<T> & base) {
     return base;
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Append one or more vectors on to the end of an existing vector.
   template <typename T, typename V1, typename... Vs>
@@ -50,8 +69,7 @@ namespace emp {
     return Append(base, vs...);
   }
 
-
-  /// Concatonate two or more vectors together, creating a new vector.
+  /// Concatenate two or more vectors together, creating a new vector.
   template <typename T, typename... Vs>
   emp::vector<T> Concat(const emp::vector<T> & v1, const Vs &... vs) {
     emp::vector<T> out_v(v1);
@@ -61,13 +79,19 @@ namespace emp {
 
   /// Convert a map to a vector.
   template <typename T, typename INDEX_T=size_t>
-  emp::vector<T> ToVector(const std::map<INDEX_T, T> & in_map, T default_val=T()) {
+  emp::vector<T> ToVector(
+    const std::map<INDEX_T, T> & in_map,
+    T default_val=T(),
+    INDEX_T index_cap=32768
+  ) {
     INDEX_T max_index = in_map.back().second;
     if (max_index < 0) max_index = 0; // In case all entries are negative...
+    if (max_index >= index_cap) max_index=index_cap-1;
     emp::vector<T> out_vec;
     out_vec.resize(max_index+1, default_val);
     for (auto [index, val] : in_map) {
-      if (index < 0) continue; // Skip entries that can't go into a vector...
+      if (index < 0) continue;       // Skip entries that can't go into a vector...
+      if (index >= index_cap) break; // Stop when we've hit the upper limit on vector size.
       out_vec[index] = val;
     }
     return out_vec;
@@ -75,10 +99,14 @@ namespace emp {
 
   /// Convert an unordered map to a vector.
   template <typename T, typename INDEX_T=size_t>
-  emp::vector<T> ToVector(const std::unordered_map<INDEX_T, T> & in_map, T default_val=T()) {
+  emp::vector<T> ToVector(
+    const std::unordered_map<INDEX_T, T> & in_map,
+    T default_val=T(),
+    INDEX_T index_cap=32768
+  ) {
     emp::vector<T> out_vec;
     for (auto [index, val] : in_map) {
-      if (index < 0) continue; // Skip entries that can't go into a vector...
+      if (index < 0 || index >= index_cap) continue; // Skip entries that can't go into a vector...
       if (((size_t) index) >= out_vec.size()) out_vec.resize(index+1, default_val);
       out_vec[index] = val;
     }
@@ -121,6 +149,29 @@ namespace emp {
     if (pos == -1) return false;
     v.erase(v.begin() + pos);
     return true;
+  }
+
+  /// Remove value at an index.
+  template <typename T>
+  void RemoveAt(emp::vector<T> & v, size_t id) {
+    v.erase(v.begin() + id);
+  }
+
+  /// Remove values starting at an index.
+  template <typename T>
+  void RemoveAt(emp::vector<T> & v, size_t id, size_t count) {
+    if (!count) return;
+    v.erase(v.begin() + id, v.begin() + id + count);
+  }
+
+  /// Return a new vector containing the same elements as @param v
+  /// with any duplicate elements removed.
+  /// Not guaranteed to preserve order
+  template <typename T>
+  emp::vector<T> RemoveDuplicates(const emp::vector<T> & v) {
+    std::set<T> temp_set(v.begin(), v.end());
+    emp::vector<T> new_vec(temp_set.begin(), temp_set.end());
+    return new_vec;
   }
 
   /// Return whether a value exists in a vector
@@ -292,16 +343,6 @@ namespace emp {
       emp::vector<T> numbers(N2-N1);
       std::iota(numbers.begin(), numbers.end(), N1);
       return numbers;
-  }
-
-  /// Return a new vector containing the same elements as @param v
-  /// with any duplicate elements removed.
-  /// Not guaranteed to preserve order
-  template <typename T>
-  emp::vector<T> RemoveDuplicates(const emp::vector<T> & v) {
-    std::set<T> temp_set(v.begin(), v.end());
-    emp::vector<T> new_vec(temp_set.begin(), temp_set.end());
-    return new_vec;
   }
 
   /// Build a vector with a range of values from min to max at the provided step size.

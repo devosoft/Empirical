@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2020
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020
- *
- *  @file unique.hpp
+ *  @file
  *  @brief Methods to generate UIDs.
  */
 
@@ -13,6 +14,7 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+#include <stddef.h>
 #include <type_traits>
 
 #include "../base/assert.hpp"

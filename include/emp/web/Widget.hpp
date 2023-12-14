@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2019.
- *
- *  @file Widget.hpp
+ *  @file
  *  @brief Widgets maintain individual components on a web page and link to Elements
  *
  *  Each HTML Widget has all of its details stored in a WidgetInfo object; Multiple Widgets can
@@ -33,8 +34,10 @@
 #define EMP_WEB_WIDGET_HPP_INCLUDE
 
 
+#include <stddef.h>
 #include <string>
 
+#include "../base/error.hpp"
 #include "../base/errors.hpp"
 #include "../base/vector.hpp"
 #include "../control/Signal.hpp"
@@ -82,7 +85,9 @@ namespace web {
   class Widget {
     friend internal::WidgetInfo; friend internal::DivInfo; friend internal::TableInfo;
   protected:
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     using WidgetInfo = internal::WidgetInfo;
+    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
     WidgetInfo * info;                        ///< Information associated with this widget.
 
     /// If an Append doesn't work with current class, forward it to the parent and try there.
@@ -257,11 +262,11 @@ namespace web {
       virtual void Unregister(Widget & w) { if (parent) parent->Unregister(w); }
 
       // Some nodes can have children and need to be able to recursively register them.
-      virtual void RegisterChildren(DivInfo * registrar) { ; }   // No children by default.
-      virtual void UnregisterChildren(DivInfo * registrar) { ; } // No children by default.
+      virtual void RegisterChildren(DivInfo * /*registrar*/) { ; }   // No children by default.
+      virtual void UnregisterChildren(DivInfo * /*registrar*/) { ; } // No children by default.
 
-      virtual void AddChild(Widget in) { ; }
-      virtual void RemoveChild(Widget & child) { ; }
+      virtual void AddChild(Widget /*in*/) { emp_error("Invalid Widget for AddChild!", id); }
+      virtual void RemoveChild(Widget & /*child*/) { emp_error("Invalid Widget for RemoveChild!", id); }
 
       // Record dependants.  Dependants are only acted upon when this widget's action is
       // triggered (e.g. a button is pressed)
@@ -399,6 +404,7 @@ namespace web {
   // Implementation of Widget methods...
 
   Widget::Widget(const std::string & id) {
+    (void) id; // Not used outside of debug mode.
     emp_assert(has_whitespace(id) == false);
     // We are creating a new widget; in derived class, make sure:
     // ... to assign info pointer to new object of proper *Info type

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
- *
- *  @file _MochaTestRunner.hpp
+ *  @file
  *  @brief Utility class for managing software testing for Emscripten web code using the Karma + Mocha
  *         javascript testing framework.
  *
@@ -15,6 +16,7 @@
 #include <algorithm>
 #include <deque>
 #include <functional>
+#include <stddef.h>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -104,12 +106,12 @@ namespace web {
 
   /// Utility class for managing software tests written for Emscripten web code.
   /// IMPORTANT: This utility assumes the Karma + Mocha javascript testing framework.
-  // MochaTestRunner is useful because emscripten does not play very nice with the browser event queue (i.e.,
-  // it does not relinquish control back to the browser until it finishes executing the compiled 'C++'
-  // code). This interacts poorly with Mocha because Mocha's 'describe' statements do not execute when
-  // they are called; instead, they are added to the browser's event queue.
-  // The MochaTestRunner exploits Mocha's describe statements + the browser's event queue to chain together
-  // the tests added to the MochaTestRunner.
+  /// MochaTestRunner is useful because emscripten does not play very nice with the browser event queue (i.e.,
+  /// it does not relinquish control back to the browser until it finishes executing the compiled 'C++'
+  /// code). This interacts poorly with Mocha because Mocha's 'describe' statements do not execute when
+  /// they are called; instead, they are added to the browser's event queue.
+  /// The MochaTestRunner exploits Mocha's describe statements + the browser's event queue to chain together
+  /// the tests added to the MochaTestRunner.
   class MochaTestRunner {
   protected:
 

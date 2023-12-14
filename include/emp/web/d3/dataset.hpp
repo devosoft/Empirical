@@ -1,16 +1,19 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
- *
- *  @file dataset.hpp
+ *  @file
  *  @brief Tools to maintain data in D3.
  */
 
 #ifndef EMP_WEB_D3_DATASET_HPP_INCLUDE
 #define EMP_WEB_D3_DATASET_HPP_INCLUDE
 
+#include <cstdint>
 #include <functional>
+#include <stddef.h>
 
 #include "d3_init.hpp"
 

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file command_line.hpp
+ *  @file
  *  @brief This file contains tools for dealing with command-line arguments (argv and argc).
  *
  *  Functions here include:
@@ -34,6 +35,7 @@
 #ifndef EMP_CONFIG_COMMAND_LINE_HPP_INCLUDE
 #define EMP_CONFIG_COMMAND_LINE_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 
 #include "../base/vector.hpp"

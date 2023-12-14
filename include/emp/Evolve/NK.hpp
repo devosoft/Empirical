@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
- *
- *  @file NK.hpp
+ *  @file
  *  @brief This file provides code to build NK-based algorithms.
  *
  *  Two version of landscapes are provided.  NKLandscape pre-calculates the entire landscape, for
@@ -19,6 +20,7 @@
 #define EMP_EVOLVE_NK_HPP_INCLUDE
 
 #include <array>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 #include "../bits/BitVector.hpp"

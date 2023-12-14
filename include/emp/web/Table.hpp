@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
- *
- *  @file Table.hpp
+ *  @file
  *  @brief Specs for the Table widget.
  *
  *  TableInfo is the core information for a table and has two helper classes:
@@ -11,7 +12,7 @@
  *  object.
  *
  *  A Table is composed of a series of rows, each with the same number of columns.
- *  TableDataInfo may be muliple cells wide/tall, masking other cells.
+ *  TableDataInfo may be multiple cells wide/tall, masking other cells.
  *
  *
  *  @todo Tables should more directly manage internal slates rather than just adding divs and
@@ -27,6 +28,8 @@
 #ifndef EMP_WEB_TABLE_HPP_INCLUDE
 #define EMP_WEB_TABLE_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../base/vector.hpp"
 
 #include "Div.hpp"
@@ -36,6 +39,7 @@
 namespace emp {
 namespace web {
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   class TableWidget;
   class Table;
   class TableCell;
@@ -44,7 +48,6 @@ namespace web {
   class TableRowGroup;
   class TableColGroup;
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     struct TableRowInfo;
@@ -59,7 +62,7 @@ namespace web {
 
       emp::vector<Widget> children;  ///< Widgets contained in this cell.
 
-      /// Debug function to determine if this datum is structually consistent.
+      /// Debug function to determine if this datum is structurally consistent.
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
         if (verbose) ss << prefix << "Scanning: emp::TableDataInfo" << std::endl;
@@ -87,7 +90,7 @@ namespace web {
         return *this;
       }
 
-      /// Debug function to determine if this row is structually consistent.
+      /// Debug function to determine if this row is structurally consistent.
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
         if (verbose) { ss << prefix << "Scanning: emp::TableRowInfo" << std::endl; }
@@ -106,8 +109,10 @@ namespace web {
     };
 
     class TableInfo : public internal::WidgetInfo {
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
       friend TableWidget; friend Table; friend TableCell; friend TableRow; friend TableCol;
       friend TableRowGroup; friend TableColGroup;
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
     protected:
       size_t row_count;                        /// How big is this table?
       size_t col_count;
@@ -235,18 +240,18 @@ namespace web {
 
       // Tables need to facilitate recursive registrations
 
-      void RegisterChildren(internal::DivInfo * regestrar) override {
+      void RegisterChildren(internal::DivInfo * registrar) override {
         for (size_t r = 0; r < row_count; r++) {
           for (size_t c = 0; c < col_count; c++) {
-            for (Widget & child : rows[r].data[c].children) regestrar->Register(child);
+            for (Widget & child : rows[r].data[c].children) registrar->Register(child);
           }
         }
       }
 
-      void UnregisterChildren(internal::DivInfo * regestrar) override {
+      void UnregisterChildren(internal::DivInfo * registrar) override {
         for (size_t r = 0; r < row_count; r++) {
           for (size_t c = 0; c < col_count; c++) {
-            for (Widget & child : rows[r].data[c].children) regestrar->Unregister(child);
+            for (Widget & child : rows[r].data[c].children) registrar->Unregister(child);
           }
         }
       }
@@ -514,7 +519,9 @@ namespace web {
   #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   class TableWidget : public internal::WidgetFacet<TableWidget> {
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend class internal::TableInfo;
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
     size_t cur_row;      // Which row/col is currently active?
     size_t cur_col;
@@ -587,14 +594,14 @@ namespace web {
     void ClearCells() { Info()->ClearTableCells(); }
     void ClearCell(size_t r, size_t c) { Info()->ClearCell(r, c); }
 
-    TableCell GetCell(size_t r, size_t c) const;  ///< Focus on a specifc cell in the table.
-    TableRow GetRow(size_t r) const;              ///< Focus on a specifc row in the table.
-    TableCol GetCol(size_t c) const;              ///< Focus on a specifc column in the table.
-    TableRowGroup GetRowGroup(size_t r) const;    ///< Focus on a specifc group of rows in the table.
-    TableColGroup GetColGroup(size_t c) const;    ///< Focus on a specifc group of columns in the table.
+    TableCell GetCell(size_t r, size_t c) const;  ///< Focus on a specific cell in the table.
+    TableRow GetRow(size_t r) const;              ///< Focus on a specific row in the table.
+    TableCol GetCol(size_t c) const;              ///< Focus on a specific column in the table.
+    TableRowGroup GetRowGroup(size_t r) const;    ///< Focus on a specific group of rows in the table.
+    TableColGroup GetColGroup(size_t c) const;    ///< Focus on a specific group of columns in the table.
     Table GetTable() const;                       ///< Focus on a the entire table.
 
-    /// Get the TExt widget assoited with the currently active cell.
+    /// Get the Text widget associated with the currently active cell.
     web::Text GetTextWidget() { return Info()->GetTextWidget(); }
 
     /// Add text to a specified cell in the table.
@@ -709,7 +716,7 @@ namespace web {
 
     /// Apply CSS to target cell.
     template <typename SETTING_TYPE>
-    Table & CellCSS(size_t row_id, size_t col_id, const std::string & setting, SETTING_TYPE && value) {
+    Table & CellCSS(size_t row_id, [[maybe_unused]] size_t col_id, const std::string & setting, SETTING_TYPE && value) {
       emp_assert(row_id >= 0 && row_id < Info()->row_count);
       emp_assert(col_id >= 0 && col_id < Info()->row_count);
       Info()->rows[row_id].extras.style.Set(setting, value);
@@ -717,7 +724,8 @@ namespace web {
       return *this;
     }
 
-    /// Apply CSS to all rows.  (@CAO: Should we use fancier jquery here?)
+    /// Apply CSS to all rows.
+    // (@CAO: Should we use fancier jquery here?)
     template <typename SETTING_TYPE>
     Table & RowsCSS(const std::string & setting, SETTING_TYPE && value) {
       for (auto & row : Info()->rows) row.extras.style.Set(setting, emp::to_string(value));

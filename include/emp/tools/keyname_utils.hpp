@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2019-2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
- *
- *  @file keyname_utils.hpp
+ *  @file
  *  @brief Utility functions that support the keyname file naming convention.
  *
  *  Plays nice with the Python package keyname.
@@ -64,19 +65,17 @@ namespace emp::keyname {
             }
             return true;
           }());
-          return emp::join_on(arr, "=");
+          return emp::join(arr, "=");
         }
       );
     }
 
-    return emp::join_on(res, "+");
+    return emp::join(res, "+");
 
   }
 
   inline unpack_t unpack(const std::string & filename) {
-
     unpack_t res;
-
     const auto kv_strs = emp::slice(
 #ifndef __EMSCRIPTEN__
       std::filesystem::path(filename).filename().string(), // get basename
@@ -91,7 +90,7 @@ namespace emp::keyname {
       std::cend(kv_strs),
       std::inserter(res, std::end(res)),
       [](const std::string & kv_str){
-        const auto kv_vec = emp::slice(kv_str, '=', 1);
+        const auto kv_vec = emp::slice(kv_str, '=', 2);
         emp_assert(kv_vec.size() > 0);
         emp_assert(kv_vec.size() <= 2);
         return (

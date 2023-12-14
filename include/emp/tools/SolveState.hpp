@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
- *
- *  @file SolveState.hpp
+ *  @file
  *  @brief Used as part of a branching solver to keep track of the current state.
  *  @note Status: BETA
  */
@@ -11,9 +12,9 @@
 #ifndef EMP_TOOLS_SOLVESTATE_HPP_INCLUDE
 #define EMP_TOOLS_SOLVESTATE_HPP_INCLUDE
 
+#include <stddef.h>
 
 #include "../base/assert.hpp"
-
 #include "../bits/BitVector.hpp"
 
 namespace emp {
@@ -56,7 +57,7 @@ namespace emp {
 
     /// Test if a particular item is going to be excluded for sure in the current solve state.
     /// (If it has been included -OR- is yet to be decided upon, false will be returned)
-    bool IsOut(size_t id) const { return !(IsIn(id) | IsUnk(id)); }
+    bool IsOut(size_t id) const { return !(IsIn(id) || IsUnk(id)); }
 
     /// Test if all items have been decided upon (none are still in the "unknown" state)
     bool IsFinal() const { return unk_items.None(); }

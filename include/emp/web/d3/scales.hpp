@@ -1,14 +1,17 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
- *
- *  @file scales.hpp
+ *  @file
  *  @brief Tools for scaling graph axes in D3.
  */
 
 #ifndef EMP_WEB_D3_SCALES_HPP_INCLUDE
 #define EMP_WEB_D3_SCALES_HPP_INCLUDE
+
+#include <stddef.h>
 
 #include "d3_init.hpp"
 #include "utils.hpp"

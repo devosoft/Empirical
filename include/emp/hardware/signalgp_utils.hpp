@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018-2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
- *
- *  @file signalgp_utils.hpp
+ *  @file
  *  @brief Helper functions for working with SignalGP virtual hardware/programs.
  *  @todo Mutator class
  *  @todo tests
@@ -13,7 +14,9 @@
 #define EMP_HARDWARE_SIGNALGP_UTILS_HPP_INCLUDE
 
 #include <algorithm>
+#include <cstdint>
 #include <functional>
+#include <stddef.h>
 #include <string>
 #include <unordered_set>
 
@@ -33,6 +36,7 @@ namespace emp {
   /// @param unique_from - Other tags that the tag being generated should be unique with respect to.
   template<size_t TAG_WIDTH>
   BitSet<TAG_WIDTH> GenRandSignalGPTag(emp::Random & rnd, const emp::vector<BitSet<TAG_WIDTH>> & unique_from=emp::vector<BitSet<TAG_WIDTH>>()) {
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     using tag_t = BitSet<TAG_WIDTH>;
     emp_assert(unique_from.size() < emp::Pow2(TAG_WIDTH), "Tag width is not large enough to be able to guarantee requested number of unique tags");
     tag_t new_tag(rnd, 0.5); // Make a random tag.
@@ -48,6 +52,7 @@ namespace emp {
       }
     }
     return new_tag;
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
   }
 
 
@@ -217,9 +222,8 @@ namespace emp {
   ///   - Single-instruction substitution (applied per-instruction)
   ///   - Single-instruction insertions and deletions (each applied per-instruction)
   ///   - Instruction-tag bit-flips (applied per-bit)
-  ///   - Instruction-argument substitutions (applied per-argument)
-  /// NOTE: could use some feedback on this!
-  ///  - Not loving the inconsistency between rates and constraints at the moment.
+  ///   - Instruction-argument substitutions (applied per-argument) NOTE: could use some feedback on this!
+  ///   - Not loving the inconsistency between rates and constraints at the moment.
   template<
     size_t TAG_WIDTH,
     typename TRAIT_T=double,
@@ -664,7 +668,7 @@ namespace emp {
         fun_t new_fun(program[fID].GetAffinity());
         size_t expected_func_len = program[fID].GetSize();
         // Compute number and location of insertions.
-        const uint32_t num_ins = rnd.GetRandBinomial(program[fID].GetSize(), INST_INS__PER_INST());
+        const uint32_t num_ins = rnd.GetBinomial(program[fID].GetSize(), INST_INS__PER_INST());
         emp::vector<size_t> ins_locs;
         if (num_ins > 0) {
           ins_locs = emp::RandomUIntVector(rnd, num_ins, 0, program[fID].GetSize());
