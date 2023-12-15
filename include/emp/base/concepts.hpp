@@ -79,15 +79,24 @@ namespace emp {
 
   // ===== Concepts to identify particular template types =====
 
+  /// Test if a given type T is an instance of template TEMPLATE
   template <typename T, template <typename...> class TEMPLATE>
   struct is_template : std::false_type {};
 
   template <template <typename...> class TEMPLATE, typename... ARG_Ts>
   struct is_template<TEMPLATE<ARG_Ts...>, TEMPLATE> : std::true_type {};
 
+  /// Test if a given type T is an instance of template TEMPLATE with one type and one non-type arg
+  template <typename T, template <typename, auto> class TEMPLATE>
+  struct is_template_tn : std::false_type {};
+
+  template <template <typename, auto> class TEMPLATE, typename ARG1, auto ARG2>
+  struct is_template_tn<TEMPLATE<ARG1, ARG2>, TEMPLATE> : std::true_type {};
+
+
   template <typename T> using is_std_function = is_template<T, std::function>;
   template <typename T> using is_emp_vector = is_template<T, emp::vector>;
-  template <typename T> using is_span = is_template<T, std::span>;
+  template <typename T> using is_span = is_template_tn<T, std::span>;
 
 
   // ===== For backward compatability only =====
@@ -98,7 +107,7 @@ namespace emp {
 
   /// A type trait to identify if a type is iterable.
   template <typename T>
-  struct IsIterable : std::bool_constant<isIterable<T>> {};
+  struct IsIterable : std::bool_constant<std::ranges::range<T>> {};
 
 }  // namespace emp
 
