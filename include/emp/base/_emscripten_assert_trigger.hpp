@@ -17,7 +17,7 @@
 
 #include <emscripten.h>
 
-#include "concept.hpp"
+#include "concepts.hpp"
 
 namespace emp {
 
