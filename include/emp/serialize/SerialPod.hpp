@@ -14,7 +14,7 @@
  *  A standard class can use a SerialPod by adding a `Serialize(SerialPod & pod)` member function.
  *
  *  An object of an independent class MyClass with a fixed interface can have a stand-alone
- *  Serialize function in the form of `Serialize(SerialPod & pos, const MyClass & obj)`.
+ *  Serialize function in the form of `Serialize(SerialPod & pod, const MyClass & obj)`.
  *
  *  Any class can have a constructor that takes a `SerialPod` to allow reconstruction of const
  *  objects.  As long as such a constructor is provided, the Serialize function can be const.
@@ -40,11 +40,55 @@
 #include <unordered_set>
 #include <variant>
 
+#include "../base/concepts.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../meta/type_traits.hpp"
 
 namespace emp {
+
+  /// Concept to identify id a type has a Serialize() member function.
+  template <typename OBJ_T>
+  concept hasSerializeMember = requires(OBJ_T & value, SerialPod & pod) {
+    { value.Serialize(pod) };
+  };
+
+  /// Concept to identify id a type has a SerialLoad() member function.
+  template <typename OBJ_T>
+  concept hasSerialLoadMember = requires(OBJ_T & value, SerialPod & pod) {
+    { value.SerialLoad(pod) };
+  };
+
+  /// Concept to identify id a type has a SerialSave() member function.
+  template <typename OBJ_T>
+  concept hasSerialSaveMember = requires(OBJ_T & value, SerialPod & pod) {
+    { value.SerialSave(pod) };
+  };
+
+  /// Concept to identify id a type has a stand-alone Serialize() overload.
+  template <typename OBJ_T>
+  concept hasSerializeOverload = requires(OBJ_T & value, SerialPod & pod) {
+    { Serialize(pod, value) };
+  };
+
+  /// Concept to identify id a type has a stand-alone SerialLoad() overload.
+  template <typename OBJ_T>
+  concept hasSerialLoadOverload = requires(OBJ_T & value, SerialPod & pod) {
+    { SerialLoad(pod, value) };
+  };
+
+  /// Concept to identify id a type has a stand-alone SerialSave() overload.
+  template <typename OBJ_T>
+  concept hasSerialSaveOverload = requires(OBJ_T & value, SerialPod & pod) {
+    { SerialSave(pod, value) };
+  };
+
+  /// Concept to identify id a type has a de-serialization constructor.
+  template <typename OBJ_T>
+  concept hasSerializeConstructor = requires(SerialPod & pod) {
+    { OBJ_T(pod) };
+  };
+
 
   /// A SerialPod manages information about other classes for serialization.
   class SerialPod {
@@ -94,16 +138,41 @@ namespace emp {
     bool IsLoad() const { return std::holds_alternative<is_ptr>(stream_ptr); }
     bool IsSave() const { return std::holds_alternative<os_ptr>(stream_ptr); }
 
-    template <typename T>
-    SerialPod & Load(T & in) {
+    SerialPod & Load() { return *this; } // Base case...
+    SerialPod & Save() const { return *this; } // Base case...
+
+    template <typename T, typename... EXTRA_Ts>
+    SerialPod & Load(T & in, EXTRA_Ts &... extras) {
       static_assert(!emp::is_ptr_type<std::decay<T>>(),
         "SerialPod cannot load or save pointers without more information.\n"
         "Use ManagePtr(value) for restoring pointers by first building the instance,\n"
         "or LinkPtr(value) to use the value of a pointer that is managed elsewhere." );
+      if constexpr (std::is_same<T, std::string>() || std::is_same<T, emp::String>()) {
+        std::getline(*std::get(stream_ptr,is_ptr), in, '\n');
+        in = emp::from_escaped_string(in);
+      }
+      else if constexpr (hasSerializeMember<T>) { in.Serialize(*this); }
+      else if constexpr (hasSerialLoadMember<T>) { in.SerialLoad(*this); }
+      else if constexpr (hasSerializeOverload<T>) { emp::Serialize(*this, in); }
+      else if constexpr (hasSerialLoadOverload<T>) { emp::SerialLoad(*this, in); }
+      else if constexpr (canStreamTo<std::ostream,T> && canStreamFrom<std::istream,T>) {
+        std::string str;
+        std::getline(*std::get(stream_ptr,is_ptr), str, '\n');
+        std::stringstream ss(str);
+        if constexpr (std::is_enum<T>()) { // enums must be converted properly.
+          int enum_val;
+          ss >> enum_val;
+          var = static_cast<T>(enum_val);
+        } else if constexpr (CanStreamFrom<std::stringstream, T>) {
+          ss >> var;
+        }
+      }
+      else static_assert(emp::dependent_false<T>(), "Invalid serialization attempt.");
+      return Load(extras...);
     }
 
     template <typename T>
-    SerialPod & Save(T & in) {
+    SerialPod & Save(const T & in) const {
       static_assert(!emp::is_ptr_type<std::decay<T>>(),
         "SerialPod cannot load or save pointers without more information.\n"
         "Use ManagePtr(value) for restoring pointers by first building the instance,\n"
