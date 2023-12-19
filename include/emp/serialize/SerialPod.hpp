@@ -10,7 +10,7 @@
  * The SerialPod object knows whether it is loading or saving and object, and provides a
  * simple mechanism to do so.
  * 
- * How to use:
+ * => How to use:
  *  A standard class can use a SerialPod by adding a `Serialize(SerialPod & pod)` member function.
  *
  *  An object of an independent class MyClass with a fixed interface can have a stand-alone
@@ -22,12 +22,22 @@
  *  More complex classes (e.g., those that do memory management) will need to have seprate
  *  `SerialSave(SerialPod & pos) const` and `SerialLoad(SerialPod & pos)` functions.
  *
- * Example:
+ * => Example:
  *  Inside of MyClass we might have:
  * 
  *  void MyClass(SerialPod & pod) {
  *    pod(member_a, member_b, member_c);  // List all members to save/load
  *  }
+ * 
+ * => Resolving duplications:
+ *  If more than one version of a serialization function exists, functions external to the class
+ *  always have precedence over those internal (so that classes can later be changed how they
+ *  serialize).
+ * 
+ *  If both a specific function (e.g., Load) and general function (i.e, Serialize) exist, the
+ *  more specific one will always be used.
+ * 
+ *  Regular streaming is used only when no other options exist.
  */
 
 #ifndef EMP_SERIALIZE_SERIALPOD_HPP_INCLUDE
@@ -151,10 +161,10 @@ namespace emp {
         std::getline(*std::get(stream_ptr,is_ptr), in, '\n');
         in = emp::from_escaped_string(in);
       }
-      else if constexpr (hasSerializeMember<T>) { in.Serialize(*this); }
-      else if constexpr (hasSerialLoadMember<T>) { in.SerialLoad(*this); }
-      else if constexpr (hasSerializeOverload<T>) { emp::Serialize(*this, in); }
       else if constexpr (hasSerialLoadOverload<T>) { emp::SerialLoad(*this, in); }
+      else if constexpr (hasSerializeOverload<T>) { emp::Serialize(*this, in); }
+      else if constexpr (hasSerialLoadMember<T>) { in.SerialLoad(*this); }
+      else if constexpr (hasSerializeMember<T>) { in.Serialize(*this); }
       else if constexpr (canStreamTo<std::ostream,T> && canStreamFrom<std::istream,T>) {
         std::string str;
         std::getline(*std::get(stream_ptr,is_ptr), str, '\n');
