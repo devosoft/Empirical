@@ -149,7 +149,7 @@ namespace emp {
     bool IsSave() const { return std::holds_alternative<os_ptr>(stream_ptr); }
 
     SerialPod & Load() { return *this; } // Base case...
-    SerialPod & Save() const { return *this; } // Base case...
+    SerialPod & Save() { return *this; } // Base case...
 
     template <typename T, typename... EXTRA_Ts>
     SerialPod & Load(T & in, EXTRA_Ts &... extras) {
@@ -181,16 +181,16 @@ namespace emp {
       return Load(extras...);
     }
 
-    template <typename T>
-    SerialPod & Save(const T & in) const {
+    template <typename T, typename... EXTRA_Ts>
+    SerialPod & Save(const T & in, EXTRA_Ts &... extras) {
       static_assert(!emp::is_ptr_type<std::decay<T>>(),
         "SerialPod cannot load or save pointers without more information.\n"
         "Use ManagePtr(value) for restoring pointers by first building the instance,\n"
         "or LinkPtr(value) to use the value of a pointer that is managed elsewhere." );
     }
 
-    template <typename T>
-    SerialPod & operator()(T & in) {
+    template <typename T, typename... EXTRA_Ts>
+    SerialPod & operator()(T & in, EXTRA_Ts &... extras) {
       if (IsLoad()) return Load(in);
       else return Save(in);
     }
