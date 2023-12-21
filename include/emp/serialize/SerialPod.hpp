@@ -103,10 +103,13 @@ namespace emp {
   /// A SerialPod manages information about other classes for serialization.
   class SerialPod {
   private:
-    using is_ptr = emp::Ptr<std::istream>;
-    using os_ptr = emp::Ptr<std::ostream>;
-    std::variant<is_ptr, os_ptr> stream_ptr = static_cast<is_ptr>(nullptr);
+    using is_ptr_t = emp::Ptr<std::istream>;
+    using os_ptr_t = emp::Ptr<std::ostream>;
+    std::variant<is_ptr_t, os_ptr_t> stream_ptr = static_cast<is_ptr_t>(nullptr);
     bool own_ptr = false;
+
+    std::istream & IStream() { return *std::get<is_ptr_t>(stream_ptr); }
+    std::ostream & OStream() { return *std::get<os_ptr_t>(stream_ptr); }
 
     void ClearData() {
       // If we own this pointer, delete it.
@@ -114,7 +117,7 @@ namespace emp {
         std::visit([](auto ptr) { ptr.Delete(); }, stream_ptr);
         own_ptr = false;
       }
-      stream_ptr = static_cast<is_ptr>(nullptr);
+      stream_ptr = static_cast<is_ptr_t>(nullptr);
     }
 
   public:
@@ -145,20 +148,20 @@ namespace emp {
 
     ~SerialPod() { ClearData(); }
 
-    bool IsLoad() const { return std::holds_alternative<is_ptr>(stream_ptr); }
-    bool IsSave() const { return std::holds_alternative<os_ptr>(stream_ptr); }
+    bool IsLoad() const { return std::holds_alternative<is_ptr_t>(stream_ptr); }
+    bool IsSave() const { return std::holds_alternative<os_ptr_t>(stream_ptr); }
 
     SerialPod & Load() { return *this; } // Base case...
     SerialPod & Save() { return *this; } // Base case...
 
     template <typename T, typename... EXTRA_Ts>
     SerialPod & Load(T & in, EXTRA_Ts &... extras) {
-      static_assert(!emp::is_ptr_type<std::decay<T>>(),
+      static_assert(!emp::is_ptr_t_type<std::decay<T>>(),
         "SerialPod cannot load or save pointers without more information.\n"
         "Use ManagePtr(value) for restoring pointers by first building the instance,\n"
         "or LinkPtr(value) to use the value of a pointer that is managed elsewhere." );
       if constexpr (std::is_same<T, std::string>() || std::is_same<T, emp::String>()) {
-        std::getline(*std::get(stream_ptr,is_ptr), in, '\n');
+        std::getline(IStream(), in, '\n');
         in = emp::from_escaped_string(in);
       }
       else if constexpr (hasSerialLoadOverload<T>) { emp::SerialLoad(*this, in); }
@@ -167,7 +170,7 @@ namespace emp {
       else if constexpr (hasSerializeMember<T>) { in.Serialize(*this); }
       else if constexpr (canStreamTo<std::ostream,T> && canStreamFrom<std::istream,T>) {
         std::string str;
-        std::getline(*std::get(stream_ptr,is_ptr), str, '\n');
+        std::getline(IStream(), str, '\n');
         std::stringstream ss(str);
         if constexpr (std::is_enum<T>()) { // enums must be converted properly.
           int enum_val;
@@ -177,16 +180,33 @@ namespace emp {
           ss >> var;
         }
       }
-      else static_assert(emp::dependent_false<T>(), "Invalid serialization attempt.");
+      else static_assert(emp::dependent_false<T>(), "Invalid serialization Load attempt.");
       return Load(extras...);
     }
 
     template <typename T, typename... EXTRA_Ts>
     SerialPod & Save(const T & in, EXTRA_Ts &... extras) {
-      static_assert(!emp::is_ptr_type<std::decay<T>>(),
+      static_assert(!emp::is_ptr_t_type<std::decay<T>>(),
         "SerialPod cannot load or save pointers without more information.\n"
         "Use ManagePtr(value) for restoring pointers by first building the instance,\n"
         "or LinkPtr(value) to use the value of a pointer that is managed elsewhere." );
+      if constexpr (std::is_same<T, std::string>() || std::is_same<T, emp::String>()) {
+        for (char c : in) { OStream() << emp::to_escaped_string(c); }
+        OStream() << '\n';
+      }
+      else if constexpr (hasSerialSaveOverload<T>) { emp::SerialSave(*this, in); }
+      else if constexpr (hasSerializeOverload<T>) { emp::Serialize(*this, in); }
+      else if constexpr (hasSerialSaveMember<T>) { in.SerialSave(*this); }
+      else if constexpr (hasSerializeMember<T>) { in.Serialize(*this); }
+      else if constexpr (canStreamTo<std::ostream,T> && canStreamFrom<std::istream,T>) {
+        if constexpr (std::is_enum<T>()) { // enums must be converted properly.
+          OStream() << static_cast<int>(var) << '\n';
+        } else if constexpr (CanStreamFrom<std::stringstream, T>) {
+          OStream() << var << '\n';
+        }
+      }
+      else static_assert(emp::dependent_false<T>(), "Invalid serialization Save attempt.");
+      return Save(extras...);
     }
 
     template <typename T, typename... EXTRA_Ts>
