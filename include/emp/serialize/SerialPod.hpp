@@ -54,8 +54,18 @@
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../meta/type_traits.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
+
+  // Pre-declarations
+  class SerialPod; 
+  class String;
+
+  // Empty version of functions so that they can be tested in the concepts below...
+  void Serialize() { }
+  void SerialLoad() { }
+  void SerialSave() { }
 
   /// Concept to identify id a type has a Serialize() member function.
   template <typename OBJ_T>
@@ -78,19 +88,19 @@ namespace emp {
   /// Concept to identify id a type has a stand-alone Serialize() overload.
   template <typename OBJ_T>
   concept hasSerializeOverload = requires(OBJ_T & value, SerialPod & pod) {
-    { Serialize(pod, value) };
+    { emp::Serialize(pod, value) };
   };
 
   /// Concept to identify id a type has a stand-alone SerialLoad() overload.
   template <typename OBJ_T>
   concept hasSerialLoadOverload = requires(OBJ_T & value, SerialPod & pod) {
-    { SerialLoad(pod, value) };
+    { emp::SerialLoad(pod, value) };
   };
 
   /// Concept to identify id a type has a stand-alone SerialSave() overload.
   template <typename OBJ_T>
   concept hasSerialSaveOverload = requires(OBJ_T & value, SerialPod & pod) {
-    { SerialSave(pod, value) };
+    { emp::SerialSave(pod, value) };
   };
 
   /// Concept to identify id a type has a de-serialization constructor.
@@ -156,13 +166,13 @@ namespace emp {
 
     template <typename T, typename... EXTRA_Ts>
     SerialPod & Load(T & in, EXTRA_Ts &... extras) {
-      static_assert(!emp::is_ptr_t_type<std::decay<T>>(),
+      static_assert(!emp::is_ptr_type<std::decay<T>>(),
         "SerialPod cannot load or save pointers without more information.\n"
         "Use ManagePtr(value) for restoring pointers by first building the instance,\n"
         "or LinkPtr(value) to use the value of a pointer that is managed elsewhere." );
       if constexpr (std::is_same<T, std::string>() || std::is_same<T, emp::String>()) {
         std::getline(IStream(), in, '\n');
-        in = emp::from_escaped_string(in);
+        in = emp::from_literal_string(in);
       }
       else if constexpr (hasSerialLoadOverload<T>) { emp::SerialLoad(*this, in); }
       else if constexpr (hasSerializeOverload<T>) { emp::Serialize(*this, in); }
@@ -175,9 +185,9 @@ namespace emp {
         if constexpr (std::is_enum<T>()) { // enums must be converted properly.
           int enum_val;
           ss >> enum_val;
-          var = static_cast<T>(enum_val);
-        } else if constexpr (CanStreamFrom<std::stringstream, T>) {
-          ss >> var;
+          in = static_cast<T>(enum_val);
+        } else if constexpr (canStreamFrom<std::stringstream, T>) {
+          ss >> in;
         }
       }
       else static_assert(emp::dependent_false<T>(), "Invalid serialization Load attempt.");
@@ -186,12 +196,12 @@ namespace emp {
 
     template <typename T, typename... EXTRA_Ts>
     SerialPod & Save(const T & in, EXTRA_Ts &... extras) {
-      static_assert(!emp::is_ptr_t_type<std::decay<T>>(),
+      static_assert(!emp::is_ptr_type<std::decay<T>>(),
         "SerialPod cannot load or save pointers without more information.\n"
         "Use ManagePtr(value) for restoring pointers by first building the instance,\n"
         "or LinkPtr(value) to use the value of a pointer that is managed elsewhere." );
       if constexpr (std::is_same<T, std::string>() || std::is_same<T, emp::String>()) {
-        for (char c : in) { OStream() << emp::to_escaped_string(c); }
+        for (char c : in) { OStream() << emp::to_literal(c); }
         OStream() << '\n';
       }
       else if constexpr (hasSerialSaveOverload<T>) { emp::SerialSave(*this, in); }
@@ -200,9 +210,9 @@ namespace emp {
       else if constexpr (hasSerializeMember<T>) { in.Serialize(*this); }
       else if constexpr (canStreamTo<std::ostream,T> && canStreamFrom<std::istream,T>) {
         if constexpr (std::is_enum<T>()) { // enums must be converted properly.
-          OStream() << static_cast<int>(var) << '\n';
-        } else if constexpr (CanStreamFrom<std::stringstream, T>) {
-          OStream() << var << '\n';
+          OStream() << static_cast<int>(in) << '\n';
+        } else if constexpr (canStreamFrom<std::stringstream, T>) {
+          OStream() << in << '\n';
         }
       }
       else static_assert(emp::dependent_false<T>(), "Invalid serialization Save attempt.");
