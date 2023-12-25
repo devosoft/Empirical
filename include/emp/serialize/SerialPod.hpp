@@ -178,51 +178,50 @@ namespace emp {
       else if constexpr (hasSerializeOverload<T>) { emp::Serialize(*this, in); }
       else if constexpr (hasSerialLoadMember<T>) { in.SerialLoad(*this); }
       else if constexpr (hasSerializeMember<T>) { in.Serialize(*this); }
+      else if constexpr (std::is_enum<T>()) { // enums must be converted properly.
+        std::string str;
+        std::getline(IStream(), str, '\n');
+        in = static_cast<T>(std::stoi(str));
+      }
       else if constexpr (canStreamTo<std::ostream,T> && canStreamFrom<std::istream,T>) {
         std::string str;
         std::getline(IStream(), str, '\n');
         std::stringstream ss(str);
-        if constexpr (std::is_enum<T>()) { // enums must be converted properly.
-          int enum_val;
-          ss >> enum_val;
-          in = static_cast<T>(enum_val);
-        } else if constexpr (canStreamFrom<std::stringstream, T>) {
-          ss >> in;
-        }
+        ss >> in;
       }
-      else static_assert(emp::dependent_false<T>(), "Invalid serialization Load attempt.");
+      else { notify::Error("Invalid SerialPod::Load attempt."); };
       return Load(extras...);
     }
 
     template <typename T, typename... EXTRA_Ts>
-    SerialPod & Save(const T & in, EXTRA_Ts &... extras) {
+    SerialPod & Save(T & in, EXTRA_Ts &... extras) {
       static_assert(!emp::is_ptr_type<std::decay<T>>(),
         "SerialPod cannot load or save pointers without more information.\n"
         "Use ManagePtr(value) for restoring pointers by first building the instance,\n"
         "or LinkPtr(value) to use the value of a pointer that is managed elsewhere." );
       if constexpr (std::is_same<T, std::string>() || std::is_same<T, emp::String>()) {
-        for (char c : in) { OStream() << emp::to_literal(c); }
-        OStream() << '\n';
+        OStream() << '\"';
+        for (char c : in) { OStream() << emp::to_escaped_string(c); }
+        OStream() << "\"\n";
       }
       else if constexpr (hasSerialSaveOverload<T>) { emp::SerialSave(*this, in); }
       else if constexpr (hasSerializeOverload<T>) { emp::Serialize(*this, in); }
       else if constexpr (hasSerialSaveMember<T>) { in.SerialSave(*this); }
       else if constexpr (hasSerializeMember<T>) { in.Serialize(*this); }
-      else if constexpr (canStreamTo<std::ostream,T> && canStreamFrom<std::istream,T>) {
-        if constexpr (std::is_enum<T>()) { // enums must be converted properly.
-          OStream() << static_cast<int>(in) << '\n';
-        } else if constexpr (canStreamFrom<std::stringstream, T>) {
-          OStream() << in << '\n';
-        }
+      else if constexpr (std::is_enum<T>()) { // enums must be converted to numerical values.
+        OStream() << static_cast<int>(in) << '\n';
       }
-      else static_assert(emp::dependent_false<T>(), "Invalid serialization Save attempt.");
+      else if constexpr (canStreamTo<std::ostream,T> && canStreamFrom<std::istream,T>) {
+        OStream() << in << '\n';
+      }
+      else { notify::Error("Invalid SerialPod::Save attempt."); }
       return Save(extras...);
     }
 
     template <typename T, typename... EXTRA_Ts>
     SerialPod & operator()(T & in, EXTRA_Ts &... extras) {
-      if (IsLoad()) return Load(in);
-      else return Save(in);
+      if (IsLoad()) return Load(in, extras...);
+      else return Save(in, extras...);
     }
   };
 
