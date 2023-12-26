@@ -61,6 +61,18 @@ struct Struct_Simple {
   bool operator==(const Struct_Simple &) const = default;
 };
 
+struct Struct_Simple2 {
+  uint64_t x = 0;
+  uint16_t y = 0;
+  uint32_t z = 0;
+
+  bool operator==(const Struct_Simple2 &) const = default;
+};
+
+namespace emp {
+  void Serialize(emp::SerialPod & pod, Struct_Simple2 & in) { pod(in.x, in.y, in.z); }
+}
+
 TEST_CASE("Test SerialPod with custom classes", "[control]")
 {
   std::stringstream ss;
@@ -82,11 +94,27 @@ TEST_CASE("Test SerialPod with custom classes", "[control]")
 
   // Test custom class with external Serialize
 
+  Struct_Simple2 in3{5000000000ul, 50, 5000000};
+  Struct_Simple2 in4{6, 77, 88888};
+
+  std::cout << ss.str() << std::endl;
+
+  save_pod(in3, in4);
+
+  Struct_Simple2 out3, out4;
+
+  load_pod(out3, out4);
+
+  CHECK(in3 == out3);
+  CHECK(in4 == out4);
+
   // Test custom class with SerialLoad and SerialSave members
 
   // Test custom class with external SerialLoad and SerialSave
 
   // Test nested custom classes.
+
+  // Test standard library containers
 
   // Test const creation from constructor
 
