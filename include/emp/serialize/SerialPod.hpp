@@ -49,6 +49,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
+#include <vector>
 
 #include "../base/concepts.hpp"
 #include "../base/Ptr.hpp"
@@ -62,10 +63,10 @@ namespace emp {
   class SerialPod; 
   class String;
 
-  // Empty version of functions so that they can be tested in the concepts below...
-  void Serialize() { }
-  void SerialLoad() { }
-  void SerialSave() { }
+  // Base version of functions so that they can be tested in the concepts below...
+  template <typename T> void Serialize(SerialPod & pod, std::vector<T> & value);
+  template <typename T> void SerialLoad(SerialPod & pod, std::vector<T> & value);
+  template <typename T> void SerialSave(SerialPod & pod, std::vector<T> & value);
 
   /// Concept to identify id a type has a Serialize() member function.
   template <typename OBJ_T>
@@ -88,19 +89,19 @@ namespace emp {
   /// Concept to identify id a type has a stand-alone Serialize() overload.
   template <typename OBJ_T>
   concept hasSerializeOverload = requires(OBJ_T & value, SerialPod & pod) {
-    { emp::Serialize(pod, value) };
+    { Serialize(pod, value) };
   };
 
   /// Concept to identify id a type has a stand-alone SerialLoad() overload.
   template <typename OBJ_T>
   concept hasSerialLoadOverload = requires(OBJ_T & value, SerialPod & pod) {
-    { emp::SerialLoad(pod, value) };
+    { SerialLoad(pod, value) };
   };
 
   /// Concept to identify id a type has a stand-alone SerialSave() overload.
   template <typename OBJ_T>
   concept hasSerialSaveOverload = requires(OBJ_T & value, SerialPod & pod) {
-    { emp::SerialSave(pod, value) };
+    { SerialSave(pod, value) };
   };
 
   /// Concept to identify id a type has a de-serialization constructor.
@@ -161,6 +162,17 @@ namespace emp {
     bool IsLoad() const { return std::holds_alternative<is_ptr_t>(stream_ptr); }
     bool IsSave() const { return std::holds_alternative<os_ptr_t>(stream_ptr); }
 
+    // Load a stand-alone value.
+    template <typename T>
+    T LoadValue() {
+      if constexpr (hasSerializeConstructor<T>) { return T(*this); }
+      else {
+        T temp;
+        Load(temp);
+        return temp;
+      }
+    }
+
     SerialPod & Load() { return *this; } // Base case...
     SerialPod & Save() { return *this; } // Base case...
 
@@ -174,8 +186,8 @@ namespace emp {
         std::getline(IStream(), in, '\n');
         in = emp::from_literal_string(in);
       }
-      else if constexpr (hasSerialLoadOverload<T>) { emp::SerialLoad(*this, in); }
-      else if constexpr (hasSerializeOverload<T>) { emp::Serialize(*this, in); }
+      else if constexpr (hasSerialLoadOverload<T>) { SerialLoad(*this, in); }
+      else if constexpr (hasSerializeOverload<T>) { Serialize(*this, in); }
       else if constexpr (hasSerialLoadMember<T>) { in.SerialLoad(*this); }
       else if constexpr (hasSerializeMember<T>) { in.Serialize(*this); }
       else if constexpr (std::is_enum<T>()) { // enums must be converted properly.
@@ -204,8 +216,8 @@ namespace emp {
         for (char c : in) { OStream() << emp::to_escaped_string(c); }
         OStream() << "\"\n";
       }
-      else if constexpr (hasSerialSaveOverload<T>) { emp::SerialSave(*this, in); }
-      else if constexpr (hasSerializeOverload<T>) { emp::Serialize(*this, in); }
+      else if constexpr (hasSerialSaveOverload<T>) { SerialSave(*this, in); }
+      else if constexpr (hasSerializeOverload<T>) { Serialize(*this, in); }
       else if constexpr (hasSerialSaveMember<T>) { in.SerialSave(*this); }
       else if constexpr (hasSerializeMember<T>) { in.Serialize(*this); }
       else if constexpr (std::is_enum<T>()) { // enums must be converted to numerical values.
@@ -224,6 +236,38 @@ namespace emp {
       else return Save(in, extras...);
     }
   };
+
+  template <typename T>
+  void Serialize(SerialPod & pod, std::vector<T> & vec) {
+    if (pod.IsSave()) SerialSave(pod, vec);
+    else SerialLoad(pod, vec);
+  }
+
+  template <typename T>
+  void SerialLoad(SerialPod & pod, std::vector<T> & vec) {
+    const size_t size = pod.LoadValue<size_t>();
+
+    if constexpr (hasSerializeConstructor<T>) {
+      vec.reserve(size);
+      for (size_t i=0; i < size; ++i) {
+        vec.emplace_back(pod);
+      }
+    } else {
+      vec.resize(size);
+      for (auto & element : vec) {
+        pod.Load(element);
+      }
+    }
+  }
+
+  template <typename T>
+  void SerialSave(SerialPod & pod, std::vector<T> & vec) {
+    pod.Save(vec.size());
+    for (auto & element : vec) {
+      pod.Save(element);
+    }
+  }
+
 
 } // Close namespace emp
 
