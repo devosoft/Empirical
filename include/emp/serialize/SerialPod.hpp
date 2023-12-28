@@ -19,7 +19,7 @@
  *  Any class can have a constructor that takes a `SerialPod` to allow reconstruction of const
  *  objects.  As long as such a constructor is provided, the Serialize function can be const.
  * 
- *  More complex classes (e.g., those that do memory management) will need to have seprate
+ *  More complex classes (e.g., those that do memory management) will need to have separate
  *  `SerialSave(SerialPod & pos) const` and `SerialLoad(SerialPod & pos)` functions.
  *
  * => Example:
@@ -62,11 +62,6 @@ namespace emp {
   // Pre-declarations
   class SerialPod; 
   class String;
-
-  // Base version of functions so that they can be tested in the concepts below...
-  template <typename T> void Serialize(SerialPod & pod, std::vector<T> & value);
-  template <typename T> void SerialLoad(SerialPod & pod, std::vector<T> & value);
-  template <typename T> void SerialSave(SerialPod & pod, std::vector<T> & value);
 
   /// Concept to identify id a type has a Serialize() member function.
   template <typename OBJ_T>
