@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2023
+ *  @date 2023-2024.
  *
  *  @file SerialPod.cpp
  */
@@ -37,7 +37,7 @@ TEST_CASE("Test SerialPod with simple types", "[control]")
   CHECK(in2 == out2);
   CHECK(in3 == out3);
 
-  // Test enumerarations
+  // Test enumerations
   TestEnum in4 = TestEnum::TWO;
   TestEnum in5 = TestEnum::TEN;
 
@@ -51,27 +51,47 @@ TEST_CASE("Test SerialPod with simple types", "[control]")
   CHECK(in5 == out5);
 }
 
-struct Struct_Simple {
+struct Struct_Internal_Serialize {
   int x = 0;
   int y = 0;
   unsigned long long z = 0;
 
   void Serialize(emp::SerialPod & pod) { pod(x, y, z); }
 
-  bool operator==(const Struct_Simple &) const = default;
+  bool operator==(const Struct_Internal_Serialize &) const = default;
 };
 
-struct Struct_Simple2 {
+struct Struct_External_Serialize {
   uint64_t x = 0;
   uint16_t y = 0;
   uint32_t z = 0;
 
-  bool operator==(const Struct_Simple2 &) const = default;
+  bool operator==(const Struct_External_Serialize &) const = default;
 };
 
 namespace emp {
-  void Serialize(emp::SerialPod & pod, Struct_Simple2 & in) { pod(in.x, in.y, in.z); }
+  void Serialize(emp::SerialPod & pod, Struct_External_Serialize & in) { pod(in.x, in.y, in.z); }
 }
+
+struct Struct_Internal_SaveLoad {
+  std::string a = "default";
+  std::string b = "default";
+  std::string c = "default";
+
+  void SerialSave(emp::SerialPod & pod) {
+    pod.Save(a);
+    pod.Save(b);
+    pod.Save(c);
+  }
+
+  void SerialLoad(emp::SerialPod & pod) {
+    pod.Load(a);
+    pod.Load(b);
+    pod.Load(c);
+  }
+
+  bool operator==(const Struct_Internal_SaveLoad &) const = default;
+};
 
 TEST_CASE("Test SerialPod with custom classes", "[control]")
 {
@@ -80,12 +100,12 @@ TEST_CASE("Test SerialPod with custom classes", "[control]")
   emp::SerialPod load_pod(ss, false);
 
   // Test custom class with Serialize member
-  Struct_Simple in1{5, 50, 5000000};
-  Struct_Simple in2{6, 77, 888888888};
+  Struct_Internal_Serialize in1{5, 50, 5000000};
+  Struct_Internal_Serialize in2{6, 77, 888888888};
 
   save_pod(in1, in2);
 
-  Struct_Simple out1, out2;
+  Struct_Internal_Serialize out1, out2;
 
   load_pod(out1, out2);
 
@@ -94,14 +114,14 @@ TEST_CASE("Test SerialPod with custom classes", "[control]")
 
   // Test custom class with external Serialize
 
-  Struct_Simple2 in3{5000000000ul, 50, 5000000};
-  Struct_Simple2 in4{6, 77, 88888};
+  Struct_External_Serialize in3{5000000000ul, 50, 5000000};
+  Struct_External_Serialize in4{6, 77, 88888};
 
   std::cout << ss.str() << std::endl;
 
   save_pod(in3, in4);
 
-  Struct_Simple2 out3, out4;
+  Struct_External_Serialize out3, out4;
 
   load_pod(out3, out4);
 
@@ -109,6 +129,20 @@ TEST_CASE("Test SerialPod with custom classes", "[control]")
   CHECK(in4 == out4);
 
   // Test custom class with SerialLoad and SerialSave members
+
+  Struct_Internal_SaveLoad in5{"one", "two", "three"};
+  Struct_Internal_SaveLoad in6{"aaa", "bb", "c"};
+
+  std::cout << ss.str() << std::endl;
+
+  save_pod(in5, in6);
+
+  Struct_Internal_SaveLoad out5, out6;
+
+  load_pod(out5, out6);
+
+  CHECK(in5 == out5);
+  CHECK(in6 == out6);
 
   // Test custom class with external SerialLoad and SerialSave
 
@@ -122,5 +156,5 @@ TEST_CASE("Test SerialPod with custom classes", "[control]")
 
   // Test pointer linkage
 
-  // Test custome linked list
+  // Test custom linked list
 }
