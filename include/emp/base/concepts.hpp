@@ -52,26 +52,26 @@ namespace emp {
 
   // ===== Member function types used throughout Empirical =====
 
-  /// Does a type have a ToString() member function.
+  /// Does a type have a ToString() member function?
   template <typename OBJ_T>
   concept hasToString = requires(OBJ_T value) {
     { value.ToString(std::cout) } -> std::same_as<std::string>;
   };
 
-  /// Does a type have a ToDouble() member function.
+  /// Does a type have a ToDouble() member function?
   template <typename OBJ_T>
   concept hasToDouble = requires(OBJ_T value) {
     { value.ToDouble(std::cout) } -> std::same_as<double>;
   };
 
-  /// Does a type have a FromString() member function.
+  /// Does a type have a FromString() member function?
   template<typename T>
   concept hasFromString = requires(T t, const std::string& s, const char* c) {
       { t.FromString(s) }; // Test with std::string
       { t.FromString(c) }; // Test with const char*
   };
 
-  /// Does a type have a FromString() member function.
+  /// Does a type have a FromString() member function?
   template<typename T>
   concept hasFromDouble = requires(T t, double d) {
       { t.FromDouble(d) };
