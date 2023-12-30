@@ -93,6 +93,29 @@ struct Struct_Internal_SaveLoad {
   bool operator==(const Struct_Internal_SaveLoad &) const = default;
 };
 
+struct Struct_External_SaveLoad {
+  std::string a = "default";
+  std::string b = "default";
+  std::string c = "default";
+  std::string d = "extra default";
+
+  bool operator==(const Struct_External_SaveLoad &) const = default;
+};
+
+void SerialSave(emp::SerialPod & pod, Struct_External_SaveLoad & in) {
+  pod.Save(in.a);
+  pod.Save(in.b);
+  pod.Save(in.c);
+  pod.Save(in.d);
+}
+
+void SerialLoad(emp::SerialPod & pod, Struct_External_SaveLoad & in) {
+  pod.Load(in.a);
+  pod.Load(in.b);
+  pod.Load(in.c);
+  pod.Load(in.d);
+}
+
 TEST_CASE("Test SerialPod with custom classes", "[control]")
 {
   std::stringstream ss;
@@ -145,6 +168,20 @@ TEST_CASE("Test SerialPod with custom classes", "[control]")
   CHECK(in6 == out6);
 
   // Test custom class with external SerialLoad and SerialSave
+
+  Struct_External_SaveLoad in7{"four", "five", "six", "seven"};
+  Struct_External_SaveLoad in8{"add", "beep", "circle", "digraph"};
+
+  std::cout << ss.str() << std::endl;
+
+  save_pod(in7, in8);
+
+  Struct_External_SaveLoad out7, out8;
+
+  load_pod(out7, out8);
+
+  CHECK(in7 == out7);
+  CHECK(in8 == out8);
 
   // Test nested custom classes.
 
