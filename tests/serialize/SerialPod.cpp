@@ -14,7 +14,7 @@
 
 enum class TestEnum { ONE=1, TWO=2, THREE=3, TEN=10 };
 
-TEST_CASE("Test SerialPod with simple types", "[control]")
+TEST_CASE("Test SerialPod with simple types", "[serialize]")
 {
   std::stringstream ss;
   emp::SerialPod save_pod(ss, true);
@@ -116,7 +116,7 @@ void SerialLoad(emp::SerialPod & pod, Struct_External_SaveLoad & in) {
   pod.Load(in.d);
 }
 
-TEST_CASE("Test SerialPod with custom classes", "[control]")
+TEST_CASE("Test SerialPod with simple custom classes", "[serialize]")
 {
   std::stringstream ss;
   emp::SerialPod save_pod(ss, true);
@@ -140,7 +140,7 @@ TEST_CASE("Test SerialPod with custom classes", "[control]")
   Struct_External_Serialize in3{5000000000ul, 50, 5000000};
   Struct_External_Serialize in4{6, 77, 88888};
 
-  std::cout << ss.str() << std::endl;
+  // std::cout << ss.str() << std::endl;
 
   save_pod(in3, in4);
 
@@ -156,7 +156,7 @@ TEST_CASE("Test SerialPod with custom classes", "[control]")
   Struct_Internal_SaveLoad in5{"one", "two", "three"};
   Struct_Internal_SaveLoad in6{"aaa", "bb", "c"};
 
-  std::cout << ss.str() << std::endl;
+  // std::cout << ss.str() << std::endl;
 
   save_pod(in5, in6);
 
@@ -172,7 +172,7 @@ TEST_CASE("Test SerialPod with custom classes", "[control]")
   Struct_External_SaveLoad in7{"four", "five", "six", "seven"};
   Struct_External_SaveLoad in8{"add", "beep", "circle", "digraph"};
 
-  std::cout << ss.str() << std::endl;
+  // std::cout << ss.str() << std::endl;
 
   save_pod(in7, in8);
 
@@ -182,8 +182,52 @@ TEST_CASE("Test SerialPod with custom classes", "[control]")
 
   CHECK(in7 == out7);
   CHECK(in8 == out8);
+}
 
+
+struct Struct_Nested {
+  Struct_Internal_Serialize s1;
+  Struct_External_Serialize s2;
+  std::string name = "none";
+
+  bool operator==(const Struct_Nested &) const = default;
+
+  void Serialize(emp::SerialPod & pod) { pod(s1, s2, name); }
+};
+
+
+
+TEST_CASE("Test SerialPod with more complex classes", "[serialize]")
+{
   // Test nested custom classes.
+  Struct_Nested in;
+  in.s1.x = 50;
+  in.s1.y = -100;
+  in.s1.z = 2;
+  in.s2.x = 10;
+  in.s2.y = 11;
+  in.s2.z = 12;
+
+  std::stringstream ss;
+  emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
+
+  save_pod(in);
+
+  Struct_Nested out;
+
+  load_pod(out);
+
+  CHECK(in == out);
+
+  CHECK(out.s1.x == 50);
+  CHECK(out.s1.y == -100);
+  CHECK(out.s1.z == 2);
+  CHECK(out.s2.x == 10);
+  CHECK(out.s2.y == 11);
+  CHECK(out.s2.z == 12);
+
+
 
   // Test standard library containers
 
