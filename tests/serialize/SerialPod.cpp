@@ -36,6 +36,13 @@ TEST_CASE("Test SerialPod with simple types", "[serialize]")
   CHECK(in1 == out1);
   CHECK(in2 == out2);
   CHECK(in3 == out3);
+}
+
+TEST_CASE("Test SerialPod with nuanced types", "[serialize]")
+{
+  std::stringstream ss;
+  emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
 
   // Test enumerations
   TestEnum in4 = TestEnum::TWO;
@@ -49,6 +56,21 @@ TEST_CASE("Test SerialPod with simple types", "[serialize]")
 
   CHECK(in4 == out4);
   CHECK(in5 == out5);
+
+  // Try saving a const value; for the moment load it as non-const.
+  const int const_val = 42;
+  save_pod(const_val);
+
+  int load_val = 0;
+
+  CHECK(const_val != load_val);
+  load_pod(load_val);
+  CHECK(const_val == load_val);
+
+  // Try saving a temporary value.
+  save_pod(const_val / 2);
+  load_pod(load_val);
+  CHECK(load_val == 21);
 }
 
 struct Struct_Internal_Serialize {
@@ -226,16 +248,39 @@ TEST_CASE("Test SerialPod with more complex classes", "[serialize]")
   CHECK(out.s2.x == 10);
   CHECK(out.s2.y == 11);
   CHECK(out.s2.z == 12);
+}
 
+TEST_CASE("Test SerialPod with standard library containers", "[serialize]")
+{
+  std::stringstream ss;
+  emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
 
+  std::vector<int> vec1{1,2,3,4,5,6,-10}, vec2;
 
-  // Test standard library containers
+  CHECK(vec1.size() == 7);
+  CHECK(vec2.size() == 0);
 
-  // Test const creation from constructor
+  save_pod(vec1);
+  load_pod(vec2);
+  CHECK(vec1.size() == 7);
+  CHECK(vec2.size() == 7);
+  CHECK(vec2[0] == 1);
+  CHECK(vec2[6] == -10);
+}
 
-  // Test pointer management
+TEST_CASE("Test SerialPod with const creation from constructor", "[serialize]")
+{
+}
 
-  // Test pointer linkage
+TEST_CASE("Test SerialPod with pointer management", "[serialize]")
+{
+}
 
-  // Test custom linked list
+TEST_CASE("Test SerialPod with pointer linkage", "[serialize]")
+{
+}
+
+TEST_CASE("Test SerialPod with custom linked list", "[serialize]")
+{
 }
