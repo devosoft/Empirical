@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2022.
+ *  @date 2016-2024.
  *
  *  @file TypeID.hpp
  *  @brief TypeID provides an easy way to convert types to strings.
@@ -231,7 +231,7 @@ namespace emp {
         using base_t = std::decay_t<T>;
 
         // If this variable has a built-in ToDouble() trait, use it!
-        if constexpr (emp::HasToDouble<T>()) {
+        if constexpr (emp::hasToDouble<T>) {
           return ptr.ReinterpretCast<const base_t>()->ToDouble();
         }
 
@@ -247,7 +247,7 @@ namespace emp {
         using base_t = std::decay_t<T>;
 
         // If this variable has a built-in ToString() trait, use it!
-        if constexpr (emp::HasToString<T>()) {
+        if constexpr (emp::hasToString<T>) {
           return ptr.ReinterpretCast<const base_t>()->ToString();
         }
 
@@ -279,7 +279,7 @@ namespace emp {
         using base_t = std::decay_t<T>;
 
         // If this variable has a built-in FromDouble() trait, use it!
-        if constexpr (emp::HasFromDouble<T>()) {
+        if constexpr (emp::hasFromDouble<T>) {
           return ptr.ReinterpretCast<base_t>()->FromDouble(value);
         }
 
@@ -297,7 +297,7 @@ namespace emp {
         using base_t = std::decay_t<T>;
 
         // If this variable has a built-in FromString() trait, use it!
-        if constexpr (emp::HasFromString<T>()) {
+        if constexpr (emp::hasFromString<T>) {
           return ptr.ReinterpretCast<base_t>()->FromString(value);
         }
 
@@ -418,6 +418,12 @@ namespace emp {
   template <typename... Ts>
   emp::vector<TypeID> GetTypeIDs() {
     return emp::vector<TypeID>{GetTypeID<Ts>()...};
+  }
+
+  /// Retrieve just the name for the type passed in.
+  template <typename T>
+  std::string GetTypeName() {
+    return GetTypeID<T>().GetName();
   }
 
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
