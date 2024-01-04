@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2023.
+ *  @date 2016-2024.
  *
  *  @file type_traits.hpp
  *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
@@ -23,6 +23,166 @@
 
 
 namespace emp {
+
+  /// Type trait framework for working with whole TYPE PACKS.
+  template <template <typename...> typename TRAIT, typename... Ts>
+  struct has_trait_any : std::false_type {};
+  template <template <typename...> typename TRAIT, typename T, typename... EXTRA_Ts>
+  struct has_trait_any<TRAIT, T, EXTRA_Ts...>
+      : std::bool_constant<TRAIT<T>::value || has_trait_any<TRAIT, EXTRA_Ts...>::value> {};
+
+  template <template <typename...> typename TRAIT, typename... Ts>
+  struct has_trait_all : std::true_type {};
+  template <template <typename...> typename TRAIT, typename T, typename... EXTRA_Ts>
+  struct has_trait_all<TRAIT, T, EXTRA_Ts...>
+      : std::bool_constant<TRAIT<T>::value && has_trait_all<TRAIT, EXTRA_Ts...>::value> {};
+
+  template <template <typename...> typename TRAIT, typename... Ts>
+  struct has_trait_none : std::negate<emp::has_trait_any<TRAIT, Ts...>> {};
+
+
+  template <typename... Ts> using has_any_void = has_trait_any<std::is_void, Ts...>;
+  template <typename... Ts> using has_all_void = has_trait_all<std::is_void, Ts...>;
+  template <typename... Ts> using has_no_void = has_trait_none<std::is_void, Ts...>;
+
+  template <typename... Ts> using has_any_null_pointer = has_trait_any<std::is_null_pointer, Ts...>;
+  template <typename... Ts> using has_all_null_pointer = has_trait_all<std::is_null_pointer, Ts...>;
+  template <typename... Ts> using has_no_null_pointer = has_trait_none<std::is_null_pointer, Ts...>;
+
+  template <typename... Ts> using has_any_integral = has_trait_any<std::is_integral, Ts...>;
+  template <typename... Ts> using has_all_integral = has_trait_all<std::is_integral, Ts...>;
+  template <typename... Ts> using has_no_integral = has_trait_none<std::is_integral, Ts...>;
+
+  template <typename... Ts> using has_any_floating_point = has_trait_any<std::is_floating_point, Ts...>;
+  template <typename... Ts> using has_all_floating_point = has_trait_all<std::is_floating_point, Ts...>;
+  template <typename... Ts> using has_no_floating_point = has_trait_none<std::is_floating_point, Ts...>;
+
+  template <typename... Ts> using has_any_array = has_trait_any<std::is_array, Ts...>;
+  template <typename... Ts> using has_all_array = has_trait_all<std::is_array, Ts...>;
+  template <typename... Ts> using has_no_array = has_trait_none<std::is_array, Ts...>;
+
+  template <typename... Ts> using has_any_enum = has_trait_any<std::is_enum, Ts...>;
+  template <typename... Ts> using has_all_enum = has_trait_all<std::is_enum, Ts...>;
+  template <typename... Ts> using has_no_enum = has_trait_none<std::is_enum, Ts...>;
+
+  template <typename... Ts> using has_any_union = has_trait_any<std::is_union, Ts...>;
+  template <typename... Ts> using has_all_union = has_trait_all<std::is_union, Ts...>;
+  template <typename... Ts> using has_no_union = has_trait_none<std::is_union, Ts...>;
+
+  template <typename... Ts> using has_any_class = has_trait_any<std::is_class, Ts...>;
+  template <typename... Ts> using has_all_class = has_trait_all<std::is_class, Ts...>;
+  template <typename... Ts> using has_no_class = has_trait_none<std::is_class, Ts...>;
+
+  template <typename... Ts> using has_any_function = has_trait_any<std::is_function, Ts...>;
+  template <typename... Ts> using has_all_function = has_trait_all<std::is_function, Ts...>;
+  template <typename... Ts> using has_no_function = has_trait_none<std::is_function, Ts...>;
+
+  template <typename... Ts> using has_any_pointer = has_trait_any<std::is_pointer, Ts...>;
+  template <typename... Ts> using has_all_pointer = has_trait_all<std::is_pointer, Ts...>;
+  template <typename... Ts> using has_no_pointer = has_trait_none<std::is_pointer, Ts...>;
+
+  template <typename... Ts> using has_any_lvalue_reference = has_trait_any<std::is_lvalue_reference, Ts...>;
+  template <typename... Ts> using has_all_lvalue_reference = has_trait_all<std::is_lvalue_reference, Ts...>;
+  template <typename... Ts> using has_no_lvalue_reference = has_trait_none<std::is_lvalue_reference, Ts...>;
+
+  template <typename... Ts> using has_any_rvalue_reference = has_trait_any<std::is_rvalue_reference, Ts...>;
+  template <typename... Ts> using has_all_rvalue_reference = has_trait_all<std::is_rvalue_reference, Ts...>;
+  template <typename... Ts> using has_no_rvalue_reference = has_trait_none<std::is_rvalue_reference, Ts...>;
+
+  template <typename... Ts> using has_any_member_object_pointer = has_trait_any<std::is_member_object_pointer, Ts...>;
+  template <typename... Ts> using has_all_member_object_pointer = has_trait_all<std::is_member_object_pointer, Ts...>;
+  template <typename... Ts> using has_no_member_object_pointer = has_trait_none<std::is_member_object_pointer, Ts...>;
+
+  template <typename... Ts> using has_any_member_function_pointer = has_trait_any<std::is_member_function_pointer, Ts...>;
+  template <typename... Ts> using has_all_member_function_pointer = has_trait_all<std::is_member_function_pointer, Ts...>;
+  template <typename... Ts> using has_no_member_function_pointer = has_trait_none<std::is_member_function_pointer, Ts...>;
+
+
+  template <typename... Ts> using has_any_fundamental = has_trait_any<std::is_fundamental, Ts...>;
+  template <typename... Ts> using has_all_fundamental = has_trait_all<std::is_fundamental, Ts...>;
+  template <typename... Ts> using has_no_fundamental = has_trait_none<std::is_fundamental, Ts...>;
+
+  template <typename... Ts> using has_any_arithmetic = has_trait_any<std::is_arithmetic, Ts...>;
+  template <typename... Ts> using has_all_arithmetic = has_trait_all<std::is_arithmetic, Ts...>;
+  template <typename... Ts> using has_no_arithmetic = has_trait_none<std::is_arithmetic, Ts...>;
+
+  template <typename... Ts> using has_any_scalar = has_trait_any<std::is_scalar, Ts...>;
+  template <typename... Ts> using has_all_scalar = has_trait_all<std::is_scalar, Ts...>;
+  template <typename... Ts> using has_no_scalar = has_trait_none<std::is_scalar, Ts...>;
+
+  template <typename... Ts> using has_any_object = has_trait_any<std::is_object, Ts...>;
+  template <typename... Ts> using has_all_object = has_trait_all<std::is_object, Ts...>;
+  template <typename... Ts> using has_no_object = has_trait_none<std::is_object, Ts...>;
+
+  template <typename... Ts> using has_any_compound = has_trait_any<std::is_compound, Ts...>;
+  template <typename... Ts> using has_all_compound = has_trait_all<std::is_compound, Ts...>;
+  template <typename... Ts> using has_no_compound = has_trait_none<std::is_compound, Ts...>;
+
+  template <typename... Ts> using has_any_reference = has_trait_any<std::is_reference, Ts...>;
+  template <typename... Ts> using has_all_reference = has_trait_all<std::is_reference, Ts...>;
+  template <typename... Ts> using has_no_reference = has_trait_none<std::is_reference, Ts...>;
+
+  template <typename... Ts> using has_any_member_pointer = has_trait_any<std::is_member_pointer, Ts...>;
+  template <typename... Ts> using has_all_member_pointer = has_trait_all<std::is_member_pointer, Ts...>;
+  template <typename... Ts> using has_no_member_pointer = has_trait_none<std::is_member_pointer, Ts...>;
+  
+  
+  template <typename... Ts> using has_any_const = has_trait_any<std::is_const, Ts...>;
+  template <typename... Ts> using has_all_const = has_trait_all<std::is_const, Ts...>;
+  template <typename... Ts> using has_no_const = has_trait_none<std::is_const, Ts...>;
+
+  template <typename... Ts> using has_any_volatile = has_trait_any<std::is_volatile, Ts...>;
+  template <typename... Ts> using has_all_volatile = has_trait_all<std::is_volatile, Ts...>;
+  template <typename... Ts> using has_no_volatile = has_trait_none<std::is_volatile, Ts...>;
+
+  template <typename... Ts> using has_any_trivial = has_trait_any<std::is_trivial, Ts...>;
+  template <typename... Ts> using has_all_trivial = has_trait_all<std::is_trivial, Ts...>;
+  template <typename... Ts> using has_no_trivial = has_trait_none<std::is_trivial, Ts...>;
+
+  template <typename... Ts> using has_any_trivially_copyable = has_trait_any<std::is_trivially_copyable, Ts...>;
+  template <typename... Ts> using has_all_trivially_copyable = has_trait_all<std::is_trivially_copyable, Ts...>;
+  template <typename... Ts> using has_no_trivially_copyable = has_trait_none<std::is_trivially_copyable, Ts...>;
+
+  template <typename... Ts> using has_any_standard_layout = has_trait_any<std::is_standard_layout, Ts...>;
+  template <typename... Ts> using has_all_standard_layout = has_trait_all<std::is_standard_layout, Ts...>;
+  template <typename... Ts> using has_no_standard_layout = has_trait_none<std::is_standard_layout, Ts...>;
+
+  template <typename... Ts> using has_any_empty = has_trait_any<std::is_empty, Ts...>;
+  template <typename... Ts> using has_all_empty = has_trait_all<std::is_empty, Ts...>;
+  template <typename... Ts> using has_no_empty = has_trait_none<std::is_empty, Ts...>;
+
+  template <typename... Ts> using has_any_polymorphic = has_trait_any<std::is_polymorphic, Ts...>;
+  template <typename... Ts> using has_all_polymorphic = has_trait_all<std::is_polymorphic, Ts...>;
+  template <typename... Ts> using has_no_polymorphic = has_trait_none<std::is_polymorphic, Ts...>;
+
+  template <typename... Ts> using has_any_abstract = has_trait_any<std::is_abstract, Ts...>;
+  template <typename... Ts> using has_all_abstract = has_trait_all<std::is_abstract, Ts...>;
+  template <typename... Ts> using has_no_abstract = has_trait_none<std::is_abstract, Ts...>;
+
+  template <typename... Ts> using has_any_final = has_trait_any<std::is_final, Ts...>;
+  template <typename... Ts> using has_all_final = has_trait_all<std::is_final, Ts...>;
+  template <typename... Ts> using has_no_final = has_trait_none<std::is_final, Ts...>;
+
+  template <typename... Ts> using has_any_aggregate = has_trait_any<std::is_aggregate, Ts...>;
+  template <typename... Ts> using has_all_aggregate = has_trait_all<std::is_aggregate, Ts...>;
+  template <typename... Ts> using has_no_aggregate = has_trait_none<std::is_aggregate, Ts...>;
+
+  template <typename... Ts> using has_any_signed = has_trait_any<std::is_signed, Ts...>;
+  template <typename... Ts> using has_all_signed = has_trait_all<std::is_signed, Ts...>;
+  template <typename... Ts> using has_no_signed = has_trait_none<std::is_signed, Ts...>;
+
+  template <typename... Ts> using has_any_unsigned = has_trait_any<std::is_unsigned, Ts...>;
+  template <typename... Ts> using has_all_unsigned = has_trait_all<std::is_unsigned, Ts...>;
+  template <typename... Ts> using has_no_unsigned = has_trait_none<std::is_unsigned, Ts...>;
+
+  template <typename... Ts> using has_any_bounded_array = has_trait_any<std::is_bounded_array, Ts...>;
+  template <typename... Ts> using has_all_bounded_array = has_trait_all<std::is_bounded_array, Ts...>;
+  template <typename... Ts> using has_no_bounded_array = has_trait_none<std::is_bounded_array, Ts...>;
+
+  template <typename... Ts> using has_any_unbounded_array = has_trait_any<std::is_unbounded_array, Ts...>;
+  template <typename... Ts> using has_all_unbounded_array = has_trait_all<std::is_unbounded_array, Ts...>;
+  template <typename... Ts> using has_no_unbounded_array = has_trait_none<std::is_unbounded_array, Ts...>;
+
 
   /// Convert std::function to base function type.
   template <typename T> struct remove_std_function_type { using type = T; };
