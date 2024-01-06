@@ -1,7 +1,7 @@
 /**
  * @note This file is part of Empirical, https://github.com/devosoft/Empirical
  * @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- * @date 2023.
+ * @date 2023-24.
  *
  * @file SerialPod.hpp
  * @brief Tools to save and load data from classes.
@@ -20,7 +20,7 @@
  *  objects.  As long as such a constructor is provided, the Serialize function can be const.
  * 
  *  More complex classes (e.g., those that do memory management) will need to have separate
- *  `SerialSave(SerialPod & pos) const` and `SerialLoad(SerialPod & pos)` functions.
+ *  `SerialSave(SerialPod & pod) const` and `SerialLoad(SerialPod & pod)` functions.
  *
  * => Example:
  *  Inside of MyClass we might have:
@@ -54,6 +54,7 @@
 #include "../base/concepts.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
+#include "../meta/TypeID.hpp"
 #include "../meta/type_traits.hpp"
 #include "../tools/string_utils.hpp"
 
@@ -201,12 +202,15 @@ namespace emp {
     }
 
     template <typename T, typename... EXTRA_Ts>
-    SerialPod & Save(T & in, EXTRA_Ts &... extras) {
+    SerialPod & Save(T && in, EXTRA_Ts &&... extras) {
       static_assert(!emp::is_ptr_type<std::decay<T>>(),
         "SerialPod cannot load or save pointers without more information.\n"
         "Use ManagePtr(value) for restoring pointers by first building the instance,\n"
         "or LinkPtr(value) to use the value of a pointer that is managed elsewhere." );
-      if constexpr (std::is_same<T, std::string>() || std::is_same<T, emp::String>()) {
+
+      using decayT = std::decay_t<T>;
+      if constexpr (std::is_same<decayT, std::string>() ||
+                    std::is_same<decayT, emp::String>()) {
         OStream() << '\"';
         for (char c : in) { OStream() << emp::to_escaped_string(c); }
         OStream() << "\"\n";
@@ -215,20 +219,32 @@ namespace emp {
       else if constexpr (hasSerializeOverload<T>) { Serialize(*this, in); }
       else if constexpr (hasSerialSaveMember<T>) { in.SerialSave(*this); }
       else if constexpr (hasSerializeMember<T>) { in.Serialize(*this); }
-      else if constexpr (std::is_enum<T>()) { // enums must be converted to numerical values.
+      else if constexpr (std::is_enum<decayT>()) { // enums must be converted to numerical values.
         OStream() << static_cast<int>(in) << '\n';
       }
-      else if constexpr (canStreamTo<std::ostream,T> && canStreamFrom<std::istream,T>) {
+      else if constexpr (canStreamTo<std::ostream,T>) {
         OStream() << in << '\n';
       }
-      else { notify::Error("Invalid SerialPod::Save attempt."); }
+      else { notify::Error("Invalid SerialPod::Save attempt on type ", emp::GetTypeName<T>()); }
       return Save(extras...);
     }
 
     template <typename T, typename... EXTRA_Ts>
-    SerialPod & operator()(T & in, EXTRA_Ts &... extras) {
-      if (IsLoad()) return Load(in, extras...);
-      else return Save(in, extras...);
+    SerialPod & operator()(T && in, EXTRA_Ts &&... extras) {
+      if (IsLoad()) {
+        // Make sure that this variable is loadable...  These are run-time errors since
+        // it is fine if pod is set to save.
+        if constexpr (emp::has_any_const<T, EXTRA_Ts...>()) {
+          emp_assert(false, "Trying to deserialize into a constant value.");
+        } else if constexpr (!emp::has_only_lvalue_reference<T, EXTRA_Ts...>()) {
+          emp_assert(false, "Trying to deserialize into other than an lvalue-reference.");
+        } else {
+          Load(std::forward<T>(in), std::forward<EXTRA_Ts>(extras)...);
+        }
+      }
+      else Save(std::forward<T>(in), std::forward<EXTRA_Ts>(extras)...);
+ 
+      return *this;
     }
   };
 
@@ -256,7 +272,7 @@ namespace emp {
   }
 
   template <typename T>
-  void SerialSave(SerialPod & pod, std::vector<T> & vec) {
+  void SerialSave(SerialPod & pod, const std::vector<T> & vec) {
     pod.Save(vec.size());
     for (auto & element : vec) {
       pod.Save(element);
