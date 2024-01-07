@@ -209,6 +209,14 @@ namespace emp {
     return Range<T, INCLUDE_UPPER>(_l,_u);
   }
 
+  /// Build a new range from a string.
+  template <typename T, bool INCLUDE_UPPER=true>
+  Range<T, INCLUDE_UPPER> MakeRange(emp::String in_str) {
+    T val1 = in_str.Pop("-").As<T>();               // Respect a dash if there is one.
+    T val2 = in_str.size() ? in_str.As<T>() : val1;
+    return emp::MakeRange(val1, val2);
+  }
+
   /// Build a new range of type int.
   template <bool INCLUDE_UPPER=true>
   inline Range<int, INCLUDE_UPPER> IntRange(int _l, int _u) {
