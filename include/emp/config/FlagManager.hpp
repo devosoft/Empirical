@@ -46,11 +46,13 @@ namespace emp {
     using fun_t = std::function<void(const emp::vector<String> &)>;
 
   private:
-    String desc;
-    size_t min_args = 0;
-    size_t max_args = 0;
-    fun_t fun;
-    char shortcut = '\0';
+    String desc;          ///< Name to type to trigger option.  E.g. "--help"
+    size_t min_args = 0;  ///< Minumum number of arguments option needs to operate.
+    size_t max_args = 0;  ///< Maximum number of arguments option can handle.
+    fun_t fun;            ///< Function to run when this option is selected.
+    char shortcut = '\0'; ///< Single-letter shortcut for this option.  E.g., 'h' is for "-h"
+
+    String group="none";  ///< Which option group does this belong to?
 
   public:
     FlagInfo() { }
@@ -67,7 +69,12 @@ namespace emp {
     fun_t GetFun() const { return fun; };
     char GetShortcut() const { return shortcut; };
 
+    FlagInfo SetDesc(const String & in) { desc = in; return *this; }
+    FlagInfo SetMinArgs(size_t in) { min_args = in; return *this; };
+    FlagInfo SetMaxArgs(size_t in) { max_args = in; return *this; };
+    FlagInfo SetFun(fun_t in) { fun = in; return *this; };
     FlagInfo & SetShortcut(char in) { shortcut = in; return *this; }
+    FlagInfo & SetGroup(String in) { group = in; return *this; }
 
     template <typename... Ts>
     void Run(Ts &&... args) { fun(std::forward<Ts>(args)...); }
@@ -75,12 +82,33 @@ namespace emp {
 
   class FlagManager {
   private:
-    emp::vector<String> args;
-    emp::vector<String> extras;
+    emp::vector<String> args;    ///< Command-line arguments to be processed
+    emp::vector<String> extras;  ///< Set of command line arguments not handled by FlagManager
 
-    std::map<String, FlagInfo> flag_options;
-    std::map<char, String> shortcuts;
+    std::map<String, FlagInfo> flag_options; ///< Set of flags known by this manager.
+    std::map<char, String> shortcuts;        ///< Single-character shortcuts to particular flags.
 
+    struct GroupInfo {
+      String name;
+      String desc;
+    };
+    emp::vector<GroupInfo> groups;   ///< Info about flag groups to organize "help".
+    int cur_group = -1;              ///< Which group are we currently adding to?
+
+    // --- Helper functions ---
+    int _FindGroupID(const String & name) {
+      for (size_t i = 0; i < groups.size(); ++i) {
+        if (groups[i].name == name) return static_cast<int>(i);
+      }
+      return -1;
+    }
+
+    FlagInfo & _AddOption(String name, std::function<void(const emp::vector<String> &)> fun,
+                   size_t min_args=0, size_t max_args=npos, String desc="") {
+      flag_options[name] = FlagInfo{desc, min_args, max_args, fun};
+      if (cur_group >= 0) flag_options[name].SetGroup(groups[cur_group].name);
+      return flag_options[name];
+    }
   public:
     FlagManager() { }
     FlagManager(int argc, char* argv[]) { AddFlags(argc, argv); }
@@ -107,29 +135,52 @@ namespace emp {
       return true;
     }
 
-    void AddOption(String name, String desc="") {
-      flag_options[name] = FlagInfo{desc, 0, 0, [](const emp::vector<String> &){} };
+    /// Add a new option group.
+    int AddGroup(String name, String desc="") {
+      cur_group = static_cast<int>(groups.size());
+      groups.emplace_back(name, desc);
+      return cur_group;
     }
-    void AddOption(String name, std::function<void()> fun, String desc="") {
-      flag_options[name] = FlagInfo{desc, 0, 0, [fun](const emp::vector<String> &){fun();}};
+
+    /// Change the option group back to a previously created group.
+    int SetGroup(String name) {
+      cur_group = _FindGroupID(name);
+      return cur_group;
     }
-    void AddOption(String name, std::function<void(String)> fun, String desc="") {
-      flag_options[name] = FlagInfo{desc, 1, 1, [fun](const emp::vector<String> & in){fun(in[0]);}};
+
+    /// Add a new option that doesn't do anything when triggered.
+    FlagInfo & AddOption(String name, String desc="") {
+      return _AddOption(name, [](const emp::vector<String> &){}, 0, 0, desc);
     }
-    void AddOption(String name, std::function<void(String,String)> fun, String desc="") {
-      flag_options[name] = FlagInfo{desc, 2, 2, [fun](const emp::vector<String> & in){fun(in[0],in[1]);}};
+
+    /// Add an option that doesn't take any arguments and runs a function when triggered.
+    FlagInfo & AddOption(String name, std::function<void()> fun, String desc="") {
+      return _AddOption(name, [fun](const emp::vector<String> &){fun();}, 0, 0, desc);
     }
-    void AddOption(String name, std::function<void(const emp::vector<String> &)> fun,
-                   size_t min_args=0, size_t max_args=npos, String desc="") {
-      flag_options[name] = FlagInfo{desc, min_args, max_args, fun};
+
+    /// Add an option that takes one argument that it passes to a function when triggered.
+    FlagInfo & AddOption(String name, std::function<void(String)> fun, String desc="") {
+      return _AddOption(name, [fun](const emp::vector<String> & in){fun(in[0]);}, 1, 1, desc);
+    }
+
+    /// Add an option that takes two arguments that it passes to a function when triggered.
+    FlagInfo & AddOption(String name, std::function<void(String,String)> fun, String desc="") {
+      return _AddOption(name, [fun](const emp::vector<String> & in){fun(in[0],in[1]);}, 2, 2, desc);
+    }
+
+    /// Add an option that takes a vector of arguments that it passes to a function when triggered.
+    FlagInfo & AddOption(String name, std::function<void(const emp::vector<String> &)> fun,
+                         size_t min_args=0, size_t max_args=npos, String desc="") {
+      return _AddOption(name, fun, min_args, max_args, desc);
     }
 
     // Allow an option to have a single-letter flag (e.g. "-h" is short for "--help")
     template <typename FUN_T>
-    void AddOption(char shortcut, String name, FUN_T fun, String desc="") {
-      AddOption(name, fun, desc);
+    FlagInfo & AddOption(char shortcut, String name, FUN_T fun, String desc="") {
+      FlagInfo & option = AddOption(name, fun, desc);
       shortcuts[shortcut] = name;
-      flag_options[name].SetShortcut(shortcut);
+      option.SetShortcut(shortcut);
+      return option;
     }
 
     void AddFlags(int argc, char* argv[]) {
