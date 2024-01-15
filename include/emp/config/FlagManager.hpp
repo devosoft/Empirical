@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2023.
+ *  @date 2023-24.
  *
  *  @file FlagManager.hpp
  *  @brief This file contains tools for dealing with command-line flags (from argv and argc).
@@ -41,18 +41,42 @@
 
 namespace emp {
 
+  class FlagInfo {
+  public:
+    using fun_t = std::function<void(const emp::vector<String> &)>;
+
+  private:
+    String desc;
+    size_t min_args = 0;
+    size_t max_args = 0;
+    fun_t fun;
+    char shortcut = '\0';
+
+  public:
+    FlagInfo() { }
+    FlagInfo(String desc, size_t min_args, size_t max_args,
+             fun_t fun, char shortcut='\0')
+      : desc(desc), min_args(min_args), max_args(max_args), fun(fun), shortcut(shortcut)
+    { }
+
+    FlagInfo & operator=(const FlagInfo &) = default;
+
+    const String & GetDesc() const { return desc; }
+    size_t GetMinArgs() const { return min_args; };
+    size_t GetMaxArgs() const { return max_args; };
+    fun_t GetFun() const { return fun; };
+    char GetShortcut() const { return shortcut; };
+
+    FlagInfo & SetShortcut(char in) { shortcut = in; return *this; }
+
+    template <typename... Ts>
+    void Run(Ts &&... args) { fun(std::forward<Ts>(args)...); }
+  };
+
   class FlagManager {
   private:
     emp::vector<String> args;
     emp::vector<String> extras;
-
-    struct FlagInfo {
-      String desc;
-      size_t min_args = 0;
-      size_t max_args = 0;
-      std::function<void(const emp::vector<String> &)> fun;
-      char shortcut = '\0';
-    };
 
     std::map<String, FlagInfo> flag_options;
     std::map<char, String> shortcuts;
@@ -87,17 +111,17 @@ namespace emp {
       flag_options[name] = FlagInfo{desc, 0, 0, [](const emp::vector<String> &){} };
     }
     void AddOption(String name, std::function<void()> fun, String desc="") {
-      flag_options[name] = FlagInfo{desc, 0,0, [fun](const emp::vector<String> &){fun();}};
+      flag_options[name] = FlagInfo{desc, 0, 0, [fun](const emp::vector<String> &){fun();}};
     }
     void AddOption(String name, std::function<void(String)> fun, String desc="") {
-      flag_options[name] = FlagInfo{desc, 1,1, [fun](const emp::vector<String> & in){fun(in[0]);}};
+      flag_options[name] = FlagInfo{desc, 1, 1, [fun](const emp::vector<String> & in){fun(in[0]);}};
     }
     void AddOption(String name, std::function<void(String,String)> fun, String desc="") {
-      flag_options[name] = FlagInfo{desc, 2,2, [fun](const emp::vector<String> & in){fun(in[0],in[1]);}};
+      flag_options[name] = FlagInfo{desc, 2, 2, [fun](const emp::vector<String> & in){fun(in[0],in[1]);}};
     }
     void AddOption(String name, std::function<void(const emp::vector<String> &)> fun,
                    size_t min_args=0, size_t max_args=npos, String desc="") {
-      flag_options[name] = FlagInfo{desc, min_args,max_args, fun};
+      flag_options[name] = FlagInfo{desc, min_args, max_args, fun};
     }
 
     // Allow an option to have a single-letter flag (e.g. "-h" is short for "--help")
@@ -105,7 +129,7 @@ namespace emp {
     void AddOption(char shortcut, String name, FUN_T fun, String desc="") {
       AddOption(name, fun, desc);
       shortcuts[shortcut] = name;
-      flag_options[name].shortcut = shortcut;
+      flag_options[name].SetShortcut(shortcut);
     }
 
     void AddFlags(int argc, char* argv[]) {
@@ -119,11 +143,11 @@ namespace emp {
       if (!emp::Has(flag_options, name)) { emp::notify::Error("Unknown flag '", name , "'."); }
       auto option = flag_options[name];
       emp::vector<String> flag_args;
-      for (size_t i = 1; i <= option.min_args; ++i) {
+      for (size_t i = 1; i <= option.GetMinArgs(); ++i) {
         flag_args.push_back(args[cur_pos+i]);
       }
-      option.fun(flag_args);
-      return option.min_args;
+      option.Run(flag_args);
+      return option.GetMinArgs();
     }
 
     // Process an argument associated with a particular character; return num additional args used.
@@ -156,11 +180,11 @@ namespace emp {
     void PrintOptions(std::ostream & os=std::cout) const {
       for (const auto & [name, options] : flag_options) {
         os << "  " << name;
-        if (options.shortcut) {
-          os << " (or '-" << options.shortcut << "')";
+        if (options.GetShortcut()) {
+          os << " (or '-" << options.GetShortcut() << "')";
         }
-        if (options.desc.size()) {
-          os << " : " << options.desc;
+        if (options.GetDesc().size()) {
+          os << " : " << options.GetDesc();
         }
         os << "\n";
       }
