@@ -68,6 +68,7 @@ namespace emp {
     size_t GetMaxArgs() const { return max_args; };
     fun_t GetFun() const { return fun; };
     char GetShortcut() const { return shortcut; };
+    const String & GetGroup() const { return group; }
 
     FlagInfo SetDesc(const String & in) { desc = in; return *this; }
     FlagInfo SetMinArgs(size_t in) { min_args = in; return *this; };
@@ -228,8 +229,17 @@ namespace emp {
       }
     }
 
-    void PrintOptions(std::ostream & os=std::cout) const {
+    size_t GroupSize(emp::String group_name) const {
+      size_t size = 0;
       for (const auto & [name, options] : flag_options) {
+        if (options.GetGroup() == group_name) ++size;
+      }
+      return size;
+    }
+
+    void PrintGroupOptions(emp::String group, std::ostream & os=std::cout) const {
+      for (const auto & [name, options] : flag_options) {
+        if (options.GetGroup() != group) continue;
         os << "  " << name;
         if (options.GetShortcut()) {
           os << " (or '-" << options.GetShortcut() << "')";
@@ -239,6 +249,25 @@ namespace emp {
         }
         os << "\n";
       }
+    }
+
+    void PrintOptions(std::ostream & os=std::cout) const {
+      // Step through groups, printing each of them.
+      for (const auto & group : groups) {
+        os << "=== " << group.name << " ===\n";
+        if (group.desc.size()) os << group.desc << '\n';
+        PrintGroupOptions(group.name, os);
+        os << '\n';
+      }
+      os.flush();
+      
+      // Print any uncategorized options
+      if (GroupSize("none") == 0) return; // No uncategorized options.
+
+      // If there are other groups, list this one as specifically uncategorized.
+      if (groups.size()) os << "=== Other Options ===\n";
+      PrintGroupOptions("none", os);
+      os.flush();
     }
   };
 
