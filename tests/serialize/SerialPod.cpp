@@ -18,6 +18,7 @@ TEST_CASE("Test SerialPod with simple types", "[serialize]")
 {
   std::stringstream ss;
   emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
 
   // Simple saving and loading.
   int in1 = 91;
@@ -26,11 +27,12 @@ TEST_CASE("Test SerialPod with simple types", "[serialize]")
 
   save_pod(in1, in2, in3);
 
+  // std::cout << "------" << std::endl << ss.str() << std::endl << "------" << std::endl;
+
   int out1 = 0;
   std::string out2 = "Not the original.";
   char out3 = ' ';
 
-  emp::SerialPod load_pod(ss, false);
   load_pod(out1, out2, out3);
 
   CHECK(in1 == out1);
