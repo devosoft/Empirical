@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2023.
+ *  @date 2023-2024.
  *
  *  @file String.hpp
  *  @brief Simple class to facilitate string manipulations
@@ -1330,7 +1330,7 @@ namespace emp {
   String String::DiagnoseLiteralString(const String & quote_marks) const {
     // A literal string must begin and end with a double quote and contain only valid characters.
     if (size() < 2) return "Too short!";
-    if (!is_one_of(Get(0), quote_marks)) return "Must begin an end in quotes.";
+    if (!is_one_of(Get(0), quote_marks)) return "Must begin and end in quotes.";
     if (back() != Get(0)) return "Must have begin and end quotes that match.";
 
     // Are all of the characters valid?

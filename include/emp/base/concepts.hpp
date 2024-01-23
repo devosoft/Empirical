@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2023.
+ *  @date 2023-24.
  *
  *  @file concepts.hpp
  *  @brief Useful concepts that are not trivially available in the C++20 standard library.
