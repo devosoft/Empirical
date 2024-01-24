@@ -193,6 +193,7 @@ namespace emp {
     /// How many types of tokens can be identified in this Lexer?
     size_t GetNumTokens() const { return token_set.size(); }
 
+    /// Reset the entire lexer to its start state.
     void Reset() {
       token_set.resize(0);
       token_map.clear();
@@ -327,16 +328,23 @@ namespace emp {
       return out_val;
     }
 
+    /// Perform a single step in the Tokenize process, tracking line number as we go.
+    emp::Token TokenizeNext(std::istream & is, size_t & cur_line) const {
+      // Loop until we get a token to return or hit the end of the stream.
+      while (true) {
+        emp::Token token = Process(is);
+        token.line_id = cur_line;
+        cur_line += emp::count(token.lexeme, '\n');
+        if (token == 0 || GetSaveToken(token)) return token;
+      }
+    }
+
     /// Turn an input stream of text into a vector of tokens.
     TokenStream Tokenize(std::istream & is, const std::string & name="in_stream") const {
       emp::vector<Token> out_tokens;
       size_t cur_line = 1;
-      emp::Token token = Process(is);
-      while (token > 0) {
-        token.line_id = cur_line;
-        cur_line += emp::count(token.lexeme, '\n');
-        if (GetSaveToken(token)) out_tokens.push_back(token);
-        token = Process(is);
+      while (emp::Token token = TokenizeNext(is, cur_line)) {
+        out_tokens.push_back(token);
       }
       return TokenStream{out_tokens, name};
     }
