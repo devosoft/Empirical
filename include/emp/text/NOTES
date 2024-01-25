@@ -4,7 +4,7 @@ Supported text formats:
  TXT (plain text - working)
  HTML (simple tags working)
  LATEX
- MARKDOWN
+ MARKDOWN (need to be careful that C++, for example, doesn't grab the '++')
  RTF
  XML
  MarkBack (custom markup language; simple tags working)
@@ -60,7 +60,6 @@ MarkBack notes:
   Some types require extra details:
 
    `@{URL}Linked-text goes here`@
-   `#{hashtag}Tagged text`#
    `[blue]This text would be blue
    `[#FF00FF]This text would be magenta
    `[]This text would be back to default color.
@@ -75,6 +74,9 @@ MarkBack notes:
 
    `" Blockquote (Should be the first non-whitespace, or a preceding newline will be assumed)
    `% Comment that will be removed
+   `# Heading
+   `## Heading level 2
+   `### etc. deeper headings.
    `- Ignore all special formatting for the rest of the line
    `: Continues the previous line for other tags in this group (should be first non-whitespace)
 
@@ -113,9 +115,7 @@ MarkBack notes:
   For example \***, \++, or \===={123}
 
   Other special insertions are also possible with backslash:
-   \#{Heading}
-   \##{Heading level 2}
-   \### etc. deeper headings.
+   \#{hashtag}
    \| is the beginning of a line for creating a table (rest of line is markdown format...?)
    \. is nothing. Use to separate other text (e.g., for unicode immediately followed by a number)
    \- is a horizontal rule
