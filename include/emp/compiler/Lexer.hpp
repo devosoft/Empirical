@@ -38,41 +38,11 @@
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
 
+#include "_TokenType.hpp"
 #include "lexer_utils.hpp"
 #include "RegEx.hpp"
 
 namespace emp {
-
-  /// Information about an individual TYPE of token to be processed within a Lexer.
-  struct TokenInfo {
-    std::string name;    ///< Name of this token type.
-    std::string desc;    ///< More detailed description of this token type.
-    RegEx regex;         ///< Pattern to describe token type.
-    int id;              ///< Unique id for token.
-    bool save_lexeme;    ///< Preserve the lexeme for this token?
-    bool save_token;     ///< Keep token at all? (Whitespace and comments are often discarded).
-
-    // Default constructor produces an error token.
-    TokenInfo() : name(""), desc("Unable to parse input!"), regex(""),
-                  id(-1), save_lexeme(true), save_token(true) { }
-    TokenInfo(const std::string & _name, const std::string & _regex, int _id,
-              bool _save_l=true, bool _save_t=true, const std::string & _desc="")
-      : name(_name), desc(_desc), regex(_regex), id(_id), save_lexeme(_save_l), save_token(_save_t) { }
-    TokenInfo(const TokenInfo &) = default;
-    TokenInfo(TokenInfo &&) = default;
-    TokenInfo & operator=(const TokenInfo &) = default;
-    TokenInfo & operator=(TokenInfo &&) = default;
-
-    /// Print out the status of this token (for debugging)
-    void Print(std::ostream & os=std::cout) const {
-      os << "Name:" << name
-         << "  RegEx:" << regex.AsString()
-         << "  ID:" << id
-         << "  save_lexeme:" << save_lexeme
-         << "  save_token:" << save_token
-         << std::endl;
-    }
-  };
 
   /// Information about a token instance from an input stream.
   struct Token {
@@ -169,15 +139,15 @@ namespace emp {
     static constexpr int MAX_ID = 255;      ///< IDs count down so that first ones have priority.
     static constexpr int ERROR_ID = -1;     ///< Code for unknown token ID.
 
-    emp::vector<TokenInfo> token_set;       ///< List of all active tokens types.
+    emp::vector<TokenType> token_set;       ///< List of all active tokens types.
     emp::map<std::string, int> token_map;   ///< Map of token names to id.
     int cur_token_id = MAX_ID;              ///< Which ID should the next new token get?
     mutable bool generate_lexer = false;    ///< Do we need to regenerate the lexer?
     mutable DFA lexer_dfa;                  ///< Table driven lexer implementation.
     mutable std::string lexeme;             ///< Current state of lexeme being generated.
 
-    static const TokenInfo & ERROR_TOKEN() {
-      static const TokenInfo token;
+    static const TokenType & ERROR_TOKEN() {
+      static const TokenType token;
       return token;
     }
 
@@ -235,7 +205,7 @@ namespace emp {
     }
 
     /// Get the full information about a token (you provide the id)
-    const TokenInfo & GetTokenInfo(int id) const {
+    const TokenType & GetTokenType(int id) const {
       if (id > MAX_ID || id <= cur_token_id) return ERROR_TOKEN();
       return token_set[(size_t)(MAX_ID - id)];
     }
@@ -246,13 +216,13 @@ namespace emp {
       if (id == 0) return "EOF";                               // Token zero is end-of-file.
       if (id < 128) return emp::to_escaped_string((char) id);  // Individual characters.
       if (id <= cur_token_id) return emp::to_string("Error (", id, ")"); // Invalid token range!
-      return GetTokenInfo(id).name;                            // User-defined tokens.
+      return GetTokenType(id).name;                            // User-defined tokens.
     }
 
     /// Identify if a token should be saved.
     bool GetSaveToken(int id) const {
       if (id > MAX_ID || id <= cur_token_id) return true;
-      return GetTokenInfo(id).save_token;
+      return GetTokenType(id).save_token;
     }
 
     /// Create the NFA that will identify the current set of tokens in a sequence.
@@ -391,7 +361,7 @@ namespace emp {
     }
 
     void DebugToken(int token_id) const {
-      const auto & token = GetTokenInfo(token_id);
+      const auto & token = GetTokenType(token_id);
       std::cout << "Debugging token " << token.id << ": '" << token.name << "'.\n"
                 << "  Desc: " << token.desc << "\n";
       token.regex.PrintDebug();
