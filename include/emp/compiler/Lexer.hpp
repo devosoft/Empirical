@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2023.
+ *  @date 2016-2024.
  *
  *  @file Lexer.hpp
  *  @brief A general-purpose, fast lexer.
@@ -38,100 +38,13 @@
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
 
+#include "_Token.hpp"
+#include "_TokenStream.hpp"
 #include "_TokenType.hpp"
 #include "lexer_utils.hpp"
 #include "RegEx.hpp"
 
 namespace emp {
-
-  /// Information about a token instance from an input stream.
-  struct Token {
-    int id;              ///< Which type of token is this?
-    std::string lexeme;  ///< Sequence matched by this token (or empty if not saved)
-    size_t line_id;      ///< Which line did this token start on?
-
-    Token(int _id, const std::string & str="", size_t _line=0)
-      : id(_id), lexeme(str), line_id(_line) { ; }
-    Token(const Token &) = default;
-    Token(Token &&) = default;
-    Token & operator=(const Token &) = default;
-    Token & operator=(Token &&) = default;
-
-    /// Token will automatically convert to its ID if used as an int.
-    operator int() const { return id; }
-
-    /// Token will automatically convert to its matched sequence (lexeme) is used as a string.
-    operator const std::string &() const { return lexeme; }
-  };
-
-  class TokenStream {
-  private:
-    std::string name = "";
-    emp::vector<Token> tokens;
-
-  public:
-    TokenStream(const std::string & in_name) : name(in_name) { }
-    TokenStream(const TokenStream &) = default;
-    TokenStream(TokenStream &&) = default;
-    TokenStream(const emp::vector<Token> & in_tokens, const std::string & in_name)
-    : name(in_name), tokens(in_tokens) { }
-
-    TokenStream & operator=(const TokenStream &) = default;
-    TokenStream & operator=(TokenStream &&) = default;
-
-    class Iterator {
-    private:
-      emp::Ptr<const TokenStream> ts;
-      size_t pos;
-
-    public:
-      Iterator(const Iterator &) = default;
-      Iterator(const TokenStream & in_ts, size_t in_pos) : ts(&in_ts), pos(in_pos) { }
-      Iterator & operator=(const Iterator &) = default;
-
-      const TokenStream & GetTokenStream() const { return *ts; }
-      size_t GetIndex() const { return pos; }
-      emp::Ptr<const Token> ToPtr() const { return ts->GetPtr(pos); }
-
-      Token operator*() const { return ts->tokens[pos]; }
-      const Token * operator->() const { return &(ts->tokens[pos]); }
-
-      bool operator==(const Iterator & in) const { return ToPtr() == in.ToPtr(); }
-      bool operator!=(const Iterator & in) const { return ToPtr() != in.ToPtr(); }
-      bool operator< (const Iterator & in) const { return ToPtr() <  in.ToPtr(); }
-      bool operator<=(const Iterator & in) const { return ToPtr() <= in.ToPtr(); }
-      bool operator> (const Iterator & in) const { return ToPtr() >  in.ToPtr(); }
-      bool operator>=(const Iterator & in) const { return ToPtr() >= in.ToPtr(); }
-
-      Iterator & operator++() { ++pos; return *this; }
-      Iterator operator++(int) { Iterator old(*this); ++pos; return old; }
-      Iterator & operator--() { --pos; return *this; }
-      Iterator operator--(int) { Iterator old(*this); --pos; return old; }
-
-      bool IsValid() const { return pos < ts->size(); }
-      bool AtEnd() const { return pos == ts->size(); }
-
-      operator bool() const { return IsValid(); }
-    };
-
-    size_t size() const { return tokens.size(); }
-    const Token & Get(size_t pos) const { return tokens[pos]; }
-    emp::Ptr<const Token> GetPtr(size_t pos) const { return &(tokens.data()[pos]); }
-    const std::string & GetName() const { return name; }
-    Iterator begin() const { return Iterator(*this, 0); }
-    Iterator end() const { return Iterator(*this, tokens.size()); }
-    const Token & back() const { return tokens.back(); }
-
-    void push_back(const Token & in) { tokens.push_back(in); }
-
-    void Print(std::ostream & os=std::cout) const {
-      for (auto x : tokens) {
-        os << " [" << x.lexeme << "]";
-      }
-      os << std::endl;
-    }
-  };
-
 
   /// A lexer with a set of token types (and associated regular expressions)
   class Lexer {
