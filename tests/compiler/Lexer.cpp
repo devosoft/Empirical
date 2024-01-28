@@ -72,3 +72,43 @@ TEST_CASE("Another Test Lexer", "[compiler]")
   REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Whitespace");
   REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Lower");
 }
+
+TEST_CASE("Test Lexer with ignore tokens", "[compiler]")
+{
+  emp::Lexer lexer;
+  lexer.AddToken("Integer", "[0-9]+");
+  lexer.AddToken("Float", "[0-9]*\\.[0-9]+");
+  lexer.AddToken("Lower", "[a-z]+");
+  lexer.AddToken("Upper", "[A-Z]+");
+  lexer.AddToken("Mixed", "[a-zA-Z]+");
+  lexer.IgnoreToken("Whitespace", "[ \t\n\r]");
+  lexer.AddToken("Other", ".");
+
+  std::stringstream ss;
+  ss << "This is a 123 TEST.  It should also have 1. .2 123.456 789 FLOATING point NUMbers!";
+
+  size_t line_num;
+  REQUIRE(lexer.TokenizeNext(ss, line_num).lexeme == "This");
+  REQUIRE(lexer.TokenizeNext(ss, line_num).lexeme == "is");
+  REQUIRE(lexer.TokenizeNext(ss, line_num).lexeme == "a");
+  REQUIRE(lexer.TokenizeNext(ss, line_num).lexeme == "123");
+  REQUIRE(lexer.TokenizeNext(ss, line_num).lexeme == "TEST");
+  REQUIRE(lexer.TokenizeNext(ss, line_num).lexeme == ".");
+
+  REQUIRE(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Mixed");    // It
+  REQUIRE(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Lower");    // should
+  REQUIRE(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Lower");    // also
+  REQUIRE(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Lower");    // have
+  REQUIRE(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Integer");  // 1
+  REQUIRE(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Other");    // .
+  REQUIRE(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Float");    // .2
+  REQUIRE(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Float");    // 123.456
+  REQUIRE(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Integer");  // 789
+
+  REQUIRE(lexer.GetLexeme() == "789");
+
+  REQUIRE(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Upper");    // FLOATING
+  REQUIRE(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Lower");    // point
+  REQUIRE(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Mixed");    // NUMbers
+  REQUIRE(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Other");    // !
+}
