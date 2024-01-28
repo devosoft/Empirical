@@ -21,12 +21,11 @@
  *  Names and IDs can be recovered later using GetTokenID(name) and GetTokenName(id).
  *
  *  Either strings or streams can be converted into their associated Tokens.
- *    Process(in) does this one at a time (including "ignored" tokens)
- *    which will return the next (non-ignored) token, removing it from the input.
+ *    Tokenize(in) returns the entire series of tokens as a TokenStream.
+ *    TokenizeNext(in, &line) return the next token only, and updates the line number
+ *    Process(in) returns the next token (even if it's normally ignored); does not track line
  *
- *  Alternatively, an entire series of tokens can be processed with Tokenize().
- *
- *  Finally, GetLexeme() can be used to retrieve the lexeme from the most recent token found.
+ *  Finally, GetLexeme() returns the lexeme from the most recent token found.
  */
 
 #ifndef EMP_COMPILER_LEXER_HPP_INCLUDE
@@ -252,10 +251,10 @@ namespace emp {
       while (best_pos < cur_pos) { is.unget(); cur_pos--; }
     }
 
-    // If we are at the end of this input stream and haven't found a token, return 0.
+    // If we can't find a token, return 0 (for end or stream) or error (for no valid options)
     if (best_stop < 0) {
-      if (!is) return { 0, "" };     // 0 = end of stream.
-      return { ERROR_ID, lexeme };   // ERROR_ID = no valid tokens available!
+      if (!is) return { 0, "" };   // 0 = end of stream.
+      return { ERROR_ID, lexeme }; // ERROR_ID = no valid tokens available!
     }
 
     // Otherwise return the best token we've found so far.
@@ -286,7 +285,7 @@ namespace emp {
       emp::Token token = Process(is);
       token.line_id = cur_line;
       cur_line += emp::count(token.lexeme, '\n');
-      if (token == 0 || GetSaveToken(token)) return token;
+      if (GetSaveToken(token)) return token;      // Skip ignored tokens and search for another.
     }
   }
 
