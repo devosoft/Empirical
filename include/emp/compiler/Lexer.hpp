@@ -77,210 +77,259 @@ namespace emp {
     size_t GetNumTokens() const { return token_set.size(); }
 
     /// Reset the entire lexer to its start state.
-    void Reset() {
-      token_set.resize(0);
-      token_map.clear();
-      cur_token_id = MAX_ID;
-      generate_lexer = false;
-    }
+    void Reset();
 
     bool TokenOK(int id) const { return id >= 0 && id < cur_token_id; }
 
     /// Add a new token, specified by a name and the regex used to identify it.
     /// Note that token ids count down with highest IDs having priority.
-    int AddToken(const std::string & name,
-                 const std::string & regex,
-                 bool save_lexeme = true,
-                 bool save_token = true,
-                 const std::string & desc = "")
-    {
-      int id = cur_token_id--;                // Grab the next available token id.
-      generate_lexer = true;                  // Indicate the the lexer DFA needs to be rebuilt.
-      token_set.emplace_back( name, regex, id, save_lexeme, save_token, desc );
-      token_map[name] = id;
-      return id;
-    }
+    int AddToken(
+      const std::string & name,
+      const std::string & regex,
+      bool save_lexeme = true,
+      bool save_token = true,
+      const std::string & desc = "");
 
     /// Add a token to ignore, specified by a name and the regex used to identify it.
-    int IgnoreToken(const std::string & name, const std::string & regex, const std::string & desc="") {
-      int id = cur_token_id--;                // Grab the next available token id.
-      generate_lexer = true;                  // Indicate the the lexer DFA needs to be rebuilt.
-      token_set.emplace_back( name, regex, id, false, false, desc );
-      token_map[name] = id;
-      return id;
-    }
+    int IgnoreToken(
+      const std::string & name,
+      const std::string & regex,
+      const std::string & desc="");
 
     /// Get the ID associated with a token type (you provide the token name)
-    int GetTokenID(const std::string & name) const {
-      int default_id = ERROR_ID;
-      if (name.size() == 1) default_id = (int) name[0];
-      return emp::Find(token_map, name, default_id);
-    }
+    int GetTokenID(const std::string & name) const;
 
     /// Get the full information about a token (you provide the id)
-    const TokenType & GetTokenType(int id) const {
-      if (id > MAX_ID || id <= cur_token_id) return ERROR_TOKEN();
-      return token_set[(size_t)(MAX_ID - id)];
-    }
+    const TokenType & GetTokenType(int id) const;
 
     /// Get the name associated with a token type (you provide the ID)
-    std::string GetTokenName(int id) const {
-      if (id < 0) return emp::to_string("Error (", id, ")");   // Negative tokens specify errors.
-      if (id == 0) return "EOF";                               // Token zero is end-of-file.
-      if (id < 128) return emp::to_escaped_string((char) id);  // Individual characters.
-      if (id <= cur_token_id) return emp::to_string("Error (", id, ")"); // Invalid token range!
-      return GetTokenType(id).name;                            // User-defined tokens.
-    }
+    std::string GetTokenName(int id) const;
 
     /// Identify if a token should be saved.
-    bool GetSaveToken(int id) const {
-      if (id > MAX_ID || id <= cur_token_id) return true;
-      return GetTokenType(id).save_token;
-    }
+    bool GetSaveToken(int id) const;
 
     /// Create the NFA that will identify the current set of tokens in a sequence.
-    void Generate() const {
-      NFA lexer_nfa;
-      for (const auto & t : token_set) {
-        lexer_nfa.Merge( to_NFA(t.regex, (uint8_t) t.id) );
-      }
-      generate_lexer = false; // We just generated it!  Don't again until another change is made.
-      lexer_dfa = to_DFA(lexer_nfa);
-    }
+    void Generate() const;
 
     /// Get the next token found in an input stream.  Do so by examining one character at a time.
     /// Keep going as long as there is a chance of a valid lexeme (since we want to choose the
     /// longest one we can find.)  Every time we do hit a valid lexeme, store it as the current
     /// "best" and keep going.  Once we hit a point where no other valid lexemes are possible,
     /// stop and return the best we've found so far.
-    Token Process(std::istream & is) const {
-      // If we still need to generate the DFA for the lexer, do so.
-      if (generate_lexer) Generate();
-
-      size_t cur_pos = 0;   // What position in the file are we actively analyzing?
-      size_t best_pos = 0;  // What is the best look-ahead we've found so far?
-      int cur_state = 0;    // What is the next state for the DFA analysis?
-      int cur_stop = 0;     // What is the current "stop" state (if we can stop here)
-      int best_stop = -1;   // What is the best stop state found so far?
-
-      lexeme.resize(0);
-
-      // Keep looking as long as:
-      // 1: We may still be able to continue the current lexeme.
-      // 2: We have not entered an invalid state.
-      // 3: Our input stream has more symbols.
-      while (cur_stop >= 0 && cur_state >= 0 && is) {
-        const char next_char = (char) is.get();
-        cur_pos++;
-        cur_state = lexer_dfa.Next(cur_state, (size_t) next_char);
-        cur_stop = lexer_dfa.GetStop(cur_state);
-        if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }
-        lexeme.push_back( next_char );
-      }
-
-      // If best_pos < cur_pos, we need to rewind the input stream and adjust the lexeme.
-      if (best_pos > 0 && best_pos < cur_pos) {
-        lexeme.resize(best_pos);
-        while (best_pos < cur_pos) { is.unget(); cur_pos--; }
-      }
-
-      // If we are at the end of this input stream and still haven't found a token, return 0.
-      if (best_stop < 0) {
-        if (!is) return { 0, "" };
-        return { ERROR_ID, lexeme };
-      }
-
-      // Otherwise return the best token we've found so far.
-      return { best_stop, lexeme };
-    }
+    Token Process(std::istream & is) const;
 
     /// Shortcut to process a string rather than a stream, chopping off one token each time.
-    Token Process(std::string & in_str) const {
-      std::stringstream ss;
-      ss << in_str;
-      auto out_val = Process(ss);
-      in_str = ss.str();
-      return out_val;
-    }
+    Token Process(std::string & in_str) const;
 
     /// Shortcut to just get a single token.
-    Token ToToken(std::string_view in_str) const {
-      std::stringstream ss;
-      ss << in_str;
-      auto out_val = Process(ss);
-      return out_val;
-    }
+    Token ToToken(std::string_view in_str) const;
 
     /// Perform a single step in the Tokenize process, tracking line number as we go.
-    emp::Token TokenizeNext(std::istream & is, size_t & cur_line) const {
-      // Loop until we get a token to return or hit the end of the stream.
-      while (true) {
-        emp::Token token = Process(is);
-        token.line_id = cur_line;
-        cur_line += emp::count(token.lexeme, '\n');
-        if (token == 0 || GetSaveToken(token)) return token;
-      }
-    }
+    emp::Token TokenizeNext(std::istream & is, size_t & cur_line) const;
 
     /// Turn an input stream of text into a vector of tokens.
-    TokenStream Tokenize(std::istream & is, const std::string & name="in_stream") const {
-      emp::vector<Token> out_tokens;
-      size_t cur_line = 1;
-      while (emp::Token token = TokenizeNext(is, cur_line)) {
-        out_tokens.push_back(token);
-      }
-      return TokenStream{out_tokens, name};
-    }
+    TokenStream Tokenize(std::istream & is, const std::string & name="in_stream") const;
 
     /// Turn an input string into a vector of tokens.
-    TokenStream Tokenize(std::string_view str, const std::string & name="in_view") const {
-      std::stringstream ss;
-      ss << str;
-      return Tokenize(ss, name);
-    }
+    TokenStream Tokenize(std::string_view str, const std::string & name="in_view") const;
 
     /// Turn a vector of strings into a vector of tokens.
     TokenStream Tokenize(const emp::vector<std::string> & str_v,
-                         const std::string & name="in_string vector") const
-    {
-      std::stringstream ss;
-      for (auto & str : str_v) {
-        ss << str << '\n';
-      }
-
-      return Tokenize(ss, name);
-    }
+                         const std::string & name="in_string vector") const;
 
     /// Get the lexeme associated with the last token identified.
     const std::string & GetLexeme() const { return lexeme; }
 
     /// Print the full information about this lexer (for debugging)
-    void Print(std::ostream & os=std::cout) const {
-      for (const auto & t : token_set) t.Print(os);
-      if (generate_lexer) Generate();               // Do we need to regenerate the lexer?
-      lexer_dfa.Print(os);                          // Table driven lexer implementation.
-    }
+    void Print(std::ostream & os=std::cout) const;
 
     /// Try out the lexer on a string and demonstrate how it's tokenized.
-    void DebugString(std::string test_string) const {
-      std::stringstream ss;
-      ss << test_string;
+    void DebugString(std::string test_string) const;
 
-      emp::Token token = 1;
-      while (token > 0) {
-        token = Process(ss);
-        std::cout << GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
-      }
-    }
-
-    void DebugToken(int token_id) const {
-      const auto & token = GetTokenType(token_id);
-      std::cout << "Debugging token " << token.id << ": '" << token.name << "'.\n"
-                << "  Desc: " << token.desc << "\n";
-      token.regex.PrintDebug();
-    }
+    void DebugToken(int token_id) const;
   };
 
+
+  /// --------------------
+  /// FUNCTION DEFINITIONS
+  /// --------------------
+
+  void Lexer::Reset() {
+    token_set.resize(0);
+    token_map.clear();
+    cur_token_id = MAX_ID;
+    generate_lexer = false;
+  }
+
+  int Lexer::AddToken(const std::string & name,
+                const std::string & regex,
+                bool save_lexeme,
+                bool save_token,
+                const std::string & desc)
+  {
+    int id = cur_token_id--;                // Grab the next available token id.
+    generate_lexer = true;                  // Indicate the the lexer DFA needs to be rebuilt.
+    token_set.emplace_back( name, regex, id, save_lexeme, save_token, desc );
+    token_map[name] = id;
+    return id;
+  }
+
+  int Lexer::IgnoreToken(const std::string & name, const std::string & regex, const std::string & desc) {
+    int id = cur_token_id--;                // Grab the next available token id.
+    generate_lexer = true;                  // Indicate the the lexer DFA needs to be rebuilt.
+    token_set.emplace_back( name, regex, id, false, false, desc );
+    token_map[name] = id;
+    return id;
+  }
+
+  int Lexer::GetTokenID(const std::string & name) const {
+    int default_id = ERROR_ID;
+    if (name.size() == 1) default_id = (int) name[0];
+    return emp::Find(token_map, name, default_id);
+  }
+
+  const TokenType & Lexer::GetTokenType(int id) const {
+    if (id > MAX_ID || id <= cur_token_id) return ERROR_TOKEN();
+    return token_set[(size_t)(MAX_ID - id)];
+  }
+
+  std::string Lexer::GetTokenName(int id) const {
+    if (id < 0) return emp::to_string("Error (", id, ")");   // Negative tokens specify errors.
+    if (id == 0) return "EOF";                               // Token zero is end-of-file.
+    if (id < 128) return emp::to_escaped_string((char) id);  // Individual characters.
+    if (id <= cur_token_id) return emp::to_string("Error (", id, ")"); // Invalid token range!
+    return GetTokenType(id).name;                            // User-defined tokens.
+  }
+
+  bool Lexer::GetSaveToken(int id) const {
+    if (id > MAX_ID || id <= cur_token_id) return true;
+    return GetTokenType(id).save_token;
+  }
+
+  void Lexer::Generate() const {
+    NFA lexer_nfa;
+    for (const auto & t : token_set) {
+      lexer_nfa.Merge( to_NFA(t.regex, (uint8_t) t.id) );
+    }
+    generate_lexer = false; // We just generated it!  Don't again until another change is made.
+    lexer_dfa = to_DFA(lexer_nfa);
+  }
+
+  Token Lexer::Process(std::istream & is) const {
+    // If we still need to generate the DFA for the lexer, do so.
+    if (generate_lexer) Generate();
+
+    size_t cur_pos = 0;   // What position in the file are we actively analyzing?
+    size_t best_pos = 0;  // What is the best look-ahead we've found so far?
+    int cur_state = 0;    // What is the next state for the DFA analysis?
+    int cur_stop = 0;     // What is the current "stop" state (if we can stop here)
+    int best_stop = -1;   // What is the best stop state found so far?
+
+    lexeme.resize(0);
+
+    // Keep looking as long as:
+    // 1: We may still be able to continue the current lexeme.
+    // 2: We have not entered an invalid state.
+    // 3: Our input stream has more symbols.
+    while (cur_stop >= 0 && cur_state >= 0 && is) {
+      const char next_char = (char) is.get();
+      cur_pos++;
+      cur_state = lexer_dfa.Next(cur_state, (size_t) next_char);
+      cur_stop = lexer_dfa.GetStop(cur_state);
+      if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }
+      lexeme.push_back( next_char );
+    }
+
+    // If best_pos < cur_pos, we need to rewind the input stream and adjust the lexeme.
+    if (best_pos > 0 && best_pos < cur_pos) {
+      lexeme.resize(best_pos);
+      while (best_pos < cur_pos) { is.unget(); cur_pos--; }
+    }
+
+    // If we are at the end of this input stream and still haven't found a token, return 0.
+    if (best_stop < 0) {
+      if (!is) return { 0, "" };
+      return { ERROR_ID, lexeme };
+    }
+
+    // Otherwise return the best token we've found so far.
+    return { best_stop, lexeme };
+  }
+
+  Token Lexer::Process(std::string & in_str) const {
+    std::stringstream ss;
+    ss << in_str;
+    auto out_val = Process(ss);
+    in_str = ss.str();
+    return out_val;
+  }
+
+  Token Lexer::ToToken(std::string_view in_str) const {
+    std::stringstream ss;
+    ss << in_str;
+    auto out_val = Process(ss);
+    return out_val;
+  }
+
+  emp::Token Lexer::TokenizeNext(std::istream & is, size_t & cur_line) const {
+    // Loop until we get a token to return or hit the end of the stream.
+    while (true) {
+      emp::Token token = Process(is);
+      token.line_id = cur_line;
+      cur_line += emp::count(token.lexeme, '\n');
+      if (token == 0 || GetSaveToken(token)) return token;
+    }
+  }
+
+  TokenStream Lexer::Tokenize(std::istream & is, const std::string & name) const {
+    emp::vector<Token> out_tokens;
+    size_t cur_line = 1;
+    while (emp::Token token = TokenizeNext(is, cur_line)) {
+      out_tokens.push_back(token);
+    }
+    return TokenStream{out_tokens, name};
+  }
+
+  TokenStream Lexer::Tokenize(std::string_view str, const std::string & name) const {
+    std::stringstream ss;
+    ss << str;
+    return Tokenize(ss, name);
+  }
+
+  TokenStream Lexer::Tokenize(const emp::vector<std::string> & str_v,
+                              const std::string & name) const
+  {
+    std::stringstream ss;
+    for (auto & str : str_v) {
+      ss << str << '\n';
+    }
+
+    return Tokenize(ss, name);
+  }
+
+  void Lexer::Print(std::ostream & os) const {
+    for (const auto & t : token_set) t.Print(os);
+    if (generate_lexer) Generate();               // Do we need to regenerate the lexer?
+    lexer_dfa.Print(os);                          // Table driven lexer implementation.
+  }
+
+  void Lexer::DebugString(std::string test_string) const {
+    std::stringstream ss;
+    ss << test_string;
+
+    emp::Token token = 1;
+    while (token > 0) {
+      token = Process(ss);
+      std::cout << GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
+    }
+  }
+
+  void Lexer::DebugToken(int token_id) const {
+    const auto & token = GetTokenType(token_id);
+    std::cout << "Debugging token " << token.id << ": '" << token.name << "'.\n"
+              << "  Desc: " << token.desc << "\n";
+    token.regex.PrintDebug();
+  }
 
 }
 
