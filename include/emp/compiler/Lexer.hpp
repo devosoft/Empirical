@@ -12,15 +12,17 @@
  *  Use AddToken(name, regex) to list out the relevant tokens.
  *   'name' is the unique name for this token.
  *   'regex' is the regular expression that describes this token.
- *  It will return a unique ID associated with this lexeme.
+ *  It will return a unique ID associated with this token that will be used in output Token
+ *  objects later.
  *
  *  IgnoreToken(name, regex) uses the same arguments, but is used for tokens that
- *  should be skipped over.
+ *  should be skipped over during lexical analysis
  *
  *  Names and IDs can be recovered later using GetTokenID(name) and GetTokenName(id).
  *
- *  Tokens can be retrieved either one at a time with Process(string) or Process(stream),
- *  which will return the next (non-ignored) token, removing it from the input.
+ *  Either strings or streams can be converted into their associated Tokens.
+ *    Process(in) does this one at a time (including "ignored" tokens)
+ *    which will return the next (non-ignored) token, removing it from the input.
  *
  *  Alternatively, an entire series of tokens can be processed with Tokenize().
  *
@@ -47,14 +49,15 @@
 namespace emp {
 
   /// A lexer with a set of token types (and associated regular expressions)
-  class Lexer {
+  /// MAX_ID determines the maximum number of allowed lexical rules.
+  template <int MAX_ID>
+  class Lexer_Base {
   private:
-    static constexpr int MAX_ID = 255;      ///< IDs count down so that first ones have priority.
     static constexpr int ERROR_ID = -1;     ///< Code for unknown token ID.
 
     emp::vector<TokenType> token_set;       ///< List of all active tokens types.
     emp::map<std::string, int> token_map;   ///< Map of token names to id.
-    int cur_token_id = MAX_ID;              ///< Which ID should the next new token get?
+    int cur_token_id = MAX_ID;              ///< ID for next new token (higher has priority)
     mutable bool generate_lexer = false;    ///< Do we need to regenerate the lexer?
     mutable DFA lexer_dfa;                  ///< Table driven lexer implementation.
     mutable std::string lexeme;             ///< Current state of lexeme being generated.
@@ -65,21 +68,13 @@ namespace emp {
     }
 
   public:
-    Lexer() = default;
-    Lexer(const Lexer &) = default;
-    Lexer(Lexer &&) = default;
-    ~Lexer() = default;
-
-    Lexer & operator=(const Lexer &) = default;
-    Lexer & operator=(Lexer &&) = default;
+    // All constructors and assignment operators are default.
 
     /// How many types of tokens can be identified in this Lexer?
     size_t GetNumTokens() const { return token_set.size(); }
 
     /// Reset the entire lexer to its start state.
     void Reset();
-
-    bool TokenOK(int id) const { return id >= 0 && id < cur_token_id; }
 
     /// Add a new token, specified by a name and the regex used to identify it.
     /// Note that token ids count down with highest IDs having priority.
@@ -149,32 +144,37 @@ namespace emp {
     void DebugToken(int token_id) const;
   };
 
+  using Lexer = Lexer_Base<255>;
 
   /// --------------------
   /// FUNCTION DEFINITIONS
   /// --------------------
 
-  void Lexer::Reset() {
+  template <int MAX_ID>
+  void Lexer_Base<MAX_ID>::Reset() {
     token_set.resize(0);
     token_map.clear();
     cur_token_id = MAX_ID;
     generate_lexer = false;
   }
 
-  int Lexer::AddToken(const std::string & name,
+  template <int MAX_ID>
+  int Lexer_Base<MAX_ID>::AddToken(const std::string & name,
                 const std::string & regex,
                 bool save_lexeme,
                 bool save_token,
                 const std::string & desc)
   {
     int id = cur_token_id--;                // Grab the next available token id.
+    emp_assert(id > 0, "Too many lexer rules added! Increase MAX_ID", name, regex, MAX_ID);
     generate_lexer = true;                  // Indicate the the lexer DFA needs to be rebuilt.
     token_set.emplace_back( name, regex, id, save_lexeme, save_token, desc );
     token_map[name] = id;
     return id;
   }
 
-  int Lexer::IgnoreToken(const std::string & name, const std::string & regex, const std::string & desc) {
+  template <int MAX_ID>
+  int Lexer_Base<MAX_ID>::IgnoreToken(const std::string & name, const std::string & regex, const std::string & desc) {
     int id = cur_token_id--;                // Grab the next available token id.
     generate_lexer = true;                  // Indicate the the lexer DFA needs to be rebuilt.
     token_set.emplace_back( name, regex, id, false, false, desc );
@@ -182,18 +182,21 @@ namespace emp {
     return id;
   }
 
-  int Lexer::GetTokenID(const std::string & name) const {
+  template <int MAX_ID>
+  int Lexer_Base<MAX_ID>::GetTokenID(const std::string & name) const {
     int default_id = ERROR_ID;
     if (name.size() == 1) default_id = (int) name[0];
     return emp::Find(token_map, name, default_id);
   }
 
-  const TokenType & Lexer::GetTokenType(int id) const {
+  template <int MAX_ID>
+  const TokenType & Lexer_Base<MAX_ID>::GetTokenType(int id) const {
     if (id > MAX_ID || id <= cur_token_id) return ERROR_TOKEN();
     return token_set[(size_t)(MAX_ID - id)];
   }
 
-  std::string Lexer::GetTokenName(int id) const {
+  template <int MAX_ID>
+  std::string Lexer_Base<MAX_ID>::GetTokenName(int id) const {
     if (id < 0) return emp::to_string("Error (", id, ")");   // Negative tokens specify errors.
     if (id == 0) return "EOF";                               // Token zero is end-of-file.
     if (id < 128) return emp::to_escaped_string((char) id);  // Individual characters.
@@ -201,12 +204,14 @@ namespace emp {
     return GetTokenType(id).name;                            // User-defined tokens.
   }
 
-  bool Lexer::GetSaveToken(int id) const {
+  template <int MAX_ID>
+  bool Lexer_Base<MAX_ID>::GetSaveToken(int id) const {
     if (id > MAX_ID || id <= cur_token_id) return true;
     return GetTokenType(id).save_token;
   }
 
-  void Lexer::Generate() const {
+  template <int MAX_ID>
+  void Lexer_Base<MAX_ID>::Generate() const {
     NFA lexer_nfa;
     for (const auto & t : token_set) {
       lexer_nfa.Merge( to_NFA(t.regex, (uint8_t) t.id) );
@@ -215,21 +220,22 @@ namespace emp {
     lexer_dfa = to_DFA(lexer_nfa);
   }
 
-  Token Lexer::Process(std::istream & is) const {
+  template <int MAX_ID>
+  Token Lexer_Base<MAX_ID>::Process(std::istream & is) const {
     // If we still need to generate the DFA for the lexer, do so.
     if (generate_lexer) Generate();
 
-    size_t cur_pos = 0;   // What position in the file are we actively analyzing?
-    size_t best_pos = 0;  // What is the best look-ahead we've found so far?
-    int cur_state = 0;    // What is the next state for the DFA analysis?
-    int cur_stop = 0;     // What is the current "stop" state (if we can stop here)
-    int best_stop = -1;   // What is the best stop state found so far?
+    size_t cur_pos = 0;   // Position in the input that we are actively analyzing
+    size_t best_pos = 0;  // Best look-ahead we've found so far
+    int cur_state = 0;    // Next state for the DFA analysis
+    int cur_stop = 0;     // Current "stop" state (if we can stop here)
+    int best_stop = -1;   // Best stop state found so far?
 
-    lexeme.resize(0);
+    lexeme.resize(0);     // Prep the lexeme for the next token.
 
     // Keep looking as long as:
-    // 1: We may still be able to continue the current lexeme.
-    // 2: We have not entered an invalid state.
+    // 1: We may be able to continue the current lexeme, and
+    // 2: We have not entered an invalid state, and
     // 3: Our input stream has more symbols.
     while (cur_stop >= 0 && cur_state >= 0 && is) {
       const char next_char = (char) is.get();
@@ -240,23 +246,24 @@ namespace emp {
       lexeme.push_back( next_char );
     }
 
-    // If best_pos < cur_pos, we need to rewind the input stream and adjust the lexeme.
+    // If best_pos < cur_pos, rewind the input stream and adjust the lexeme.
     if (best_pos > 0 && best_pos < cur_pos) {
       lexeme.resize(best_pos);
       while (best_pos < cur_pos) { is.unget(); cur_pos--; }
     }
 
-    // If we are at the end of this input stream and still haven't found a token, return 0.
+    // If we are at the end of this input stream and haven't found a token, return 0.
     if (best_stop < 0) {
-      if (!is) return { 0, "" };
-      return { ERROR_ID, lexeme };
+      if (!is) return { 0, "" };     // 0 = end of stream.
+      return { ERROR_ID, lexeme };   // ERROR_ID = no valid tokens available!
     }
 
     // Otherwise return the best token we've found so far.
     return { best_stop, lexeme };
   }
 
-  Token Lexer::Process(std::string & in_str) const {
+  template <int MAX_ID>
+  Token Lexer_Base<MAX_ID>::Process(std::string & in_str) const {
     std::stringstream ss;
     ss << in_str;
     auto out_val = Process(ss);
@@ -264,14 +271,16 @@ namespace emp {
     return out_val;
   }
 
-  Token Lexer::ToToken(std::string_view in_str) const {
+  template <int MAX_ID>
+  Token Lexer_Base<MAX_ID>::ToToken(std::string_view in_str) const {
     std::stringstream ss;
     ss << in_str;
     auto out_val = Process(ss);
     return out_val;
   }
 
-  emp::Token Lexer::TokenizeNext(std::istream & is, size_t & cur_line) const {
+  template <int MAX_ID>
+  emp::Token Lexer_Base<MAX_ID>::TokenizeNext(std::istream & is, size_t & cur_line) const {
     // Loop until we get a token to return or hit the end of the stream.
     while (true) {
       emp::Token token = Process(is);
@@ -281,7 +290,8 @@ namespace emp {
     }
   }
 
-  TokenStream Lexer::Tokenize(std::istream & is, const std::string & name) const {
+  template <int MAX_ID>
+  TokenStream Lexer_Base<MAX_ID>::Tokenize(std::istream & is, const std::string & name) const {
     emp::vector<Token> out_tokens;
     size_t cur_line = 1;
     while (emp::Token token = TokenizeNext(is, cur_line)) {
@@ -290,13 +300,15 @@ namespace emp {
     return TokenStream{out_tokens, name};
   }
 
-  TokenStream Lexer::Tokenize(std::string_view str, const std::string & name) const {
+  template <int MAX_ID>
+  TokenStream Lexer_Base<MAX_ID>::Tokenize(std::string_view str, const std::string & name) const {
     std::stringstream ss;
     ss << str;
     return Tokenize(ss, name);
   }
 
-  TokenStream Lexer::Tokenize(const emp::vector<std::string> & str_v,
+  template <int MAX_ID>
+  TokenStream Lexer_Base<MAX_ID>::Tokenize(const emp::vector<std::string> & str_v,
                               const std::string & name) const
   {
     std::stringstream ss;
@@ -307,13 +319,15 @@ namespace emp {
     return Tokenize(ss, name);
   }
 
-  void Lexer::Print(std::ostream & os) const {
+  template <int MAX_ID>
+  void Lexer_Base<MAX_ID>::Print(std::ostream & os) const {
     for (const auto & t : token_set) t.Print(os);
     if (generate_lexer) Generate();               // Do we need to regenerate the lexer?
     lexer_dfa.Print(os);                          // Table driven lexer implementation.
   }
 
-  void Lexer::DebugString(std::string test_string) const {
+  template <int MAX_ID>
+  void Lexer_Base<MAX_ID>::DebugString(std::string test_string) const {
     std::stringstream ss;
     ss << test_string;
 
@@ -324,7 +338,8 @@ namespace emp {
     }
   }
 
-  void Lexer::DebugToken(int token_id) const {
+  template <int MAX_ID>
+  void Lexer_Base<MAX_ID>::DebugToken(int token_id) const {
     const auto & token = GetTokenType(token_id);
     std::cout << "Debugging token " << token.id << ": '" << token.name << "'.\n"
               << "  Desc: " << token.desc << "\n";
