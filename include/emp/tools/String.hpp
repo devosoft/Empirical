@@ -338,6 +338,12 @@ namespace emp {
     String & RemoveDigits()      { return RemoveChars(DigitCharSet()); }
     String & RemovePunctuation() { return RemoveChars(PunctuationCharSet()); }
 
+    String & Resize(size_t new_size) { resize(new_size); return *this; }
+    String & ResizeTo(CharSet chars, const Syntax & syntax=Syntax::None())
+      { return Resize( std::min(Find(chars, 0, syntax), size()) ); }
+    String & ResizeTo(String delim, const Syntax & syntax=Syntax::None())
+      { return Resize( std::min(Find(delim, 0, syntax), size()) ); }
+
     inline bool PopIf(char c);
     inline bool PopIf(String in);
     inline String PopAll();
@@ -710,7 +716,7 @@ namespace emp {
     [[nodiscard]] String AsRemoveChars(const CharSet & chars) const
       { return MakeRemoveChars(*this, chars); }
 
-    String & AppendSlugify(String in) { return *this += std::move(in.Slugify()); }
+    String & AppendSlugify(String in) { return Append(std::move(in.Slugify())); }
     String & SetSlugify(String in) { return *this = std::move(in.Slugify()); }
     String & Slugify()
       { return SetLower().RemovePunctuation().Compress().ReplaceChar(' ', '-'); }
