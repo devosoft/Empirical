@@ -88,33 +88,26 @@ Browser-based delivery can yield particularly effective public-facing apps due t
 Empirical amplifies Emscripten by fleshing out its interface for interaction with browser elements.
 DOM elements are bound to corresponding C++ objects (e.g., `emp::Button` manages a `<button>` and `emp::Canvas` manages a `<canvas>`) and are easily manipulated from within C++.
 Empirical also packages collections of prefabricated web widgets (e.g., configuration managers or collapsible data displays).
-These tools radically simplify generating a mobile-friendly, web-based GUI for existing software.
+These tools simplify generating a mobile-friendly, web-based GUI for existing software.
 
 A live demo of Empirical widgets, presented alongside their source C++ code, is available [here](https://devosoft.github.io/empirical-prefab-demo/empirical-prefab-demo).
 
 ## Runtime Efficiency
 
-WebAssembly's runtime efficiency is a major driver of its growing impact on web app development.
-Just-in-time compilation engines translate critical sections into native machine code [@haas2017bringing], giving at least 50% --- and at times closer to 90% --- of native performance and providing an order of magnitude speed increase over JavaScript alone [@jangda2019not].
-Theis opens the door to entirely new possibilities for browser-based scientific computation.
-For example, [Avida-ED](https://avida-ed.msu.edu/) simulates hundreds of thousands of generations of digital organisms within the span of a class period.
+WebAssembly's runtime efficiency has driven its adoption in web development [@haas2017bringing], achieving 50% to 90% of native performance [@jangda2019not] and enabling new possibilities for browser-based scientific computation.
+For example, [Avida-ED](https://avida-ed.msu.edu/) simulates billions of digital organisms in a day.
 
-More broadly, Empirical supports runtime efficiency in scientific computing by providing optimized tools for performance-critical tasks.
-For example, `emp::BitArray` and `emp::BitVector` classes are faster drop-in replacements for their standard library equivalents (`std::bitset` and `std::vector<bool>`) while providing extensive additional functionality for rapid bit manipulations.
-Likewise,`emp::Random` wraps a cutting-edge high-performance pseudorandom number generator algorithm [@widynski2020squares].
-At a more fundamental level, Empirical's header-only design prioritizes ease of use and runtime performance at the cost of somewhat longer compilation times.
+More broadly, Empirical provides optimized tools for performance-critical tasks.
+For example, `emp::BitArray` and `emp::BitVector` are faster drop-in replacements for their standard library equivalents (`std::bitset` and `std::vector<bool>`) while providing extensive additional functionality.
+More fundamentally, Empirical's header-only design prioritizes ease of use and runtime performance, albeit at the cost of longer compilation times.
 
 ## Debugging
 
-Software bugs that slip through into production can inflict huge costs, especially in scientific contexts where the validity of generated data and analyses is paramount.
-
-In conjunction with unit tests and integration tests, runtime safety checks are commonly used to flag potential bugs.
-Most programming languages (Rust, Python, etc.) provide built-in support to detect common runtime violations, such as out-of-bounds indexing or bad type conversions.
-C++ does not, in an effort to maximize performance.
-However, standard library vendors --- like [GCC's `libstdc++`](https://web.archive.org/web/20210118212109/https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html), [Clang's `libc++`](https://web.archive.org/web/20210414014331/https://libcxx.llvm.org/docs/DesignDocs/DebugMode.html), and [Microsoft's `stl`](https://web.archive.org/web/20210121201948/https://docs.microsoft.com/en-us/cpp/standard-library/checked-iterators?view=msvc-160) --- do provide some proprietary support for such safety checks.
-This support, however, is limited and poorly documented[^1].
-Empirical supplements vendors' runtime safety checking by providing drop-in replacements for `std::array`, `std::optional`, and `std::vector` with stronger runtime safety checks when compiled in debug mode.
-Empirical also furnishes a safety-checked pointer wrapper, `emp::Ptr`, that identifies memory leaks and invalid memory access in debug mode while retaining the full speed of raw pointers in release mode.
+Undetected software bugs can damage the scientific validity of generated data and analyses.
+However, in an effort to maximize performance, C++ eschews common run time safety checks such as out-of-bounds indexing or memory managment errors.
+Standard library vendors --- like [GCC's `libstdc++`](https://web.archive.org/web/20210118212109/https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html), [Clang's `libc++`](https://web.archive.org/web/20210414014331/https://libcxx.llvm.org/docs/DesignDocs/DebugMode.html), and [Microsoft's `stl`](https://web.archive.org/web/20210121201948/https://docs.microsoft.com/en-us/cpp/standard-library/checked-iterators?view=msvc-160) --- do provide some support for such safety checks, which is incomplete and poorly documented[^1].
+Empirical supplements vendors' runtime safety checking by providing drop-in replacements for standard library containers and even raw pointers,
+identifying memory leaks and invalid memory access in debug mode while retaining the full speed of raw pointers in release mode.
 
 Because of poor support for built-in runtime safety checks, C++ developers typically use an external toolchain to detect and diagnose runtime violations.
 Popular tools include Valgrind, GDB, and runtime sanitizers.
@@ -122,7 +115,8 @@ Although this tooling is very mature and quite powerful, there are substantial l
 Additionally, most of this tooling is not available when debugging WASM code compiled with Emscripten --- a core use case targeted by the Empirical library.
 Although Emscripten provides some [sanitizer support](https://web.archive.org/web/20210513071104/https://emscripten.org/docs/debugging/Sanitizers.html) and [other debugging features](https://web.archive.org/web/20210513070806/https://emscripten.org/docs/porting/Debugging.html), tooling limitations (such as the lack of a steppable debugger) make runtime safety checking provided by Empirical particularly useful.
 
-[^1]: For example, neither GCC 10.3 nor Clang 12.0.0 detect `std::vector` iterator invalidation when appending to a `std::vector` happens to fall within existing allocated buffer space ([GCC live example](https://perma.cc/6WDU-3C8X); [Clang live example](https://perma.cc/6SU9-CUKY)). Clang 12.0.0's sanitizers also fail todetect this iterator invalidation ([live example](https://perma.cc/4ECQ-D5LG)).
+[^1]: For example, neither GCC 10.3 nor Clang 12.0.0 detect `std::vector` iterator invalidation when appending to a `std::vector` happens to fall within existing allocated buffer space ([GCC live example](https://perma.cc/6WDU-3C8X); [Clang live example](https://perma.cc/6SU9-CUKY)).
+Clang 12.0.0's sanitizers also fail todetect this iterator invalidation ([live example](https://perma.cc/4ECQ-D5LG)).
 
 # Outlook and Future Plans
 
