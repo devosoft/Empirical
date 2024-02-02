@@ -178,6 +178,7 @@ namespace emp {
     // Allow an option to have a single-letter flag (e.g. "-h" is short for "--help")
     template <typename FUN_T>
     FlagInfo & AddOption(char shortcut, String name, FUN_T fun, String desc="") {
+      notify::TestError(shortcuts.count(shortcut), "Already added shortcut for '", shortcut, "'");
       FlagInfo & option = AddOption(name, fun, desc);
       shortcuts[shortcut] = name;
       option.SetShortcut(shortcut);
