@@ -164,7 +164,7 @@ Like Emscripten, Cheerp provides primariliy low-level APIs for browser interacti
 * [Dishtiny](https://mmore500.com/dishtiny) [@moreno2019toward]: agent-based model to studdy major transitions in evolution.
 * [ecology in evolutionary computation explorer](https://emilydolson.github.io/ecology_of_evolutionary_computation/web/interaction_networks.html) [@dolson2018evological]: interactive visualization of ecological interaction networks in evolutionary computation.
 * [Symbulation](https://anyaevostinar.github.io/SymbulationEmp/web/symbulation.html) [@vostinar2017suicide]: agent-based model for evolution of parasitism, mutualism, and commensalism.
-* [SignalGP](https://github.com/amlalejini/signalgp) [@Lalejini2018-GECCO]: an event-driven genetic programming substrate.
+* [SignalGP](https://github.com/amlalejini/signalgp) [@Lalejini2018-GECCO,@moreno2021signalgp]: an event-driven genetic programming substrate.
 * [Model of cancer evolution on an oxygen gradient](http://emilydolson.github.io/memic_model/web/memic_model.html).
 
 # Acknowledgements
