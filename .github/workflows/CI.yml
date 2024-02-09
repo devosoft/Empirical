@@ -23,19 +23,6 @@ jobs:
     name: Test Tidy Enforcement on macOS
     runs-on: macos-11
     steps:
-      - run: brew install coreutils findutils gnu-sed gawk grep rename sphinx-doc
-      # adapted from https://stackoverflow.com/a/42878119
-      - run: brew link sphinx-doc --force
-      # Attempted workaround for mysterious issue where repo isn't clean after clone
-      # Upgrade Git using Homebrew. This command will update Homebrew itself
-      # and then upgrade Git to the latest version available via Homebrew.
-      - run: brew update && brew upgrade git
-      # Verify the upgraded Git version
-      - run: git --version
-      # updates PATH to use Homebrew-installed tools first
-      # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-system-path
-      - run: echo "/usr/local/bin:$PATH" > $GITHUB_PATH
-      - run: echo $PATH
       - uses: actions/checkout@v4
         with:
           # sometimes checkout action doesn't result in clean directory?
@@ -43,6 +30,13 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
           submodules: 'recursive'
       - run: git status --ignored
+      - run: brew install coreutils findutils gnu-sed gawk grep rename sphinx-doc
+      # adapted from https://stackoverflow.com/a/42878119
+      - run: brew link sphinx-doc --force
+      # updates PATH to use Homebrew-installed tools first
+      # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-system-path
+      - run: echo "/usr/local/bin:$PATH" > $GITHUB_PATH
+      - run: echo $PATH
       - run: ./ci/test_tidy.sh
   test:
     name: Tests
