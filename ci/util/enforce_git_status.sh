@@ -29,4 +29,6 @@ then
 fi
 
 # end CI bypass
+else
+echo "CI detected, bypassing git status check..."
 fi  # if [ "$CI" != "true" ]; then
