@@ -53,21 +53,21 @@ Specifically, the library sets out to fulfill the following goals:
 
 # Statement of Need
 
-High quality open-science tools encourage researchers to follow effective software development practices by improving code quality, scientific rigor, and ease of replication or extension.
-Empirical's debugging suite protects against common C++ programming pitfalls, such as iterator invalidation, memory leakage, and out-of-bounds indexing.
-Throughout, library design obviates trade-offs between performance and safety; compile-time switches toggle safety checks for undefined or incorrect behavior.
+High quality open-science tools improve code quality, scientific rigor, and ease of replication or extension for scientific software.
+Empirical's debugging suite combats C++ programming pitfalls, such as iterator invalidation, memory leakage, and out-of-bounds indexing.
+Throughout, library design achieves both performance and safety through compile-time toggling of checks for undefined or incorrect behavior.
 
-In practice, many scientific software applications are difficult to obtain, install, or use, and produce data in proprietary formats.
-Modern web-based interfaces give computational research the potential to better embody open science objectives by making each step of the scientific process more observable [@woelfle2011open].
-Empirical leverages recent developments in web technology to compile C++ source code to browser-based interactive interfaces.
+Unfortunately, in practice, scientific software is often difficult to obtain, install, or use.
+Modern web-based interfaces give computational research the potential to better embody open science objectives by empowering easier and more complete access [@woelfle2011open].
+Empirical leverages modern web technology to provide browser-based interactive interfaces for C++ source code.
 
 # Empirical Features
 
 ## Better Code for Scientific Software
 
-Empirical components are subjected to structured code review, unit testing (with coverage tracking), and other modern software development practices detailed [in our documentation](https://empirical.readthedocs.io/en/latest/dev/empirical-development-practices.html).
-Sustained effort invested into optimization of the library's utilities enables developers to produce safe and efficient software at far less effort, especially for new developers.
-Additionally we provide a [template project](https://github.com/devosoft/cookiecutter-empirical-project) that streamlines laying out crosscompilation boilerplate.
+Empirical components are subjected to structured code review, unit testing with coverage tracking, and other best practices detailed [in our documentation](https://empirical.readthedocs.io/en/latest/dev/empirical-development-practices.html).
+Effort invested into optimization of the library's utilities enables developer-users to more easily produce safe and efficient software, especially for new developers.
+We provide a [template project](https://github.com/devosoft/cookiecutter-empirical-project) that streamlines laying out crosscompilation boilerplate.
 
 As an example of Emprical's utility, the library provides a configuration framework that includes utilities to
 
@@ -76,87 +76,76 @@ As an example of Emprical's utility, the library provides a configuration framew
 * perform on-the-fly configuration adjustments, and
 * support independent configuration subsystems.
 
-High-quality software cannot succeed without an inclusive community of contributors.
-As detailed [in our documentation](https://empirical.readthedocs.io/en/latest/dev/empirical-development-practices.html), our development practices emphasize the importance of diverse backgrounds and perspectives in the community.
+High-quality software needs a robust, inclusive, and diverse community of users and contributors.
+Our [development practices](https://empirical.readthedocs.io/en/latest/dev/empirical-development-practices.html) reflect this priority.
 
 ## Realizing the Promise of Emscripten-based Web UIs
 
-Educational or outreach versions of scientific software can promote classroom learning and citizen science.
+Educational editions of scientific software promote classroom learning and citizen science.
 The Emscripten compiler enables an existing native codebase to additionally compile to the web [@zakai2011emscripten].
 Browser-based delivery can yield particularly effective public-facing apps due to easy access and compelling interfaces.
 
 Empirical amplifies Emscripten by fleshing out its interface for interaction with browser elements.
 DOM elements are bound to corresponding C++ objects (e.g., `emp::Button` manages a `<button>` and `emp::Canvas` manages a `<canvas>`) and are easily manipulated from within C++.
 Empirical also packages collections of prefabricated web widgets (e.g., configuration managers or collapsible data displays).
-These tools simplify generating a mobile-friendly, web-based GUI for existing software.
+These tools simplify generating a mobile-friendly, web-based GUI.
 
 A live demo of Empirical widgets, presented alongside their source C++ code, is available [here](https://devosoft.github.io/empirical-prefab-demo/empirical-prefab-demo).
 
 ## Runtime Efficiency
 
-WebAssembly's runtime efficiency has driven its adoption in web development [@haas2017bringing], achieving 50% to 90% of native performance [@jangda2019not] and enabling new possibilities for browser-based scientific computation.
-For example, [Avida-ED](https://avida-ed.msu.edu/) simulates billions of digital organisms in a day.
+WebAssembly's runtime efficiency --- achieving 50% to 90% of native performance [@jangda2019not] --- has driven adoption in web development [@haas2017bringing] and enabled new possibilities for browser-based scientific computation.
+For example, [Avida-ED](https://avida-ed.msu.edu/) leverages WebAssembly to incorporate sophisticated agent-based evolution models into classroom activities.
 
 More broadly, Empirical provides optimized tools for performance-critical tasks.
-For example, `emp::BitArray` and `emp::BitVector` are faster drop-in replacements for their standard library equivalents (`std::bitset` and `std::vector<bool>`) while providing extensive additional functionality.
+For example, `emp::BitArray` and `emp::BitVector` are faster drop-in replacements for their standard library equivalents (`std::bitset` and `std::vector<bool>`) with extensive additional functionality.
 More fundamentally, Empirical's header-only design prioritizes ease of use and runtime performance, albeit at the cost of longer compilation times.
 
 ## Debugging
 
-Undetected software bugs can damage the scientific validity of generated data and analyses.
-However, in an effort to maximize performance, C++ eschews common run time safety checks such as out-of-bounds indexing or memory managment errors.
-Standard library vendors --- like [GCC's `libstdc++`](https://web.archive.org/web/20210118212109/https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html), [Clang's `libc++`](https://web.archive.org/web/20210414014331/https://libcxx.llvm.org/docs/DesignDocs/DebugMode.html), and [Microsoft's `stl`](https://web.archive.org/web/20210121201948/https://docs.microsoft.com/en-us/cpp/standard-library/checked-iterators?view=msvc-160) --- do provide some support for such safety checks, which is incomplete and poorly documented[^1].
-Empirical supplements vendors' runtime safety checking by providing drop-in replacements for standard library containers and even raw pointers,
-identifying memory leaks and invalid memory access in debug mode while retaining the full speed of raw pointers in release mode.
+Although performant, C++'s permissiveness to out-of-bounds indexing or memory managment errors can emperil validity of generated data and analyses.
+Standard library vendors --- like [`libstdc++`](https://web.archive.org/web/20210118212109/https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html), [`libc++`](https://web.archive.org/web/20210414014331/https://libcxx.llvm.org/docs/DesignDocs/DebugMode.html), and [`stl`](https://web.archive.org/web/20210121201948/https://docs.microsoft.com/en-us/cpp/standard-library/checked-iterators?view=msvc-160) --- provide some runtime safety features, but these are incomplete and poorly documented[^1].
+Empirical supplements vendor offerings with debug mode standins for standard library containers and even raw pointers that can identify memory leaks and invalid memory access.
 
-Because of poor support for built-in runtime safety checks, C++ developers typically use an external toolchain to detect and diagnose runtime violations.
-Popular tools include Valgrind, GDB, and runtime sanitizers.
-Although this tooling is very mature and quite powerful, there are substantial limitations to the runtime violations it can detect[^1].
-Additionally, most of this tooling is not available when debugging WASM code compiled with Emscripten --- a core use case targeted by the Empirical library.
-Although Emscripten provides some [sanitizer support](https://web.archive.org/web/20210513071104/https://emscripten.org/docs/debugging/Sanitizers.html) and [other debugging features](https://web.archive.org/web/20210513070806/https://emscripten.org/docs/porting/Debugging.html), tooling limitations (such as the lack of a steppable debugger) make runtime safety checking provided by Empirical particularly useful.
+Developers typically compensate for C++'s missing guardrails with external toolchains like Valgrind, GDB, and sanitizers.
+Although mature, such tooling suffers substantial limitations[^1], particularly for WASM compiled with Emscripten.
+Although Emscripten provides some [sanitizer support](https://web.archive.org/web/20210513071104/https://emscripten.org/docs/debugging/Sanitizers.html) and [other debugging features](https://web.archive.org/web/20210513070806/https://emscripten.org/docs/porting/Debugging.html), Empirical's safety features offset remaining limitations, such as the lack of a steppable debugger.
 
 [^1]: For example, neither GCC 10.3 nor Clang 12.0.0 detect `std::vector` iterator invalidation when appending to a `std::vector` happens to fall within existing allocated buffer space ([GCC live example](https://perma.cc/6WDU-3C8X); [Clang live example](https://perma.cc/6SU9-CUKY)).
-Clang 12.0.0's sanitizers also fail todetect this iterator invalidation ([live example](https://perma.cc/4ECQ-D5LG)).
+Clang 12.0.0's sanitizers also fail to detect this iterator invalidation ([live example](https://perma.cc/4ECQ-D5LG)).
 
 # Outlook and Future Plans
 
 Empirical remains under active development.
-Current priorities include assembling higher-level web widgets for common tasks, making existing classes more web-friendly (such as file management and rich text handling), and adding more step-by-step tutorials to our documentation.
+Current priorities include web-friendly refinements (e.g., file management, rich text handling) and additional step-by-step tutorials for new users.
+That said, Empirical has largely converged to API stability, and releases are archived on Zenodo for those who depend on them [@empirical_2020].
 
-We are committed to maintaining a stable interface for existing users.
-Our software releases are archived on Zenodo to guarantee access to our software for those who depend on it [@empirical_2020].
-
-Empirical has already been successfully incorporated into major projects within our research group's primary domains: digital evolution, artificial life, and genetic programming.
-We aim for potential utility across a much broader swath of the scientific software ecosystem, particularly among projects that prioritize open science objectives.
-To this end, we look forward to welcoming new collaborations and supporting a wider collection of end-users.
+Empirical already underlies major projects within digital evolution, artificial life, and genetic programming.
+To benefit the broader scientific software and open science community, we look forward to welcoming new collaborations and supporting a wider collection of end-users.
 
 # Related Software Packages
 
-## Software Addressing Related Needs
-
-Many existing software platforms that provide functionalities overlapping with Empirical.
-However, most are not in C++, and there is value in this functionality being easily available to C++ programmers.
+Several projects pursue objectives related to Empirical's.
 
 ### RepastHPC
 
-RepastHPC, accessible at <https://repast.github.io/>, is a C++ modeling framework targeted at large computing clusters and supercomputers[@collier2013parallel; @north2013complex].
+RepastHPC, accessible at <https://repast.github.io/>, is a C++ modeling framework targeted to high-performance computing [@collier2013parallel; @north2013complex].
 A Java-based counterpart, Repast Simphony, provides interactive GUI support.
 
 ### Boost C++ Libraries
 
-Boost C++ Libraries, available at <https://www.boost.org/>, provide an enormous range of software components.
-However, Boost does not contain libraries for web-based GUI tools, configuration management, or data management specifically tailored to scientific software.
+Boost C++ Libraries, available at <https://www.boost.org/>, implement a broad portfolio of software components.
+However, Boost lacks tools for web-based GUI, configuration management, or data management tailored to scientific software.
 
 ### Emscripten
 
-Emscripten is available at <https://emscripten.org/> [@zakai2011emscripten].
-It provides cross-compilation from C++ to WebAssembly and we use it in Empirical.
-Empirical's tools build abstractions from Emscripten intrinsics tailored to visualization and interactive control of scientific simulations.
+Emscripten provides cross-compilation from C++ to WebAssembly and available at <https://emscripten.org/> [@zakai2011emscripten].
+Empirical furnishes a complementary high-level interface to Emscripten intrinsics.
 
 ### Cheerp
 
 Cheerp, another C++ to WebAssembly compiler, is available at <https://leaningtech.com/cheerp/>.
-Like Emscripten, Cheerp provides primariliy low-level APIs for interaction with browser GUI elements.
+Like Emscripten, Cheerp provides primariliy low-level APIs for browser interaction.
 
 ### Non-C++ Comparable Software
 
