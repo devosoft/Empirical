@@ -148,7 +148,12 @@ namespace emp {
     size_t GetSize() const { return text.size(); }
 
     // Return the current text as an unformatted string.
-    const String & GetText() const { return text; }
+    const String & AsString() const { return text; }
+
+    // Return all of the styles used in this text.
+    const std::unordered_map<String, BitVector> & GetStyleMap() const {
+      return style_map;
+    }
 
     // Return the current bit pattern for a specified style.
     const BitVector & GetStyle(const String & style) const {
@@ -156,7 +161,7 @@ namespace emp {
     }
 
     /// Automatic conversion back to an unformatted string
-    operator const String &() const { return GetText(); }
+    operator const String &() const { return AsString(); }
 
     /// @brief Test if this Text object is aware of how to use a specified encoding.
     /// @param name Name of the encoding to test for.
