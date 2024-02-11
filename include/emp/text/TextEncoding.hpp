@@ -1,12 +1,16 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2023.
+ *  @date 2023-2024.
  *
  *  @file TextEncoding.hpp
  *  @brief Plugs into emp::Text with the specification of a given encoding.
  *  @note Status: ALPHA
  *
+ *  DEVELOPER NOTES:
+ *  - Right now a close tag of "\n" is special; it will end ALL styles it is associated with.
+ *    Perhaps we should have configurable rules for how common end tags work?  For example,
+ *    there could be "no duplicates allowed", "close most recent", or "close all"
  */
 
 #ifndef EMP_TEXT_TEXTENCODING_HPP_INCLUDE
@@ -22,75 +26,294 @@
 #include "../datastructs/map_utils.hpp"
 
 #include "Text.hpp"
+#include "Text_Rule.hpp"
 
 namespace emp {
 
   class TextEncoding : public emp::TextEncoding_Interface {
   protected:
 
-    // Tags have three possible things they can do:
-    //  1: Start a new style
-    //  2: End an ongoing style, or
-    //  3: Be replaced with text (which may have a style associated)
-    struct Tag {
-      String name;                  // Unique name for this tag; default encoding symbol.
-      String pattern;               // Regular expression to identify tag.
-      size_t id = emp::MAX_SIZE_T;  // Unique ID for this tag (index in tag_map)
-      int token_id = -1;            // ID of this tag in the lexer.
-
-      // -- Starting a Style --
-      // Tags can indicate that they start a style.  Since the style may have arguments, the
-      // lexeme that identified the tag will be passed in and can be processed.
-      // Note that style zero (the default) is "no_style" and used to indicate no start style.
-      size_t start_style_id = 0;                    // No style started by default.
-      std::function<String(String)> get_style_args; // Function to convert lexeme to style arguments.
-
-      // -- Ending a Style --
-      // Tags may be used to end one or more styles.  The set of styles that can be ended is
-      // tracked, and whether multiple styles can be ended at once.  For example, a newline might
-      // end a whole set of styles in an encoding.  A "</b>" in HTML, on the other hand might only
-      // end the bold style.  A "}" in latex would end the most recent style started.
-      std::set<size_t> end_style_ids;  // Set of styles this tag can end.
-      bool multi_end = false;          // Can this tag end more than one style at a time?
-
-      // -- Text Replacement --
-      // Some tags might be used to produce a special character in the output text. For example,
-      // "&lt;" in HTML would be replaced by '<'.  A replacement character can also have a
-      // style with it.  For example, "&nbsp;" would be replaced by ' ' with the style "no_break".
-      char replace_char = '\0';     // Character to place in TEXT (Default is none).
-      size_t replace_style_id = 0;  // Style ID to use if there is a replacement char.
-      String out_encoding="";       // Use to replace char (and correct style) in encoding.
-    };
-
     struct Style {
-      String name;                      // Unique name for this style.
-      size_t id = emp::MAX_SIZE_T;      // Unique ID number (vector position) for this style.
-      std::set<size_t> open_tag_ids;    // Which tags start this style?
-      std::set<size_t> close_tag_ids;   // Which tags close this style?
-      std::set<size_t> replace_tag_ids; // Which replacements use this style?
+      String name;                 // Unique name for this style.
+      size_t id = emp::MAX_SIZE_T; // Unique ID number (vector position) for this style.
+      std::set<size_t> rule_ids;   // Which rules manage this style?
 
-      std::function<String(String)> make_open_tag;  // Generate an open tag based on style args.
-      std::function<String(String)> make_close_tag; // Generate an close tag based on style args.
+      Style(String name, size_t id) : name(name), id(id) { }
     };
 
-    emp::vector<Tag> tag_set;
-    emp::vector<Style> style_set;
-
-    std::map<String, size_t> pattern_to_tag_id;  // Link tag pattens to tag IDs.
-    std::map<int, size_t> token_to_tag_id;       // Link lexer IDs to the associate tag.
-    std::map<String, size_t> name_to_style_id;   // Lookup a style to find its ID.
-    emp::array<size_t, 128> char_tags;           // Track which tags are associated with each character.
-
-    emp::Lexer lexer;      // Lexer to process encoding.
-    int text_token = -1;   // Token to represent any non-tag text.
-
-    // Track information about active styles.
+    // Track information about _active_ styles.
     struct StyleEntry {
       size_t style_id;
       String full_info;  // Style name and arguments, as should be stored.
-    };
-    std::vector<StyleEntry> active_styles; // Styles to use on appended text; done as stack.
+      size_t rule_id=0;  // Which rule created this entry? (determines legal end)
 
+      StyleEntry(size_t style_id, String full_info, size_t rule_id)
+        : style_id(style_id), full_info(full_info), rule_id(rule_id) { }
+      StyleEntry(const StyleEntry &) = default;
+    };
+
+    // Track info about each unique tag.
+    class TagInfo {
+    private:
+      size_t open_id = 0;         // A tag may open only a single rule.
+      std::set<size_t> close_ids; // A tag may close any number of rules.
+      bool multi_close = false;   // Can a single instance of this tag close multiple rules?
+
+    public:
+      bool HasOpen() const { return open_id; }
+      bool HasClose() const { return close_ids.size(); }
+      bool HasClose(size_t id) const { return close_ids.count(id); }
+      bool IsMultiClose() const { return multi_close; }
+      size_t GetOpenID() const { return open_id; }
+      std::set<size_t> GetCloseIDs() const { return close_ids; }
+      void AddOpen(size_t rule_id) {
+        emp_assert(open_id == 0, "Rule trying to use open tag already in use.", rule_id, open_id);
+        open_id = rule_id;
+      }
+      void AddClose(size_t rule_id) { close_ids.insert(rule_id); }
+    };
+
+    emp::vector<Text_Rule> rule_set;
+    emp::vector<Style> style_set;
+
+    std::map<String, size_t> name_to_style_id; // Link style names to their ID
+    std::map<String, TagInfo> tag_map;         // Map of tags to the rules they may affect
+
+    // Map of special (Emphatic) strings to the rules that generate them
+    std::map<String, size_t> special_strings;
+
+    emp::Lexer lexer;                           // Lexer to process encoding.
+    int text_token = -1;                        // Token to represent any non-tag text.
+    std::unordered_map<int, TagInfo> token_map; // Map of token ids to possible tags.
+
+    // Styles to use on appended text; handled as stack so a common close tag (e.g. '}') will
+    // close only the most recently opened match.
+    std::vector<StyleEntry> active_styles;
+
+    // === Helper Functions ===
+
+    // Get a style entry.  If it doesn't exist yet, add it if allowed.
+    Style & GetStyle(String style_name, bool create_ok=true) {
+      // If this style has control arguments, remove them for retrieval.
+      style_name.ResizeTo(':');
+
+      // If this style hasn't been used before, try to build its entry.
+      if (!emp::Has(name_to_style_id, style_name)) {
+        emp::notify::TestError(create_ok == false, "Requested style '", style_name,
+                               "' does not exist; creation is disallowed.");
+        style_set.emplace_back(style_name, style_set.size());
+        name_to_style_id[style_name] = style_set.back().id;
+        return style_set.back();
+      }
+      const size_t style_id = name_to_style_id[style_name];
+      return style_set[style_id];
+    }
+
+    // Get a const version of an existing style entry.
+    const Style & GetStyle(String style_name) const {
+      // If this style has control arguments, remove them for retrieval.
+      style_name.ResizeTo(':');
+
+      // If this style hasn't been used before, error (cannot build it).
+      notify::TestError(!emp::Has(name_to_style_id, style_name),
+                        "Requested style '", style_name,
+                        "' does not exist; creation is disallowed.");
+      size_t style_id = name_to_style_id.find(style_name)->second;
+      return style_set[style_id];
+    }
+
+    // Get a rule associated with a style that can be applied at the specific text position.
+    const Text_Rule & GetRule(const Style & style, const Text & text, size_t pos) const {
+      // Scan through possible rules taking the first that applies.
+      for (size_t rule_id : style.rule_ids) {
+        const Text_Rule & rule = rule_set[rule_id];
+        // If this rule has associated internal text, make sure it's there.
+        if (rule.internal_text.size() && !text.AsString().HasAt(rule.internal_text, pos)) {
+          continue; // Does not have correct internal text.
+        }
+        return rule;
+      }
+      // No rule found.  Give a warning and return the default rule.
+      notify::Warning("No appropriate rule to convert style '", style.name, "'. Skipping.");
+      return rule_set[0];
+    }
+
+    // Build all of the regular expressions for the lexer and setup the tags.
+    void SetupLexer() {
+      if (lexer.GetNumTokens()) return;  // If the lexer is ready, stop here.
+
+      // Loop through all tags, inserting each into the lexer.
+      for (const auto & [tag, info] : tag_map) {
+        int id = lexer.AddToken(MakeString("Tag:", tag), tag);
+        token_map[id] = info;
+      }
+
+      // Finally, add an "everything else" token for regular text.
+      text_token = lexer.AddToken("plain text", ".");
+    }
+
+    // Append a string that has already been otherwise processed.
+    void Append_RawText(Text & text, const String & in) const {
+      size_t start = text.size();
+      size_t end = start + in.size();
+      text.Append_Raw(in);
+      // Apply all active styles.
+      for (const auto & style : active_styles) {
+        text.SetStyle(style.full_info, start, end);
+      }
+    }
+
+    // Helper function to append text when we know we've hit a tag.
+    void Append_Tag(Text & text, int token_id, const String & lexeme, std::stringstream & ss) {
+      emp_assert(Has(token_map, token_id), "Unknown token id: ", token_id);
+
+      const TagInfo & info = token_map[token_id];
+      bool used = false;
+
+      // If this token might CLOSE a style, search for options.
+      if (info.HasClose()) {
+        // Scan through active styles from most recent to figure out which one to remove.
+        for (size_t id = active_styles.size()-1; id < active_styles.size(); --id) {
+          // If we have found a tag to end, do so.
+          if (info.HasClose(active_styles[id].rule_id)) {
+            active_styles.erase(active_styles.begin()+id);
+            used = true; // Indicate that this tag has been used at least once.
+            if (!info.IsMultiClose()) break;
+          }
+        }
+      }
+
+      if (used) return;  // If the tag was used to close, don't ALSO open.
+
+      // OPEN a new style if indicated by this tag.
+      if (info.HasOpen()) {
+        const Text_Rule & rule = rule_set[info.GetOpenID()];
+
+        // Collect a control sequence if needed by this rule.
+        String control;
+        if (rule.UsesControl()) {
+          char c = '\0';
+          while (ss) {
+            ss >> c;
+            if (c == rule.open_tag_end) break; // Stop when we find the tag end.
+            control += c;
+          }
+          notify::TestError(c != rule.open_tag_end,
+                            "Open tag beginning with '", rule.open_tag_start,
+                            "' did not have end ('", rule.open_tag_end, "')");
+        }
+
+        // Setup style opened by this rule, if any.
+        String style_desc = rule.MakeStyle(control);
+        if (style_desc.size()) {
+          size_t style_id = name_to_style_id[rule.base_style];
+          active_styles.emplace_back(style_id, style_desc, rule.id);
+        }
+
+        // Do any text insertion required by this rule.
+        if (rule.GeneratesText()) {
+          text.Append_Raw(rule.internal_text);
+        }
+
+        // If this rule does not use a close, end new styles here.
+        if (rule.close_tag.size() == 0 && style_desc.size()) {
+          active_styles.pop_back();
+        }
+
+        used = true; // This tag has been used.
+      }
+    }
+
+    // === Tools for Constructing an Encoding ===
+
+    // Add a pre-build rule to this encoding.
+    void RegisterRule(const Text_Rule & rule) {
+      rule_set.emplace_back(rule);
+      rule_set.back().id = rule_set.size() - 1;
+
+      // All rules must have a unique start to open_tag (for parse simplicity)
+      String start_pattern = rule.open_tag_start;
+      emp::notify::TestError(start_pattern.empty(),
+        "Tag ", rule.id, " does not have a start pattern.");
+      emp::notify::TestError(emp::Has(tag_map, start_pattern),
+        "Start tag ", rule.id, ", '", start_pattern, "' cannot be used for more than one rule.");
+
+      // Register the start pattern so we know when we hit it.
+      tag_map[start_pattern].AddOpen(rule.id);
+
+      // If this rule has an ending pattern, register it as well.
+      // NOTE: A newline close tag (i.e., "\n") is special and will end ALL styles that use it.
+      if (rule.close_tag.size()) tag_map[rule.close_tag].AddClose(rule.id);
+
+      // If this rule uses a style, link it in.
+      if (rule.base_style.size()) {
+        Style & style = GetStyle(rule.base_style);
+        style.rule_ids.insert(rule.id);
+      }
+
+      // If this rule generates internal text without a style, make it reversible.
+      if (rule.internal_text.size() && !rule.base_style.size()) {
+        special_strings[rule.internal_text] = rule.id;
+      }
+    }
+
+    /// Specify both open and close tags that indicate a style.
+    void AddStyleTags(String style_name, String open_tag, String close_tag) {
+      Text_Rule rule(open_tag, '\0', close_tag, style_name);
+      RegisterRule(rule);
+    }
+
+    /// Specify a single tag that will toggle a style when used.
+    void AddStyleToggle(String style_name, String tag) {
+      Text_Rule rule(tag, '\0', tag, style_name);
+      RegisterRule(rule);
+    }
+
+    /// Specify a tag that will set a new style to the end of the current line only.
+    void AddStyleLine(String style_name, String tag) {
+      Text_Rule rule(tag, '\0', "\n", style_name);
+      RegisterRule(rule);
+    }
+
+    /// Specify a new set of tags, with a control block.  The control sequence
+    /// is directly moved back and forth with the style arguments.
+    void AddStyleControl(String open_tag_start, char open_tag_end, String close_tag,
+                         String base_style)
+    {
+      Text_Rule rule(open_tag_start, open_tag_end, close_tag, base_style);
+      rule.to_style_arg = [](String arg){ return arg; };
+      rule.to_control = [](String arg){ return arg; };
+      RegisterRule(rule);
+    }
+
+    /// Specify a new set of tags, with a control block.  You must also specify HOW
+    /// the control should be converted to style args and vice-versa.
+    void AddStyleDynamic(String open_tag_start, String open_tag_end, String close_tag,
+                         String base_style, auto to_style_arg, auto to_control)
+    {
+      Text_Rule rule(open_tag_start, open_tag_end, close_tag, base_style);
+      rule.to_style_arg = to_style_arg;
+      rule.to_control = to_control;
+      RegisterRule(rule);
+    }
+
+    /// Add a new tag that gets replaced in plain-text. For example:
+    ///   AddReplaceTag("&lt;", "<")                 for less-than in HTML -or-
+    ///   AddReplaceTag("&nbsp;", " ", "no_break")   for non-breaking spaces.
+    void AddReplaceTag(String tag, String text_str, String style_name="") {
+      Text_Rule rule(tag, '\0', "", style_name);
+      rule.internal_text = text_str;
+      RegisterRule(rule);
+    }
+
+    /// Add a symbol that will be represented as a space, but specified in its style.
+    void AddReplaceControl(String tag_start, char tag_end, String text_str, String style_name) {
+      Text_Rule rule(tag_start, tag_end, "", style_name);
+      rule.internal_text = text_str;
+      RegisterRule(rule);
+    }
+
+/*
     size_t GetTagID(const String & tag_name, const String & tag_pattern) {
       // If we don't have this tag yet, build it.
       if (!emp::Has(pattern_to_tag_id, tag_pattern)) {
@@ -110,63 +333,8 @@ namespace emp {
       return GetTagID(tag_name, emp::MakeLiteral(tag_name));
     }
 
-    // Get a style entry.  If it doesn't exist yet, add it.
-    Style & GetStyle(const String & style_name) {
-      // If this style hasn't been used before, build its entry.
-      if (!emp::Has(name_to_style_id, style_name)) {
-        Style new_style;
-        new_style.name = style_name;
-        new_style.id = style_set.size();
-        style_set.push_back(new_style);
-        name_to_style_id[style_name] = new_style.id;
-        return style_set.back();
-      }
-      size_t style_id = name_to_style_id[style_name];
-      return style_set[style_id];
-    }
 
-    // Add new tags that setup a specific style.  For example:
-    //   SetupStyleTags("bold", "<b>", "</b>")    for HTML -or-
-    //   SetupStyleTags("bold, "{\bf", "}")       for Latex
-    void SetupStyleTags(String style_name, String open_name, String close_name) {
-      Style & style = GetStyle(style_name);
-      size_t open_id = GetTagID(open_name);
-      size_t close_id = GetTagID(close_name);
-      Tag & open_tag = tag_set[open_id];
-      Tag & close_tag = tag_set[close_id];
 
-      style.open_tag_ids.insert(open_tag.id);
-      style.close_tag_ids.insert(close_tag.id);
-      if (!style.make_open_tag) style.make_open_tag = [open_name](String){ return open_name; };
-      if (!style.make_close_tag) style.make_close_tag = [close_name](String){ return close_name; };
-
-      emp::notify::TestError(open_tag.start_style_id != 0,
-        "Tag '", open_name, "' cannot be used to start more than one style.");
-      open_tag.start_style_id = style.id;
-      close_tag.end_style_ids.insert(style.id);
-    }
-
-    // Add a new tag that gets replaced by a single character in plain-text. For example:
-    //   SetupReplaceTag("&nbsp;", '<')               for less-than in HTML -or-
-    //   SetupReplaceTag("&nbsp;", ' ', "no_break")   for non-breaking spaces.
-    void SetupReplaceTag(String tag_name, char replace_char, String style_name="") {
-      Tag & replace_tag = tag_set[ GetTagID(tag_name) ];
-      replace_tag.replace_char = replace_char;
-      replace_tag.out_encoding = tag_name;
-
-      // Track character / tag association.
-      size_t char_id = static_cast<size_t>(replace_char);
-      notify::TestError(char_tags[char_id],
-        "Cannot associate character ", char_id, "('", replace_char, "') with multiple tags.");
-      char_tags[char_id] = replace_tag.id;
-
-      // If we were given a style, set it up too.
-      if (style_name.size()) {
-        Style & style = GetStyle(style_name);
-        style.replace_tag_ids.insert(replace_tag.id);
-        replace_tag.replace_style_id = style.id;
-      }
-    }
 
     // Get the style name with any associated args that should be used in Text.
     String GetStyleDesc(const Style & style, const Tag & start_tag, const String & lexeme) {
@@ -175,62 +343,9 @@ namespace emp {
     }
 
 
-    // Append a string that has already been otherwise processed.
-    void Append_RawText(Text & text, const String & in) {
-      size_t start = text.size();
-      size_t end = start + in.size();
-      text.Append_Raw(in);
-      for (const auto & style : active_styles) {
-        text.SetStyle(style.full_info, start, end);
-      }
-    }
 
-    void Append_Tag(Text & text, int token_id, const String & lexeme) {
-      Tag & tag = tag_set[ token_to_tag_id[token_id] ];
 
-      // If this token might END a style, search for options.
-      if (tag.end_style_ids.size()) {
-        // Scan through active styles from most recent to figure out which one to remove.
-        for (size_t id = active_styles.size()-1; id < active_styles.size(); --id) {
-          // If we have found a tag to end, do so.
-          if (tag.end_style_ids.count(active_styles[id].style_id)) {
-            active_styles.erase(active_styles.begin()+id);
-            if (!tag.multi_end) return;
-          }
-        }
-      }
 
-      // START a new styles if indicated by this tag.
-      if (tag.start_style_id) {
-        Style & style = style_set[tag.start_style_id];
-        active_styles.push_back({style.id, GetStyleDesc(style, tag, lexeme)});
-        return;
-      }
-
-      // Otherwise see if we need to do a replacement.
-      if (tag.replace_char) {
-        text.Append_Raw(tag.replace_char);
-        if (tag.replace_style_id) {
-          Style & style = style_set[tag.replace_style_id];
-          text.SetStyle(style.name, text.size() -1);
-        }
-      }
-    }
-
-    // Build all of the regular expressions for the lexer and setup the tags.
-    void SetupLexer() {
-      // If the lexer is already setup, skip this step.
-      if (lexer.GetNumTokens()) return;
-
-      // Loop through the tags to build the regular expressions.
-      for (Tag & tag : tag_set) {
-        tag.token_id = lexer.AddToken(tag.name, tag.pattern);
-        token_to_tag_id[tag.token_id] = tag.id;
-      }
-
-      // Finally, add an "everything else" token for regular text.
-      text_token = lexer.AddToken("plain text", ".");
-    }
 
     void _EncodeChar(const Text & text, String & out_string, const size_t char_pos) const {
       const char c = text.GetChar(char_pos);
@@ -252,73 +367,129 @@ namespace emp {
         ++start;
       }
     }
+*/
 
   public:
     TextEncoding() : TextEncoding_Interface() {
-        Tag default_tag;
-        default_tag.name = "__default_tag__";
-        default_tag.id = 0;
-        tag_set.push_back(default_tag);
+      // Setup a default rule that is always ID zero.
+      Text_Rule default_rule("__default_Text_Rule__", '\0', "", "");
+      default_rule.id = 0;
+      rule_set.push_back(default_rule);
 
-        Style default_style;
-        default_style.name = "__default_style__";
-        default_style.id = 0;
-        style_set.push_back(default_style);
-
-        char_tags.fill(0);
-      }
+      // Setup a default style that is always ID zero.
+      Style default_style("__default_style__", 0);
+      style_set.push_back(default_style);
+    }
     ~TextEncoding() = default;
 
     // Reset the current encoding to clear all tag knowledge for this encoding.
     void Reset() {
-      tag_set.resize(1);           // Reduce down to just the default tag.
-      style_set.resize(0);         // Reduce down to just the default style.
-      char_tags.fill(0);           // Clear all character tags.
-      pattern_to_tag_id.clear();   // Remove all references to tags
-      token_to_tag_id.clear();
-      name_to_style_id.size();
-      active_styles.resize(0);     // All active styles turn off on changing encodings.
-      text_token = -1;             // Allow the lexer to reset.
+      rule_set.resize(1);       // Reduce to just the default rule.
+      style_set.resize(1);      // Reduce to just the default style.
+      name_to_style_id.clear();
+      tag_map.clear();
+      special_strings.clear();
       lexer.Reset();
+      text_token = -1;
+      active_styles.resize(0);
     }
 
     // Add new text into this object, translated as needed
     void Append(Text & text, const String & in) override {
       SetupLexer();
-      auto tokens = lexer.Tokenize(in.str());
-      String raw_text;  // Place to accumulate raw text.
-      for (const auto & token : tokens) {
+      String raw_text;  // Place to accumulate raw text for adding all at once.
+      size_t line_num;  // What line number are we on in the input?
+
+      std::stringstream ss;
+      ss << in;
+
+      while (const auto token = lexer.TokenizeNext(ss, line_num)) {
         if (token.id == text_token) raw_text += token.lexeme;
         else {
           if (raw_text.size()) Append_RawText(text, raw_text.PopAll());
-          Append_Tag(text, token.id, token.lexeme);
+          Append_Tag(text, token.id, token.lexeme, ss);
         }
       }
       if (raw_text.size()) Append_RawText(text, raw_text.PopAll());
     }
 
     String Encode(const Text & text) const override {
-      // Determine where tags should be placed.
-      std::map<size_t, String> tag_map;
-      emp::vector<String> style_list = text.GetStyles();
+      // Create a map of "text positions" to style info that open (or close) at that position.
+      // Each position should have:
+      //  1: a pointer to the style change there, and
+      //  2: a flag to indicate if it should be an "open" tag
+      using pos_info_t = std::pair<emp::Ptr<const String>, bool>;
+      std::map<size_t, emp::vector<pos_info_t>> style_pos_map;
+
+      // Go through the styles in this Text and insert the associated rules into the maps.
+      const std::unordered_map<String, BitVector> & style_map = text.GetStyleMap();
+      for (const auto & [style_desc, sites] : style_map) {
+        // Loop through marking every change in style.
+        auto ranges = sites.GetRanges();
+        for (const auto & range : ranges) {
+          auto & open_v = style_pos_map[range.GetLower()];
+          auto & close_v = style_pos_map[range.GetUpper()];
+          // Insert opens at the end and closes at the beginning; thus we close all existing
+          // styles before we open any new ones (and closes happen in reverse order.)
+          open_v.emplace_back(&style_desc, true);
+          close_v.insert(close_v.begin(), pos_info_t{&style_desc, false});
+        }
+      }
+
+      // Export the string, encoding tags back in as we go.
+      std::stringstream out_stream;
+      size_t scan_pos = 0;
+      for (auto [tag_pos, style_vec] : style_pos_map) {
+        // Copy everything into the out_stream up to the tags we need to insert.
+        if (scan_pos < tag_pos) {
+          out_stream << text.AsString().ViewRange(scan_pos, tag_pos);
+          scan_pos = tag_pos;
+        }
+
+        // Insert any needed tags.  They should already be in the right order to deal with.
+        for (auto [style_ptr, is_open] : style_vec) {
+          const Style & style = GetStyle(*style_ptr);
+          const Text_Rule & rule = GetRule(style, text, scan_pos);
+          if (rule.id == 0) continue; // No rule found; warning already sent.
+
+          // If the rule has text associated with it, skip over text.
+          if (rule.internal_text.size()) scan_pos += rule.internal_text.size();
+
+          // Drop the appropriate tag here.
+          if (is_open) out_stream << rule.MakeOpenTag(*style_ptr);
+          else out_stream << rule.close_tag;
+        }
+      }
+
+      // @CAO CONTINUE HERE
+
+
+
+      for (auto [tag_pos, tags] : tag_map) {
+        _EncodeTo(text, out_stream, scan_pos, tag_pos);
+        out_stream += tags;
+      }
+      _EncodeTo(text, out_stream, scan_pos, text.size()); // Add final text after the last tag.
+
+      return out_stream;
+
+
+
+
+
+
+      const emp::vector<String> & style_list = text.GetStyles();
       for (String style_desc : style_list) {
         String style_name = style_desc.Pop(":");
-        const Style & style = style_set[ emp::Find(name_to_style_id, style_name, 0) ];
+        const Style & style = GetStyle(style_desc);
+        emp_assert(style.rule_ids.size(), "Style has no associated rules!", style_name);
+        size_t rule_id = *style.rule_ids.begin();
+
         if (!style.make_open_tag) continue; // If no tags are available, assume a replacement style.
         AddOutputTags(text, tag_map, style_name,
                       style.make_open_tag(style_desc), style.make_close_tag(style_desc));
       }
 
-      // Convert the string, adding tags back in as we go.
-      String out_string;
-      size_t output_pos = 0;
-      for (auto [tag_pos, tags] : tag_map) {
-        _EncodeTo(text, out_string, output_pos, tag_pos);
-        out_string += tags;
-      }
-      _EncodeTo(text, out_string, output_pos, text.size()); // Add final text after the last tag.
-
-      return out_string;
     }
 
     void PrintDebug(std::ostream & os = std::cout) const override {
