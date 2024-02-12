@@ -94,6 +94,17 @@ namespace emp {
       }
       else return open_tag_start;
     }
+
+    void PrintDebug(std::ostream & os = std::cout) const {
+      os << "Rule " << id << ": " << open_tag_start;
+      if (UsesControl()) os << "CONTROL" << open_tag_end;
+      if (UsesText()) os << "TEXT" << close_tag;
+      os << " : base_style='" << base_style
+         << "' ; internal_text='" << internal_text
+         << "' ; open_token_id=" << open_token_id
+         << " ; close_token_id=" << close_token_id
+         << std::endl;
+    }
   };
 
 }
