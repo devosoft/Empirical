@@ -39,6 +39,11 @@ namespace emp {
       std::set<size_t> rule_ids;   // Which rules manage this style?
 
       Style(String name, size_t id) : name(name), id(id) { }
+
+      void PrintDebug(std::ostream & os = std::cout) const {
+        os << "Style " << id << " (" << name << "): Rule(s) "
+           << emp::MakeEnglishList(rule_ids) << std::endl;
+      }
     };
 
     // Track information about _active_ styles.
@@ -79,8 +84,8 @@ namespace emp {
     std::map<String, size_t> name_to_style_id; // Link style names to their ID
     std::map<String, TagInfo> tag_map;         // Map of tags to the rules they may affect
 
-    // Map of special (Emphatic) strings to the rules that generate them
-    std::map<String, size_t> special_strings;
+    // Chart of characters to the rule by which they must be encoded (with no associated special style)
+    std::array<size_t, 128> special_chars;
 
     emp::Lexer lexer;                           // Lexer to process encoding.
     int text_token = -1;                        // Token to represent any non-tag text.
@@ -253,7 +258,10 @@ namespace emp {
 
       // If this rule generates internal text without a style, make it reversible.
       if (rule.internal_text.size() && !rule.base_style.size()) {
-        special_strings[rule.internal_text] = rule.id;
+        emp::notify::TestError(rule.internal_text.size() != 1,
+          "Rules that convert text with no emphatic style must be limited to one character.\n",
+          "Text = '", rule.internal_text, "'.");
+        special_chars[rule.internal_text[0]] = rule.id;
       }
     }
 
@@ -313,61 +321,16 @@ namespace emp {
       RegisterRule(rule);
     }
 
-/*
-    size_t GetTagID(const String & tag_name, const String & tag_pattern) {
-      // If we don't have this tag yet, build it.
-      if (!emp::Has(pattern_to_tag_id, tag_pattern)) {
-        Tag new_tag;
-        new_tag.name = tag_name;
-        new_tag.pattern = tag_pattern;
-        new_tag.id = tag_set.size();
-        tag_set.push_back(new_tag);
-        pattern_to_tag_id[tag_pattern] = new_tag.id;
-        return tag_set.back().id;
-      }
-      return pattern_to_tag_id[tag_pattern];
-    }
-
-    // If no pattern is provided in get, use the tag name to generate it.
-    size_t GetTagID(const String & tag_name) {
-      return GetTagID(tag_name, emp::MakeLiteral(tag_name));
-    }
-
-
-
-
-    // Get the style name with any associated args that should be used in Text.
-    String GetStyleDesc(const Style & style, const Tag & start_tag, const String & lexeme) {
-      if (!start_tag.get_style_args) return style.name;
-      return emp::MakeString(style.name, ':', start_tag.get_style_args(lexeme));
-    }
-
-
-
-
-
-
-    void _EncodeChar(const Text & text, String & out_string, const size_t char_pos) const {
-      const char c = text.GetChar(char_pos);
-      // If there is a tag associated with this character AND the associated type (if any) use tag.
-      if (char_tags[c]) {
-        const Tag & tag = tag_set[char_tags[c]];
-        const Style & style = style_set[tag.replace_style_id];
-        if (!tag.replace_style_id || text.HasStyle(style.name, char_pos)) {
-          out_string += tag.out_encoding; // Char match AND style match (or no style), so print tag
-        } else out_string += c;   // Wrong style for tag; just print character.
-      } else {
-        out_string += c;
+  private: // Pure helper functions...
+    void _Encode_NoStyle(std::ostream & out_stream, std::string_view text_block) const {
+      for (char c : text_block) {
+        if (c > 0 && special_chars[c]) {
+          const Text_Rule & rule = rule_set[special_chars[c]];
+          out_stream << rule.open_tag_start;
+        }
+        else out_stream << c;
       }
     }
-
-    void _EncodeTo(const Text & text, String & out_string, size_t & start, const size_t end) const {
-      while (start < end) {
-        _EncodeChar(text, out_string, start);
-        ++start;
-      }
-    }
-*/
 
   public:
     TextEncoding() : TextEncoding_Interface() {
@@ -379,6 +342,9 @@ namespace emp {
       // Setup a default style that is always ID zero.
       Style default_style("__default_style__", 0);
       style_set.push_back(default_style);
+
+      // Initially there should be no rules for special characters.
+      special_chars.fill(0);
     }
     ~TextEncoding() = default;
 
@@ -388,7 +354,7 @@ namespace emp {
       style_set.resize(1);      // Reduce to just the default style.
       name_to_style_id.clear();
       tag_map.clear();
-      special_strings.clear();
+      special_chars.fill(0);
       lexer.Reset();
       text_token = -1;
       active_styles.resize(0);
@@ -442,7 +408,8 @@ namespace emp {
       for (auto [tag_pos, style_vec] : style_pos_map) {
         // Copy everything into the out_stream up to the tags we need to insert.
         if (scan_pos < tag_pos) {
-          out_stream << text.AsString().ViewRange(scan_pos, tag_pos);
+          auto text_block = text.AsString().ViewRange(scan_pos, tag_pos);
+          _Encode_NoStyle(out_stream, text_block);
           scan_pos = tag_pos;
         }
 
@@ -461,46 +428,26 @@ namespace emp {
         }
       }
 
-      // @CAO CONTINUE HERE
-
-
-
-      for (auto [tag_pos, tags] : tag_map) {
-        _EncodeTo(text, out_stream, scan_pos, tag_pos);
-        out_stream += tags;
-      }
-      _EncodeTo(text, out_stream, scan_pos, text.size()); // Add final text after the last tag.
-
-      return out_stream;
-
-
-
-
-
-
-      const emp::vector<String> & style_list = text.GetStyles();
-      for (String style_desc : style_list) {
-        String style_name = style_desc.Pop(":");
-        const Style & style = GetStyle(style_desc);
-        emp_assert(style.rule_ids.size(), "Style has no associated rules!", style_name);
-        size_t rule_id = *style.rule_ids.begin();
-
-        if (!style.make_open_tag) continue; // If no tags are available, assume a replacement style.
-        AddOutputTags(text, tag_map, style_name,
-                      style.make_open_tag(style_desc), style.make_close_tag(style_desc));
+      // Encode any remaining text after the final tag.
+      if (scan_pos < text.size()) {
+        _Encode_NoStyle(out_stream, text.AsString().View(scan_pos));
       }
 
+      return out_stream.str();
+    }
+
+    void PrintDebug_Rules(std::ostream & os = std::cout) const {
+      for (const Text_Rule & rule : rule_set) rule.PrintDebug(os);
+    }
+
+    void PrintDebug_Styles(std::ostream & os = std::cout) const {
+      for (const Style & style : style_set) style.PrintDebug(os);
     }
 
     void PrintDebug(std::ostream & os = std::cout) const override {
-      os << "Tags:\n";
-      for (const auto & tag : tag_set) {
-        os << "  '" << tag.name << "' id=" << tag.id << "; start_style=" << tag.start_style_id << "\n";
-      }
-      os << "Styles:\n";
-      for (const auto & style : style_set) {
-        os << "  '" << style.name << "' id=" << style.id << "; open_count=" << style.open_tag_ids.size() << "\n";
-      }
+      PrintDebug_Rules(os);
+      PrintDebug_Styles(os);
+      // @CAO Should print other info.
     }
 
   protected:
