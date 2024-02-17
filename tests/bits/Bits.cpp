@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022.
+ *  @date 2022-24.
  *
  *  @file Bits.cpp
  */
@@ -658,6 +658,20 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   CHECK(bv.FindOne(13) == 13);
   CHECK(bv.FindOne(14) == 14);
   CHECK(bv.FindOne(15) == -1);
+
+  // Also check that we find the zeroes.
+  CHECK(bv.FindZero() == 0);
+  CHECK(bv.FindZero(1) == 1);
+  CHECK(bv.FindZero(2) == 2);
+  CHECK(bv.FindZero(3) == 4);
+  CHECK(bv.FindZero(4) == 4);
+  CHECK(bv.FindZero(5) == 5);
+  CHECK(bv.FindZero(7) == 8);
+  CHECK(bv.FindZero(11) == 11);
+  CHECK(bv.FindZero(12) == 15);
+  CHECK(bv.FindZero(14) == 15);
+  CHECK(bv.FindZero(15) == 15);
+  CHECK(bv.FindZero(16) == -1);
 
   // Get all of the ones at once and make sure they're there.
   emp::vector<size_t> ones = bv.GetOnes();
@@ -1540,14 +1554,14 @@ struct TestBitArrayConstruct<> {
 TEST_CASE("17: Test BitArray Constructors", "[bits]"){
   // Create a size 50 bit vector, default to all zeros.
   emp::BitArray<50> ba1;
-  REQUIRE( ba1.GetSize() == 50 );
-  REQUIRE( ba1.CountOnes() == 0 );
-  REQUIRE( (~ba1).CountOnes() == 50 );
+  CHECK( ba1.GetSize() == 50 );
+  CHECK( ba1.CountOnes() == 0 );
+  CHECK( (~ba1).CountOnes() == 50 );
 
   // Create a size 1000 BitArray, default to all ones.
   emp::BitArray<1000> ba2(true);
-  REQUIRE( ba2.GetSize() == 1000 );
-  REQUIRE( ba2.CountOnes() == 1000 );
+  CHECK( ba2.GetSize() == 1000 );
+  CHECK( ba2.CountOnes() == 1000 );
 
   // Try a range of BitArray sizes, from 1 to 200.
   TestBitArrayConstruct<1,2,7,8,9,15,16,17,31,32,33,63,64,65,127,128,129,191,192,193,200>::Run();
@@ -1555,45 +1569,45 @@ TEST_CASE("17: Test BitArray Constructors", "[bits]"){
   // Build a relatively large BitArray.
   emp::BitArray<1000000> ba4;
   for (size_t i = 0; i < ba4.GetSize(); i += 100) ba4[i].Toggle();
-  REQUIRE( ba4.CountOnes() == 10000 );
+  CHECK( ba4.CountOnes() == 10000 );
 
   // Try out the copy constructor.
   emp::BitArray<1000000> ba5(ba4);
-  REQUIRE( ba5.GetSize() == 1000000 );
-  REQUIRE( ba5.CountOnes() == 10000 );
+  CHECK( ba5.GetSize() == 1000000 );
+  CHECK( ba5.CountOnes() == 10000 );
 
   // Construct from std::bitset.
   std::bitset<6> bit_set;
   bit_set[1] = 1;   bit_set[2] = 1;   bit_set[4] = 1;
   emp::BitArray<6> ba7(bit_set);
-  REQUIRE( ba7.GetSize() == 6 );
-  REQUIRE( ba7.CountOnes() == 3 );
+  CHECK( ba7.GetSize() == 6 );
+  CHECK( ba7.CountOnes() == 3 );
 
   // Construct from string.
   std::string bit_string = "10011001010000011101";
   emp::BitArray<20> ba8(bit_string);
-  REQUIRE( ba8.GetSize() == 20 );
-  REQUIRE( ba8.CountOnes() == 9 );
+  CHECK( ba8.GetSize() == 20 );
+  CHECK( ba8.CountOnes() == 9 );
 
   // Some random BitArrays
   emp::Random random;
   emp::BitArray<1000> ba9(random);            // 50/50 chance for each bit.
   const size_t ba9_ones = ba9.CountOnes();
-  REQUIRE( ba9_ones >= 400 );
-  REQUIRE( ba9_ones <= 600 );
+  CHECK( ba9_ones >= 400 );
+  CHECK( ba9_ones <= 600 );
 
   emp::BitArray<1000> ba10(random, 0.8);      // 80% chance of ones.
   const size_t ba10_ones = ba10.CountOnes();
-  REQUIRE( ba10_ones >= 750 );
-  REQUIRE( ba10_ones <= 850 );
+  CHECK( ba10_ones >= 750 );
+  CHECK( ba10_ones <= 850 );
 
   emp::BitArray<1000> ba11(random, 117);      // Exactly 117 ones, randomly placed.
   const size_t ba11_ones = ba11.CountOnes();
-  REQUIRE( ba11_ones == 117 );
+  CHECK( ba11_ones == 117 );
 
   emp::BitArray<13> ba12({1,0,0,0,1,1,1,0,0,0,1,1,1}); // Construct with initializer list.
-  REQUIRE( ba12.GetSize() == 13 );
-  REQUIRE( ba12.CountOnes() == 7 );
+  CHECK( ba12.GetSize() == 13 );
+  CHECK( ba12.CountOnes() == 7 );
 }
 
 
@@ -1613,7 +1627,7 @@ struct TestBVAssign<VAL1, VALS...> {
 
     ba = ba2;
 
-    REQUIRE( ba.CountOnes() == ba.GetSize()/2 );
+    CHECK( ba.CountOnes() == ba.GetSize()/2 );
 
     // Try copying in from an std::bitset.
     std::bitset<VAL1> bit_set;
@@ -1624,8 +1638,8 @@ struct TestBVAssign<VAL1, VALS...> {
 
     ba2 = bit_set;  // Copy in an std::bitset.
 
-    REQUIRE( ba2.GetSize() == VAL1 );
-    REQUIRE( ba2.CountOnes() == num_ones );
+    CHECK( ba2.GetSize() == VAL1 );
+    CHECK( ba2.CountOnes() == num_ones );
 
     // Try copying from an std::string
     std::string bit_string = "100110010100000111011001100101000001110110011001010000011101";
@@ -1637,8 +1651,8 @@ struct TestBVAssign<VAL1, VALS...> {
 
     ba2 = bit_string;
 
-    REQUIRE( ba2.GetSize() == VAL1 );
-    REQUIRE( ba2.CountOnes() == num_ones );
+    CHECK( ba2.GetSize() == VAL1 );
+    CHECK( ba2.CountOnes() == num_ones );
 
     TestBVAssign<VALS...>::Run();
   }
@@ -1664,177 +1678,177 @@ TEST_CASE("19: Test Simple BitArray Accessors", "[bits]"){
   emp::BitArray<1000> ba1k(random, 0.75);
 
   // Make sure all sizes are correct.
-  REQUIRE( ba1.GetSize() == 1 );
-  REQUIRE( ba8.GetSize() == 8 );
-  REQUIRE( ba32.GetSize() == 32 );
-  REQUIRE( ba64.GetSize() == 64 );
-  REQUIRE( ba75.GetSize() == 75 );
-  REQUIRE( ba1k.GetSize() == 1000 );
+  CHECK( ba1.GetSize() == 1 );
+  CHECK( ba8.GetSize() == 8 );
+  CHECK( ba32.GetSize() == 32 );
+  CHECK( ba64.GetSize() == 64 );
+  CHECK( ba75.GetSize() == 75 );
+  CHECK( ba1k.GetSize() == 1000 );
 
   // Check byte counts (should always round up!)
-  REQUIRE( ba1.GetNumBytes() == 1 );     // round up!
-  REQUIRE( ba8.GetNumBytes() == 1 );
-  REQUIRE( ba32.GetNumBytes() == 4 );
-  REQUIRE( ba64.GetNumBytes() == 8 );
-  REQUIRE( ba75.GetNumBytes() == 10 );   // round up!
-  REQUIRE( ba1k.GetNumBytes() == 125 );
+  CHECK( ba1.GetNumBytes() == 1 );     // round up!
+  CHECK( ba8.GetNumBytes() == 1 );
+  CHECK( ba32.GetNumBytes() == 4 );
+  CHECK( ba64.GetNumBytes() == 8 );
+  CHECK( ba75.GetNumBytes() == 10 );   // round up!
+  CHECK( ba1k.GetNumBytes() == 125 );
 
   // How many states can be represented in each size of BitArray?
-  REQUIRE( ba1.GetNumStates() == 2.0 );
-  REQUIRE( ba8.GetNumStates() == 256.0 );
-  REQUIRE( ba32.GetNumStates() == 4294967296.0 );
-  REQUIRE( ba64.GetNumStates() >= 18446744073709551610.0 );
-  REQUIRE( ba64.GetNumStates() <= 18446744073709551720.0 );
-  REQUIRE( ba75.GetNumStates() >= 37778931862957161709560.0 );
-  REQUIRE( ba75.GetNumStates() <= 37778931862957161709570.0 );
-  REQUIRE( ba1k.GetNumStates() == emp::Pow2(1000) );
+  CHECK( ba1.GetNumStates() == 2.0 );
+  CHECK( ba8.GetNumStates() == 256.0 );
+  CHECK( ba32.GetNumStates() == 4294967296.0 );
+  CHECK( ba64.GetNumStates() >= 18446744073709551610.0 );
+  CHECK( ba64.GetNumStates() <= 18446744073709551720.0 );
+  CHECK( ba75.GetNumStates() >= 37778931862957161709560.0 );
+  CHECK( ba75.GetNumStates() <= 37778931862957161709570.0 );
+  CHECK( ba1k.GetNumStates() == emp::Pow2(1000) );
 
   // Test Get()
-  REQUIRE( ba1.Get(0) == 1 );
-  REQUIRE( ba8.Get(0) == 1 );
-  REQUIRE( ba8.Get(4) == 1 );
-  REQUIRE( ba8.Get(6) == 0 );
-  REQUIRE( ba8.Get(7) == 1 );
-  REQUIRE( ba75.Get(0) == 0 );
-  REQUIRE( ba75.Get(1) == 1 );
-  REQUIRE( ba75.Get(72) == 0 );
-  REQUIRE( ba75.Get(73) == 1 );
-  REQUIRE( ba75.Get(74) == 1 );
+  CHECK( ba1.Get(0) == 1 );
+  CHECK( ba8.Get(0) == 1 );
+  CHECK( ba8.Get(4) == 1 );
+  CHECK( ba8.Get(6) == 0 );
+  CHECK( ba8.Get(7) == 1 );
+  CHECK( ba75.Get(0) == 0 );
+  CHECK( ba75.Get(1) == 1 );
+  CHECK( ba75.Get(72) == 0 );
+  CHECK( ba75.Get(73) == 1 );
+  CHECK( ba75.Get(74) == 1 );
 
   // Test Has() (including out of range)
-  REQUIRE( ba1.Has(0) == true );
-  REQUIRE( ba1.Has(1) == false );
-  REQUIRE( ba1.Has(1000000) == false );
+  CHECK( ba1.Has(0) == true );
+  CHECK( ba1.Has(1) == false );
+  CHECK( ba1.Has(1000000) == false );
 
-  REQUIRE( ba8.Has(0) == true );
-  REQUIRE( ba8.Has(4) == true );
-  REQUIRE( ba8.Has(6) == false );
-  REQUIRE( ba8.Has(7) == true );
-  REQUIRE( ba8.Has(8) == false );
+  CHECK( ba8.Has(0) == true );
+  CHECK( ba8.Has(4) == true );
+  CHECK( ba8.Has(6) == false );
+  CHECK( ba8.Has(7) == true );
+  CHECK( ba8.Has(8) == false );
 
-  REQUIRE( ba75.Has(0) == false );
-  REQUIRE( ba75.Has(1) == true );
-  REQUIRE( ba75.Has(72) == false );
-  REQUIRE( ba75.Has(73) == true );
-  REQUIRE( ba75.Has(74) == true );
-  REQUIRE( ba75.Has(75) == false );
-  REQUIRE( ba75.Has(79) == false );
-  REQUIRE( ba75.Has(1000000) == false );
+  CHECK( ba75.Has(0) == false );
+  CHECK( ba75.Has(1) == true );
+  CHECK( ba75.Has(72) == false );
+  CHECK( ba75.Has(73) == true );
+  CHECK( ba75.Has(74) == true );
+  CHECK( ba75.Has(75) == false );
+  CHECK( ba75.Has(79) == false );
+  CHECK( ba75.Has(1000000) == false );
 
   // Test Set(), changing in most (but not all) cases.
   ba1.Set(0, 0);
-  REQUIRE( ba1.Get(0) == 0 );
+  CHECK( ba1.Get(0) == 0 );
   ba8.Set(0, 1);                // Already a 1!
-  REQUIRE( ba8.Get(0) == 1 );
+  CHECK( ba8.Get(0) == 1 );
   ba8.Set(4, 0);
-  REQUIRE( ba8.Get(4) == 0 );
+  CHECK( ba8.Get(4) == 0 );
   ba8.Set(6, 1);
-  REQUIRE( ba8.Get(6) == 1 );
+  CHECK( ba8.Get(6) == 1 );
   ba8.Set(7, 0);
-  REQUIRE( ba8.Get(7) == 0 );
+  CHECK( ba8.Get(7) == 0 );
   ba75.Set(0, 0);               // Already a 0!
-  REQUIRE( ba75.Get(0) == 0 );
+  CHECK( ba75.Get(0) == 0 );
   ba75.Set(1, 0);
-  REQUIRE( ba75.Get(1) == 0 );
+  CHECK( ba75.Get(1) == 0 );
   ba75.Set(72);                 // No second arg!
-  REQUIRE( ba75.Get(72) == 1 );
+  CHECK( ba75.Get(72) == 1 );
   ba75.Set(73);                 // No second arg AND already a 1!
-  REQUIRE( ba75.Get(73) == 1 );
+  CHECK( ba75.Get(73) == 1 );
   ba75.Set(74, 0);
-  REQUIRE( ba75.Get(74) == 0 );
+  CHECK( ba75.Get(74) == 0 );
 }
 
 TEST_CASE("20: Test BitArray Set*, Clear* and Toggle* Accessors", "[bits]") {
   // Now try range-based accessors on a single bit.
-  emp::BitArray<1> ba1(false);  REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.Set(0);           REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
-  ba1.Clear(0);         REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.Toggle(0);        REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
-  ba1.Clear();          REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.SetAll();         REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
-  ba1.Toggle();         REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.SetRange(0,1);    REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
-  ba1.Clear(0,1);       REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.Toggle(0,1);      REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
-  ba1.Set(0, false);    REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.SetRange(0,0);    REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.SetRange(1,1);    REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
+  emp::BitArray<1> ba1(false);  CHECK( ba1[0] == false );   CHECK( ba1.CountOnes() == 0 );
+  ba1.Set(0);           CHECK( ba1[0] == true );    CHECK( ba1.CountOnes() == 1 );
+  ba1.Clear(0);         CHECK( ba1[0] == false );   CHECK( ba1.CountOnes() == 0 );
+  ba1.Toggle(0);        CHECK( ba1[0] == true );    CHECK( ba1.CountOnes() == 1 );
+  ba1.Clear();          CHECK( ba1[0] == false );   CHECK( ba1.CountOnes() == 0 );
+  ba1.SetAll();         CHECK( ba1[0] == true );    CHECK( ba1.CountOnes() == 1 );
+  ba1.Toggle();         CHECK( ba1[0] == false );   CHECK( ba1.CountOnes() == 0 );
+  ba1.SetRange(0,1);    CHECK( ba1[0] == true );    CHECK( ba1.CountOnes() == 1 );
+  ba1.Clear(0,1);       CHECK( ba1[0] == false );   CHECK( ba1.CountOnes() == 0 );
+  ba1.Toggle(0,1);      CHECK( ba1[0] == true );    CHECK( ba1.CountOnes() == 1 );
+  ba1.Set(0, false);    CHECK( ba1[0] == false );   CHECK( ba1.CountOnes() == 0 );
+  ba1.SetRange(0,0);    CHECK( ba1[0] == false );   CHECK( ba1.CountOnes() == 0 );
+  ba1.SetRange(1,1);    CHECK( ba1[0] == false );   CHECK( ba1.CountOnes() == 0 );
 
   // Test when a full byte is used.
-  emp::BitArray<8> ba8( "10001101" );   REQUIRE(ba8.GetValue() == 177.0);  // 10110001
-  ba8.Set(2);           REQUIRE(ba8.GetValue() == 181.0);  // 10110101
-  ba8.Set(0, 0);        REQUIRE(ba8.GetValue() == 180.0);  // 10110100
-  ba8.SetRange(1, 4);   REQUIRE(ba8.GetValue() == 190.0);  // 10111110
-  ba8.SetAll();         REQUIRE(ba8.GetValue() == 255.0);  // 11111111
-  ba8.Clear(3);         REQUIRE(ba8.GetValue() == 247.0);  // 11110111
-  ba8.Clear(5,5);       REQUIRE(ba8.GetValue() == 247.0);  // 11110111
-  ba8.Clear(5,7);       REQUIRE(ba8.GetValue() == 151.0);  // 10010111
-  ba8.Clear();          REQUIRE(ba8.GetValue() ==   0.0);  // 00000000
-  ba8.Toggle(4);        REQUIRE(ba8.GetValue() ==  16.0);  // 00010000
-  ba8.Toggle(4,6);      REQUIRE(ba8.GetValue() ==  32.0);  // 00100000
-  ba8.Toggle(0,3);      REQUIRE(ba8.GetValue() ==  39.0);  // 00100111
-  ba8.Toggle(7,8);      REQUIRE(ba8.GetValue() == 167.0);  // 10100111
-  ba8.Toggle();         REQUIRE(ba8.GetValue() ==  88.0);  // 01011000
+  emp::BitArray<8> ba8( "10001101" );   CHECK(ba8.GetValue() == 177.0);  // 10110001
+  ba8.Set(2);           CHECK(ba8.GetValue() == 181.0);  // 10110101
+  ba8.Set(0, 0);        CHECK(ba8.GetValue() == 180.0);  // 10110100
+  ba8.SetRange(1, 4);   CHECK(ba8.GetValue() == 190.0);  // 10111110
+  ba8.SetAll();         CHECK(ba8.GetValue() == 255.0);  // 11111111
+  ba8.Clear(3);         CHECK(ba8.GetValue() == 247.0);  // 11110111
+  ba8.Clear(5,5);       CHECK(ba8.GetValue() == 247.0);  // 11110111
+  ba8.Clear(5,7);       CHECK(ba8.GetValue() == 151.0);  // 10010111
+  ba8.Clear();          CHECK(ba8.GetValue() ==   0.0);  // 00000000
+  ba8.Toggle(4);        CHECK(ba8.GetValue() ==  16.0);  // 00010000
+  ba8.Toggle(4,6);      CHECK(ba8.GetValue() ==  32.0);  // 00100000
+  ba8.Toggle(0,3);      CHECK(ba8.GetValue() ==  39.0);  // 00100111
+  ba8.Toggle(7,8);      CHECK(ba8.GetValue() == 167.0);  // 10100111
+  ba8.Toggle();         CHECK(ba8.GetValue() ==  88.0);  // 01011000
 
   // Test a full field.
   constexpr double ALL_64 = (double) ((uint64_t) -1);
   emp::BitArray<64> ba64( "11011000110110001101" );
-  REQUIRE(ba64.GetValue() == 727835.0);
-  ba64.Set(6);          REQUIRE(ba64.GetValue() == 727899.0);        // ...0 010110001101101011011
-  ba64.Set(0, 0);       REQUIRE(ba64.GetValue() == 727898.0);        // ...0 010110001101101011010
-  ba64.SetRange(4, 9);  REQUIRE(ba64.GetValue() == 728058.0);        // ...0 010110001101111111010
-  ba64.SetAll();        REQUIRE(ba64.GetValue() == ALL_64);          // ...1 111111111111111111111
-  ba64.Clear(2);        REQUIRE(ba64.GetValue() == ALL_64 - 4);      // ...1 111111111111111111011
-  ba64.Clear(5,5);      REQUIRE(ba64.GetValue() == ALL_64 - 4);      // ...1 111111111111111111011
-  ba64.Clear(5,7);      REQUIRE(ba64.GetValue() == ALL_64 - 100);    // ...1 111111111111110011011
-  ba64.Clear();         REQUIRE(ba64.GetValue() == 0.0);             // ...0 000000000000000000000
-  ba64.Toggle(19);      REQUIRE(ba64.GetValue() == emp::Pow2(19));   // ...0 010000000000000000000
-  ba64.Toggle(15,20);   REQUIRE(ba64.GetValue() == 491520.0);        // ...0 001111000000000000000
-  ba64.Toggle();        REQUIRE(ba64.GetValue() == ALL_64-491520.0); // ...1 110000111111111111111
-  ba64.Toggle(0,64);    REQUIRE(ba64.GetValue() == 491520.0);        // ...0 001111000000000000000
+  CHECK(ba64.GetValue() == 727835.0);
+  ba64.Set(6);          CHECK(ba64.GetValue() == 727899.0);        // ...0 010110001101101011011
+  ba64.Set(0, 0);       CHECK(ba64.GetValue() == 727898.0);        // ...0 010110001101101011010
+  ba64.SetRange(4, 9);  CHECK(ba64.GetValue() == 728058.0);        // ...0 010110001101111111010
+  ba64.SetAll();        CHECK(ba64.GetValue() == ALL_64);          // ...1 111111111111111111111
+  ba64.Clear(2);        CHECK(ba64.GetValue() == ALL_64 - 4);      // ...1 111111111111111111011
+  ba64.Clear(5,5);      CHECK(ba64.GetValue() == ALL_64 - 4);      // ...1 111111111111111111011
+  ba64.Clear(5,7);      CHECK(ba64.GetValue() == ALL_64 - 100);    // ...1 111111111111110011011
+  ba64.Clear();         CHECK(ba64.GetValue() == 0.0);             // ...0 000000000000000000000
+  ba64.Toggle(19);      CHECK(ba64.GetValue() == emp::Pow2(19));   // ...0 010000000000000000000
+  ba64.Toggle(15,20);   CHECK(ba64.GetValue() == 491520.0);        // ...0 001111000000000000000
+  ba64.Toggle();        CHECK(ba64.GetValue() == ALL_64-491520.0); // ...1 110000111111111111111
+  ba64.Toggle(0,64);    CHECK(ba64.GetValue() == 491520.0);        // ...0 001111000000000000000
 
 
   emp::BitArray<75> ba75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
 
   // Test a full + partial field.
   constexpr double ALL_88 = ((double) ((uint64_t) -1)) * emp::Pow2(24);
-  emp::BitArray<88> ba88( "11011000110110001101" ); REQUIRE(ba88.GetValue() == 727835.0);
-  REQUIRE(ba88.GetValue() == 727835.0);                              // ...0 010110001101100011011
+  emp::BitArray<88> ba88( "11011000110110001101" ); CHECK(ba88.GetValue() == 727835.0);
+  CHECK(ba88.GetValue() == 727835.0);                              // ...0 010110001101100011011
 
   // Start with same tests as last time...
-  ba88.Set(6);          REQUIRE(ba88.GetValue() == 727899.0);        // ...0 010110001101101011011
-  ba88.Set(0, 0);       REQUIRE(ba88.GetValue() == 727898.0);        // ...0 010110001101101011010
-  ba88.SetRange(4, 9);  REQUIRE(ba88.GetValue() == 728058.0);        // ...0 010110001101111111010
-  ba88.SetAll();        REQUIRE(ba88.GetValue() == ALL_88);          // ...1 111111111111111111111
-  ba88.Clear(2);        REQUIRE(ba88.GetValue() == ALL_88 - 4);      // ...1 111111111111111111011
-  ba88.Clear(5,5);      REQUIRE(ba88.GetValue() == ALL_88 - 4);      // ...1 111111111111111111011
-  ba88.Clear(5,7);      REQUIRE(ba88.GetValue() == ALL_88 - 100);    // ...1 111111111111110011011
-  ba88.Clear();         REQUIRE(ba88.GetValue() == 0.0);             // ...0 000000000000000000000
-  ba88.Toggle(19);      REQUIRE(ba88.GetValue() == emp::Pow2(19));   // ...0 010000000000000000000
-  ba88.Toggle(15,20);   REQUIRE(ba88.GetValue() == 491520.0);        // ...0 001111000000000000000
-  ba88.Toggle();        REQUIRE(ba88.GetValue() == ALL_88-491520.0); // ...1 110000111111111111111
-  ba88.Toggle(0,88);    REQUIRE(ba88.GetValue() == 491520.0);        // ...0 001111000000000000000
+  ba88.Set(6);          CHECK(ba88.GetValue() == 727899.0);        // ...0 010110001101101011011
+  ba88.Set(0, 0);       CHECK(ba88.GetValue() == 727898.0);        // ...0 010110001101101011010
+  ba88.SetRange(4, 9);  CHECK(ba88.GetValue() == 728058.0);        // ...0 010110001101111111010
+  ba88.SetAll();        CHECK(ba88.GetValue() == ALL_88);          // ...1 111111111111111111111
+  ba88.Clear(2);        CHECK(ba88.GetValue() == ALL_88 - 4);      // ...1 111111111111111111011
+  ba88.Clear(5,5);      CHECK(ba88.GetValue() == ALL_88 - 4);      // ...1 111111111111111111011
+  ba88.Clear(5,7);      CHECK(ba88.GetValue() == ALL_88 - 100);    // ...1 111111111111110011011
+  ba88.Clear();         CHECK(ba88.GetValue() == 0.0);             // ...0 000000000000000000000
+  ba88.Toggle(19);      CHECK(ba88.GetValue() == emp::Pow2(19));   // ...0 010000000000000000000
+  ba88.Toggle(15,20);   CHECK(ba88.GetValue() == 491520.0);        // ...0 001111000000000000000
+  ba88.Toggle();        CHECK(ba88.GetValue() == ALL_88-491520.0); // ...1 110000111111111111111
+  ba88.Toggle(0,88);    CHECK(ba88.GetValue() == 491520.0);        // ...0 001111000000000000000
 
-  ba88 <<= 20;          REQUIRE(ba88.CountOnes() == 4);   // four ones, moved to bits 35-39
-  ba88 <<= 27;          REQUIRE(ba88.CountOnes() == 4);   // four ones, moved to bits 62-65
-  ba88 <<= 22;          REQUIRE(ba88.CountOnes() == 4);   // four ones, moved to bits 84-87
-  ba88 <<= 1;           REQUIRE(ba88.CountOnes() == 3);   // three ones left, moved to bits 85-87
-  ba88 <<= 2;           REQUIRE(ba88.CountOnes() == 1);   // one one left, at bit 87
-  ba88 >>= 30;          REQUIRE(ba88.CountOnes() == 1);   // one one left, now at bit 57
-  ba88.Toggle(50,80);   REQUIRE(ba88.CountOnes() == 29);  // Toggling 30 bits, only one was on.
-  ba88.Clear(52,78);    REQUIRE(ba88.CountOnes() == 4);   // Leave two 1s on each side of range
-  ba88.SetRange(64,66); REQUIRE(ba88.CountOnes() == 6);   // Set two more 1s, just into 2nd field.
+  ba88 <<= 20;          CHECK(ba88.CountOnes() == 4);   // four ones, moved to bits 35-39
+  ba88 <<= 27;          CHECK(ba88.CountOnes() == 4);   // four ones, moved to bits 62-65
+  ba88 <<= 22;          CHECK(ba88.CountOnes() == 4);   // four ones, moved to bits 84-87
+  ba88 <<= 1;           CHECK(ba88.CountOnes() == 3);   // three ones left, moved to bits 85-87
+  ba88 <<= 2;           CHECK(ba88.CountOnes() == 1);   // one one left, at bit 87
+  ba88 >>= 30;          CHECK(ba88.CountOnes() == 1);   // one one left, now at bit 57
+  ba88.Toggle(50,80);   CHECK(ba88.CountOnes() == 29);  // Toggling 30 bits, only one was on.
+  ba88.Clear(52,78);    CHECK(ba88.CountOnes() == 4);   // Leave two 1s on each side of range
+  ba88.SetRange(64,66); CHECK(ba88.CountOnes() == 6);   // Set two more 1s, just into 2nd field.
 
   // A larger BitArray with lots of random tests.
   emp::Random random;
 
   emp::BitArray<40> ba40(random, 0.65);
-  size_t num_ones = ba40.CountOnes();  REQUIRE(num_ones >= 14); REQUIRE(num_ones < 39);
-  ba40.Toggle();                       REQUIRE(ba40.CountOnes() == 40 - num_ones);
+  size_t num_ones = ba40.CountOnes();  CHECK(num_ones >= 14); CHECK(num_ones < 39);
+  ba40.Toggle();                       CHECK(ba40.CountOnes() == 40 - num_ones);
 
   emp::BitArray<1000> ba1k(random, 0.65);
-  num_ones = ba1k.CountOnes();         REQUIRE(num_ones > 560); REQUIRE(num_ones < 760);
-  ba1k.Toggle();                       REQUIRE(ba1k.CountOnes() == 1000 - num_ones);
+  num_ones = ba1k.CountOnes();         CHECK(num_ones > 560); CHECK(num_ones < 760);
+  ba1k.Toggle();                       CHECK(ba1k.CountOnes() == 1000 - num_ones);
 
   for (size_t test_id = 0; test_id < 10000; ++test_id) {
     size_t val1 = random.GetUInt(1000);
@@ -1858,17 +1872,17 @@ TEST_CASE("20: Test BitArray Set*, Clear* and Toggle* Accessors", "[bits]") {
   emp::BitArray<6> ba_mixed = "010101";
   emp::BitArray<6> ba_full  = "111111";
 
-  REQUIRE(ba_empty.Any() == false);
-  REQUIRE(ba_mixed.Any() == true);
-  REQUIRE(ba_full.Any() == true);
+  CHECK(ba_empty.Any() == false);
+  CHECK(ba_mixed.Any() == true);
+  CHECK(ba_full.Any() == true);
 
-  REQUIRE(ba_empty.All() == false);
-  REQUIRE(ba_mixed.All() == false);
-  REQUIRE(ba_full.All() == true);
+  CHECK(ba_empty.All() == false);
+  CHECK(ba_mixed.All() == false);
+  CHECK(ba_full.All() == true);
 
-  REQUIRE(ba_empty.None() == true);
-  REQUIRE(ba_mixed.None() == false);
-  REQUIRE(ba_full.None() == false);
+  CHECK(ba_empty.None() == true);
+  CHECK(ba_mixed.None() == false);
+  CHECK(ba_full.None() == false);
 }
 
 
@@ -1876,91 +1890,91 @@ TEST_CASE("21: Test Randomize() and variants", "[bits]") {
   emp::Random random;
   emp::BitArray<1000> ba;
 
-  REQUIRE(ba.None() == true);
+  CHECK(ba.None() == true);
 
   // Do all of the random tests 10 times.
   for (size_t test_num = 0; test_num < 10; test_num++) {
     ba.Randomize(random);
     size_t num_ones = ba.CountOnes();
-    REQUIRE(num_ones > 300);
-    REQUIRE(num_ones < 700);
+    CHECK(num_ones > 300);
+    CHECK(num_ones < 700);
 
     // 85% Chance of 1
     ba.Randomize(random, 0.85);
     num_ones = ba.CountOnes();
-    REQUIRE(num_ones > 700);
-    REQUIRE(num_ones < 950);
+    CHECK(num_ones > 700);
+    CHECK(num_ones < 950);
 
     // 15% Chance of 1
     ba.Randomize(random, 0.15);
     num_ones = ba.CountOnes();
-    REQUIRE(num_ones > 50);
-    REQUIRE(num_ones < 300);
+    CHECK(num_ones > 50);
+    CHECK(num_ones < 300);
 
     // Try randomizing only a portion of the genome.
     uint64_t first_bits = ba.GetUInt64(0);
     ba.Randomize(random, 0.7, 64, 1000);
 
-    REQUIRE(ba.GetUInt64(0) == first_bits);  // Make sure first bits haven't changed
+    CHECK(ba.GetUInt64(0) == first_bits);  // Make sure first bits haven't changed
 
     num_ones = ba.CountOnes();
-    REQUIRE(num_ones > 500);                 // Expected with new randomization is ~665 ones.
-    REQUIRE(num_ones < 850);
+    CHECK(num_ones > 500);                 // Expected with new randomization is ~665 ones.
+    CHECK(num_ones < 850);
 
     // Try randomizing using specific numbers of ones.
-    ba.ChooseRandom(random, 1);       REQUIRE(ba.CountOnes() == 1);
-    ba.ChooseRandom(random, 12);      REQUIRE(ba.CountOnes() == 12);
-    ba.ChooseRandom(random, 128);     REQUIRE(ba.CountOnes() == 128);
-    ba.ChooseRandom(random, 507);     REQUIRE(ba.CountOnes() == 507);
-    ba.ChooseRandom(random, 999);     REQUIRE(ba.CountOnes() == 999);
+    ba.ChooseRandom(random, 1);       CHECK(ba.CountOnes() == 1);
+    ba.ChooseRandom(random, 12);      CHECK(ba.CountOnes() == 12);
+    ba.ChooseRandom(random, 128);     CHECK(ba.CountOnes() == 128);
+    ba.ChooseRandom(random, 507);     CHECK(ba.CountOnes() == 507);
+    ba.ChooseRandom(random, 999);     CHECK(ba.CountOnes() == 999);
 
     // Test the probabilistic CHANGE functions.
-    ba.Clear();                     REQUIRE(ba.CountOnes() == 0);   // Set all bits to 0.
+    ba.Clear();                     CHECK(ba.CountOnes() == 0);   // Set all bits to 0.
 
     ba.FlipRandom(random, 0.3);     // Expected: 300 ones (from flipping zeros)
-    num_ones = ba.CountOnes();      REQUIRE(num_ones > 230);  REQUIRE(num_ones < 375);
+    num_ones = ba.CountOnes();      CHECK(num_ones > 230);  CHECK(num_ones < 375);
 
     ba.FlipRandom(random, 0.3);     // Expected: 420 ones (hit by ONE but not both flips)
-    num_ones = ba.CountOnes();      REQUIRE(num_ones > 345);  REQUIRE(num_ones < 495);
+    num_ones = ba.CountOnes();      CHECK(num_ones > 345);  CHECK(num_ones < 495);
 
     ba.SetRandom(random, 0.5);      // Expected: 710 (already on OR newly turned on)
-    num_ones = ba.CountOnes();      REQUIRE(num_ones > 625);  REQUIRE(num_ones < 775);
+    num_ones = ba.CountOnes();      CHECK(num_ones > 625);  CHECK(num_ones < 775);
 
     ba.SetRandom(random, 0.8);      // Expected: 942 (already on OR newly turned on)
-    num_ones = ba.CountOnes();      REQUIRE(num_ones > 900);  REQUIRE(num_ones < 980);
+    num_ones = ba.CountOnes();      CHECK(num_ones > 900);  CHECK(num_ones < 980);
 
     ba.ClearRandom(random, 0.2);    // Expected 753.6 (20% of those on now off)
-    num_ones = ba.CountOnes();      REQUIRE(num_ones > 675);  REQUIRE(num_ones < 825);
+    num_ones = ba.CountOnes();      CHECK(num_ones > 675);  CHECK(num_ones < 825);
 
     ba.FlipRandom(random, 0.5);     // Expected: 500 ones (each bit has a 50% chance of flipping)
-    num_ones = ba.CountOnes();      REQUIRE(num_ones > 425);  REQUIRE(num_ones < 575);
+    num_ones = ba.CountOnes();      CHECK(num_ones > 425);  CHECK(num_ones < 575);
 
 
     // Repeat with fixed-sized changes.
-    ba.Clear();                        REQUIRE(ba.CountOnes() == 0);     // Set all bits to 0.
+    ba.Clear();                        CHECK(ba.CountOnes() == 0);     // Set all bits to 0.
 
     ba.FlipRandomCount(random, 123);   // Flip exactly 123 bits to 1.
-    num_ones = ba.CountOnes();         REQUIRE(num_ones == 123);
+    num_ones = ba.CountOnes();         CHECK(num_ones == 123);
 
     ba.FlipRandomCount(random, 877);   // Flip exactly 877 bits; Expected 784.258 ones
-    num_ones = ba.CountOnes();         REQUIRE(num_ones > 700);  REQUIRE(num_ones < 850);
+    num_ones = ba.CountOnes();         CHECK(num_ones > 700);  CHECK(num_ones < 850);
 
 
-    ba.SetAll();                       REQUIRE(ba.CountOnes() == 1000);  // Set all bits to 1.
+    ba.SetAll();                       CHECK(ba.CountOnes() == 1000);  // Set all bits to 1.
 
     ba.ClearRandomCount(random, 123);
-    num_ones = ba.CountOnes();         REQUIRE(num_ones == 877);
+    num_ones = ba.CountOnes();         CHECK(num_ones == 877);
 
     ba.ClearRandomCount(random, 877);  // Clear exactly 877 bits; Expected 107.871 ones
-    num_ones = ba.CountOnes();         REQUIRE(num_ones > 60);  REQUIRE(num_ones < 175);
+    num_ones = ba.CountOnes();         CHECK(num_ones > 60);  CHECK(num_ones < 175);
 
     ba.SetRandomCount(random, 500);    // Half of the remaining ones should be set; 553.9355 expected.
-    num_ones = ba.CountOnes();         REQUIRE(num_ones > 485);  REQUIRE(num_ones < 630);
+    num_ones = ba.CountOnes();         CHECK(num_ones > 485);  CHECK(num_ones < 630);
 
 
-    ba.Clear();                        REQUIRE(ba.CountOnes() == 0);     // Set all bits to 0.
+    ba.Clear();                        CHECK(ba.CountOnes() == 0);     // Set all bits to 0.
     ba.SetRandomCount(random, 567);    // Half of the remaining ones should be set; 607.871 expected.
-    num_ones = ba.CountOnes();         REQUIRE(num_ones == 567);
+    num_ones = ba.CountOnes();         CHECK(num_ones == 567);
   }
 
 
@@ -1983,13 +1997,13 @@ TEST_CASE("21: Test Randomize() and variants", "[bits]") {
   }
 
   // Check if the counts are reasonable.
-  for (size_t i = 0;   i < 100; i++)  { REQUIRE(one_counts[i] == 0); }
-  for (size_t i = 100; i < 250; i++)  { REQUIRE(one_counts[i] > 420);  REQUIRE(one_counts[i] < 580); }
-  for (size_t i = 250; i < 400; i++)  { REQUIRE(one_counts[i] > 190);  REQUIRE(one_counts[i] < 320); }
-  for (size_t i = 400; i < 550; i++)  { REQUIRE(one_counts[i] > 680);  REQUIRE(one_counts[i] < 810); }
-  for (size_t i = 550; i < 700; i++)  { REQUIRE(one_counts[i] >  60);  REQUIRE(one_counts[i] < 150); }
-  for (size_t i = 700; i < 850; i++)  { REQUIRE(one_counts[i] > 950);  REQUIRE(one_counts[i] < 999); }
-  for (size_t i = 850; i < 1000; i++) { REQUIRE(one_counts[i] == 0); }
+  for (size_t i = 0;   i < 100; i++)  { CHECK(one_counts[i] == 0); }
+  for (size_t i = 100; i < 250; i++)  { CHECK(one_counts[i] > 420);  CHECK(one_counts[i] < 580); }
+  for (size_t i = 250; i < 400; i++)  { CHECK(one_counts[i] > 190);  CHECK(one_counts[i] < 320); }
+  for (size_t i = 400; i < 550; i++)  { CHECK(one_counts[i] > 680);  CHECK(one_counts[i] < 810); }
+  for (size_t i = 550; i < 700; i++)  { CHECK(one_counts[i] >  60);  CHECK(one_counts[i] < 150); }
+  for (size_t i = 700; i < 850; i++)  { CHECK(one_counts[i] > 950);  CHECK(one_counts[i] < 999); }
+  for (size_t i = 850; i < 1000; i++) { CHECK(one_counts[i] == 0); }
 }
 
 TEST_CASE("22: Test getting and setting whole chunks of bits", "[bits]") {
@@ -1997,158 +2011,172 @@ TEST_CASE("22: Test getting and setting whole chunks of bits", "[bits]") {
   constexpr size_t num_bytes = 19;
 
   emp::BitArray<num_bits> ba;
-  REQUIRE(ba.GetSize() == num_bits);
-  REQUIRE(ba.GetNumBytes() == num_bytes);
+  CHECK(ba.GetSize() == num_bits);
+  CHECK(ba.GetNumBytes() == num_bytes);
 
   // All bytes should start out empty.
-  for (size_t i = 0; i < num_bytes; i++) REQUIRE(ba.GetByte(i) == 0);
+  for (size_t i = 0; i < num_bytes; i++) CHECK(ba.GetByte(i) == 0);
 
   ba.SetByte(2, 11);
-  REQUIRE(ba.GetByte(2) == 11);
+  CHECK(ba.GetByte(2) == 11);
 
-  REQUIRE(ba.GetValue() == 720896.0);
+  CHECK(ba.GetValue() == 720896.0);
 
   ba.SetByte(5, 7);
-  REQUIRE(ba.GetByte(0) == 0);
-  REQUIRE(ba.GetByte(1) == 0);
-  REQUIRE(ba.GetByte(2) == 11);
-  REQUIRE(ba.GetByte(3) == 0);
-  REQUIRE(ba.GetByte(4) == 0);
-  REQUIRE(ba.GetByte(5) == 7);
-  REQUIRE(ba.GetByte(6) == 0);
-  REQUIRE(ba.CountOnes() == 6);
+  CHECK(ba.GetByte(0) == 0);
+  CHECK(ba.GetByte(1) == 0);
+  CHECK(ba.GetByte(2) == 11);
+  CHECK(ba.GetByte(3) == 0);
+  CHECK(ba.GetByte(4) == 0);
+  CHECK(ba.GetByte(5) == 7);
+  CHECK(ba.GetByte(6) == 0);
+  CHECK(ba.CountOnes() == 6);
 
-  for (size_t i = 0; i < num_bytes; i++) REQUIRE(ba.GetByte(i) == ba.GetUInt8(i));
+  for (size_t i = 0; i < num_bytes; i++) CHECK(ba.GetByte(i) == ba.GetUInt8(i));
 
-  REQUIRE(ba.GetUInt16(0) == 0);
-  REQUIRE(ba.GetUInt16(1) == 11);
-  REQUIRE(ba.GetUInt16(2) == 1792);
-  REQUIRE(ba.GetUInt16(3) == 0);
+  CHECK(ba.GetUInt16(0) == 0);
+  CHECK(ba.GetUInt16(1) == 11);
+  CHECK(ba.GetUInt16(2) == 1792);
+  CHECK(ba.GetUInt16(3) == 0);
 
-  REQUIRE(ba.GetUInt32(0) == 720896);
-  REQUIRE(ba.GetUInt32(1) == 1792);
-  REQUIRE(ba.GetUInt32(2) == 0);
+  CHECK(ba.GetUInt32(0) == 720896);
+  CHECK(ba.GetUInt32(1) == 1792);
+  CHECK(ba.GetUInt32(2) == 0);
 
-  REQUIRE(ba.GetUInt64(0) == 7696582115328);
-  REQUIRE(ba.GetUInt64(1) == 0);
+  CHECK(ba.GetUInt64(0) == 7696582115328);
+  CHECK(ba.GetUInt64(1) == 0);
 
   ba.SetUInt64(0, 12345678901234);
   ba.SetUInt32(2, 2000000);
   ba.SetUInt16(7, 7777);
   ba.SetUInt8(17, 17);
 
-  REQUIRE(ba.GetUInt64(0) == 12345678901234);
-  REQUIRE(ba.GetUInt32(2) == 2000000);
-  REQUIRE(ba.GetUInt16(7) == 7777);
-  REQUIRE(ba.GetUInt8(17) == 17);
+  CHECK(ba.GetUInt64(0) == 12345678901234);
+  CHECK(ba.GetUInt32(2) == 2000000);
+  CHECK(ba.GetUInt16(7) == 7777);
+  CHECK(ba.GetUInt8(17) == 17);
 
   ba.Clear();
   ba.SetUInt16AtBit(40, 40);
 
-  REQUIRE(ba.GetUInt16AtBit(40) == 40);
+  CHECK(ba.GetUInt16AtBit(40) == 40);
 
-  REQUIRE(ba.GetUInt8(5) == 40);
-  REQUIRE(ba.GetUInt8AtBit(40) == 40);
-  REQUIRE(ba.GetUInt32AtBit(40) == 40);
-  REQUIRE(ba.GetUInt64AtBit(40) == 40);
+  CHECK(ba.GetUInt8(5) == 40);
+  CHECK(ba.GetUInt8AtBit(40) == 40);
+  CHECK(ba.GetUInt32AtBit(40) == 40);
+  CHECK(ba.GetUInt64AtBit(40) == 40);
 
-  REQUIRE(ba.GetUInt16AtBit(38) == 160);
-  REQUIRE(ba.GetUInt16AtBit(39) == 80);
-  REQUIRE(ba.GetUInt16AtBit(41) == 20);
-  REQUIRE(ba.GetUInt16AtBit(42) == 10);
+  CHECK(ba.GetUInt16AtBit(38) == 160);
+  CHECK(ba.GetUInt16AtBit(39) == 80);
+  CHECK(ba.GetUInt16AtBit(41) == 20);
+  CHECK(ba.GetUInt16AtBit(42) == 10);
 
-  REQUIRE(ba.GetUInt8AtBit(38) == 160);
-  REQUIRE(ba.GetUInt8AtBit(37) == 64);
-  REQUIRE(ba.GetUInt8AtBit(36) == 128);
-  REQUIRE(ba.GetUInt8AtBit(35) == 0);
+  CHECK(ba.GetUInt8AtBit(38) == 160);
+  CHECK(ba.GetUInt8AtBit(37) == 64);
+  CHECK(ba.GetUInt8AtBit(36) == 128);
+  CHECK(ba.GetUInt8AtBit(35) == 0);
 }
 
 TEST_CASE("23: Test functions that analyze and manipulate ones", "[bits]") {
 
   emp::BitArray<16> ba = "0001000100001110";
 
-  REQUIRE(ba.GetSize() == 16);
-  REQUIRE(ba.CountOnes() == 5);
+  CHECK(ba.GetSize() == 16);
+  CHECK(ba.CountOnes() == 5);
 
   // Make sure we can find all of the ones.
-  REQUIRE(ba.FindOne() == 3);
-  REQUIRE(ba.FindOne(4) == 7);
-  REQUIRE(ba.FindOne(5) == 7);
-  REQUIRE(ba.FindOne(6) == 7);
-  REQUIRE(ba.FindOne(7) == 7);
-  REQUIRE(ba.FindOne(8) == 12);
-  REQUIRE(ba.FindOne(13) == 13);
-  REQUIRE(ba.FindOne(14) == 14);
-  REQUIRE(ba.FindOne(15) == -1);
+  CHECK(ba.FindOne() == 3);
+  CHECK(ba.FindOne(4) == 7);
+  CHECK(ba.FindOne(5) == 7);
+  CHECK(ba.FindOne(6) == 7);
+  CHECK(ba.FindOne(7) == 7);
+  CHECK(ba.FindOne(8) == 12);
+  CHECK(ba.FindOne(13) == 13);
+  CHECK(ba.FindOne(14) == 14);
+  CHECK(ba.FindOne(15) == -1);
 
   // Get all of the ones at once and make sure they're there.
   emp::vector<size_t> ones = ba.GetOnes();
-  REQUIRE(ones.size() == 5);
-  REQUIRE(ones[0] == 3);
-  REQUIRE(ones[1] == 7);
-  REQUIRE(ones[2] == 12);
-  REQUIRE(ones[3] == 13);
-  REQUIRE(ones[4] == 14);
+  CHECK(ones.size() == 5);
+  CHECK(ones[0] == 3);
+  CHECK(ones[1] == 7);
+  CHECK(ones[2] == 12);
+  CHECK(ones[3] == 13);
+  CHECK(ones[4] == 14);
+
+  // Make sure that the ones can be identified in ranges correctly.
+  auto ranges = ba.GetRanges();
+  CHECK(ranges.size() == 3);
+  CHECK(ranges[0] == emp::Range<size_t>(3,3));
+  CHECK(ranges[1] == emp::Range<size_t>(7,7));
+  CHECK(ranges[2] == emp::Range<size_t>(12,14));
 
   // Try finding the length of the longest segment of ones.
-  REQUIRE(ba.LongestSegmentOnes() == 3);
+  CHECK(ba.LongestSegmentOnes() == 3);
 
   // Identify the final one.
-  REQUIRE(ba.FindMaxOne() == 14);
+  CHECK(ba.FindMaxOne() == 14);
 
   // Pop all ones, one at a time.
-  REQUIRE(ba.PopOne() == 3);
-  REQUIRE(ba.PopOne() == 7);
-  REQUIRE(ba.PopOne() == 12);
-  REQUIRE(ba.PopOne() == 13);
-  REQUIRE(ba.PopOne() == 14);
-  REQUIRE(ba.PopOne() == -1);
+  CHECK(ba.PopOne() == 3);
+  CHECK(ba.PopOne() == 7);
+  CHECK(ba.PopOne() == 12);
+  CHECK(ba.PopOne() == 13);
+  CHECK(ba.PopOne() == 14);
+  CHECK(ba.PopOne() == -1);
 
-  REQUIRE(ba.CountOnes() == 0);
-  REQUIRE(ba.LongestSegmentOnes() == 0);
-  REQUIRE(ba.FindMaxOne() == -1);
+  CHECK(ba.CountOnes() == 0);
+  CHECK(ba.LongestSegmentOnes() == 0);
+  CHECK(ba.FindMaxOne() == -1);
 
 
   ba.SetAll();                             // 1111111111111111
-  REQUIRE(ba.LongestSegmentOnes() == 16);
+  CHECK(ba.LongestSegmentOnes() == 16);
   ba[8] = 0;                               // 1111111101111111
-  REQUIRE(ba.LongestSegmentOnes() == 8);
+  CHECK(ba.LongestSegmentOnes() == 8);
   ba[4] = 0;                               // 1111011101111111
-  REQUIRE(ba.LongestSegmentOnes() == 7);
+  CHECK(ba.LongestSegmentOnes() == 7);
+
+  // Try getting ranges of one values from this BitArray.
+  ranges = ba.GetRanges();
+  CHECK(ranges.size() == 3);
+  CHECK(ranges[0] == emp::Range<size_t>(0,3));
+  CHECK(ranges[1] == emp::Range<size_t>(5,7));
+  CHECK(ranges[2] == emp::Range<size_t>(9,15));
 
   // Try again with Find, this time with a random sequence of ones.
   emp::Random random;
   ba.Randomize(random);
   size_t count = 0;
   for (int i = ba.FindOne(); i != -1; i = ba.FindOne(i+1)) count++;
-  REQUIRE(count == ba.CountOnes());
+  CHECK(count == ba.CountOnes());
 
 }
 
 TEST_CASE("24: Test printing and string functions.", "[bits]") {
   emp::BitArray<6> ba6("000111");
 
-  REQUIRE(ba6.ToString() == "000111");
-  REQUIRE(ba6.ToBinaryString() == "111000");
-  REQUIRE(ba6.ToIDString() == "3 4 5");
-  REQUIRE(ba6.ToIDString() == "3 4 5");
-  REQUIRE(ba6.ToRangeString() == "3-5");
+  CHECK(ba6.ToString() == "000111");
+  CHECK(ba6.ToBinaryString() == "111000");
+  CHECK(ba6.ToIDString() == "3 4 5");
+  CHECK(ba6.ToIDString() == "3 4 5");
+  CHECK(ba6.ToRangeString() == "3-5");
 
   emp::BitArray<64> ba64("0001110000000000000100000000000001000110000001000001000100000001");
 
-  REQUIRE(ba64.ToString()       == "0001110000000000000100000000000001000110000001000001000100000001");
-  REQUIRE(ba64.ToBinaryString() == "1000000010001000001000000110001000000000000010000000000000111000");
-  REQUIRE(ba64.ToIDString() == "3 4 5 19 33 37 38 45 51 55 63");
-  REQUIRE(ba64.ToIDString(",") == "3,4,5,19,33,37,38,45,51,55,63");
-  REQUIRE(ba64.ToRangeString() == "3-5,19,33,37-38,45,51,55,63");
+  CHECK(ba64.ToString()       == "0001110000000000000100000000000001000110000001000001000100000001");
+  CHECK(ba64.ToBinaryString() == "1000000010001000001000000110001000000000000010000000000000111000");
+  CHECK(ba64.ToIDString() == "3 4 5 19 33 37 38 45 51 55 63");
+  CHECK(ba64.ToIDString(",") == "3,4,5,19,33,37,38,45,51,55,63");
+  CHECK(ba64.ToRangeString() == "3-5,19,33,37-38,45,51,55,63");
 
   emp::BitArray<65> ba65("00011110000000000001000000000000010001100000010000010001000000111");
 
-  REQUIRE(ba65.ToString()       == "00011110000000000001000000000000010001100000010000010001000000111");
-  REQUIRE(ba65.ToBinaryString() == "11100000010001000001000000110001000000000000010000000000001111000");
-  REQUIRE(ba65.ToIDString()     == "3 4 5 6 19 33 37 38 45 51 55 62 63 64");
-  REQUIRE(ba65.ToIDString(",")  == "3,4,5,6,19,33,37,38,45,51,55,62,63,64");
-  REQUIRE(ba65.ToRangeString()  == "3-6,19,33,37-38,45,51,55,62-64");
+  CHECK(ba65.ToString()       == "00011110000000000001000000000000010001100000010000010001000000111");
+  CHECK(ba65.ToBinaryString() == "11100000010001000001000000110001000000000000010000000000001111000");
+  CHECK(ba65.ToIDString()     == "3 4 5 6 19 33 37 38 45 51 55 62 63 64");
+  CHECK(ba65.ToIDString(",")  == "3,4,5,6,19,33,37,38,45,51,55,62,63,64");
+  CHECK(ba65.ToRangeString()  == "3-6,19,33,37-38,45,51,55,62-64");
 }
 
 TEST_CASE("25: Test Boolean logic and shifting functions.", "[bits]") {
@@ -2157,166 +2185,166 @@ TEST_CASE("25: Test Boolean logic and shifting functions.", "[bits]") {
   const emp::BitArray<8> input3 = "01010101";
 
   // Test *_SELF() Boolean Logic functions.
-  emp::BitArray<8> ba;       REQUIRE(ba == emp::BitArray<8>("00000000"));
-  ba.NOT_SELF();           REQUIRE(ba == emp::BitArray<8>("11111111"));
-  ba.AND_SELF(input1);     REQUIRE(ba == emp::BitArray<8>("00001111"));
-  ba.AND_SELF(input1);     REQUIRE(ba == emp::BitArray<8>("00001111"));
-  ba.AND_SELF(input2);     REQUIRE(ba == emp::BitArray<8>("00000011"));
-  ba.AND_SELF(input3);     REQUIRE(ba == emp::BitArray<8>("00000001"));
+  emp::BitArray<8> ba;       CHECK(ba == emp::BitArray<8>("00000000"));
+  ba.NOT_SELF();           CHECK(ba == emp::BitArray<8>("11111111"));
+  ba.AND_SELF(input1);     CHECK(ba == emp::BitArray<8>("00001111"));
+  ba.AND_SELF(input1);     CHECK(ba == emp::BitArray<8>("00001111"));
+  ba.AND_SELF(input2);     CHECK(ba == emp::BitArray<8>("00000011"));
+  ba.AND_SELF(input3);     CHECK(ba == emp::BitArray<8>("00000001"));
 
-  ba.OR_SELF(input1);      REQUIRE(ba == emp::BitArray<8>("00001111"));
-  ba.OR_SELF(input1);      REQUIRE(ba == emp::BitArray<8>("00001111"));
-  ba.OR_SELF(input3);      REQUIRE(ba == emp::BitArray<8>("01011111"));
-  ba.OR_SELF(input2);      REQUIRE(ba == emp::BitArray<8>("01111111"));
+  ba.OR_SELF(input1);      CHECK(ba == emp::BitArray<8>("00001111"));
+  ba.OR_SELF(input1);      CHECK(ba == emp::BitArray<8>("00001111"));
+  ba.OR_SELF(input3);      CHECK(ba == emp::BitArray<8>("01011111"));
+  ba.OR_SELF(input2);      CHECK(ba == emp::BitArray<8>("01111111"));
 
-  ba.NAND_SELF(input1);    REQUIRE(ba == emp::BitArray<8>("11110000"));
-  ba.NAND_SELF(input1);    REQUIRE(ba == emp::BitArray<8>("11111111"));
-  ba.NAND_SELF(input2);    REQUIRE(ba == emp::BitArray<8>("11001100"));
-  ba.NAND_SELF(input3);    REQUIRE(ba == emp::BitArray<8>("10111011"));
+  ba.NAND_SELF(input1);    CHECK(ba == emp::BitArray<8>("11110000"));
+  ba.NAND_SELF(input1);    CHECK(ba == emp::BitArray<8>("11111111"));
+  ba.NAND_SELF(input2);    CHECK(ba == emp::BitArray<8>("11001100"));
+  ba.NAND_SELF(input3);    CHECK(ba == emp::BitArray<8>("10111011"));
 
-  ba.NOR_SELF(input1);     REQUIRE(ba == emp::BitArray<8>("01000000"));
-  ba.NOR_SELF(input1);     REQUIRE(ba == emp::BitArray<8>("10110000"));
-  ba.NOR_SELF(input2);     REQUIRE(ba == emp::BitArray<8>("01001100"));
-  ba.NOR_SELF(input3);     REQUIRE(ba == emp::BitArray<8>("10100010"));
+  ba.NOR_SELF(input1);     CHECK(ba == emp::BitArray<8>("01000000"));
+  ba.NOR_SELF(input1);     CHECK(ba == emp::BitArray<8>("10110000"));
+  ba.NOR_SELF(input2);     CHECK(ba == emp::BitArray<8>("01001100"));
+  ba.NOR_SELF(input3);     CHECK(ba == emp::BitArray<8>("10100010"));
 
-  ba.XOR_SELF(input1);     REQUIRE(ba == emp::BitArray<8>("10101101"));
-  ba.XOR_SELF(input1);     REQUIRE(ba == emp::BitArray<8>("10100010"));
-  ba.XOR_SELF(input2);     REQUIRE(ba == emp::BitArray<8>("10010001"));
-  ba.XOR_SELF(input3);     REQUIRE(ba == emp::BitArray<8>("11000100"));
+  ba.XOR_SELF(input1);     CHECK(ba == emp::BitArray<8>("10101101"));
+  ba.XOR_SELF(input1);     CHECK(ba == emp::BitArray<8>("10100010"));
+  ba.XOR_SELF(input2);     CHECK(ba == emp::BitArray<8>("10010001"));
+  ba.XOR_SELF(input3);     CHECK(ba == emp::BitArray<8>("11000100"));
 
-  ba.EQU_SELF(input1);     REQUIRE(ba == emp::BitArray<8>("00110100"));
-  ba.EQU_SELF(input1);     REQUIRE(ba == emp::BitArray<8>("11000100"));
-  ba.EQU_SELF(input2);     REQUIRE(ba == emp::BitArray<8>("00001000"));
-  ba.EQU_SELF(input3);     REQUIRE(ba == emp::BitArray<8>("10100010"));
+  ba.EQU_SELF(input1);     CHECK(ba == emp::BitArray<8>("00110100"));
+  ba.EQU_SELF(input1);     CHECK(ba == emp::BitArray<8>("11000100"));
+  ba.EQU_SELF(input2);     CHECK(ba == emp::BitArray<8>("00001000"));
+  ba.EQU_SELF(input3);     CHECK(ba == emp::BitArray<8>("10100010"));
 
-  ba.NOT_SELF();           REQUIRE(ba == emp::BitArray<8>("01011101"));
+  ba.NOT_SELF();           CHECK(ba == emp::BitArray<8>("01011101"));
 
   // Test regular Boolean Logic functions.
-  ba.Clear();                            REQUIRE(ba == emp::BitArray<8>("00000000"));
-  emp::BitArray<8> ba1 = ba.NOT();         REQUIRE(ba1 == emp::BitArray<8>("11111111"));
+  ba.Clear();                            CHECK(ba == emp::BitArray<8>("00000000"));
+  emp::BitArray<8> ba1 = ba.NOT();         CHECK(ba1 == emp::BitArray<8>("11111111"));
 
-  ba1 = ba1.AND(input1);                 REQUIRE(ba1 == emp::BitArray<8>("00001111"));
-  emp::BitArray<8> ba2 = ba1.AND(input1);  REQUIRE(ba2 == emp::BitArray<8>("00001111"));
-  emp::BitArray<8> ba3 = ba2.AND(input2);  REQUIRE(ba3 == emp::BitArray<8>("00000011"));
-  emp::BitArray<8> ba4 = ba3.AND(input3);  REQUIRE(ba4 == emp::BitArray<8>("00000001"));
+  ba1 = ba1.AND(input1);                 CHECK(ba1 == emp::BitArray<8>("00001111"));
+  emp::BitArray<8> ba2 = ba1.AND(input1);  CHECK(ba2 == emp::BitArray<8>("00001111"));
+  emp::BitArray<8> ba3 = ba2.AND(input2);  CHECK(ba3 == emp::BitArray<8>("00000011"));
+  emp::BitArray<8> ba4 = ba3.AND(input3);  CHECK(ba4 == emp::BitArray<8>("00000001"));
 
-  ba1 = ba4.OR(input1);      REQUIRE(ba1 == emp::BitArray<8>("00001111"));
-  ba2 = ba1.OR(input1);      REQUIRE(ba2 == emp::BitArray<8>("00001111"));
-  ba3 = ba2.OR(input3);      REQUIRE(ba3 == emp::BitArray<8>("01011111"));
-  ba4 = ba3.OR(input2);      REQUIRE(ba4 == emp::BitArray<8>("01111111"));
+  ba1 = ba4.OR(input1);      CHECK(ba1 == emp::BitArray<8>("00001111"));
+  ba2 = ba1.OR(input1);      CHECK(ba2 == emp::BitArray<8>("00001111"));
+  ba3 = ba2.OR(input3);      CHECK(ba3 == emp::BitArray<8>("01011111"));
+  ba4 = ba3.OR(input2);      CHECK(ba4 == emp::BitArray<8>("01111111"));
 
-  ba1 = ba4.NAND(input1);    REQUIRE(ba1 == emp::BitArray<8>("11110000"));
-  ba2 = ba1.NAND(input1);    REQUIRE(ba2 == emp::BitArray<8>("11111111"));
-  ba3 = ba2.NAND(input2);    REQUIRE(ba3 == emp::BitArray<8>("11001100"));
-  ba4 = ba3.NAND(input3);    REQUIRE(ba4 == emp::BitArray<8>("10111011"));
+  ba1 = ba4.NAND(input1);    CHECK(ba1 == emp::BitArray<8>("11110000"));
+  ba2 = ba1.NAND(input1);    CHECK(ba2 == emp::BitArray<8>("11111111"));
+  ba3 = ba2.NAND(input2);    CHECK(ba3 == emp::BitArray<8>("11001100"));
+  ba4 = ba3.NAND(input3);    CHECK(ba4 == emp::BitArray<8>("10111011"));
 
-  ba1 = ba4.NOR(input1);     REQUIRE(ba1 == emp::BitArray<8>("01000000"));
-  ba2 = ba1.NOR(input1);     REQUIRE(ba2 == emp::BitArray<8>("10110000"));
-  ba3 = ba2.NOR(input2);     REQUIRE(ba3 == emp::BitArray<8>("01001100"));
-  ba4 = ba3.NOR(input3);     REQUIRE(ba4 == emp::BitArray<8>("10100010"));
+  ba1 = ba4.NOR(input1);     CHECK(ba1 == emp::BitArray<8>("01000000"));
+  ba2 = ba1.NOR(input1);     CHECK(ba2 == emp::BitArray<8>("10110000"));
+  ba3 = ba2.NOR(input2);     CHECK(ba3 == emp::BitArray<8>("01001100"));
+  ba4 = ba3.NOR(input3);     CHECK(ba4 == emp::BitArray<8>("10100010"));
 
-  ba1 = ba4.XOR(input1);     REQUIRE(ba1 == emp::BitArray<8>("10101101"));
-  ba2 = ba1.XOR(input1);     REQUIRE(ba2 == emp::BitArray<8>("10100010"));
-  ba3 = ba2.XOR(input2);     REQUIRE(ba3 == emp::BitArray<8>("10010001"));
-  ba4 = ba3.XOR(input3);     REQUIRE(ba4 == emp::BitArray<8>("11000100"));
+  ba1 = ba4.XOR(input1);     CHECK(ba1 == emp::BitArray<8>("10101101"));
+  ba2 = ba1.XOR(input1);     CHECK(ba2 == emp::BitArray<8>("10100010"));
+  ba3 = ba2.XOR(input2);     CHECK(ba3 == emp::BitArray<8>("10010001"));
+  ba4 = ba3.XOR(input3);     CHECK(ba4 == emp::BitArray<8>("11000100"));
 
-  ba1 = ba4.EQU(input1);     REQUIRE(ba1 == emp::BitArray<8>("00110100"));
-  ba2 = ba1.EQU(input1);     REQUIRE(ba2 == emp::BitArray<8>("11000100"));
-  ba3 = ba2.EQU(input2);     REQUIRE(ba3 == emp::BitArray<8>("00001000"));
-  ba4 = ba3.EQU(input3);     REQUIRE(ba4 == emp::BitArray<8>("10100010"));
+  ba1 = ba4.EQU(input1);     CHECK(ba1 == emp::BitArray<8>("00110100"));
+  ba2 = ba1.EQU(input1);     CHECK(ba2 == emp::BitArray<8>("11000100"));
+  ba3 = ba2.EQU(input2);     CHECK(ba3 == emp::BitArray<8>("00001000"));
+  ba4 = ba3.EQU(input3);     CHECK(ba4 == emp::BitArray<8>("10100010"));
 
-  ba = ba4.NOT();            REQUIRE(ba == emp::BitArray<8>("01011101"));
+  ba = ba4.NOT();            CHECK(ba == emp::BitArray<8>("01011101"));
 
 
   // Test Boolean Logic operators.
-  ba.Clear();               REQUIRE(ba == emp::BitArray<8>("00000000"));
-  ba1 = ~ba;                REQUIRE(ba1 == emp::BitArray<8>("11111111"));
+  ba.Clear();               CHECK(ba == emp::BitArray<8>("00000000"));
+  ba1 = ~ba;                CHECK(ba1 == emp::BitArray<8>("11111111"));
 
-  ba1 = ba1 & input1;       REQUIRE(ba1 == emp::BitArray<8>("00001111"));
-  ba2 = ba1 & input1;       REQUIRE(ba2 == emp::BitArray<8>("00001111"));
-  ba3 = ba2 & input2;       REQUIRE(ba3 == emp::BitArray<8>("00000011"));
-  ba4 = ba3 & input3;       REQUIRE(ba4 == emp::BitArray<8>("00000001"));
+  ba1 = ba1 & input1;       CHECK(ba1 == emp::BitArray<8>("00001111"));
+  ba2 = ba1 & input1;       CHECK(ba2 == emp::BitArray<8>("00001111"));
+  ba3 = ba2 & input2;       CHECK(ba3 == emp::BitArray<8>("00000011"));
+  ba4 = ba3 & input3;       CHECK(ba4 == emp::BitArray<8>("00000001"));
 
-  ba1 = ba4 | input1;       REQUIRE(ba1 == emp::BitArray<8>("00001111"));
-  ba2 = ba1 | input1;       REQUIRE(ba2 == emp::BitArray<8>("00001111"));
-  ba3 = ba2 | input3;       REQUIRE(ba3 == emp::BitArray<8>("01011111"));
-  ba4 = ba3 | input2;       REQUIRE(ba4 == emp::BitArray<8>("01111111"));
+  ba1 = ba4 | input1;       CHECK(ba1 == emp::BitArray<8>("00001111"));
+  ba2 = ba1 | input1;       CHECK(ba2 == emp::BitArray<8>("00001111"));
+  ba3 = ba2 | input3;       CHECK(ba3 == emp::BitArray<8>("01011111"));
+  ba4 = ba3 | input2;       CHECK(ba4 == emp::BitArray<8>("01111111"));
 
-  ba1 = ~(ba4 & input1);    REQUIRE(ba1 == emp::BitArray<8>("11110000"));
-  ba2 = ~(ba1 & input1);    REQUIRE(ba2 == emp::BitArray<8>("11111111"));
-  ba3 = ~(ba2 & input2);    REQUIRE(ba3 == emp::BitArray<8>("11001100"));
-  ba4 = ~(ba3 & input3);    REQUIRE(ba4 == emp::BitArray<8>("10111011"));
+  ba1 = ~(ba4 & input1);    CHECK(ba1 == emp::BitArray<8>("11110000"));
+  ba2 = ~(ba1 & input1);    CHECK(ba2 == emp::BitArray<8>("11111111"));
+  ba3 = ~(ba2 & input2);    CHECK(ba3 == emp::BitArray<8>("11001100"));
+  ba4 = ~(ba3 & input3);    CHECK(ba4 == emp::BitArray<8>("10111011"));
 
-  ba1 = ~(ba4 | input1);    REQUIRE(ba1 == emp::BitArray<8>("01000000"));
-  ba2 = ~(ba1 | input1);    REQUIRE(ba2 == emp::BitArray<8>("10110000"));
-  ba3 = ~(ba2 | input2);    REQUIRE(ba3 == emp::BitArray<8>("01001100"));
-  ba4 = ~(ba3 | input3);    REQUIRE(ba4 == emp::BitArray<8>("10100010"));
+  ba1 = ~(ba4 | input1);    CHECK(ba1 == emp::BitArray<8>("01000000"));
+  ba2 = ~(ba1 | input1);    CHECK(ba2 == emp::BitArray<8>("10110000"));
+  ba3 = ~(ba2 | input2);    CHECK(ba3 == emp::BitArray<8>("01001100"));
+  ba4 = ~(ba3 | input3);    CHECK(ba4 == emp::BitArray<8>("10100010"));
 
-  ba1 = ba4 ^ input1;       REQUIRE(ba1 == emp::BitArray<8>("10101101"));
-  ba2 = ba1 ^ input1;       REQUIRE(ba2 == emp::BitArray<8>("10100010"));
-  ba3 = ba2 ^ input2;       REQUIRE(ba3 == emp::BitArray<8>("10010001"));
-  ba4 = ba3 ^ input3;       REQUIRE(ba4 == emp::BitArray<8>("11000100"));
+  ba1 = ba4 ^ input1;       CHECK(ba1 == emp::BitArray<8>("10101101"));
+  ba2 = ba1 ^ input1;       CHECK(ba2 == emp::BitArray<8>("10100010"));
+  ba3 = ba2 ^ input2;       CHECK(ba3 == emp::BitArray<8>("10010001"));
+  ba4 = ba3 ^ input3;       CHECK(ba4 == emp::BitArray<8>("11000100"));
 
-  ba1 = ~(ba4 ^ input1);    REQUIRE(ba1 == emp::BitArray<8>("00110100"));
-  ba2 = ~(ba1 ^ input1);    REQUIRE(ba2 == emp::BitArray<8>("11000100"));
-  ba3 = ~(ba2 ^ input2);    REQUIRE(ba3 == emp::BitArray<8>("00001000"));
-  ba4 = ~(ba3 ^ input3);    REQUIRE(ba4 == emp::BitArray<8>("10100010"));
+  ba1 = ~(ba4 ^ input1);    CHECK(ba1 == emp::BitArray<8>("00110100"));
+  ba2 = ~(ba1 ^ input1);    CHECK(ba2 == emp::BitArray<8>("11000100"));
+  ba3 = ~(ba2 ^ input2);    CHECK(ba3 == emp::BitArray<8>("00001000"));
+  ba4 = ~(ba3 ^ input3);    CHECK(ba4 == emp::BitArray<8>("10100010"));
 
-  ba = ~ba4;                REQUIRE(ba == emp::BitArray<8>("01011101"));
+  ba = ~ba4;                CHECK(ba == emp::BitArray<8>("01011101"));
 
 
   // Test COMPOUND Boolean Logic operators.
-  ba = "11111111";    REQUIRE(ba == emp::BitArray<8>("11111111"));
+  ba = "11111111";    CHECK(ba == emp::BitArray<8>("11111111"));
 
-  ba &= input1;       REQUIRE(ba == emp::BitArray<8>("00001111"));
-  ba &= input1;       REQUIRE(ba == emp::BitArray<8>("00001111"));
-  ba &= input2;       REQUIRE(ba == emp::BitArray<8>("00000011"));
-  ba &= input3;       REQUIRE(ba == emp::BitArray<8>("00000001"));
+  ba &= input1;       CHECK(ba == emp::BitArray<8>("00001111"));
+  ba &= input1;       CHECK(ba == emp::BitArray<8>("00001111"));
+  ba &= input2;       CHECK(ba == emp::BitArray<8>("00000011"));
+  ba &= input3;       CHECK(ba == emp::BitArray<8>("00000001"));
 
-  ba |= input1;       REQUIRE(ba == emp::BitArray<8>("00001111"));
-  ba |= input1;       REQUIRE(ba == emp::BitArray<8>("00001111"));
-  ba |= input3;       REQUIRE(ba == emp::BitArray<8>("01011111"));
-  ba |= input2;       REQUIRE(ba == emp::BitArray<8>("01111111"));
+  ba |= input1;       CHECK(ba == emp::BitArray<8>("00001111"));
+  ba |= input1;       CHECK(ba == emp::BitArray<8>("00001111"));
+  ba |= input3;       CHECK(ba == emp::BitArray<8>("01011111"));
+  ba |= input2;       CHECK(ba == emp::BitArray<8>("01111111"));
 
-  ba ^= input1;       REQUIRE(ba == emp::BitArray<8>("01110000"));
-  ba ^= input1;       REQUIRE(ba == emp::BitArray<8>("01111111"));
-  ba ^= input2;       REQUIRE(ba == emp::BitArray<8>("01001100"));
-  ba ^= input3;       REQUIRE(ba == emp::BitArray<8>("00011001"));
+  ba ^= input1;       CHECK(ba == emp::BitArray<8>("01110000"));
+  ba ^= input1;       CHECK(ba == emp::BitArray<8>("01111111"));
+  ba ^= input2;       CHECK(ba == emp::BitArray<8>("01001100"));
+  ba ^= input3;       CHECK(ba == emp::BitArray<8>("00011001"));
 
   // Now some tests with BitArrays longer than one field.
   const emp::BitArray<80> bal80 =
     "00110111000101110001011100010111000101110001011100010111000101110001011100010111";
-  REQUIRE( bal80.GetSize() == 80 );
-  REQUIRE( bal80.CountOnes() == 41 );
-  REQUIRE( (bal80 << 1) ==
+  CHECK( bal80.GetSize() == 80 );
+  CHECK( bal80.CountOnes() == 41 );
+  CHECK( (bal80 << 1) ==
            emp::BitArray<80>("00011011100010111000101110001011100010111000101110001011100010111000101110001011")
          );
-  REQUIRE( (bal80 << 2) ==
+  CHECK( (bal80 << 2) ==
            emp::BitArray<80>("00001101110001011100010111000101110001011100010111000101110001011100010111000101")
          );
-  REQUIRE( (bal80 << 63) ==
+  CHECK( (bal80 << 63) ==
            emp::BitArray<80>("00000000000000000000000000000000000000000000000000000000000000000110111000101110")
          );
-  REQUIRE( (bal80 << 64) ==
+  CHECK( (bal80 << 64) ==
            emp::BitArray<80>("00000000000000000000000000000000000000000000000000000000000000000011011100010111")
          );
-  REQUIRE( (bal80 << 65) ==
+  CHECK( (bal80 << 65) ==
            emp::BitArray<80>("00000000000000000000000000000000000000000000000000000000000000000001101110001011")
          );
 
-  REQUIRE( (bal80 >> 1) ==
+  CHECK( (bal80 >> 1) ==
            emp::BitArray<80>("01101110001011100010111000101110001011100010111000101110001011100010111000101110")
          );
-  REQUIRE( (bal80 >> 2) ==
+  CHECK( (bal80 >> 2) ==
            emp::BitArray<80>("11011100010111000101110001011100010111000101110001011100010111000101110001011100")
          );
-  REQUIRE( (bal80 >> 63) ==
+  CHECK( (bal80 >> 63) ==
            emp::BitArray<80>("10001011100010111000000000000000000000000000000000000000000000000000000000000000")
          );
-  REQUIRE( (bal80 >> 64) ==
+  CHECK( (bal80 >> 64) ==
            emp::BitArray<80>("00010111000101110000000000000000000000000000000000000000000000000000000000000000")
          );
-  REQUIRE( (bal80 >> 65) ==
+  CHECK( (bal80 >> 65) ==
            emp::BitArray<80>("00101110001011100000000000000000000000000000000000000000000000000000000000000000")
          );
 }
@@ -2327,10 +2355,10 @@ TEST_CASE("25: Test Boolean logic and shifting functions.", "[bits]") {
 /// 1) A == B
 /// 2) A and B can be constexpr or non-constexpr.
 /// 3) A and B have the same values regardless of constexpr-ness.
-#define CONSTEXPR_REQUIRE_EQ(A, B)       \
+#define CONSTEXPR_CHECK_EQ(A, B)       \
   {                                      \
     static_assert(A == B, #A " == " #B); \
-    REQUIRE(A == B);                     \
+    CHECK(A == B);                     \
   }
 
 
@@ -2341,13 +2369,13 @@ TEST_CASE("25: Test Boolean logic and shifting functions.", "[bits]") {
  */
 void test_status(){
   emp::BitArray<10> ba10;
-  REQUIRE(!ba10.any());
-  REQUIRE(ba10.none());
-  REQUIRE(!ba10.all());
+  CHECK(!ba10.any());
+  CHECK(ba10.none());
+  CHECK(!ba10.all());
   ba10.SetAll();
-  REQUIRE(ba10.all());
+  CHECK(ba10.all());
   ba10.Clear();
-  REQUIRE(ba10.none());
+  CHECK(ba10.none());
 }
 
 /**
@@ -2355,13 +2383,13 @@ void test_status(){
  */
 void test_size(){
   emp::BitArray<42> ba42;
-  REQUIRE(ba42.size() == 42);
+  CHECK(ba42.size() == 42);
 
   emp::BitArray<35> ba35;
-  REQUIRE(ba35.GetSize() == 35);
+  CHECK(ba35.GetSize() == 35);
 
   emp::BitArray<1> ba1;
-  REQUIRE(ba1.size() == 1);
+  CHECK(ba1.size() == 1);
 }
 
 /**
@@ -2370,22 +2398,22 @@ void test_size(){
 void test_flip(){
   emp::BitArray<2> ba2;  // ba2 = 00
   ba2.flip(0);        // ba2 = 01
-  REQUIRE(ba2[0]);
+  CHECK(ba2[0]);
 
   emp::BitArray<8> ba8;  // ba8 = 00000000
   ba8.flip(0,4);      // ba8 = 00001111
-  REQUIRE(ba8[0]);
-  REQUIRE(ba8[1]);
-  REQUIRE(ba8[2]);
-  REQUIRE(ba8[3]);
-  REQUIRE(!ba8[4]);
+  CHECK(ba8[0]);
+  CHECK(ba8[1]);
+  CHECK(ba8[2]);
+  CHECK(ba8[3]);
+  CHECK(!ba8[4]);
 
   ba8[0].Toggle();    // ba8 = 00001110
-  REQUIRE(!ba8[0]);
+  CHECK(!ba8[0]);
 
   emp::BitArray<4> ba4;  // ba4 = 0000
   ba4.flip();          // ba4 = 1111
-  REQUIRE(ba4.all());
+  CHECK(ba4.all());
 }
 
 /**
@@ -2394,13 +2422,13 @@ void test_flip(){
 void test_find(){
   emp::BitArray<10> ba10;  // ba10 = 00 00000000
   ba10.flip(3);          // ba10 = 00 00001000
-  REQUIRE(ba10.FindOne() == 3);
+  CHECK(ba10.FindOne() == 3);
   ba10.PopOne();        // ba10 = 00 00000000
-  REQUIRE(ba10.PopOne() == -1);
+  CHECK(ba10.PopOne() == -1);
   ba10.flip(3);
   ba10.flip(1);
-  REQUIRE(ba10.FindOne(2) == 3);
-  REQUIRE(ba10.FindOne(4) == -1);
+  CHECK(ba10.FindOne(2) == 3);
+  CHECK(ba10.FindOne(4) == -1);
 }
 
 /**
@@ -2409,12 +2437,12 @@ void test_find(){
 void test_byte(){
   emp::BitArray<10>  ba10;
   ba10.SetByte(0, 10);
-  REQUIRE(ba10.GetByte(0) == 10);
+  CHECK(ba10.GetByte(0) == 10);
 
   ba10.flip(0,4);
-  REQUIRE(ba10.GetByte(0) == 5);
+  CHECK(ba10.GetByte(0) == 5);
   ba10.SetByte(1, 3);
-  REQUIRE(ba10.count() == 4);
+  CHECK(ba10.count() == 4);
 }
 
 /**
@@ -2431,7 +2459,7 @@ void do_byte_test() {
 
   const auto my_span = ba.GetBytes();
   for (size_t i = 0; i < Bits / 8; ++i) {
-    REQUIRE(my_span[i] == static_cast<std::byte>(i * 10));
+    CHECK(my_span[i] == static_cast<std::byte>(i * 10));
   }
 }
 // helper function that uses a fold expression to
@@ -2456,12 +2484,12 @@ void test_shift(){
   emp::BitArray<40> ba40;
   ba40.SetByte(0, 1);
   ba40 <<= 34;
-  REQUIRE(ba40.GetByte(4) == 4);
+  CHECK(ba40.GetByte(4) == 4);
 
   emp::BitArray<10> ba10;
   ba10.SetByte(0, 10);
   ba10 >>= 2;
-  REQUIRE(ba10.GetByte(0) == 2);
+  CHECK(ba10.GetByte(0) == 2);
 }
 
 /**
@@ -2470,10 +2498,10 @@ void test_shift(){
 void test_count(){
   emp::BitArray<12> ba12;
   ba12.SetAll();
-  REQUIRE(ba12.count() == 12);
-  REQUIRE(ba12.CountOnes_Sparse() == 12);
+  CHECK(ba12.count() == 12);
+  CHECK(ba12.CountOnes_Sparse() == 12);
   ba12.flip(0,5);
-  REQUIRE(ba12.count() == 7);
+  CHECK(ba12.count() == 7);
 }
 
 /**
@@ -2483,8 +2511,8 @@ void test_get_ones(){
   emp::BitArray<5> ba5;
   ba5.flip(2); // 00100
   emp::vector<size_t> ones = ba5.GetOnes();
-  REQUIRE(ones.size() == 1);
-  REQUIRE(ones[0] == 2);
+  CHECK(ones.size() == 1);
+  CHECK(ones[0] == 2);
 }
 
 
@@ -2494,12 +2522,12 @@ void test_get_ones(){
 void test_bit(){
   emp::BitArray<8> ba8;
   ba8.Set(0, 1);       // ba8 = 00000001
-  REQUIRE(ba8.Get(0));
+  CHECK(ba8.Get(0));
 
   ba8.Set(7, 1);      // ba8 = 10000001
   ba8.Set(0, 0);      // ba8 = 10000000
-  REQUIRE(!ba8.Get(0));
-  REQUIRE(ba8.Get(7));
+  CHECK(!ba8.Get(0));
+  CHECK(ba8.Get(7));
 }
 
 /**
@@ -2511,10 +2539,10 @@ void test_bitwise_xor(){
   emp::BitArray<4> ba4_1;
   ba4_1.SetByte(0,3);
   ba4 ^= ba4_1;                 // ba4 = 0001 ^ 0011 = 0010
-  REQUIRE(ba4.GetByte(0) == 2);   // 0010 = 2
+  CHECK(ba4.GetByte(0) == 2);   // 0010 = 2
   ba4_1.PopOne();               // ba4_1 = 0010
   ba4 ^= ba4_1;                 // ba4 = 0010 ^ 0010 = 0000
-  REQUIRE(ba4.GetByte(0) == 0);  // 0000 = 0
+  CHECK(ba4.GetByte(0) == 0);  // 0000 = 0
 }
 
 /**
@@ -2526,10 +2554,10 @@ void test_bitwise_or(){
   ba10.Set(1,1);                 // ba10 = 00 0000 0010
   ba10_1.Set(3,1);
   ba10_1.SetByte(1,3);
-  REQUIRE(ba10_1.count() == 3);  // ba10_1 = 11 00001000
+  CHECK(ba10_1.count() == 3);  // ba10_1 = 11 00001000
   ba10_1 |= ba10;                // ba10_1 = 11 00001000 | 00 00000010 = 11 00001010
-  REQUIRE(ba10_1.GetByte(0) == 10);
-  REQUIRE(ba10_1.GetByte(1) == 3);
+  CHECK(ba10_1.GetByte(0) == 10);
+  CHECK(ba10_1.GetByte(1) == 3);
 }
 
 /**
@@ -2541,7 +2569,7 @@ void test_bitwise_and(){
   ba8.SetByte(0,13);    // ba8 = 00001101
   ba8_1.SetByte(0,10);  // ba8_1 = 00001010
   ba8_1 &= ba8;          // ba8_1 = 00001010 & 00001101 = 00001000
-  REQUIRE(ba8_1.GetByte(0) == 8);
+  CHECK(ba8_1.GetByte(0) == 8);
 }
 
 /**
@@ -2552,27 +2580,27 @@ void test_more_comparators(){
   emp::BitArray<8> ba8_1;
   emp::BitArray<8> ba8_2;
   ba8_1.SetAll();
-  REQUIRE(ba8_1.NAND(ba8_2).All());
+  CHECK(ba8_1.NAND(ba8_2).All());
   ba8_2.flip(1);
   ba8_1.NAND_SELF(ba8_2);
-  REQUIRE(ba8_1.Any());
-  REQUIRE( !(ba8_1.Get(1)) );
+  CHECK(ba8_1.Any());
+  CHECK( !(ba8_1.Get(1)) );
 
   // NOR
   ba8_1.SetAll();
   ba8_2.Clear();
-  REQUIRE(ba8_1.NOR(ba8_2).None());
+  CHECK(ba8_1.NOR(ba8_2).None());
   ba8_1.flip(1);
   ba8_1.NOR_SELF(ba8_2);
-  REQUIRE(ba8_1.Get(1));
+  CHECK(ba8_1.Get(1));
 
   // EQU
   ba8_1.Clear();
   ba8_2.SetAll();
-  REQUIRE( (ba8_1.EQU(ba8_2).None()) );
+  CHECK( (ba8_1.EQU(ba8_2).None()) );
   ba8_2.Clear();
   ba8_2.EQU_SELF(ba8_1);
-  REQUIRE(ba8_2.All());
+  CHECK(ba8_2.All());
 }
 
 /**
@@ -2582,9 +2610,9 @@ void test_random(){
   emp::Random random;
   emp::BitArray<8> ba8(random);
   ba8.Randomize(random, 1.0);
-  REQUIRE(ba8.all());
+  CHECK(ba8.all());
   ba8.Randomize(random, 0.0);
-  REQUIRE(ba8.none());
+  CHECK(ba8.none());
 }
 
 /**
@@ -2597,7 +2625,7 @@ void test_copy(){
 
   emp::BitArray<10> ba10_1;
   ba10_1 = ba10;
-  REQUIRE(ba10 == ba10_1);
+  CHECK(ba10 == ba10_1);
 }
 
 /**
@@ -2607,15 +2635,15 @@ void test_comparators(){
   emp::BitArray<10> ba10;
   emp::BitArray<10> ba10_1;
   ba10_1.SetAll();
-  REQUIRE(ba10_1 != ba10);
-  REQUIRE(ba10_1 > ba10);
+  CHECK(ba10_1 != ba10);
+  CHECK(ba10_1 > ba10);
   ba10.SetAll();
-  REQUIRE(ba10_1 >= ba10);
-  REQUIRE(ba10_1 <= ba10);
-  REQUIRE(ba10_1 == ba10);
-  REQUIRE(!(ba10_1 < ba10));
+  CHECK(ba10_1 >= ba10);
+  CHECK(ba10_1 <= ba10);
+  CHECK(ba10_1 == ba10);
+  CHECK(!(ba10_1 < ba10));
   ba10.Clear();
-  REQUIRE( (ba10 < ba10_1) );
+  CHECK( (ba10 < ba10_1) );
 }
 
 /**
@@ -2624,11 +2652,11 @@ void test_comparators(){
 void test_export(){
   emp::BitArray<8> ba8;
   ba8.SetAll();
-  REQUIRE(ba8.count() == 8);
+  CHECK(ba8.count() == 8);
   emp::BitArray<10> ba10 = ba8.ExportArray<10>();
-  REQUIRE(ba10.size() == 10);
-  REQUIRE(ba10.GetByte(0) == 255);
-  REQUIRE(ba10.GetByte(1) == 0);
+  CHECK(ba10.size() == 10);
+  CHECK(ba10.GetByte(0) == 255);
+  CHECK(ba10.GetByte(1) == 0);
 }
 
 /**
@@ -2640,12 +2668,12 @@ void test_import(){
   ba20[5] = 1;
 
   ba8.Import(ba20);
-  REQUIRE(ba8[5]);
+  CHECK(ba8[5]);
 
   emp::BitArray<10> ba10;
   ba10.SetAll();
   ba20.Import(ba10);
-  REQUIRE(ba20.count() == 10);
+  CHECK(ba20.count() == 10);
 }
 
 
@@ -2688,20 +2716,20 @@ struct ImportExportTester {
     dest.template Import(source);
 
     for (size_t i = 0; i < std::min(source.GetSize(), dest.GetSize()); ++i) {
-      REQUIRE(source.Get(i) == dest.Get(i));
+      CHECK(source.Get(i) == dest.Get(i));
     }
     for (size_t i = source.GetSize(); i < dest.GetSize(); ++i) {
-      REQUIRE(dest.Get(i) == 0);
+      CHECK(dest.Get(i) == 0);
     }
 
     dest.Clear();
     dest = source.template ExportArray<DEST_BITS>();
 
     for (size_t i = 0; i < std::min(source.GetSize(), dest.GetSize()); ++i) {
-      REQUIRE(source.Get(i) == dest.Get(i));
+      CHECK(source.Get(i) == dest.Get(i));
     }
     for (size_t i = source.GetSize(); i < dest.GetSize(); ++i) {
-      REQUIRE(dest.Get(i) == 0);
+      CHECK(dest.Get(i) == 0);
     }
 
     // using all from_bit's
@@ -2717,20 +2745,20 @@ struct ImportExportTester {
       // std::cout << source << std::endl;
       // std::cout << dest << std::endl;
       for (size_t i = 0; i < std::min(source.GetSize() - from_bit, dest.GetSize()); ++i) {
-        REQUIRE(source.Get(i+from_bit) == dest.Get(i));
+        CHECK(source.Get(i+from_bit) == dest.Get(i));
       }
       for (size_t i = source.GetSize() - from_bit; i < dest.GetSize(); ++i) {
-        REQUIRE(dest.Get(i) == 0);
+        CHECK(dest.Get(i) == 0);
       }
 
       dest.Clear();
       dest = source.template ExportArray<DEST_BITS>(from_bit);
 
       for (size_t i = 0; i < std::min(source.GetSize() - from_bit, dest.GetSize()); ++i) {
-        REQUIRE(source.Get(i+from_bit) == dest.Get(i));
+        CHECK(source.Get(i+from_bit) == dest.Get(i));
       }
       for (size_t i = source.GetSize() - from_bit; i < dest.GetSize(); ++i) {
-        REQUIRE(dest.Get(i) == 0);
+        CHECK(dest.Get(i) == 0);
       }
 
     }
@@ -2757,9 +2785,9 @@ struct MultiTester {
     for (int i = -width - STEP - 1; i <= width + STEP + 1; i += STEP) {
       for (size_t rep = 0; rep < width; ++ rep) {
         ba.ROTATE_SELF(i);
-        REQUIRE(ba.CountOnes() == num_ones);
+        CHECK(ba.CountOnes() == num_ones);
       }
-      REQUIRE(ba == ba_orig);
+      CHECK(ba == ba_orig);
     }
 
     // Try each individual bit set with many possible rotations.
@@ -2768,25 +2796,25 @@ struct MultiTester {
       for (int j = 0; j < (width < 200 ? width : 1); ++j) {
         ba.Clear(); ba.Set(j);
         ba.ROTATE_SELF(i);
-        REQUIRE(ba.CountOnes() == 1);
-        REQUIRE(ba.Get(emp::Mod(j-i,width)));
+        CHECK(ba.CountOnes() == 1);
+        CHECK(ba.Get(emp::Mod(j-i,width)));
 
         ba.SetAll(); ba.Set(j, false);
         ba.ROTATE_SELF(i);
-        REQUIRE(ba.CountOnes() == width-1);
-        REQUIRE(!ba.Get(emp::Mod(j-i,width)));
+        CHECK(ba.CountOnes() == width-1);
+        CHECK(!ba.Get(emp::Mod(j-i,width)));
 
         ba.Randomize(rand); ba.Set(j);
         const size_t c1 = ba.CountOnes();
         ba.ROTATE_SELF(i);
-        REQUIRE(ba.CountOnes() == c1);
-        REQUIRE(ba.Get(emp::Mod(j-i,width)));
+        CHECK(ba.CountOnes() == c1);
+        CHECK(ba.Get(emp::Mod(j-i,width)));
 
         ba.Randomize(rand); ba.Set(j, false);
         const size_t c2 = ba.CountOnes();
         ba.ROTATE_SELF(i);
-        REQUIRE(ba.CountOnes() == c2);
-        REQUIRE(!ba.Get(emp::Mod(j-i,width)));
+        CHECK(ba.CountOnes() == c2);
+        CHECK(!ba.Get(emp::Mod(j-i,width)));
       }
     }
 
@@ -2806,116 +2834,116 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
 
   // test BitArray GetSize, GetNumBytes
   {
-    REQUIRE(emp::BitArray<2>{}.GetSize() == 2);
-    REQUIRE(emp::BitArray<2>{}.GetNumBytes() == 1);
+    CHECK(emp::BitArray<2>{}.GetSize() == 2);
+    CHECK(emp::BitArray<2>{}.GetNumBytes() == 1);
 
-    REQUIRE(emp::BitArray<7>{}.GetSize() == 7);
-    REQUIRE(emp::BitArray<7>{}.GetNumBytes() == 1);
+    CHECK(emp::BitArray<7>{}.GetSize() == 7);
+    CHECK(emp::BitArray<7>{}.GetNumBytes() == 1);
 
-    REQUIRE(emp::BitArray<8>{}.GetSize() == 8);
-    REQUIRE(emp::BitArray<8>{}.GetNumBytes() == 1);
+    CHECK(emp::BitArray<8>{}.GetSize() == 8);
+    CHECK(emp::BitArray<8>{}.GetNumBytes() == 1);
 
-    REQUIRE(emp::BitArray<9>{}.GetSize() == 9);
-    REQUIRE(emp::BitArray<9>{}.GetNumBytes() == 2);
+    CHECK(emp::BitArray<9>{}.GetSize() == 9);
+    CHECK(emp::BitArray<9>{}.GetNumBytes() == 2);
 
-    REQUIRE(emp::BitArray<16>{}.GetSize() == 16);
-    REQUIRE(emp::BitArray<16>{}.GetNumBytes() == 2);
+    CHECK(emp::BitArray<16>{}.GetSize() == 16);
+    CHECK(emp::BitArray<16>{}.GetNumBytes() == 2);
 
-    REQUIRE(emp::BitArray<24>{}.GetSize() == 24);
-    REQUIRE(emp::BitArray<24>{}.GetNumBytes() == 3);
+    CHECK(emp::BitArray<24>{}.GetSize() == 24);
+    CHECK(emp::BitArray<24>{}.GetNumBytes() == 3);
   }
 
   // test BitArray reverse
   {
 
-    REQUIRE(emp::BitArray<1>{0}.REVERSE_SELF() == emp::BitArray<1>{0});
-    REQUIRE(emp::BitArray<1>{0}.REVERSE_SELF().CountOnes() == 0);
-    REQUIRE(emp::BitArray<1>{1}.REVERSE_SELF() == emp::BitArray<1>{1});
-    REQUIRE(emp::BitArray<1>{1}.REVERSE_SELF().CountOnes() == 1);
+    CHECK(emp::BitArray<1>{0}.REVERSE_SELF() == emp::BitArray<1>{0});
+    CHECK(emp::BitArray<1>{0}.REVERSE_SELF().CountOnes() == 0);
+    CHECK(emp::BitArray<1>{1}.REVERSE_SELF() == emp::BitArray<1>{1});
+    CHECK(emp::BitArray<1>{1}.REVERSE_SELF().CountOnes() == 1);
 
-    REQUIRE(
+    CHECK(
       (emp::BitArray<2>{1,1}.REVERSE_SELF())
       ==
       (emp::BitArray<2>{1,1})
     );
-    REQUIRE((emp::BitArray<2>{1,1}.REVERSE_SELF().CountOnes()) == 2);
-    REQUIRE(
+    CHECK((emp::BitArray<2>{1,1}.REVERSE_SELF().CountOnes()) == 2);
+    CHECK(
       (emp::BitArray<2>{0,1}.REVERSE_SELF())
       ==
       (emp::BitArray<2>{1,0})
     );
-    REQUIRE((emp::BitArray<2>{0,1}.REVERSE_SELF().CountOnes()) == 1);
-    REQUIRE(
+    CHECK((emp::BitArray<2>{0,1}.REVERSE_SELF().CountOnes()) == 1);
+    CHECK(
       (emp::BitArray<2>{0,0}.REVERSE_SELF())
       ==
       (emp::BitArray<2>{0,0})
     );
-    REQUIRE((emp::BitArray<2>{0,0}.REVERSE_SELF().CountOnes()) == 0);
+    CHECK((emp::BitArray<2>{0,0}.REVERSE_SELF().CountOnes()) == 0);
 
-    REQUIRE(
+    CHECK(
       (emp::BitArray<7>{1,1,0,0,0,0,1}.REVERSE_SELF())
       ==
       (emp::BitArray<7>{1,0,0,0,0,1,1})
     );
-    REQUIRE((emp::BitArray<7>{1,1,0,0,0,0,1}.REVERSE_SELF().CountOnes()) == 3);
-    REQUIRE(
+    CHECK((emp::BitArray<7>{1,1,0,0,0,0,1}.REVERSE_SELF().CountOnes()) == 3);
+    CHECK(
       (emp::BitArray<7>{1,0,1,0,1,0,1}.REVERSE_SELF())
       ==
       (emp::BitArray<7>{1,0,1,0,1,0,1})
     );
-    REQUIRE((emp::BitArray<7>{1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes()) == 4);
-    REQUIRE(
+    CHECK((emp::BitArray<7>{1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes()) == 4);
+    CHECK(
       (emp::BitArray<7>{1,1,1,1,1,0,1}.REVERSE_SELF())
       ==
       (emp::BitArray<7>{1,0,1,1,1,1,1})
     );
-    REQUIRE((emp::BitArray<7>{1,1,1,1,1,0,1}.REVERSE_SELF().CountOnes()) == 6);
+    CHECK((emp::BitArray<7>{1,1,1,1,1,0,1}.REVERSE_SELF().CountOnes()) == 6);
 
-    REQUIRE(
+    CHECK(
       (emp::BitArray<8>{1,1,0,0,0,0,1,0}.REVERSE_SELF())
       ==
       (emp::BitArray<8>{0,1,0,0,0,0,1,1})
     );
-    REQUIRE((emp::BitArray<8>{1,1,0,0,0,0,1,0}.REVERSE_SELF().CountOnes()) == 3);
-    REQUIRE(
+    CHECK((emp::BitArray<8>{1,1,0,0,0,0,1,0}.REVERSE_SELF().CountOnes()) == 3);
+    CHECK(
       (emp::BitArray<8>{1,0,1,0,1,0,1,0}.REVERSE_SELF())
       ==
       (emp::BitArray<8>{0,1,0,1,0,1,0,1})
     );
-    REQUIRE((emp::BitArray<8>{0,1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes()) == 4);
-    REQUIRE(
+    CHECK((emp::BitArray<8>{0,1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes()) == 4);
+    CHECK(
       (emp::BitArray<8>{1,1,1,1,1,0,1,0}.REVERSE_SELF())
       ==
       (emp::BitArray<8>{0,1,0,1,1,1,1,1})
     );
-    REQUIRE((emp::BitArray<8>{1,1,1,1,1,0,1,0}.REVERSE_SELF().CountOnes()) == 6);
+    CHECK((emp::BitArray<8>{1,1,1,1,1,0,1,0}.REVERSE_SELF().CountOnes()) == 6);
 
-    REQUIRE(
+    CHECK(
       (emp::BitArray<9>{1,1,0,0,0,0,1,0,0}.REVERSE_SELF())
       ==
       (emp::BitArray<9>{0,0,1,0,0,0,0,1,1})
     );
-    REQUIRE(
+    CHECK(
       (emp::BitArray<9>{1,1,0,0,0,0,1,0,0}.REVERSE_SELF().CountOnes())
       ==
       3
     );
-    REQUIRE(
+    CHECK(
       (emp::BitArray<9>{1,0,1,0,1,0,1,0,0}.REVERSE_SELF())
       ==
       (emp::BitArray<9>{0,0,1,0,1,0,1,0,1})
     );
-    REQUIRE(
+    CHECK(
       (emp::BitArray<9>{0,0,1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes())
       ==
       4
     );
-    REQUIRE(
+    CHECK(
       (emp::BitArray<9>{1,1,1,1,1,0,1,0,0}.REVERSE_SELF())
       ==
       (emp::BitArray<9>{0,0,1,0,1,1,1,1,1})
     );
-    REQUIRE(
+    CHECK(
       (emp::BitArray<9>{1,1,1,1,1,0,1,0,0}.REVERSE_SELF().CountOnes())
       ==
       6
@@ -2926,108 +2954,108 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
       emp::BitArray<15> ba(rand);
       ba[0] = 0;
       ba[15-1] = 1;
-      REQUIRE(ba.REVERSE() != ba);
-      REQUIRE(ba.REVERSE().REVERSE() == ba);
-      REQUIRE(ba.REVERSE().CountOnes() == ba.CountOnes());
+      CHECK(ba.REVERSE() != ba);
+      CHECK(ba.REVERSE().REVERSE() == ba);
+      CHECK(ba.REVERSE().CountOnes() == ba.CountOnes());
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
       emp::BitArray<16> ba(rand);
       ba[0] = 0;
       ba[16-1] = 1;
-      REQUIRE(ba.REVERSE() != ba);
-      REQUIRE(ba.REVERSE().REVERSE() == ba);
-      REQUIRE(ba.REVERSE().CountOnes() == ba.CountOnes());
+      CHECK(ba.REVERSE() != ba);
+      CHECK(ba.REVERSE().REVERSE() == ba);
+      CHECK(ba.REVERSE().CountOnes() == ba.CountOnes());
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
       emp::BitArray<17> ba(rand);
       ba[0] = 0;
       ba[17-1] = 1;
-      REQUIRE(ba.REVERSE() != ba);
-      REQUIRE(ba.REVERSE().REVERSE() == ba);
-      REQUIRE(ba.REVERSE().CountOnes() == ba.CountOnes());
+      CHECK(ba.REVERSE() != ba);
+      CHECK(ba.REVERSE().REVERSE() == ba);
+      CHECK(ba.REVERSE().CountOnes() == ba.CountOnes());
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
       emp::BitArray<31> ba(rand);
       ba[0] = 0;
       ba[31-1] = 1;
-      REQUIRE(ba.REVERSE() != ba);
-      REQUIRE(ba.REVERSE().REVERSE() == ba);
-      REQUIRE(ba.REVERSE().CountOnes() == ba.CountOnes());
+      CHECK(ba.REVERSE() != ba);
+      CHECK(ba.REVERSE().REVERSE() == ba);
+      CHECK(ba.REVERSE().CountOnes() == ba.CountOnes());
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
       emp::BitArray<32> ba(rand);
       ba[0] = 0;
       ba[32-1] = 1;
-      REQUIRE(ba.REVERSE() != ba);
-      REQUIRE(ba.REVERSE().REVERSE() == ba);
-      REQUIRE(ba.REVERSE().CountOnes() == ba.CountOnes());
+      CHECK(ba.REVERSE() != ba);
+      CHECK(ba.REVERSE().REVERSE() == ba);
+      CHECK(ba.REVERSE().CountOnes() == ba.CountOnes());
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
       emp::BitArray<33> ba(rand);
       ba[0] = 0;
       ba[33-1] = 1;
-      REQUIRE(ba.REVERSE() != ba);
-      REQUIRE(ba.REVERSE().REVERSE() == ba);
-      REQUIRE(ba.REVERSE().CountOnes() == ba.CountOnes());
+      CHECK(ba.REVERSE() != ba);
+      CHECK(ba.REVERSE().REVERSE() == ba);
+      CHECK(ba.REVERSE().CountOnes() == ba.CountOnes());
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
       emp::BitArray<63> ba(rand);
       ba[0] = 0;
       ba[63-1] = 1;
-      REQUIRE(ba.REVERSE() != ba);
-      REQUIRE(ba.REVERSE().REVERSE() == ba);
-      REQUIRE(ba.REVERSE().CountOnes() == ba.CountOnes());
+      CHECK(ba.REVERSE() != ba);
+      CHECK(ba.REVERSE().REVERSE() == ba);
+      CHECK(ba.REVERSE().CountOnes() == ba.CountOnes());
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
       emp::BitArray<64> ba(rand);
       ba[0] = 0;
       ba[64-1] = 1;
-      REQUIRE(ba.REVERSE() != ba);
-      REQUIRE(ba.REVERSE().REVERSE() == ba);
-      REQUIRE(ba.REVERSE().CountOnes() == ba.CountOnes());
+      CHECK(ba.REVERSE() != ba);
+      CHECK(ba.REVERSE().REVERSE() == ba);
+      CHECK(ba.REVERSE().CountOnes() == ba.CountOnes());
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
       emp::BitArray<65> ba(rand);
       ba[0] = 0;
       ba[65-1] = 1;
-      REQUIRE(ba.REVERSE() != ba);
-      REQUIRE(ba.REVERSE().REVERSE() == ba);
-      REQUIRE(ba.REVERSE().CountOnes() == ba.CountOnes());
+      CHECK(ba.REVERSE() != ba);
+      CHECK(ba.REVERSE().REVERSE() == ba);
+      CHECK(ba.REVERSE().CountOnes() == ba.CountOnes());
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
       emp::BitArray<127> ba(rand);
       ba[0] = 0;
       ba[127-1] = 1;
-      REQUIRE(ba.REVERSE() != ba);
-      REQUIRE(ba.REVERSE().REVERSE() == ba);
-      REQUIRE(ba.REVERSE().CountOnes() == ba.CountOnes());
+      CHECK(ba.REVERSE() != ba);
+      CHECK(ba.REVERSE().REVERSE() == ba);
+      CHECK(ba.REVERSE().CountOnes() == ba.CountOnes());
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
       emp::BitArray<128> ba(rand);
       ba[0] = 0;
       ba[128-1] = 1;
-      REQUIRE(ba.REVERSE() != ba);
-      REQUIRE(ba.REVERSE().REVERSE() == ba);
-      REQUIRE(ba.REVERSE().CountOnes() == ba.CountOnes());
+      CHECK(ba.REVERSE() != ba);
+      CHECK(ba.REVERSE().REVERSE() == ba);
+      CHECK(ba.REVERSE().CountOnes() == ba.CountOnes());
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
       emp::BitArray<129> ba(rand);
       ba[0] = 0;
       ba[129-1] = 1;
-      REQUIRE(ba.REVERSE() != ba);
-      REQUIRE(ba.REVERSE().REVERSE() == ba);
-      REQUIRE(ba.REVERSE().CountOnes() == ba.CountOnes());
+      CHECK(ba.REVERSE() != ba);
+      CHECK(ba.REVERSE().REVERSE() == ba);
+      CHECK(ba.REVERSE().CountOnes() == ba.CountOnes());
     }
 
   }
@@ -3039,26 +3067,26 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
   emp::BitArray<32> ba1;
   ba1.SetUInt(0,1);
   ba0+=ba1;
-  REQUIRE (ba0.GetUInt(0) == 4294967295);
-  REQUIRE ((ba0+ba1).GetUInt(0) == 0);
-  REQUIRE ((ba0+ba0).GetUInt(0) == 4294967294);
+  CHECK (ba0.GetUInt(0) == 4294967295);
+  CHECK ((ba0+ba1).GetUInt(0) == 0);
+  CHECK ((ba0+ba0).GetUInt(0) == 4294967294);
 
   emp::BitArray<8> ba2;
   ba2.SetUInt(0, emp::IntPow(2UL, 8UL)-1);
   emp::BitArray<8> ba3;
   ba3.SetUInt(0, 1);
-  REQUIRE((ba2+ba3).GetUInt(0) == 0);
+  CHECK((ba2+ba3).GetUInt(0) == 0);
   emp::BitArray<64> ba4;
   ba4.SetUInt(0, std::numeric_limits<uint32_t>::max()-1);
   ba4.SetUInt(1, std::numeric_limits<uint32_t>::max());
   emp::BitArray<64> ba5;
   ba5.SetUInt(0, 1);
   ba4+=ba5;
-  REQUIRE(ba4.GetUInt(0) == pow((size_t)2, (size_t)32)-1);
-  REQUIRE(ba4.GetUInt(1) == pow((size_t)2, (size_t)32)-1);
+  CHECK(ba4.GetUInt(0) == pow((size_t)2, (size_t)32)-1);
+  CHECK(ba4.GetUInt(1) == pow((size_t)2, (size_t)32)-1);
   ba4+=ba5;
-  REQUIRE(ba4.GetUInt(0) == 0);
-  REQUIRE(ba4.GetUInt(1) == 0);
+  CHECK(ba4.GetUInt(0) == 0);
+  CHECK(ba4.GetUInt(1) == 0);
   }
 
   // test BitArray subtraction
@@ -3068,8 +3096,8 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
   emp::BitArray<32> ba1;
   ba1.SetUInt(0, 1);
   ba0 = ba0 - ba1;
-  REQUIRE (ba0.GetUInt(0) == 0);
-  REQUIRE ((ba0-ba1).GetUInt(0) == std::numeric_limits<uint32_t>::max());
+  CHECK (ba0.GetUInt(0) == 0);
+  CHECK ((ba0-ba1).GetUInt(0) == std::numeric_limits<uint32_t>::max());
 
   emp::BitArray<8> ba2;
   ba2.SetUInt(0, 1);
@@ -3077,8 +3105,8 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
   ba3.SetUInt(0, 1);
 
   ba2-=ba3;
-  REQUIRE (ba2.GetUInt(0) == 0);
-  REQUIRE((ba2-ba3).GetUInt(0) == emp::IntPow(2UL,8UL)-1);
+  CHECK (ba2.GetUInt(0) == 0);
+  CHECK((ba2-ba3).GetUInt(0) == emp::IntPow(2UL,8UL)-1);
 
   emp::BitArray<64> ba4;
   ba4.SetUInt(0, 1);
@@ -3088,15 +3116,15 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
   ba5.SetUInt(0, 1);
 
   ba4-=ba5;
-  REQUIRE(ba4.GetUInt(0) == 0);
-  REQUIRE(ba4.GetUInt(1) == 0);
+  CHECK(ba4.GetUInt(0) == 0);
+  CHECK(ba4.GetUInt(1) == 0);
 
   ba4-=ba5;
-  REQUIRE(ba4.GetUInt(0) == std::numeric_limits<uint32_t>::max());
-  REQUIRE(ba4.GetUInt(1) == std::numeric_limits<uint32_t>::max());
+  CHECK(ba4.GetUInt(0) == std::numeric_limits<uint32_t>::max());
+  CHECK(ba4.GetUInt(1) == std::numeric_limits<uint32_t>::max());
   ba4 = ba4 - ba5;
-  REQUIRE(ba4.GetUInt(0) == std::numeric_limits<uint32_t>::max() - 1);
-  REQUIRE(ba4.GetUInt(1) == std::numeric_limits<uint32_t>::max());
+  CHECK(ba4.GetUInt(0) == std::numeric_limits<uint32_t>::max() - 1);
+  CHECK(ba4.GetUInt(1) == std::numeric_limits<uint32_t>::max());
   }
 
   // test addition and subtraction with multiple fields
@@ -3111,15 +3139,15 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
   ba1.Set(64); // 10000...
   ba2.Set(0);  // ...00001
 
-  for (size_t i = 0; i < 64; ++i) REQUIRE((ba1 - ba2).Get(i));
-  REQUIRE(!(ba1 - ba2).Get(64));
+  for (size_t i = 0; i < 64; ++i) CHECK((ba1 - ba2).Get(i));
+  CHECK(!(ba1 - ba2).Get(64));
 
   ba1 -= ba2;
 
   for (size_t i = 0; i < 64; ++i) {
-    REQUIRE(ba1.Get(i));
+    CHECK(ba1.Get(i));
   }
-  REQUIRE(!ba1.Get(64));
+  CHECK(!ba1.Get(64));
 
   /* PART 2 */
   ba1.Clear();
@@ -3127,11 +3155,11 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
 
   ba2.Set(0);  // ...00001
 
-  for (size_t i = 0; i < 65; ++i) REQUIRE((ba1 - ba2).Get(i));
+  for (size_t i = 0; i < 65; ++i) CHECK((ba1 - ba2).Get(i));
 
   ba1 -= ba2;
 
-  for (size_t i = 0; i < 65; ++i) REQUIRE(ba1.Get(i));
+  for (size_t i = 0; i < 65; ++i) CHECK(ba1.Get(i));
 
   /* PART 3 */
   ba1.Clear();
@@ -3140,12 +3168,12 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
   for (size_t i = 0; i < 65; ++i) ba1.Set(i); // 11111...11111
   ba2.Set(0);  // ...00001
 
-  for (size_t i = 0; i < 65; ++i) REQUIRE(!(ba1 + ba2).Get(i));
-  for (size_t i = 0; i < 65; ++i) REQUIRE(!(ba2 + ba1).Get(i));
+  for (size_t i = 0; i < 65; ++i) CHECK(!(ba1 + ba2).Get(i));
+  for (size_t i = 0; i < 65; ++i) CHECK(!(ba2 + ba1).Get(i));
 
   ba1 += ba2;
 
-  for (size_t i = 0; i < 65; ++i) REQUIRE(!ba1.Get(i));
+  for (size_t i = 0; i < 65; ++i) CHECK(!ba1.Get(i));
 
   /* PART 4 */
   ba1.Clear();
@@ -3154,52 +3182,52 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
   for (size_t i = 0; i < 64; ++i) ba1.Set(i); // 01111...11111
   ba2.Set(0);  // ...00001
 
-  for (size_t i = 0; i < 64; ++i) REQUIRE(!(ba1 + ba2).Get(i));
-  REQUIRE((ba1 + ba2).Get(64));
-  for (size_t i = 0; i < 64; ++i) REQUIRE(!(ba2 + ba1).Get(i));
-  REQUIRE((ba2 + ba1).Get(64));
+  for (size_t i = 0; i < 64; ++i) CHECK(!(ba1 + ba2).Get(i));
+  CHECK((ba1 + ba2).Get(64));
+  for (size_t i = 0; i < 64; ++i) CHECK(!(ba2 + ba1).Get(i));
+  CHECK((ba2 + ba1).Get(64));
 
   ba1 += ba2;
 
-  for (size_t i = 0; i < 64; ++i) REQUIRE(!ba1.Get(i));
-  REQUIRE((ba2 + ba1).Get(64));
+  for (size_t i = 0; i < 64; ++i) CHECK(!ba1.Get(i));
+  CHECK((ba2 + ba1).Get(64));
   }
 
   {
   emp::BitArray<3> ba0{0,0,0};
-  REQUIRE(ba0.GetUInt8(0) == 0);
-  REQUIRE(ba0.GetUInt16(0) == 0);
-  REQUIRE(ba0.GetUInt32(0) == 0);
-  REQUIRE(ba0.GetUInt64(0) == 0);
-  REQUIRE(ba0.GetNumStates() == 8);
+  CHECK(ba0.GetUInt8(0) == 0);
+  CHECK(ba0.GetUInt16(0) == 0);
+  CHECK(ba0.GetUInt32(0) == 0);
+  CHECK(ba0.GetUInt64(0) == 0);
+  CHECK(ba0.GetNumStates() == 8);
 
   emp::BitArray<3> ba1{1,0,0};
-  REQUIRE(ba1.GetUInt8(0) == 1);
-  REQUIRE(ba1.GetUInt16(0) == 1);
-  REQUIRE(ba1.GetUInt32(0) == 1);
-  REQUIRE(ba1.GetUInt64(0) == 1);
+  CHECK(ba1.GetUInt8(0) == 1);
+  CHECK(ba1.GetUInt16(0) == 1);
+  CHECK(ba1.GetUInt32(0) == 1);
+  CHECK(ba1.GetUInt64(0) == 1);
 
   emp::BitArray<3> ba2{1,1,0};
-  REQUIRE(ba2.GetUInt8(0) == 3);
-  REQUIRE(ba2.GetUInt16(0) == 3);
-  REQUIRE(ba2.GetUInt32(0) == 3);
-  REQUIRE(ba2.GetUInt64(0) == 3);
+  CHECK(ba2.GetUInt8(0) == 3);
+  CHECK(ba2.GetUInt16(0) == 3);
+  CHECK(ba2.GetUInt32(0) == 3);
+  CHECK(ba2.GetUInt64(0) == 3);
 
   emp::BitArray<3> ba3{1,1,1};
-  REQUIRE(ba3.GetUInt8(0) == 7);
+  CHECK(ba3.GetUInt8(0) == 7);
 
   emp::BitArray<3> ba4{0,1,1};
-  REQUIRE(ba4.GetUInt8(0) == 6);
+  CHECK(ba4.GetUInt8(0) == 6);
 
   emp::BitArray<32> ba5;
   ba5.SetUInt(0, 1789156UL);
-  REQUIRE(ba5.GetUInt64(0) == 1789156ULL);
-  REQUIRE(ba5.GetNumStates() == 4294967296ULL);
+  CHECK(ba5.GetUInt64(0) == 1789156ULL);
+  CHECK(ba5.GetNumStates() == 4294967296ULL);
 
   emp::BitArray<63> ba6;
   ba6.SetUInt64(0, 789156816848ULL);
-  REQUIRE(ba6.GetUInt64(0) == 789156816848ULL);
-  REQUIRE(ba6.GetNumStates() == 9223372036854775808ULL);
+  CHECK(ba6.GetUInt64(0) == 789156816848ULL);
+  CHECK(ba6.GetNumStates() == 9223372036854775808ULL);
 
 
   // @CAO: Removed GetDouble() due to confusing name (GetUInt64() gives the same answer, but with
@@ -3207,13 +3235,13 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
   // emp::BitArray<65> ba7;
   // ba7.SetUInt64(0, 1789156816848ULL);
   // ba7.Set(64);
-  // REQUIRE(ba7.GetDouble() == 1789156816848.0 + emp::Pow2(64.0));
-  // REQUIRE(ba7.MaxDouble() == 36893488147419103231.0);
+  // CHECK(ba7.GetDouble() == 1789156816848.0 + emp::Pow2(64.0));
+  // CHECK(ba7.MaxDouble() == 36893488147419103231.0);
 
   // emp::BitArray<1027> ba8;
   // ba8.Set(1026);
-  // REQUIRE(std::isinf(ba8.GetDouble()));
-  // REQUIRE(std::isinf(ba8.MaxDouble()));
+  // CHECK(std::isinf(ba8.GetDouble()));
+  // CHECK(std::isinf(ba8.MaxDouble()));
   }
 
   // test list initializer
@@ -3223,10 +3251,10 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
   emp::BitArray<3> ba_last{0,0,1};
   emp::BitArray<3> ba_full{1,1,1};
 
-  REQUIRE(ba_empty.CountOnes() == 0);
-  REQUIRE(ba_first.CountOnes() == 1);
-  REQUIRE(ba_last.CountOnes() == 1);
-  REQUIRE(ba_full.CountOnes() == 3);
+  CHECK(ba_empty.CountOnes() == 0);
+  CHECK(ba_first.CountOnes() == 1);
+  CHECK(ba_last.CountOnes() == 1);
+  CHECK(ba_full.CountOnes() == 3);
   }
 
   // test Import and Export
@@ -3253,12 +3281,12 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
     for (size_t i = 0; i < 32; ++i) d32[i].Import(orig, i * 1);
 
     for (size_t i = 0; i < 32; ++i) {
-      REQUIRE(orig[i] == d1[i/32][i%32]);
-      REQUIRE(orig[i] == d2[i/16][i%16]);
-      REQUIRE(orig[i] == d4[i/8][i%8]);
-      REQUIRE(orig[i] == d8[i/4][i%4]);
-      REQUIRE(orig[i] == d16[i/2][i%2]);
-      REQUIRE(orig[i] == d32[i/1][i%1]);
+      CHECK(orig[i] == d1[i/32][i%32]);
+      CHECK(orig[i] == d2[i/16][i%16]);
+      CHECK(orig[i] == d4[i/8][i%8]);
+      CHECK(orig[i] == d8[i/4][i%4]);
+      CHECK(orig[i] == d16[i/2][i%2]);
+      CHECK(orig[i] == d32[i/1][i%1]);
     }
 
     // Export
@@ -3271,12 +3299,12 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
     for (size_t i = 0; i < 32; ++i) d32[i] = orig.ExportArray<1>(i * 1);
 
     for (size_t i = 0; i < 32; ++i) {
-      REQUIRE(orig[i] == d1[i/32][i%32]);
-      REQUIRE(orig[i] == d2[i/16][i%16]);
-      REQUIRE(orig[i] == d4[i/8][i%8]);
-      REQUIRE(orig[i] == d8[i/4][i%4]);
-      REQUIRE(orig[i] == d16[i/2][i%2]);
-      REQUIRE(orig[i] == d32[i/1][i%1]);
+      CHECK(orig[i] == d1[i/32][i%32]);
+      CHECK(orig[i] == d2[i/16][i%16]);
+      CHECK(orig[i] == d4[i/8][i%8]);
+      CHECK(orig[i] == d8[i/4][i%4]);
+      CHECK(orig[i] == d16[i/2][i%2]);
+      CHECK(orig[i] == d32[i/1][i%1]);
     }
 
     // now test some funky imports and exports
@@ -3408,79 +3436,79 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
 
   for (size_t i = 0; i < 75; i++) {
     emp::BitArray<80> shift_set = ba80 >> i;
-    REQUIRE((shift_set.CountOnes() == 1) == (i <= 71));
+    CHECK((shift_set.CountOnes() == 1) == (i <= 71));
   }
 
   ba80.Clear();
 
-  REQUIRE(ba10[2] == false);
+  CHECK(ba10[2] == false);
   ba10.flip(2);
-  REQUIRE(ba10[2] == true);
+  CHECK(ba10[2] == true);
 
-  REQUIRE(ba32[2] == false);
+  CHECK(ba32[2] == false);
   ba32.flip(2);
-  REQUIRE(ba32[2] == true);
+  CHECK(ba32[2] == true);
 
-  REQUIRE(ba80[2] == false);
+  CHECK(ba80[2] == false);
   ba80.flip(2);
-  REQUIRE(ba80[2] == true);
+  CHECK(ba80[2] == true);
 
-  for (size_t i = 3; i < 8; i++) {REQUIRE(ba10[i] == false);}
+  for (size_t i = 3; i < 8; i++) {CHECK(ba10[i] == false);}
   ba10.flip(3, 8);
-  for (size_t i = 3; i < 8; i++) {REQUIRE(ba10[i] == true);}
-  REQUIRE(ba10[8] == false);
+  for (size_t i = 3; i < 8; i++) {CHECK(ba10[i] == true);}
+  CHECK(ba10[8] == false);
 
-  for (size_t i = 3; i < 8; i++) {REQUIRE(ba32[i] == false);}
+  for (size_t i = 3; i < 8; i++) {CHECK(ba32[i] == false);}
   ba32.flip(3, 8);
-  for (size_t i = 3; i < 8; i++) {REQUIRE(ba32[i] == true);}
-  REQUIRE(ba32[8] == false);
+  for (size_t i = 3; i < 8; i++) {CHECK(ba32[i] == true);}
+  CHECK(ba32[8] == false);
 
-  for (size_t i = 3; i < 8; i++) {REQUIRE(ba80[i] == false);}
+  for (size_t i = 3; i < 8; i++) {CHECK(ba80[i] == false);}
   ba80.flip(3, 8);
-  for (size_t i = 3; i < 8; i++) {REQUIRE(ba80[i] == true);}
-  REQUIRE(ba80[8] == false);
+  for (size_t i = 3; i < 8; i++) {CHECK(ba80[i] == true);}
+  CHECK(ba80[8] == false);
 
   ba80[70] = 1;
 
-  REQUIRE(ba10.GetUInt(0) == 252);
-  REQUIRE(ba10.GetUInt32(0) == 252);
-  REQUIRE(ba10.GetUInt64(0) == 252);
+  CHECK(ba10.GetUInt(0) == 252);
+  CHECK(ba10.GetUInt32(0) == 252);
+  CHECK(ba10.GetUInt64(0) == 252);
 
-  REQUIRE(ba32.GetUInt(0) == 252);
-  REQUIRE(ba32.GetUInt32(0) == 252);
-  REQUIRE(ba32.GetUInt64(0) == 252);
+  CHECK(ba32.GetUInt(0) == 252);
+  CHECK(ba32.GetUInt32(0) == 252);
+  CHECK(ba32.GetUInt64(0) == 252);
 
-  REQUIRE(ba80.GetUInt(0) == 252);
-  REQUIRE(ba80.GetUInt(1) == 0);
-  REQUIRE(ba80.GetUInt(2) == 64);
-  REQUIRE(ba80.GetUInt32(0) == 252);
-  REQUIRE(ba80.GetUInt32(1) == 0);
-  REQUIRE(ba80.GetUInt32(2) == 64);
-  REQUIRE(ba80.GetUInt64(0) == 252);
-  REQUIRE(ba80.GetUInt64(1) == 64);
+  CHECK(ba80.GetUInt(0) == 252);
+  CHECK(ba80.GetUInt(1) == 0);
+  CHECK(ba80.GetUInt(2) == 64);
+  CHECK(ba80.GetUInt32(0) == 252);
+  CHECK(ba80.GetUInt32(1) == 0);
+  CHECK(ba80.GetUInt32(2) == 64);
+  CHECK(ba80.GetUInt64(0) == 252);
+  CHECK(ba80.GetUInt64(1) == 64);
 
   ba80 = ba80c;
 
   // Test arbitrary bit retrieval of UInts
   ba80[65] = 1;
-  REQUIRE(ba80.GetUInt32(2) == 130);
-  REQUIRE(ba80.GetUInt32AtBit(64) == 130);
-  REQUIRE(ba80.GetUInt8AtBit(64) == 130);
+  CHECK(ba80.GetUInt32(2) == 130);
+  CHECK(ba80.GetUInt32AtBit(64) == 130);
+  CHECK(ba80.GetUInt8AtBit(64) == 130);
 
   emp::BitArray<96> ba;
 
-  REQUIRE (ba.LongestSegmentOnes() == 0);
+  CHECK (ba.LongestSegmentOnes() == 0);
   ba.SetUInt(2, 1);
-  REQUIRE (ba.LongestSegmentOnes() == 1);
+  CHECK (ba.LongestSegmentOnes() == 1);
   ba.SetUInt(1, 3);
-  REQUIRE (ba.LongestSegmentOnes() == 2);
+  CHECK (ba.LongestSegmentOnes() == 2);
   ba.SetUInt(0, 7);
-  REQUIRE (ba.LongestSegmentOnes() == 3);
+  CHECK (ba.LongestSegmentOnes() == 3);
 
   ba.SetUInt(0, std::numeric_limits<uint32_t>::max());
   ba.SetUInt(1, std::numeric_limits<uint32_t>::max() - 1);
   ba.SetUInt(2, std::numeric_limits<uint32_t>::max() - 3);
-  REQUIRE (ba.LongestSegmentOnes() == 32);
+  CHECK (ba.LongestSegmentOnes() == 32);
 
   // tests for ROTATE
   // ... with one set bit
@@ -3493,30 +3521,30 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
 
   for (int rot = -100; rot < 101; ++rot) {
 
-    REQUIRE( ba10.CountOnes() == ba10.ROTATE(rot).CountOnes() );
-    REQUIRE( ba25.CountOnes() == ba25.ROTATE(rot).CountOnes() );
-    REQUIRE( ba32.CountOnes() == ba32.ROTATE(rot).CountOnes() );
-    REQUIRE( ba50.CountOnes() == ba50.ROTATE(rot).CountOnes() );
-    REQUIRE( ba64.CountOnes() == ba64.ROTATE(rot).CountOnes() );
-    REQUIRE( ba80.CountOnes() == ba80.ROTATE(rot).CountOnes() );
+    CHECK( ba10.CountOnes() == ba10.ROTATE(rot).CountOnes() );
+    CHECK( ba25.CountOnes() == ba25.ROTATE(rot).CountOnes() );
+    CHECK( ba32.CountOnes() == ba32.ROTATE(rot).CountOnes() );
+    CHECK( ba50.CountOnes() == ba50.ROTATE(rot).CountOnes() );
+    CHECK( ba64.CountOnes() == ba64.ROTATE(rot).CountOnes() );
+    CHECK( ba80.CountOnes() == ba80.ROTATE(rot).CountOnes() );
 
-    if (rot % 10) REQUIRE( ba10 != ba10.ROTATE(rot) );
-    else REQUIRE( ba10 == ba10.ROTATE(rot) );
+    if (rot % 10) CHECK( ba10 != ba10.ROTATE(rot) );
+    else CHECK( ba10 == ba10.ROTATE(rot) );
 
-    if (rot % 25) REQUIRE( ba25 != ba25.ROTATE(rot) );
-    else REQUIRE( ba25 == ba25.ROTATE(rot) );
+    if (rot % 25) CHECK( ba25 != ba25.ROTATE(rot) );
+    else CHECK( ba25 == ba25.ROTATE(rot) );
 
-    if (rot % 32) REQUIRE( ba32 != ba32.ROTATE(rot) );
-    else REQUIRE( ba32 == ba32.ROTATE(rot) );
+    if (rot % 32) CHECK( ba32 != ba32.ROTATE(rot) );
+    else CHECK( ba32 == ba32.ROTATE(rot) );
 
-    if (rot % 50) REQUIRE( ba50 != ba50.ROTATE(rot) );
-    else REQUIRE( ba50 == ba50.ROTATE(rot) );
+    if (rot % 50) CHECK( ba50 != ba50.ROTATE(rot) );
+    else CHECK( ba50 == ba50.ROTATE(rot) );
 
-    if (rot % 64) REQUIRE( ba64 != ba64.ROTATE(rot) );
-    else REQUIRE( ba64 == ba64.ROTATE(rot) );
+    if (rot % 64) CHECK( ba64 != ba64.ROTATE(rot) );
+    else CHECK( ba64 == ba64.ROTATE(rot) );
 
-    if (rot % 80) REQUIRE( ba80 != ba80.ROTATE(rot) );
-    else REQUIRE( ba80 == ba80.ROTATE(rot) );
+    if (rot % 80) CHECK( ba80 != ba80.ROTATE(rot) );
+    else CHECK( ba80 == ba80.ROTATE(rot) );
 
   }
 
@@ -3532,26 +3560,26 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
 
   for (int rot = -100; rot < 101; ++rot) {
 
-    REQUIRE( ba25.CountOnes() == ba25.ROTATE(rot).CountOnes() );
-    REQUIRE( ba32.CountOnes() == ba32.ROTATE(rot).CountOnes() );
-    REQUIRE( ba50.CountOnes() == ba50.ROTATE(rot).CountOnes() );
-    REQUIRE( ba64.CountOnes() == ba64.ROTATE(rot).CountOnes() );
-    REQUIRE( ba80.CountOnes() == ba80.ROTATE(rot).CountOnes() );
+    CHECK( ba25.CountOnes() == ba25.ROTATE(rot).CountOnes() );
+    CHECK( ba32.CountOnes() == ba32.ROTATE(rot).CountOnes() );
+    CHECK( ba50.CountOnes() == ba50.ROTATE(rot).CountOnes() );
+    CHECK( ba64.CountOnes() == ba64.ROTATE(rot).CountOnes() );
+    CHECK( ba80.CountOnes() == ba80.ROTATE(rot).CountOnes() );
 
-    if (rot % 25) REQUIRE( ba25 != ba25.ROTATE(rot) );
-    else REQUIRE( ba25 == ba25.ROTATE(rot) );
+    if (rot % 25) CHECK( ba25 != ba25.ROTATE(rot) );
+    else CHECK( ba25 == ba25.ROTATE(rot) );
 
-    if (rot % 32) REQUIRE( ba32 != ba32.ROTATE(rot) );
-    else REQUIRE( ba32 == ba32.ROTATE(rot) );
+    if (rot % 32) CHECK( ba32 != ba32.ROTATE(rot) );
+    else CHECK( ba32 == ba32.ROTATE(rot) );
 
-    if (rot % 50) REQUIRE( ba50 != ba50.ROTATE(rot) );
-    else REQUIRE( ba50 == ba50.ROTATE(rot) );
+    if (rot % 50) CHECK( ba50 != ba50.ROTATE(rot) );
+    else CHECK( ba50 == ba50.ROTATE(rot) );
 
-    if (rot % 64) REQUIRE( ba64 != ba64.ROTATE(rot) );
-    else REQUIRE( ba64 == ba64.ROTATE(rot) );
+    if (rot % 64) CHECK( ba64 != ba64.ROTATE(rot) );
+    else CHECK( ba64 == ba64.ROTATE(rot) );
 
-    if (rot % 80) REQUIRE( ba80 != ba80.ROTATE(rot) );
-    else REQUIRE( ba80 == ba80.ROTATE(rot) );
+    if (rot % 80) CHECK( ba80 != ba80.ROTATE(rot) );
+    else CHECK( ba80 == ba80.ROTATE(rot) );
 
   }
 
@@ -3575,35 +3603,35 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
     emp::BitArray<80> ba_80;
 
     ba_25.FlipRandomCount(random, 0);
-    REQUIRE(!ba_25.CountOnes());
+    CHECK(!ba_25.CountOnes());
 
     ba_32.FlipRandomCount(random, 0);
-    REQUIRE(!ba_32.CountOnes());
+    CHECK(!ba_32.CountOnes());
 
     ba_50.FlipRandomCount(random, 0);
-    REQUIRE(!ba_50.CountOnes());
+    CHECK(!ba_50.CountOnes());
 
     ba_64.FlipRandomCount(random, 0);
-    REQUIRE(!ba_64.CountOnes());
+    CHECK(!ba_64.CountOnes());
 
     ba_80.FlipRandomCount(random, 0);
-    REQUIRE(!ba_80.CountOnes());
+    CHECK(!ba_80.CountOnes());
 
 
     ba_25.FlipRandomCount(random, 1);
-    REQUIRE( ba_25.CountOnes() == 1);
+    CHECK( ba_25.CountOnes() == 1);
 
     ba_32.FlipRandomCount(random, 1);
-    REQUIRE( ba_32.CountOnes() == 1);
+    CHECK( ba_32.CountOnes() == 1);
 
     ba_50.FlipRandomCount(random, 1);
-    REQUIRE( ba_50.CountOnes() == 1);
+    CHECK( ba_50.CountOnes() == 1);
 
     ba_64.FlipRandomCount(random, 1);
-    REQUIRE( ba_64.CountOnes() == 1);
+    CHECK( ba_64.CountOnes() == 1);
 
     ba_80.FlipRandomCount(random, 1);
-    REQUIRE( ba_80.CountOnes() == 1);
+    CHECK( ba_80.CountOnes() == 1);
 
     ba_25.Clear();
     ba_32.Clear();
@@ -3613,52 +3641,52 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
 
     for (size_t i = 1; i < 5000; ++i) {
       ba_25.FlipRandomCount(random, 1);
-      REQUIRE(ba_25.CountOnes() <= i);
+      CHECK(ba_25.CountOnes() <= i);
 
       ba_32.FlipRandomCount(random, 1);
-      REQUIRE(ba_32.CountOnes() <= i);
+      CHECK(ba_32.CountOnes() <= i);
 
       ba_50.FlipRandomCount(random, 1);
-      REQUIRE(ba_50.CountOnes() <= i);
+      CHECK(ba_50.CountOnes() <= i);
 
       ba_64.FlipRandomCount(random, 1);
-      REQUIRE(ba_64.CountOnes() <= i);
+      CHECK(ba_64.CountOnes() <= i);
 
       ba_80.FlipRandomCount(random, 1);
-      REQUIRE(ba_80.CountOnes() <= i);
+      CHECK(ba_80.CountOnes() <= i);
     }
 
-    REQUIRE(ba_25.CountOnes() > ba_25.size()/4);
-    REQUIRE(ba_25.CountOnes() < 3*ba_25.size()/4);
-    REQUIRE(ba_32.CountOnes() > ba_32.size()/4);
-    REQUIRE(ba_32.CountOnes() < 3*ba_32.size()/4);
-    REQUIRE(ba_50.CountOnes() > ba_50.size()/4);
-    REQUIRE(ba_50.CountOnes() < 3*ba_50.size()/4);
-    REQUIRE(ba_64.CountOnes() > ba_64.size()/4);
-    REQUIRE(ba_64.CountOnes() < 3*ba_64.size()/4);
-    REQUIRE(ba_80.CountOnes() > ba_80.size()/4);
-    REQUIRE(ba_80.CountOnes() < 3*ba_80.size()/4);
+    CHECK(ba_25.CountOnes() > ba_25.size()/4);
+    CHECK(ba_25.CountOnes() < 3*ba_25.size()/4);
+    CHECK(ba_32.CountOnes() > ba_32.size()/4);
+    CHECK(ba_32.CountOnes() < 3*ba_32.size()/4);
+    CHECK(ba_50.CountOnes() > ba_50.size()/4);
+    CHECK(ba_50.CountOnes() < 3*ba_50.size()/4);
+    CHECK(ba_64.CountOnes() > ba_64.size()/4);
+    CHECK(ba_64.CountOnes() < 3*ba_64.size()/4);
+    CHECK(ba_80.CountOnes() > ba_80.size()/4);
+    CHECK(ba_80.CountOnes() < 3*ba_80.size()/4);
 
     for (size_t i = 0; i < 10; ++i) {
       ba_25.FlipRandomCount(random, ba_25.size());
-      REQUIRE(ba_25.CountOnes() > ba_25.size()/4);
-      REQUIRE(ba_25.CountOnes() < 3*ba_25.size()/4);
+      CHECK(ba_25.CountOnes() > ba_25.size()/4);
+      CHECK(ba_25.CountOnes() < 3*ba_25.size()/4);
 
       ba_32.FlipRandomCount(random, ba_32.size());
-      REQUIRE(ba_32.CountOnes() > ba_32.size()/4);
-      REQUIRE(ba_32.CountOnes() < 3*ba_32.size()/4);
+      CHECK(ba_32.CountOnes() > ba_32.size()/4);
+      CHECK(ba_32.CountOnes() < 3*ba_32.size()/4);
 
       ba_50.FlipRandomCount(random, ba_50.size());
-      REQUIRE(ba_50.CountOnes() > ba_50.size()/4);
-      REQUIRE(ba_50.CountOnes() < 3*ba_50.size()/4);
+      CHECK(ba_50.CountOnes() > ba_50.size()/4);
+      CHECK(ba_50.CountOnes() < 3*ba_50.size()/4);
 
       ba_64.FlipRandomCount(random, ba_64.size());
-      REQUIRE(ba_64.CountOnes() > ba_64.size()/4);
-      REQUIRE(ba_64.CountOnes() < 3*ba_64.size()/4);
+      CHECK(ba_64.CountOnes() > ba_64.size()/4);
+      CHECK(ba_64.CountOnes() < 3*ba_64.size()/4);
 
       ba_80.FlipRandomCount(random, ba_80.size());
-      REQUIRE(ba_80.CountOnes() > ba_80.size()/4);
-      REQUIRE(ba_80.CountOnes() < 3*ba_80.size()/4);
+      CHECK(ba_80.CountOnes() > ba_80.size()/4);
+      CHECK(ba_80.CountOnes() < 3*ba_80.size()/4);
     }
   }
 
@@ -3714,12 +3742,12 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
 
     }
 
-    REQUIRE(ba10 == ba10_deser);
-    REQUIRE(ba25 == ba25_deser);
-    REQUIRE(ba32 == ba32_deser);
-    REQUIRE(ba50 == ba50_deser);
-    REQUIRE(ba64 == ba64_deser);
-    REQUIRE(ba80 == ba80_deser);
+    CHECK(ba10 == ba10_deser);
+    CHECK(ba25 == ba25_deser);
+    CHECK(ba32 == ba32_deser);
+    CHECK(ba50 == ba50_deser);
+    CHECK(ba64 == ba64_deser);
+    CHECK(ba80 == ba80_deser);
 
   }
 
@@ -3774,12 +3802,12 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
 
     }
 
-    REQUIRE(ba10 == ba10_deser);
-    REQUIRE(ba25 == ba25_deser);
-    REQUIRE(ba32 == ba32_deser);
-    REQUIRE(ba50 == ba50_deser);
-    REQUIRE(ba64 == ba64_deser);
-    REQUIRE(ba80 == ba80_deser);
+    CHECK(ba10 == ba10_deser);
+    CHECK(ba25 == ba25_deser);
+    CHECK(ba32 == ba32_deser);
+    CHECK(ba50 == ba50_deser);
+    CHECK(ba64 == ba64_deser);
+    CHECK(ba80 == ba80_deser);
 
   }
 
@@ -3787,10 +3815,10 @@ TEST_CASE("27: Another Test BitArray", "[bits]")
 
 TEST_CASE("28: Test BitArray string construction", "[tools]") {
 
-  REQUIRE( emp::BitArray<5>( "01001" ) == emp::BitArray<5>{0, 1, 0, 0, 1} );
+  CHECK( emp::BitArray<5>( "01001" ) == emp::BitArray<5>{0, 1, 0, 0, 1} );
 
   // std::bitset treats bits in the opposite direction of emp::BitArray.
-  REQUIRE(
+  CHECK(
     emp::BitArray<5>( std::bitset<5>( "01001" ) )
     == emp::BitArray<5>{1, 0, 0, 1, 0}
   );
@@ -3803,5 +3831,5 @@ TEST_CASE("29: Test Append()", "[tools]") {
   bv1.Append(ba1);
   emp::BitVector exp_result = {0,1,1,1,0,0,0,1,0,0,0,1,0,0,0,1};
 
-  REQUIRE( bv1 == exp_result );
+  CHECK( bv1 == exp_result );
 }
