@@ -22,19 +22,19 @@ authors:
     orcid: 0000-0003-4726-4479
     affiliation: "4, 5"
 affiliations:
- - name: BEACON Center for the Study of Evolution in Action
+ - name: BEACON Center for the Study of Evolution in Action, USA
    index: 1
- - name: Computer Science and Engineering, Michigan State University
+ - name: Computer Science and Engineering, Michigan State University, USA
    index: 2
- - name: Ecology, Evolutionary Biology, and Behavior, Michigan State University
+ - name: Ecology, Evolutionary Biology, and Behavior, Michigan State University, USA
    index: 3
- - name: Computer Science, Carleton College
+ - name: Computer Science, Carleton College, USA
    index: 4
- - name: Ecology and Evolutionary Biology, University of Michigan
+ - name: Ecology and Evolutionary Biology, University of Michigan, USA
    index: 5
- - name: Center for the Study of Complex Systems, University of Michigan
+ - name: Center for the Study of Complex Systems, University of Michigan, USA
    index: 6
- - name: Computer Science, Grand Valley State University
+ - name: Computer Science, Grand Valley State University, USA
    index: 7
 date: 30 July 2021
 bibliography: paper.bib
