@@ -1919,7 +1919,7 @@ namespace emp {
 
     // If there's a hit in a partial first field, return it.
     if (field_pos && (~_data.bits[field_id] & ~(MaskField(field_pos)))) {
-      return (int) (~find_bit(_data.bits[field_id] & ~(MaskField(field_pos))) +
+      return (int) (find_bit(~_data.bits[field_id] & ~(MaskField(field_pos))) +
                     field_id * FIELD_BITS);
     }
 
@@ -2002,8 +2002,8 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   emp::vector<emp::Range<size_t>> Bits<DATA_T,ZERO_LEFT>::GetRanges() const {
     emp::vector<emp::Range<size_t>> out_ranges;
-    for (int start_pos = FindOne(); start_pos >= 0; start_pos = FindOne(start_pos+1)) {
-      int end_pos = FindZero(start_pos);
+    for (int start_pos = FindOne(), end_pos; start_pos >= 0; start_pos = FindOne(end_pos+1)) {
+      end_pos = FindZero(start_pos);
       end_pos = (end_pos == -1) ? GetSize() - 1 : end_pos - 1;
       out_ranges.emplace_back(start_pos, end_pos);
     }
