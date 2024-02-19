@@ -228,6 +228,13 @@ namespace emp {
   inline Range<double, INCLUDE_UPPER> DRange(double _l, double _u) {
     return Range<double, INCLUDE_UPPER>(_l,_u);
   }
+
+  // Allow a Range to be printed.
+  template <typename T, bool INCLUDE_UPPER=true>
+  std::ostream & operator<<(std::ostream & out, const emp::Range<T,INCLUDE_UPPER> & range) {
+    out << '[' << range.GetLower() << ',' << range.GetUpper() << (INCLUDE_UPPER ? ']' : ')');
+    return out;
+  }
 }
 
 #endif // #ifndef EMP_MATH_RANGE_HPP_INCLUDE
