@@ -205,7 +205,8 @@ namespace emp {
     [[nodiscard]] std::string_view ViewBack(size_t out_size) const
       { emp_assert(out_size <= size()); return View(size()-out_size, out_size); }
     [[nodiscard]] std::string_view ViewRange(size_t start, size_t end) const {
-      emp_assert(start <= end && end <= size(), start, end, size());
+      emp_assert(start <= end, start, end, size());
+      if (end > size()) end = size();
       return View(start, end - start);
     }
     [[nodiscard]] std::string_view ViewTo(CharSet stop_chars, size_t start=0,
@@ -1616,20 +1617,16 @@ namespace emp {
   template <typename CONTAINER_T>
   String MakeEnglishList(const CONTAINER_T & container) {
     if (container.size() == 0) return "";
-    if (container.size() == 1) return to_string(container.front());
+    if (container.size() == 1) return MakeString(*container.begin());
 
-    auto it = container.begin();
-    if (container.size() == 2) return to_string(*it, " and ", *(it+1));
+    auto back_it = container.end();  back_it--;
+    if (container.size() == 2) return MakeString(*container.begin(), " and ", *back_it);
 
-    auto last_it = container.end() - 1;
-    String out = MakeString(*it);
-    ++it;
-    while (it != last_it) {
-      out += ',';
-      out += MakeString(*it);
-      ++it;
+    String out;;
+    for (auto it = container.begin(); it != back_it; ++it) {
+      out += MakeString(", ", *it);
     }
-    out += MakeString(", and ", *it);
+    out += MakeString("and ", *back_it);
 
     return out;
   }
