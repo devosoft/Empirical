@@ -460,7 +460,7 @@ namespace emp {
 
     /// Process the input regex into a tree representation.
     Ptr<re_block> Process(Ptr<re_block> cur_block=nullptr) {
-      emp_assert(pos < regex.size(), pos, regex.size());
+      emp_assert(pos < regex.size(), pos, regex.size(), regex);
 
       // If caller does not provide current block, create one (and return it.)
       if (cur_block==nullptr) cur_block = NewPtr<re_block>();
