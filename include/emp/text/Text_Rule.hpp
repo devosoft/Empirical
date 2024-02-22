@@ -47,9 +47,10 @@ namespace emp {
   ///
   /// When converting back to HTML, the start of the "link" style would trigger the open
   /// tag to be generated.  When the link ends, the close take will appear.
-  /// If there is no style, the internal text will trigger this rule to apply.
+  /// If there is no style, the internal character will trigger this rule to apply.
 
-  struct Text_Rule {
+  class Text_Rule {
+  private:
     size_t id = emp::MAX_SIZE_T;  // Unique ID for this rule (index in tag_map)
     int open_token_id = -1;       // ID of open_tag_start in the lexer
     int close_token_id = -1;      // ID of close_tag in the lexer
@@ -63,22 +64,43 @@ namespace emp {
     // A base style would be "font"
     // Style argument could be "arial"
     // This would generate a full style: "font:arial"
-    String base_style;     ///< What style is this rule associated with?
-    String internal_text;  ///< What string is used to placehold in text?
+    String base_style;          ///< What style is this rule associated with?
+    char internal_char = '\0';  ///< What character is used to placehold internally in Text?
 
     std::function<String(String)> to_style_arg; ///< Convert CONTROL into STYLE arguments
     std::function<String(String)> to_control;   ///< Convert STYLE into CONTROL
 
-    // === Helper functions ===
-    bool UsesControl() const { return open_tag_end != '\0'; }
-    bool UsesText() const { return close_tag.size(); }
-    bool UsesStyle() const { return base_style.size(); }
-    bool GeneratesText() const { return internal_text.size(); }
-
+  public:
+    Text_Rule() { }
     Text_Rule(String open_tag_start, char open_tag_end, String close_tag, String base_style)
       : open_tag_start(open_tag_start), open_tag_end(open_tag_end), close_tag(close_tag)
       , base_style(base_style)
     { }
+
+    // === Accessors ===
+    size_t GetID() const { return id; }
+    const String & GetOpenTagStart() const { return open_tag_start; }
+    char GetOpenTagEnd() const { return open_tag_end; }
+    const String & GetCloseTag() const { return close_tag; }
+    const String & GetBaseStyle() const { return base_style; }
+    char GetInternalChar() const { return internal_char; }
+
+    void SetID(size_t in_id) {
+      emp_assert(in_id < 1000000000, in_id, "Invalid rule ID");
+      id = in_id;
+    }
+    void SetInternalChar(char in) { internal_char = in; }
+    void SetConversions(auto _to_style_arg, auto _to_control) {
+      to_style_arg = _to_style_arg;
+      to_control = _to_control;
+    }
+
+    // === Helper functions ===
+    bool IsValid() const { return (id < emp::MAX_SIZE_T); }
+    bool UsesControl() const { return open_tag_end != '\0'; }
+    bool UsesText() const { return close_tag.size(); }
+    bool UsesStyle() const { return base_style.size(); }
+    bool GeneratesText() const { return internal_char; }
 
     String MakeStyle(String control) const {
       if (UsesControl() && to_style_arg) {
@@ -100,7 +122,7 @@ namespace emp {
       if (UsesControl()) os << "CONTROL" << open_tag_end;
       if (UsesText()) os << "TEXT" << close_tag;
       os << " : base_style='" << base_style
-         << "' ; internal_text='" << internal_text
+         << "' ; internal_char='" << internal_char
          << "' ; open_token_id=" << open_token_id
          << " ; close_token_id=" << close_token_id
          << std::endl;
