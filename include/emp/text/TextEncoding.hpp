@@ -33,12 +33,28 @@ namespace emp {
   class TextEncoding : public emp::TextEncoding_Interface {
   protected:
 
-    struct Style {
-      String name;                 // Unique name for this style.
+    class Style {
+    private:
+      String name = "No Name";     // Unique name for this style.
       size_t id = emp::MAX_SIZE_T; // Unique ID number (vector position) for this style.
       std::set<size_t> rule_ids;   // Which rules manage this style?
 
+    public:
+      Style() { }
       Style(String name, size_t id) : name(name), id(id) { }
+
+      const String & GetName() const { return name; }
+      size_t GetID() const { return id; }
+      const std::set<size_t> & GetRules() const { return rule_ids; }
+
+      void SetID(size_t new_id) {
+        emp_assert(new_id < 1000000000, new_id, "Setting a style to have an invalid ID");
+        id = new_id;
+      }
+      void AddRuleID(size_t rule_id) {
+        emp_assert(rule_id < 1000000000, rule_id, "Adding an invalid rule ID to a style");
+        rule_ids.insert(rule_id);
+      }
 
       void PrintDebug(std::ostream & os = std::cout) const {
         os << "Style " << id << " (" << name << "): Rule(s) "
@@ -48,10 +64,11 @@ namespace emp {
 
     // Track information about _active_ styles.
     struct StyleEntry {
-      size_t style_id;
+      size_t style_id=0;
       String full_info;  // Style name and arguments, as should be stored.
       size_t rule_id=0;  // Which rule created this entry? (determines legal end)
 
+      StyleEntry() { }
       StyleEntry(size_t style_id, String full_info, size_t rule_id)
         : style_id(style_id), full_info(full_info), rule_id(rule_id) { }
       StyleEntry(const StyleEntry &) = default;
@@ -71,11 +88,19 @@ namespace emp {
       bool IsMultiClose() const { return multi_close; }
       size_t GetOpenID() const { return open_id; }
       std::set<size_t> GetCloseIDs() const { return close_ids; }
+
       void AddOpen(size_t rule_id) {
         emp_assert(open_id == 0, "Rule trying to use open tag already in use.", rule_id, open_id);
         open_id = rule_id;
       }
       void AddClose(size_t rule_id) { close_ids.insert(rule_id); }
+      void SetMultiClose(bool in_mc=true) { multi_close = in_mc; }
+
+      void PrintDebug(std::ostream & os=std::cout) const {
+        os << "open_id=" << open_id << " ; close_ids=";
+        for (size_t id : close_ids) os << id << " ";
+        os << "; multiclose=" << multi_close << std::endl;
+      }
     };
 
     emp::vector<Text_Rule> rule_set;
@@ -107,7 +132,7 @@ namespace emp {
         emp::notify::TestError(create_ok == false, "Requested style '", style_name,
                                "' does not exist; creation is disallowed.");
         style_set.emplace_back(style_name, style_set.size());
-        name_to_style_id[style_name] = style_set.back().id;
+        name_to_style_id[style_name] = style_set.back().GetID();
         return style_set.back();
       }
       const size_t style_id = name_to_style_id[style_name];
@@ -130,16 +155,17 @@ namespace emp {
     // Get a rule associated with a style that can be applied at the specific text position.
     const Text_Rule & GetRule(const Style & style, const Text & text, size_t pos) const {
       // Scan through possible rules taking the first that applies.
-      for (size_t rule_id : style.rule_ids) {
+      for (size_t rule_id : style.GetRules()) {
         const Text_Rule & rule = rule_set[rule_id];
-        // If this rule has associated internal text, make sure it's there.
-        if (rule.internal_text.size() && !text.AsString().HasAt(rule.internal_text, pos)) {
-          continue; // Does not have correct internal text.
+        // If this rule uses an internal character, make sure it's there.
+        if (rule.GeneratesText() && text.AsString()[pos] != rule.GetInternalChar()) {
+          // std::cout << "Failed on style '" << style.GetName() << "' because wrong internal text; expected '" << rule.GetInternalChar() << "' but found '" << text.AsString()[pos] << "'." << std::endl;
+          continue; // Does not have correct internal char.
         }
         return rule;
       }
       // No rule found.  Give a warning and return the default rule.
-      notify::Warning("No appropriate rule to convert style '", style.name, "'. Skipping.");
+      notify::Warning("No appropriate rule to convert style '", style.GetName(), "'. Skipping.");
       return rule_set[0];
     }
 
@@ -149,7 +175,7 @@ namespace emp {
 
       // Loop through all tags, inserting each into the lexer.
       for (const auto & [tag, info] : tag_map) {
-        int id = lexer.AddToken(MakeString("Tag:", tag), tag);
+        int id = lexer.AddToken(MakeString("Tag:", tag), tag.AsLiteral());
         token_map[id] = info;
       }
 
@@ -169,7 +195,7 @@ namespace emp {
     }
 
     // Helper function to append text when we know we've hit a tag.
-    void Append_Tag(Text & text, int token_id, const String & lexeme, std::stringstream & ss) {
+    void Append_Tag(Text & text, int token_id, std::istream & input_stream) {
       emp_assert(Has(token_map, token_id), "Unknown token id: ", token_id);
 
       const TagInfo & info = token_map[token_id];
@@ -198,30 +224,30 @@ namespace emp {
         String control;
         if (rule.UsesControl()) {
           char c = '\0';
-          while (ss) {
-            ss >> c;
-            if (c == rule.open_tag_end) break; // Stop when we find the tag end.
+          while (input_stream) {
+            input_stream >> c;
+            if (c == rule.GetOpenTagEnd()) break; // Stop when we find the tag end.
             control += c;
           }
-          notify::TestError(c != rule.open_tag_end,
-                            "Open tag beginning with '", rule.open_tag_start,
-                            "' did not have end ('", rule.open_tag_end, "')");
+          notify::TestError(c != rule.GetOpenTagEnd(),
+                            "Open tag beginning with '", rule.GetOpenTagStart(),
+                            "' did not have end ('", rule.GetOpenTagEnd(), "')");
         }
 
         // Setup style opened by this rule, if any.
         String style_desc = rule.MakeStyle(control);
         if (style_desc.size()) {
-          size_t style_id = name_to_style_id[rule.base_style];
-          active_styles.emplace_back(style_id, style_desc, rule.id);
+          size_t style_id = name_to_style_id[rule.GetBaseStyle()];
+          active_styles.emplace_back(style_id, style_desc, rule.GetID());
         }
 
         // Do any text insertion required by this rule.
         if (rule.GeneratesText()) {
-          text.Append_Raw(rule.internal_text);
+          Append_RawText(text, MakeString(rule.GetInternalChar()));
         }
 
         // If this rule does not use a close, end new styles here.
-        if (rule.close_tag.size() == 0 && style_desc.size()) {
+        if (!rule.UsesText() && style_desc.size()) {
           active_styles.pop_back();
         }
 
@@ -231,37 +257,38 @@ namespace emp {
 
     // === Tools for Constructing an Encoding ===
 
-    // Add a pre-build rule to this encoding.
-    void RegisterRule(const Text_Rule & rule) {
-      rule_set.emplace_back(rule);
-      rule_set.back().id = rule_set.size() - 1;
+    // Add a pre-built rule to this encoding.
+    void RegisterRule(const Text_Rule & in_rule) {
+      rule_set.emplace_back(in_rule);
+      Text_Rule & rule = rule_set.back();
+      rule.SetID(rule_set.size() - 1);
 
       // All rules must have a unique start to open_tag (for parse simplicity)
-      String start_pattern = rule.open_tag_start;
+      String start_pattern = rule.GetOpenTagStart();
       emp::notify::TestError(start_pattern.empty(),
-        "Tag ", rule.id, " does not have a start pattern.");
+        "Tag ", rule.GetID(), " does not have a start pattern.");
       emp::notify::TestError(emp::Has(tag_map, start_pattern),
-        "Start tag ", rule.id, ", '", start_pattern, "' cannot be used for more than one rule.");
+        "Start tag ", rule.GetID(), ", '", start_pattern, "' cannot be used for more than one rule.");
 
       // Register the start pattern so we know when we hit it.
-      tag_map[start_pattern].AddOpen(rule.id);
+      tag_map[start_pattern].AddOpen(rule.GetID());
 
       // If this rule has an ending pattern, register it as well.
       // NOTE: A newline close tag (i.e., "\n") is special and will end ALL styles that use it.
-      if (rule.close_tag.size()) tag_map[rule.close_tag].AddClose(rule.id);
+      if (rule.UsesText()) tag_map[rule.GetCloseTag()].AddClose(rule.GetID());
 
       // If this rule uses a style, link it in.
-      if (rule.base_style.size()) {
-        Style & style = GetStyle(rule.base_style);
-        style.rule_ids.insert(rule.id);
+      if (rule.UsesStyle()) {
+        Style & style = GetStyle(rule.GetBaseStyle());
+        style.AddRuleID(rule.GetID());
       }
 
-      // If this rule generates internal text without a style, make it reversible.
-      if (rule.internal_text.size() && !rule.base_style.size()) {
-        emp::notify::TestError(rule.internal_text.size() != 1,
+      // If this rule generates an internal char without a style, make it reversible.
+      if (rule.GeneratesText() && !rule.UsesStyle()) {
+        emp::notify::TestError(rule.GeneratesText() != 1,
           "Rules that convert text with no emphatic style must be limited to one character.\n",
-          "Text = '", rule.internal_text, "'.");
-        special_chars[rule.internal_text[0]] = rule.id;
+          "Text = '", rule.GetInternalChar(), "'.");
+        special_chars[rule.GetInternalChar()] = rule.GetID();
       }
     }
 
@@ -289,35 +316,33 @@ namespace emp {
                          String base_style)
     {
       Text_Rule rule(open_tag_start, open_tag_end, close_tag, base_style);
-      rule.to_style_arg = [](String arg){ return arg; };
-      rule.to_control = [](String arg){ return arg; };
+      rule.SetConversions( [](String arg){ return arg; }, [](String arg){ return arg; } );
       RegisterRule(rule);
     }
 
     /// Specify a new set of tags, with a control block.  You must also specify HOW
     /// the control should be converted to style args and vice-versa.
-    void AddStyleDynamic(String open_tag_start, String open_tag_end, String close_tag,
+    void AddStyleDynamic(String open_tag_start, char open_tag_end, String close_tag,
                          String base_style, auto to_style_arg, auto to_control)
     {
       Text_Rule rule(open_tag_start, open_tag_end, close_tag, base_style);
-      rule.to_style_arg = to_style_arg;
-      rule.to_control = to_control;
+      rule.SetConversions(to_style_arg, to_control);
       RegisterRule(rule);
     }
 
     /// Add a new tag that gets replaced in plain-text. For example:
     ///   AddReplaceTag("&lt;", "<")                 for less-than in HTML -or-
     ///   AddReplaceTag("&nbsp;", " ", "no_break")   for non-breaking spaces.
-    void AddReplaceTag(String tag, String text_str, String style_name="") {
+    void AddReplaceTag(String tag, char internal_char, String style_name="") {
       Text_Rule rule(tag, '\0', "", style_name);
-      rule.internal_text = text_str;
+      rule.SetInternalChar(internal_char);
       RegisterRule(rule);
     }
 
-    /// Add a symbol that will be represented as a space, but specified in its style.
-    void AddReplaceControl(String tag_start, char tag_end, String text_str, String style_name) {
-      Text_Rule rule(tag_start, tag_end, "", style_name);
-      rule.internal_text = text_str;
+    /// Add a symbol pair (tag start and end) that will use its CONTROL argument as a STYLE argument.
+    void AddReplaceControl(String open_start, char open_end, char internal_char, String style_name) {
+      Text_Rule rule(open_start, open_end, "", style_name);
+      rule.SetInternalChar(internal_char);
       RegisterRule(rule);
     }
 
@@ -326,7 +351,7 @@ namespace emp {
       for (char c : text_block) {
         if (c > 0 && special_chars[c]) {
           const Text_Rule & rule = rule_set[special_chars[c]];
-          out_stream << rule.open_tag_start;
+          out_stream << rule.GetOpenTagStart();
         }
         else out_stream << c;
       }
@@ -336,7 +361,7 @@ namespace emp {
     TextEncoding() : TextEncoding_Interface() {
       // Setup a default rule that is always ID zero.
       Text_Rule default_rule("__default_Text_Rule__", '\0', "", "");
-      default_rule.id = 0;
+      default_rule.SetID(0);
       rule_set.push_back(default_rule);
 
       // Setup a default style that is always ID zero.
@@ -373,7 +398,7 @@ namespace emp {
         if (token.id == text_token) raw_text += token.lexeme;
         else {
           if (raw_text.size()) Append_RawText(text, raw_text.PopAll());
-          Append_Tag(text, token.id, token.lexeme, ss);
+          Append_Tag(text, token.id, ss);
         }
       }
       if (raw_text.size()) Append_RawText(text, raw_text.PopAll());
@@ -393,12 +418,12 @@ namespace emp {
         // Loop through marking every change in style.
         auto ranges = sites.GetRanges();
         for (const auto & range : ranges) {
-          auto & open_v = style_pos_map[range.GetLower()];
-          auto & close_v = style_pos_map[range.GetUpper()];
+          auto & open_vec = style_pos_map[range.GetLower()];
+          auto & close_vec = style_pos_map[range.GetUpper()+1];
           // Insert opens at the end and closes at the beginning; thus we close all existing
           // styles before we open any new ones (and closes happen in reverse order.)
-          open_v.emplace_back(&style_desc, true);
-          close_v.insert(close_v.begin(), pos_info_t{&style_desc, false});
+          open_vec.emplace_back(&style_desc, true);
+          close_vec.insert(close_vec.begin(), pos_info_t{&style_desc, false});
         }
       }
 
@@ -417,14 +442,14 @@ namespace emp {
         for (auto [style_ptr, is_open] : style_vec) {
           const Style & style = GetStyle(*style_ptr);
           const Text_Rule & rule = GetRule(style, text, scan_pos);
-          if (rule.id == 0) continue; // No rule found; warning already sent.
+          if (rule.GetID() == 0) continue; // No rule found; warning already sent.
 
           // If the rule has text associated with it, skip over text.
-          if (rule.internal_text.size()) scan_pos += rule.internal_text.size();
+          if (rule.GeneratesText()) scan_pos += rule.GeneratesText();
 
           // Drop the appropriate tag here.
           if (is_open) out_stream << rule.MakeOpenTag(*style_ptr);
-          else out_stream << rule.close_tag;
+          else out_stream << rule.GetCloseTag();
         }
       }
 
