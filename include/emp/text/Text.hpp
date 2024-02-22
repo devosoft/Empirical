@@ -339,7 +339,7 @@ namespace emp {
     void resize(size_t new_size) { Resize(new_size); }
 
     template <typename... Ts>
-    Text & assign(Ts &&... in) { text.assign( std::forward<Ts>(in)... ); }
+    Text & assign(Ts &&... in) { text.assign( std::forward<Ts>(in)... ); return *this; }
     TextCharRef<false> front()      { return operator[](0); }
     TextCharRef<true> front() const { return operator[](0); }
     TextCharRef<false> back()       { return operator[](text.size()-1); }
@@ -347,9 +347,9 @@ namespace emp {
 
     bool empty() const { return text.empty(); }
     template <typename... Ts>
-    bool starts_with(Ts &&... in) const { text.starts_with(std::forward<Ts>(in)... ); }
+    bool starts_with(Ts &&... in) const { return text.starts_with(std::forward<Ts>(in)... ); }
     template <typename... Ts>
-    bool ends_with(Ts &&... in) const { text.ends_with(std::forward<Ts>(in)... ); }
+    bool ends_with(Ts &&... in) const { return text.ends_with(std::forward<Ts>(in)... ); }
 
     template <typename... Ts>
     size_t find(Ts &&... in) const { return text.find(std::forward<Ts>(in)...); }
@@ -519,6 +519,7 @@ namespace emp {
 
     void PrintDebug(std::ostream & os = std::cout) {
       os << ToDebugString();
+      os << "ENCODING:\n";
       encoding_ptr->PrintDebug(os);
     }
   };
