@@ -51,20 +51,21 @@ namespace emp {
 
   class Text_Rule {
   private:
-    size_t id = emp::MAX_SIZE_T;  // Unique ID for this rule (index in tag_map)
-    int open_token_id = -1;       // ID of open_tag_start in the lexer
-    int close_token_id = -1;      // ID of close_tag in the lexer
+    size_t id = emp::MAX_SIZE_T;  ///< Unique ID for this rule (index in tag_map)
+    int open_token_id = -1;       ///< ID of open_tag_start in the lexer
+    int close_token_id = -1;      ///< ID of close_tag in the lexer
 
     // - Target parsing info -
-    String open_tag_start;    ///< Beginning of open tag. (E.g. "<a" or "\bold{")
-    char open_tag_end = '\0'; ///< End of open tag (E.g., '>') or empty if no control used
-    String close_tag;         ///< Tag to indicate close of text, or empty if no text used
+    String open_tag_start;        ///< Beginning of open tag. (E.g. "<a" or "\bold{")
+    char open_tag_end = '\0';     ///< End of open tag (E.g., '>') or empty if no control used
+    String close_tag;             ///< Tag to indicate close of text, or empty if no text used
 
     // - Styling info -
     // A base style would be "font"
     // Style argument could be "arial"
     // This would generate a full style: "font:arial"
-    String base_style;          ///< What style is this rule associated with?
+    String base_style;          ///< What style is this rule associated with? (args may be added)
+    String symbol_type;         ///< Is there a special symbol associated with this rule?
     char internal_char = '\0';  ///< What character is used to placehold internally in Text?
 
     std::function<String(String)> to_style_arg; ///< Convert CONTROL into STYLE arguments
@@ -72,9 +73,9 @@ namespace emp {
 
   public:
     Text_Rule() { }
-    Text_Rule(String open_tag_start, char open_tag_end, String close_tag, String base_style)
+    Text_Rule(String open_tag_start, char open_tag_end, String close_tag, String base_style, String symbol_type)
       : open_tag_start(open_tag_start), open_tag_end(open_tag_end), close_tag(close_tag)
-      , base_style(base_style)
+      , base_style(base_style), symbol_type(symbol_type)
     { }
 
     // === Accessors ===
@@ -83,6 +84,7 @@ namespace emp {
     char GetOpenTagEnd() const { return open_tag_end; }
     const String & GetCloseTag() const { return close_tag; }
     const String & GetBaseStyle() const { return base_style; }
+    const String & GetSymbol() const { return symbol_type; }
     char GetInternalChar() const { return internal_char; }
 
     void SetID(size_t in_id) {
@@ -100,7 +102,7 @@ namespace emp {
     bool UsesControl() const { return open_tag_end != '\0'; }
     bool UsesText() const { return close_tag.size(); }
     bool UsesStyle() const { return base_style.size(); }
-    bool GeneratesText() const { return internal_char; }
+    bool UsesSymbol() const { return symbol_type.size(); }
 
     String MakeStyle(String control) const {
       if (UsesControl() && to_style_arg) {
@@ -122,6 +124,7 @@ namespace emp {
       if (UsesControl()) os << "CONTROL" << open_tag_end;
       if (UsesText()) os << "TEXT" << close_tag;
       os << " : base_style='" << base_style
+         << "' ; symbol_type='" << symbol_type
          << "' ; internal_char='" << internal_char
          << "' ; open_token_id=" << open_token_id
          << " ; close_token_id=" << close_token_id
