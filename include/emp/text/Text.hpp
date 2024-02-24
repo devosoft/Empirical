@@ -89,6 +89,9 @@ namespace emp {
     // a colon, and the font size.  E.g.: "TimesNewRoman:12"
     std::unordered_map<String, BitVector> style_map;
 
+    // Track non-ascii symbols as a sorted set of positions and the symbol name at that position.
+    std::map<size_t, emp::String> symbol_map;
+
     // A set of encodings that this Text object can handle.
     using encoding_ptr_t = emp::Ptr<TextEncoding_Interface>;
     encoding_ptr_t encoding_ptr = nullptr;
@@ -116,7 +119,7 @@ namespace emp {
 
   public:
     Text() { encoding_ptr = encodings["txt"] = NewPtr<TextEncoding_None>(); }
-    Text(const Text & in) : text(in.text), style_map(in.style_map) { CloneEncodings(in); }
+    Text(const Text & in) : text(in.text), style_map(in.style_map), symbol_map(in.symbol_map) { CloneEncodings(in); }
     template <typename... Ts>
     Text(Ts &&... in) : Text() { Append(std::forward<Ts>(in)...); }
     ~Text() { for (auto & [e_name, ptr] : encodings) ptr.Delete(); }
@@ -130,6 +133,7 @@ namespace emp {
     Text & operator=(Text && in) {
       std::swap(text, in.text);
       std::swap(style_map, in.style_map);
+      std::swap(symbol_map, in.symbol_map);
       std::swap(encodings, in.encodings);
       std::swap(encoding_ptr, in.encoding_ptr);
       return *this;
@@ -138,6 +142,7 @@ namespace emp {
     template <typename T>
     Text & operator=(const T & in) {
       style_map.clear(); // Clear out existing content.
+      symbol_map.clear();
       text.clear();
       Append(in);
       return *this;
@@ -153,6 +158,11 @@ namespace emp {
     // Return all of the styles used in this text.
     const std::unordered_map<String, BitVector> & GetStyleMap() const {
       return style_map;
+    }
+
+    // Return all of the symbols in this text.
+    const std::map<size_t, String> & GetSymbols() const {
+      return symbol_map;
     }
 
     // Return the current bit pattern for a specified style.
@@ -250,6 +260,9 @@ namespace emp {
         for (auto & [style_name, new_bits] : in.style_map) {
           style_map[style_name].Resize(start_size).Append(new_bits);
         }
+        for (auto [pos,symbol] : in.symbol_map) {
+          symbol_map[start_size+pos] = symbol;
+        }
       }
 
       // Otherwise, convert the input to a string and add it on.
@@ -281,6 +294,13 @@ namespace emp {
       return *this;
     }
 
+    // Append a special symbol; assume no formatting.
+    Text & Append_Symbol(const emp::String & symbol_type, char placeholder) {
+      symbol_map[size()] = symbol_type;
+      text += placeholder;
+      return *this;
+    }
+
     // Stream operator.
     template <typename T> Text & operator<<(T && in) { return Append(std::forward<T>(in)); }
     template <typename T> Text & operator+=(T && in) { return Append(std::forward<T>(in)); }
@@ -290,13 +310,20 @@ namespace emp {
     String Encode() const { return encoding_ptr->Encode(*this); }
 
     void Resize(size_t new_size) {
-      text.resize(new_size);
-      for (auto & [tag, bits] : style_map) {
-        if (bits.GetSize() > new_size) {
-          bits.Resize(new_size);
+      // If we are shrinking the text, make sure we remove styles and symbols as needed.
+      if (new_size < size()) {
+        // Remove styles that go beyond the new size.
+        for (auto & [tag, bits] : style_map) {
+          if (bits.GetSize() > new_size) {
+            bits.Resize(new_size);
+          }
         }
+        // Remove symbols, as needed.
+        auto it = symbol_map.lower_bound(new_size);
+        symbol_map.erase(it, symbol_map.end());
+        Cleanup(); // Remove any styles that are no longer used.
       }
-      Cleanup(); // Remove any styles that are no longer used.
+      text.resize(new_size);
     }
 
     // Direct Get accessors
@@ -508,12 +535,23 @@ namespace emp {
     Text & ClearSuperscript(size_t start, size_t end) { return Clear("superscript", start, end); }
     Text & ClearUnderline(size_t start, size_t end) { return Clear("underline", start, end); }
 
+    BitVector GetSymbolPositions() const {
+      if (symbol_map.empty()) return BitVector(0);
+      size_t max_value = symbol_map.rbegin()->first;
+      BitVector out_bits(max_value+1, false);
+      for (auto entry : symbol_map) {
+        out_bits.Set(entry.first);
+      }
+      return out_bits;
+    }
+
     String ToDebugString() {
       String out;
       out += MakeString("Text: ", text, "\n");
       for (auto [name, bits] : style_map) {
         out += MakeString("      ", bits, " : ", name, "\n");
       }
+      out += MakeString("      ", GetSymbolPositions(), " : SYMBOLS\n");
       return out;
     }
 
