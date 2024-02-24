@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022-2023.
+ *  @date 2022-2024.
  *
  *  @file HTMLEncoding.hpp
  *  @brief Plugs into emp::Text, setting up inputs and output to be HTML encoded.
@@ -18,6 +18,7 @@
 
 #include "TextEncoding.hpp"
 #include "Text.hpp"
+#include "Text_utils.hpp"
 
 namespace emp {
 
@@ -25,24 +26,15 @@ namespace emp {
   private:
 
     void SetupTags() {
-      SetupStyleTags("bold", "<b>", "</b>");
-      SetupStyleTags("code", "<code>", "</code>");
-      SetupStyleTags("italic", "<i>", "</i>");
-      SetupStyleTags("strike", "<del>", "</del>");
-      SetupStyleTags("subscript", "<sub>", "</sub>");
-      SetupStyleTags("superscript", "<sup>", "</sup>");
-      SetupStyleTags("underline", "<u>", "</u>");
-      SetupStyleTags("header1", "<h1>", "</h1>");
-      SetupStyleTags("header2", "<h2>", "</h2>");
-      SetupStyleTags("header3", "<h3>", "</h3>");
-      SetupStyleTags("header4", "<h4>", "</h4>");
-      SetupStyleTags("header5", "<h5>", "</h5>");
-      SetupStyleTags("header6", "<h6>", "</h6>");
+      const auto & code_map = GetTextStyleMap_FromHTML();
+      for (auto & [html_tag, style] : code_map) {
+        AddStyleTags(style, MakeString("<",html_tag,">"), MakeString("</",html_tag,">"));
+      }
 
-      SetupReplaceTag("&amp;", '&');
-      SetupReplaceTag("&gt;", '>');
-      SetupReplaceTag("&lt;", '<');
-      SetupReplaceTag("&nbsp;", ' ', "no_break");
+      AddReplaceTag("&amp;", '&');
+      AddReplaceTag("&gt;", '>');
+      AddReplaceTag("&lt;", '<');
+      AddReplaceTag("&nbsp;", ' ', "no_break");
     }
 
 
