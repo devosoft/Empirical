@@ -72,7 +72,6 @@ namespace emp {
 
     /// A helper tag type for tags with a control sequence to specify their operation.
     struct TagInfo {
-      int token_id = -1;  ///< ID of this tag in the lexer
       String start;   ///< Unique beginning of the tag (e.g., "<img " or "<a ")
       char end='\0';  ///< End of tag (E.g., '>')
 
@@ -82,7 +81,7 @@ namespace emp {
       // Can this tag forgo a control sequence?
       TagInfo() { }
       TagInfo(String start, char end='\0') : start(start), end(end) { }
-      [[nodiscard]] bool IsUsed() const { return token_id >= 0; }
+      [[nodiscard]] bool IsUsed() const { return start.size(); }
       [[nodiscard]] bool IsSimple() const { return end == '\0'; }
       [[nodiscard]] bool HasFuns() const { return to_arg_fun && to_control_fun; }
     };
@@ -122,7 +121,7 @@ namespace emp {
     [[nodiscard]] String GetCloseTag()     const { return close_tag.start; }
     [[nodiscard]] String GetBaseStyle()    const { return rule_type == STYLE_RULE ? base_type : ""; }
     [[nodiscard]] String GetSymbol()       const { return rule_type == OBJECT_RULE ? base_type : ""; }
-    [[nodiscard]] char   GetInternalChar() const { return placeholder; }
+    [[nodiscard]] char   GetPlaceholder()  const { return placeholder; }
 
     void SetID(size_t in_id) {
       emp_assert(in_id < 1000000000, in_id, "Invalid rule ID");
@@ -138,7 +137,7 @@ namespace emp {
     [[nodiscard]] bool UsesControl() const { return !main_tag.IsSimple(); }
     [[nodiscard]] bool UsesText() const { return close_tag.IsUsed(); }
     [[nodiscard]] bool SetsStyle() const { return rule_type == RuleType::STYLE_RULE; }
-    [[nodiscard]] bool SetsObject() const { return rule_type == RuleType::OBJECT_RULE; }
+    [[nodiscard]] bool InsertsObject() const { return rule_type == RuleType::OBJECT_RULE; }
     [[nodiscard]] bool IsSimpleReplacement() const { return base_type.size() == 0; }
 
     [[nodiscard]] String MakeStyle(String control) const {
@@ -163,8 +162,6 @@ namespace emp {
       if (UsesText()) os << "TEXT" << close_tag.start;
       os << " : base_type='" << base_type
          << "' ; placeholder='" << placeholder
-         << "' ; open_token_id=" << main_tag.token_id
-         << " ; close_token_id=" << close_tag.token_id
          << std::endl;
     }
   };
