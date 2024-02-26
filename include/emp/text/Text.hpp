@@ -60,22 +60,23 @@ namespace emp {
 
   // A base class for any special encodings that should work with Text objects.
   struct TextEncoding_Interface {
+    using this_t = TextEncoding_Interface;
     virtual ~TextEncoding_Interface() { }
 
-    virtual String GetName() const = 0;                         // Return name of encoding.
-    virtual void Append(Text &, const String &) = 0;            // Add new text.
-    virtual String Encode(const Text &) const = 0;              // Output formatted text.
-    virtual emp::Ptr<TextEncoding_Interface> Clone() const = 0; // Copy encoding.
+    [[nodiscard]] virtual String GetName() const = 0;              // Return name of encoding.
+    virtual void Append(Text &, const String &) = 0;               // Add new text.
+    [[nodiscard]] virtual String Encode(const Text &) const = 0;   // Output formatted text.
+    [[nodiscard]] virtual emp::Ptr<this_t> Clone() const = 0;      // Copy encoding.
     virtual void PrintDebug(std::ostream &) const = 0;
   };
 
   class TextEncoding_None : public TextEncoding_Interface {
   public:
     TextEncoding_None() { }
-    String GetName() const override { return "text"; }
+    [[nodiscard]] String GetName() const override { return "text"; }
     void Append(Text & text, const String & in) override;
-    String Encode(const Text & text) const override;
-    emp::Ptr<TextEncoding_Interface> Clone() const override;
+    [[nodiscard]] String Encode(const Text & text) const override;
+    [[nodiscard]] emp::Ptr<TextEncoding_Interface> Clone() const override;
     void PrintDebug(std::ostream & os) const override;
   };
 
@@ -150,10 +151,10 @@ namespace emp {
 
 
     // GetSize() returns the number of characters IGNORING all formatting.
-    size_t GetSize() const { return text.size(); }
+    [[nodiscard]] size_t GetSize() const { return text.size(); }
 
     // Return the current text as an unformatted string.
-    const String & AsString() const { return text; }
+    [[nodiscard]] const String & AsString() const { return text; }
 
     // View the current string
     [[nodiscard]] std::string_view ViewString(size_t start=0, size_t out_size=String::npos) const {
@@ -166,17 +167,17 @@ namespace emp {
     }
 
     // Return all of the styles used in this text.
-    const std::unordered_map<String, BitVector> & GetStyleMap() const {
+    [[nodiscard]] const std::unordered_map<String, BitVector> & GetStyleMap() const {
       return style_map;
     }
 
     // Return all of the symbols in this text.
-    const std::map<size_t, String> & GetSymbols() const {
+    [[nodiscard]] const std::map<size_t, String> & GetSymbols() const {
       return symbol_layout;
     }
 
     // Return the current bit pattern for a specified style.
-    const BitVector & GetStyle(const String & style) const {
+    [[nodiscard]] const BitVector & GetStyle(const String & style) const {
       return emp::GetConstRef(style_map, style);
     }
 
@@ -186,13 +187,13 @@ namespace emp {
     /// @brief Test if this Text object is aware of how to use a specified encoding.
     /// @param name Name of the encoding to test for.
     /// @return A true/false indicate if the named encoding is known.
-    bool HasEncoding(const String & name) const {
+    [[nodiscard]] bool HasEncoding(const String & name) const {
       return emp::Has(encodings, name);
     }
 
     /// @brief Get the name of the current encoding being applied.
     /// @return Name of the current encoding.
-    String GetEncodingName() const {
+    [[nodiscard]] String GetEncodingName() const {
       for (const auto & [e_name, ptr] : encodings) {
         if (encoding_ptr == ptr) return e_name;
       }
@@ -317,7 +318,7 @@ namespace emp {
 
     /// @brief Convert text to a string using the current encoding.
     /// @return The resulting string.
-    String Encode() const { return encoding_ptr->Encode(*this); }
+    [[nodiscard]] String Encode() const { return encoding_ptr->Encode(*this); }
 
     void Resize(size_t new_size) {
       // If we are shrinking the text, make sure we remove styles and symbols as needed.
@@ -337,7 +338,7 @@ namespace emp {
     }
 
     // Direct Get accessors
-    char GetChar(size_t pos) const {
+    [[nodiscard]] char GetChar(size_t pos) const {
       emp_assert(pos < text.size());
       return text[pos];
     }
@@ -361,45 +362,49 @@ namespace emp {
       return *this;
     }
 
-    TextCharRef<false> operator[](size_t pos) {
+    [[nodiscard]] TextCharRef<false> operator[](size_t pos) {
       emp_assert(pos < GetSize(), pos, GetSize());
       return TextCharRef<false>(*this, pos);
     }
 
-    TextCharRef<true> operator[](size_t pos) const {
+    [[nodiscard]] TextCharRef<true> operator[](size_t pos) const {
       emp_assert(pos < GetSize(), pos, GetSize());
       return TextCharRef<true>(*this, pos);
     }
 
     // STL-like functions for perfect compatibility with string.
-    size_t size() const { return text.size(); }
+    [[nodiscard]] size_t size() const { return text.size(); }
     void resize(size_t new_size) { Resize(new_size); }
 
     template <typename... Ts>
     Text & assign(Ts &&... in) { text.assign( std::forward<Ts>(in)... ); return *this; }
-    TextCharRef<false> front()      { return operator[](0); }
-    TextCharRef<true> front() const { return operator[](0); }
-    TextCharRef<false> back()       { return operator[](text.size()-1); }
-    TextCharRef<true> back() const  { return operator[](text.size()-1); }
+    [[nodiscard]] TextCharRef<false> front()      { return operator[](0); }
+    [[nodiscard]] TextCharRef<true> front() const { return operator[](0); }
+    [[nodiscard]] TextCharRef<false> back()       { return operator[](text.size()-1); }
+    [[nodiscard]] TextCharRef<true> back() const  { return operator[](text.size()-1); }
 
-    bool empty() const { return text.empty(); }
+    [[nodiscard]] bool empty() const { return text.empty(); }
     template <typename... Ts>
-    bool starts_with(Ts &&... in) const { return text.starts_with(std::forward<Ts>(in)... ); }
+    [[nodiscard]] bool starts_with(Ts &&... in) const {
+      return text.starts_with(std::forward<Ts>(in)... );
+    }
     template <typename... Ts>
-    bool ends_with(Ts &&... in) const { return text.ends_with(std::forward<Ts>(in)... ); }
+    [[nodiscard]] bool ends_with(Ts &&... in) const {
+      return text.ends_with(std::forward<Ts>(in)... );
+    }
 
     template <typename... Ts>
-    size_t find(Ts &&... in) const { return text.find(std::forward<Ts>(in)...); }
+    [[nodiscard]] size_t find(Ts &&... in) const { return text.find(std::forward<Ts>(in)...); }
     template <typename... Ts>
-    size_t rfind(Ts &&... in) const { return text.rfind(std::forward<Ts>(in)...); }
+    [[nodiscard]] size_t rfind(Ts &&... in) const { return text.rfind(std::forward<Ts>(in)...); }
     template <typename... Ts>
-    size_t find_first_of(Ts &&... in) const { return text.find_first_of(std::forward<Ts>(in)...); }
+    [[nodiscard]] size_t find_first_of(Ts &&... in) const { return text.find_first_of(std::forward<Ts>(in)...); }
     template <typename... Ts>
-    size_t find_first_not_of(Ts &&... in) const { return text.find_first_not_of(std::forward<Ts>(in)...); }
+    [[nodiscard]] size_t find_first_not_of(Ts &&... in) const { return text.find_first_not_of(std::forward<Ts>(in)...); }
     template <typename... Ts>
-    size_t find_last_of(Ts &&... in) const { return text.find_last_of(std::forward<Ts>(in)...); }
+    [[nodiscard]] size_t find_last_of(Ts &&... in) const { return text.find_last_of(std::forward<Ts>(in)...); }
     template <typename... Ts>
-    size_t find_last_not_of(Ts &&... in) const { return text.find_last_not_of(std::forward<Ts>(in)...); }
+    [[nodiscard]] size_t find_last_not_of(Ts &&... in) const { return text.find_last_not_of(std::forward<Ts>(in)...); }
 
     // ---------------- FORMATTING functions ----------------
 
@@ -451,7 +456,7 @@ namespace emp {
 
     /// Return the set of active styles in this text.
     /// @param pos optional position to specify only styles used at position.
-    emp::vector<String> GetStyles(size_t pos=MAX_SIZE_T) const {
+    [[nodiscard]] emp::vector<String> GetStyles(size_t pos=MAX_SIZE_T) const {
       emp::vector<String> styles;
       for (const auto & [name, bits] : style_map) {
         if (pos == MAX_SIZE_T || bits.Has(pos)) {
@@ -462,31 +467,31 @@ namespace emp {
     }
 
     // Test if a particular style is present anywhere in the text
-    bool HasStyle(const String & style) const {
+    [[nodiscard]] bool HasStyle(const String & style) const {
       if (!emp::Has(style_map, style)) return false;
       return GetConstRef(style_map, style).Any();
     }
-    bool HasBold() const { return HasStyle("bold"); }
-    bool HasCode() const { return HasStyle("code"); }
-    bool HasItalic() const { return HasStyle("italic"); }
-    bool HasStrike() const { return HasStyle("strike"); }
-    bool HasSubscript() const { return HasStyle("subscript"); }
-    bool HasSuperscript() const { return HasStyle("superscript"); }
-    bool HasUnderline() const { return HasStyle("underline"); }
+    [[nodiscard]] bool HasBold() const { return HasStyle("bold"); }
+    [[nodiscard]] bool HasCode() const { return HasStyle("code"); }
+    [[nodiscard]] bool HasItalic() const { return HasStyle("italic"); }
+    [[nodiscard]] bool HasStrike() const { return HasStyle("strike"); }
+    [[nodiscard]] bool HasSubscript() const { return HasStyle("subscript"); }
+    [[nodiscard]] bool HasSuperscript() const { return HasStyle("superscript"); }
+    [[nodiscard]] bool HasUnderline() const { return HasStyle("underline"); }
 
     // Test if a particular style is present at a given position.
-    bool HasStyle(const String & style, size_t pos) const {
+    [[nodiscard]] bool HasStyle(const String & style, size_t pos) const {
       auto it = style_map.find(style);
       if (it == style_map.end()) return false; // Style is nowhere.
       return it->second.Has(pos);
     }
-    bool HasBold(size_t pos) const { return HasStyle("bold", pos); }
-    bool HasCode(size_t pos) const { return HasStyle("code", pos); }
-    bool HasItalic(size_t pos) const { return HasStyle("italic", pos); }
-    bool HasStrike(size_t pos) const { return HasStyle("strike", pos); }
-    bool HasSubscript(size_t pos) const { return HasStyle("subscript", pos); }
-    bool HasSuperscript(size_t pos) const { return HasStyle("superscript", pos); }
-    bool HasUnderline(size_t pos) const { return HasStyle("underline", pos); }
+    [[nodiscard]] bool HasBold(size_t pos) const { return HasStyle("bold", pos); }
+    [[nodiscard]] bool HasCode(size_t pos) const { return HasStyle("code", pos); }
+    [[nodiscard]] bool HasItalic(size_t pos) const { return HasStyle("italic", pos); }
+    [[nodiscard]] bool HasStrike(size_t pos) const { return HasStyle("strike", pos); }
+    [[nodiscard]] bool HasSubscript(size_t pos) const { return HasStyle("subscript", pos); }
+    [[nodiscard]] bool HasSuperscript(size_t pos) const { return HasStyle("superscript", pos); }
+    [[nodiscard]] bool HasUnderline(size_t pos) const { return HasStyle("underline", pos); }
 
     // Clear ALL formatting
     Text & Clear() { style_map.clear(); return *this; }
@@ -545,7 +550,7 @@ namespace emp {
     Text & ClearSuperscript(size_t start, size_t end) { return Clear("superscript", start, end); }
     Text & ClearUnderline(size_t start, size_t end) { return Clear("underline", start, end); }
 
-    BitVector GetSymbolPositions() const {
+    [[nodiscard]] BitVector GetSymbolPositions() const {
       if (symbol_layout.empty()) return BitVector(0);
       size_t max_value = symbol_layout.rbegin()->first;
       BitVector out_bits(max_value+1, false);
@@ -555,7 +560,7 @@ namespace emp {
       return out_bits;
     }
 
-    String ToDebugString() {
+    [[nodiscard]] String ToDebugString() {
       String out;
       out += MakeString("Text: ", text, "\n");
       for (auto [name, bits] : style_map) {
