@@ -111,8 +111,8 @@ namespace emp {
     std::array<size_t, 128> special_chars;     // Chart of special ASCII chars to encoding rule
 
     // Internal objects that are inserted into the text (such as symbols, images, divs, etc)
-    // must have a function that indicates how to convert them to an appropriate tag.
-    std::unordered_map<String, size_t> symbol_map;
+    // must have a rule that indicates how to convert them to an appropriate tag.
+    std::unordered_map<String, size_t> object_map;
 
     emp::Lexer lexer;                           // Lexer to process encoding.
     int text_token = -1;                        // Token to represent any non-tag text.
@@ -156,8 +156,8 @@ namespace emp {
 
     // Get the symbol tag associated with a given internal name.
     const Text_Rule & GetSymbolRule(const String & internal_name) const {
-      auto it = symbol_map.find(internal_name);
-      if (it == symbol_map.end()) {
+      auto it = object_map.find(internal_name);
+      if (it == object_map.end()) {
         notify::Warning("Unknown symbol '", internal_name, "'!  Skipping.");
         return rule_set[0];
       }
@@ -170,9 +170,8 @@ namespace emp {
       for (size_t rule_id : style.GetRules()) {
         const Text_Rule & rule = rule_set[rule_id];
         // If this rule needs an internal char for an object, make sure it's there.
-        if (rule.SetsObject() &&
-            (pos >= text.size() || text.AsString()[pos] != rule.GetInternalChar())) {
-          // std::cout << "Failed on style '" << style.GetName() << "' because wrong internal text; expected '" << rule.GetInternalChar() << "' but found '" << text.AsString()[pos] << "'." << std::endl;
+        if (rule.InsertsObject() &&
+            (pos >= text.size() || text.AsString()[pos] != rule.GetPlaceholder())) {
           continue; // Does not have correct internal char.
         }
         return rule;
@@ -216,60 +215,62 @@ namespace emp {
       }
     }
 
+    /// Helper function to append a tag part 1: Test if it is CLOSING a style.
+    /// @return Was the tag used?
+    bool Append_Tag_Close(Text & text, const TagInfo & info) {
+      if (!info.HasClose()) return false;   // If this token can't CLOSE a style, abort.
+
+      // Scan active styles from most recent to figure out which one to remove.
+      bool used = false;
+      for (size_t id = active_styles.size()-1; id < active_styles.size(); --id) {
+        // If we have found a tag to end, do so.
+        if (info.HasClose(active_styles[id].rule_id)) {
+          active_styles.erase(active_styles.begin()+id);
+          used = true; // Indicate that this tag has been used at least once.
+          if (!info.IsMultiClose()) break;
+        }
+      }
+      return used;
+    }
+
     // Helper function to append text when we know we've hit a tag.
     void Append_Tag(Text & text, int token_id, std::istream & input_stream) {
       emp_assert(Has(token_map, token_id), "Unknown token id: ", token_id);
 
       const TagInfo & info = token_map[token_id];
-      bool used = false;
 
-      // If this token might CLOSE a style, search for options.
-      if (info.HasClose()) {
-        // Scan through active styles from most recent to figure out which one to remove.
-        for (size_t id = active_styles.size()-1; id < active_styles.size(); --id) {
-          // If we have found a tag to end, do so.
-          if (info.HasClose(active_styles[id].rule_id)) {
-            active_styles.erase(active_styles.begin()+id);
-            used = true; // Indicate that this tag has been used at least once.
-            if (!info.IsMultiClose()) break;
-          }
-        }
-      }
+      if (Append_Tag_Close(text, info)) return;  // Handle close tags.
 
-      if (used) return;  // If the tag was used to close, don't ALSO open.
+      emp::notify::TestWarning(!info.HasOpen(), "No options for using tag!");
 
       // OPEN a new style or INSERT a new object as indicated by this tag.
-      if (info.HasOpen()) {
-        const Text_Rule & rule = rule_set[info.GetOpenID()];
+      const Text_Rule & rule = rule_set[info.GetOpenID()];
 
-        // Collect a control sequence if needed by this rule.
-        String control;
-        if (rule.UsesControl()) {
-          char c = '\0';
-          while (input_stream) {
-            input_stream >> c;
-            if (c == rule.GetOpenTagEnd()) break; // Stop when we find the tag end.
-            control += c;
-          }
-          notify::TestError(c != rule.GetOpenTagEnd(),
-                            "Open tag beginning with '", rule.GetOpenTagStart(),
-                            "' did not have end ('", rule.GetOpenTagEnd(), "')");
+      // Collect a control sequence if needed by this rule.
+      String control;
+      if (rule.UsesControl()) {
+        char c = '\0';
+        while (input_stream) {
+          input_stream >> c;
+          if (c == rule.GetOpenTagEnd()) break; // Stop when we find the tag end.
+          control += c;
         }
+        notify::TestError(c != rule.GetOpenTagEnd(),
+                          "Open tag beginning with '", rule.GetOpenTagStart(),
+                          "' did not have end ('", rule.GetOpenTagEnd(), "')");
+      }
 
-        // Setup style opened by this rule, if any.
+      // Setup style opened by this rule, if any.
+      if (rule.SetsStyle()) {
         String style_desc = rule.MakeStyle(control);
-        if (style_desc.size()) {
-          size_t style_id = name_to_style_id[rule.GetBaseStyle()];
-          active_styles.emplace_back(style_id, style_desc, rule.GetID());
-          emp_assert(rule.UsesText(), "Rules that start a style MUST eventually close it.", style_desc);
-        }
+        size_t style_id = name_to_style_id[rule.GetBaseStyle()];
+        active_styles.emplace_back(style_id, style_desc, rule.GetID());
+        emp_assert(rule.UsesText(), "Rules that start a style MUST eventually close it.", style_desc);
+      }
 
-        // Do any symbol insertion required by this rule.
-        if (rule.SetsObject()) {
-          Append_Symbol(text, rule.GetSymbol(), rule.GetInternalChar());
-        }
-
-        used = true; // This tag has been used.
+      // Do any symbol insertion required by this rule.
+      if (rule.InsertsObject()) {
+        Append_Symbol(text, rule.GetSymbol(), rule.GetPlaceholder());
       }
     }
 
@@ -302,11 +303,11 @@ namespace emp {
       }
 
       // If this rule does describe an object, set it up to refer back.
-      if (rule.SetsObject()) {
+      if (rule.InsertsObject()) {
         if (rule.IsSimpleReplacement()) {  // No special object associated with insertion.
-          special_chars[rule.GetInternalChar()] = rule.GetID();
+          special_chars[rule.GetPlaceholder()] = rule.GetID();
         } else {
-          symbol_map[rule.GetSymbol()] = rule.GetID();
+          object_map[rule.GetSymbol()] = rule.GetID();
         }
       }
     }
@@ -398,7 +399,7 @@ namespace emp {
       name_to_style_id.clear();
       tag_map.clear();
       special_chars.fill(0);
-      symbol_map.clear();
+      object_map.clear();
       lexer.Reset();
       text_token = -1;
       active_styles.resize(0);
