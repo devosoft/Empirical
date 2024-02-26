@@ -120,7 +120,7 @@ namespace emp {
     [[nodiscard]] char   GetOpenTagEnd()   const { return main_tag.end; }
     [[nodiscard]] String GetCloseTag()     const { return close_tag.start; }
     [[nodiscard]] String GetBaseStyle()    const { return rule_type == STYLE_RULE ? base_type : ""; }
-    [[nodiscard]] String GetSymbol()       const { return rule_type == OBJECT_RULE ? base_type : ""; }
+    [[nodiscard]] String GetBaseObject()   const { return rule_type == OBJECT_RULE ? base_type : ""; }
     [[nodiscard]] char   GetPlaceholder()  const { return placeholder; }
 
     void SetID(size_t in_id) {
@@ -138,7 +138,7 @@ namespace emp {
     [[nodiscard]] bool UsesText() const { return close_tag.IsUsed(); }
     [[nodiscard]] bool SetsStyle() const { return rule_type == RuleType::STYLE_RULE; }
     [[nodiscard]] bool InsertsObject() const { return rule_type == RuleType::OBJECT_RULE; }
-    [[nodiscard]] bool IsSimpleReplacement() const { return base_type.size() == 0; }
+    [[nodiscard]] bool IsCharReplacement() const { return base_type.size() == 0; }
 
     [[nodiscard]] String MakeStyle(String control) const {
       if (UsesControl()) {

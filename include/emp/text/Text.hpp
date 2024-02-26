@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022-23.
+ *  @date 2022-24.
  *
  *  @file Text.hpp
  *  @brief Functionality similar to emp::String, but tracks text formatting for easy conversion.
@@ -90,7 +90,7 @@ namespace emp {
     std::unordered_map<String, BitVector> style_map;
 
     // Track non-ascii symbols as a sorted set of positions and the symbol name at that position.
-    std::map<size_t, emp::String> symbol_map;
+    std::map<size_t, emp::String> symbol_layout;
 
     // A set of encodings that this Text object can handle.
     using encoding_ptr_t = emp::Ptr<TextEncoding_Interface>;
@@ -119,7 +119,7 @@ namespace emp {
 
   public:
     Text() { encoding_ptr = encodings["txt"] = NewPtr<TextEncoding_None>(); }
-    Text(const Text & in) : text(in.text), style_map(in.style_map), symbol_map(in.symbol_map) { CloneEncodings(in); }
+    Text(const Text & in) : text(in.text), style_map(in.style_map), symbol_layout(in.symbol_layout) { CloneEncodings(in); }
     template <typename... Ts>
     Text(Ts &&... in) : Text() { Append(std::forward<Ts>(in)...); }
     ~Text() { for (auto & [e_name, ptr] : encodings) ptr.Delete(); }
@@ -133,7 +133,7 @@ namespace emp {
     Text & operator=(Text && in) {
       std::swap(text, in.text);
       std::swap(style_map, in.style_map);
-      std::swap(symbol_map, in.symbol_map);
+      std::swap(symbol_layout, in.symbol_layout);
       std::swap(encodings, in.encodings);
       std::swap(encoding_ptr, in.encoding_ptr);
       return *this;
@@ -142,7 +142,7 @@ namespace emp {
     template <typename T>
     Text & operator=(const T & in) {
       style_map.clear(); // Clear out existing content.
-      symbol_map.clear();
+      symbol_layout.clear();
       text.clear();
       Append(in);
       return *this;
@@ -155,6 +155,16 @@ namespace emp {
     // Return the current text as an unformatted string.
     const String & AsString() const { return text; }
 
+    // View the current string
+    [[nodiscard]] std::string_view ViewString(size_t start=0, size_t out_size=String::npos) const {
+      return text.View(start, out_size);
+    }
+
+    // View a section of the current string.
+    [[nodiscard]] std::string_view ViewStringRange(size_t start, size_t end) const {
+      return text.ViewRange(start, end);
+    }
+
     // Return all of the styles used in this text.
     const std::unordered_map<String, BitVector> & GetStyleMap() const {
       return style_map;
@@ -162,7 +172,7 @@ namespace emp {
 
     // Return all of the symbols in this text.
     const std::map<size_t, String> & GetSymbols() const {
-      return symbol_map;
+      return symbol_layout;
     }
 
     // Return the current bit pattern for a specified style.
@@ -260,8 +270,8 @@ namespace emp {
         for (auto & [style_name, new_bits] : in.style_map) {
           style_map[style_name].Resize(start_size).Append(new_bits);
         }
-        for (auto [pos,symbol] : in.symbol_map) {
-          symbol_map[start_size+pos] = symbol;
+        for (auto [pos,symbol] : in.symbol_layout) {
+          symbol_layout[start_size+pos] = symbol;
         }
       }
 
@@ -296,7 +306,7 @@ namespace emp {
 
     // Append a special symbol; assume no formatting.
     Text & Append_Symbol(const emp::String & symbol_type, char placeholder) {
-      symbol_map[size()] = symbol_type;
+      symbol_layout[size()] = symbol_type;
       text += placeholder;
       return *this;
     }
@@ -319,8 +329,8 @@ namespace emp {
           }
         }
         // Remove symbols, as needed.
-        auto it = symbol_map.lower_bound(new_size);
-        symbol_map.erase(it, symbol_map.end());
+        auto it = symbol_layout.lower_bound(new_size);
+        symbol_layout.erase(it, symbol_layout.end());
         Cleanup(); // Remove any styles that are no longer used.
       }
       text.resize(new_size);
@@ -361,7 +371,7 @@ namespace emp {
       return TextCharRef<true>(*this, pos);
     }
 
-    // STL-like functions for perfect compatability with string.
+    // STL-like functions for perfect compatibility with string.
     size_t size() const { return text.size(); }
     void resize(size_t new_size) { Resize(new_size); }
 
@@ -536,10 +546,10 @@ namespace emp {
     Text & ClearUnderline(size_t start, size_t end) { return Clear("underline", start, end); }
 
     BitVector GetSymbolPositions() const {
-      if (symbol_map.empty()) return BitVector(0);
-      size_t max_value = symbol_map.rbegin()->first;
+      if (symbol_layout.empty()) return BitVector(0);
+      size_t max_value = symbol_layout.rbegin()->first;
       BitVector out_bits(max_value+1, false);
-      for (auto entry : symbol_map) {
+      for (auto entry : symbol_layout) {
         out_bits.Set(entry.first);
       }
       return out_bits;
