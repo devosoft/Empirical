@@ -175,6 +175,10 @@ TEST_CASE("Test Systematics", "[Evolve]") {
   // std::cout << "MPD: " << mpd <<std::endl;
   CHECK(mpd == Approx(2.8));
 
+  double sd = sys.GetSumDistance();
+  // std::cout << "MPD: " << mpd <<std::endl;
+  CHECK(sd == Approx(74.0));
+
   // std::cout << "\nAddOrg 31 (id8; parent id7)\n";
   sys.SetUpdate(11);
   auto id8 = sys.AddOrg(31, id7);

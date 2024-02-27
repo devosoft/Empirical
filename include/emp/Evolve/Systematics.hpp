@@ -420,6 +420,7 @@ namespace emp {
     virtual int GetMaxDepth() = 0;
     virtual int GetPhylogeneticDiversity() const = 0;
     virtual double GetMeanPairwiseDistance(bool branch_only) const = 0;
+    virtual double GetSumDistance() const = 0;
     virtual double GetSumPairwiseDistance(bool branch_only) const = 0;
     virtual double GetVariancePairwiseDistance(bool branch_only) const = 0;
     virtual emp::vector<double> GetPairwiseDistances(bool branch_only) const = 0;
@@ -494,6 +495,7 @@ namespace emp {
     using parent_t::GetNumTaxa;
     using parent_t::GetPhylogeneticDiversity;
     using parent_t::GetMeanPairwiseDistance;
+    using parent_t::GetSumDistance;
     using parent_t::GetSumPairwiseDistance;
     using parent_t::GetVariancePairwiseDistance;
     using parent_t::GetPairwiseDistances;
@@ -1084,6 +1086,21 @@ namespace emp {
     double GetMeanPairwiseDistance(bool branch_only=false) const {
       emp::vector<double> dists = GetPairwiseDistances(branch_only);
       return (double)Sum(dists)/dists.size();
+    }
+
+    /** Calculates summed branch lengths of tree. Tucker et al 2017 points
+     *  out that this is a measure of phylogenetic richness.
+     */
+    double GetSumDistance() const {
+      const auto op = [](const double a, const Ptr<taxon_t>& t){
+        const auto branch = t->GetParent() ? t->GetOriginationTime() - t->GetParent()->GetOriginationTime(): 0.0;
+        return a + branch;
+      };
+      return std::accumulate(
+        std::begin(active_taxa), std::end(active_taxa), double{}, op
+      ) + std::accumulate(
+        std::begin(ancestor_taxa), std::end(ancestor_taxa), double{}, op
+      );
     }
 
     /** Calculates summed pairwise distance between extant taxa. Tucker et al 2017 points
