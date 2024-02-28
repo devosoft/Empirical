@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2019
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019
- *
- *  @file memo_function.hpp
+ *  @file
  *  @brief A function that memorizes previous results to speed up any repeated calls.
  *  @note Status: BETA
  */
@@ -11,6 +12,7 @@
 #ifndef EMP_FUNCTIONAL_MEMO_FUNCTION_HPP_INCLUDE
 #define EMP_FUNCTIONAL_MEMO_FUNCTION_HPP_INCLUDE
 
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../base/assert.hpp"

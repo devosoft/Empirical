@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
- *
- *  @file Var.hpp
+ *  @file
  *  @brief A collection of information about a single, instantiated variable in Empower
  *
  *
@@ -18,6 +19,7 @@
 #ifndef EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_INCLUDE
 #define EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 
 #include "../base/assert.hpp"

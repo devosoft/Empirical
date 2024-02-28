@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2022-23
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022.
- *
- *  @file Bits_Data.hpp
+ *  @file
  *  @brief Helper class to handle memory management for Bits objects.
  *  @note Status: BETA
  *
@@ -50,6 +51,9 @@ namespace emp {
       constexpr void SetSize(size_t new_size) { num_bits = new_size; }
 
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return num_bits; }
+
+      // Number of bits locked in at compile time.
+      [[nodiscard]] static constexpr size_t NumCTBits() noexcept { return 0; }
 
       /// Number of bits used in partial field at the end; 0 = perfect fit.
       [[nodiscard]] constexpr size_t NumEndBits() const noexcept {
@@ -107,6 +111,9 @@ namespace emp {
 
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return NUM_BITS; }
 
+      // Number of bits locked in at compile time.
+      [[nodiscard]] static constexpr size_t NumCTBits() noexcept { return NUM_BITS; }
+
       /// Number of bits used in partial field at the end; 0 if perfect fit.
       [[nodiscard]] constexpr size_t NumEndBits() const noexcept {
         return NUM_BITS & (NUM_FIELD_BITS - 1);
@@ -140,13 +147,13 @@ namespace emp {
         return NumFields() * sizeof(field_t);
       }
 
-      Bits_Data_Size_Fixed(size_t in_size=NUM_BITS) {
+      Bits_Data_Size_Fixed([[maybe_unused]] size_t in_size=NUM_BITS) {
         emp_assert(in_size <= NUM_BITS, in_size, NUM_BITS);
       }
       Bits_Data_Size_Fixed(const Bits_Data_Size_Fixed &) = default;
 
       template <class Archive>
-      void serialize(Archive & ar) { /* Nothing to do here. */ }
+      void serialize(Archive & /* ar */) { /* Nothing to do here. */ }
 
       [[nodiscard]] constexpr bool OK() const { return true; } // Nothing to check yet.
     };
@@ -190,13 +197,8 @@ namespace emp {
         }
       }
 
-      #ifdef NDEBUG
-      [[nodiscard]] auto AsSpan() { return std::span<field_t,MAX_FIELDS>(bits); }
-      [[nodiscard]] auto AsSpan() const { return std::span<const field_t,MAX_FIELDS>(bits); }
-      #else
-      [[nodiscard]] auto AsSpan() { return std::span<field_t,MAX_FIELDS>(bits.data()); }
-      [[nodiscard]] auto AsSpan() const { return std::span<const field_t,MAX_FIELDS>(bits.data()); }
-      #endif
+      [[nodiscard]] auto AsSpan() { return std::span<field_t,MAX_FIELDS>(bits.data(), MAX_FIELDS); }
+      [[nodiscard]] auto AsSpan() const { return std::span<const field_t,MAX_FIELDS>(bits.data(), MAX_FIELDS); }
 
       [[nodiscard]] bool OK() const { return true; } // Nothing to check yet.
 
@@ -230,9 +232,9 @@ namespace emp {
       {
         if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
       }
-      Bits_Data_Mem_Dynamic(const Bits_Data_Mem_Dynamic & in) : bits(nullptr) { Copy(in); }
+      Bits_Data_Mem_Dynamic(const Bits_Data_Mem_Dynamic & in) : base_t(), bits(nullptr) { Copy(in); }
       Bits_Data_Mem_Dynamic(Bits_Data_Mem_Dynamic && in) : bits(nullptr) { Move(std::move(in)); }
-      ~Bits_Data_Mem_Dynamic() { if (bits) {bits.DeleteArray();} }
+      ~Bits_Data_Mem_Dynamic() { if (bits) bits.DeleteArray(); }
 
       Bits_Data_Mem_Dynamic & operator=(const Bits_Data_Mem_Dynamic & in) { Copy(in); return *this; }
       Bits_Data_Mem_Dynamic & operator=(Bits_Data_Mem_Dynamic && in) { Move(std::move(in)); return *this; }
@@ -340,8 +342,8 @@ namespace emp {
       {
         field_capacity = base_t::NumFields();
       }
-      Bits_Data_Mem_Watermark(const this_t & in) { Copy(in); }
-      Bits_Data_Mem_Watermark(this_t && in) { Move(std::move(in)); }
+      Bits_Data_Mem_Watermark(const this_t & in) : base_t(0) { Copy(in); }
+      Bits_Data_Mem_Watermark(this_t && in) : base_t(0) { Move(std::move(in)); }
       ~Bits_Data_Mem_Watermark() { /* cleanup in base class */ }
 
       Bits_Data_Mem_Watermark & operator=(const this_t & in) { Copy(in); return *this; }

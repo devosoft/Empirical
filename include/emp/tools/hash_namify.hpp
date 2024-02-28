@@ -1,15 +1,17 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020.
- *
- *  @file hash_namify.hpp
+ *  @file
  *  @brief A method for mapping hash values to intuitive names.
  */
 
 #ifndef EMP_TOOLS_HASH_NAMIFY_HPP_INCLUDE
 #define EMP_TOOLS_HASH_NAMIFY_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 
 #include "../base/vector.hpp"

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
- *
- *  @file World_reflect.hpp
+ *  @file
  *  @brief Handle reflection on organisms to setup reasonable defaults in World.
  *
  *  @note None of the functions defined here should be called from outside the world object;
@@ -45,7 +46,7 @@ namespace emp {
 
     template <typename WORLD, typename ORG>
     void SetDefaultFitFun_impl(WORLD & world, ... ) {
-      world.SetFitFun( [](ORG & org){
+      world.SetFitFun( [](ORG & /* org */){
         emp_assert(false, "No default fitness function available");
         return 0.0;
       } );
@@ -71,7 +72,7 @@ namespace emp {
 
     template <typename WORLD, typename ORG>
     void SetDefaultMutFun_impl(WORLD & world, ... ) {
-      world.SetMutFun( [](ORG & org, Random & random) {
+      world.SetMutFun( [](ORG & /* org */, Random & /* random */ ) {
         emp_assert(false, "No default DoMutations available");
         return 0;
       } );
@@ -103,7 +104,7 @@ namespace emp {
 
     template <typename WORLD, typename ORG>
     void SetDefaultPrintFun_impl(WORLD & world, ... ) {
-      world.SetPrintFun( [](ORG & org, std::ostream & os){
+      world.SetPrintFun( [](ORG & /* org */, std::ostream & /* os */){
         emp_assert(false, "No default Print function available");
       } );
     }

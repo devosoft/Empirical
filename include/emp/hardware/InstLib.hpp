@@ -1,16 +1,18 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2021.
- *
- *  @file InstLib.hpp
- *  @brief This file maintains information about instructions available in virtual hardware.
+ *  @file
+ *  @brief This file maintains information about instructions availabel in virtual hardware.
  */
 
 #ifndef EMP_HARDWARE_INSTLIB_HPP_INCLUDE
 #define EMP_HARDWARE_INSTLIB_HPP_INCLUDE
 
 #include <map>
+#include <stddef.h>
 #include <string>
 #include <unordered_set>
 
@@ -28,9 +30,9 @@ namespace emp {
   enum class ScopeType { NONE=0, ROOT, BASIC, LOOP, FUNCTION };
 
   /// @brief InstLib maintains a set of instructions for use in virtual hardware.
-  /// @param HARDWARE_T Type of the virtual hardware class to track instructions.
-  /// @param ARG_T What types of arguments are associated with instructions.
-  /// @param ARG_COUNT Max number of arguments on an instruction.
+  /// @tparam HARDWARE_T Type of the virtual hardware class to track instructions.
+  /// @tparam ARG_T What types of arguments are associated with instructions.
+  /// @tparam ARG_COUNT Max number of arguments on an instruction.
   template <typename HARDWARE_T, typename ARG_T=size_t, size_t ARG_COUNT=3>
   class InstLib {
   public:
@@ -121,6 +123,8 @@ namespace emp {
     /// Get the number of instructions in this set.
     size_t GetSize() const { return inst_lib.size(); }
 
+    /// Returns boolean indicating whether the given
+    /// string is a valid instruction.
     bool IsInst(const std::string name) const {
       return Has(name_map, name);
     }
@@ -135,7 +139,7 @@ namespace emp {
     }
 
     /// Return the ID of the instruction associated with the specified symbol.
-    size_t GetID(char symbol) {
+    size_t GetIDFromSymbol(char symbol) const {
       emp_assert(symbol > 0);
       return symbol_map[(size_t) symbol];
     }
@@ -145,10 +149,15 @@ namespace emp {
       emp_assert(Has(name_map, name), name);
       return Find(name_map, name, (size_t) -1);
     }
-    /// Return the ID of the instruction that has the specified name.
+    /// Return the ID of the instruction that has the specified id.
     size_t GetIndex(const size_t id) const {
       emp_assert(Has(id_map, id), id);
       return Find(id_map, id, (size_t) -1);
+    }
+
+    size_t GetIndexFromSymbol(char symbol) const {
+      size_t id = GetIDFromSymbol(symbol);
+      return GetIndex(id);
     }
 
     /// Return the argument value associated with the provided keyword.

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2022-2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022-23.
- *
- *  @file HTMLEncoding.hpp
+ *  @file
  *  @brief Plugs into emp::Text, setting up inputs and output to be HTML encoded.
  *  @note Status: ALPHA
  *
@@ -15,9 +16,6 @@
 #include <set>
 #include <string>
 #include <unordered_map>
-
-#include "../base/assert.hpp"
-#include "../compiler/Lexer.hpp"
 
 #include "TextEncoding.hpp"
 #include "Text.hpp"
@@ -50,12 +48,21 @@ namespace emp {
 
 
   public:
-    HTMLEncoding(Text & _text, const std::string _name="html")
-      : TextEncoding(_text, _name) { SetupTags(); }
+    HTMLEncoding() { SetupTags(); }
     ~HTMLEncoding() = default;
 
+    String GetName() const override { return "html"; }
+    emp::Ptr<TextEncoding_Interface> Clone() const override {
+      return emp::NewPtr<HTMLEncoding>();
+    }
   };
 
+  using HTMLText = EncodedText<HTMLEncoding>;
+
+  template <typename... Ts>
+  emp::Text MakeHTMLText(Ts &&... args) {
+    return MakeEncodedText<HTMLEncoding>(std::forward<Ts>(args)...);
+  }
 }
 
 #endif // #ifndef EMP_TEXT_HTMLENCODING_HPP_INCLUDE

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
- *
- *  @file Author.hpp
+ *  @file
  *  @brief Basic information about an author.
  *
  *  Developer notes:
@@ -16,6 +17,7 @@
 #ifndef EMP_SCHOLAR_AUTHOR_HPP_INCLUDE
 #define EMP_SCHOLAR_AUTHOR_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 
 #include "../compiler/Lexer.hpp"

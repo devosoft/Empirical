@@ -1,214 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2023.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2023.
- *
- *  @file string_utils.hpp
+ *  @file
  *  @brief Simple functions to manipulate strings.
- *  @note Status: RELEASE
- *
- *  Available Functions
- *    const std::string & empty_string() - Reference to an empty string for null returns
- *
- *    -- CLASSIFICATION --
- *    size_t count(const std::string & str, char c)    - Count the occurrences of c in str.
- *    bool is_literal_char(const std::string & value)
- *    bool is_literal_string(const std::string & value, type="\"")
- *    bool is_composed_of(const std::string & test_str, const std::string & char_set)
- *    bool is_digits(const std::string & test_str)
- *    bool is_number(const std::string & test_str)
- *    bool is_alphanumeric(const std::string & test_str)
- *    bool is_whitespace(const std::string & test_str)
- *    bool is_valid(const std::string & test_str, FUNS... funs)
- *    bool has_whitespace(const std::string & test_str)
- *    bool has_nonwhitespace(const std::string & test_str)
- *    bool has_upper_letter(const std::string & test_str)
- *    bool has_lower_letter(const std::string & test_str)
- *    bool has_letter(const std::string & test_str)
- *    bool has_digit(const std::string & test_str)
- *    bool has_alphanumeric(const std::string & test_str)
- *    bool has_one_of(const std::string & test_str, const std::string & char_set)
- *    bool has_prefix(const std::string & in_string, const std::string & prefix)
- *    bool has_char_at(const std::string & str, char c, size_t pos)
- *    bool has_one_of_at(const std::string & str, const std::string & opts, size_t pos)
- *    bool has_digit_at(const std::string & str, size_t pos)
- *    bool has_letter_at(const std::string & str, size_t pos)
- *
- *    -- SEARCHING --
- *    size_t find_quote_match(std::string_view in_string, size_t start_pos=0)
- *    size_t find_paren_match(std::string_view in_string, size_t start_pos=0,
- *                            bool skip_quotes=true)
- *    size_t find_match(std::string_view in_string, size_t start_pos=0, bool skip_quotes=true)
- *    size_t find(std::string_view in_string, std::string target, size_t start_pos,
- *                bool skip_quotes=false, bool skip_parens=false, bool skip_braces=false,
- *                bool skip_brackets=false)
- *    void find_all(std::string_view in_string, char target, emp::vector<size_t> & results,
- *                bool skip_quotes=false, bool skip_parens=false, bool skip_braces=false,
- *                bool skip_brackets=false)
- *    emp::vector<size_t> find_all(std::string_view in_string, char target, bool skip_quotes=false
- *      bool skip_parens=false, bool skip_braces=false, bool skip_brackets=false)
- *    size_t find_any_of(const std::string & test_str, std::string... tests)
- *    size_t find_any_of(const std::string & test_str, size_t start_pos, std::string... tests)
- *    size_t find_id(std::string_view in_string, std::string target, size_t start_pos,
- *      bool skip_quotes=true, bool skip_parens=false, bool skip_braces=false, bool skip_brackets=false)
- *    size_t find_non_whitespace(std::string_view in_string, size_t start_pos)
- *
- *    -- FORMATTING --
- *    std::string to_escaped_string(char value)
- *    std::string to_escaped_string(const std::string & value)
- *    std::string to_web_safe_string(const std::string & value)
- *    template<bool encode_space=false> std::string url_encode(const std::string &value)
- *    template<bool decode_plus=false> std::string url_decode(const std::string& str)
- *    std::string to_literal(...)
- *    char from_literal_char(const std::string & value)
- *    std::string from_literal_string(const std::string & value)
- *    std::string to_upper(std::string value)
- *    std::string to_lower(std::string value)
- *    std::string to_titlecase(std::string value)
- *    std::string to_roman_numeral(int val, const std::string & prefix="")
- *    void trim_whitespace(std::string & in_string)
- *    void compress_whitespace(std::string & in_string)
- *    void remove_whitespace(std::string & in_string)
- *    void remove_punctuation(std::string & in_string)
- *    std::string slugify(const std::string & in_string)
- *    std::string combine_strings(const string_vec_t & strings, std::string spacer=" ")
- *    std::string to_english_list(const string_vec_t & strings)
- *    string_vec_t transform_strings(const string_vec_t & in_strings,
- *                                   std::function<std::string(const std::string &)> fun)
- *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string quote="'")
- *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string open_quote,
- *                               const std::string close_quote)
- *    to_quoted_list(const string_vec_t & in_strings, const std::string quote="'")
- *    std::string format_string( const std::string& format, Args... args )
- *    std::string replace_vars( const std::string& base, const MAP_T & map )
- *    std::string replace_macro( const std:string &in_string, std::string macro_name,
- *                               string(string) fun, bool skip_quotes=true)
- *
- *    -- EXTRACTIONS and CROPPING --
- *    void remove_chars(std::string & in_string, std::string chars)
- *    bool string_pop_if_char(std::string & in_string, char c)
- *    std::string string_pop_fixed(std::string & in_string, std::size_t end_pos,
- *                                 size_t delim_size=0)
- *    std::string string_get_range(const std::string & in_string, std::size_t start_pos,
- *                                 std::size_t end_pos)
- *    std::string string_pop(std::string & in_string, const char delim=' ')
- *    std::string string_get(const std::string & in_string, const char delim=' ',
- *                           size_t start_pos=0)
- *    std::string string_pop(std::string & in_string, const std::string & delim_set)
- *    std::string string_get_to(const std::string & in_string, const std::string & delim=" ")
- *    std::string string_pop_to(std::string & in_string, const std::string & delim=" ",
- *      size_t start_pos=0, bool skip_quotes=false, bool skip_parens=false,
- *      bool skip_braces=false, bool skip_brackets=false)
- *    std::string string_get(const std::string & in_string, const std::string & delim_set,
- *                           size_t start_pos=0)
- *    std::string string_pop_word(std::string & in_string)
- *    std::string string_get_word(const std::string & in_string, size_t start_pos=0)
- *    std::string string_pop_line(std::string & in_string)
- *    std::string string_get_line(const std::string & in_string, size_t start_pos=0)
- *    std::string string_pop_quote(std::string & in_string)
- *    size_t string_pop_uint(std::string & in_string)
- *    size_t string_get_uint(const std::string & in_string)
- *    std::string left_justify(std::string & in_string)
- *    void right_justify(std::string & in_string)
- *    void justify(std::string & in_string)
- *
- *    -- STRING_VIEW HELPERS --
- *    std::string_view view_string(const std::string_view & str)
- *    std::string_view view_string(const std::string_view & str, size_t start)
- *    std::string_view view_string(const std::string_view & str, size_t start, size_t npos)
- *    std::string_view view_string_front(const std::string_view & str, size_t npos)
- *    std::string_view view_string_back(const std::string_view & str, size_t npos)
- *    std::string_view view_string_range(const std::string_view & str, size_t start, size_t end)
- *    std::string_view view_string_to(const std::string_view & in_string, const char delim,
- *                                    size_t start_pos=0)
- *
- *    -- OTHER MANIPULATIONS --
- *    std::string pad_front(const std::string & in_string, char padding, size_t target_size)
- *    std::string pad_back(const std::string & in_string, char padding, size_t target_size)
- *    std::string repeat(const std::string& value, const size_t n)
- *    void slice(const std::string_view & in_string, emp::vector<std::string> & out_set,
- *               const char delim='\n', [size_t max_split], bool keep_quotes=false,
- *               bool keep_parens=false, bool keep_braces=false, bool kee_brackets=false)
- *    emp::vector<std::string>
- *      slice(const std::string_view & in_string, const char delim='\n', [size_t max_split],
- *            bool keep_quotes=false, bool keep_parens=false, bool keep_braces=false,
- *            bool keep_brackets=false)
- *    void view_slices(const std::string_view & in_string, emp::vector<std::string_view> & out_set,
- *                     char delim='\n', bool keep_quotes=false, bool keep_parens=false,
- *                     bool keep_braces=false, bool keep_brackets=false)
- *    emp::vector<std::string_view>
- *      view_slices(const std::string_view & in_string, char delim='\n',
- *                  bool keep_quotes=false, bool keep_parens=false,
- *                  bool keep_braces=false, bool keep_brackets=false)
- *    std::map<std::string, std::string>
- *      slice_assign(const std::string_view & in_string, const char delim=',',
- *                   std::string assign="=", [size_t max_split], bool trim_whitespace=true,
- *                   bool keep_quotes=true, bool keep_parens=true, bool keep_braces=true,
- *                   bool keep_brackets=true)
- *    emp::vector<std::string_view> ViewCSV(const std::string_view & csv_line)
- *    std::string_view
- *      ViewNestedBlock(std::string_view str, const std::string symbols="()", size_t start=0)
- *    std::string to_string(...)
- *    void from_string(const std::string & str, ...)
- *    std::string join(const emp::vector<T> & v, std::string join_str)
- *
- *    -- ANSI TOOLS --
- *    char ANSI_ESC()
- *    std::string ANSI_Reset()
- *    std::string ANSI_Bold()
- *    std::string ANSI_Faint()
- *    std::string ANSI_Italic()
- *    std::string ANSI_Underline()
- *    std::string ANSI_SlowBlink()
- *    std::string ANSI_Blink()
- *    std::string ANSI_Reverse()
- *    std::string ANSI_Strike()
- *    std::string ANSI_NoBold()
- *    std::string ANSI_NoItalic()
- *    std::string ANSI_NoUnderline()
- *    std::string ANSI_NoBlink()
- *    std::string ANSI_NoReverse()
- *    std::string ANSI_Black()
- *    std::string ANSI_Red()
- *    std::string ANSI_Green()
- *    std::string ANSI_Yellow()
- *    std::string ANSI_Blue()
- *    std::string ANSI_Magenta()
- *    std::string ANSI_Cyan()
- *    std::string ANSI_White()
- *    std::string ANSI_DefaultColor()
- *    std::string ANSI_BlackBG()
- *    std::string ANSI_RedBG()
- *    std::string ANSI_GreenBG()
- *    std::string ANSI_YellowBG()
- *    std::string ANSI_BlueBG()
- *    std::string ANSI_MagentaBG()
- *    std::string ANSI_CyanBG()
- *    std::string ANSI_WhiteBG()
- *    std::string ANSI_DefaultBGColor()
- *    std::string ANSI_BrightBlack()
- *    std::string ANSI_BrightRed()
- *    std::string ANSI_BrightGreen()
- *    std::string ANSI_BrightYellow()
- *    std::string ANSI_BrightBlue()
- *    std::string ANSI_BrightMagenta()
- *    std::string ANSI_BrightCyan()
- *    std::string ANSI_BrightWhite()
- *    std::string ANSI_BrightBlackBG()
- *    std::string ANSI_BrightRedBG()
- *    std::string ANSI_BrightGreenBG()
- *    std::string ANSI_BrightYellowBG()
- *    std::string ANSI_BrightBlueBG()
- *    std::string ANSI_BrightMagentaBG()
- *    std::string ANSI_BrightCyanBG()
- *    std::string ANSI_BrightWhiteBG()
- *
- *    to_ansi_bold(const std::string & _in)
- *    to_ansi_italic(const std::string & _in)
- *    to_ansi_underline(const std::string & _in)
- *    to_ansi_blink(const std::string & _in)
- *    to_ansi_reverse(const std::string & _in)
- *
+ *  Status: RELEASE
  */
 
 #ifndef EMP_TOOLS_STRING_UTILS_HPP_INCLUDE
@@ -229,6 +27,7 @@
 #include <numeric>
 #include <regex>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 #include <string_view>
 #include <unordered_set>
@@ -247,7 +46,6 @@ namespace emp {
 
   /// Return a const reference to an empty string.  This function is useful to implement other
   /// functions that need to return a const reference for efficiency, but also need a null response.
-
   static inline const std::string & empty_string() {
     static std::string empty = "";
     return empty;
@@ -669,7 +467,7 @@ namespace emp {
     return ss.str();
   }
 
-  #endif
+  #endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 
   /// Convert a literal character representation to an actual string.
@@ -1035,22 +833,23 @@ namespace emp {
     return end_pos ? string_pop_fixed(in_string, end_pos+1) : "";
   }
 
-  inline size_t string_pop_uint(std::string & in_string) {
+  inline size_t string_uint_size(const std::string & in_string) {
     size_t uint_size = 0;
     for (char c : in_string) {
       if (is_digit(c)) uint_size++;
       else break;
     }
+    return uint_size;
+  }
+
+  inline unsigned long long string_pop_uint(std::string & in_string) {
+    const size_t uint_size = string_uint_size(in_string);
     std::string out_uint = string_pop_fixed(in_string, uint_size);
     return std::stoull(out_uint);
   }
 
-  inline size_t string_get_uint(const std::string & in_string) {
-    size_t uint_size = 0;
-    for (char c : in_string) {
-      if (is_digit(c)) uint_size++;
-      else break;
-    }
+  inline unsigned long long string_get_uint(const std::string & in_string) {
+    const size_t uint_size = string_uint_size(in_string);
     std::string out_uint = string_get_range(in_string, 0, uint_size);
     return std::stoull(out_uint);
   }
@@ -1072,11 +871,13 @@ namespace emp {
     right_justify(in_string);
   }
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+
   /// Apply sprintf-like formatting to a string.
-  /// See https://en.cppreference.com/w/cpp/io/c/fprintf.
-  /// Adapted from https://stackoverflow.com/a/26221725.
   template<typename... Args>
-  [[nodiscard]] std::string format_string( const std::string& format, Args... args ) {
+  std::string format_string( const std::string& format, Args... args ) {
+    // See https://en.cppreference.com/w/cpp/io/c/fprintf.
+    // Adapted from https://stackoverflow.com/a/26221725.
 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wformat-security"
@@ -1093,6 +894,8 @@ namespace emp {
     #pragma GCC diagnostic pop
 
   }
+
+  #endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   /// Find any instances of ${X} and replace with dictionary lookup of X.
   template <typename MAP_T>
@@ -1323,9 +1126,9 @@ namespace emp {
   /// View a section of a string with the properly matching nested blocks.
   /// For example if ((abc(de))f(ghi)) would return "(abc(de))f(ghi)" at 0, "de" at 5, or
   /// "" at 2 (since there is no start!)
-  std::string_view ViewNestedBlock(std::string_view str,
-                                   const std::string symbols="()",
-                                   size_t start=0) {
+  static inline std::string_view ViewNestedBlock(std::string_view str,
+                                                 const std::string symbols="()",
+                                                 size_t start=0) {
     // Test if we are not starting at the beginning of a block, return empty.
     if (str[start] != symbols[0]) return emp::view_string(str, 0, 0);
 
@@ -1342,8 +1145,6 @@ namespace emp {
     return emp::view_string(str, start+1, stop-start-1);
   }
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-
   // The next functions are not efficient, but they will take any number of inputs and
   // dynamically convert them all into a single, concatenated string.
 
@@ -1352,6 +1153,7 @@ namespace emp {
   template <typename T, typename... Ts>
   inline std::string ToString(const emp::vector<T, Ts...> & container);
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   namespace internal {
     // If the item passed in has a ToString(), always use it.
@@ -1372,7 +1174,7 @@ namespace emp {
 
   }
 
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  #endif // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 
   /// This function does its best to convert any type to a string. Accepts any number of
@@ -1572,7 +1374,6 @@ namespace emp {
   inline std::string to_ansi_reverse(const std::string & _in) {
     return ANSI_Reverse() + _in + ANSI_NoReverse();
   }
-
 
   //////////////////////////////////////////////////////
   //  Implementations of larger functions (>25 lines)
@@ -1898,13 +1699,48 @@ namespace emp {
     return out.str();
   }
 
+  /// Advance a position in a string, respecting quotes, parens, braces, and brackets as indicated
+  /// @param in_string string being stepped through
+  /// @param pos Position to advance from
+  /// @param keep_quotes Should quoted text be treated as a unit?
+  /// @param keep_parens Should parens be treated as a unit?
+  /// @param keep_braces Should braces be treated as a unit?
+  /// @param keep_brackets Should brackets be treated as a unit?
+  static inline size_t next_pos(
+    std::string_view in_string, size_t pos,
+    bool keep_quotes=false, bool keep_parens=false,
+    bool keep_braces=false, bool keep_brackets=false)
+  {
+    // See if we need to skip a whole segment
+    const char c = in_string[pos];
+    switch (c) {
+    case '"': case '\'':
+      if (keep_quotes) pos = find_quote_match(in_string, pos, c);
+      break;
+    case '(':
+      if (keep_parens) pos = find_paren_match(in_string, pos, c, ')', keep_quotes);
+      break;
+    case '[':
+      if (keep_brackets) pos = find_paren_match(in_string, pos, c, ']', keep_quotes);
+      break;
+    case '{':
+      if (keep_braces) pos = find_paren_match(in_string, pos, c, '}', keep_quotes);
+      break;
+    }
+
+    return pos + 1;
+  }
+
   /// Cut up a string based on the provided delimiter; fill them in to the provided vector.
   /// @param in_string string to be sliced
   /// @param out_set destination
   /// @param delim delimiter to split on
   /// @param max_split defines the maximum number of splits
-  /// @param keep_quotes Should quoted text be kept together?
-  static inline void slice (
+  /// @param keep_quotes Should quoted text be treated as a unit?
+  /// @param keep_parens Should parens be treated as a unit?
+  /// @param keep_braces Should braces be treated as a unit?
+  /// @param keep_brackets Should brackets be treated as a unit?
+  static inline void slice(
     const std::string_view & in_string,
     emp::vector<std::string> & out_set,
     const char delim,
@@ -1914,51 +1750,28 @@ namespace emp {
     const bool keep_braces,
     const bool keep_brackets
   ) {
-    const size_t test_size = in_string.size();
-    if (test_size == 0) return; // Nothing to set!
+    out_set.resize(0);
+    if (in_string.empty() || max_split == 0) return; // Nothing to set!
 
-    // Count produced strings
-    size_t out_count = 0;
-    size_t pos = 0;
-    size_t start_pos = 0;
-    while (pos < test_size && out_count <= max_split) {
+    size_t pos = 0;           // Position currently being scanned.
+    size_t start_pos = 0;     // Start position for the next segment.
+    while (pos < in_string.size() && out_set.size()+1 < max_split) {
       // Find the end of the current segment.
-      while (pos < test_size && in_string[pos] != delim) {
-        if (keep_quotes && (in_string[pos] == '"' || in_string[pos] == '\'')) {
-          pos = find_quote_match(in_string, pos, in_string[pos]);
-        }
-        else if (keep_parens && in_string[pos] == '(') {
-          pos = find_paren_match(in_string, pos, '(', ')', keep_quotes);
-        }
-        else if (keep_braces && in_string[pos] == '{') {
-          pos = find_paren_match(in_string, pos, '{', '}', keep_quotes);
-        }
-        else if (keep_brackets && in_string[pos] == '[') {
-          pos = find_paren_match(in_string, pos, '[', ']', keep_quotes);
-        }
-        pos++;
+      while (pos < in_string.size() && in_string[pos] != delim) {
+        pos = next_pos(in_string, pos, keep_quotes, keep_parens, keep_braces, keep_brackets);
       }
 
       // Record the current segment.
-      if (out_count >= out_set.size()) {
-        out_set.emplace_back( in_string.substr(start_pos, pos-start_pos) );
-      } else {
-        out_set[out_count] = in_string.substr(start_pos, pos-start_pos);
-      }
+      out_set.emplace_back( in_string.substr(start_pos, pos-start_pos) );
 
-      // Move on to the next segment.
-      pos++;              // Skip deliminator
-      start_pos = pos;    // Record start of segment.
-      out_count++;        // Keep count of segments.
+      start_pos = ++pos;  // Skip deliminator and record next start.
     }
 
-    if (start_pos < in_string.size()-1) {
-      out_set[out_count-1] += in_string.substr(start_pos - 1, in_string.size()-1);
+    // If there are any segments left, put them all at the end.
+    if (start_pos < in_string.size()) {
+      out_set.emplace_back( in_string.substr(start_pos, in_string.size()-start_pos) );
     }
-
-    out_set.resize(out_count); // Shrink out_set if needed.
   }
-
 }
 
 #endif // #ifndef EMP_TOOLS_STRING_UTILS_HPP_INCLUDE

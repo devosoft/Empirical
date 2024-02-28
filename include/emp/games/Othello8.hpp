@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
- *
- *  @file Othello8.hpp
+ *  @file
  *  @brief A simple Othello game state handler limited to an 8x8 board.
  *
  *  @todo Add Hash for boards to be able to cachce moves.
@@ -13,9 +14,11 @@
 #ifndef EMP_GAMES_OTHELLO8_HPP_INCLUDE
 #define EMP_GAMES_OTHELLO8_HPP_INCLUDE
 
+#include <cstdint>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../base/array.hpp"
@@ -49,11 +52,11 @@ namespace emp {
       constexpr Index(size_t x, size_t y) : pos() { Set(x,y); }
       constexpr Index(const Index & _in) : pos(_in.pos) { emp_assert(pos <= NUM_CELLS); }
 
-      operator size_t() const { return pos; }
-      size_t x() const { return pos & 7; }
-      size_t y() const { return pos >> 3; }
-      void Set(size_t x, size_t y) { pos = (x<BOARD_SIZE && y<BOARD_SIZE) ? (x+(y<<3)) : NUM_CELLS; }
-      bool IsValid() const { return pos < NUM_CELLS; }
+      constexpr operator size_t() const { return pos; }
+      constexpr size_t x() const { return pos & 7; }
+      constexpr size_t y() const { return pos >> 3; }
+      constexpr void Set(size_t x, size_t y) { pos = (x<BOARD_SIZE && y<BOARD_SIZE) ? (x+(y<<3)) : NUM_CELLS; }
+      constexpr bool IsValid() const { return pos < NUM_CELLS; }
 
       Index CalcNeighbor(Facing dir) {
         Index faced_id;

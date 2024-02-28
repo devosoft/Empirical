@@ -1,11 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020.
- *
- *  @file optional.hpp
+ *  @file
  *  @brief Audited implementation of std::optional.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *  Drop-in replacements for std::optional.
  *  In debug mode, operator * and operator-> value accesses are checked for undefined behavior.
@@ -15,6 +16,7 @@
 #define EMP_BASE_OPTIONAL_HPP_INCLUDE
 
 #include <optional>
+#include <stddef.h>
 #include <type_traits>
 #include <utility>
 
@@ -99,6 +101,7 @@ namespace emp {
 
 } // namespace emp
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
 
   template <typename T>
@@ -109,7 +112,7 @@ namespace std {
   };
 
 } // namespace std
-
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 #endif
 
 #endif // #ifndef EMP_BASE_OPTIONAL_HPP_INCLUDE

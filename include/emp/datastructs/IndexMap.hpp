@@ -1,10 +1,11 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2022.
- *
- *  @file IndexMap.hpp
- *  @brief Container that weights items and returns ID for a given weight position.
+ *  @file
+ *  @brief A simple class to weight items differently within a container and return the correct index.
  *  @note Status: BETA
  *
  *  An IndexMap is a container where each item has a specified weight (specified as a double).
@@ -22,6 +23,8 @@
 
 #ifndef EMP_DATASTRUCTS_INDEXMAP_HPP_INCLUDE
 #define EMP_DATASTRUCTS_INDEXMAP_HPP_INCLUDE
+
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 

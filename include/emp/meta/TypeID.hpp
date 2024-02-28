@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2022.
- *
- *  @file TypeID.hpp
+ *  @file
  *  @brief TypeID provides an easy way to convert types to strings.
  *
  *  TypeID provides an easy way to compare types, analyze them, and convert to strings.
@@ -68,7 +69,9 @@
 #define EMP_META_TYPEID_HPP_INCLUDE
 
 #include <cmath>
+#include <cstdint>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 
 #include "../base/Ptr.hpp"
@@ -283,7 +286,7 @@ namespace emp {
           return ptr.ReinterpretCast<base_t>()->FromDouble(value);
         }
 
-        // If this type is convertable to a double, cast the pointer to the correct type, de-reference it,
+        // If this type is convertible to a double, cast the pointer to the correct type, de-reference it,
         // and then return the conversion.  Otherwise return NaN
         if constexpr (std::is_convertible<double, T>::value) {
           *ptr.ReinterpretCast<base_t>() = (base_t) value;
@@ -534,7 +537,7 @@ namespace emp {
   }
 }
 
-
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
   /// Hash function to allow TypeID to be used with maps and sets (must be in std).
   template <>
@@ -550,5 +553,6 @@ namespace std {
     return out;
   }
 }
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_META_TYPEID_HPP_INCLUDE

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022.
- *
- *  @file char_utils.hpp
+ *  @file
  *  @brief Simple functions and tools to manipulate individual characters.
  *  @note Status: BETA
  *
@@ -161,8 +162,28 @@ namespace emp {
     /// Count the number of matches that occur in a string.
     size_t CountMatches(const std::string & str) const {
       size_t count = 0;
-      for (char c : str) if (Has(c)) count++;
+      for (char c : str) if (Has(c)) ++count;
       return count;
+    }
+
+    /// Count the number of matches that occur in a sub-string.
+    size_t CountMatches(const std::string & str, size_t start, size_t end) const {
+      size_t count = 0;
+      for (size_t i = start; i < end; ++i) if (Has(str[i])) ++count;
+      return count;
+    }
+
+    /// Count the number of matches that occur at the beginning of a string.
+    size_t CountFrontMatches(const std::string & str, size_t start=0) const {
+      size_t count = 0;
+      while (count+start < str.size() && Has(str[count+start])) count++;
+      return count;
+    }
+
+    size_t CountBackMatches(const std::string & str) const {
+      size_t end_pos = str.size();
+      while (end_pos > 0 && Has(str[end_pos-1])) end_pos--;
+      return str.size() - end_pos;
     }
 
     /// Convert this set of characters into a regex-style character set.
@@ -253,7 +274,7 @@ namespace emp {
   }
 
   /// Convert a char after a backslash to its escaped version.
-  char ToEscapeChar(char c) {
+  inline char ToEscapeChar(char c) {
     switch (c) {
       case 'b': return '\b';   // Backspace
       case 'f': return '\f';   // Form feed

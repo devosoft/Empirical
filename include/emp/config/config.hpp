@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2019.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019.
- *
- *  @file config.hpp
+ *  @file
  *  @brief Maintains a set of configuration options.
  *
  *  This file defines a master configuration option Config, whose values can be loaded
@@ -42,6 +43,7 @@
 #include <functional>
 #include <ostream>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 #include <unordered_set>
 
@@ -402,7 +404,9 @@ namespace emp {
       for (auto & x : type_manager_map) delete x.second;
     }
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend class ConfigWebUI;
+    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
     ConfigEntry * operator[](const std::string & name) { return var_map[name]; }
     auto begin() -> decltype(var_map.begin()) { return var_map.begin(); }

@@ -1,11 +1,11 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022
- *
- *  @file Wordle-simple.cpp
- *
- *  This version of Wordle is a bit simpler than it should be; it does not handle double letters
+ *  @file
+ *  @brief version of Wordle is a bit simpler than it should be; it does not handle double letters
  *  correctly.
  */
 

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
- *
- *  @file Othello.hpp
+ *  @file
  *  @brief A simple Othello game state handler.
  *
  *  @todo Add Hash for boards to be able to cachce moves.
@@ -16,6 +17,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../base/array.hpp"

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
- *
- *  @file flex_function.hpp
+ *  @file
  *  @brief Based on std::function, but holds default parameter values for calls with fewer args.
  *  @note Status: ALPHA
  */
@@ -13,6 +14,7 @@
 
 
 #include <functional>
+#include <stddef.h>
 #include <tuple>
 
 #include "../base/assert.hpp"

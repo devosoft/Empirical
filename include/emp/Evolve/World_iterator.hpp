@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2021.
- *
- *  @file World_iterator.hpp
+ *  @file
  *  @brief This file defines iterators for use with emp::World objects.
  *
  *  @note Originally called PopulationIterator.h
@@ -14,6 +15,8 @@
 
 #ifndef EMP_EVOLVE_WORLD_ITERATOR_HPP_INCLUDE
 #define EMP_EVOLVE_WORLD_ITERATOR_HPP_INCLUDE
+
+#include <stddef.h>
 
 #include "../base/Ptr.hpp"
 

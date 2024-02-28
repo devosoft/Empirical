@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
- *
- *  @file TypeManager.hpp
+ *  @file
  *  @brief Handles creation or retrieval of type objects.
  */
 
@@ -11,6 +12,7 @@
 #define EMP_IN_PROGRESS_EMPOWER_TYPEMANAGER_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 #include <string>
 #include <unordered_map>
 

@@ -1,15 +1,18 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
- *
- *  @file distances.hpp
+ *  @file
  *  @brief Library of commonly used distance functions
  *  @note Status: BETA
  */
 
 #ifndef EMP_MATH_DISTANCES_HPP_INCLUDE
 #define EMP_MATH_DISTANCES_HPP_INCLUDE
+
+#include <stddef.h>
 
 #include "../meta/type_traits.hpp"
 

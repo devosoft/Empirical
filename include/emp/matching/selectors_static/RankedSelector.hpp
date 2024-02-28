@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
- *
- *  @file RankedSelector.hpp
+ *  @file
  *  @brief Selector that picks the N best matches within a threshold.
  *
  */
@@ -14,6 +15,7 @@
 #include <algorithm>
 #include <numeric>
 #include <ratio>
+#include <stddef.h>
 
 #include "../../base/vector.hpp"
 #include "../../datastructs/SmallVector.hpp"

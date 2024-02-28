@@ -1,14 +1,17 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
- *
- *  @file Struct.hpp
+ *  @file
  *  @brief Struct is a set of active variables, grouped by name (organized by a specific StructType)
  */
 
 #ifndef EMP_IN_PROGRESS_EMPOWER_STRUCT_HPP_INCLUDE
 #define EMP_IN_PROGRESS_EMPOWER_STRUCT_HPP_INCLUDE
+
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"

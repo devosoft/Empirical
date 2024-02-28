@@ -48,6 +48,7 @@ demos/Emphatic/Emphatic
 demos/Emphatic/examples/ConceptTest
 demos/Emphatic/examples/ConceptTest.cpp
 demos/MABE/examples/NK
+demos/MAP-Elites-Arm/web/MAP-Elites-Arm.js
 demos/NK.bak/
 demos/NK/NK
 demos/NK/web/NK.js
@@ -76,6 +77,13 @@ demos/NK/web/jquery-1.11.2.min.js
 demos/NK/web/NK.asm.js
 demos/NK/web/NK.html
 demos/NK/web/NK.js.mem
+demos/utils/words/Wordle/Wordle
+demos/utils/words/Wordle/web/
+demos/utils/words/annotate-length
+demos/utils/words/has-only
+demos/utils/words/wordlists/
+demos/utils/words/wordplay-remove
+demos/utils/words/wordplay-shuffle
 
 doc/doxygen/
 examples/*/*

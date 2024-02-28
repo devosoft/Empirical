@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
- *
- *  @file combos.hpp
+ *  @file
  *  @brief Tools to step through combinations of items.
  *
  *  Step through all combinations of size K from a set of N values.  For ComboIDs just return the
@@ -21,6 +22,7 @@
 #define EMP_MATH_COMBOS_HPP_INCLUDE
 
 #include <iostream>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"

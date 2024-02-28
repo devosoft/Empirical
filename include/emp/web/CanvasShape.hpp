@@ -1,12 +1,13 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
- *
- *  @file CanvasShape.hpp
+ *  @file
  *  @brief Define simple shapes to draw on a canvas.
  *
- *  Canvas shapes can be definied in detail, describing how they modify a canvas.
+ *  Canvas shapes can be defined in detail, describing how they modify a canvas.
  *
  *  Other, more specific actions defined here are:
  *    CanvasCircle
@@ -16,7 +17,7 @@
 #ifndef EMP_WEB_CANVASSHAPE_HPP_INCLUDE
 #define EMP_WEB_CANVASSHAPE_HPP_INCLUDE
 
-
+#include <stddef.h>
 #include <string>
 
 #include "../base/vector.hpp"
@@ -27,7 +28,7 @@
 namespace emp {
 namespace web {
 
-  /// Define an arbitrary shape to draw on a canvas (base clase)
+  /// Define an arbitrary shape to draw on a canvas (base class)
   class CanvasShape : public CanvasAction {
   protected:
     Point p;                 ///< Anchor point for this shape.
@@ -92,7 +93,7 @@ namespace web {
 
   /// Track a rectangle shape to be drawn on a canvas.
   class CanvasRect : public CanvasShape {
-    double w;  ///< Rectangle widgth.
+    double w;  ///< Rectangle width.
     double h;  ///< Rectangle height.
   public:
     CanvasRect(Point _p, double _w, double _h,
@@ -115,7 +116,7 @@ namespace web {
 
   /// Clear a rectangular area in a canvas.
   class CanvasClearRect : public CanvasShape {
-    double w;  ///< Rectangle widgth.
+    double w;  ///< Rectangle width.
     double h;  ///< Rectangle height.
   public:
     CanvasClearRect(Point _p, double _w, double _h)
@@ -132,7 +133,7 @@ namespace web {
   /// An arbitrary-sized polygon to be drawn on a canvas.
   class CanvasPolygon : public CanvasShape {
   private:
-    emp::vector<Point> points;  ///< Series of points defining the perimiter of the Polygon.
+    emp::vector<Point> points;  ///< Series of points defining the perimeter of the Polygon.
   public:
     CanvasPolygon(const std::string & fc="", const std::string & lc="")
       : CanvasShape(0, 0, fc, lc) { ; }

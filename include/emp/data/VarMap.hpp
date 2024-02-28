@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2019
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
- *
- *  @file VarMap.hpp
+ *  @file
  *  @brief VarMaps track arbitrary data by name (slow) or id (faster).
  *  @note Status: ALPHA
  */
@@ -11,6 +12,7 @@
 #ifndef EMP_DATA_VARMAP_HPP_INCLUDE
 #define EMP_DATA_VARMAP_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 
 #include "../base/assert.hpp"

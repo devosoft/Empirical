@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
- *
- *  @file BatchConfig.hpp
+ *  @file
  *  @brief A tool to control a series of runs and keep them updated.
  *
  *  Development notes: currently doesn't compile because of last line.
@@ -13,6 +14,7 @@
 #define EMP_IN_PROGRESS_BATCHCONFIG_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 
