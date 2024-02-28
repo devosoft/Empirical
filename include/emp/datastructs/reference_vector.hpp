@@ -1,15 +1,18 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2019
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
- *
- *  @file reference_vector.hpp
+ *  @file
  *  @brief A version of vector that holds only references to objects.  Be careful!
  *  @note Status: ALPHA
  */
 
 #ifndef EMP_DATASTRUCTS_REFERENCE_VECTOR_HPP_INCLUDE
 #define EMP_DATASTRUCTS_REFERENCE_VECTOR_HPP_INCLUDE
+
+#include <stddef.h>
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"

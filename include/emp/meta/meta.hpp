@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021
- *
- *  @file meta.hpp
+ *  @file
  *  @brief A bunch of C++ Template Meta-programming tricks.
  *
  *  Developer notes:
@@ -16,6 +17,7 @@
 #define EMP_META_META_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 #include <tuple>
 #include <utility>
 
@@ -327,6 +329,8 @@ namespace emp {
     static constexpr int Product() { return I; }
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+
   //This bit of magic is from
   //http://meh.schizofreni.co/programming/magic/2013/01/23/function-pointer-from-lambda.html
   //and is useful for fixing lambda function woes
@@ -355,6 +359,8 @@ namespace emp {
   {
     return static_cast<typename function_traits<Function>::function>(lambda);
   }
+
+  #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
   /// Determine the size of a built-in array.
   template <typename T, size_t N>

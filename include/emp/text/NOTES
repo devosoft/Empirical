@@ -1,66 +1,135 @@
+Emphatic is an internal coding for Empirical that will try to support as many text encodings as reasonable, simplifying the conversion between them while being easy to write to in code (via the emp::Text object.)
+
 Supported text formats:
- TXT (plain text)
- HTML
+ TXT (plain text - working)
+ HTML (simple tags working)
  LATEX
  MARKDOWN
  RTF
  XML
+ MarkBack (custom markup language; simple tags working)
 
-+ Custom Empirical markup language, Emphatic
+Internal encoding (Emphatic)
+ The Emphatic encoding maintains a string of characters, each associated with any number of styles.  The standard styles are:
+  bold
+  code
+  comment (text that should not be shown in final output)
+  italic
+  strike (for strikethrough)
+  subscript
+  superscript
+  underline
 
- *
- *  Internal format is .emp, which uses just a backquote (`) as a special character.  It
- *  is otherwise heavily inspired from markdown, but makes special characters less tricky
- *  to use in your writing.
- *
- *  The following tags toggle a formatting style.
- *
- *  `*Bold!`*
- *  ``Code``
- *  `/Italic`/
- *  `_Underlined!`_
- *  `^Superscript`^
- *  `.Subscript`.
- *  `~Strikethrough`~
- *
- *  The following tags grab the rest of the line they are on.  These should generally
- *  be the first non-whitespace on a line, but if they are not a newline will be assumed
- *  to be before them.
- *
- *  `# Heading level 1
- *  `## Heading level 2
- *  `### etc.
- *  `" Blockquote
- *  `- Bulleted list entry
- *  `+ Numbered list entry
- *  `| Continues the previous line for other tags in this group.
- *  `% Comment that will be removed.
- *
- *  `[Include a link name here](http://and.its.url.here)
- *  `<http://just.a.url.here>
- *  `![Link/to/image/here.jpg](with an optional URL link)
- *
- *  Now for the crazy.  We can embed code as needed.
- *
- *  `{variable = value || other_code}
- *  `$var_value_printed_here$
- *
- *  Anything with four spaces at the beginning will be treated like indented code.
- *  Add a `= at the beginning of a line if you don't want special formatting.
- *
- *  A single or double backtick indicates that everything in between is going to be inline
- *  code.  A single backtick must be followed by an alphanumeric character or whitespace,
- *  but a double backtick can be followed by anything.
- *
- *  `This would be rendered as CODE`
- *  ``{This would also be code}``
- *
- *  Escape characters do work.
- *  \\ is a regular backslash ('\')
- *  \` is a backtick in the actual string ('`')
- *  \  (backlash space) is a non-breaking space.
- *  \n is a newline
- *  \t is a tab
+ Some styles are only associated with individual special characters (usually matched with a space).  This are:
+  no_break - non-breaking space
+  bullet
+  ordered
+  indent
+  blockquote - Marks this line as being part of a blockquote.
+
+ Additional styles are followed by a colon and details must be provided.
+  header - followed by header level (e.g.: header:1)
+  link - text should redirect to provided URL (e.g.: link:https://google.com)
+  image - followed by location of image.
+
+
+
+---------------------------------------
+
+
+MarkBack notes:
+  New format is .mback, which is inspired by markdown, but uses just two types of special characters for formatting:
+     Backquotes (`) indicate a change in text STYLE
+     Backslashes (\) indicate a special CHARACTER
+
+  The following tags toggle a formatting STYLE.
+
+   `*Bold!`*
+   ``Code``
+   `/Italic`/
+   `_Underlined!`_
+   `^Superscript`^
+   `.Subscript`.
+   `~Strikethrough`~
+   `<{URL}Linked-text goes here`>
+   `#{hashtag}Tagged text`#
+
+  Color changes are placed in brackets.
+
+   `[blue]This text would be blue
+   `[#FF00FF]This text would be magenta
+   `[]This text would be back to default color.
+
+  You can end ALL special formatting with `!
+
+  Code -- see below.
+   `{var name=value or other_code}
+   `?{TEST}Optional formatting  -- e.g., ?{has_error}[red] or ?{important}*
+
+  The following tags change the format for the rest of the line they are on.  These should generally be the first non-whitespace on a line, but if not a newline will be assumed before them.
+
+   `" Blockquote
+   `% Comment that will be removed.
+   `| Continues the previous line for other tags in this group.
+
+   Anything with three backticks (```) before and after will be treated as code blocks.
+   Add a `= at the beginning of a line if you don't want any special formatting on that line.
+
+   A single or double backtick indicates that everything in between is going to be inline
+   code.  A single backtick must be followed by an alphanumeric character or whitespace,
+   but a double backtick can be followed by anything.
+
+   `This would be rendered as CODE`
+   ``{This would also be code, _with_ the braces appearing}``
+
+
+  Unused symbols for style: @$&()-=+;:',
+  ALSO unused, but less useful: ]}
+
+  The following tags handle special CHARACTERS:
+
+   \\ is a regular backslash ('\')
+   \` is a regular backtick ('`')
+   \#{Heading}
+   \##{Heading level 2}
+   \### etc. deeper headings.
+   \| is the beginning of a table line (rest of line is markdown format...?)
+   \_ is a non-breaking space.
+   \. is nothing. Use to separate other text (e.g., for unicode immediately followed by a number)
+   \- is a horizontal rule
+   \^{note} creates an footnote.  This is a superscript value with the contents included at the end of the page (or end of document if no pagebreaks)
+   \* is a bullet which will start a list entry
+   \+ is a consecutive number bullet, incrementing if in a list
+   \={123} (or any other numbers or letters) is a specified value for a bullet (a subsequent \+, \a, or \R will continue from it)
+   \a is an alphabetic bullet, incrementing if in a list
+   \b is a page break
+   \d{name} creates a division with a specified name
+   \n is a line break (newline)
+   \p is a paragraph break
+   \t is a tab
+   \R is a roman numeral bullet, incrementing if in a list
+   \(123) (or any other number) converts to the associated unicode character.
+   \<URL> or \<#hashtag> will place a link this point WITH itself as the text
+   \[URL] will RESOLVE a URL to an image (or somethign else?) and place it here
+   \:name: por \:{name} will place the emoji associated with 'name'
+   \&name; or \&{name} insert a character by a given name
+   \${var_value_printed_here} - see below
+   \?{TEST}{Optional text} - insert only if TEST is true.
+
+  Unused symbols for insertions: ~!@%;'",/ plus lots of letters
+  ALSO technically unused, but less useful: ]>})
+
+
+  Now for the crazy.  We can EMBED CODE as needed.
+
+   `{var name=value or other_code}
+   \${var_value_printed_here}
+   `?{TEST}Optional formatting  -- e.g., ?{has_error}[red] or ?{important}*
+   \?{TEST}{Optional text} - insert only if TEST is true.
+
+
+
+
 
 
 Some saved notes:
@@ -69,14 +138,14 @@ Some saved notes:
     //   HTML:      One word is <b>bold</b>.
     //   MarkDown:  One word is *bold*.
     //   LaTeX:     One word is \textbf{bold}.
-    //   Emphatic:  One word is `*bold`*
+    //   MarkBack:  One word is `*bold`*
     //
     // Some styles need to have arguments associated with them.  For example, a heading needs
     // to have a level.  A level 3 heading, for example, would be stored as style "heading:3".
     //   HTML:      <h3>A level 3 heading</h3>
     //   MarkDown:  ### A level 3 heading
     //   LaTeX:     \subsubsection{A level 3 heading}
-    //   Emphatic:  `### A level 3 heading
+    //   MarkBack:  `### A level 3 heading
     //
     // The patterns associated with these can either be broken up into multiple tags (for example,
     // in LaTeX it's easier to match a specific "\subsubsection{" open tag with "header:3" style),
@@ -88,7 +157,7 @@ Some saved notes:
     //   HTML:      This is <a href="http://www.exmaple.com/">linked</a> text.
     //   MarkDown:  This is [linked](http://www.exmaple.com/) text.
     //   LaTeX:     This is \href{http://www.exmaple.com/}{linked} text.
-    //   Emphatic:  This is `[linked](http://www.exmaple.com/) text.
+    //   MarkBack:  This is `[linked](http://www.exmaple.com/) text.
     //
     // For these patterns, HTML open would look like: <a href="%u">
     // And it would be set to the style: "link:$0".
@@ -110,6 +179,7 @@ For style replacements:
       // name of the font.)
 
 And for converting a pattern to a normal regex:
+```cpp
       std::string AsRegEx() {
         std::string out;
         for (size_t i = 0; i < pattern.size(); ++i) {
@@ -146,3 +216,4 @@ And for converting a pattern to a normal regex:
         }
         return out;
       }
+```

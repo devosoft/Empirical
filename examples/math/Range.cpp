@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
- *
- *  @file Range.cpp
+ *  @file
  */
 
 #include <iostream>
@@ -18,7 +19,7 @@ int main()
   std::cout << "Upper = " << range.GetUpper() << std::endl;
 
   for (int i = 10; i < 40; i += 5) {
-    std::cout << "Value " << i << " valid = " << range.Valid(i) << std::endl;
+    std::cout << "Value " << i << " valid = " << range.Has(i) << std::endl;
   }
 
   for (size_t s = 4; s <= 8; s++) {

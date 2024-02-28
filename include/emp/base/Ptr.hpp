@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2022.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2022.
- *
- *  @file Ptr.hpp
+ *  @file
  *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
  *  @note Status: BETA
  *
@@ -31,6 +32,7 @@
 #define EMP_BASE_PTR_HPP_INCLUDE
 
 #include <cstring>
+#include <stddef.h>
 #include <unordered_map>
 
 #include "assert.hpp"
@@ -607,8 +609,8 @@ namespace emp {
 
     /// Delete this pointer to an array (must be an array).
     void DeleteArray() {
-      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not responsible for.");
       emp_assert(ptr, "Trying to delete null Ptr.");
+      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not responsible for.");
       emp_assert(Tracker().IsArrayID(id), id, "Trying to delete non-array pointer as array.");
       emp_assert(Tracker().IsActive(ptr), id, "Trying to delete inactive pointer (already deleted!)");
       if (internal::ptr_debug) std::cout << "Ptr::DeleteArray() : " << ptr << std::endl;

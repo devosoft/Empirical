@@ -1,10 +1,13 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021-2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021-2022
- *
- *  @file VirtualCPU.cpp
- *
+ *  @file
+ */
+
+/*
  *  TODO
  *  [ ] *INSTRUCTIONS struct
  *    [ ] Constructors assign values correctly
@@ -1589,7 +1592,7 @@ TEST_CASE("VirtualCPU_String_Methods", "[Hardware]") {
     CHECK(string_vec[1] == "[0] 0");
     CHECK(string_vec[2] == "[1] 1");
     CHECK(string_vec[3] == "[2] 2");
-    CHECK(string_vec[4] == "[3] 3"); // last line gets to keep its newline character
+    CHECK(string_vec[4] == "[3] 3");
   /*
     [X] GetWorkingGenomeString returns a string representation of the working genome
     [X] GetGenomeString returns a string representation of the (non-working) genome

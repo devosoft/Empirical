@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021-2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021-2022.
- *
- *  @file notify.hpp
+ *  @file
  *  @brief Tools to alert users of messages (including errors and warnings) in a consistant manner.
  *  @note Status: ALPHA
  *
@@ -246,10 +247,10 @@ namespace notify {
 
   /// Central call to obtain NotifyData singleton.
   static NotifyData & GetData() { static NotifyData data; return data; }
-  auto & MessageHandlers() { return GetData().GetHandler(Type::MESSAGE); }
-  auto & DebugHandlers() { return GetData().GetHandler(Type::DEBUG); }
-  auto & WarningHandlers() { return GetData().GetHandler(Type::WARNING); }
-  auto & ErrorHandlers() { return GetData().GetHandler(Type::ERROR); }
+  inline auto & MessageHandlers() { return GetData().GetHandler(Type::MESSAGE); }
+  inline auto & DebugHandlers() { return GetData().GetHandler(Type::DEBUG); }
+  inline auto & WarningHandlers() { return GetData().GetHandler(Type::WARNING); }
+  inline auto & ErrorHandlers() { return GetData().GetHandler(Type::ERROR); }
 
   [[maybe_unused]] static void AddExitHandler(exit_fun_t fun) { GetData().exit_funs.push_back(fun); }
   [[maybe_unused]] static void ClearExitHandlers() { GetData().exit_funs.resize(0); }
@@ -378,7 +379,7 @@ namespace notify {
   }
 
   /// Turn on a particular verbosity category.
-  [[maybe_unused]] void SetVerbose(std::string id, bool make_active=true) {
+  [[maybe_unused]] static void SetVerbose(std::string id, bool make_active=true) {
     GetData().verbose_map[id] = make_active;
   }
 

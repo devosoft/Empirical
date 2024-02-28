@@ -1,10 +1,11 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
- *
- *  @file SmallVector.cpp
- *
+ *  @file
+ *  @brief TODO.
  *  Adapted in part from the LLVM Project, under the Apache License v2.0 with
  *  LLVM Exceptions. See https://llvm.org/LICENSE.txt for license information.
  *  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception

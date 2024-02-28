@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file BitSet.cpp
+ *  @file
  */
 
 #define EMP_DECORATE(X) [X]
@@ -42,7 +43,7 @@ template <size_t... VALS> struct TestBVConstruct;
 template <size_t VAL1, size_t... VALS>
 struct TestBVConstruct<VAL1, VALS...> {
   static void Run() {
-    emp::BitSet<VAL1> bs;
+    emp::old::BitSet<VAL1> bs;
     REQUIRE( bs.GetSize() == VAL1 );
     REQUIRE( bs.CountOnes() == 0 );
     for (size_t i = 0; i < VAL1; i++) bs[i] = true;
@@ -60,13 +61,13 @@ struct TestBVConstruct<> {
 
 TEST_CASE("1: Test BitSet Constructors", "[bits]"){
   // Create a size 50 bit vector, default to all zeros.
-  emp::BitSet<50> bs1;
+  emp::old::BitSet<50> bs1;
   REQUIRE( bs1.GetSize() == 50 );
   REQUIRE( bs1.CountOnes() == 0 );
   REQUIRE( (~bs1).CountOnes() == 50 );
 
   // Create a size 1000 BitSet, default to all ones.
-  emp::BitSet<1000> bs2(true);
+  emp::old::BitSet<1000> bs2(true);
   REQUIRE( bs2.GetSize() == 1000 );
   REQUIRE( bs2.CountOnes() == 1000 );
 
@@ -74,45 +75,45 @@ TEST_CASE("1: Test BitSet Constructors", "[bits]"){
   TestBVConstruct<1,2,7,8,9,15,16,17,31,32,33,63,64,65,127,128,129,191,192,193,200>::Run();
 
   // Build a relatively large BitSet.
-  emp::BitSet<1000000> bs4;
+  emp::old::BitSet<1000000> bs4;
   for (size_t i = 0; i < bs4.GetSize(); i += 100) bs4[i].Toggle();
   REQUIRE( bs4.CountOnes() == 10000 );
 
   // Try out the copy constructor.
-  emp::BitSet<1000000> bs5(bs4);
+  emp::old::BitSet<1000000> bs5(bs4);
   REQUIRE( bs5.GetSize() == 1000000 );
   REQUIRE( bs5.CountOnes() == 10000 );
 
   // Construct from std::bitset.
   std::bitset<6> bit_set;
   bit_set[1] = 1;   bit_set[2] = 1;   bit_set[4] = 1;
-  emp::BitSet<6> bs7(bit_set);
+  emp::old::BitSet<6> bs7(bit_set);
   REQUIRE( bs7.GetSize() == 6 );
   REQUIRE( bs7.CountOnes() == 3 );
 
   // Construct from string.
   std::string bit_string = "10011001010000011101";
-  emp::BitSet<20> bs8(bit_string);
+  emp::old::BitSet<20> bs8(bit_string);
   REQUIRE( bs8.GetSize() == 20 );
   REQUIRE( bs8.CountOnes() == 9 );
 
   // Some random BitSets
   emp::Random random;
-  emp::BitSet<1000> bs9(random);            // 50/50 chance for each bit.
+  emp::old::BitSet<1000> bs9(random);            // 50/50 chance for each bit.
   const size_t bs9_ones = bs9.CountOnes();
   REQUIRE( bs9_ones >= 400 );
   REQUIRE( bs9_ones <= 600 );
 
-  emp::BitSet<1000> bs10(random, 0.8);      // 80% chance of ones.
+  emp::old::BitSet<1000> bs10(random, 0.8);      // 80% chance of ones.
   const size_t bs10_ones = bs10.CountOnes();
   REQUIRE( bs10_ones >= 750 );
   REQUIRE( bs10_ones <= 850 );
 
-  emp::BitSet<1000> bs11(random, 117);      // Exactly 117 ones, randomly placed.
+  emp::old::BitSet<1000> bs11(random, 117);      // Exactly 117 ones, randomly placed.
   const size_t bs11_ones = bs11.CountOnes();
   REQUIRE( bs11_ones == 117 );
 
-  emp::BitSet<13> bs12({1,0,0,0,1,1,1,0,0,0,1,1,1}); // Construct with initializer list.
+  emp::old::BitSet<13> bs12({1,0,0,0,1,1,1,0,0,0,1,1,1}); // Construct with initializer list.
   REQUIRE( bs12.GetSize() == 13 );
   REQUIRE( bs12.CountOnes() == 7 );
 }
@@ -123,10 +124,10 @@ template <size_t... VALS> struct TestBVAssign;
 template <size_t VAL1, size_t... VALS>
 struct TestBVAssign<VAL1, VALS...> {
   static void Run() {
-    emp::BitSet<VAL1> bs;
+    emp::old::BitSet<VAL1> bs;
 
     // Copy to a second bs, make changes, then copy back.
-    emp::BitSet<VAL1> bs2;
+    emp::old::BitSet<VAL1> bs2;
 
     for (size_t i = 1; i < bs2.GetSize(); i += 2) {
       bs2[i] = 1;
@@ -175,14 +176,14 @@ TEST_CASE("2: Test BitSet Assignemnts", "[bits]"){
 
 
 TEST_CASE("3: Test Simple BitSet Accessors", "[bits]"){
-  emp::BitSet<1>  bs1(true);
-  emp::BitSet<8>  bs8( "10001101" );
-  emp::BitSet<32> bs32( "10001101100011011000110110001101" );
-  emp::BitSet<64> bs64( "1000110110001101100000011000110000001101100000000000110110001101" );
-  emp::BitSet<75> bs75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
+  emp::old::BitSet<1>  bs1(true);
+  emp::old::BitSet<8>  bs8( "10001101" );
+  emp::old::BitSet<32> bs32( "10001101100011011000110110001101" );
+  emp::old::BitSet<64> bs64( "1000110110001101100000011000110000001101100000000000110110001101" );
+  emp::old::BitSet<75> bs75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
 
   emp::Random random(1);
-  emp::BitSet<1000> bs1k(random, 0.75);
+  emp::old::BitSet<1000> bs1k(random, 0.75);
 
   // Make sure all sizes are correct.
   REQUIRE( bs1.GetSize() == 1 );
@@ -269,7 +270,7 @@ TEST_CASE("3: Test Simple BitSet Accessors", "[bits]"){
 
 TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
   // Now try range-based accessors on a single bit.
-  emp::BitSet<1> bs1(false);  REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
+  emp::old::BitSet<1> bs1(false);  REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
   bs1.Set(0);                 REQUIRE( bs1[0] == true );    REQUIRE( bs1.CountOnes() == 1 );
   bs1.Clear(0);               REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
   bs1.Toggle(0);              REQUIRE( bs1[0] == true );    REQUIRE( bs1.CountOnes() == 1 );
@@ -284,7 +285,7 @@ TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
   bs1.SetRange(1,1);          REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
 
   // Test when a full byte is used.
-  emp::BitSet<8> bs8( "10110001" );   REQUIRE(bs8.GetValue() == 177.0);  // 10110001
+  emp::old::BitSet<8> bs8( "10110001" );   REQUIRE(bs8.GetValue() == 177.0);  // 10110001
   bs8.Set(2);                         REQUIRE(bs8.GetValue() == 181.0);  // 10110101
   bs8.Set(0, 0);                      REQUIRE(bs8.GetValue() == 180.0);  // 10110100
   bs8.SetRange(1, 4);                 REQUIRE(bs8.GetValue() == 190.0);  // 10111110
@@ -301,7 +302,7 @@ TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
 
   // Test a full field.
   constexpr double ALL_64 = (double) ((uint64_t) -1);
-  emp::BitSet<64> bs64( "10110001101100011011" );
+  emp::old::BitSet<64> bs64( "10110001101100011011" );
   REQUIRE(bs64.GetValue() == 727835.0);
   bs64.Set(6);          REQUIRE(bs64.GetValue() == 727899.0);        // ...0 010110001101101011011
   bs64.Set(0, 0);       REQUIRE(bs64.GetValue() == 727898.0);        // ...0 010110001101101011010
@@ -317,11 +318,11 @@ TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
   bs64.Toggle(0,64);    REQUIRE(bs64.GetValue() == 491520.0);        // ...0 001111000000000000000
 
 
-  emp::BitSet<75> bs75( "110000111110010011111000001011100000111110001011110000011111010001110100010" );
+  emp::old::BitSet<75> bs75( "110000111110010011111000001011100000111110001011110000011111010001110100010" );
 
   // Test a full + partial field.
   constexpr double ALL_88 = ((double) ((uint64_t) -1)) * emp::Pow2(24);
-  emp::BitSet<88> bs88( "11011000110110001101" );
+  emp::old::BitSet<88> bs88( "11011000110110001101" );
   REQUIRE(bs88.GetValue() == 888205.0);                              // ...0 010110001101100011011
 
   // Start with same tests as last time...
@@ -350,7 +351,7 @@ TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
 
   // A larger BitSet with lots of random tests.
   emp::Random random(1);
-  emp::BitSet<1000> bs1k(random, 0.65);
+  emp::old::BitSet<1000> bs1k(random, 0.65);
   size_t num_ones = bs1k.CountOnes();  REQUIRE(num_ones > 550);
   bs1k.Toggle();                       REQUIRE(bs1k.CountOnes() == 1000 - num_ones);
 
@@ -372,9 +373,9 @@ TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
   }
 
   // Test Any(), All() and None()
-  emp::BitSet<6> bs_empty = "000000";
-  emp::BitSet<6> bs_mixed = "010101";
-  emp::BitSet<6> bs_full  = "111111";
+  emp::old::BitSet<6> bs_empty = "000000";
+  emp::old::BitSet<6> bs_mixed = "010101";
+  emp::old::BitSet<6> bs_full  = "111111";
 
   REQUIRE(bs_empty.Any() == false);
   REQUIRE(bs_mixed.Any() == true);
@@ -392,7 +393,7 @@ TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
 
 TEST_CASE("5: Test Randomize() and variants", "[bits]") {
   emp::Random random(1);
-  emp::BitSet<1000> bs;
+  emp::old::BitSet<1000> bs;
 
   REQUIRE(bs.None() == true);
 
@@ -513,7 +514,7 @@ TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
   constexpr size_t num_bits = 145;
   constexpr size_t num_bytes = 19;
 
-  emp::BitSet<num_bits> bs;
+  emp::old::BitSet<num_bits> bs;
   REQUIRE(bs.GetSize() == num_bits);
   REQUIRE(bs.GetNumBytes() == num_bytes);
 
@@ -582,7 +583,7 @@ TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
 
 TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
 
-  emp::BitSet<16> bs = "0111000010001000";
+  emp::old::BitSet<16> bs = "0111000010001000";
 
   REQUIRE(bs.GetSize() == 16);
   REQUIRE(bs.CountOnes() == 5);
@@ -643,7 +644,7 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
 }
 
 TEST_CASE("8: Test printing and string functions.", "[bits]") {
-  emp::BitSet<6> bs6("111000");
+  emp::old::BitSet<6> bs6("111000");
 
   REQUIRE(bs6.ToString() == "111000");
   REQUIRE(bs6.ToBinaryString() == "111000");
@@ -652,7 +653,7 @@ TEST_CASE("8: Test printing and string functions.", "[bits]") {
   REQUIRE(bs6.ToIDString() == "3 4 5");
   REQUIRE(bs6.ToRangeString() == "3-5");
 
-  emp::BitSet<64> bs64("1000000010001000001000000110001000000000000010000000000000111000");
+  emp::old::BitSet<64> bs64("1000000010001000001000000110001000000000000010000000000000111000");
 
   REQUIRE(bs64.ToArrayString()  == "0001110000000000000100000000000001000110000001000001000100000001");
   REQUIRE(bs64.ToBinaryString() == "1000000010001000001000000110001000000000000010000000000000111000");
@@ -660,8 +661,8 @@ TEST_CASE("8: Test printing and string functions.", "[bits]") {
   REQUIRE(bs64.ToIDString(",") == "3,4,5,19,33,37,38,45,51,55,63");
   REQUIRE(bs64.ToRangeString() == "3-5,19,33,37-38,45,51,55,63");
 
-//  emp::BitSet<65> bs65("00011110000000000001000000000000010001100000010000010001000000111");
-  emp::BitSet<65> bs65("11100000010001000001000000110001000000000000010000000000001111000");
+//  emp::old::BitSet<65> bs65("00011110000000000001000000000000010001100000010000010001000000111");
+  emp::old::BitSet<65> bs65("11100000010001000001000000110001000000000000010000000000001111000");
 
   REQUIRE(bs65.ToArrayString()  == "00011110000000000001000000000000010001100000010000010001000000111");
   REQUIRE(bs65.ToBinaryString() == "11100000010001000001000000110001000000000000010000000000001111000");
@@ -671,172 +672,172 @@ TEST_CASE("8: Test printing and string functions.", "[bits]") {
 }
 
 TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
-  const emp::BitSet<8> input1 = "00001111";
-  const emp::BitSet<8> input2 = "00110011";
-  const emp::BitSet<8> input3 = "01010101";
+  const emp::old::BitSet<8> input1 = "00001111";
+  const emp::old::BitSet<8> input2 = "00110011";
+  const emp::old::BitSet<8> input3 = "01010101";
 
   // Test *_SELF() Boolean Logic functions.
-  emp::BitSet<8> bs;       REQUIRE(bs == emp::BitSet<8>("00000000"));
-  bs.NOT_SELF();           REQUIRE(bs == emp::BitSet<8>("11111111"));
-  bs.AND_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("00001111"));
-  bs.AND_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("00001111"));
-  bs.AND_SELF(input2);     REQUIRE(bs == emp::BitSet<8>("00000011"));
-  bs.AND_SELF(input3);     REQUIRE(bs == emp::BitSet<8>("00000001"));
+  emp::old::BitSet<8> bs;       REQUIRE(bs == emp::old::BitSet<8>("00000000"));
+  bs.NOT_SELF();           REQUIRE(bs == emp::old::BitSet<8>("11111111"));
+  bs.AND_SELF(input1);     REQUIRE(bs == emp::old::BitSet<8>("00001111"));
+  bs.AND_SELF(input1);     REQUIRE(bs == emp::old::BitSet<8>("00001111"));
+  bs.AND_SELF(input2);     REQUIRE(bs == emp::old::BitSet<8>("00000011"));
+  bs.AND_SELF(input3);     REQUIRE(bs == emp::old::BitSet<8>("00000001"));
 
-  bs.OR_SELF(input1);      REQUIRE(bs == emp::BitSet<8>("00001111"));
-  bs.OR_SELF(input1);      REQUIRE(bs == emp::BitSet<8>("00001111"));
-  bs.OR_SELF(input3);      REQUIRE(bs == emp::BitSet<8>("01011111"));
-  bs.OR_SELF(input2);      REQUIRE(bs == emp::BitSet<8>("01111111"));
+  bs.OR_SELF(input1);      REQUIRE(bs == emp::old::BitSet<8>("00001111"));
+  bs.OR_SELF(input1);      REQUIRE(bs == emp::old::BitSet<8>("00001111"));
+  bs.OR_SELF(input3);      REQUIRE(bs == emp::old::BitSet<8>("01011111"));
+  bs.OR_SELF(input2);      REQUIRE(bs == emp::old::BitSet<8>("01111111"));
 
-  bs.NAND_SELF(input1);    REQUIRE(bs == emp::BitSet<8>("11110000"));
-  bs.NAND_SELF(input1);    REQUIRE(bs == emp::BitSet<8>("11111111"));
-  bs.NAND_SELF(input2);    REQUIRE(bs == emp::BitSet<8>("11001100"));
-  bs.NAND_SELF(input3);    REQUIRE(bs == emp::BitSet<8>("10111011"));
+  bs.NAND_SELF(input1);    REQUIRE(bs == emp::old::BitSet<8>("11110000"));
+  bs.NAND_SELF(input1);    REQUIRE(bs == emp::old::BitSet<8>("11111111"));
+  bs.NAND_SELF(input2);    REQUIRE(bs == emp::old::BitSet<8>("11001100"));
+  bs.NAND_SELF(input3);    REQUIRE(bs == emp::old::BitSet<8>("10111011"));
 
-  bs.NOR_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("01000000"));
-  bs.NOR_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("10110000"));
-  bs.NOR_SELF(input2);     REQUIRE(bs == emp::BitSet<8>("01001100"));
-  bs.NOR_SELF(input3);     REQUIRE(bs == emp::BitSet<8>("10100010"));
+  bs.NOR_SELF(input1);     REQUIRE(bs == emp::old::BitSet<8>("01000000"));
+  bs.NOR_SELF(input1);     REQUIRE(bs == emp::old::BitSet<8>("10110000"));
+  bs.NOR_SELF(input2);     REQUIRE(bs == emp::old::BitSet<8>("01001100"));
+  bs.NOR_SELF(input3);     REQUIRE(bs == emp::old::BitSet<8>("10100010"));
 
-  bs.XOR_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("10101101"));
-  bs.XOR_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("10100010"));
-  bs.XOR_SELF(input2);     REQUIRE(bs == emp::BitSet<8>("10010001"));
-  bs.XOR_SELF(input3);     REQUIRE(bs == emp::BitSet<8>("11000100"));
+  bs.XOR_SELF(input1);     REQUIRE(bs == emp::old::BitSet<8>("10101101"));
+  bs.XOR_SELF(input1);     REQUIRE(bs == emp::old::BitSet<8>("10100010"));
+  bs.XOR_SELF(input2);     REQUIRE(bs == emp::old::BitSet<8>("10010001"));
+  bs.XOR_SELF(input3);     REQUIRE(bs == emp::old::BitSet<8>("11000100"));
 
-  bs.EQU_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("00110100"));
-  bs.EQU_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("11000100"));
-  bs.EQU_SELF(input2);     REQUIRE(bs == emp::BitSet<8>("00001000"));
-  bs.EQU_SELF(input3);     REQUIRE(bs == emp::BitSet<8>("10100010"));
+  bs.EQU_SELF(input1);     REQUIRE(bs == emp::old::BitSet<8>("00110100"));
+  bs.EQU_SELF(input1);     REQUIRE(bs == emp::old::BitSet<8>("11000100"));
+  bs.EQU_SELF(input2);     REQUIRE(bs == emp::old::BitSet<8>("00001000"));
+  bs.EQU_SELF(input3);     REQUIRE(bs == emp::old::BitSet<8>("10100010"));
 
-  bs.NOT_SELF();           REQUIRE(bs == emp::BitSet<8>("01011101"));
+  bs.NOT_SELF();           REQUIRE(bs == emp::old::BitSet<8>("01011101"));
 
   // Test regular Boolean Logic functions.
-  bs.Clear();                            REQUIRE(bs == emp::BitSet<8>("00000000"));
-  emp::BitSet<8> bs1 = bs.NOT();         REQUIRE(bs1 == emp::BitSet<8>("11111111"));
+  bs.Clear();                            REQUIRE(bs == emp::old::BitSet<8>("00000000"));
+  emp::old::BitSet<8> bs1 = bs.NOT();         REQUIRE(bs1 == emp::old::BitSet<8>("11111111"));
 
-  bs1 = bs1.AND(input1);                 REQUIRE(bs1 == emp::BitSet<8>("00001111"));
-  emp::BitSet<8> bs2 = bs1.AND(input1);  REQUIRE(bs2 == emp::BitSet<8>("00001111"));
-  emp::BitSet<8> bs3 = bs2.AND(input2);  REQUIRE(bs3 == emp::BitSet<8>("00000011"));
-  emp::BitSet<8> bs4 = bs3.AND(input3);  REQUIRE(bs4 == emp::BitSet<8>("00000001"));
+  bs1 = bs1.AND(input1);                 REQUIRE(bs1 == emp::old::BitSet<8>("00001111"));
+  emp::old::BitSet<8> bs2 = bs1.AND(input1);  REQUIRE(bs2 == emp::old::BitSet<8>("00001111"));
+  emp::old::BitSet<8> bs3 = bs2.AND(input2);  REQUIRE(bs3 == emp::old::BitSet<8>("00000011"));
+  emp::old::BitSet<8> bs4 = bs3.AND(input3);  REQUIRE(bs4 == emp::old::BitSet<8>("00000001"));
 
-  bs1 = bs4.OR(input1);      REQUIRE(bs1 == emp::BitSet<8>("00001111"));
-  bs2 = bs1.OR(input1);      REQUIRE(bs2 == emp::BitSet<8>("00001111"));
-  bs3 = bs2.OR(input3);      REQUIRE(bs3 == emp::BitSet<8>("01011111"));
-  bs4 = bs3.OR(input2);      REQUIRE(bs4 == emp::BitSet<8>("01111111"));
+  bs1 = bs4.OR(input1);      REQUIRE(bs1 == emp::old::BitSet<8>("00001111"));
+  bs2 = bs1.OR(input1);      REQUIRE(bs2 == emp::old::BitSet<8>("00001111"));
+  bs3 = bs2.OR(input3);      REQUIRE(bs3 == emp::old::BitSet<8>("01011111"));
+  bs4 = bs3.OR(input2);      REQUIRE(bs4 == emp::old::BitSet<8>("01111111"));
 
-  bs1 = bs4.NAND(input1);    REQUIRE(bs1 == emp::BitSet<8>("11110000"));
-  bs2 = bs1.NAND(input1);    REQUIRE(bs2 == emp::BitSet<8>("11111111"));
-  bs3 = bs2.NAND(input2);    REQUIRE(bs3 == emp::BitSet<8>("11001100"));
-  bs4 = bs3.NAND(input3);    REQUIRE(bs4 == emp::BitSet<8>("10111011"));
+  bs1 = bs4.NAND(input1);    REQUIRE(bs1 == emp::old::BitSet<8>("11110000"));
+  bs2 = bs1.NAND(input1);    REQUIRE(bs2 == emp::old::BitSet<8>("11111111"));
+  bs3 = bs2.NAND(input2);    REQUIRE(bs3 == emp::old::BitSet<8>("11001100"));
+  bs4 = bs3.NAND(input3);    REQUIRE(bs4 == emp::old::BitSet<8>("10111011"));
 
-  bs1 = bs4.NOR(input1);     REQUIRE(bs1 == emp::BitSet<8>("01000000"));
-  bs2 = bs1.NOR(input1);     REQUIRE(bs2 == emp::BitSet<8>("10110000"));
-  bs3 = bs2.NOR(input2);     REQUIRE(bs3 == emp::BitSet<8>("01001100"));
-  bs4 = bs3.NOR(input3);     REQUIRE(bs4 == emp::BitSet<8>("10100010"));
+  bs1 = bs4.NOR(input1);     REQUIRE(bs1 == emp::old::BitSet<8>("01000000"));
+  bs2 = bs1.NOR(input1);     REQUIRE(bs2 == emp::old::BitSet<8>("10110000"));
+  bs3 = bs2.NOR(input2);     REQUIRE(bs3 == emp::old::BitSet<8>("01001100"));
+  bs4 = bs3.NOR(input3);     REQUIRE(bs4 == emp::old::BitSet<8>("10100010"));
 
-  bs1 = bs4.XOR(input1);     REQUIRE(bs1 == emp::BitSet<8>("10101101"));
-  bs2 = bs1.XOR(input1);     REQUIRE(bs2 == emp::BitSet<8>("10100010"));
-  bs3 = bs2.XOR(input2);     REQUIRE(bs3 == emp::BitSet<8>("10010001"));
-  bs4 = bs3.XOR(input3);     REQUIRE(bs4 == emp::BitSet<8>("11000100"));
+  bs1 = bs4.XOR(input1);     REQUIRE(bs1 == emp::old::BitSet<8>("10101101"));
+  bs2 = bs1.XOR(input1);     REQUIRE(bs2 == emp::old::BitSet<8>("10100010"));
+  bs3 = bs2.XOR(input2);     REQUIRE(bs3 == emp::old::BitSet<8>("10010001"));
+  bs4 = bs3.XOR(input3);     REQUIRE(bs4 == emp::old::BitSet<8>("11000100"));
 
-  bs1 = bs4.EQU(input1);     REQUIRE(bs1 == emp::BitSet<8>("00110100"));
-  bs2 = bs1.EQU(input1);     REQUIRE(bs2 == emp::BitSet<8>("11000100"));
-  bs3 = bs2.EQU(input2);     REQUIRE(bs3 == emp::BitSet<8>("00001000"));
-  bs4 = bs3.EQU(input3);     REQUIRE(bs4 == emp::BitSet<8>("10100010"));
+  bs1 = bs4.EQU(input1);     REQUIRE(bs1 == emp::old::BitSet<8>("00110100"));
+  bs2 = bs1.EQU(input1);     REQUIRE(bs2 == emp::old::BitSet<8>("11000100"));
+  bs3 = bs2.EQU(input2);     REQUIRE(bs3 == emp::old::BitSet<8>("00001000"));
+  bs4 = bs3.EQU(input3);     REQUIRE(bs4 == emp::old::BitSet<8>("10100010"));
 
-  bs = bs4.NOT();            REQUIRE(bs == emp::BitSet<8>("01011101"));
+  bs = bs4.NOT();            REQUIRE(bs == emp::old::BitSet<8>("01011101"));
 
 
   // Test Boolean Logic operators.
-  bs.Clear();               REQUIRE(bs == emp::BitSet<8>("00000000"));
-  bs1 = ~bs;                REQUIRE(bs1 == emp::BitSet<8>("11111111"));
+  bs.Clear();               REQUIRE(bs == emp::old::BitSet<8>("00000000"));
+  bs1 = ~bs;                REQUIRE(bs1 == emp::old::BitSet<8>("11111111"));
 
-  bs1 = bs1 & input1;       REQUIRE(bs1 == emp::BitSet<8>("00001111"));
-  bs2 = bs1 & input1;       REQUIRE(bs2 == emp::BitSet<8>("00001111"));
-  bs3 = bs2 & input2;       REQUIRE(bs3 == emp::BitSet<8>("00000011"));
-  bs4 = bs3 & input3;       REQUIRE(bs4 == emp::BitSet<8>("00000001"));
+  bs1 = bs1 & input1;       REQUIRE(bs1 == emp::old::BitSet<8>("00001111"));
+  bs2 = bs1 & input1;       REQUIRE(bs2 == emp::old::BitSet<8>("00001111"));
+  bs3 = bs2 & input2;       REQUIRE(bs3 == emp::old::BitSet<8>("00000011"));
+  bs4 = bs3 & input3;       REQUIRE(bs4 == emp::old::BitSet<8>("00000001"));
 
-  bs1 = bs4 | input1;       REQUIRE(bs1 == emp::BitSet<8>("00001111"));
-  bs2 = bs1 | input1;       REQUIRE(bs2 == emp::BitSet<8>("00001111"));
-  bs3 = bs2 | input3;       REQUIRE(bs3 == emp::BitSet<8>("01011111"));
-  bs4 = bs3 | input2;       REQUIRE(bs4 == emp::BitSet<8>("01111111"));
+  bs1 = bs4 | input1;       REQUIRE(bs1 == emp::old::BitSet<8>("00001111"));
+  bs2 = bs1 | input1;       REQUIRE(bs2 == emp::old::BitSet<8>("00001111"));
+  bs3 = bs2 | input3;       REQUIRE(bs3 == emp::old::BitSet<8>("01011111"));
+  bs4 = bs3 | input2;       REQUIRE(bs4 == emp::old::BitSet<8>("01111111"));
 
-  bs1 = ~(bs4 & input1);    REQUIRE(bs1 == emp::BitSet<8>("11110000"));
-  bs2 = ~(bs1 & input1);    REQUIRE(bs2 == emp::BitSet<8>("11111111"));
-  bs3 = ~(bs2 & input2);    REQUIRE(bs3 == emp::BitSet<8>("11001100"));
-  bs4 = ~(bs3 & input3);    REQUIRE(bs4 == emp::BitSet<8>("10111011"));
+  bs1 = ~(bs4 & input1);    REQUIRE(bs1 == emp::old::BitSet<8>("11110000"));
+  bs2 = ~(bs1 & input1);    REQUIRE(bs2 == emp::old::BitSet<8>("11111111"));
+  bs3 = ~(bs2 & input2);    REQUIRE(bs3 == emp::old::BitSet<8>("11001100"));
+  bs4 = ~(bs3 & input3);    REQUIRE(bs4 == emp::old::BitSet<8>("10111011"));
 
-  bs1 = ~(bs4 | input1);    REQUIRE(bs1 == emp::BitSet<8>("01000000"));
-  bs2 = ~(bs1 | input1);    REQUIRE(bs2 == emp::BitSet<8>("10110000"));
-  bs3 = ~(bs2 | input2);    REQUIRE(bs3 == emp::BitSet<8>("01001100"));
-  bs4 = ~(bs3 | input3);    REQUIRE(bs4 == emp::BitSet<8>("10100010"));
+  bs1 = ~(bs4 | input1);    REQUIRE(bs1 == emp::old::BitSet<8>("01000000"));
+  bs2 = ~(bs1 | input1);    REQUIRE(bs2 == emp::old::BitSet<8>("10110000"));
+  bs3 = ~(bs2 | input2);    REQUIRE(bs3 == emp::old::BitSet<8>("01001100"));
+  bs4 = ~(bs3 | input3);    REQUIRE(bs4 == emp::old::BitSet<8>("10100010"));
 
-  bs1 = bs4 ^ input1;       REQUIRE(bs1 == emp::BitSet<8>("10101101"));
-  bs2 = bs1 ^ input1;       REQUIRE(bs2 == emp::BitSet<8>("10100010"));
-  bs3 = bs2 ^ input2;       REQUIRE(bs3 == emp::BitSet<8>("10010001"));
-  bs4 = bs3 ^ input3;       REQUIRE(bs4 == emp::BitSet<8>("11000100"));
+  bs1 = bs4 ^ input1;       REQUIRE(bs1 == emp::old::BitSet<8>("10101101"));
+  bs2 = bs1 ^ input1;       REQUIRE(bs2 == emp::old::BitSet<8>("10100010"));
+  bs3 = bs2 ^ input2;       REQUIRE(bs3 == emp::old::BitSet<8>("10010001"));
+  bs4 = bs3 ^ input3;       REQUIRE(bs4 == emp::old::BitSet<8>("11000100"));
 
-  bs1 = ~(bs4 ^ input1);    REQUIRE(bs1 == emp::BitSet<8>("00110100"));
-  bs2 = ~(bs1 ^ input1);    REQUIRE(bs2 == emp::BitSet<8>("11000100"));
-  bs3 = ~(bs2 ^ input2);    REQUIRE(bs3 == emp::BitSet<8>("00001000"));
-  bs4 = ~(bs3 ^ input3);    REQUIRE(bs4 == emp::BitSet<8>("10100010"));
+  bs1 = ~(bs4 ^ input1);    REQUIRE(bs1 == emp::old::BitSet<8>("00110100"));
+  bs2 = ~(bs1 ^ input1);    REQUIRE(bs2 == emp::old::BitSet<8>("11000100"));
+  bs3 = ~(bs2 ^ input2);    REQUIRE(bs3 == emp::old::BitSet<8>("00001000"));
+  bs4 = ~(bs3 ^ input3);    REQUIRE(bs4 == emp::old::BitSet<8>("10100010"));
 
-  bs = ~bs4;                REQUIRE(bs == emp::BitSet<8>("01011101"));
+  bs = ~bs4;                REQUIRE(bs == emp::old::BitSet<8>("01011101"));
 
 
   // Test COMPOUND Boolean Logic operators.
-  bs = "11111111";    REQUIRE(bs == emp::BitSet<8>("11111111"));
+  bs = "11111111";    REQUIRE(bs == emp::old::BitSet<8>("11111111"));
 
-  bs &= input1;       REQUIRE(bs == emp::BitSet<8>("00001111"));
-  bs &= input1;       REQUIRE(bs == emp::BitSet<8>("00001111"));
-  bs &= input2;       REQUIRE(bs == emp::BitSet<8>("00000011"));
-  bs &= input3;       REQUIRE(bs == emp::BitSet<8>("00000001"));
+  bs &= input1;       REQUIRE(bs == emp::old::BitSet<8>("00001111"));
+  bs &= input1;       REQUIRE(bs == emp::old::BitSet<8>("00001111"));
+  bs &= input2;       REQUIRE(bs == emp::old::BitSet<8>("00000011"));
+  bs &= input3;       REQUIRE(bs == emp::old::BitSet<8>("00000001"));
 
-  bs |= input1;       REQUIRE(bs == emp::BitSet<8>("00001111"));
-  bs |= input1;       REQUIRE(bs == emp::BitSet<8>("00001111"));
-  bs |= input3;       REQUIRE(bs == emp::BitSet<8>("01011111"));
-  bs |= input2;       REQUIRE(bs == emp::BitSet<8>("01111111"));
+  bs |= input1;       REQUIRE(bs == emp::old::BitSet<8>("00001111"));
+  bs |= input1;       REQUIRE(bs == emp::old::BitSet<8>("00001111"));
+  bs |= input3;       REQUIRE(bs == emp::old::BitSet<8>("01011111"));
+  bs |= input2;       REQUIRE(bs == emp::old::BitSet<8>("01111111"));
 
-  bs ^= input1;       REQUIRE(bs == emp::BitSet<8>("01110000"));
-  bs ^= input1;       REQUIRE(bs == emp::BitSet<8>("01111111"));
-  bs ^= input2;       REQUIRE(bs == emp::BitSet<8>("01001100"));
-  bs ^= input3;       REQUIRE(bs == emp::BitSet<8>("00011001"));
+  bs ^= input1;       REQUIRE(bs == emp::old::BitSet<8>("01110000"));
+  bs ^= input1;       REQUIRE(bs == emp::old::BitSet<8>("01111111"));
+  bs ^= input2;       REQUIRE(bs == emp::old::BitSet<8>("01001100"));
+  bs ^= input3;       REQUIRE(bs == emp::old::BitSet<8>("00011001"));
 
   // Now some tests with BitSets longer than one field.
-  const emp::BitSet<80> bsl80 =
+  const emp::old::BitSet<80> bsl80 =
     "00110111000101110001011100010111000101110001011100010111000101110001011100010111";
   REQUIRE( bsl80.GetSize() == 80 );
   REQUIRE( bsl80.CountOnes() == 41 );
   REQUIRE( (bsl80 >> 1) ==
-           emp::BitSet<80>("00011011100010111000101110001011100010111000101110001011100010111000101110001011")
+           emp::old::BitSet<80>("00011011100010111000101110001011100010111000101110001011100010111000101110001011")
          );
   REQUIRE( (bsl80 >> 2) ==
-           emp::BitSet<80>("00001101110001011100010111000101110001011100010111000101110001011100010111000101")
+           emp::old::BitSet<80>("00001101110001011100010111000101110001011100010111000101110001011100010111000101")
          );
   REQUIRE( (bsl80 >> 63) ==
-           emp::BitSet<80>("00000000000000000000000000000000000000000000000000000000000000000110111000101110")
+           emp::old::BitSet<80>("00000000000000000000000000000000000000000000000000000000000000000110111000101110")
          );
   REQUIRE( (bsl80 >> 64) ==
-           emp::BitSet<80>("00000000000000000000000000000000000000000000000000000000000000000011011100010111")
+           emp::old::BitSet<80>("00000000000000000000000000000000000000000000000000000000000000000011011100010111")
          );
   REQUIRE( (bsl80 >> 65) ==
-           emp::BitSet<80>("00000000000000000000000000000000000000000000000000000000000000000001101110001011")
+           emp::old::BitSet<80>("00000000000000000000000000000000000000000000000000000000000000000001101110001011")
          );
 
   REQUIRE( (bsl80 << 1) ==
-           emp::BitSet<80>("01101110001011100010111000101110001011100010111000101110001011100010111000101110")
+           emp::old::BitSet<80>("01101110001011100010111000101110001011100010111000101110001011100010111000101110")
          );
   REQUIRE( (bsl80 << 2) ==
-           emp::BitSet<80>("11011100010111000101110001011100010111000101110001011100010111000101110001011100")
+           emp::old::BitSet<80>("11011100010111000101110001011100010111000101110001011100010111000101110001011100")
          );
   REQUIRE( (bsl80 << 63) ==
-           emp::BitSet<80>("10001011100010111000000000000000000000000000000000000000000000000000000000000000")
+           emp::old::BitSet<80>("10001011100010111000000000000000000000000000000000000000000000000000000000000000")
          );
   REQUIRE( (bsl80 << 64) ==
-           emp::BitSet<80>("00010111000101110000000000000000000000000000000000000000000000000000000000000000")
+           emp::old::BitSet<80>("00010111000101110000000000000000000000000000000000000000000000000000000000000000")
          );
   REQUIRE( (bsl80 << 65) ==
-           emp::BitSet<80>("00101110001011100000000000000000000000000000000000000000000000000000000000000000")
+           emp::old::BitSet<80>("00101110001011100000000000000000000000000000000000000000000000000000000000000000")
          );
 }
 
@@ -859,7 +860,7 @@ TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
  * as well as Clear and SetAll
  */
 void test_status(){
-  emp::BitSet<10> bs10;
+  emp::old::BitSet<10> bs10;
   REQUIRE(!bs10.any());
   REQUIRE(bs10.none());
   REQUIRE(!bs10.all());
@@ -873,13 +874,13 @@ void test_status(){
  * GetSize
  */
 void test_size(){
-  emp::BitSet<42> bs42;
+  emp::old::BitSet<42> bs42;
   REQUIRE(bs42.size() == 42);
 
-  emp::BitSet<35> bs35;
+  emp::old::BitSet<35> bs35;
   REQUIRE(bs35.GetSize() == 35);
 
-  emp::BitSet<1> bs1;
+  emp::old::BitSet<1> bs1;
   REQUIRE(bs1.size() == 1);
 }
 
@@ -887,11 +888,11 @@ void test_size(){
  * Flip and Toggle
  */
 void test_flip(){
-  emp::BitSet<2> bs2;  // bs2 = 00
+  emp::old::BitSet<2> bs2;  // bs2 = 00
   bs2.flip(0);        // bs2 = 01
   REQUIRE(bs2[0]);
 
-  emp::BitSet<8> bs8;  // bs8 = 00000000
+  emp::old::BitSet<8> bs8;  // bs8 = 00000000
   bs8.flip(0,4);      // bs8 = 00001111
   REQUIRE(bs8[0]);
   REQUIRE(bs8[1]);
@@ -902,7 +903,7 @@ void test_flip(){
   bs8[0].Toggle();    // bs8 = 00001110
   REQUIRE(!bs8[0]);
 
-  emp::BitSet<4> bs4;  // bs4 = 0000
+  emp::old::BitSet<4> bs4;  // bs4 = 0000
   bs4.flip();          // bs4 = 1111
   REQUIRE(bs4.all());
 }
@@ -911,7 +912,7 @@ void test_flip(){
  * FindOne and PopOne
  */
 void test_find(){
-  emp::BitSet<10> bs10;  // bs10 = 00 00000000
+  emp::old::BitSet<10> bs10;  // bs10 = 00 00000000
   bs10.flip(3);          // bs10 = 00 00001000
   REQUIRE(bs10.FindOne() == 3);
   bs10.PopOne();        // bs10 = 00 00000000
@@ -926,7 +927,7 @@ void test_find(){
  * GetByte and SetByte
  */
 void test_byte(){
-  emp::BitSet<10>  bs10;
+  emp::old::BitSet<10>  bs10;
   bs10.SetByte(0, 10);
   REQUIRE(bs10.GetByte(0) == 10);
 
@@ -942,7 +943,7 @@ void test_byte(){
 // actual testing function
 template <size_t Bits>
 void do_byte_test() {
-  emp::BitSet<Bits> bs;
+  emp::old::BitSet<Bits> bs;
 
   for (size_t i = 0; i < Bits / 8; ++i) {
     bs.SetByte(i, 10 * i);
@@ -972,12 +973,12 @@ void test_bytes() {
  * Left and Right shifts
  */
 void test_shift(){
-  emp::BitSet<40> bs40;
+  emp::old::BitSet<40> bs40;
   bs40.SetByte(0, 1);
   bs40 <<= 34;
   REQUIRE(bs40.GetByte(4) == 4);
 
-  emp::BitSet<10> bs10;
+  emp::old::BitSet<10> bs10;
   bs10.SetByte(0, 10);
   bs10 >>= 2;
   REQUIRE(bs10.GetByte(0) == 2);
@@ -987,7 +988,7 @@ void test_shift(){
  * Count ones
  */
 void test_count(){
-  emp::BitSet<12> bs12;
+  emp::old::BitSet<12> bs12;
   bs12.SetAll();
   REQUIRE(bs12.count() == 12);
   REQUIRE(bs12.CountOnes_Sparse() == 12);
@@ -999,7 +1000,7 @@ void test_count(){
  * Get ones
  */
 void test_get_ones(){
-  emp::BitSet<5> bs5;
+  emp::old::BitSet<5> bs5;
   bs5.flip(2); // 00100
   emp::vector<size_t> ones = bs5.GetOnes();
   REQUIRE(ones.size() == 1);
@@ -1011,7 +1012,7 @@ void test_get_ones(){
  * Get and Set bits
  */
 void test_bit(){
-  emp::BitSet<8> bs8;
+  emp::old::BitSet<8> bs8;
   bs8.Set(0, 1);       // bs8 = 00000001
   REQUIRE(bs8.Get(0));
 
@@ -1025,9 +1026,9 @@ void test_bit(){
  * Bitwise XOR ^
  */
 void test_bitwise_xor(){
-  emp::BitSet<4> bs4;
+  emp::old::BitSet<4> bs4;
   bs4.Set(0, 1);
-  emp::BitSet<4> bs4_1;
+  emp::old::BitSet<4> bs4_1;
   bs4_1.SetByte(0,3);
   bs4 ^= bs4_1;                 // bs4 = 0001 ^ 0011 = 0010
   REQUIRE(bs4.GetByte(0) == 2);   // 0010 = 2
@@ -1040,8 +1041,8 @@ void test_bitwise_xor(){
  * Bitwise OR |
  */
 void test_bitwise_or(){
-  emp::BitSet<10> bs10;
-  emp::BitSet<10> bs10_1;
+  emp::old::BitSet<10> bs10;
+  emp::old::BitSet<10> bs10_1;
   bs10.Set(1,1);                 // bs10 = 00 0000 0010
   bs10_1.Set(3,1);
   bs10_1.SetByte(1,3);
@@ -1055,8 +1056,8 @@ void test_bitwise_or(){
  * Bitwise AND &
  */
 void test_bitwise_and(){
-  emp::BitSet<8> bs8;
-  emp::BitSet<8> bs8_1;
+  emp::old::BitSet<8> bs8;
+  emp::old::BitSet<8> bs8_1;
   bs8.SetByte(0,13);    // bs8 = 00001101
   bs8_1.SetByte(0,10);  // bs8_1 = 00001010
   bs8_1 &= bs8;          // bs8_1 = 00001010 & 00001101 = 00001000
@@ -1068,8 +1069,8 @@ void test_bitwise_and(){
  */
 void test_more_comparators(){
   // NAND
-  emp::BitSet<8> bs8_1;
-  emp::BitSet<8> bs8_2;
+  emp::old::BitSet<8> bs8_1;
+  emp::old::BitSet<8> bs8_2;
   bs8_1.SetAll();
   REQUIRE(bs8_1.NAND(bs8_2).All());
   bs8_2.flip(1);
@@ -1099,7 +1100,7 @@ void test_more_comparators(){
  */
 void test_random(){
   emp::Random random(1);
-  emp::BitSet<8> bs8(random);
+  emp::old::BitSet<8> bs8(random);
   bs8.Randomize(random, 1.0);
   REQUIRE(bs8.all());
   bs8.Randomize(random, 0.0);
@@ -1110,11 +1111,11 @@ void test_random(){
  * Copy
  */
 void test_copy(){
-  emp::BitSet<10> bs10;
+  emp::old::BitSet<10> bs10;
   bs10.SetAll();
   bs10.flip(0,5);
 
-  emp::BitSet<10> bs10_1;
+  emp::old::BitSet<10> bs10_1;
   bs10_1 = bs10;
   REQUIRE(bs10 == bs10_1);
 }
@@ -1123,8 +1124,8 @@ void test_copy(){
  * Comparators (>=,>,==,!=,<,<=)
  */
 void test_comparators(){
-  emp::BitSet<10> bs10;
-  emp::BitSet<10> bs10_1;
+  emp::old::BitSet<10> bs10;
+  emp::old::BitSet<10> bs10_1;
   bs10_1.SetAll();
   REQUIRE(bs10_1 != bs10);
   REQUIRE(bs10_1 > bs10);
@@ -1141,10 +1142,10 @@ void test_comparators(){
  * Export
  */
 void test_export(){
-  emp::BitSet<8> bs8;
+  emp::old::BitSet<8> bs8;
   bs8.SetAll();
   REQUIRE(bs8.count() == 8);
-  emp::BitSet<10> bs10 = bs8.Export<10>();
+  emp::old::BitSet<10> bs10 = bs8.Export<10>();
   REQUIRE(bs10.size() == 10);
   REQUIRE(bs10.GetByte(0) == 255);
   REQUIRE(bs10.GetByte(1) == 0);
@@ -1154,14 +1155,14 @@ void test_export(){
  * Import
  */
 void test_import(){
-  emp::BitSet<8> bs8;
-  emp::BitSet<20> bs20;
+  emp::old::BitSet<8> bs8;
+  emp::old::BitSet<20> bs20;
   bs20[5] = 1;
 
   bs8.Import(bs20);
   REQUIRE(bs8[5]);
 
-  emp::BitSet<10> bs10;
+  emp::old::BitSet<10> bs10;
   bs10.SetAll();
   bs20.Import(bs10);
   REQUIRE(bs20.count() == 10);
@@ -1201,8 +1202,8 @@ struct ImportExportTester {
     emp::Random rand(1);
 
     // using default parameter
-    emp::BitSet<SOURCE_BITS> source(rand);
-    emp::BitSet<DEST_BITS> dest(rand);
+    emp::old::BitSet<SOURCE_BITS> source(rand);
+    emp::old::BitSet<DEST_BITS> dest(rand);
 
     dest.template Import(source);
 
@@ -1268,7 +1269,7 @@ struct MultiTester2 {
     emp::Random rand(1);
 
     constexpr int W = N - 2;
-    emp::BitSet<W> bs;
+    emp::old::BitSet<W> bs;
 
     for (int j = 0; j < W; ++j) {
       bs.Clear(); bs.Set(j);
@@ -1334,8 +1335,8 @@ struct MultiTester {
     constexpr int width = I;
 
     emp::Random rand(1);
-    emp::BitSet<width> bs(rand);
-    const emp::BitSet<width> bs_orig(bs);
+    emp::old::BitSet<width> bs(rand);
+    const emp::old::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
     for (int i = -width - 1; i <= width + 1; ++i) {
@@ -1394,124 +1395,124 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
   // test BitSet GetSize, GetNumBytes
   {
-    REQUIRE(emp::BitSet<2>{}.GetSize() == 2);
-    REQUIRE(emp::BitSet<2>{}.GetNumBytes() == 1);
+    REQUIRE(emp::old::BitSet<2>{}.GetSize() == 2);
+    REQUIRE(emp::old::BitSet<2>{}.GetNumBytes() == 1);
 
-    REQUIRE(emp::BitSet<7>{}.GetSize() == 7);
-    REQUIRE(emp::BitSet<7>{}.GetNumBytes() == 1);
+    REQUIRE(emp::old::BitSet<7>{}.GetSize() == 7);
+    REQUIRE(emp::old::BitSet<7>{}.GetNumBytes() == 1);
 
-    REQUIRE(emp::BitSet<8>{}.GetSize() == 8);
-    REQUIRE(emp::BitSet<8>{}.GetNumBytes() == 1);
+    REQUIRE(emp::old::BitSet<8>{}.GetSize() == 8);
+    REQUIRE(emp::old::BitSet<8>{}.GetNumBytes() == 1);
 
-    REQUIRE(emp::BitSet<9>{}.GetSize() == 9);
-    REQUIRE(emp::BitSet<9>{}.GetNumBytes() == 2);
+    REQUIRE(emp::old::BitSet<9>{}.GetSize() == 9);
+    REQUIRE(emp::old::BitSet<9>{}.GetNumBytes() == 2);
 
-    REQUIRE(emp::BitSet<16>{}.GetSize() == 16);
-    REQUIRE(emp::BitSet<16>{}.GetNumBytes() == 2);
+    REQUIRE(emp::old::BitSet<16>{}.GetSize() == 16);
+    REQUIRE(emp::old::BitSet<16>{}.GetNumBytes() == 2);
 
-    REQUIRE(emp::BitSet<24>{}.GetSize() == 24);
-    REQUIRE(emp::BitSet<24>{}.GetNumBytes() == 3);
+    REQUIRE(emp::old::BitSet<24>{}.GetSize() == 24);
+    REQUIRE(emp::old::BitSet<24>{}.GetNumBytes() == 3);
   }
 
   // test BitSet reverse
   {
 
-    REQUIRE(emp::BitSet<1>{0}.REVERSE_SELF() == emp::BitSet<1>{0});
-    REQUIRE(emp::BitSet<1>{0}.REVERSE_SELF().CountOnes() == 0);
-    REQUIRE(emp::BitSet<1>{1}.REVERSE_SELF() == emp::BitSet<1>{1});
-    REQUIRE(emp::BitSet<1>{1}.REVERSE_SELF().CountOnes() == 1);
+    REQUIRE(emp::old::BitSet<1>{0}.REVERSE_SELF() == emp::old::BitSet<1>{0});
+    REQUIRE(emp::old::BitSet<1>{0}.REVERSE_SELF().CountOnes() == 0);
+    REQUIRE(emp::old::BitSet<1>{1}.REVERSE_SELF() == emp::old::BitSet<1>{1});
+    REQUIRE(emp::old::BitSet<1>{1}.REVERSE_SELF().CountOnes() == 1);
 
     REQUIRE(
-      (emp::BitSet<2>{1,1}.REVERSE_SELF())
+      (emp::old::BitSet<2>{1,1}.REVERSE_SELF())
       ==
-      (emp::BitSet<2>{1,1})
+      (emp::old::BitSet<2>{1,1})
     );
-    REQUIRE((emp::BitSet<2>{1,1}.REVERSE_SELF().CountOnes()) == 2);
+    REQUIRE((emp::old::BitSet<2>{1,1}.REVERSE_SELF().CountOnes()) == 2);
     REQUIRE(
-      (emp::BitSet<2>{0,1}.REVERSE_SELF())
+      (emp::old::BitSet<2>{0,1}.REVERSE_SELF())
       ==
-      (emp::BitSet<2>{1,0})
+      (emp::old::BitSet<2>{1,0})
     );
-    REQUIRE((emp::BitSet<2>{0,1}.REVERSE_SELF().CountOnes()) == 1);
+    REQUIRE((emp::old::BitSet<2>{0,1}.REVERSE_SELF().CountOnes()) == 1);
     REQUIRE(
-      (emp::BitSet<2>{0,0}.REVERSE_SELF())
+      (emp::old::BitSet<2>{0,0}.REVERSE_SELF())
       ==
-      (emp::BitSet<2>{0,0})
+      (emp::old::BitSet<2>{0,0})
     );
-    REQUIRE((emp::BitSet<2>{0,0}.REVERSE_SELF().CountOnes()) == 0);
+    REQUIRE((emp::old::BitSet<2>{0,0}.REVERSE_SELF().CountOnes()) == 0);
 
     REQUIRE(
-      (emp::BitSet<7>{1,1,0,0,0,0,1}.REVERSE_SELF())
+      (emp::old::BitSet<7>{1,1,0,0,0,0,1}.REVERSE_SELF())
       ==
-      (emp::BitSet<7>{1,0,0,0,0,1,1})
+      (emp::old::BitSet<7>{1,0,0,0,0,1,1})
     );
-    REQUIRE((emp::BitSet<7>{1,1,0,0,0,0,1}.REVERSE_SELF().CountOnes()) == 3);
+    REQUIRE((emp::old::BitSet<7>{1,1,0,0,0,0,1}.REVERSE_SELF().CountOnes()) == 3);
     REQUIRE(
-      (emp::BitSet<7>{1,0,1,0,1,0,1}.REVERSE_SELF())
+      (emp::old::BitSet<7>{1,0,1,0,1,0,1}.REVERSE_SELF())
       ==
-      (emp::BitSet<7>{1,0,1,0,1,0,1})
+      (emp::old::BitSet<7>{1,0,1,0,1,0,1})
     );
-    REQUIRE((emp::BitSet<7>{1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes()) == 4);
+    REQUIRE((emp::old::BitSet<7>{1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes()) == 4);
     REQUIRE(
-      (emp::BitSet<7>{1,1,1,1,1,0,1}.REVERSE_SELF())
+      (emp::old::BitSet<7>{1,1,1,1,1,0,1}.REVERSE_SELF())
       ==
-      (emp::BitSet<7>{1,0,1,1,1,1,1})
+      (emp::old::BitSet<7>{1,0,1,1,1,1,1})
     );
-    REQUIRE((emp::BitSet<7>{1,1,1,1,1,0,1}.REVERSE_SELF().CountOnes()) == 6);
+    REQUIRE((emp::old::BitSet<7>{1,1,1,1,1,0,1}.REVERSE_SELF().CountOnes()) == 6);
 
     REQUIRE(
-      (emp::BitSet<8>{1,1,0,0,0,0,1,0}.REVERSE_SELF())
+      (emp::old::BitSet<8>{1,1,0,0,0,0,1,0}.REVERSE_SELF())
       ==
-      (emp::BitSet<8>{0,1,0,0,0,0,1,1})
+      (emp::old::BitSet<8>{0,1,0,0,0,0,1,1})
     );
-    REQUIRE((emp::BitSet<8>{1,1,0,0,0,0,1,0}.REVERSE_SELF().CountOnes()) == 3);
+    REQUIRE((emp::old::BitSet<8>{1,1,0,0,0,0,1,0}.REVERSE_SELF().CountOnes()) == 3);
     REQUIRE(
-      (emp::BitSet<8>{1,0,1,0,1,0,1,0}.REVERSE_SELF())
+      (emp::old::BitSet<8>{1,0,1,0,1,0,1,0}.REVERSE_SELF())
       ==
-      (emp::BitSet<8>{0,1,0,1,0,1,0,1})
+      (emp::old::BitSet<8>{0,1,0,1,0,1,0,1})
     );
-    REQUIRE((emp::BitSet<8>{0,1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes()) == 4);
+    REQUIRE((emp::old::BitSet<8>{0,1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes()) == 4);
     REQUIRE(
-      (emp::BitSet<8>{1,1,1,1,1,0,1,0}.REVERSE_SELF())
+      (emp::old::BitSet<8>{1,1,1,1,1,0,1,0}.REVERSE_SELF())
       ==
-      (emp::BitSet<8>{0,1,0,1,1,1,1,1})
+      (emp::old::BitSet<8>{0,1,0,1,1,1,1,1})
     );
-    REQUIRE((emp::BitSet<8>{1,1,1,1,1,0,1,0}.REVERSE_SELF().CountOnes()) == 6);
+    REQUIRE((emp::old::BitSet<8>{1,1,1,1,1,0,1,0}.REVERSE_SELF().CountOnes()) == 6);
 
     REQUIRE(
-      (emp::BitSet<9>{1,1,0,0,0,0,1,0,0}.REVERSE_SELF())
+      (emp::old::BitSet<9>{1,1,0,0,0,0,1,0,0}.REVERSE_SELF())
       ==
-      (emp::BitSet<9>{0,0,1,0,0,0,0,1,1})
+      (emp::old::BitSet<9>{0,0,1,0,0,0,0,1,1})
     );
     REQUIRE(
-      (emp::BitSet<9>{1,1,0,0,0,0,1,0,0}.REVERSE_SELF().CountOnes())
+      (emp::old::BitSet<9>{1,1,0,0,0,0,1,0,0}.REVERSE_SELF().CountOnes())
       ==
       3
     );
     REQUIRE(
-      (emp::BitSet<9>{1,0,1,0,1,0,1,0,0}.REVERSE_SELF())
+      (emp::old::BitSet<9>{1,0,1,0,1,0,1,0,0}.REVERSE_SELF())
       ==
-      (emp::BitSet<9>{0,0,1,0,1,0,1,0,1})
+      (emp::old::BitSet<9>{0,0,1,0,1,0,1,0,1})
     );
     REQUIRE(
-      (emp::BitSet<9>{0,0,1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes())
+      (emp::old::BitSet<9>{0,0,1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes())
       ==
       4
     );
     REQUIRE(
-      (emp::BitSet<9>{1,1,1,1,1,0,1,0,0}.REVERSE_SELF())
+      (emp::old::BitSet<9>{1,1,1,1,1,0,1,0,0}.REVERSE_SELF())
       ==
-      (emp::BitSet<9>{0,0,1,0,1,1,1,1,1})
+      (emp::old::BitSet<9>{0,0,1,0,1,1,1,1,1})
     );
     REQUIRE(
-      (emp::BitSet<9>{1,1,1,1,1,0,1,0,0}.REVERSE_SELF().CountOnes())
+      (emp::old::BitSet<9>{1,1,1,1,1,0,1,0,0}.REVERSE_SELF().CountOnes())
       ==
       6
     );
 
     emp::Random rand(1);
     for (size_t rep = 0; rep < 100; ++rep) {
-      emp::BitSet<15> bs(rand);
+      emp::old::BitSet<15> bs(rand);
       bs[0] = 0;
       bs[15-1] = 1;
       REQUIRE(bs.REVERSE() != bs);
@@ -1520,7 +1521,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
-      emp::BitSet<16> bs(rand);
+      emp::old::BitSet<16> bs(rand);
       bs[0] = 0;
       bs[16-1] = 1;
       REQUIRE(bs.REVERSE() != bs);
@@ -1529,7 +1530,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
-      emp::BitSet<17> bs(rand);
+      emp::old::BitSet<17> bs(rand);
       bs[0] = 0;
       bs[17-1] = 1;
       REQUIRE(bs.REVERSE() != bs);
@@ -1538,7 +1539,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
-      emp::BitSet<31> bs(rand);
+      emp::old::BitSet<31> bs(rand);
       bs[0] = 0;
       bs[31-1] = 1;
       REQUIRE(bs.REVERSE() != bs);
@@ -1547,7 +1548,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
-      emp::BitSet<32> bs(rand);
+      emp::old::BitSet<32> bs(rand);
       bs[0] = 0;
       bs[32-1] = 1;
       REQUIRE(bs.REVERSE() != bs);
@@ -1556,7 +1557,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
-      emp::BitSet<33> bs(rand);
+      emp::old::BitSet<33> bs(rand);
       bs[0] = 0;
       bs[33-1] = 1;
       REQUIRE(bs.REVERSE() != bs);
@@ -1565,7 +1566,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
-      emp::BitSet<63> bs(rand);
+      emp::old::BitSet<63> bs(rand);
       bs[0] = 0;
       bs[63-1] = 1;
       REQUIRE(bs.REVERSE() != bs);
@@ -1574,7 +1575,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
-      emp::BitSet<64> bs(rand);
+      emp::old::BitSet<64> bs(rand);
       bs[0] = 0;
       bs[64-1] = 1;
       REQUIRE(bs.REVERSE() != bs);
@@ -1583,7 +1584,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
-      emp::BitSet<65> bs(rand);
+      emp::old::BitSet<65> bs(rand);
       bs[0] = 0;
       bs[65-1] = 1;
       REQUIRE(bs.REVERSE() != bs);
@@ -1592,7 +1593,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
-      emp::BitSet<127> bs(rand);
+      emp::old::BitSet<127> bs(rand);
       bs[0] = 0;
       bs[127-1] = 1;
       REQUIRE(bs.REVERSE() != bs);
@@ -1601,7 +1602,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
-      emp::BitSet<128> bs(rand);
+      emp::old::BitSet<128> bs(rand);
       bs[0] = 0;
       bs[128-1] = 1;
       REQUIRE(bs.REVERSE() != bs);
@@ -1610,7 +1611,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
     }
 
     for (size_t rep = 0; rep < 100; ++rep) {
-      emp::BitSet<129> bs(rand);
+      emp::old::BitSet<129> bs(rand);
       bs[0] = 0;
       bs[129-1] = 1;
       REQUIRE(bs.REVERSE() != bs);
@@ -1622,24 +1623,24 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
   // test BitSet addition
   {
-  emp::BitSet<32> bs0;
+  emp::old::BitSet<32> bs0;
   bs0.SetUInt(0, std::numeric_limits<uint32_t>::max() - 1);
-  emp::BitSet<32> bs1;
+  emp::old::BitSet<32> bs1;
   bs1.SetUInt(0,1);
   bs0+=bs1;
   REQUIRE (bs0.GetUInt(0) == 4294967295);
   REQUIRE ((bs0+bs1).GetUInt(0) == 0);
   REQUIRE ((bs0+bs0).GetUInt(0) == 4294967294);
 
-  emp::BitSet<8> bs2;
+  emp::old::BitSet<8> bs2;
   bs2.SetUInt(0, emp::IntPow(2UL, 8UL)-1);
-  emp::BitSet<8> bs3;
+  emp::old::BitSet<8> bs3;
   bs3.SetUInt(0, 1);
   REQUIRE((bs2+bs3).GetUInt(0) == 0);
-  emp::BitSet<64> bs4;
+  emp::old::BitSet<64> bs4;
   bs4.SetUInt(0, std::numeric_limits<uint32_t>::max()-1);
   bs4.SetUInt(1, std::numeric_limits<uint32_t>::max());
-  emp::BitSet<64> bs5;
+  emp::old::BitSet<64> bs5;
   bs5.SetUInt(0, 1);
   bs4+=bs5;
   REQUIRE(bs4.GetUInt(0) == pow((size_t)2, (size_t)32)-1);
@@ -1651,28 +1652,28 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
   // test BitSet subtraction
   {
-  emp::BitSet<32> bs0;
+  emp::old::BitSet<32> bs0;
   bs0.SetUInt(0, 1);
-  emp::BitSet<32> bs1;
+  emp::old::BitSet<32> bs1;
   bs1.SetUInt(0, 1);
   bs0 = bs0 - bs1;
   REQUIRE (bs0.GetUInt(0) == 0);
   REQUIRE ((bs0-bs1).GetUInt(0) == std::numeric_limits<uint32_t>::max());
 
-  emp::BitSet<8> bs2;
+  emp::old::BitSet<8> bs2;
   bs2.SetUInt(0, 1);
-  emp::BitSet<8> bs3;
+  emp::old::BitSet<8> bs3;
   bs3.SetUInt(0, 1);
 
   bs2-=bs3;
   REQUIRE (bs2.GetUInt(0) == 0);
   REQUIRE((bs2-bs3).GetUInt(0) == emp::IntPow(2UL,8UL)-1);
 
-  emp::BitSet<64> bs4;
+  emp::old::BitSet<64> bs4;
   bs4.SetUInt(0, 1);
   bs4.SetUInt(1, 0);
 
-  emp::BitSet<64> bs5;
+  emp::old::BitSet<64> bs5;
   bs5.SetUInt(0, 1);
 
   bs4-=bs5;
@@ -1689,8 +1690,8 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
   // test addition and subtraction with multiple fields
   {
-  emp::BitSet<65> bs1;
-  emp::BitSet<65> bs2;
+  emp::old::BitSet<65> bs1;
+  emp::old::BitSet<65> bs2;
 
   /* PART 1 */
   bs1.Clear();
@@ -1754,37 +1755,37 @@ TEST_CASE("Another Test BitSet", "[bits]")
   }
 
   {
-  emp::BitSet<3> bs0{0,0,0};
+  emp::old::BitSet<3> bs0{0,0,0};
   REQUIRE(bs0.GetUInt8(0) == 0);
   REQUIRE(bs0.GetUInt16(0) == 0);
   REQUIRE(bs0.GetUInt32(0) == 0);
   REQUIRE(bs0.GetUInt64(0) == 0);
   REQUIRE(bs0.GetNumStates() == 8);
 
-  emp::BitSet<3> bs1{0,0,1};
+  emp::old::BitSet<3> bs1{0,0,1};
   REQUIRE(bs1.GetUInt8(0) == 1);
   REQUIRE(bs1.GetUInt16(0) == 1);
   REQUIRE(bs1.GetUInt32(0) == 1);
   REQUIRE(bs1.GetUInt64(0) == 1);
 
-  emp::BitSet<3> bs2{0,1,1};
+  emp::old::BitSet<3> bs2{0,1,1};
   REQUIRE(bs2.GetUInt8(0) == 3);
   REQUIRE(bs2.GetUInt16(0) == 3);
   REQUIRE(bs2.GetUInt32(0) == 3);
   REQUIRE(bs2.GetUInt64(0) == 3);
 
-  emp::BitSet<3> bs3{1,1,1};
+  emp::old::BitSet<3> bs3{1,1,1};
   REQUIRE(bs3.GetUInt8(0) == 7);
 
-  emp::BitSet<3> bs4{1,1,0};
+  emp::old::BitSet<3> bs4{1,1,0};
   REQUIRE(bs4.GetUInt8(0) == 6);
 
-  emp::BitSet<32> bs5;
+  emp::old::BitSet<32> bs5;
   bs5.SetUInt(0, 1789156UL);
   REQUIRE(bs5.GetUInt64(0) == 1789156ULL);
   REQUIRE(bs5.GetNumStates() == 4294967296ULL);
 
-  emp::BitSet<63> bs6;
+  emp::old::BitSet<63> bs6;
   bs6.SetUInt64(0, 789156816848ULL);
   REQUIRE(bs6.GetUInt64(0) == 789156816848ULL);
   REQUIRE(bs6.GetNumStates() == 9223372036854775808ULL);
@@ -1792,13 +1793,13 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
   // @CAO: Removed GetDouble() due to confusing name (GetUInt64() gives the same answer, but with
   //       the correct encoding.
-  // emp::BitSet<65> bs7;
+  // emp::old::BitSet<65> bs7;
   // bs7.SetUInt64(0, 1789156816848ULL);
   // bs7.Set(64);
   // REQUIRE(bs7.GetDouble() == 1789156816848.0 + emp::Pow2(64.0));
   // REQUIRE(bs7.MaxDouble() == 36893488147419103231.0);
 
-  // emp::BitSet<1027> bs8;
+  // emp::old::BitSet<1027> bs8;
   // bs8.Set(1026);
   // REQUIRE(std::isinf(bs8.GetDouble()));
   // REQUIRE(std::isinf(bs8.MaxDouble()));
@@ -1806,10 +1807,10 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
   // test list initializer
   {
-  emp::BitSet<3> bs_empty{0,0,0};
-  emp::BitSet<3> bs_first{1,0,0};
-  emp::BitSet<3> bs_last{0,0,1};
-  emp::BitSet<3> bs_full{1,1,1};
+  emp::old::BitSet<3> bs_empty{0,0,0};
+  emp::old::BitSet<3> bs_first{1,0,0};
+  emp::old::BitSet<3> bs_last{0,0,1};
+  emp::old::BitSet<3> bs_full{1,1,1};
 
   REQUIRE(bs_empty.CountOnes() == 0);
   REQUIRE(bs_first.CountOnes() == 1);
@@ -1822,14 +1823,14 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
     emp::Random rand(1);
 
-    emp::BitSet<32> orig(rand);
+    emp::old::BitSet<32> orig(rand);
 
-    emp::array<emp::BitSet<32>, 1> d1;
-    emp::array<emp::BitSet<16>, 2> d2;
-    emp::array<emp::BitSet<8>, 4> d4;
-    emp::array<emp::BitSet<4>, 8> d8;
-    emp::array<emp::BitSet<2>, 16> d16;
-    emp::array<emp::BitSet<1>, 32> d32;
+    emp::array<emp::old::BitSet<32>, 1> d1;
+    emp::array<emp::old::BitSet<16>, 2> d2;
+    emp::array<emp::old::BitSet<8>, 4> d4;
+    emp::array<emp::old::BitSet<4>, 8> d8;
+    emp::array<emp::old::BitSet<2>, 16> d16;
+    emp::array<emp::old::BitSet<1>, 32> d32;
 
     // Import
 
@@ -1983,19 +1984,19 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
   }
 
-  emp::BitSet<10> bs10;
-  emp::BitSet<25> bs25;
-  emp::BitSet<32> bs32;
-  emp::BitSet<50> bs50;
-  emp::BitSet<64> bs64;
-  emp::BitSet<80> bs80;
+  emp::old::BitSet<10> bs10;
+  emp::old::BitSet<25> bs25;
+  emp::old::BitSet<32> bs32;
+  emp::old::BitSet<50> bs50;
+  emp::old::BitSet<64> bs64;
+  emp::old::BitSet<80> bs80;
 
   bs80[70] = 1;
   bs80 <<= 1;
-  emp::BitSet<80> bs80c(bs80);
+  emp::old::BitSet<80> bs80c(bs80);
 
   for (size_t i = 0; i < 75; i++) {
-    emp::BitSet<80> shift_set = bs80 >> i;
+    emp::old::BitSet<80> shift_set = bs80 >> i;
     REQUIRE((shift_set.CountOnes() == 1) == (i <= 71));
   }
 
@@ -2055,7 +2056,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
   REQUIRE(bs80.GetUInt32AtBit(64) == 130);
   REQUIRE(bs80.GetUInt8AtBit(64) == 130);
 
-  emp::BitSet<96> bs;
+  emp::old::BitSet<96> bs;
 
   REQUIRE (bs.LongestSegmentOnes() == 0);
   bs.SetUInt(2, 1);
@@ -2156,11 +2157,11 @@ TEST_CASE("Another Test BitSet", "[bits]")
   // tests for RandomizeFixed
   {
     emp::Random random(1);
-    emp::BitSet<25> bs_25;
-    emp::BitSet<32> bs_32;
-    emp::BitSet<50> bs_50;
-    emp::BitSet<64> bs_64;
-    emp::BitSet<80> bs_80;
+    emp::old::BitSet<25> bs_25;
+    emp::old::BitSet<32> bs_32;
+    emp::old::BitSet<50> bs_50;
+    emp::old::BitSet<64> bs_64;
+    emp::old::BitSet<80> bs_80;
 
     bs_25.FlipRandomCount(random, 0);
     REQUIRE(!bs_25.CountOnes());
@@ -2255,19 +2256,19 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
     // set up
     emp::Random rand(1);
-    emp::BitSet<10> bs10(rand);
-    emp::BitSet<25> bs25(rand);
-    emp::BitSet<32> bs32(rand);
-    emp::BitSet<50> bs50(rand);
-    emp::BitSet<64> bs64(rand);
-    emp::BitSet<80> bs80(rand);
+    emp::old::BitSet<10> bs10(rand);
+    emp::old::BitSet<25> bs25(rand);
+    emp::old::BitSet<32> bs32(rand);
+    emp::old::BitSet<50> bs50(rand);
+    emp::old::BitSet<64> bs64(rand);
+    emp::old::BitSet<80> bs80(rand);
 
-    emp::BitSet<10> bs10_deser;
-    emp::BitSet<25> bs25_deser;
-    emp::BitSet<32> bs32_deser;
-    emp::BitSet<50> bs50_deser;
-    emp::BitSet<64> bs64_deser;
-    emp::BitSet<80> bs80_deser;
+    emp::old::BitSet<10> bs10_deser;
+    emp::old::BitSet<25> bs25_deser;
+    emp::old::BitSet<32> bs32_deser;
+    emp::old::BitSet<50> bs50_deser;
+    emp::old::BitSet<64> bs64_deser;
+    emp::old::BitSet<80> bs80_deser;
 
     std::stringstream ss;
 
@@ -2315,19 +2316,19 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
     // set up
     emp::Random rand(1);
-    emp::BitSet<10> bs10(rand);
-    emp::BitSet<25> bs25(rand);
-    emp::BitSet<32> bs32(rand);
-    emp::BitSet<50> bs50(rand);
-    emp::BitSet<64> bs64(rand);
-    emp::BitSet<80> bs80(rand);
+    emp::old::BitSet<10> bs10(rand);
+    emp::old::BitSet<25> bs25(rand);
+    emp::old::BitSet<32> bs32(rand);
+    emp::old::BitSet<50> bs50(rand);
+    emp::old::BitSet<64> bs64(rand);
+    emp::old::BitSet<80> bs80(rand);
 
-    emp::BitSet<10> bs10_deser;
-    emp::BitSet<25> bs25_deser;
-    emp::BitSet<32> bs32_deser;
-    emp::BitSet<50> bs50_deser;
-    emp::BitSet<64> bs64_deser;
-    emp::BitSet<80> bs80_deser;
+    emp::old::BitSet<10> bs10_deser;
+    emp::old::BitSet<25> bs25_deser;
+    emp::old::BitSet<32> bs32_deser;
+    emp::old::BitSet<50> bs50_deser;
+    emp::old::BitSet<64> bs64_deser;
+    emp::old::BitSet<80> bs80_deser;
 
     std::stringstream ss;
 
@@ -2376,12 +2377,12 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
 TEST_CASE("Test BitSet string construction", "[tools]") {
 
-  REQUIRE( emp::BitSet<5>( "01001" ) == emp::BitSet<5>{0, 1, 0, 0, 1} );
+  REQUIRE( emp::old::BitSet<5>( "01001" ) == emp::old::BitSet<5>{0, 1, 0, 0, 1} );
 
-  // std::bitset treats bits in the opposite direction of emp::BitSet.
+  // std::bitset treats bits in the opposite direction of emp::old::BitSet.
   REQUIRE(
-    emp::BitSet<5>( std::bitset<5>( "10010" ) )
-    == emp::BitSet<5>{1, 0, 0, 1, 0}
+    emp::old::BitSet<5>( std::bitset<5>( "10010" ) )
+    == emp::old::BitSet<5>{1, 0, 0, 1, 0}
   );
 
 }

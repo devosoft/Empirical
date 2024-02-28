@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
- *
- *  @file SettingCombos.hpp
+ *  @file
  *  @brief A tool for exploring all parameter combinations
  *  @note Status: ALPHA
  */
@@ -12,6 +13,7 @@
 #define EMP_CONFIG_SETTINGCOMBOS_HPP_INCLUDE
 
 #include <sstream>
+#include <stddef.h>
 #include <string>
 #include <string_view>
 #include <unordered_map>

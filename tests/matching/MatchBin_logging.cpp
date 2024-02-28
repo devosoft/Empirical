@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020
- *
- *  @file MatchBin_logging.cpp
+ *  @file
  */
 
 #define EMP_DECORATE(X) [X]
@@ -236,7 +237,7 @@ TEST_CASE("Test MatchBin", "[matchbin]")
 
     emp::File file(ss);
 
-    auto data = file.ToData<std::string>();
+    auto data = file.ToData<emp::String>();
 
     // buffer should be empty, so must only have a header
     REQUIRE(data.size() == 1);
@@ -247,7 +248,7 @@ TEST_CASE("Test MatchBin", "[matchbin]")
     // test flush log buffer
     bin.log.FlushLogBuffer();
 
-    data = file.ToData<std::string>();
+    data = file.ToData<emp::String>();
 
     REQUIRE(data.size() == 1);
     REQUIRE(bin.log.GetLogBuffer().empty());
@@ -328,8 +329,8 @@ TEST_CASE("Test MatchBin", "[matchbin]")
 
     auto data = file.ToData<std::string>();
 
-    // data must be equal to 3n, given that for each matchbin we have
-    // 1 header and 2 matches
+    // data must be equal to 3n + 1, given that for each matchbin we have
+    // 1 header and 2 matches, and at the end an EOF newline
     REQUIRE(data.size() == 3 * n);
   }
     // test logging misses
@@ -357,9 +358,9 @@ TEST_CASE("Test MatchBin", "[matchbin]")
     emp::File file(ss);
 
     // extract header
-    std::vector<std::string> header{file.ExtractRow()};
-    std::vector<std::string> regulated_row{file.ExtractRow()};
-    std::vector<std::string> raw_row{file.ExtractRow()};
+    emp::vector<emp::String> header{file.ExtractRow()};
+    emp::vector<emp::String> regulated_row{file.ExtractRow()};
+    emp::vector<emp::String> raw_row{file.ExtractRow()};
 
     // find the index of the tag
     // if a future change moves it, this test won't break

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2018.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018.
- *
- *  @file _TableCell.hpp
+ *  @file
  *  @brief The TableCell widget, which behaves like the Table widget, but focuses on a single cell.
  *
  *  DO NOT include this file directly.  All files begining with '_' are for internal use only.
@@ -11,6 +12,8 @@
 
 #ifndef EMP_WEB__TABLECELL_HPP_INCLUDE
 #define EMP_WEB__TABLECELL_HPP_INCLUDE
+
+#include <stddef.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 

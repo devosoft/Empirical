@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2019-2022.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019-2022.
- *
- *  @file matchbin_metrics.hpp
+ *  @file
  *  @brief Metric structs that can be plugged into MatchBin.
  *
  */
@@ -20,6 +21,7 @@
 #include <queue>
 #include <ratio>
 #include <span>
+#include <stddef.h>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -254,7 +256,7 @@ namespace emp {
     }
 
     inline static double calculate(const query_t& a, const tag_t& b) {
-      return (b - a).GetValue() / emp::BitSet<Width>::GetNumStates();
+      return (b - a).GetValue() / emp::Pow2(Width);
     }
 
   };
@@ -281,7 +283,7 @@ namespace emp {
     }
 
     inline static double calculate(const query_t& a, const tag_t& b) {
-      constexpr double max_dist = emp::BitSet<Width>::GetNumStates();
+      constexpr double max_dist = emp::Pow2(Width);
       return (b >= a ? (b - a).GetValue() : max_dist) / max_dist;
     }
 
@@ -312,7 +314,7 @@ namespace emp {
     }
 
     inline static double calculate(const query_t& a, const tag_t& b) {
-      constexpr double max_dist = emp::BitSet<Width>::GetNumStates() / 2.0;
+      constexpr double max_dist = emp::Pow2(Width) / 2.0;
       return std::min(a - b, b - a).GetValue() / max_dist;
     }
 
@@ -342,7 +344,7 @@ namespace emp {
     }
 
     inline static double calculate(const query_t& a, const tag_t& b) {
-      return (a > b ? a - b : b - a).GetValue() /  emp::BitSet<Width>::GetNumStates();
+      return (a > b ? a - b : b - a).GetValue() /  emp::Pow2(Width);
     }
 
   };
@@ -714,7 +716,7 @@ namespace emp {
 
       for (size_t i = 0; i < metric_width; ++ i) {
         best = std::min(Metric::calculate(dup, b), best);
-        dup.template ROTL_SELF<1>();
+        dup.ROTATE_SELF(-1);
       }
 
       return best;
@@ -1176,22 +1178,22 @@ namespace emp {
     : public BaseMetric<
       emp::BitSet<
         std::tuple_size<typename DimMetric::query_t>::value
-        * DimMetric::query_t::value_type::GetSize()
+        * DimMetric::query_t::value_type::GetCTSize()
       >,
       emp::BitSet<
         std::tuple_size<typename DimMetric::tag_t>::value
-        * DimMetric::tag_t::value_type::GetSize()
+        * DimMetric::tag_t::value_type::GetCTSize()
       >
     >
   {
 
     using query_t = emp::BitSet<
       std::tuple_size<typename DimMetric::query_t>::value
-      * DimMetric::query_t::value_type::GetSize()
+      * DimMetric::query_t::value_type::GetCTSize()
     >;
     using tag_t = emp::BitSet<
       std::tuple_size<typename DimMetric::query_t>::value
-      * DimMetric::tag_t::value_type::GetSize()
+      * DimMetric::tag_t::value_type::GetCTSize()
     >;
 
     inline static DimMetric metric{};
@@ -1214,8 +1216,8 @@ namespace emp {
       typename DimMetric::tag_t arr_b;
 
       for (size_t d = 0; d < metric.dim(); ++d) {
-        arr_a[d].Import(a, d * DimMetric::query_t::value_type::GetSize());
-        arr_b[d].Import(b, d * DimMetric::tag_t::value_type::GetSize());
+        arr_a[d].Import(a, d * DimMetric::query_t::value_type::GetCTSize());
+        arr_b[d].Import(b, d * DimMetric::tag_t::value_type::GetCTSize());
       }
 
       return DimMetric::calculate(arr_a, arr_b);

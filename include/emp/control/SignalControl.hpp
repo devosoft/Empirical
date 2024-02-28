@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file SignalControl.hpp
+ *  @file
  *  @brief The SignalControl class manages all of the signals and actions, linking them together
  *  upon request (by name, base class, or derived class).
  *
@@ -17,6 +18,8 @@
 #ifndef EMP_CONTROL_SIGNALCONTROL_HPP_INCLUDE
 #define EMP_CONTROL_SIGNALCONTROL_HPP_INCLUDE
 
+#include <cstdint>
+#include <stddef.h>
 #include <string>
 #include <unordered_map>
 

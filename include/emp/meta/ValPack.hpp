@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
- *
- *  @file ValPack.hpp
+ *  @file
  *  @brief A set of values that can be manipulated at compile time (good for metaprogramming)
  *
  *  Any built-in type can be added to ValPack to be manipulated at compile time.
@@ -12,11 +13,12 @@
 #ifndef EMP_META_VALPACK_HPP_INCLUDE
 #define EMP_META_VALPACK_HPP_INCLUDE
 
+#include <iostream>
+#include <stddef.h>
+#include <string>
 
 #include "meta.hpp"
 
-#include <iostream>
-#include <string>
 
 namespace emp {
 

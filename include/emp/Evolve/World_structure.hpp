@@ -1,16 +1,19 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2022.
- *
- *  @file World_structure.hpp
+ *  @file
  *  @brief Functions for popular world structure methods.
  */
 
 #ifndef EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
 #define EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
 
+#include <cstdint>
 #include <set>
+#include <stddef.h>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"

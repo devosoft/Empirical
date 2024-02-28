@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2022-2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022-23.
- *
- *  @file Text.hpp
+ *  @file
  *  @brief Functionality similar to emp::String, but tracks text formatting for easy conversion.
  *  @note Status: ALPHA
  *
@@ -52,84 +53,31 @@
 #include "../datastructs/map_utils.hpp"
 #include "../tools/String.hpp"
 
+#include "_TextCharRef.hpp"
+
 namespace emp {
 
   class Text;
 
-  // An individual proxy character from Text that is format aware.
-  template <bool IS_CONST=false>
-  class TextCharRef {
-  private:
-    using text_t = typename std::conditional<IS_CONST, const Text, Text>::type;
-    text_t & text_ref;
-    size_t pos;
-  public:
-    TextCharRef(text_t & _ref, size_t _pos) : text_ref(_ref), pos(_pos) { }
-    TextCharRef(const TextCharRef<false> & in) : text_ref(in.text_ref), pos(in.pos) { }
-    TextCharRef(const TextCharRef<true> & in) : text_ref(in.text_ref), pos(in.pos) { }
-    ~TextCharRef() = default;
+  // A base class for any special encodings that should work with Text objects.
+  struct TextEncoding_Interface {
+    virtual ~TextEncoding_Interface() { }
 
-    // Set this character equal (with same inputs) as in parameter; don't change reference.
-    TextCharRef & operator=(const TextCharRef<false> & in);
-    TextCharRef & operator=(const TextCharRef<true> & in);
-
-    // Set just this character; don't change style.
-    TextCharRef & operator=(char in);
-
-    // Convert to a normal C++ char.
-    char AsChar() const;
-    operator char() const { return AsChar(); }
-
-    // Comparison operators
-    auto operator<=>(const TextCharRef & in) const;
-    auto operator<=>(char in) const;
-
-    text_t & GetText() const { return text_ref; }
-    size_t GetPos() const { return pos; }
-    emp::vector<String> GetStyles() const;
-
-    bool HasStyle(const String & style) const;
-    bool IsBold()        { return HasStyle("bold"); }
-    bool IsCode()        { return HasStyle("code"); }
-    bool IsItalic()      { return HasStyle("italic"); }
-    bool IsStrike()      { return HasStyle("strike"); }
-    bool IsSubscript()   { return HasStyle("subscript"); }
-    bool IsSuperscript() { return HasStyle("superscript"); }
-    bool IsUnderline()   { return HasStyle("underline"); }
-
-    TextCharRef & SetStyle(const String & style);
-    TextCharRef & Bold()        { return SetStyle("bold"); }
-    TextCharRef & Code()        { return SetStyle("code"); }
-    TextCharRef & Italic()      { return SetStyle("italic"); }
-    TextCharRef & Strike()      { return SetStyle("strike"); }
-    TextCharRef & Subscript()   { return SetStyle("subscript"); }
-    TextCharRef & Superscript() { return SetStyle("superscript"); }
-    TextCharRef & Underline()   { return SetStyle("underline"); }
+    virtual String GetName() const = 0;                         // Return name of encoding.
+    virtual void Append(Text &, const String &) = 0;            // Add new text.
+    virtual String Encode(const Text &) const = 0;              // Output formatted text.
+    virtual emp::Ptr<TextEncoding_Interface> Clone() const = 0; // Copy encoding.
+    virtual void PrintDebug(std::ostream &) const = 0;
   };
 
-  // A base class for any special encodings that should work with Text objects.
-  class TextEncoding_Base {
-  protected:
-    Text & text;  // The emp::Text this encoding is associated with.
-    String name;  // The name by which this encoding should be called.
+  class TextEncoding_None : public TextEncoding_Interface {
   public:
-    TextEncoding_Base(Text & _text, const String _name) : text(_text), name(_name) { }
-    virtual ~TextEncoding_Base() { }
-
-    const String & GetName() const { return name; }
-
-    // By default, append text assuming that there is no special formatting in it.
-    virtual void Append(const String & in);
-
-    // By default, return text and ignore all formatting.
-    virtual String Encode() const;
-
-    // Make a copy of this TextEncoding, including proper derived class.
-    virtual emp::Ptr<TextEncoding_Base> Clone(Text & _text) const {
-      return emp::NewPtr<TextEncoding_Base>(_text, name);
-    }
-
-    virtual void PrintDebug(std::ostream &) const { };
+    TextEncoding_None() { }
+    String GetName() const override { return "text"; }
+    void Append(Text & text, const String & in) override;
+    String Encode(const Text & text) const override;
+    emp::Ptr<TextEncoding_Interface> Clone() const override;
+    void PrintDebug(std::ostream & os) const override;
   };
 
   class Text {
@@ -143,10 +91,11 @@ namespace emp {
     std::unordered_map<String, BitVector> style_map;
 
     // A set of encodings that this Text object can handle.
-    std::map< String, emp::Ptr<TextEncoding_Base> > encodings;
-    emp::Ptr<TextEncoding_Base> encoding_ptr = nullptr;
+    using encoding_ptr_t = emp::Ptr<TextEncoding_Interface>;
+    encoding_ptr_t encoding_ptr = nullptr;
+    std::map<String, encoding_ptr_t> encodings;
 
-    // Internal function to remove unused styles.
+    // Helper function to remove unused styles.
     void Cleanup() {
       // Scan for styles that are no longer unused.
       emp::vector<String> unused_styles;
@@ -159,29 +108,19 @@ namespace emp {
       }
     }
 
+    void CloneEncodings(const Text & in) {
+      for (const auto & [e_name, ptr] : in.encodings) {
+        encodings[e_name] = ptr->Clone();
+        if (in.encoding_ptr == ptr) encoding_ptr = encodings[e_name];
+      }
+    }
+
   public:
-    Text() {
-      encodings["txt"] = NewPtr<TextEncoding_Base>(*this, "txt");
-      encoding_ptr = encodings["txt"];
-    };
-    Text(const Text & in) : text(in.text), style_map(in.style_map) {
-      for (const auto & [e_name, ptr] : encodings) {
-        encodings[e_name] = ptr->Clone(*this);
-      }
-      encoding_ptr = encodings[in.encoding_ptr->GetName()];
-    }
-    Text(const String & in) {
-      encodings["txt"] = NewPtr<TextEncoding_Base>(*this, "txt");
-      encoding_ptr = encodings["txt"];
-      Append(in);
-    }
-    ~Text() {
-      if (encoding_ptr != nullptr) {
-        for (auto & [e_name, ptr] : encodings) {
-          ptr.Delete();
-        }
-      }
-    }
+    Text() { encoding_ptr = encodings["txt"] = NewPtr<TextEncoding_None>(); }
+    Text(const Text & in) : text(in.text), style_map(in.style_map) { CloneEncodings(in); }
+    template <typename... Ts>
+    Text(Ts &&... in) : Text() { Append(std::forward<Ts>(in)...); }
+    ~Text() { for (auto & [e_name, ptr] : encodings) ptr.Delete(); }
 
     Text & operator=(const Text & in) {
       Text new_text(in);
@@ -229,7 +168,12 @@ namespace emp {
 
     /// @brief Get the name of the current encoding being applied.
     /// @return Name of the current encoding.
-    const String & GetEncoding() const { return encoding_ptr->GetName(); }
+    String GetEncodingName() const {
+      for (const auto & [e_name, ptr] : encodings) {
+        if (encoding_ptr == ptr) return e_name;
+      }
+      return "Unknown";
+    }
 
     /// @brief Change the current encoding being used to another known encoding type.
     /// @param name Name of the encoding type to be used.
@@ -250,17 +194,22 @@ namespace emp {
     /// @brief Add an encoding to this Text object; new encodings automatically become active.
     /// @tparam ENCODING_T The type of the new encoding to use
     /// @tparam ...EXTRA_Ts Automatically set by variadic arguments.
-    /// @param name Name to be used for this new encoding.
     /// @param ...args Any extra arguments to configure this new encoding (passed to constructor)
+    /// @return Name of the encoding that was created.
     template <typename ENCODING_T, typename... EXTRA_Ts>
-    void AddEncoding(const String & name, EXTRA_Ts &&... args) {
-      emp_assert(!HasEncoding(name), name, "Trying to add a TextEncoding that already exists. To replace, use RemoveEncoding() first.");
-      encoding_ptr = NewPtr<ENCODING_T>(*this, name, std::forward<EXTRA_Ts>(args)...);
-      encodings[name] = encoding_ptr;
+    String AddEncoding(EXTRA_Ts &&... args) {
+      encoding_ptr = NewPtr<ENCODING_T>(std::forward<EXTRA_Ts>(args)...);
+      String encoding_name = encoding_ptr->GetName();
+      emp_assert(!HasEncoding(encoding_name), encoding_name,
+                 "Adding TextEncoding that already exists. To replace, RemoveEncoding() first.");
+      encodings[encoding_name] = encoding_ptr;
+      return encoding_name;
     }
 
+    /// @brief Remove an encoding with a provided name.
+    /// @param name Name of the encoding to remove.
     void RemoveEncoding(const String & name) {
-      emp_assert(HasEncoding(name), name, "Trying to remove a TextEncoding that does not exist.");
+      emp_assert(HasEncoding(name), name, "Trying to remove TextEncoding that does not exist.");
       if (HasEncoding(name)) {
         if (encoding_ptr == encodings[name]) encoding_ptr = nullptr;
         encodings[name].Delete();
@@ -268,27 +217,55 @@ namespace emp {
       }
     }
 
-    /// ActivateEncoding will add an encoding if (and only if) it doesn't exist already.
+    /// @brief Set an encoding as active, creating it if needed.
+    /// @tparam ENCODING_T The type of the new encoding to use
+    /// @tparam ...EXTRA_Ts Automatically set by variadic arguments.
+    /// @param name Name of the encoding that we want activated / added
+    /// @param ...args Any extra arguments to configure this new encoding (passed to constructor)
+    /// @return Name of the encoding that was created.
     template <typename ENCODING_T, typename... EXTRA_Ts>
-    void ActivateEncoding(const String & name, EXTRA_Ts &&... args) {
-      if (!HasEncoding(name)) {
-        AddEncoding<ENCODING_T>(name, std::forward<EXTRA_Ts>(args)...);
-      } else {
-        SetEncoding(name);
+    String ActivateEncoding(const String & name, EXTRA_Ts &&... args) {
+      if (HasEncoding(name)) encoding_ptr = encodings[name];
+      else {
+        encoding_ptr = NewPtr<ENCODING_T>(std::forward<EXTRA_Ts>(args)...);
+        emp_assert(encoding_ptr->GetName() == name, encoding_ptr->GetName(), name,
+                   "ActivateEncoding name does not match provided type.");
+        encodings[name] = encoding_ptr;
       }
+      return name;
     }
 
-
     /// Append potentially-formatted text through the current encoding.
-    Text & Append(const String & in) {
-      encoding_ptr->Append(in);
+    template <typename T, typename... EXTRA_Ts>
+    Text & Append(T && in, EXTRA_Ts &&... in_extra) {
+      // If we have a Text object being fed in, merge it in.
+      using CleanT = typename std::remove_const_t<typename std::remove_reference_t<T>>;
+      if constexpr (std::is_base_of_v<emp::Text, CleanT>) {
+        const size_t start_size = text.size();
+        text += in.text;
+        for (auto & [style_name, new_bits] : in.style_map) {
+          style_map[style_name].Resize(start_size).Append(new_bits);
+        }
+      }
+
+      // Otherwise, convert the input to a string and add it on.
+      else {
+        encoding_ptr->Append(*this, emp::MakeString(std::forward<T>(in)));
+      }
+
+      // If more than one argument was provided, process the remaining ones.
+      if constexpr (sizeof...(EXTRA_Ts) > 0) {
+        Append(std::forward<EXTRA_Ts>(in_extra)...);
+      }
+
       return *this;
     }
 
     /// Specify the encoding of a value being appended.
     template <typename ENCODING_T, typename IN_T>
     Text & AppendAs(const String & encode_name, IN_T && in) {
-      ActivateEncoding<ENCODING_T>(encode_name);
+      if (!HasEncoding(encode_name)) AddEncoding<ENCODING_T>();
+      else SetEncoding(encode_name);
       Append(std::forward<IN_T>(in));
       return *this;
     }
@@ -301,19 +278,12 @@ namespace emp {
     }
 
     // Stream operator.
-    template <typename T>
-    Text & operator<<(T && in) {
-      return Append(emp::MakeString(in));
-    }
-
-    template <typename T>
-    Text & operator+=(T && in) {
-      return Append(emp::MakeString(in));
-    }
+    template <typename T> Text & operator<<(T && in) { return Append(std::forward<T>(in)); }
+    template <typename T> Text & operator+=(T && in) { return Append(std::forward<T>(in)); }
 
     /// @brief Convert text to a string using the current encoding.
     /// @return The resulting string.
-    String Encode() const { return encoding_ptr->Encode(); }
+    String Encode() const { return encoding_ptr->Encode(*this); }
 
     void Resize(size_t new_size) {
       text.resize(new_size);
@@ -440,17 +410,13 @@ namespace emp {
 
     /// Return the set of active styles in this text.
     /// @param pos optional position to specify only styles used at position.
-    emp::vector<String> GetStyles(size_t pos=MAX_SIZE_T) {
+    emp::vector<String> GetStyles(size_t pos=MAX_SIZE_T) const {
       emp::vector<String> styles;
-      emp::vector<String> to_clear;
       for (const auto & [name, bits] : style_map) {
-        if (bits.None()) to_clear.push_back(name);
-        else if (pos == MAX_SIZE_T || bits.Has(pos)) {
+        if (pos == MAX_SIZE_T || bits.Has(pos)) {
           styles.push_back(name);
         }
       }
-      for (const auto & name : to_clear) Clear(name);
-
       return styles;
     }
 
@@ -553,74 +519,15 @@ namespace emp {
     }
   };
 
-  // Set this character equal (with same inputs) as in parameter; don't change reference.
-  template <bool IS_CONST>
-  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::operator=(const TextCharRef<false> & in) {
-    text_ref.Set(pos, in);
-    return *this;
+  void TextEncoding_None::Append(Text & text, const String & in) { text.Append_Raw(in); }
+  String TextEncoding_None::Encode(const Text & text) const { return text; };
+  emp::Ptr<TextEncoding_Interface> TextEncoding_None::Clone() const {
+    return emp::NewPtr<TextEncoding_None>();
   }
-
-  template <bool IS_CONST>
-  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::operator=(const TextCharRef<true> & in) {
-    static_assert(IS_CONST == false,
-      "Cannot assign a const TextCharRef to a mutatble version.");
-    text_ref.Set(pos, in);
-    return *this;
+  void TextEncoding_None::PrintDebug(std::ostream & os) const {
+    os << "TextEncoding None.";
   }
-
-  // Set just this character; don't change style.
-  template <bool IS_CONST>
-  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::operator=(char in) {
-    text_ref.Set(pos, in);
-    return *this;
-  }
-
-  // Convert to a normal C++ char.
-  template <bool IS_CONST>
-  char TextCharRef<IS_CONST>::AsChar() const {
-    return text_ref.GetChar(pos);
-  }
-
-  template <bool IS_CONST>
-  auto TextCharRef<IS_CONST>::operator<=>(const TextCharRef & in) const {
-    return text_ref.GetChar(pos) <=> in.text_ref.GetChar(in.pos);
-  }
-  template <bool IS_CONST>
-  auto TextCharRef<IS_CONST>::operator<=>(char in) const {
-    return text_ref.GetChar(pos) <=> in;
-  }
-
-  template <bool IS_CONST>
-  emp::vector<String> TextCharRef<IS_CONST>::GetStyles() const {
-    return text_ref.GetStyles(pos);
-  }
-
-  template <bool IS_CONST>
-  bool TextCharRef<IS_CONST>::HasStyle(const String & style) const {
-    return text_ref.HasStyle(style, pos);
-  }
-
-  template <bool IS_CONST>
-  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::SetStyle(const String & style) {
-    text_ref.HasStyle(style, pos);
-    return *this;
-  }
-
-
-  // ------- TextEncoding_Base --------
-
-    // By default, append text assuming that there is no special formatting in it.
-  void TextEncoding_Base::Append(const String & in) {
-    text.Append_Raw(in);
-  }
-
-  // By default, return text and ignore all formatting.
-  String TextEncoding_Base::Encode() const {
-    return text;
-  }
-
 
 }
-
 
 #endif // #ifndef EMP_TEXT_TEXT_HPP_INCLUDE

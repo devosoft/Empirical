@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018-2020.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2020.
- *
- *  @file Distribution.hpp
+ *  @file
  *  @brief A set of pre-calculated discrete distributions that can quickly generate random values.
  *  @note Status: ALPHA
  *
@@ -26,6 +27,8 @@
 
 #ifndef EMP_MATH_DISTRIBUTION_HPP_INCLUDE
 #define EMP_MATH_DISTRIBUTION_HPP_INCLUDE
+
+#include <stddef.h>
 
 #include "../datastructs/UnorderedIndexMap.hpp"
 

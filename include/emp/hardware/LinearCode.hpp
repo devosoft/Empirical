@@ -1,14 +1,17 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
- *
- *  @file LinearCode.hpp
+ *  @file
  *  @brief A linear sequence of instructions.
  */
 
 #ifndef EMP_HARDWARE_LINEARCODE_HPP_INCLUDE
 #define EMP_HARDWARE_LINEARCODE_HPP_INCLUDE
+
+#include <stddef.h>
 
 #include "../base/array.hpp"
 #include "../base/vector.hpp"

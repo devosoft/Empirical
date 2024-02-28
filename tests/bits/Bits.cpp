@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022.
- *
- *  @file Bits.cpp
+ *  @file
  */
 
 #include <limits>
@@ -1576,7 +1577,7 @@ TEST_CASE("17: Test BitArray Constructors", "[bits]"){
   REQUIRE( ba8.CountOnes() == 9 );
 
   // Some random BitArrays
-  emp::Random random;
+  emp::Random random(1);
   emp::BitArray<1000> ba9(random);            // 50/50 chance for each bit.
   const size_t ba9_ones = ba9.CountOnes();
   REQUIRE( ba9_ones >= 400 );
@@ -1660,7 +1661,7 @@ TEST_CASE("19: Test Simple BitArray Accessors", "[bits]"){
   emp::BitArray<64> ba64( "1000110110001101100000011000110000001101100000000000110110001101" );
   emp::BitArray<75> ba75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
 
-  emp::Random random;
+  emp::Random random(1);
   emp::BitArray<1000> ba1k(random, 0.75);
 
   // Make sure all sizes are correct.
@@ -1826,7 +1827,7 @@ TEST_CASE("20: Test BitArray Set*, Clear* and Toggle* Accessors", "[bits]") {
   ba88.SetRange(64,66); REQUIRE(ba88.CountOnes() == 6);   // Set two more 1s, just into 2nd field.
 
   // A larger BitArray with lots of random tests.
-  emp::Random random;
+  emp::Random random(1);
 
   emp::BitArray<40> ba40(random, 0.65);
   size_t num_ones = ba40.CountOnes();  REQUIRE(num_ones >= 14); REQUIRE(num_ones < 39);
@@ -1873,7 +1874,7 @@ TEST_CASE("20: Test BitArray Set*, Clear* and Toggle* Accessors", "[bits]") {
 
 
 TEST_CASE("21: Test Randomize() and variants", "[bits]") {
-  emp::Random random;
+  emp::Random random(1);
   emp::BitArray<1000> ba;
 
   REQUIRE(ba.None() == true);
@@ -2117,7 +2118,7 @@ TEST_CASE("23: Test functions that analyze and manipulate ones", "[bits]") {
   REQUIRE(ba.LongestSegmentOnes() == 7);
 
   // Try again with Find, this time with a random sequence of ones.
-  emp::Random random;
+  emp::Random random(1);
   ba.Randomize(random);
   size_t count = 0;
   for (int i = ba.FindOne(); i != -1; i = ba.FindOne(i+1)) count++;
@@ -2438,7 +2439,7 @@ void do_byte_test() {
 // unpack the integer sequence of bits to test
 // and then call the actual testing function with each as a template arg
 template <typename T, T... Bits>
-void do_byte_tests(const std::integer_sequence<T, Bits...>& sequence) {
+void do_byte_tests(const std::integer_sequence<T, Bits...>& /* sequence */) {
   ((do_byte_test<Bits>()),...);
 }
 // function that holds what number of bits to test, and then calls
@@ -2579,7 +2580,7 @@ void test_more_comparators(){
  * Random bitset
  */
 void test_random(){
-  emp::Random random;
+  emp::Random random(1);
   emp::BitArray<8> ba8(random);
   ba8.Randomize(random, 1.0);
   REQUIRE(ba8.all());

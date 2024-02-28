@@ -1,11 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
- *
- *  @file macros.hpp
+ *  @file
  *  @brief Generally useful macros that can perform cools tricks.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *
  *  Generally useful macros that can perform cools tricks.  As with all macros, use only
@@ -422,7 +423,7 @@
 /// @endcond
 
 
-// @cond MACROS
+/// @cond MACROS
 
 
 // **********************
@@ -441,7 +442,6 @@
 #define EMP_INTERNAL_CALL_BY_PACKS(C, F, ...)                                     \
   EMP_INTERNAL_CALL_BY_PACKS_impl(C, F, EMP_DEC_TO_PACK(EMP_COUNT_ARGS(__VA_ARGS__)), __VA_ARGS__, ~)
 
-/// @cond MACROS
 
 // Internal helpers...
 // P is the pack of call counts the still need to be done

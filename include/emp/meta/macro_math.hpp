@@ -1,11 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
- *
- *  @file macro_math.hpp
+ *  @file
  *  @brief Macros to build a pre-processor calculator system.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *  Working macros include:
  *   EMP_INC(A)    : converts to result of A+1

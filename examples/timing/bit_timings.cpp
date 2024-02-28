@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020-2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020-2021
- *
- *  @file bit_timings.cpp
+ *  @file
  *  @brief Some code testing the speed of operations on BitSet and BitVector.
  */
 
@@ -61,8 +62,8 @@ struct SpeedTester_impl<SIZE1, OTHER_SIZES...> : public SpeedTester_impl<OTHER_S
   // How many objects should we use?
   static constexpr size_t OBJ_COUNT = TEST_BITS / OBJ_BITS;
 
-  emp::array< emp::BitSet<SIZE1>, OBJ_COUNT > bs_objs;
-  emp::array< emp::BitVector, OBJ_COUNT > bv_objs;
+  emp::array< emp::old::BitSet<SIZE1>, OBJ_COUNT > bs_objs;
+  emp::array< emp::old::BitVector, OBJ_COUNT > bv_objs;
 
   using base_t = SpeedTester_impl<OTHER_SIZES...>;
 
