@@ -1486,7 +1486,7 @@ namespace emp {
     else if (p < 0.88) RandomizeP<Random::PROB_87_5>(random, start_pos, stop_pos);
     else SetRange(start_pos, stop_pos);
 
-    size_t cur_ones = CountOnes(start_pos, stop_pos) - kept_ones;
+    size_t cur_ones = CountOnes() - kept_ones;
 
     // Do we need to add more ones?
     while (cur_ones < (size_t) target_ones) {
