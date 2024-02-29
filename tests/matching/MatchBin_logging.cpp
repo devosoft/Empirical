@@ -281,9 +281,10 @@ TEST_CASE("Test MatchBin", "[matchbin]")
     auto data = file.ToData<std::string>();
 
     /*
-     there have to be three lines written to our file:
+     there have to be four lines written to our file:
       * 1 header
       * 2 matches
+      * 1 EOF newline
     */
     REQUIRE(data.size() == 3);
     REQUIRE(bin.log.GetLogBuffer().empty());
