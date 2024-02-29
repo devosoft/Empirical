@@ -20,14 +20,14 @@
 #endif
 
 
-#if defined( IN_PYTHON )
+#if defined( EMP_OPTIONAL_THROW_ON )
 
   // #if defined (_MSC_VER )
 
   #define emp_optional_throw(TEST, MESSAGE)                                     \
     do {                                                                  \
       if (!(TEST)) {                                                      \
-        emp::assert_throw(__FILE__, __LINE__, #TEST, MESSAGE, 0);                \
+        emp::assert_throw_opt(__FILE__, __LINE__, #TEST, MESSAGE, 0);                \
       }                                                                   \
     } while(0)
 

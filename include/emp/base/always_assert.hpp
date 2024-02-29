@@ -59,7 +59,7 @@
 
   #define emp_always_assert_impl(TEST) emp_always_assert_msvc_impl(TEST)
 
-#elif defined(IN_PYTHON)
+#elif defined(EMP_OPTIONAL_THROW_ON)
 
   #define emp_always_assert_impl(...)                                     \
     do {                                                                  \

@@ -19,7 +19,7 @@ TEST_CASE("Optional throw" "[asserts]") {
   emp_optional_throw(false);
   REQUIRE(emp::assert_last_fail);
 
-  #define IN_PYTHON 1
+  #define EMP_OPTIONAL_THROW_ON 1
   try {
     emp_optional_throw(false);
   }
