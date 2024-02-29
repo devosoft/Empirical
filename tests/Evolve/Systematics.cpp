@@ -916,7 +916,7 @@ TEST_CASE("Run world", "[evo]") {
   for (size_t i = 0; i < 100; i++) {
       EliteSelect(world, 1, 1);
   }
-    
+
   for (size_t i = 0; i < world.GetSize(); i++) {
     record_fit_sig.Trigger(i, world.CalcFitnessID(i));
     record_phen_sig.Trigger(i, phen_fun(world.GetOrg(i)));
