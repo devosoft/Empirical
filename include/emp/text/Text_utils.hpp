@@ -348,86 +348,88 @@ namespace emp {
       symbol_map.emplace("&upsih;",   'U', "upsih",      978,  "ϒ",   "Upsilon symbol");
       symbol_map.emplace("&piv;",     'O', "piv",        982,  "ϖ",   "Pi symbol");
 
-      // AddReplaceTag("&ensp;",      ' ', "symbol:ensp");       // 8194 : En space
-      // AddReplaceTag("&emsp;",      ' ', "symbol:emsp");       // 8195 : Em space
-      // AddReplaceTag("&thinsp;",  ' ', "symbol:thinsp");     // 8201 : Thin space
-      // AddReplaceTag("&zwnj;",    ' ', "symbol:zwnj");       // 8204 : Zero width non-joiner
-      // AddReplaceTag("&zwj;",     ' ', "symbol:zwj");        // 8205 : Zero width joiner
-      // AddReplaceTag("&lrm;",     '?', "symbol:lrm");        // 8206 : Left-to-right mark
-      // AddReplaceTag("&rlm;",     '?', "symbol:rlm");        // 8207 : Right-to-left mark
-      // AddReplaceTag("&ndash;",   '-', "symbol:ndash");      // 8211 – : En dash
-      // AddReplaceTag("&mdash;",   '-', "symbol:mdash");      // 8212 — : Em dash
-      // AddReplaceTag("&lsquo;",   ' ', "symbol:lsquo");      // 8216 ‘ : Left single quotation mark
-      // AddReplaceTag("&rsquo;",   ' ', "symbol:rsquo");      // 8217 ’ : Right single quotation mark
-      // AddReplaceTag("&sbquo;",   ' ', "symbol:sbquo");      // 8218 ‚ : Single low-9 quotation mark
-      // AddReplaceTag("&ldquo;",   ' ', "symbol:ldquo");      // 8220 “ : Left double quotation mark
-      // AddReplaceTag("&rdquo;",   ' ', "symbol:rdquo");      // 8221 ” : Right double quotation mark
-      // AddReplaceTag("&bdquo;",   ' ', "symbol:bdquo");      // 8222 „ : Double low-9 quotation mark
-      // AddReplaceTag("&dagger;",  ' ', "symbol:dagger");     // 8224 † : Dagger
-      // AddReplaceTag("&Dagger;",  ' ', "symbol:Dagger");     // 8225 ‡ : Double dagger
-      // AddReplaceTag("&bull;",    ' ', "symbol:bull");       // 8226 • : Bullet
-      // AddReplaceTag("&hellip;",  ' ', "symbol:hellip");     // 8230 … : Horizontal ellipsis
-      // AddReplaceTag("&permil;",  ' ', "symbol:permil");     // 8240 ‰ : Per mille
-      // AddReplaceTag("&prime;",   ' ', "symbol:prime");      // 8242 ′ : Minutes (Degrees)
-      // AddReplaceTag("&Prime;",   ' ', "symbol:Prime");      // 8243 ″ : Seconds (Degrees)
-      // AddReplaceTag("&lsaquo;",  ' ', "symbol:lsaquo");     // 8249 ‹ : Single left angle quotation
-      // AddReplaceTag("&rsaquo;",  ' ', "symbol:rsaquo");     // 8250 › : Single right angle quotation
-      // AddReplaceTag("&oline;",   ' ', "symbol:oline");      // 8254 ‾ : Overline
-      // AddReplaceTag("&euro;",    ' ', "symbol:euro");       // 8364 € : Euro
-      // AddReplaceTag("&trade;",   ' ', "symbol:trade");      // 8482 ™ : Trademark
-      // AddReplaceTag("&larr;",    ' ', "symbol:larr");       // 8592 ← : Left arrow
-      // AddReplaceTag("&uarr;",    ' ', "symbol:uarr");       // 8593 ↑ : Up arrow
-      // AddReplaceTag("&rarr;",    ' ', "symbol:rarr");       // 8594 → : Right arrow
-      // AddReplaceTag("&darr;",    ' ', "symbol:darr");       // 8595 ↓ : Down arrow
-      // AddReplaceTag("&harr;",    ' ', "symbol:harr");       // 8596 ↔ : Left right arrow
-      // AddReplaceTag("&crarr;",   ' ', "symbol:crarr");      // 8629 ↵ : Carriage return arrow
-      // AddReplaceTag("&forall;",  ' ', "symbol:forall");     // 8704 ∀ : For all
-      // AddReplaceTag("&part;",    ' ', "symbol:part");       // 8706 ∂ : Part
-      // AddReplaceTag("&exist;",   ' ', "symbol:exist");      // 8707 ∃ : Exist
-      // AddReplaceTag("&empty;",   ' ', "symbol:empty");      // 8709 ∅ : Empty
-      // AddReplaceTag("&nabla;",   ' ', "symbol:nabla");      // 8711 ∇ : Nabla
-      // AddReplaceTag("&isin;",    ' ', "symbol:isin");       // 8712 ∈ : Is in
-      // AddReplaceTag("&notin;",   ' ', "symbol:notin");      // 8713 ∉ : Not in
-      // AddReplaceTag("&ni;",      ' ', "symbol:ni");         // 8715 ∋ : Ni
-      // AddReplaceTag("&prod;",    ' ', "symbol:prod");       // 8719 ∏ : Product
-      // AddReplaceTag("&sum;",     ' ', "symbol:sum");        // 8721 ∑ : Sum
-      // AddReplaceTag("&minus;",   ' ', "symbol:minus");      // 8722 − : Minus
-      // AddReplaceTag("&lowast;",  ' ', "symbol:lowast");     // 8727 ∗ : Asterisk (Lowast)
-      // AddReplaceTag("&radic;",   ' ', "symbol:radic");      // 8730 √ : Square root
-      // AddReplaceTag("&prop;",    ' ', "symbol:prop");       // 8733 ∝ : Proportional to
-      // AddReplaceTag("&infin;",   ' ', "symbol:infin");      // 8734 ∞ : Infinity
-      // AddReplaceTag("&ang;",     ' ', "symbol:ang");        // 8736 ∠ : Angle
-      // AddReplaceTag("&and;",     ' ', "symbol:and");        // 8743 ∧ : And
-      // AddReplaceTag("&or;",      ' ', "symbol:or");         // 8744 ∨ : Or
-      // AddReplaceTag("&cap;",     ' ', "symbol:cap");        // 8745 ∩ : Cap
-      // AddReplaceTag("&cup;",     ' ', "symbol:cup");        // 8746 ∪ : Cup
-      // AddReplaceTag("&int;",     ' ', "symbol:int");        // 8747 ∫ : Integral
-      // AddReplaceTag("&there4;",  ' ', "symbol:there4");     // 8756 ∴ : Therefore
-      // AddReplaceTag("&sim;",     ' ', "symbol:sim");        // 8764 ∼ : Similar to
-      // AddReplaceTag("&cong;",    ' ', "symbol:cong");       // 8773 ≅ : Congurent to
-      // AddReplaceTag("&asymp;",   ' ', "symbol:asymp");      // 8776 ≈ : Almost equal
-      // AddReplaceTag("&ne;",      ' ', "symbol:ne");         // 8800 ≠ : Not equal
-      // AddReplaceTag("&equiv;",   ' ', "symbol:equiv");      // 8801 ≡ : Equivalent
-      // AddReplaceTag("&le;",      ' ', "symbol:le");         // 8804 ≤ : Less or equal
-      // AddReplaceTag("&ge;",      ' ', "symbol:ge");         // 8805 ≥ : Greater or equal
-      // AddReplaceTag("&sub;",     ' ', "symbol:sub");        // 8834 ⊂ : Subset of
-      // AddReplaceTag("&sup;",     ' ', "symbol:sup");        // 8835 ⊃ : Superset of
-      // AddReplaceTag("&nsub;",    ' ', "symbol:nsub");       // 8836 ⊄ : Not subset of
-      // AddReplaceTag("&sube;",    ' ', "symbol:sube");       // 8838 ⊆ : Subset or equal
-      // AddReplaceTag("&supe;",    ' ', "symbol:supe");       // 8839 ⊇ : Superset or equal
-      // AddReplaceTag("&oplus;",   ' ', "symbol:oplus");      // 8853 ⊕ : Circled plus
-      // AddReplaceTag("&otimes;",  ' ', "symbol:otimes");     // 8855 ⊗ : Circled times
-      // AddReplaceTag("&perp;",    ' ', "symbol:perp");       // 8869 ⊥ : Perpendicular
-      // AddReplaceTag("&sdot;",    ' ', "symbol:sdot");       // 8901 ⋅ : Dot operator
-      // AddReplaceTag("&lceil;",   ' ', "symbol:lceil");      // 8968 ⌈ : Left ceiling
-      // AddReplaceTag("&rceil;",   ' ', "symbol:rceil");      // 8969 ⌉ : Right ceiling
-      // AddReplaceTag("&lfloor;",  ' ', "symbol:lfloor");     // 8970 ⌊ : Left floor
-      // AddReplaceTag("&rfloor;",  ' ', "symbol:rfloor");     // 8971 ⌋ : Right floor
-      // AddReplaceTag("&loz;",     ' ', "symbol:loz");        // 9674 ◊ : Lozenge
-      // AddReplaceTag("&spades;",  ' ', "symbol:spades");     // 9824 ♠ : Spade
-      // AddReplaceTag("&clubs;",   ' ', "symbol:clubs");      // 9827 ♣ : Club
-      // AddReplaceTag("&hearts;",  ' ', "symbol:hearts");     // 9829 ♥ : Heart
-      // AddReplaceTag("&diams;",   ' ', "symbol:diams");      // 9830 ♦ : Diamond
+      // === Higher ID Symbols ===
+
+      symbol_map.emplace("&ensp;",    ' ', "ensp",       8194, " ",   "En space");
+      symbol_map.emplace("&emsp;",    ' ', "emsp",       8195, " ",   "Em space");
+      symbol_map.emplace("&thinsp;",  ' ', "thinsp",     8201, " ",   "Thin space");
+      symbol_map.emplace("&zwnj;",    ' ', "zwnj",       8204, ":",   "Zero width non-joiner");
+      symbol_map.emplace("&zwj;",     ' ', "zwj",        8205, ":",   "Zero width joiner");
+      symbol_map.emplace("&lrm;",     '?', "lrm",        8206, ":",   "Left-to-right mark");
+      symbol_map.emplace("&rlm;",     '?', "rlm",        8207, ":",   "Right-to-left mark");
+      symbol_map.emplace("&ndash;",   '-', "ndash",      8211, "–",   "En dash");
+      symbol_map.emplace("&mdash;",   '-', "mdash",      8212, "—",   "Em dash");
+      symbol_map.emplace("&lsquo;",   ' ', "lsquo",      8216, "‘",   "Left single quotation mark");
+      symbol_map.emplace("&rsquo;",   ' ', "rsquo",      8217, "’",   "Right single quotation mark");
+      symbol_map.emplace("&sbquo;",   ' ', "sbquo",      8218, "‚",   "Single low-9 quotation mark");
+      symbol_map.emplace("&ldquo;",   ' ', "ldquo",      8220, "“",   "Left double quotation mark");
+      symbol_map.emplace("&rdquo;",   ' ', "rdquo",      8221, "”",   "Right double quotation mark");
+      symbol_map.emplace("&bdquo;",   ' ', "bdquo",      8222, "„",   "Double low-9 quotation mark");
+      symbol_map.emplace("&dagger;",  ' ', "dagger",     8224, "†",   "Dagger");
+      symbol_map.emplace("&Dagger;",  ' ', "Dagger",     8225, "‡",   "Double dagger");
+      symbol_map.emplace("&bull;",    ' ', "bull",       8226, "•",   "Bullet");
+      symbol_map.emplace("&hellip;",  ' ', "hellip",     8230, "…",   "Horizontal ellipsis");
+      symbol_map.emplace("&permil;",  ' ', "permil",     8240, "‰",   "Per mille");
+      symbol_map.emplace("&prime;",   ' ', "prime",      8242, "′",   "Minutes (Degrees)");
+      symbol_map.emplace("&Prime;",   ' ', "Prime",      8243, "″",   "Seconds (Degrees)");
+      symbol_map.emplace("&lsaquo;",  ' ', "lsaquo",     8249, "‹",   "Single left angle quotation");
+      symbol_map.emplace("&rsaquo;",  ' ', "rsaquo",     8250, "›",   "Single right angle quotation");
+      symbol_map.emplace("&oline;",   ' ', "oline",      8254, "‾",   "Overline");
+      symbol_map.emplace("&euro;",    ' ', "euro",       8364, "€",   "Euro");
+      symbol_map.emplace("&trade;",   ' ', "trade",      8482, "™",   "Trademark");
+      symbol_map.emplace("&larr;",    ' ', "larr",       8592, "←",   "Left arrow");
+      symbol_map.emplace("&uarr;",    ' ', "uarr",       8593, "↑",   "Up arrow");
+      symbol_map.emplace("&rarr;",    ' ', "rarr",       8594, "→",   "Right arrow");
+      symbol_map.emplace("&darr;",    ' ', "darr",       8595, "↓",   "Down arrow");
+      symbol_map.emplace("&harr;",    ' ', "harr",       8596, "↔",   "Left right arrow");
+      symbol_map.emplace("&crarr;",   ' ', "crarr",      8629, "↵",   "Carriage return arrow");
+      symbol_map.emplace("&forall;",  ' ', "forall",     8704, "∀",   "For all");
+      symbol_map.emplace("&part;",    ' ', "part",       8706, "∂",   "Part");
+      symbol_map.emplace("&exist;",   ' ', "exist",      8707, "∃",   "Exist");
+      symbol_map.emplace("&empty;",   ' ', "empty",      8709, "∅",   "Empty");
+      symbol_map.emplace("&nabla;",   ' ', "nabla",      8711, "∇",   "Nabla");
+      symbol_map.emplace("&isin;",    ' ', "isin",       8712, "∈",   "Is in");
+      symbol_map.emplace("&notin;",   ' ', "notin",      8713, "∉",   "Not in");
+      symbol_map.emplace("&ni;",      ' ', "ni",         8715, "∋",   "Ni");
+      symbol_map.emplace("&prod;",    ' ', "prod",       8719, "∏",   "Product");
+      symbol_map.emplace("&sum;",     ' ', "sum",        8721, "∑",   "Sum");
+      symbol_map.emplace("&minus;",   ' ', "minus",      8722, "−",   "Minus");
+      symbol_map.emplace("&lowast;",  ' ', "lowast",     8727, "∗",   "Asterisk (Lowast)");
+      symbol_map.emplace("&radic;",   ' ', "radic",      8730, "√",   "Square root");
+      symbol_map.emplace("&prop;",    ' ', "prop",       8733, "∝",   "Proportional to");
+      symbol_map.emplace("&infin;",   ' ', "infin",      8734, "∞",   "Infinity");
+      symbol_map.emplace("&ang;",     ' ', "ang",        8736, "∠",   "Angle");
+      symbol_map.emplace("&and;",     ' ', "and",        8743, "∧",   "And");
+      symbol_map.emplace("&or;",      ' ', "or",         8744, "∨",   "Or");
+      symbol_map.emplace("&cap;",     ' ', "cap",        8745, "∩",   "Cap");
+      symbol_map.emplace("&cup;",     ' ', "cup",        8746, "∪",   "Cup");
+      symbol_map.emplace("&int;",     ' ', "int",        8747, "∫",   "Integral");
+      symbol_map.emplace("&there4;",  ' ', "there4",     8756, "∴",   "Therefore");
+      symbol_map.emplace("&sim;",     ' ', "sim",        8764, "∼",   "Similar to");
+      symbol_map.emplace("&cong;",    ' ', "cong",       8773, "≅",   "Congurent to");
+      symbol_map.emplace("&asymp;",   ' ', "asymp",      8776, "≈",   "Almost equal");
+      symbol_map.emplace("&ne;",      ' ', "ne",         8800, "≠",   "Not equal");
+      symbol_map.emplace("&equiv;",   ' ', "equiv",      8801, "≡",   "Equivalent");
+      symbol_map.emplace("&le;",      ' ', "le",         8804, "≤",   "Less or equal");
+      symbol_map.emplace("&ge;",      ' ', "ge",         8805, "≥",   "Greater or equal");
+      symbol_map.emplace("&sub;",     ' ', "sub",        8834, "⊂",   "Subset of");
+      symbol_map.emplace("&sup;",     ' ', "sup",        8835, "⊃",   "Superset of");
+      symbol_map.emplace("&nsub;",    ' ', "nsub",       8836, "⊄",   "Not subset of");
+      symbol_map.emplace("&sube;",    ' ', "sube",       8838, "⊆",   "Subset or equal");
+      symbol_map.emplace("&supe;",    ' ', "supe",       8839, "⊇",   "Superset or equal");
+      symbol_map.emplace("&oplus;",   ' ', "oplus",      8853, "⊕",   "Circled plus");
+      symbol_map.emplace("&otimes;",  ' ', "otimes",     8855, "⊗",   "Circled times");
+      symbol_map.emplace("&perp;",    ' ', "perp",       8869, "⊥",   "Perpendicular");
+      symbol_map.emplace("&sdot;",    ' ', "sdot",       8901, "⋅",   "Dot operator");
+      symbol_map.emplace("&lceil;",   ' ', "lceil",      8968, "⌈",   "Left ceiling");
+      symbol_map.emplace("&rceil;",   ' ', "rceil",      8969, "⌉",   "Right ceiling");
+      symbol_map.emplace("&lfloor;",  ' ', "lfloor",     8970, "⌊",   "Left floor");
+      symbol_map.emplace("&rfloor;",  ' ', "rfloor",     8971, "⌋",   "Right floor");
+      symbol_map.emplace("&loz;",     ' ', "loz",        9674, "◊",   "Lozenge");
+      symbol_map.emplace("&spades;",  ' ', "spades",     9824, "♠",   "Spade");
+      symbol_map.emplace("&clubs;",   ' ', "clubs",      9827, "♣",   "Club");
+      symbol_map.emplace("&hearts;",  ' ', "hearts",     9829, "♥",   "Heart");
+      symbol_map.emplace("&diams;",   ' ', "diams",      9830, "♦",   "Diamond");
     }
     return symbol_map;
   }
