@@ -138,8 +138,7 @@ namespace emp {
     using mem_val_t = double;                                  //< Hardware memory map value type.
     using memory_t = std::unordered_map<mem_key_t, mem_val_t>; //< Hardware memory map type.
     using arg_t = int;                                         //< Instruction argument type.
-    // TODO: Turn this back into emp::array when possible
-    using arg_set_t = std::array<arg_t, MAX_INST_ARGS>;        //< Instruction argument set type.
+    using arg_set_t = emp::array<arg_t, MAX_INST_ARGS>;        //< Instruction argument set type.
     using affinity_t = BitSet<AFFINITY_WIDTH>;                 //< Affinity type alias.
     using properties_t = std::unordered_set<std::string>;      //< Event/Instruction properties type.
     using trait_t = TRAIT_T;
