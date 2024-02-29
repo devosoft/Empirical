@@ -1,11 +1,11 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2024
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2023.
- *
- *  @file optional_throw.hpp
- *  @brief Like emp_assert, but throws an exception if in Python
- *  @note Status: RELEASE
+ *  @file
+ *  @brief TODO.
  *
  */
 

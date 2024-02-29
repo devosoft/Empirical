@@ -1,11 +1,11 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2024
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2023
- *
- *  @file Systematics.hpp
- *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
- *
+ *  @file
+ *  @brief TODO.
  *  @todo We should provide an option to back up systematics data to a file so that it doesn't all
  *        need to be kept in memory, especially if we're only doing post-analysis.
  *  @todo This inheritance system makes adding new systematics-related data tracking kind of a pain.

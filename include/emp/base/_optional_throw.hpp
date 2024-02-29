@@ -1,11 +1,11 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2024
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2023.
- *
- *  @file _optional_throw.hpp
- *  @brief Variant of asserts that throws exception
- *  @note This is useful for writing code that gets wrapped in Python via pybind11
+ *  @file
+ *  @brief TODO.
  */
 
 #ifndef EMP_BASE__OPTIONAL_THROW_TRIGGER_HPP_INCLUDE
