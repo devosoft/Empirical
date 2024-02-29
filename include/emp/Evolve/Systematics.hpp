@@ -827,8 +827,12 @@ namespace emp {
 
     /// @returns true if there is a taxon at specified location
     bool IsTaxonAt(WorldPosition id) {
-      emp_optional_throw(id.GetPopID() < taxon_locations.size(), "Invalid population id");
-      emp_optional_throw(id.GetIndex() < taxon_locations[id.GetPopID()].size(), "Invalid taxon location");
+      if (id.GetPopID() >= taxon_locations.size()) {
+        return false;
+      }
+      if (id.GetIndex() >= taxon_locations[id.GetPopID()].size()) {
+        return false;
+      }
       return taxon_locations[id.GetPopID()][id.GetIndex()] != nullptr;
     }
 
