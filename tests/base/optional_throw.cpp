@@ -1,13 +1,13 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2024
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2023
- *
- *  @file optional_throw.cpp
- */
-
+ *  @file
+ *  @brief TODO.
 #include <iostream>
-#include <sstream>
+ */
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
