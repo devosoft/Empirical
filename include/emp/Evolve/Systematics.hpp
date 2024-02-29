@@ -2160,7 +2160,7 @@ namespace emp {
     } else{
 
       emp::File generation_percentiles(filename); //opens file
-      emp::vector< emp::vector<double> >percentile_data = generation_percentiles.ToData<double>(','); //turns file contents into vector
+      emp::vector< emp::vector<double> >percentile_data = generation_percentiles.ToData<double>(","); //turns file contents into vector
 
       for(int j = 0; j <= percentile_data[gen_value].size() - 2; j++){ //searches through vector for slot where phylo diversity fits
 
@@ -2205,7 +2205,7 @@ namespace emp {
 
     // Load files
     emp::File in_file(file_path);
-    emp::vector<std::string> header = in_file.ExtractRow();
+    emp::vector<emp::String> header = in_file.ExtractRow();
 
     // Find column ids
     auto id_pos_it = std::find(header.begin(), header.end(), "id");
