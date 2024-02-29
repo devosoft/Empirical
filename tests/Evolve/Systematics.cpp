@@ -510,7 +510,7 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]") {
   CHECK(sys.GetNumOutside() == 0);
 
   auto active = sys.GetActive();
-  emp::vector<emp::Ptr<emp::Taxon< active_vec(active.begin(), active.end());
+  emp::vector<emp::Ptr<emp::Taxon<int>>> active_vec(active.begin(), active.end());
   emp::Sort(active_vec, [](emp::Ptr<emp::Taxon<int>> & a, emp::Ptr<emp::Taxon<int>> & b){
     return a->GetID() < b->GetID();
   });
