@@ -8,8 +8,8 @@
  *  @brief TODO.
  */
 
-#ifndef EMP_BASE__OPTIONAL_THROW_TRIGGER_HPP_INCLUDE
-#define EMP_BASE__OPTIONAL_THROW_TRIGGER_HPP_INCLUDE
+#ifndef EMP_BASE__OPTIONAL_THROW_HPP_INCLUDE
+#define EMP_BASE__OPTIONAL_THROW_HPP_INCLUDE
 
 #include <sstream>
 #include <string>
@@ -57,4 +57,4 @@ namespace emp {
     }
 }
 
-#endif // #ifndef EMP_BASE__OPTIONAL_THROW_TRIGGER_HPP_INCLUDE
+#endif // #ifndef EMP_BASE__OPTIONAL_THROW_HPP_INCLUDE
