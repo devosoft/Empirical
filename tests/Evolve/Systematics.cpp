@@ -1,14 +1,14 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2024
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file Systematics.cpp
- */
-
+ *  @file
+ *  @brief TODO.
 #include <filesystem>
 #include <iostream>
-#include <sstream>
+ */
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
@@ -920,7 +920,7 @@ TEST_CASE("Run world", "[evo]") {
   for (size_t i = 0; i < 100; i++) {
       EliteSelect(world, 1, 1);
   }
-    
+
   for (size_t i = 0; i < world.GetSize(); i++) {
     record_fit_sig.Trigger(i, world.CalcFitnessID(i));
     record_phen_sig.Trigger(i, phen_fun(world.GetOrg(i)));

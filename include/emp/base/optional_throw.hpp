@@ -1,11 +1,11 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2024
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2023.
- *
- *  @file optional_throw.hpp
- *  @brief Like emp_assert, but throws an exception if in Python
- *  @note Status: RELEASE
+ *  @file
+ *  @brief TODO.
  *
  */
 
@@ -20,14 +20,14 @@
 #endif
 
 
-#if defined( IN_PYTHON )
+#if defined( EMP_OPTIONAL_THROW_ON )
 
   // #if defined (_MSC_VER )
 
   #define emp_optional_throw(TEST, MESSAGE)                                     \
     do {                                                                  \
       if (!(TEST)) {                                                      \
-        emp::assert_throw(__FILE__, __LINE__, #TEST, MESSAGE, 0);                \
+        emp::assert_throw_opt(__FILE__, __LINE__, #TEST, MESSAGE, 0);                \
       }                                                                   \
     } while(0)
 
