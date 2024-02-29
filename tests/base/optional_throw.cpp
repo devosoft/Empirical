@@ -6,11 +6,11 @@
 /**
  *  @file
  *  @brief TODO.
-#include <iostream>
  */
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#undef NDEBUG
 #define TDEBUG 1
 #include "emp/base/optional_throw.hpp"
 
