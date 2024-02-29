@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021-2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021-2022.
- *
- *  @file ReadoutPanel.hpp
+ *  @file
  *  @brief UI framework for live statistic readouts.
  */
 
@@ -19,6 +20,7 @@
 
 namespace emp::prefab {
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     /**
      * Shared pointer held by instances of ReadoutPanel class representing
@@ -54,6 +56,8 @@ namespace emp::prefab {
 
     };
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
+
   /**
    * Use a ReadoutPanel to display a collection of related live values
    * in a Card.
@@ -82,8 +86,8 @@ namespace emp::prefab {
   public:
     /**
      * @param group_name name for this collection of values, displayed in card header
-     * @param refresh_time the time in milliseconds between refreshes to the live values
-     * @param state initial state of the card, one of STATIC, INIT_OPEN, or INIT_CLOSED
+     * @param refresh_milliseconds the time in milliseconds between refreshes to the live values
+     * @param state initial state of the card, one of STAITC, INIT_OPEN, or INIT_CLOSED
      * @param show_glyphs whether the underlying card should show toggle icons in card header
      * @param id a user defined ID for ReadoutPanel div (default is emscripten generated)
      */
@@ -117,7 +121,7 @@ namespace emp::prefab {
      * INIT_CLOSED
      * @param show_glyphs whether the underlying card should show toggle icons
      * in card header
-     * @param info_ref a pointer to the underlying ReadoutPanelInfo object for
+     * @param in_info a pointer to the underlying ReadoutPanelInfo object for
      * this ReadoutPanel or a pointer to a derived info object (simulating inheritance)
      */
     ReadoutPanel(const std::string & group_name,
@@ -136,7 +140,7 @@ namespace emp::prefab {
       auto & live_divs = Info()->GetLiveDivs();
       // Animation is referenced by this component's ID
       AddAnimation(GetID(), [
-        elapsed_milliseconds = 0, refresh_milliseconds, &live_divs
+        elapsed_milliseconds = 0.0, refresh_milliseconds, &live_divs
       ](double stepTime) mutable {
         // Accumulate steps, then redraw after enough time has elapsed
         elapsed_milliseconds += stepTime;
@@ -178,7 +182,7 @@ namespace emp::prefab {
      * parent div to a list of divs to be redrawn at the refresh rate.
      * @param name the name for this value.
      * @param desc a description for this value.
-     * @param value_getter a function that will return the string for this value.
+     * @param value a function that will return the string for this value.
      *
      * @return the readout panel for chaining calls
      */

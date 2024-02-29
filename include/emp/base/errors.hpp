@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
- *
- *  @file errors.hpp
+ *  @file
  *  @brief Tools to help manage various problems in command-line or Emscripten-based applications.
  *  @note Status: ALPHA
  *
@@ -42,9 +43,10 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 
-/// If we are in emscripten, make sure to include the header.
+// If we are in emscripten, make sure to include the header.
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif

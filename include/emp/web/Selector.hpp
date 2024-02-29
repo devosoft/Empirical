@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
- *
- *  @file Selector.hpp
+ *  @file
  *  @brief Specs for the Selector widget.
  *
  *  A Selector widget provides the user with a pull-down menu.  It can be
@@ -24,6 +25,7 @@
 #ifndef EMP_WEB_SELECTOR_HPP_INCLUDE
 #define EMP_WEB_SELECTOR_HPP_INCLUDE
 
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 

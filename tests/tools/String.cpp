@@ -1,14 +1,20 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2023.
- *
- *  @file String.cpp
+ *  @file
  */
 
-#include "../third-party/Catch/single_include/catch2/catch.hpp"
+#include <iostream>
+#include <string>
+#include <string_view>
+
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/tools/String.hpp"
+
 
 TEST_CASE("Test String Constructors", "[tools]")
 {
@@ -31,8 +37,8 @@ TEST_CASE("Test String Constructors", "[tools]")
   CHECK(emp::MakeLiteral('\\') == "'\\\\'");
 
   emp::String up = "A String!";
-  CHECK(up.ToUpper() == "A STRING!");
-  CHECK(up.ToLower() == "a string!");
+  CHECK(up.AsUpper() == "A STRING!");
+  CHECK(up.AsLower() == "a string!");
 
   CHECK(emp::MakeRoman(50) == "L");
   CHECK(emp::MakeRoman(562) == "DLXII");
@@ -42,7 +48,10 @@ TEST_CASE("Test String Constructors", "[tools]")
   CHECK(emp::MakeRoman(500000) == "D|");
   CHECK(emp::MakeRoman(500000000) == "D||");
   CHECK(emp::MakeRoman(500500500) == "D|D|D");
+}
 
+TEST_CASE("Test String Composition-ID Functions", "[tools]")
+{
   emp::String abc = "aabcccabbcccabcbca";
   CHECK(abc.IsComposedOf("abc"));
   CHECK(!abc.IsComposedOf("abx"));
@@ -61,188 +70,288 @@ TEST_CASE("Test String Constructors", "[tools]")
   CHECK(emp::String("!@#$%^&*()0987654321").HasDigit());
   CHECK(!emp::String("!@#$%^&*()abcdefg").HasDigit());
 
-/*
-  CHECK(emp::has_alphanumeric("all letters"));
-  CHECK(emp::has_alphanumeric("12345"));
-  CHECK(emp::has_alphanumeric("s0m3 l3tt3r5 @nd num83r5"));
-  CHECK(!emp::has_alphanumeric(")(!*#@&#^%&!"));
+  CHECK(emp::String("all letters").HasAlphanumeric());
+  CHECK(emp::String("12345").HasAlphanumeric());
+  CHECK(emp::String("s0m3 l3tt3r5 @nd num83r5").HasAlphanumeric());
+  CHECK(!emp::String(")(!*#@&#^%&!").HasAlphanumeric());
 
-  CHECK(emp::has_one_of("abcdefghijklmnopqrstuvwxyz","aeiou"));
-  CHECK(emp::has_one_of("abcdefghijklmnopqrstuvwxyz","abc123"));
-  CHECK(!emp::has_one_of("abcdefghijklmnopqrstuvwxyz","12345"));
+  CHECK(emp::String("abcdefghijklmnopqrstuvwxyz").HasOneOf("aeiou"));
+  CHECK(emp::String("abcdefghijklmnopqrstuvwxyz").HasOneOf("abc123"));
+  CHECK(!emp::String("abcdefghijklmnopqrstuvwxyz").HasOneOf("12345"));
 
+  CHECK(emp::String("391830581734").OnlyDigits());
+  CHECK(!emp::String("3h91830581734").OnlyDigits());
+  CHECK(!emp::String("3.14").OnlyDigits());
+  CHECK(!emp::String("8.5e-6").OnlyDigits());
+  CHECK(!emp::String("9e27").OnlyDigits());
+
+  CHECK(emp::String("391830581734").IsNumber());
+  CHECK(!emp::String("3h91830581734").IsNumber());
+  CHECK(emp::String("3.14").IsNumber());
+  CHECK(emp::String("8.5e-6").IsNumber());
+  CHECK(emp::String("9e27").IsNumber());
+  CHECK(!emp::String("e").IsNumber());
+  CHECK(!emp::String("-.e").IsNumber());
+  CHECK(!emp::String("-4.5e").IsNumber());
+  CHECK(emp::String("-4.5e+4").IsNumber());
+  CHECK(!emp::String(".").IsNumber());
+  CHECK(emp::String(".1").IsNumber());
+  CHECK(!emp::String("1.").IsNumber());
+
+  CHECK(emp::String("39adg18af3tj05ykty81734").OnlyAlphanumeric());
+  CHECK(!emp::String("39adg18af?3tj05ykty81734").OnlyAlphanumeric());
+
+  CHECK(emp::String("'f'").IsLiteralChar());
+  CHECK(emp::String("' '").IsLiteralChar());
+  CHECK(!emp::String("f").IsLiteralChar());
+  CHECK(emp::String("'\n'").IsLiteralChar());
+  CHECK(!emp::String("'\\'").IsLiteralChar());
+  CHECK(emp::MakeFromLiteral_Char("'f'") == 'f');
+  CHECK(emp::MakeFromLiteral_Char("'\n'") == '\n');
+
+  CHECK(emp::String("\"He llo!\"").IsLiteralString());
+  CHECK(!emp::String("\"\\\\He\"llo!\"").IsLiteralString());
+  CHECK(emp::String("\"Hel\n\t\r\\\'lo!\"").IsLiteralString());
+  CHECK(emp::String("\"Hel\n \t \r \'lo!\"").IsLiteralString());
+  CHECK(emp::MakeFromLiteral_String("\"Hello!\"") == "Hello!");
+  CHECK(emp::MakeFromLiteral_String("\"Hel\n \t \r \'lo!\"") == "Hel\n \t \r \'lo!");
+
+  // Make sure that we can properly identify different types of characters.
+  const emp::String special_string = "This\t5tr1ng\nis\non THREE (3) \"lines\".";
+
+  CHECK(special_string.CountWhitespace() == 6);
+  CHECK(special_string.CountUpper() == 6);
+  CHECK(special_string.CountLower() == 16);
+  CHECK(special_string.CountLetters() == 22);
+  CHECK(special_string.CountDigits() == 3);
+  CHECK(special_string.CountAlphanumeric() == 25);
+  CHECK(special_string.CountNonwhitespace() == 30);
+
+  /*
   CHECK(emp::is_valid("aaaaaaaaa", [](char x) { return (x == 'a'); } ));
   CHECK( !(emp::is_valid("aaaabaaaa", [](char x) { return (x == 'a'); })) );
+*/
+}
 
-  std::string start = "a string.";
-  CHECK(emp::string_pop_fixed(start, 9) == "a string.");
+TEST_CASE("Test String Find Functions", "[tools]")
+{
+  emp::String pal = "able was I ere I saw Elba";
+  // Search for single characters.
+  CHECK(pal.Find('a') == 0);
+  CHECK(pal.Find('b') == 1);
+  CHECK(pal.Find('c') == std::string::npos);
+  CHECK(pal.Find('e') == 3);
+  CHECK(pal.Find('I') == 9);
+  CHECK(pal.Find('E') == 21);
+
+  // Try with offset
+  CHECK(pal.Find('a', 10) == 18);
+  CHECK(pal.Find('b', 10) == 23);
+  CHECK(pal.Find('c', 10) == std::string::npos);
+  CHECK(pal.Find('e', 10) == 11);
+  CHECK(pal.Find('I', 10) == 15);
+  CHECK(pal.Find('E', 10) == 21);
+
+  // Try reversed.
+  CHECK(pal.RFind('a') == 24);
+  CHECK(pal.RFind('b') == 23);
+  CHECK(pal.RFind('c') == std::string::npos);
+  CHECK(pal.RFind('e') == 13);
+  CHECK(pal.RFind('I') == 15);
+  CHECK(pal.RFind('E') == 21);
+
+  // Try reversed with offset.
+  CHECK(pal.RFind('a', 20) == 18);
+  CHECK(pal.RFind('b', 20) == 1);
+  CHECK(pal.RFind('c', 20) == std::string::npos);
+  CHECK(pal.RFind('e', 20) == 13);
+  CHECK(pal.RFind('I', 20) == 15);
+  CHECK(pal.RFind('E', 20) == std::string::npos);
+
+  // Try string Find.
+  CHECK(pal.Find("able") == 0);
+  CHECK(pal.Find("was") == 5);
+  CHECK(pal.Find("I") == 9);
+  CHECK(pal.Find("able", 5) == std::string::npos);
+  CHECK(pal.Find("was", 5) == 5);
+  CHECK(pal.Find("I", 10) == 15);
+  CHECK(pal.RFind("able") == 0);
+  CHECK(pal.RFind("was") == 5);
+  CHECK(pal.RFind("I") == 15);
+
+  // Try CharSet Find.
+  CHECK(pal.Find(emp::LowerCharSet()) == 0);
+  CHECK(pal.Find(emp::WhitespaceCharSet()) == 4);
+  CHECK(pal.Find(emp::UpperCharSet()) == 9);
+  CHECK(pal.Find(emp::UpperCharSet(), 10) == 15);
+  CHECK(pal.Find(emp::UpperCharSet(), 16) == 21);
+  CHECK(pal.RFind(emp::UpperCharSet()) == 21);
+  CHECK(pal.RFind(emp::UpperCharSet(), 20) == 15);
+  CHECK(pal.RFind(emp::UpperCharSet(), 10) == 9);
+  CHECK(pal.RFind(emp::UpperCharSet(), 5) == std::string::npos);
+
+  // Do some tests on quotes in strings...
+  emp::String quotes = "\"abc\"\"def\"123 \"\"\"long\\\"er\"";  // "abc""def"123 """long\"er"
+  CHECK( quotes.FindQuoteMatch() == 4 );
+  CHECK( quotes.FindQuoteMatch(1) == std::string::npos );
+  CHECK( quotes.FindQuoteMatch(5) == 9 );
+  CHECK( quotes.FindQuoteMatch(10) == std::string::npos );
+  CHECK( quotes.FindQuoteMatch(14) == 15 );
+  CHECK( quotes.FindQuoteMatch(16) == 25 );
+
+  CHECK( quotes.RFindQuoteMatch(4) == 0 );
+  CHECK( quotes.RFindQuoteMatch(9) == 5 );
+  CHECK( quotes.RFindQuoteMatch(15) == 14 );
+  CHECK( quotes.RFindQuoteMatch(25) == 16 );
+
+  // Do some tests on parentheses matching...
+  emp::String parens = "(()(()()))((())\")))))()\")";
+  CHECK( parens.FindParenMatch() == 9 );
+  CHECK( parens.FindParenMatch(0) == 9 );
+  CHECK( parens.FindParenMatch(1) == 2 );
+  CHECK( parens.FindParenMatch(2) == std::string::npos );
+  CHECK( parens.FindParenMatch(3) == 8 );
+  CHECK( parens.FindParenMatch(10) == 16 );
+  CHECK( parens.FindParenMatch(11) == 14 );
+  CHECK( parens.FindParenMatch(21) == 22 ); // Works inside a quote if start there.
+  CHECK( parens.FindParenMatch(10,{"","()"}) == 16 );   // Specify parens and show works.
+  CHECK( parens.FindParenMatch(10,{"\"","()"}) == 24 ); // Do not ignore quotes.
+  CHECK( parens.FindParenMatch(10,{"","ab"}) == std::string::npos );   // Using non-parens works.
+  CHECK( quotes.FindParenMatch(1,{"","ab"}) == 2 );   // Using non-parens works.
+
+  CHECK( parens.RFindParenMatch(9) == 0 );
+  CHECK( parens.RFindParenMatch(2) == 1 );
+  CHECK( parens.RFindParenMatch(8) == 3 );
+  CHECK( parens.RFindParenMatch(16) == 10 );
+  CHECK( parens.RFindParenMatch(14) == 11 );
+  CHECK( parens.RFindParenMatch(22) == 21 ); // Works inside a quote if start there.
+
+  // Extra tests with braces and single quotes.
+  emp::String braces = "{{}{}}{'{}}'}";
+  CHECK( braces.FindParenMatch(0) == 5 );
+  CHECK( braces.FindParenMatch(0,{"","{}"}) == 5 );
+  CHECK( braces.FindParenMatch(1,{"","{}"}) == 2 );
+  CHECK( braces.FindParenMatch(2,{"","{}"}) == std::string::npos );
+  CHECK( braces.FindParenMatch(3,{"","{}"}) == 4 );
+  CHECK( braces.FindParenMatch(6,{"","{}"}) == 10 );  // Across single quotes
+  CHECK( braces.FindParenMatch(6,{"'","{}"}) == 12 ); // Don't ignore quotes.
+
+  // Test a multi-find.
+  emp::String test_str = "This is my best test!";
+  emp::vector<size_t> found = test_str.FindAll(' ');
+  CHECK( found == emp::vector<size_t>{4,7,10,15} );
+  test_str.FindAll('i', found);
+  CHECK( found == emp::vector<size_t>{2,5} );
+  parens.FindAll(')', found);
+  CHECK( found == emp::vector<size_t>{2,5,7,8,9,13,14,16,17,18,19,20,22,24} );
+  parens.FindAll(')', found, "\""); // Ignore items in quotes.
+  CHECK( found == emp::vector<size_t>{2,5,7,8,9,13,14,24} );
+}
+
+TEST_CASE("Test String Pop and Slice Functions", "[tools]")
+{
+  emp::String start = "a string.";
+  CHECK(start.PopFixed(9) == "a string.");
   CHECK(start == "");
 
-  CHECK(emp::string_get("John Doe"," ") == "John");
-  CHECK(emp::string_get_line("Line1\nLine2\nLine3") == "Line1");
+  start = "This is a slightly longer string";
+  auto split = start.Slice(" ");
+  CHECK(split.size() == 6);
+  CHECK(split[0] == "This");
+  CHECK(split[5] == "string");
 
-  std::string hello = "!!h&&e#l!!&l###o&!!";
-  emp::remove_chars(hello, "!&#");
+  start = "This string has \"internal quotes\" that shouldn't be split.";
+  split = start.Slice(" ", {"\""}); // Slice, but keep quotes as one unit.
+  for (auto x : split) { std::cout << ":" << x << ": "; } std::cout << std::endl;
+  CHECK(split.size() == 8);
+  CHECK(split[0] == "This");
+  CHECK(split[3] == "\"internal quotes\"");
+  CHECK(split[5] == "shouldn't");
+}
+
+TEST_CASE("Test String Removal Functions", "[tools]")
+{
+
+  emp::String hello = "!!h&&e#l!!&l###o&!!";
+  hello.RemoveChars("!&#");
   CHECK(hello == "hello");
 
-  std::string email = "you@example.com";
-  emp::remove_punctuation(email);
+  emp::String email = "you@example.com";
+  email.RemovePunctuation();
   CHECK(email == "youexamplecom");
+}
 
-  emp::vector<std::string> numbers;
-  numbers.push_back("1");
-  numbers.push_back("2");
-  numbers.push_back("3");
-  emp::vector<int> int_numbers = emp::from_strings<int>(numbers);
-  CHECK(int_numbers[0] == 1);
-  CHECK(int_numbers[1] == 2);
-  CHECK(int_numbers[2] == 3);
+TEST_CASE("Test String Conversion Functions", "[tools]")
+{
+  // Test conversion to an escaped string.
+  const emp::String special_string = "This\t5tr1ng\nis\non THREE (3) \"lines\".";
+  emp::String escaped_string = emp::MakeEscaped(special_string);
 
-  CHECK(emp::is_digits("391830581734"));
-  CHECK(!emp::is_digits("3h91830581734"));
-  CHECK(!emp::is_digits("3.14"));
-  CHECK(!emp::is_digits("8.5e-6"));
-  CHECK(!emp::is_digits("9e27"));
+  // note: we had to double-escape the test to make sure this worked.
+  CHECK(escaped_string == "This\\t5tr1ng\\nis\\non THREE (3) \\\"lines\\\".");
 
-  CHECK(emp::is_number("391830581734"));
-  CHECK(!emp::is_number("3h91830581734"));
-  CHECK(emp::is_number("3.14"));
-  CHECK(emp::is_number("8.5e-6"));
-  CHECK(emp::is_number("9e27"));
-  CHECK(!emp::is_number("e"));
-  CHECK(!emp::is_number("-.e"));
-  CHECK(!emp::is_number("-4.5e"));
-  CHECK(emp::is_number("-4.5e+4"));
-  CHECK(!emp::is_number("."));
-  CHECK(emp::is_number(".1"));
-  CHECK(!emp::is_number("1."));
+  // Test more general conversion to literals.
+  CHECK(emp::MakeLiteral(42) == "42");
+  CHECK(emp::MakeLiteral('a') == "'a'");
+  CHECK(emp::MakeLiteral('\t') == "'\\t'");
+  CHECK(emp::MakeLiteral(1.234) == "1.234");
 
-  CHECK(emp::is_alphanumeric("39adg18af3tj05ykty81734"));
-  CHECK(!emp::is_alphanumeric("39adg18af?3tj05ykty81734"));
+  CHECK(special_string.AsEscaped() == escaped_string);
+  CHECK(special_string.AsEscaped() == escaped_string);
 
-  CHECK(emp::is_literal_char("'f'"));
-  CHECK(emp::is_literal_char("' '"));
-  CHECK(!emp::is_literal_char("f"));
-  CHECK(emp::is_literal_char("'\n'"));
-  CHECK(!emp::is_literal_char("'\\'"));
-  CHECK(emp::from_literal_char("'f'") == 'f');
-  CHECK(emp::from_literal_char("'\n'") == '\n');
-  CHECK(emp::is_literal_string("\"He llo!\""));
-  CHECK(!emp::is_literal_string("\"\\\\He\"llo!\""));
-  CHECK(emp::is_literal_string("\"Hel\n\t\r\\\'lo!\""));
-  CHECK(emp::is_literal_string("\"Hel\n \t \r \'lo!\""));
-  CHECK(emp::from_literal_string("\"Hello!\"") == "Hello!");
-  CHECK(emp::from_literal_string("\"Hel\n \t \r \'lo!\"") == "Hel\n \t \r \'lo!");
+  emp::String base_string = "This is an okay string.\n  \tThis\nis   -MY-    very best string!!!!   ";
 
-  // TODO: try this with more arguments
-  int one;
-  emp::from_string<int>("1", one);
-  CHECK(one == 1);
-  */
+  CHECK(emp::MakeSlugify(base_string) == "this-is-an-okay-string-this-is-my-very-best-string");
+
+  emp::String first_line = base_string.PopLine();
+
+  CHECK(first_line == "This is an okay string.");
+  CHECK(first_line.ViewWord() == "This");
+
+  CHECK(first_line.PopWord() == "This");
+  CHECK(first_line == "is an okay string.");
+
+  CHECK(first_line.RemoveWhitespace() == "isanokaystring.");
+
+  CHECK(first_line.Pop("ns") == "i");
+  CHECK(first_line == "anokaystring.");
+
+  emp::String popped_str = first_line.Pop("ns");
+  CHECK(popped_str == "a");
+  CHECK(first_line == "okaystring.");
+
+  popped_str = first_line.Pop('y');
+  CHECK(popped_str == "oka");
+  CHECK(first_line == "string.");
+
+  CHECK(base_string.TrimFront() == "This\nis   -MY-    very best string!!!!   ");
+  CHECK(base_string.TrimBack() == "This\nis   -MY-    very best string!!!!");
+  CHECK(base_string.Compress() == "This is -MY- very best string!!!!");
+}
+
+
+TEST_CASE("Test Stirng assign and Macro functions", "[tools]")
+{
+  emp::String test = "TIMES(abc,3) + TIMES(def,2) + TIMES(g, 8)";
+  test.ReplaceMacro("TIMES(", ")",
+    [](emp::String check_body, size_t, size_t) {
+      emp::String pattern = check_body.Pop(',');
+      size_t count = check_body.As<size_t>();
+      return pattern * count;
+    });
+
+  CHECK(test == "abcabcabc + defdef + gggggggg");
+
+  test = "MACRO(ABC);\n  MACRO(\"DEF\");\n MACRO( \"([{\");\n  and normal;";
+  test.ReplaceMacro("MACRO(", ")",
+    [](emp::String check_body, size_t, size_t) { return emp::MakeString("[[[", check_body, "]]]"); }
+  );
+  CHECK(test == "[[[ABC]]];\n  [[[\"DEF\"]]];\n [[[ \"([{\"]]];\n  and normal;");
 }
 
 /*
 TEST_CASE("Another Test string_utils", "[tools]")
 {
-
-  // TEST1: lets test our conversion to an escaped string.
-  const std::string special_string = "This\t5tr1ng\nis\non THREE (3) \"lines\".";
-  std::string escaped_string = emp::to_escaped_string(special_string);
-
-  // note: we had to double-escape the test to make sure this worked.
-  CHECK(escaped_string == "This\\t5tr1ng\\nis\\non THREE (3) \\\"lines\\\".");
-
-  // TEST2: Test more general conversion to literals.
-  CHECK(emp::to_literal(42) == "42");
-  CHECK(emp::to_literal('a') == "'a'");
-  CHECK(emp::to_literal('\t') == "'\\t'");
-  CHECK(emp::to_literal(1.234) == "1.234000");
-
-  // TEST3: Make sure that we can properly identify different types of characters.
-  int num_ws = 0;
-  int num_cap = 0;
-  int num_lower = 0;
-  int num_let = 0;
-  int num_num = 0;
-  int num_alphanum = 0;
-  int num_i = 0;
-  int num_vowel = 0;
-  for (char cur_char : special_string) {
-    if (emp::is_whitespace(cur_char)) num_ws++;
-    if (emp::is_upper_letter(cur_char)) num_cap++;
-    if (emp::is_lower_letter(cur_char)) num_lower++;
-    if (emp::is_letter(cur_char)) num_let++;
-    if (emp::is_digit(cur_char)) num_num++;
-    if (emp::is_alphanumeric(cur_char)) num_alphanum++;
-    if (emp::is_valid(cur_char, [](char c){ return c=='i'; })) num_i++;
-    if (emp::is_valid(cur_char, [](char c){return c=='a' || c=='A';},
-                      [](char c){return c=='e' || c=='E';},
-                      [](char c){return c=='i' || c=='I';},
-                      [](char c){return c=='o' || c=='O';},
-                      [](char c){return c=='u' || c=='U';},
-                      [](char c){return c=='y';}
-                      )) num_vowel++;
-  }
-  int num_other = ((int) special_string.size()) - num_alphanum - num_ws;
-
-
-  CHECK(num_ws == 6);
-  CHECK(num_cap == 6);
-  CHECK(num_lower == 16);
-  CHECK(num_let == 22);
-  CHECK(num_num == 3);
-  CHECK(num_alphanum == 25);
-  CHECK(num_other == 5);
-  CHECK(num_i == 3);
-  CHECK(num_vowel == 7);
-
-  std::string base_string = "This is an okay string.\n  \tThis\nis   -MY-    very best string!!!!   ";
-
-  CHECK(
-    emp::slugify(base_string)
-    == "this-is-an-okay-string-this-is-my-very-best-string"
-  );
-
-  std::string first_line = emp::string_pop_line(base_string);
-
-  CHECK(first_line == "This is an okay string.");
-  CHECK(emp::string_get_word(first_line) == "This");
-
-  emp::string_pop_word(first_line);
-
-  CHECK(first_line == "is an okay string.");
-
-  emp::remove_whitespace(first_line);
-
-  CHECK(first_line == "isanokaystring.");
-
-  std::string popped_str = emp::string_pop(first_line, "ns");
-
-  CHECK(popped_str == "i");
-  CHECK(first_line == "anokaystring.");
-
-
-  popped_str = emp::string_pop(first_line, "ns");
-
-
-  CHECK(popped_str == "a");
-  CHECK(first_line == "okaystring.");
-
-
-  popped_str = emp::string_pop(first_line, 'y');
-
-  CHECK(popped_str == "oka");
-  CHECK(first_line == "string.");
-
-  emp::left_justify(base_string);
-  CHECK(base_string == "This\nis   -MY-    very best string!!!!   ");
-
-  emp::right_justify(base_string);
-  CHECK(base_string == "This\nis   -MY-    very best string!!!!");
-
-  emp::compress_whitespace(base_string);
-  CHECK(base_string == "This is -MY- very best string!!!!");
-
 
   std::string view_test = "This is my view test!";
   CHECK( emp::view_string(view_test) == "This is my view test!" );
@@ -254,15 +363,6 @@ TEST_CASE("Another Test string_utils", "[tools]")
   CHECK( emp::view_string_to(view_test, ' ') == "This" );
   CHECK( emp::view_string_to(view_test, ' ', 5) == "is" );
 
-  // Do some tests on quotes in strings...
-  std::string quotes = "\"abc\"\"def\"123 \"\"\"long\\\"er\"";  // "abc""def"123 """long\"er"
-  CHECK( emp::find_quote_match(quotes) == 4 );
-  CHECK( emp::find_quote_match(quotes, 1) == 1 );
-  CHECK( emp::find_quote_match(quotes, 5) == 9 );
-  CHECK( emp::find_quote_match(quotes, 10) == 10 );
-  CHECK( emp::find_quote_match(quotes, 14) == 15 );
-  CHECK( emp::find_quote_match(quotes, 16) == 25 );
-
   CHECK( emp::string_pop_quote(quotes) == "\"abc\"");
   CHECK( emp::string_pop_quote(quotes) == "\"def\"");
   CHECK( emp::string_pop_quote(quotes) == "");
@@ -271,39 +371,6 @@ TEST_CASE("Another Test string_utils", "[tools]")
   CHECK( emp::string_pop_quote(quotes) == "\"long\\\"er\"");
   CHECK( emp::string_pop_quote(quotes) == "");
 
-  // Do some tests on parentheses matching...
-  std::string parens = "(()(()()))((())\")))))()\")";
-  CHECK( emp::find_paren_match(parens) == 9 );
-  CHECK( emp::find_paren_match(parens, 0) == 9 );
-  CHECK( emp::find_paren_match(parens, 1) == 2 );
-  CHECK( emp::find_paren_match(parens, 2) == 2 );
-  CHECK( emp::find_paren_match(parens, 3) == 8 );
-  CHECK( emp::find_paren_match(parens, 3) == 8 );
-  CHECK( emp::find_paren_match(parens, 10) == 24 );
-  CHECK( emp::find_paren_match(parens, 11) == 14 );
-  CHECK( emp::find_paren_match(parens, 21) == 22 ); // Works inside a quote if start there.
-  CHECK( emp::find_paren_match(parens, 10,'(',')',true) == 24 );  // Specify parens and show works.
-  CHECK( emp::find_paren_match(parens, 10,'(',')',false) == 16 ); // Do no ignore quotes.
-  CHECK( emp::find_paren_match(parens, 10,'a','b',false) == 10 ); // Using non-parens works.
-
-  // Extra tests with braces and single quotes.
-  std::string braces = "{{}{}}{'{}}'}";
-  CHECK( emp::find_paren_match(braces, 0) == 0 );
-  CHECK( emp::find_paren_match(braces, 0, '{', '}') == 5 );
-  CHECK( emp::find_paren_match(braces, 1, '{', '}') == 2 );
-  CHECK( emp::find_paren_match(braces, 3, '{', '}') == 4 );
-  CHECK( emp::find_paren_match(braces, 6, '{', '}') == 12 );  // Across single quotes
-  CHECK( emp::find_paren_match(braces, 6, '{', '}', false) == 10 ); // Don't ignore quotes.
-
-  // Test a multi-find.
-  emp::vector<size_t> found = emp::find_all(view_test, ' ');
-  CHECK( found == emp::vector<size_t>{4,7,10,15} );
-  emp::find_all(view_test, 'i', found);
-  CHECK( found == emp::vector<size_t>{2,5,12} );
-  emp::find_all(parens, ')', found);
-  CHECK( found == emp::vector<size_t>{2,5,7,8,9,13,14,16,17,18,19,20,22,24} );
-  emp::find_all(parens, ')', found, true); // Ignore items in quotes.
-  CHECK( found == emp::vector<size_t>{2,5,7,8,9,13,14,24} );
 
   emp::vector<std::string_view> slice_view = emp::view_slices(view_test, ' ');
   CHECK( slice_view.size() == 5 );

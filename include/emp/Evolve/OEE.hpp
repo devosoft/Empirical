@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file OEE.hpp
+ *  @file
  *  @brief TODO.
  */
 
@@ -11,6 +12,7 @@
 #define EMP_EVOLVE_OEE_HPP_INCLUDE
 
 #include <deque>
+#include <stddef.h>
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"

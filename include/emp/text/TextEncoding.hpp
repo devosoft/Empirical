@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2023.
- *
- *  @file TextEncoding.hpp
+ *  @file
  *  @brief Plugs into emp::Text with the specification of a given encoding.
  *  @note Status: ALPHA
  *
@@ -25,7 +26,7 @@
 
 namespace emp {
 
-  class TextEncoding : public emp::TextEncoding_Base {
+  class TextEncoding : public emp::TextEncoding_Interface {
   protected:
 
     // Tags have three possible things they can do:
@@ -176,7 +177,7 @@ namespace emp {
 
 
     // Append a string that has already been otherwise processed.
-    void Append_RawText(const String & in) {
+    void Append_RawText(Text & text, const String & in) {
       size_t start = text.size();
       size_t end = start + in.size();
       text.Append_Raw(in);
@@ -185,7 +186,7 @@ namespace emp {
       }
     }
 
-    void Append_Tag(int token_id, const String & lexeme) {
+    void Append_Tag(Text & text, int token_id, const String & lexeme) {
       Tag & tag = tag_set[ token_to_tag_id[token_id] ];
 
       // If this token might END a style, search for options.
@@ -232,7 +233,7 @@ namespace emp {
       text_token = lexer.AddToken("plain text", ".");
     }
 
-    void _EncodeChar(String & out_string, const size_t char_pos) const {
+    void _EncodeChar(const Text & text, String & out_string, const size_t char_pos) const {
       const char c = text.GetChar(char_pos);
       // If there is a tag associated with this character AND the associated type (if any) use tag.
       if (char_tags[c]) {
@@ -246,16 +247,15 @@ namespace emp {
       }
     }
 
-    void _EncodeTo(String & out_string, size_t & start, const size_t end) const {
+    void _EncodeTo(const Text & text, String & out_string, size_t & start, const size_t end) const {
       while (start < end) {
-        _EncodeChar(out_string, start);
+        _EncodeChar(text, out_string, start);
         ++start;
       }
     }
 
   public:
-    TextEncoding(Text & _text, const String & _name="html")
-      : TextEncoding_Base(_text, _name) {
+    TextEncoding() : TextEncoding_Interface() {
         Tag default_tag;
         default_tag.name = "__default_tag__";
         default_tag.id = 0;
@@ -270,22 +270,35 @@ namespace emp {
       }
     ~TextEncoding() = default;
 
+    // Reset the current encoding to clear all tag knowledge for this encoding.
+    void Reset() {
+      tag_set.resize(1);           // Reduce down to just the default tag.
+      style_set.resize(0);         // Reduce down to just the default style.
+      char_tags.fill(0);           // Clear all character tags.
+      pattern_to_tag_id.clear();   // Remove all references to tags
+      token_to_tag_id.clear();
+      name_to_style_id.size();
+      active_styles.resize(0);     // All active styles turn off on changing encodings.
+      text_token = -1;             // Allow the lexer to reset.
+      lexer.Reset();
+    }
+
     // Add new text into this object, translated as needed
-    void Append(const String & in) override {
+    void Append(Text & text, const String & in) override {
       SetupLexer();
-      auto tokens = lexer.Tokenize(in.cpp_str());
+      auto tokens = lexer.Tokenize(in.str());
       String raw_text;  // Place to accumulate raw text.
       for (const auto & token : tokens) {
         if (token.id == text_token) raw_text += token.lexeme;
         else {
-          if (raw_text.size()) Append_RawText(raw_text.PopAll());
-          Append_Tag(token.id, token.lexeme);
+          if (raw_text.size()) Append_RawText(text, raw_text.PopAll());
+          Append_Tag(text, token.id, token.lexeme);
         }
       }
-      if (raw_text.size()) Append_RawText(raw_text.PopAll());
+      if (raw_text.size()) Append_RawText(text, raw_text.PopAll());
     }
 
-    String Encode() const override {
+    String Encode(const Text & text) const override {
       // Determine where tags should be placed.
       std::map<size_t, String> tag_map;
       emp::vector<String> style_list = text.GetStyles();
@@ -293,17 +306,18 @@ namespace emp {
         String style_name = style_desc.Pop(":");
         const Style & style = style_set[ emp::Find(name_to_style_id, style_name, 0) ];
         if (!style.make_open_tag) continue; // If no tags are available, assume a replacement style.
-        AddOutputTags(tag_map, style_name, style.make_open_tag(style_desc), style.make_close_tag(style_desc));
+        AddOutputTags(text, tag_map, style_name,
+                      style.make_open_tag(style_desc), style.make_close_tag(style_desc));
       }
 
       // Convert the string, adding tags back in as we go.
       String out_string;
       size_t output_pos = 0;
       for (auto [tag_pos, tags] : tag_map) {
-        _EncodeTo(out_string, output_pos, tag_pos);
+        _EncodeTo(text, out_string, output_pos, tag_pos);
         out_string += tags;
       }
-      _EncodeTo(out_string, output_pos, text.size()); // Add final text after the last tag.
+      _EncodeTo(text, out_string, output_pos, text.size()); // Add final text after the last tag.
 
       return out_string;
     }
@@ -325,6 +339,7 @@ namespace emp {
     // A helper to add start and end tag info to tag map for insertion into
     // the output string as it's created.
     void AddOutputTags(
+      const Text & text,
       std::map<size_t, String> & tag_map,
       String style,
       String start_tag,
@@ -346,6 +361,37 @@ namespace emp {
       // Close any styles left open by the end.
       if (sites.back()) tag_map[sites.size()] += end_tag;
     }
+  };
+
+  template <typename ENCODING_T, typename... Ts>
+  emp::Text MakeEncodedText(Ts &&... args) {
+    Text out;                              // Create the text object
+    out.AddEncoding<ENCODING_T>();         // Setup the encoding
+    out.Append(std::forward<Ts>(args)...); // Append the inputs, if any
+    return out;                            // Return the finished product
+  }
+
+  template <typename ENCODING_T>
+  class EncodedText : public emp::Text {
+  private:
+    using this_t = EncodedText<ENCODING_T>;
+  public:
+    /// @brief Create a new, default EncodedText object.
+    EncodedText() { AddEncoding<ENCODING_T>(); };
+    EncodedText(const this_t & in) = default;
+
+    template <typename... Ts>
+    EncodedText(Ts &&... in) : EncodedText() {
+      Append(std::forward<Ts>(in)...);
+    }
+
+    this_t & operator=(const this_t &) = default;
+    this_t & operator=(this_t &&) = default;
+    template <typename T>
+    this_t & operator=(T && in) {
+      Text::operator=(std::forward<T>(in));
+      return *this;
+    };
   };
 
 }

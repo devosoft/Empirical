@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2022.
- *
- *  @file map_utils.hpp
+ *  @file
  *  @brief A set of simple functions to manipulate maps.
  *  @note Status: BETA
  */
@@ -13,12 +14,26 @@
 
 #include <algorithm>
 #include <map>
+#include <sstream>
+#include <string>
 #include <unordered_map>
 
 #include "../base/map.hpp"
 #include "../base/vector.hpp"
 
 namespace emp {
+
+  template <typename MAP_T>
+  std::string MapToString(const MAP_T & in_map) {
+    std::stringstream ss;
+    bool use_comma = false;
+    for (const auto & [key, value] : in_map) {
+      if (use_comma) ss << ",";
+      ss << "{" << key << ":" << value << "}";
+      use_comma = true;
+    }
+    return ss.str();
+  }
 
   /// Take any map type, and run find to determine if a key is present.
   template <class MAP_T, class KEY_T>
@@ -82,15 +97,12 @@ namespace emp {
   }
 
   template <class MAP_T>
-  inline auto Keys( const MAP_T & in_map) -> emp::vector<typename std::remove_const<decltype(in_map.begin()->first)>::type> {
-    using KEY_T = typename std::remove_const<decltype(in_map.begin()->first)>::type;
-    emp::vector<KEY_T> keys;
+  inline auto Keys( const MAP_T & in_map) {
+    emp::vector<typename MAP_T::key_type> keys;
     for (auto it : in_map) {
       keys.push_back(it.first);
     }
-
     return keys;
-
   }
 
 

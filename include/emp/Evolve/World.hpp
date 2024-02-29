@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
- *
- *  @file World.hpp
+ *  @file
  *  @brief Definition of a base class for a World template for use in evolutionary algorithms.
  *
  *  A definition of the emp::World template, linking in specialized file handling, iterators,
@@ -26,6 +27,7 @@
 
 #include <functional>
 #include <map>
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../base/Ptr.hpp"
@@ -365,8 +367,8 @@ namespace emp {
       return *(pop[id]);
     }
 
-    /// Retrieve a const reference to the organsim as the specified x,y coordinates.
-    /// @CAO: Technically, we should set this up with any number of coordinates.
+    /// Retrieve a const reference to the organism as the specified x,y coordinates.
+    // @CAO: Technically, we should set this up with any number of coordinates.
     ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*GetWidth()); }
 
     /// Retrive a pointer to the contents of a specified cell; will be nullptr if the cell is
@@ -941,6 +943,7 @@ namespace emp {
 
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // =============================================================
   // ===                                                       ===
   // ===  Out-of-class member function definitions from above  ===
@@ -1734,7 +1737,7 @@ namespace emp {
       os << std::endl;
     }
   }
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 
 #endif // #ifndef EMP_EVOLVE_WORLD_HPP_INCLUDE

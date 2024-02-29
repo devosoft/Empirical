@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020-2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020-2023.
- *
- *  @file string_utils.cpp
+ *  @file
  */
 
 #include "../third-party/Catch/single_include/catch2/catch.hpp"
@@ -384,32 +385,29 @@ TEST_CASE("Another Test string_utils", "[tools]")
   slices = emp::slice(
     "This is a test.",
     ' ',
-    0
+    1
   );
   CHECK(slices.size() == 1);
   CHECK(slices[0] == "This is a test.");
-  // CHECK(slices[0] == "This");
-
-  slices = emp::slice(
-    "This is a test.",
-    ' ',
-    1
-  );
-  CHECK(slices.size() == 2);
-  CHECK(slices[0] == "This");
-  CHECK(slices[1] == "is a test.");
-  // CHECK(slices[1] == "is");
 
   slices = emp::slice(
     "This is a test.",
     ' ',
     2
   );
+  CHECK(slices.size() == 2);
+  CHECK(slices[0] == "This");
+  CHECK(slices[1] == "is a test.");
+
+  slices = emp::slice(
+    "This is a test.",
+    ' ',
+    3
+  );
   CHECK(slices.size() == 3);
   CHECK(slices[0] == "This");
   CHECK(slices[1] == "is");
   CHECK(slices[2] == "a test.");
-  // CHECK(slices[2] == "a");
 
   // Try other ways of using slice().
   emp::slice(base_string, slices, 's');

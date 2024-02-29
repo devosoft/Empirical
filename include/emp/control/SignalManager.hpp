@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file SignalManager.hpp
+ *  @file
  *  @brief This file defines the SignalManager class, which collects sets of Signals to be looked up
  * or manipulated later.
  */
@@ -11,6 +12,8 @@
 #ifndef EMP_CONTROL_SIGNALMANAGER_HPP_INCLUDE
 #define EMP_CONTROL_SIGNALMANAGER_HPP_INCLUDE
 
+#include <cstdint>
+#include <stddef.h>
 #include <string>
 #include <unordered_map>
 

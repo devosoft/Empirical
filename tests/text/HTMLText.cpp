@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2022-2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022-23.
- *
- *  @file HTMLText.cpp
+ *  @file
  */
 
 #include <iostream>
@@ -11,7 +12,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/text/HTMLText.hpp"
+#include "emp/text/HTMLEncoding.hpp"
 
 TEST_CASE("Testing HTMLText", "[text]") {
   emp::HTMLText text("Test Text");
@@ -83,4 +84,15 @@ TEST_CASE("Testing HTMLText", "[text]") {
   emp::HTMLText text2 = "Now let's try something with a non-breaking&nbsp;space.";
   REQUIRE(text2.GetText() == "Now let's try something with a non-breaking space.");
   REQUIRE(text2.Encode() == "Now let's try something with a non-breaking&nbsp;space.");
+
+  // Play with merging and converting.
+  emp::HTMLText part1 = "Part 1 of text;";
+  emp::HTMLText part2 = "And now part 2 of text.";
+  part1.Bold(5,6);
+  part2.Bold(13,14);
+  part2.Italic(18,22);
+
+  emp::Text merged = emp::MakeHTMLText(part1, " ", part2);
+  REQUIRE(merged.GetText() == "Part 1 of text; And now part 2 of text.");
+  REQUIRE(merged.Encode() == "Part <b>1</b> of text; And now part <b>2</b> of <i>text</i>.");
 }

@@ -29,34 +29,11 @@ for collecting data over the course of a computational experiment.
 
 ## Data Tools API
 
-### DataNodes
-
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
 ```{eval-rst}
-.. doxygenfile:: emp/data/DataNode.hpp
-  :project: Empirical
-  :no-link:
-```
+.. toctree::
+   :glob:
 
-### DataManagers
-
-```{eval-rst}
-.. doxygenfile:: emp/data/DataManager.hpp
-  :project: Empirical
-  :no-link:
-```
-
-### DataInterfaces
-
-```{eval-rst}
-.. doxygenfile:: emp/data/DataInterface.hpp
-  :project: Empirical
-  :no-link:
-```
-
-### DataFiles
-
-```{eval-rst}
-.. doxygenfile:: emp/data/DataFile.hpp
-  :project: Empirical
-  :no-link:
+   api/*
 ```

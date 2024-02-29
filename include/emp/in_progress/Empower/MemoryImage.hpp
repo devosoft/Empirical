@@ -1,14 +1,17 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
- *
- *  @file MemoryImage.hpp
+ *  @file
  *  @brief A collection of arbitrary objects stored in a chunk of memory.
  */
 
 #ifndef EMP_IN_PROGRESS_EMPOWER_MEMORYIMAGE_HPP_INCLUDE
 #define EMP_IN_PROGRESS_EMPOWER_MEMORYIMAGE_HPP_INCLUDE
+
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"

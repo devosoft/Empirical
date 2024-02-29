@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
- *
- *  @file ActionManager.hpp
+ *  @file
  *  @brief ActionManager collects sets of Actions to be looked up or manipulated later.
  *  @note Status: Beta
  */
@@ -11,6 +12,7 @@
 #ifndef EMP_CONTROL_ACTIONMANAGER_HPP_INCLUDE
 #define EMP_CONTROL_ACTIONMANAGER_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 #include <unordered_map>
 

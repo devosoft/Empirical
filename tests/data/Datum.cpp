@@ -1,12 +1,15 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022
- *
- *  @file Datum.cpp
+ *  @file
  */
 
+#ifndef CATCH_CONFIG_MAIN
 #define CATCH_CONFIG_MAIN
+#endif
 
 #ifndef EMP_TRACK_MEM
 #define EMP_TRACK_MEM
@@ -122,4 +125,60 @@ TEST_CASE("Test Datum", "[data]")
   CHECK(x == 123.0);
   CHECK(y == "123");
 
+}
+
+TEST_CASE("Test Datum Math", "[data]")
+{
+  emp::Datum d2(2.0);
+  emp::Datum d3(3.0);
+  emp::Datum ds("Num:");
+
+  CHECK(d2 + 1.0 == d3);
+  CHECK(d2 + d3 == 5.0);
+  CHECK(d3 + 3.0 == 6.0);
+  CHECK(ds + 1.5 == "Num:1.500000");
+
+  CHECK(d2 * 2.0 == 4.0);
+  CHECK(d3 * 3.0 == 9.0);
+  CHECK(ds * 4.0 == "Num:Num:Num:Num:");
+
+  CHECK(d2 - 1.0 == 1.0);
+  CHECK(d3 - 1.0 == 2.0);
+
+  CHECK(d2 / 2.0 == 1.0);
+  CHECK(d3 / 2.0 == 1.5);
+
+  CHECK(d3 % 2.0 == 1.0);
+
+  CHECK(1.0 + d2 == d3);
+  CHECK(3.0 + d3 == 6.0);
+  CHECK(2.0 * d2 == 4.0);
+  CHECK(5.0 - d2 == 3.0);
+  CHECK(12.0 / d3 == 4.0);
+  CHECK(13.0 % d3 == 1.0);
+
+  d2 += d3;
+  CHECK(d2 == 5.0);
+  d2 += 2.0;
+  CHECK(d2 == 7.0);
+  d2 -= 4.0;
+  CHECK(d2 == 3.0);
+  d2 *= 10.0;
+  CHECK(d2 == 30.0);
+  d2 /= 6.0;
+  CHECK(d2 == 5.0);
+  d2 %= 3.0;
+  CHECK(d2 == 2.0);
+
+  CHECK(+d2 == 2.0);
+  CHECK(-d2 == -2.0);
+  CHECK(!d2 == false);
+
+  ds += "string";
+  CHECK(ds == "Num:string");
+
+  double dval = d2;
+  std::string sval = ds;
+  CHECK(dval == 2.0);
+  CHECK(sval == "Num:string");
 }

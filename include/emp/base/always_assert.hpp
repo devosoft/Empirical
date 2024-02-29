@@ -1,11 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020-2021.
- *
- *  @file always_assert.hpp
+ *  @file
  *  @brief A more dynamic replacement for standard library asserts.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *  A replacement for the system-level assert.h, called "emp_always_assert"
  *  Added functionality:
@@ -21,7 +22,7 @@
  *     int a = 6;
  *     emp_always_assert(a==5, a);
  *
- *  Unlinke "emp_assert", "emp_always_assert" will trigger an assertion error
+ *  Unlike "emp_assert", "emp_always_assert" will trigger an assertion error
  *  whether compiled in debug mode or not.
  *
  */
@@ -58,7 +59,7 @@
 
   #define emp_always_assert_impl(TEST) emp_always_assert_msvc_impl(TEST)
 
-#elif defined(IN_PYTHON)
+#elif defined(EMP_OPTIONAL_THROW_ON)
 
   #define emp_always_assert_impl(...)                                     \
     do {                                                                  \

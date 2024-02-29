@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
- *
- *  @file Trait.hpp
+ *  @file
  *  @brief Directly measure a target quality about a type of object.
  *
  *  These objects are able to measure a specific trait on another object.  They
@@ -13,6 +14,7 @@
 #ifndef EMP_DATA_TRAIT_HPP_INCLUDE
 #define EMP_DATA_TRAIT_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 
 #include "../base/assert.hpp"
@@ -83,7 +85,7 @@ namespace emp {
     void SetMax(value_t max) { range.SetUpper(max); }
 
     value_t Eval(target_t & target) const { return fun(target); }
-    value_t EvalLimit(target_t & target) const { return range.Limit(fun(target)); }
+    value_t EvalLimit(target_t & target) const { return range.Clamp(fun(target)); }
     std::string EvalString(target_t & target) const { return std::to_string(EvalLimit(target)); }
     double EvalValue(target_t & target) const { return (double) EvalLimit(target); }
 

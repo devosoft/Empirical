@@ -1,11 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2021.
- *
- *  @file Random.hpp
+ *  @file
  *  @brief A versatile and non-patterned pseudo-random-number generator.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  */
 
 #ifndef EMP_MATH_RANDOM_HPP_INCLUDE
@@ -13,9 +14,11 @@
 
 #include <climits>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <iterator>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
@@ -24,7 +27,9 @@
 #include "Range.hpp"
 
 namespace emp {
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   using namespace emp;
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   ///  Middle Square Weyl Sequence: A versatile and non-patterned pseudo-random-number
   ///  generator.
@@ -87,6 +92,10 @@ namespace emp {
       original_seed = weyl_state;
 
       weyl_state *= 2;  // Make sure starting state is even.
+
+      // Reset other internal state
+      value = 0;
+      expRV = 0.0;
 
       Get(); // Prime the new sequence by skipping the first number.
     }

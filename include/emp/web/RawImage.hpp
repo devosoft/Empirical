@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
- *
- *  @file RawImage.hpp
+ *  @file
  *  @brief Handle the fundamental loading of an image (without Widget tracking)
  */
 
@@ -12,6 +13,7 @@
 
 #include <functional>
 #include <map>
+#include <stddef.h>
 #include <string>
 #include <vector>
 

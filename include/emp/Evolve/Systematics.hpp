@@ -1,11 +1,11 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2024
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2023
- *
- *  @file Systematics.hpp
- *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
- *
+ *  @file
+ *  @brief TODO.
  *  @todo We should provide an option to back up systematics data to a file so that it doesn't all
  *        need to be kept in memory, especially if we're only doing post-analysis.
  *  @todo This inheritance system makes adding new systematics-related data tracking kind of a pain.
@@ -420,6 +420,7 @@ namespace emp {
     virtual int GetMaxDepth() = 0;
     virtual int GetPhylogeneticDiversity() const = 0;
     virtual double GetMeanPairwiseDistance(bool branch_only) const = 0;
+    virtual double GetSumDistance() const = 0;
     virtual double GetSumPairwiseDistance(bool branch_only) const = 0;
     virtual double GetVariancePairwiseDistance(bool branch_only) const = 0;
     virtual emp::vector<double> GetPairwiseDistances(bool branch_only) const = 0;
@@ -494,6 +495,7 @@ namespace emp {
     using parent_t::GetNumTaxa;
     using parent_t::GetPhylogeneticDiversity;
     using parent_t::GetMeanPairwiseDistance;
+    using parent_t::GetSumDistance;
     using parent_t::GetSumPairwiseDistance;
     using parent_t::GetVariancePairwiseDistance;
     using parent_t::GetPairwiseDistances;
@@ -1088,6 +1090,21 @@ namespace emp {
     double GetMeanPairwiseDistance(bool branch_only=false) const {
       emp::vector<double> dists = GetPairwiseDistances(branch_only);
       return (double)Sum(dists)/dists.size();
+    }
+
+    /** Calculates summed branch lengths of tree. Tucker et al 2017 points
+     *  out that this is a measure of phylogenetic richness.
+     */
+    double GetSumDistance() const {
+      const auto op = [](const double a, const Ptr<taxon_t>& t){
+        const auto branch = t->GetParent() ? t->GetOriginationTime() - t->GetParent()->GetOriginationTime(): 0.0;
+        return a + branch;
+      };
+      return std::accumulate(
+        std::begin(active_taxa), std::end(active_taxa), double{}, op
+      ) + std::accumulate(
+        std::begin(ancestor_taxa), std::end(ancestor_taxa), double{}, op
+      );
     }
 
     /** Calculates summed pairwise distance between extant taxa. Tucker et al 2017 points
@@ -2164,7 +2181,7 @@ namespace emp {
     } else{
 
       emp::File generation_percentiles(filename); //opens file
-      emp::vector< emp::vector<double> >percentile_data = generation_percentiles.ToData<double>(','); //turns file contents into vector
+      emp::vector< emp::vector<double> >percentile_data = generation_percentiles.ToData<double>(","); //turns file contents into vector
 
       for(int j = 0; j <= percentile_data[gen_value].size() - 2; j++){ //searches through vector for slot where phylo diversity fits
 
@@ -2209,7 +2226,7 @@ namespace emp {
 
     // Load files
     emp::File in_file(file_path);
-    emp::vector<std::string> header = in_file.ExtractRow();
+    emp::vector<emp::String> header = in_file.ExtractRow();
 
     // Find column ids
     auto id_pos_it = std::find(header.begin(), header.end(), "id");

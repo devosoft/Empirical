@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2022.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2022.
- *
- *  @file RegEx.hpp
+ *  @file
  *  @brief Basic regular expression handler.
  *  @note Status: BETA
  *
@@ -42,6 +43,7 @@
 
 #include <ostream>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 
 #include "../base/Ptr.hpp"

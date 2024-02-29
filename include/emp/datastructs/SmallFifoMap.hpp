@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
- *
- *  @file SmallFifoMap.hpp
+ *  @file
  *  @brief Store key value pairs in a fixed-sized array, bumping out the oldest
  *  value when full. Optimized for small N. Requires N < 256.
  *
@@ -13,6 +14,7 @@
 #define EMP_DATASTRUCTS_SMALLFIFOMAP_HPP_INCLUDE
 
 #include <algorithm>
+#include <stddef.h>
 #include <utility>
 
 #include "../base/array.hpp"
@@ -27,8 +29,8 @@ class SmallFifoMap {
   using value_type = std::pair<Key, Value>;
 
 private:
-  // TODO: Turn this back into an emp::array once iterator is fixed
-  using storage_t = std::array<value_type, N>;
+
+  using storage_t = emp::array<value_type, N>;
 
   storage_t storage;
 

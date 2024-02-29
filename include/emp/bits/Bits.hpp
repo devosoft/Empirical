@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2022-23
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022.
- *
- *  @file Bits.hpp
+ *  @file
  *  @brief A generic bit-handler to replace vector<bool>, etc +additional bitwise logic features.
  *  @note Status: RELEASE
  *
@@ -64,6 +65,7 @@
 #include "../math/constants.hpp"
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
+#include "../math/Range.hpp"
 #include "../meta/type_traits.hpp"
 
 #include "Bits_Data.hpp"
@@ -283,6 +285,9 @@ namespace emp {
 
     /// @brief How many bits do we currently have?
     [[nodiscard]] constexpr auto GetSize() const { return _data.NumBits(); }
+
+    /// @brief How many bits are locked in a compile time?
+    [[nodiscard]] static constexpr auto GetCTSize() { return DATA_T::NumCTBits(); }
 
     /// @brief How many bytes are in this Bits? (includes empty field space)
     [[nodiscard]] constexpr auto GetNumBytes() const { return _data.NumBytes(); }
@@ -558,6 +563,11 @@ namespace emp {
     /// @param num number of bits to be pushed.
     void PushBack(const bool bit=true, const size_t num=1);
 
+    /// @brief Push given bit(s) onto the front of a vector.
+    /// @param bit value of bit to be pushed.
+    /// @param num number of bits to be pushed.
+    void PushFront(const bool bit=true, const size_t num=1);
+
     /// @brief Insert bit(s) into any index of vector using bit magic.
     /// Blog post on implementation reasoning: https://devolab.org/?p=2249
     /// @param index location to insert bit(s).
@@ -574,6 +584,10 @@ namespace emp {
     /// @brief Return the position of the first one; return -1 if no ones in vector.
     [[nodiscard]] int FindOne() const;
 
+    /// @brief Return the position of the first zero; return -1 if no zeroes in vector.
+    [[nodiscard]] int FindZero() const;
+
+
     /// Deprecated: Return the position of the first one; return -1 if no ones in vector.
     [[deprecated("Renamed to more accurate FindOne()")]]
     [[nodiscard]] int FindBit() const { return FindOne(); }
@@ -582,12 +596,24 @@ namespace emp {
     /// You can loop through all 1-bit positions of Bits object "bits" with:
     ///
     ///   for (int pos = bits.FindOne(); pos >= 0; pos = bits.FindOne(pos+1)) { ... }
-    ///
+
     [[nodiscard]] int FindOne(const size_t start_pos) const;
 
-    /// @brief Special version of FindOne takes int; most common way to call.
+    /// @brief Return the position of the first zero after start_pos (or -1 if none)
+    /// You can loop through all 0-bit positions of Bits object "bits" with:
+    ///
+    ///   for (int pos = bits.FindZero(); pos >= 0; pos = bits.FindZero(pos+1)) { ... }
+
+    [[nodiscard]] int FindZero(const size_t start_pos) const;
+
+    /// @brief Special version of FindOne takes int; common way to call.
     [[nodiscard]] int FindOne(int start_pos) const {
       return FindOne(static_cast<size_t>(start_pos));
+    }
+
+    /// @brief Special version of FindZero takes int; common way to call.
+    [[nodiscard]] int FindZero(int start_pos) const {
+      return FindZero(static_cast<size_t>(start_pos));
     }
 
     /// Deprecated version of FindOne().
@@ -613,6 +639,10 @@ namespace emp {
 
     /// @brief Find the length of the longest continuous series of ones.
     [[nodiscard]] size_t LongestSegmentOnes() const;
+
+    /// @brief Find ids of all groups of ones.
+    /// @return A vector of ranges that identify all ids of ones.
+    [[nodiscard]] emp::vector<emp::Range<size_t>> GetRanges() const;
 
     /// @brief Return true if any ones are in common with another Bits.
     [[nodiscard]] bool HasOverlap(const Bits & in) const;
@@ -807,7 +837,7 @@ namespace emp {
     const Bits & operator-=(const Bits & ar2) { return SUB_SELF(ar2); }
 
 
-    // =========  Cereal Compatability  ========= //
+    // =========  Cereal Compatibility  ========= //
 
     /// @brief Setup this bits object so that it can be stored in an archive and re-loaded.
     template <class Archive>
@@ -1456,7 +1486,7 @@ namespace emp {
     else if (p < 0.88) RandomizeP<Random::PROB_87_5>(random, start_pos, stop_pos);
     else SetRange(start_pos, stop_pos);
 
-    size_t cur_ones = CountOnes(start_pos, stop_pos) - kept_ones;
+    size_t cur_ones = CountOnes() - kept_ones;
 
     // Do we need to add more ones?
     while (cur_ones < (size_t) target_ones) {
@@ -1795,6 +1825,16 @@ namespace emp {
     if (bit) SetRange(GetSize()-num, GetSize());
   }
 
+  /// Push given bit(s) onto the front of a vector.
+  /// @param bit value of bit to be pushed.
+  /// @param num number of bits to be pushed.
+  template <typename DATA_T, bool ZERO_LEFT>
+  void Bits<DATA_T,ZERO_LEFT>::PushFront(const bool bit, const size_t num) {
+    Resize(GetSize() + num);
+    SHIFT_SELF(num);
+    if (bit) SetRange(0, num);
+  }
+
   /// Insert bit(s) into any index of vector using bit magic.
   /// Blog post on implementation reasoning: https://devolab.org/?p=2249
   /// @param index location to insert bit(s).
@@ -1802,11 +1842,11 @@ namespace emp {
   /// @param num number of bits to insert, default 1.
   template <typename DATA_T, bool ZERO_LEFT>
   void Bits<DATA_T,ZERO_LEFT>::Insert(const size_t index, const bool val, const size_t num) {
-    Resize(GetSize() + num);                 // Adjust to new number of bits.
-    Bits<DATA_T,ZERO_LEFT> low_bits(*this);              // Copy current bits
+    Resize(GetSize() + num);                // Adjust to new number of bits.
+    Bits<DATA_T,ZERO_LEFT> low_bits(*this); // Copy current bits
     SHIFT_SELF(-(int)num);                  // Shift the high bits into place.
     Clear(0, index+num);                    // Reduce current to just high bits.
-    low_bits.Clear(index, GetSize());        // Reduce copy to just low bits.
+    low_bits.Clear(index, GetSize());       // Reduce copy to just low bits.
     if (val) SetRange(index, index+num);    // If new bits should be ones, make it so.
     OR_SELF(low_bits);                      // Put the low bits back in place.
   }
@@ -1832,6 +1872,16 @@ namespace emp {
       (int) (find_bit(_data.bits[field_id]) + (field_id * FIELD_BITS))  :  -1;
   }
 
+  /// Return the position of the first zero; return -1 if no zeros in vector.
+  template <typename DATA_T, bool ZERO_LEFT>
+  int Bits<DATA_T,ZERO_LEFT>::FindZero() const {
+    const size_t NUM_FIELDS = _data.NumFields();
+    size_t field_id = 0;
+    while (field_id < NUM_FIELDS && _data.bits[field_id]==FIELD_ALL) field_id++;
+    return (field_id < NUM_FIELDS) ?
+      (int) (find_bit(~_data.bits[field_id]) + (field_id * FIELD_BITS))  :  -1;
+  }
+
   /// Return the position of the first one after start_pos; return -1 if no ones in vector.
   /// You can loop through all 1-bit positions in "bits" with:
   ///
@@ -1839,9 +1889,9 @@ namespace emp {
 
   template <typename DATA_T, bool ZERO_LEFT>
   int Bits<DATA_T,ZERO_LEFT>::FindOne(const size_t start_pos) const {
-    if (start_pos >= GetSize()) return -1;            // If we're past the end, return fail.
-    size_t field_id  = FieldID(start_pos);           // What field do we start in?
-    const size_t field_pos = FieldPos(start_pos);    // What position in that field?
+    if (start_pos >= GetSize()) return -1;          // If we are past the end, return fail.
+    size_t field_id = FieldID(start_pos);           // What field do we start in?
+    const size_t field_pos = FieldPos(start_pos);   // What position in that field?
 
     // If there's a hit in a partial first field, return it.
     if (field_pos && (_data.bits[field_id] & ~(MaskField(field_pos)))) {
@@ -1855,6 +1905,31 @@ namespace emp {
     while (field_id < NUM_FIELDS && _data.bits[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
       (int) (find_bit(_data.bits[field_id]) + (field_id * FIELD_BITS)) : -1;
+  }
+
+  /// Return the position of the first zero after start_pos; return -1 if no zeroes in vector.
+  /// You can loop through all 0-bit positions in "bits" with:
+  ///
+  ///   for (int pos = bits.FindZero(); pos >= 0; pos = bits.FindZero(pos+1)) { ... }
+
+  template <typename DATA_T, bool ZERO_LEFT>
+  int Bits<DATA_T,ZERO_LEFT>::FindZero(const size_t start_pos) const {
+    if (start_pos >= GetSize()) return -1;          // If we are past the end, return fail.
+    size_t field_id = FieldID(start_pos);           // What field do we start in?
+    const size_t field_pos = FieldPos(start_pos);   // What position in that field?
+
+    // If there's a hit in a partial first field, return it.
+    if (field_pos && (~_data.bits[field_id] & ~(MaskField(field_pos)))) {
+      return (int) (~find_bit(_data.bits[field_id] & ~(MaskField(field_pos))) +
+                    field_id * FIELD_BITS);
+    }
+
+    // Search other fields...
+    const size_t NUM_FIELDS = _data.NumFields();
+    if (field_pos) field_id++;
+    while (field_id < NUM_FIELDS && _data.bits[field_id]==FIELD_ALL) field_id++;
+    return (field_id < NUM_FIELDS) ?
+      (int) (find_bit(~_data.bits[field_id]) + (field_id * FIELD_BITS)) : -1;
   }
 
   /// Find the most-significant set-bit.
@@ -1923,6 +1998,17 @@ namespace emp {
       test_bits.AND_SELF(test_bits<<1);
     }
     return length;
+  }
+
+  template <typename DATA_T, bool ZERO_LEFT>
+  emp::vector<emp::Range<size_t>> Bits<DATA_T,ZERO_LEFT>::GetRanges() const {
+    emp::vector<emp::Range<size_t>> out_ranges;
+    for (int start_pos = FindOne(); start_pos >= 0; start_pos = FindOne(start_pos+1)) {
+      int end_pos = FindZero(start_pos);
+      end_pos = (end_pos == -1) ? GetSize() - 1 : end_pos - 1;
+      out_ranges.emplace_back(start_pos, end_pos);
+    }
+    return out_ranges;
   }
 
   /// Return true if any ones are in common with another Bits object.
@@ -2257,10 +2343,10 @@ namespace emp {
 // ---------------------- Implementations to work with standard library ----------------------
 
 namespace std {
-  /// Hash function to allow BitVector to be used with maps and sets (must be in std).
-  template <>
-  struct hash<emp::BitVector> {
-    std::size_t operator()(const emp::BitVector & bits) const {
+  /// Hash function to allow Bits objects to be used with maps and sets (must be in std).
+  template <typename DATA_T, bool ZERO_LEFT>
+  struct hash<emp::Bits<DATA_T,ZERO_LEFT>> {
+    std::size_t operator()(const emp::Bits<DATA_T,ZERO_LEFT> & bits) const {
       return bits.Hash();
     }
   };

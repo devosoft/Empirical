@@ -1,14 +1,17 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
- *
- *  @file axis.hpp
+ *  @file
  *  @brief Handle drawing of axes on D3 graphts.
  */
 
 #ifndef EMP_WEB_D3_AXIS_HPP_INCLUDE
 #define EMP_WEB_D3_AXIS_HPP_INCLUDE
+
+#include <stddef.h>
 
 #include "../../tools/string_utils.hpp"
 

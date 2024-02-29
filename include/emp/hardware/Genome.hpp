@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021.
- *
- *  @file Genome.hpp
+ *  @file
  *  @brief This is a simple, container for a series of instructions.
  *
  */
@@ -11,10 +12,10 @@
 #ifndef EMP_HARDWARE_GENOME_HPP_INCLUDE
 #define EMP_HARDWARE_GENOME_HPP_INCLUDE
 
-#include "../base/Ptr.hpp"
-
+#include <stddef.h>
 
 #include "../base/array.hpp"
+#include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../io/File.hpp"

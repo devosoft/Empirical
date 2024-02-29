@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021-2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file math.cpp
+ *  @file
  */
 
 #include <algorithm>
@@ -32,8 +33,6 @@ TEST_CASE("Test Math", "[math]")
   REQUIRE( emp::Abs(emp::Ln(emp::Exp(5)) - 5) < 0.01);
 
   REQUIRE(emp::IntLog2(10) == 3);
-  // REQUIRE(emp::CountOnes(15) == 4);
-  // REQUIRE(emp::CountOnes(255) == 8);
 
   unsigned long long large = 0x8000000000000000;
   REQUIRE(emp::MaskHigh<unsigned long long>(1) == large);
