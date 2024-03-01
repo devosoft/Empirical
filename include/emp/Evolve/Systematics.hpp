@@ -1161,7 +1161,7 @@ namespace emp {
      *  there is no common ancestor, distance to the root of this tree is calculated instead.
      * @param tax the taxon who's distance to root you want to calculate
      * */
-    int GetDistanceToRoot(Ptr<taxon_t> tax) const ;
+    int GetDistanceToRoot(Ptr<taxon_t> tax) const;
 
     /** Calculates the number of branching points leading to multiple extant taxa
      * between the given taxon and the most-recent common ancestor (or the root of its subtree,
