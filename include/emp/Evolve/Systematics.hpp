@@ -10,7 +10,7 @@
  *        need to be kept in memory, especially if we're only doing post-analysis.
  *  @todo This inheritance system makes adding new systematics-related data tracking kind of a pain.
  *        Over time, this will probably become a maintainability problem. We could make the inheritance
- *        go away and just use signals, but then the World could not maintain systematics managers.
+ *        go away and just use signals, but then the emp::World could not maintain systematics managers.
  */
 
 #ifndef EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
