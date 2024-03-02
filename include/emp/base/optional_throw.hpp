@@ -5,8 +5,10 @@
 */
 /**
  *  @file
- *  @brief TODO.
+ *  @brief A version of emp_assert that throws a runtime error if compiled with -DEMP_OPTIONAL_THROW_ON.
  *
+ *  This is useful if you want the option to throw a runtime error outside of debug mode. A common use
+ *  case is wrapping C++ code in Python, since segfaults kill the entire Python interpreter.
  */
 
 #ifndef EMP_BASE_OPTIONAL_THROW_HPP_INCLUDE
@@ -31,25 +33,25 @@
       }                                                                   \
     } while(0)
 
-  // #define emp_optional_throw_impl(TEST, MESSAGE) emp_optional_throw_mscv_impl(TEST, MESSAGE)
+  /* #define emp_optional_throw_impl(TEST, MESSAGE) emp_optional_throw_mscv_impl(TEST, MESSAGE)
 
-  // #else
+  / #else
 
-  // #define emp_optional_throw_impl(...)                                     \
-  //   do {                                                                  \
-  //     if (!(emp_assert_GET_ARG_1(__VA_ARGS__, ~))) {                      \
-  //       emp::assert_throw(                                             \
-  //       __FILE__, __LINE__,                                               \
-  //       emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~),  ),   \
-  //       emp_assert_STRINGIFY( emp_assert_GET_ARG_2(__VA_ARGS__, ~),  ),   \
-  //       emp_assert_TO_PAIRS(__VA_ARGS__));                                       \
-  //     }                                                                   \
-  //   } while(0)
+  / #define emp_optional_throw_impl(...)                                     \
+  /   do {                                                                  \
+  /     if (!(emp_assert_GET_ARG_1(__VA_ARGS__, ~))) {                      \
+  /       emp::assert_throw(                                             \
+  /       __FILE__, __LINE__,                                               \
+  /       emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~),  ),   \
+  /       emp_assert_STRINGIFY( emp_assert_GET_ARG_2(__VA_ARGS__, ~),  ),   \
+  /       emp_assert_TO_PAIRS(__VA_ARGS__));                                       \
+  /     }                                                                   \
+  /   } while(0)
 
-  //   #endif
+  /   #endif
 
-    // #define emp_optional_throw(...) emp_optional_throw_impl(__VA_ARGS__)
-
+    / #define emp_optional_throw(...) emp_optional_throw_impl(__VA_ARGS__)
+  */
 #elif defined( EMP_NDEBUG )
 
   #define emp_optional_throw(...)

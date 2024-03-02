@@ -1639,8 +1639,8 @@ TEST_CASE("Test Loading Phylogeny From File") {
     CHECK(((off->GetID() == 7) || (off->GetID() == 2) || (off->GetID() == 3)));
   }
   CHECK(sys2.GetNumActive() == 5);
-  CHECK(sys2.GetNumAncestors() == 5);
-  CHECK(sys2.GetNumOutside() == 0);
+  CHECK(sys2.GetNumAncestors() == 2);
+  CHECK(sys2.GetNumOutside() == 3);
   CHECK(sys2.GetNumTaxa() == 10);
   CHECK(sys2.GetMaxDepth() == 3);
   CHECK(mrca2->GetTotalOffspring() == 6);

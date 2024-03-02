@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief TODO.
+ *  @brief Implementation of emp_optional_throw.
  */
 
 #ifndef EMP_BASE__OPTIONAL_THROW_HPP_INCLUDE

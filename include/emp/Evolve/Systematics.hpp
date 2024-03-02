@@ -5,7 +5,13 @@
 */
 /**
  *  @file
- *  @brief TODO.
+ *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
+ *  
+ *  Note that this file powers the Python library phylotrackpy. The main consequence
+ *  is that we should generally prefer emp_optional_throw to emp_assert in any circumstance
+ *  where user input could trigger an error. emp_assert will trigger a segfault in Python 
+ *  (killing the whole interpreter), whereas emp_optional_throw will raise a Python exception.
+ * 
  *  @todo We should provide an option to back up systematics data to a file so that it doesn't all
  *        need to be kept in memory, especially if we're only doing post-analysis.
  *  @todo This inheritance system makes adding new systematics-related data tracking kind of a pain.
@@ -26,6 +32,7 @@
 #include <string>
 #include <unordered_set>
 
+#include "../base/assert_warning.hpp"
 #include "../base/optional_throw.hpp"
 #include "../base/Ptr.hpp"
 #include "../control/Signal.hpp"
@@ -44,7 +51,7 @@
 
 namespace emp {
 
-  template <typename A, typename B, typename C>
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   class Systematics;
 
   /// The systematics manager allows an optional second template type that
@@ -104,7 +111,7 @@ namespace emp {
       /// @param muts can contain as many strings (types of mutation) as desired, each accompanied
       /// by a number indicating how many of that mutation occurred
       /// Example: {"point_mutation":2, "insertion":1}
-      void RecordMutation(std::unordered_map<std::string, int> & muts) {
+      void RecordMutation(const std::unordered_map<std::string, int> & muts) {
         for (auto mut : muts) {
           if (Has(mut_counts, mut.first)) {
             mut_counts[mut.first] += mut.second;
@@ -137,7 +144,7 @@ namespace emp {
   /// track an evolutionary pathway)
   template <typename ORG_INFO, typename DATA_STRUCT = emp::datastruct::no_data>
   class Taxon {
-    template <typename A, typename B, typename C>
+    template <typename ORG, typename SYS_ORG_INFO, typename SYS_DATA_STRUCT>
     friend class Systematics;
   protected:
     using this_t = Taxon<ORG_INFO, DATA_STRUCT>;
@@ -300,7 +307,7 @@ namespace emp {
     size_t org_count;         ///< How many organisms are currently active?
     size_t total_depth;       ///< Sum of taxa depths for calculating average.
     size_t num_roots;         ///< How many distinct injected ancestors are currently in population?
-    int max_depth;            ///< Depth of deepest taxon. -1 means needs to be recalculated
+    mutable int max_depth;    ///< Depth of deepest taxon. -1 means needs to be recalculated
 
     size_t next_id;           ///< What ID value should the next new taxon have?
     size_t curr_update;
@@ -417,7 +424,7 @@ namespace emp {
     virtual size_t GetNumOutside() const = 0;
     virtual size_t GetTreeSize() const = 0;
     virtual size_t GetNumTaxa() const = 0;
-    virtual int GetMaxDepth() = 0;
+    virtual int GetMaxDepth() const = 0;
     virtual int GetPhylogeneticDiversity() const = 0;
     virtual double GetMeanPairwiseDistance(bool branch_only) const = 0;
     virtual double GetSumDistance() const = 0;
@@ -613,7 +620,6 @@ namespace emp {
     /// Add information about a new organism, including its stored info and parent's taxon;
     /// If you would like the systematics manager to track taxon age, you can also supply
     /// the update at which the taxon is being added.
-    /// return a pointer for the associated taxon.
     /// @returns a pointer for the associated taxon.
     /// @param org a reference to the organism being added
     /// @param pos the position of the organism being added
@@ -742,6 +748,7 @@ namespace emp {
     template <typename T>
     emp::vector<T> ApplyToAllTaxa(const std::function<T(const emp::Ptr<taxon_t> tax)> & fun) const {
       emp::vector<T> result;
+      // TODO: Swap in this version when we update to c++23 and range support is available on more compilers
       // const auto all = {std::ranges::ref_view(active_taxa), std::ranges::ref_view(ancestor_taxa),
       //             std::ranges::ref_view(outside_taxa)};
       // for (emp::Ptr<taxon_t> tax : all | std::views::join) {
@@ -765,6 +772,7 @@ namespace emp {
     template <typename T>
     emp::vector<T> ApplyToAllTaxa(const std::function<T(emp::Ptr<taxon_t> tax)> & fun) {
       emp::vector<T> result;
+      // TODO: Swap in this version when we update to c++23 and range support is available on more compilers
       // const auto all = {std::ranges::ref_view(active_taxa),
       //             std::ranges::ref_view(ancestor_taxa),
       //             std::ranges::ref_view(outside_taxa)};
@@ -810,17 +818,17 @@ namespace emp {
 
     /// @returns the phylogenetic depth (lineage length) of the taxon with
     /// the longest lineage out of all active taxa
-    int GetMaxDepth();
+    int GetMaxDepth() const;
 
     /// @returns the taxon that will be used as the parent
     /// of the next taxon created via the version of AddOrg
     /// that does not accept a parent
-    Ptr<taxon_t> GetNextParent() {
+    Ptr<taxon_t> GetNextParent() const {
       return next_parent;
     }
 
     /// @returns the most recently created taxon
-    Ptr<taxon_t> GetMostRecent() {
+    Ptr<taxon_t> GetMostRecent() const {
       return most_recent;
     }
 
@@ -828,7 +836,7 @@ namespace emp {
     Ptr<taxon_t> Parent(Ptr<taxon_t> taxon) const;
 
     /// @returns true if there is a taxon at specified location
-    bool IsTaxonAt(WorldPosition id) {
+    bool IsTaxonAt(WorldPosition id) const {
       if (id.GetPopID() >= taxon_locations.size()) {
         return false;
       }
@@ -839,7 +847,7 @@ namespace emp {
     }
 
     /// @returns pointer to taxon at specified location
-    Ptr<taxon_t> GetTaxonAt(WorldPosition id) {
+    Ptr<taxon_t> GetTaxonAt(WorldPosition id) const {
       emp_optional_throw(id.GetPopID() < taxon_locations.size(), "Invalid population id");
       emp_optional_throw(id.GetIndex() < taxon_locations[id.GetPopID()].size(), "Invalid taxon location");
       return taxon_locations[id.GetPopID()][id.GetIndex()];
@@ -913,9 +921,8 @@ namespace emp {
       } else {
         node->AddPullSet([this](){
           emp::vector<double> result;
-          for (auto tax : active_taxa) {
-            result.push_back(CountDeleteriousSteps(tax));
-          }
+          std::transform(active_taxa.begin(), active_taxa.end(), std::back_inserter(result),
+            [this](Ptr<taxon_t> tax) { return CountDeleteriousSteps(tax); });
           return result;
         });
       }
@@ -935,9 +942,8 @@ namespace emp {
       } else {
         node->AddPullSet([this](){
           emp::vector<double> result;
-          for (auto tax : active_taxa) {
-            result.push_back(CountPhenotypeChanges(tax));
-          }
+          std::transform(active_taxa.begin(), active_taxa.end(), std::back_inserter(result),
+            [this](Ptr<taxon_t> tax) { return CountPhenotypeChanges(tax); });
           return result;
         });
       }
@@ -958,9 +964,8 @@ namespace emp {
 
         node->AddPullSet([this](){
           emp::vector<double> result;
-          for (auto tax : active_taxa) {
-            result.push_back(CountUniquePhenotypes(tax));
-          }
+          std::transform(active_taxa.begin(), active_taxa.end(), std::back_inserter(result),
+            [this](Ptr<taxon_t> tax) { return CountUniquePhenotypes(tax); });
           return result;
         });
       }
@@ -981,9 +986,8 @@ namespace emp {
       } else {
         node->AddPullSet([this,mutation](){
           emp::vector<double> result;
-          for (auto tax : active_taxa) {
-            result.push_back(CountMuts(tax, mutation));
-          }
+          std::transform(active_taxa.begin(), active_taxa.end(), std::back_inserter(result),
+            [this,mutation](Ptr<taxon_t> tax) { return CountMuts(tax, mutation); });
           return result;
         });
       }
@@ -1016,9 +1020,10 @@ namespace emp {
 
     /// @returns phylogenetic diversity if used without any arguments .
     /// If you want to receive normalized data, you need to include the number of generations
-    /// your tree has (multiples of 10 from 10 to 100 are allowed)
+    /// your tree has
     /// you also need to specify a file with which to normalize your data.
     /// If value is outside of the values in the file, 100th percentile will be returned
+    /// NOTE: This is experimental and in early development/research phases!
     int GetPhylogeneticDiversityNormalize(int generation = 0, std::string filename = "") const;
 
 
@@ -1200,8 +1205,9 @@ namespace emp {
      * each taxon's values by the number of offspring taxa it has minus one.
     */
     double GetAverageOriginTime(bool normalize=false) const {
-      double total = 0;
-      double count = 0;
+      double total = 0.0;
+      double count = 0.0;
+      // TODO: Replace when ranges are supported
       // const auto all = {std::ranges::ref_view(active_taxa),
       //                   std::ranges::ref_view(ancestor_taxa),
       //                   std::ranges::ref_view(outside_taxa)};
@@ -1209,7 +1215,7 @@ namespace emp {
       for (emp::Ptr<taxon_t> tax : active_taxa) {
         double weight = 1;
         if (normalize) {
-          weight = std::max(0, (int)tax->GetNumOff() - 1);
+          weight = std::max(0, static_cast<int>(tax->GetNumOff()) - 1);
         }
         total += tax->GetOriginationTime() * weight;
         count += weight;
@@ -1217,7 +1223,7 @@ namespace emp {
       for (emp::Ptr<taxon_t> tax : ancestor_taxa) {
         double weight = 1;
         if (normalize) {
-          weight = std::max(0, (int)tax->GetNumOff() - 1);
+          weight = std::max(0, static_cast<int>(tax->GetNumOff()) - 1);
         }
         total += tax->GetOriginationTime() * weight;
         count += weight;
@@ -1225,7 +1231,7 @@ namespace emp {
       for (emp::Ptr<taxon_t> tax : outside_taxa) {
         double weight = 1;
         if (normalize) {
-          weight = std::max(0, (int)tax->GetNumOff() - 1);
+          weight = std::max(0, static_cast<int>(tax->GetNumOff()) - 1);
         }
         total += tax->GetOriginationTime() * weight;
         count += weight;
@@ -1320,6 +1326,13 @@ namespace emp {
       std::swap(v1[p1.GetIndex()], v2[p2.GetIndex()]);
     }
 
+    /// Load data from a file into the systematics manager.
+    /// Intended to be used on an empty systematics object
+    /// Expects a file in ALife phylogeny standard format (see: https://alife-data-standards.github.io/alife-data-standards/phylogeny)
+    /// @param file_path the file to load data from
+    /// @param info_col the name of the column in the file that contains the taxon info (i.e. the information taxa are defined based; should match return type of calc_taxon_info_fun)
+    /// @param assume_leaves_extant if true, assumes that all leaf nodes correspond to extant taxa
+    /// @param adjust_total_offspring if true, adjusts the total offspring count of each taxon based on the number of offspring it actually has (time consuming but necessary for some stats)
     void LoadFromFile(const std::string & file_path, const std::string & info_col = "info",
                                                              bool assume_leaves_extant=true,
                                                              bool adjust_total_offspring = true);
@@ -1431,10 +1444,8 @@ namespace emp {
   // Add information about a new organism, including its stored info and parent's taxon;
   // Can't return a pointer for the associated taxon because of obnoxious inheritance problems
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, WorldPosition pos) {
     emp_optional_throw(store_position, "Trying to pass position to a systematics manager that can't use it");
-    // emp_optional_throw(next_parent, "Adding organism with no parent specified and no next_parent set");
     AddOrg(org, pos, next_parent);
     next_parent = nullptr;
   }
@@ -1442,10 +1453,8 @@ namespace emp {
   // Add information about a new organism, including its stored info and parent's taxon;
   // Can't return a pointer for the associated taxon because of obnoxious inheritance problems
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, WorldPosition pos) {
     emp_optional_throw(store_position, "Trying to pass position to a systematics manager that can't use it");
-    // emp_optional_throw(next_parent, "Adding organism with no parent specified and no next_parent set");
     AddOrg(org, pos, next_parent);
     next_parent = nullptr;
   }
@@ -1453,7 +1462,6 @@ namespace emp {
   // Add information about a new organism, including its stored info and parent's taxon;
   // Can't return a pointer for the associated taxon because of obnoxious inheritance problems
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, WorldPosition pos, WorldPosition parent) {
     emp_optional_throw(store_position, "Trying to pass position to a systematics manager that can't use it");
     AddOrg(org, pos, taxon_locations[parent.GetPopID()][parent.GetIndex()]);
@@ -1462,7 +1470,6 @@ namespace emp {
   // Add information about a new organism, including its stored info and parent's taxon;
   // Can't return a pointer for the associated taxon because of obnoxious inheritance problems
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, WorldPosition pos, WorldPosition parent) {
     emp_optional_throw(store_position, "Trying to pass position to a systematics manager that can't use it");
     AddOrg(org, pos, taxon_locations[parent.GetPopID()][parent.GetIndex()]);
@@ -1815,10 +1822,9 @@ namespace emp {
       // First, find a candidate among the living taxa.  Only taxa that have one offsrping
       // can be on the line-of-descent to the MRCA, so anything else is a good start point.
       // There must be at least one!  Stop as soon as we find a candidate.
-      Ptr<taxon_t> candidate(nullptr);
-      for (auto x : active_taxa) {
-        if (x->GetNumOff() != 1) { candidate = x; break; }
-      }
+      Ptr<taxon_t> candidate = *std::find_if(active_taxa.begin(), active_taxa.end(),
+        [](Ptr<taxon_t> x){ return x->GetNumOff() != 1; }
+      );
 
       // Now, trace the line of descent, updating the candidate as we go.
       Ptr<taxon_t> test_taxon = candidate->GetParent();
@@ -1842,6 +1848,7 @@ namespace emp {
     return -1;
   }
 
+  // @returns a pointer to the Most-Recent Ancestor shared by two taxa.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetSharedAncestor(Ptr<taxon_t> t1, Ptr<taxon_t> t2) const {
     // Same taxon
@@ -1889,23 +1896,15 @@ namespace emp {
     }
 
     for (Ptr<taxon_t> off : curr->GetOffspring()) {
-      // std::cout << "Recursing on ID: " << off->GetID() << " Offspring: " << off->GetTotalOffspring() << std::endl;
 
       CollessStruct new_result = RecursiveCollessStep(off);
       result.ns.push_back(Sum(new_result.ns) + log(off->GetOffspring().size() + exp(1)));
       result.total += new_result.total;
     }
 
-    // std::cout << "Evaluating: " << curr->GetID() << std::endl;
-
     double med = Median(result.ns);
-    double sum_diffs = 0;
-    // std::cout << "Median: " << med << std::endl;
-    for (double n : result.ns) {
-      // std::cout << n << std::endl;
-      sum_diffs += std::abs(n-med);
-    }
-    // std::cout << "Sumdiffs: " << sum_diffs << " n: " << result.ns.size() << " average: " << sum_diffs/result.ns.size() << std::endl;
+    double sum_diffs = std::accumulate(result.ns.begin(), result.ns.end(), 0.0, [med](double sum, double n) { return sum + std::abs(n-med); });
+
     result.total += sum_diffs/result.ns.size();
     return result;
   }
@@ -1918,9 +1917,27 @@ namespace emp {
     // the tree, keeping track of distances. When things meet up, we calculate
     // distances between the nodes on the sides that just met up.
 
+    // Vector to store distances between all pairs of extant taxa
     emp::vector<double> dists;
 
+    /* Map of nodes we are currently looking at (will start at extant taxa and then work our way up)
+    / to the distances between them and extant taxa below them. So for example,
+    / if we had this tree:
+    /        X
+    /        |
+    /        A
+    /      / | \
+    /     B  C  D
+    /    / \    |
+    /   E   F   G  (with E, F, and G extant)
+    / And A was in curr_pointers, its value would be:
+    / [[2, 2], [1], [2]] */
     std::map< Ptr<taxon_t>, emp::vector<emp::vector<int>> > curr_pointers;
+
+    // next_pointers is the same, but is the data to consider on the next iteration.
+    // For example, after we've processed A from the previous example, we would end
+    // up adding X with the value [[3, 3, 2, 3]] (all of the values from before in
+    // a single flattened vector and incremented by 1)
     std::map< Ptr<taxon_t>, emp::vector<emp::vector<int>> > next_pointers;
 
 
@@ -1928,12 +1945,10 @@ namespace emp {
       curr_pointers[tax] = emp::vector<emp::vector<int>>({{0}});
     }
 
-    // std::cout << "Starting curr_pointers size: " << curr_pointers.size() << std::endl;
-
     while (curr_pointers.size() > 0) {
       for (auto & tax : curr_pointers) {
         bool alive = tax.first->GetNumOrgs() > 0;
-        // std::cout << tax.first << " has " << to_string(tax.second) << "and is waiting for " << tax.first->GetNumOff() + int(alive) << std::endl;
+
         if ( tax.second.size() < tax.first->GetNumOff() + int(alive)) {
           if (Has(next_pointers, tax.first)) {
             // In case an earlier iteration added this node to next_pointers
@@ -1956,14 +1971,12 @@ namespace emp {
             for (size_t j = i+1; j < tax.second.size(); j++) {
               for (int disti : tax.second[i]) {
                 for (int distj : tax.second[j]) {
-                  // std::cout << "Adding " << disti << " and " << distj << std::endl;
                   dists.push_back(disti+distj);
                 }
               }
             }
           }
         }
-        // std::cout << "dists " << to_string(dists) << std::endl;
         // Increment distances and stick them in new vector
         emp::vector<int> new_dist_vec;
         for (auto & vec : tax.second) {
@@ -1971,8 +1984,6 @@ namespace emp {
             new_dist_vec.push_back(el+1);
           }
         }
-
-        // std::cout << "new_dist_vec " << to_string(new_dist_vec) << std::endl;
 
         next_pointers.erase(tax.first);
 
@@ -1996,16 +2007,14 @@ namespace emp {
       }
       curr_pointers = next_pointers;
       next_pointers.clear();
-      // std::cout << curr_pointers.size() << std::endl;
     }
 
     if (dists.size() != (active_taxa.size()*(active_taxa.size()-1))/2) {
       // The tree is not connected
       // It's possible we should do something different here...
+      emp_assert_warning(false, "Warning: Tree is not connected - some pairwise distances are infinite (ommitted)");
       return dists;
     }
-
-    // std::cout << "Total: " << total << "Dists: " << dists.size() << std::endl;
 
     return dists;
 
@@ -2019,8 +2028,8 @@ namespace emp {
     }
 
     // If not same, we have to actually do work
-    emp::vector<Ptr<taxon_t> > lineage1 = GetLineageToMRCA(t1);
-    emp::vector<Ptr<taxon_t> > lineage2 = GetLineageToMRCA(t2);
+    const emp::vector<Ptr<taxon_t> > lineage1 = GetLineageToMRCA(t1);
+    const emp::vector<Ptr<taxon_t> > lineage2 = GetLineageToMRCA(t2);
 
     size_t l1 = lineage1.size() - 1;
     size_t l2 = lineage2.size() - 1;
@@ -2036,17 +2045,8 @@ namespace emp {
     double count = l1 + l2 + 2;
 
     if (branch_only) {
-      for (size_t i = l1; i > 0; i--) {
-        if (lineage1[i]->GetNumOff() == 1) {
-          count--;
-        }
-      }
-
-      for (size_t i = l2; i > 0; i--) {
-        if (lineage2[i]->GetNumOff() == 1) {
-          count--;
-        }
-      }
+      count -= std::count_if(lineage1.begin()+1, lineage1.begin() + l1, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1; });
+      count -= std::count_if(lineage2.begin()+1, lineage2.begin() + l2, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1; });
     }
 
     return count;
@@ -2080,26 +2080,19 @@ namespace emp {
 
     while (test_taxon) {
 
-      // emp_assert(test_taxon->GetOriginationTime() != -1 &&
-      //           "Invalid time - are you passing time to rg?", time);
-
       depth += time - test_taxon->GetOriginationTime();
-      // std::cout << "Tax: " << test_taxon->GetID() << " depth: " << depth << " time: " << time  << " Orig: " << test_taxon->GetOriginationTime() << " divisor: " << divisor << std::endl;
       time = test_taxon->GetOriginationTime();
       if (test_taxon == mrca || !test_taxon) {
         // Stop when everything has converged or when we hit the root.
-        // std::cout << (int)(test_taxon == mrca) << " depth: " << depth << " divisor: " << divisor << std::endl;
         total += depth/divisor;
         return total;
       } else if (test_taxon->GetNumOrgs() > 0) {
         // If this taxon is still alive we need to update the divisor
-        // std::cout << "Alive point" << " depth: " << depth << " divisor: " << divisor << std::endl;
         total += depth/divisor;
         depth = 0;
         divisor = test_taxon->GetTotalOffspring() + 1;
       } else if (test_taxon->GetNumOff() > 1) {
         // This is a branch point. We need to add the things on the other branch to the divisor..
-        // std::cout << "Branch point" << " depth: " << depth << " divisor: " << divisor << std::endl;
         total += depth/divisor;
         depth = 0;
         divisor = test_taxon->GetTotalOffspring();
@@ -2118,7 +2111,7 @@ namespace emp {
     int depth = 0;
     Ptr<taxon_t> test_taxon = tax->GetParent();
     while (test_taxon) {
-      if (test_taxon == mrca || !test_taxon) {
+      if (test_taxon == mrca) {
         return depth;
       } else if (test_taxon->GetNumOff() > 1) {
         depth++;
@@ -2137,7 +2130,7 @@ namespace emp {
     Ptr<taxon_t> test_taxon = tax->GetParent();
     while (test_taxon) {
       depth++;
-      if (test_taxon == mrca || !test_taxon) {
+      if (test_taxon == mrca) {
         return depth;
       }
       test_taxon = test_taxon->GetParent();
@@ -2196,17 +2189,14 @@ namespace emp {
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMaxDepth() {
+  int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMaxDepth() const {
     if (max_depth != -1) {
       return max_depth;
     }
 
     for (auto tax : active_taxa) {
-      int depth = tax->GetDepth();
-      if (depth > max_depth) {
-        max_depth = depth;
-      }
-    }
+      max_depth = std::max(max_depth, static_cast<int>(tax->GetDepth()));
+     }
     return max_depth;
   }
 
@@ -2223,6 +2213,9 @@ namespace emp {
       emp_optional_throw(false, "Failed to load phylogeny from file. ORG_INFO template type cannot be created from string");
       return;
     }
+
+    emp_optional_throw(active_taxa.size() == 0 && ancestor_taxa.size() == 0 && outside_taxa.size() == 0, 
+                                  "LoadFromFile is intended to be used on an empty systematics object.");
 
     // Load files
     emp::File in_file(file_path);
@@ -2279,8 +2272,8 @@ namespace emp {
     // Read in each row and make a taxon for it
     size_t num_lines = in_file.GetNumLines();
     for (size_t i = 0; i < num_lines; i++) {
-      emp::vector<std::string_view> row = in_file.ViewRowSlices(i);
-      int id = emp::from_string<int>(row[id_pos]);
+      const emp::vector<std::string_view> row = in_file.ViewRowSlices(i);
+      const int id = emp::from_string<int>(row[id_pos]);
 
       // Inf means this taxon is still alive
       // or we don't know which taxa are alive
@@ -2299,7 +2292,7 @@ namespace emp {
       }
 
       // Load ancestor list
-      std::string ancestor_list_str = {row[anc_pos].begin(), row[anc_pos].end()};
+      std::string ancestor_list_str(row[anc_pos].begin(), row[anc_pos].end());
       emp::remove_chars(ancestor_list_str, "[]\"");
       emp::Ptr<taxon_t> tax;
 
@@ -2337,6 +2330,7 @@ namespace emp {
       if (emp::to_lower(ancestor_list_str) != "none") {
         emp::vector<std::string> ancestor_split = emp::slice(ancestor_list_str, ',');
         emp::vector<int> ancestor_list = emp::from_strings<int>(ancestor_split);
+        emp_optional_throw(ancestor_list.size()==1, "Error: individual can only have one parent in phylogeny file.");
         unlinked_parents[id] = ancestor_list[0];
       } else {
         // If no parent, this is a root
@@ -2346,10 +2340,10 @@ namespace emp {
     }
 
     // Link up parents and offspring
-    for (auto element : unlinked_parents) {
-      taxa[element.first]->parent = taxa[element.second];
-      taxa[element.second]->offspring.insert(taxa[element.first]);
-      taxa[element.second]->num_offspring++;
+    for (auto &[child_id, parent_id] : unlinked_parents) {
+      taxa[child_id]->parent = taxa[parent_id];
+      taxa[parent_id]->offspring.insert(taxa[child_id]);
+      taxa[parent_id]->num_offspring++;
     }
 
     // Set up depth
@@ -2392,6 +2386,20 @@ namespace emp {
           active_taxa.insert(leaf);
         }
       }
+    } else {
+      // Move stuff over to outside taxa
+      for (auto leaf : leaves) {
+        if (Has(ancestor_taxa, leaf)) {
+          ancestor_taxa.erase(leaf);
+          outside_taxa.insert(leaf);
+          emp::Ptr<taxon_t> parent = leaf->GetParent();
+          while (parent && Has(ancestor_taxa, parent)) {
+            ancestor_taxa.erase(parent);
+            outside_taxa.insert(parent);
+            parent = parent->GetParent();
+          }
+        }
+      }
     }
 
     if (num_orgs_pos == -1) {
@@ -2401,6 +2409,10 @@ namespace emp {
         tax->SetTotOrgs(1);
         org_count++;
       }
+    } else {
+      org_count = std::accumulate(active_taxa.begin(), active_taxa.end(), 0, [](int sum, Ptr<taxon_t> tax) {
+        return sum + tax->GetNumOrgs();
+      });
     }
 
     // Adjust total offspring
