@@ -1330,7 +1330,7 @@ namespace emp {
     /// Intended to be used on an empty systematics object
     /// Expects a file in ALife phylogeny standard format (see: https://alife-data-standards.github.io/alife-data-standards/phylogeny)
     /// @param file_path the file to load data from
-    /// @param info_col the name of the column in the file that contains the taxon info (i.e. the information taxa are defined based; should match return type of calc_taxon_info_fun)
+    /// @param info_col the name of the column in the file that contains the taxon info (i.e. the information distinguishing taxa; should match return type of calc_taxon_info_fun)
     /// @param assume_leaves_extant if true, assumes that all leaf nodes correspond to extant taxa
     /// @param adjust_total_offspring if true, adjusts the total offspring count of each taxon based on the number of offspring it actually has (time consuming but necessary for some stats)
     void LoadFromFile(const std::string & file_path, const std::string & info_col = "info",
