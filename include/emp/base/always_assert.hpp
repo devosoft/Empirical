@@ -34,6 +34,7 @@
 
 #include "_assert_macros.hpp"
 #include "_assert_trigger.hpp"
+#include "_optional_throw.hpp"
 
 #if defined( __EMSCRIPTEN__ )
 
@@ -57,6 +58,19 @@
     } while(0)
 
   #define emp_always_assert_impl(TEST) emp_always_assert_msvc_impl(TEST)
+
+#elif defined(EMP_OPTIONAL_THROW_ON)
+
+  #define emp_always_assert_impl(...)                                     \
+    do {                                                                  \
+      if (!(emp_assert_GET_ARG_1(__VA_ARGS__, ~))) {                      \
+        emp::assert_throw(                                             \
+        __FILE__, __LINE__,                                               \
+        emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~),  ),   \
+        emp_assert_TO_PAIRS(__VA_ARGS__));                                       \
+      }                                                                   \
+    } while(0)
+
 
 #else
 

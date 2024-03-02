@@ -54,6 +54,10 @@ namespace emp {
       return Has(node_map, name);
     }
 
+    bool HasNoNode(const std::string & name) {
+      return !Has(node_map, name);
+    }
+
     /// Creates and adds a new DataNode
     /// @param name the name of the DataNode
     node_t & New(const std::string & name) {
