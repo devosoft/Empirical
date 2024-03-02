@@ -474,9 +474,9 @@ namespace emp {
     fun_calc_info_t calc_info_fun; ///< Function that takes an organism and returns the unit being tracked by systematics
     Ptr<taxon_t> next_parent;      ///< The taxon that has been marked as parent for next new org
     Ptr<taxon_t> most_recent;      ///< The most-recently added taxon
-    bool num_orgs_wrong = false;   ///< Keep track of whether we have loaded from a file that didn't
+    bool num_orgs_defaulted = false;   ///< Keep track of whether we have loaded from a file that didn't
                                    ///  provide num_orgs
-    bool total_offspring_wrong = false;   ///< Keep track of whether we have loaded from a file without
+    bool total_offspring_defaulted = false;   ///< Keep track of whether we have loaded from a file without
                                           ///  recalculating total offspring
 
     using parent_t::store_active;
@@ -1808,7 +1808,7 @@ namespace emp {
   // @returns the genetic diversity of the population.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   double Systematics<ORG, ORG_INFO, DATA_STRUCT>::CalcDiversity() const {
-    emp_optional_throw(!num_orgs_wrong, "Error: calculating diversity from phylogeny missing org counts");
+    emp_optional_throw(!num_orgs_defaulted, "Error: calculating diversity from phylogeny missing org counts");
     return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, (double) org_count);
   }
 
@@ -2054,7 +2054,7 @@ namespace emp {
 
     // If we loaded this phylogeny from a file without calculating total offspring,
     // we need to actually calculate it here
-    emp_optional_throw(!total_offspring_wrong, "To calculate evolutionary distinctiveness on phylogeny loaded from file you must calculate total offspring.");
+    emp_optional_throw(!total_offspring_defaulted, "To calculate evolutionary distinctiveness on phylogeny loaded from file you must calculate total offspring.");
 
     double depth = 0; // Length (in time units) of section we're currently exploring
     double total = 0; // Count up scores for each section of tree
@@ -2400,7 +2400,7 @@ namespace emp {
     }
 
     if (num_orgs_pos == -1) {
-      num_orgs_wrong = true;
+      num_orgs_defaulted = true;
       for (auto tax : active_taxa) {
         tax->SetNumOrgs(1);
         tax->SetTotOrgs(1);
@@ -2420,7 +2420,7 @@ namespace emp {
         }
       }
     } else {
-      total_offspring_wrong = true;
+      total_offspring_defaulted = true;
     }
 
     // Force stats to be recalculated
