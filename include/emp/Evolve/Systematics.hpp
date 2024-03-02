@@ -1900,7 +1900,7 @@ namespace emp {
     }
 
     double med = Median(result.ns);
-    double sum_diffs = std::accumulate(result.ns.begin(), result.ns.end(), 0.0, [med](double sum, double n) { return sum + std::abs(n-med); });
+    const double sum_diffs = std::accumulate(result.ns.begin(), result.ns.end(), 0.0, [med](double sum, double n) { return sum + std::abs(n-med); });
 
     result.total += sum_diffs/result.ns.size();
     return result;
