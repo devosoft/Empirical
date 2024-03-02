@@ -1525,14 +1525,14 @@ namespace emp {
       cur_taxon->SetOriginationTime(curr_update);
       on_new_sig.Trigger(cur_taxon, org);
     }
-    // std::cout << "about to store poisition" << std::endl;
+
     if (store_position) {
-      if (pos.GetPopID() >= taxon_locations.size()) {
-        taxon_locations.resize(pos.GetPopID()+1);
-      }
-      if (pos.GetIndex() >= taxon_locations[pos.GetPopID()].size()) {
-        taxon_locations[pos.GetPopID()].resize(pos.GetIndex()+1);
-      }
+      const uint32_t required_num_pops = std::max(static_cast<uint32_t>(taxon_locations.size()), pos.GetPopID() + 1);
+      if (required_num_pops > static_cast<uint32_t>(taxon_locations.size())) { taxon_locations.resize(required_num_pops);}
+
+      const uint32_t required_pop_size = std::max(static_cast<uint32_t>(taxon_locations[pos.GetPopID()].size()), pos.GetIndex() + 1);
+      if (required_pop_size > static_cast<uint32_t>(taxon_locations[pos.GetPopID()].size())) { taxon_locations[pos.GetPopID()].resize(required_pop_size);}
+
       taxon_locations[pos.GetPopID()][pos.GetIndex()] = cur_taxon;
     }
 
@@ -1875,7 +1875,7 @@ namespace emp {
   // Helper for Colless function calculation
   struct CollessStruct {
     double total = 0;
-    emp::vector<double> ns;
+    emp::vector<double> n_values;
   };
 
   // Helper for Colless function calculation
@@ -1888,21 +1888,21 @@ namespace emp {
     }
 
     if (curr->GetNumOff() == 0) {
-      result.ns.push_back(0); // Node itself is calculated at level above
+      result.n_values.push_back(0); // Node itself is calculated at level above
       return result;
     }
 
     for (Ptr<taxon_t> off : curr->GetOffspring()) {
 
       CollessStruct new_result = RecursiveCollessStep(off);
-      result.ns.push_back(Sum(new_result.ns) + log(off->GetOffspring().size() + exp(1)));
+      result.n_values.push_back(Sum(new_result.n_values) + log(off->GetOffspring().size() + exp(1)));
       result.total += new_result.total;
     }
 
-    double med = Median(result.ns);
-    double sum_diffs = std::accumulate(result.ns.begin(), result.ns.end(), 0.0, [med](double sum, double n) { return sum + std::abs(n-med); });
+    double med = Median(result.n_values);
+    double sum_diffs = std::accumulate(result.n_values.begin(), result.n_values.end(), 0.0, [med](double sum, double n) { return sum + std::abs(n-med); });
 
-    result.total += sum_diffs/result.ns.size();
+    result.total += sum_diffs/result.n_values.size();
     return result;
   }
   #endif // #DOXYGEN_SHOULD_SKIP_THIS
@@ -2278,7 +2278,7 @@ namespace emp {
       if (destruction_pos != -1) {
         destruction_time = row[destruction_pos];
       } else {
-        destruction_time = "unknown";
+        destruction_time = "missing";
       }
 
       ORG_INFO info;
@@ -2307,7 +2307,7 @@ namespace emp {
         double origin_time = emp::from_string<double>(row[origin_pos]);
         tax->SetOriginationTime(origin_time);
       }
-      if (destruction_time != "inf" && destruction_time != "unknown") {
+      if (destruction_time != "inf" && destruction_time != "missing") {
         tax->SetDestructionTime(emp::from_string<double>(destruction_time));
       }
 
