@@ -1213,10 +1213,7 @@ namespace emp {
       //                   std::ranges::ref_view(outside_taxa)};
       // for (emp::Ptr<taxon_t> tax : all | std::views::join) {
       for (emp::Ptr<taxon_t> tax : active_taxa) {
-        double weight = 1;
-        if (normalize) {
-          weight = std::max(0, static_cast<int>(tax->GetNumOff()) - 1);
-        }
+        const double weight = normalize ? std::max(0, static_cast<int>(tax->GetNumOff()) - 1) : 1.0;
         total += tax->GetOriginationTime() * weight;
         count += weight;
       }
