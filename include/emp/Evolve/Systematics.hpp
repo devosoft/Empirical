@@ -6,12 +6,12 @@
 /**
  *  @file
  *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
- *  
+ *
  *  Note that this file powers the Python library phylotrackpy. The main consequence
  *  is that we should generally prefer emp_optional_throw to emp_assert in any circumstance
- *  where user input could trigger an error. emp_assert will trigger a segfault in Python 
+ *  where user input could trigger an error. emp_assert will trigger a segfault in Python
  *  (killing the whole interpreter), whereas emp_optional_throw will raise a Python exception.
- * 
+ *
  *  @todo We should provide an option to back up systematics data to a file so that it doesn't all
  *        need to be kept in memory, especially if we're only doing post-analysis.
  *  @todo This inheritance system makes adding new systematics-related data tracking kind of a pain.
@@ -2214,7 +2214,7 @@ namespace emp {
       return;
     }
 
-    emp_optional_throw(active_taxa.size() == 0 && ancestor_taxa.size() == 0 && outside_taxa.size() == 0, 
+    emp_optional_throw(active_taxa.size() == 0 && ancestor_taxa.size() == 0 && outside_taxa.size() == 0,
                                   "LoadFromFile is intended to be used on an empty systematics object.");
 
     // Load files
