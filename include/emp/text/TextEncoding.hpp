@@ -270,7 +270,7 @@ namespace emp {
 
     // Helper function to append text when we know we've hit a tag.
     void Append_Tag(Text & text, emp::Token token, std::istream & input_stream) {
-      emp_assert(Has(token_map, token.id), "Unknown token id: ", token.id);
+      emp_assert(Has(token_map, token.id), "Unknown token id: ", token.id, token.lexeme);
 
       const TagInfo & info = token_map[token.id];
 
@@ -304,7 +304,7 @@ namespace emp {
     }
 
     // Add a pre-built rule to this encoding.
-    void RegisterRule(const Text_Rule & in_rule) {
+    Text_Rule & RegisterRule(const Text_Rule & in_rule) {
       rule_set.emplace_back(in_rule);
       Text_Rule & rule = rule_set.back();
       rule.SetID(rule_set.size() - 1);
@@ -325,58 +325,60 @@ namespace emp {
         if (rule.IsCharReplacement()) special_chars[rule.GetPlaceholder()] = rule.GetID();
         else object_map[rule.GetBaseObject()] = rule.GetID();
       }
+
+      return rule;
     }
 
     /// Specify both open and close tags that indicate a style.
-    void AddStyleTags(String style_name, String open_tag, String close_tag) {
+    Text_Rule & AddStyleTags(String style_name, String open_tag, String close_tag) {
       Text_Rule rule(open_tag, '\0', close_tag, style_name);
-      RegisterRule(rule);
+      return RegisterRule(rule);
     }
 
     /// Specify a single tag that will toggle a style when used.
-    void AddStyleToggle(String style_name, String tag) {
+    Text_Rule & AddStyleToggle(String style_name, String tag) {
       Text_Rule rule(tag, '\0', tag, style_name);
-      RegisterRule(rule);
+      return RegisterRule(rule);
     }
 
     /// Specify a tag that will set a new style to the end of the current line only.
-    void AddStyleLine(String style_name, String tag) {
+    Text_Rule & AddStyleLine(String style_name, String tag) {
       Text_Rule rule(tag, '\0', "\n", style_name);
-      RegisterRule(rule);
+      return RegisterRule(rule);
     }
 
     /// Specify a new set of tags, with a control block.  The control sequence
     /// is directly moved back and forth with the style arguments.
-    void AddStyleControl(String open_tag_start, char open_tag_end, String close_tag,
+    Text_Rule & AddStyleControl(String open_tag_start, char open_tag_end, String close_tag,
                          String base_style)
     {
       Text_Rule rule(open_tag_start, open_tag_end, close_tag, base_style);
       rule.SetConversions( [](String arg){ return arg; }, [](String arg){ return arg; } );
-      RegisterRule(rule);
+      return RegisterRule(rule);
     }
 
     /// Specify a new set of tags, with a control block.  You must also specify HOW
     /// the control should be converted to style args and vice-versa.
-    void AddStyleDynamic(String open_tag_start, char open_tag_end, String close_tag,
+    Text_Rule & AddStyleDynamic(String open_tag_start, char open_tag_end, String close_tag,
                          String base_style, auto to_style_arg, auto to_control)
     {
       Text_Rule rule(open_tag_start, open_tag_end, close_tag, base_style);
       rule.SetConversions(to_style_arg, to_control);
-      RegisterRule(rule);
+      return RegisterRule(rule);
     }
 
     /// Add a new tag that gets replaced in plain-text. For example:
     ///   AddReplaceTag("&lt;", "<")                 for less-than in HTML -or-
     ///   AddReplaceTag("&nbsp;", " ", "no_break")   for non-breaking spaces.
-    void AddReplaceTag(String tag, char internal_char, String symbol_name="") {
+    Text_Rule & AddReplaceTag(String tag, char internal_char, String symbol_name="") {
       Text_Rule rule(tag, '\0', "", symbol_name, internal_char);
-      RegisterRule(rule);
+      return RegisterRule(rule);
     }
 
     /// Add two parts of a tag (start and end) that will use its CONTROL argument as a STYLE.
-    void AddReplaceControl(String open_start, char open_end, char internal_char, String symbol_base) {
+    Text_Rule & AddReplaceControl(String open_start, char open_end, char internal_char, String symbol_base) {
       Text_Rule rule(open_start, open_end, "", symbol_base, internal_char);
-      RegisterRule(rule);
+      return RegisterRule(rule);
       // @CAO NEED TO DO something to adjust symbol name based on CONTROL, with append as default.
     }
 
