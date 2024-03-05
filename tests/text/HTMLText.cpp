@@ -81,7 +81,6 @@ TEST_CASE("Testing HTMLText", "[text]") {
   CHECK(html_text.Encode() == "The &lt;b&gt; and &lt;/b&gt; here should <b>not</b> be converted.");
 
   emp::HTMLText text2 = "Now let's try <b>something</b> with a non-breaking&nbsp;space.";
-  text2.PrintDebug();
   CHECK(text2.AsString() == "Now let's try something with a non-breaking space.");
   CHECK(text2.Encode() == "Now let's try <b>something</b> with a non-breaking&nbsp;space.");
 
