@@ -12,6 +12,7 @@
 #define EMP_MATH_RANGE_HPP_INCLUDE
 
 #include <limits>
+#include <stddef.h>
 #include <type_traits>
 
 #include "../base/assert.hpp"

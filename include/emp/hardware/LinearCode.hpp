@@ -10,6 +10,8 @@
 #ifndef EMP_HARDWARE_LINEARCODE_HPP_INCLUDE
 #define EMP_HARDWARE_LINEARCODE_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../base/array.hpp"
 #include "../base/vector.hpp"
 

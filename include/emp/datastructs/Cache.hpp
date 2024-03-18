@@ -12,6 +12,7 @@
 #define EMP_DATASTRUCTS_CACHE_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 #include <unordered_map>
 
 namespace emp {

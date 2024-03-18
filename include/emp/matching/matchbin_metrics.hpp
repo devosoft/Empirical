@@ -20,6 +20,7 @@
 #include <queue>
 #include <ratio>
 #include <span>
+#include <stddef.h>
 #include <stdexcept>
 #include <string>
 #include <tuple>

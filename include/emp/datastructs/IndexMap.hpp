@@ -23,6 +23,8 @@
 #ifndef EMP_DATASTRUCTS_INDEXMAP_HPP_INCLUDE
 #define EMP_DATASTRUCTS_INDEXMAP_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../base/vector.hpp"
 
 namespace emp {

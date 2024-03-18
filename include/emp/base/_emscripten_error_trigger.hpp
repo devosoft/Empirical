@@ -13,6 +13,7 @@
 #define EMP_BASE__EMSCRIPTEN_ERROR_TRIGGER_HPP_INCLUDE
 
 #include <iostream>
+#include <stddef.h>
 #include <string>
 
 namespace emp {

@@ -31,8 +31,10 @@
 #ifndef EMP_COMPILER_LEXER_HPP_INCLUDE
 #define EMP_COMPILER_LEXER_HPP_INCLUDE
 
+#include <cstdint>
 #include <iostream>
 #include <map>
+#include <stddef.h>
 #include <string>
 
 #include "../base/map.hpp"

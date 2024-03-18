@@ -11,9 +11,9 @@
 #ifndef EMP_TOOLS_SOLVESTATE_HPP_INCLUDE
 #define EMP_TOOLS_SOLVESTATE_HPP_INCLUDE
 
+#include <stddef.h>
 
 #include "../base/assert.hpp"
-
 #include "../bits/BitVector.hpp"
 
 namespace emp {

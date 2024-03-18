@@ -22,6 +22,7 @@
 #ifndef EMP_DATASTRUCTS_STRINGMAP_HPP_INCLUDE
 #define EMP_DATASTRUCTS_STRINGMAP_HPP_INCLUDE
 
+#include <stddef.h>
 
 #include "../base/unordered_map.hpp"
 #include "../tools/string_utils.hpp"

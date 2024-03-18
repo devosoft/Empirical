@@ -12,6 +12,7 @@
 #define EMP_DATASTRUCTS_GRAPH_HPP_INCLUDE
 
 #include <iostream>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"

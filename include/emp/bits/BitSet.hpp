@@ -12,6 +12,7 @@
 #ifndef EMP_BITS_BITSET_HPP_INCLUDE
 #define EMP_BITS_BITSET_HPP_INCLUDE
 
+#include <stddef.h>
 
 #include "BitArray.hpp"
 
