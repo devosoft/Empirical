@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022-23.
+ *  @date 2022-24.
  *
  *  @file Bits.hpp
  *  @brief A generic bit-handler to replace vector<bool>, etc +additional bitwise logic features.
@@ -159,6 +159,8 @@ namespace emp {
     constexpr void ROTR_SELF(const size_t shift_size_raw);
 
   public:
+    static constexpr size_t npos = static_cast<size_t>(-1);
+
     /// @brief Default constructor; will build the default number of bits (often 0, but not always)
     /// @param init_val Initial value of all default bits.
     Bits(bool init_val=0) { if (init_val) SetAll(); else Clear(); }
@@ -580,30 +582,30 @@ namespace emp {
     /// @param num number of bits to delete, default 1.
     void Delete(const size_t index, const size_t num=1);
 
-    /// @brief Return the position of the first one; return -1 if no ones in vector.
-    [[nodiscard]] int FindOne() const;
+    /// @brief Return the position of the first one; return npos if no ones in vector.
+    [[nodiscard]] size_t FindOne() const;
 
-    /// @brief Return the position of the first zero; return -1 if no zeroes in vector.
-    [[nodiscard]] int FindZero() const;
+    /// @brief Return the position of the first zero; return npos if no zeroes in vector.
+    [[nodiscard]] size_t FindZero() const;
 
 
     /// Deprecated: Return the position of the first one; return -1 if no ones in vector.
     [[deprecated("Renamed to more accurate FindOne()")]]
     [[nodiscard]] int FindBit() const { return FindOne(); }
 
-    /// @brief Return the position of the first one after start_pos (or -1 if none)
+    /// @brief Return the position of the first one after start_pos (or npos if none)
     /// You can loop through all 1-bit positions of Bits object "bits" with:
     ///
-    ///   for (int pos = bits.FindOne(); pos >= 0; pos = bits.FindOne(pos+1)) { ... }
+    ///   for (size_t pos = bits.FindOne(); pos < bits.size(); pos = bits.FindOne(pos+1)) { ... }
 
-    [[nodiscard]] int FindOne(const size_t start_pos) const;
+    [[nodiscard]] size_t FindOne(const size_t start_pos) const;
 
-    /// @brief Return the position of the first zero after start_pos (or -1 if none)
+    /// @brief Return the position of the first zero after start_pos (or npos if none)
     /// You can loop through all 0-bit positions of Bits object "bits" with:
     ///
-    ///   for (int pos = bits.FindZero(); pos >= 0; pos = bits.FindZero(pos+1)) { ... }
+    ///   for (size_t pos = bits.FindZero(); pos < bits.size(); pos = bits.FindZero(pos+1)) { ... }
 
-    [[nodiscard]] int FindZero(const size_t start_pos) const;
+    [[nodiscard]] size_t FindZero(const size_t start_pos) const;
 
     /// @brief Special version of FindOne takes int; common way to call.
     [[nodiscard]] int FindOne(int start_pos) const {
@@ -620,10 +622,10 @@ namespace emp {
     [[nodiscard]] int FindBit(const size_t start_pos) const;
 
     /// @brief Find the most-significant set-bit.
-    [[nodiscard]] int FindMaxOne() const;
+    [[nodiscard]] size_t FindMaxOne() const;
 
-    /// @brief Return the position of the first one and change it to a zero.  Return -1 if none.
-    int PopOne();
+    /// @brief Return the position of the first one and change it to a zero.  Return npos if none.
+    size_t PopOne();
 
     /// Deprecated version of PopOne().
     [[deprecated("Renamed to more accurate PopOne()")]]
@@ -645,6 +647,20 @@ namespace emp {
 
     /// @brief Return true if any ones are in common with another Bits.
     [[nodiscard]] bool HasOverlap(const Bits & in) const;
+
+    /// @brief Run the provided function on each one index.
+    template <typename FUN_T>
+    void ForEach(FUN_T && fun) { for (size_t i = FindOne(); i < GetSize(); i=FindOne(i+1)) fun(i); }
+
+    /// @brief Run the provided function on each pair of one indices.
+    template <typename FUN_T>
+    void ForEachPair(FUN_T && fun) {
+      for (size_t i = FindOne(); i < GetSize(); i=FindOne(i+1)) {
+        for (size_t j = FindOne(i+1); j < GetSize(); j=FindOne(j+1)) {
+          fun(i, j);
+        }
+      }
+    }
 
 
     // =========  Print/String Functions  ========= //
@@ -1669,10 +1685,10 @@ namespace emp {
   /// and returning the value as a double.
   template <typename DATA_T, bool ZERO_LEFT>
   double Bits<DATA_T,ZERO_LEFT>::GetValue() const {
-    const int max_one = FindMaxOne();
+    const size_t max_one = FindMaxOne();
 
     // If there are no ones, this value must be 0.
-    if (max_one == -1) return 0.0;
+    if (max_one == npos) return 0.0;
 
     // If all ones are in the least-significant field, just return it.
     if (max_one < 64) return (double) GetUInt64(0);
@@ -1861,66 +1877,63 @@ namespace emp {
     Resize(GetSize() - num);               // Crop off end bits.
   }
 
-  /// Return the position of the first one; return -1 if no ones in vector.
+  /// Return the position of the first one; return npos if no ones in vector.
   template <typename DATA_T, bool ZERO_LEFT>
-  int Bits<DATA_T,ZERO_LEFT>::FindOne() const {
+  size_t Bits<DATA_T,ZERO_LEFT>::FindOne() const {
     const size_t NUM_FIELDS = _data.NumFields();
     size_t field_id = 0;
     while (field_id < NUM_FIELDS && _data.bits[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
-      (int) (find_bit(_data.bits[field_id]) + (field_id * FIELD_BITS))  :  -1;
+      (find_bit(_data.bits[field_id]) + (field_id * FIELD_BITS))  :  npos;
   }
 
-  /// Return the position of the first zero; return -1 if no zeros in vector.
+  /// Return the position of the first zero; return npos if no zeros in vector.
   template <typename DATA_T, bool ZERO_LEFT>
-  int Bits<DATA_T,ZERO_LEFT>::FindZero() const {
+  size_t Bits<DATA_T,ZERO_LEFT>::FindZero() const {
     const size_t NUM_FIELDS = _data.NumFields();
     size_t field_id = 0;
     while (field_id < NUM_FIELDS && _data.bits[field_id]==FIELD_ALL) field_id++;
     return (field_id < NUM_FIELDS) ?
-      (int) (find_bit(~_data.bits[field_id]) + (field_id * FIELD_BITS))  :  -1;
+      (find_bit(~_data.bits[field_id]) + (field_id * FIELD_BITS))  :  npos;
   }
 
-  /// Return the position of the first one after start_pos; return -1 if no ones in vector.
+  /// Return the position of the first one after start_pos; return npos if no ones in vector.
   /// You can loop through all 1-bit positions in "bits" with:
   ///
-  ///   for (int pos = bits.FindOne(); pos >= 0; pos = bits.FindOne(pos+1)) { ... }
+  ///   for (size_t pos = bits.FindOne(); pos < bits.size(); pos = bits.FindOne(pos+1)) { ... }
 
   template <typename DATA_T, bool ZERO_LEFT>
-  int Bits<DATA_T,ZERO_LEFT>::FindOne(const size_t start_pos) const {
-    if (start_pos >= GetSize()) return -1;          // If we are past the end, return fail.
+  size_t Bits<DATA_T,ZERO_LEFT>::FindOne(const size_t start_pos) const {
+    if (start_pos >= GetSize()) return npos;        // If we are past the end, return fail.
     size_t field_id = FieldID(start_pos);           // What field do we start in?
     const size_t field_pos = FieldPos(start_pos);   // What position in that field?
 
     // If there's a hit in a partial first field, return it.
     if (field_pos && (_data.bits[field_id] & ~(MaskField(field_pos)))) {
-      return (int) (find_bit(_data.bits[field_id] & ~(MaskField(field_pos))) +
-                    field_id * FIELD_BITS);
+      return find_bit(_data.bits[field_id] & ~(MaskField(field_pos))) + field_id*FIELD_BITS;
     }
 
     // Search other fields...
     const size_t NUM_FIELDS = _data.NumFields();
     if (field_pos) field_id++;
     while (field_id < NUM_FIELDS && _data.bits[field_id]==0) field_id++;
-    return (field_id < NUM_FIELDS) ?
-      (int) (find_bit(_data.bits[field_id]) + (field_id * FIELD_BITS)) : -1;
+    return (field_id < NUM_FIELDS) ? (find_bit(_data.bits[field_id]) + field_id*FIELD_BITS) : npos;
   }
 
-  /// Return the position of the first zero after start_pos; return -1 if no zeroes in vector.
+  /// Return the position of the first zero after start_pos; return npos if no zeroes in vector.
   /// You can loop through all 0-bit positions in "bits" with:
   ///
-  ///   for (int pos = bits.FindZero(); pos >= 0; pos = bits.FindZero(pos+1)) { ... }
+  ///   for (size_t pos = bits.FindZero(); pos < bits.size(); pos = bits.FindZero(pos+1)) { ... }
 
   template <typename DATA_T, bool ZERO_LEFT>
-  int Bits<DATA_T,ZERO_LEFT>::FindZero(const size_t start_pos) const {
-    if (start_pos >= GetSize()) return -1;          // If we are past the end, return fail.
+  size_t Bits<DATA_T,ZERO_LEFT>::FindZero(const size_t start_pos) const {
+    if (start_pos >= GetSize()) return npos;          // If we are past the end, return fail.
     size_t field_id = FieldID(start_pos);           // What field do we start in?
     const size_t field_pos = FieldPos(start_pos);   // What position in that field?
 
     // If there's a hit in a partial first field, return it.
     if (field_pos && (~_data.bits[field_id] & ~(MaskField(field_pos)))) {
-      return (int) (find_bit(~_data.bits[field_id] & ~(MaskField(field_pos))) +
-                    field_id * FIELD_BITS);
+      return find_bit(~_data.bits[field_id] & ~(MaskField(field_pos))) + field_id * FIELD_BITS;
     }
 
     // Search other fields...
@@ -1928,23 +1941,23 @@ namespace emp {
     if (field_pos) field_id++;
     while (field_id < NUM_FIELDS && _data.bits[field_id]==FIELD_ALL) field_id++;
     return (field_id < NUM_FIELDS) ?
-      (int) (find_bit(~_data.bits[field_id]) + (field_id * FIELD_BITS)) : -1;
+      (find_bit(~_data.bits[field_id]) + (field_id * FIELD_BITS)) : npos;
   }
 
   /// Find the most-significant set-bit.
   template <typename DATA_T, bool ZERO_LEFT>
-  int Bits<DATA_T,ZERO_LEFT>::FindMaxOne() const {
+  size_t Bits<DATA_T,ZERO_LEFT>::FindMaxOne() const {
     // Find the max field with a one.
     size_t max_field = _data.NumFields() - 1;
     while (max_field > 0 && _data.bits[max_field] == 0) max_field--;
 
-    // If there are no ones, return -1.
-    if (_data.bits[max_field] == 0) return -1;
+    // If there are no ones, return npos.
+    if (_data.bits[max_field] == 0) return npos;
 
     const field_t field = _data.bits[max_field]; // Save a local copy of this field.
-    field_t mask = (field_t) -1;           // Mask off the bits still under consideration.
-    size_t offset = 0;                     // Indicate where the mask should be applied.
-    size_t range = FIELD_BITS;             // Indicate how many bits are in the mask.
+    field_t mask = FIELD_ALL;                    // Mask off bits still under consideration.
+    size_t offset = 0;                           // Position where mask should be applied.
+    size_t range = FIELD_BITS;                   // Num bits in the mask.
 
     while (range > 1) {
       // Cut the range in half and see if we need to adjust the offset.
@@ -1955,14 +1968,14 @@ namespace emp {
       if (field & (mask << (offset + range))) offset += range;
     }
 
-    return (int) (max_field * FIELD_BITS + offset);
+    return max_field * FIELD_BITS + offset;
   }
 
-  /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
+  /// Return the position of the first one and change it to a zero.  Return npos if no ones.
   template <typename DATA_T, bool ZERO_LEFT>
-  int Bits<DATA_T,ZERO_LEFT>::PopOne() {
-    const int out_bit = FindOne();
-    if (out_bit >= 0) Clear((size_t) out_bit);
+  size_t Bits<DATA_T,ZERO_LEFT>::PopOne() {
+    const size_t out_bit = FindOne();
+    if (out_bit < size()) Clear((size_t) out_bit);
     return out_bit;
   }
 
@@ -2002,9 +2015,9 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   emp::vector<emp::Range<size_t>> Bits<DATA_T,ZERO_LEFT>::GetRanges() const {
     emp::vector<emp::Range<size_t>> out_ranges;
-    for (int start_pos = FindOne(), end_pos; start_pos >= 0; start_pos = FindOne(end_pos+1)) {
+    for (size_t start_pos = FindOne(), end_pos; start_pos < size(); start_pos = FindOne(end_pos+1)) {
       end_pos = FindZero(start_pos);
-      end_pos = (end_pos == -1) ? GetSize() - 1 : end_pos - 1;
+      end_pos = (end_pos == npos) ? GetSize() - 1 : end_pos - 1;
       out_ranges.emplace_back(start_pos, end_pos);
     }
     return out_ranges;
