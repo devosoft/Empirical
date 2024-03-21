@@ -92,6 +92,8 @@ namespace emp {
       Bits_Data_Size_Var(size_t in_size=DEFAULT_SIZE) : num_bits(in_size) { }
       Bits_Data_Size_Var(const Bits_Data_Size_Var &) = default;
 
+      Bits_Data_Size_Var & operator=(const Bits_Data_Size_Var &) = default;
+
       template <class Archive>
       void serialize(Archive & ar) { ar(num_bits); }
 
@@ -104,7 +106,7 @@ namespace emp {
       using field_t = bits_field_t;
       static constexpr size_t DEFAULT_SIZE = NUM_BITS;
 
-      constexpr void SetSize(size_t new_size) {
+      constexpr void SetSize([[maybe_unused]] size_t new_size) {
         emp_assert(new_size == NUM_BITS, "Cannot change to new_size");
       }
 
