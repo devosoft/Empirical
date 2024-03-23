@@ -714,6 +714,11 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   for (int i = bv.FindOne(); i != -1; i = bv.FindOne(i+1)) count++;
   CHECK(count == bv.CountOnes());
 
+  // Try again with the built-in ForEach function.
+  count = 0;
+  bv.ForEach([&count](size_t){ ++count; });
+  CHECK(count == bv.CountOnes());
+
 }
 
 TEST_CASE("8: Test printing and string functions.", "[bits]") {
