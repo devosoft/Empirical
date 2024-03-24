@@ -710,14 +710,20 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   // Try again with Find, this time with a random sequence of ones.
   emp::Random random(1);
   bv.Randomize(random);
+  size_t target = bv.CountOnes();
+
   size_t count = 0;
   for (int i = bv.FindOne(); i != -1; i = bv.FindOne(i+1)) count++;
-  CHECK(count == bv.CountOnes());
+  CHECK(count == target);
 
   // Try again with the built-in ForEach function.
   count = 0;
   bv.ForEach([&count](size_t){ ++count; });
-  CHECK(count == bv.CountOnes());
+  CHECK(count == target);
+
+  count = 0;
+  bv.ForEachPair([&count](size_t, size_t){ ++count; });
+  CHECK(count == target * (target-1) / 2);
 
 }
 
