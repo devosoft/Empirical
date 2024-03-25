@@ -662,6 +662,33 @@ namespace emp {
       }
     }
 
+    // @brief Test if ANY of the bit positions have a given property.
+    template <typename FUN_T>
+    bool TestAny(FUN_T && fun) {
+      for (size_t i = FindOne(); i < GetSize(); i=FindOne(i+1)) {
+        if (fun(i)) return true;
+      }
+      return false;
+    }
+
+    // @brief Test if ALL of the bit positions have a given property.
+    template <typename FUN_T>
+    bool TestAll(FUN_T && fun) {
+      for (size_t i = FindOne(); i < GetSize(); i=FindOne(i+1)) {
+        if (!fun(i)) return false;
+      }
+      return true;
+    }
+
+    // @brief Test if NONE of the bit positions have a given property.
+    template <typename FUN_T>
+    bool TestNone(FUN_T && fun) {
+      for (size_t i = FindOne(); i < GetSize(); i=FindOne(i+1)) {
+        if (fun(i)) return false;
+      }
+      return true;
+    }
+
 
     // =========  Print/String Functions  ========= //
 
