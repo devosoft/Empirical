@@ -725,6 +725,22 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   bv.ForEachPair([&count](size_t, size_t){ ++count; });
   CHECK(count == target * (target-1) / 2);
 
+  bv.Resize(10);
+  bv.Clear();
+  bv.Set(1).Set(3).Set(5).Set(7).Set(9);
+
+  // Are they all odd?
+  CHECK( bv.TestAll([](size_t pos){ return pos % 2 == 1; }) == true );
+  CHECK( bv.TestAll([](size_t pos){ return pos % 3 == 1; }) == false );
+
+  CHECK( bv.TestAny([](size_t pos){ return pos % 2 == 1; }) == true );
+  CHECK( bv.TestAny([](size_t pos){ return pos % 3 == 1; }) == true );
+  CHECK( bv.TestAny([](size_t pos){ return pos == 5; }) == true );
+  CHECK( bv.TestAny([](size_t pos){ return pos == 6; }) == false );
+
+  CHECK( bv.TestNone([](size_t pos){ return pos % 2 == 1; }) == false );
+  CHECK( bv.TestNone([](size_t pos){ return pos == 5; }) == false );
+  CHECK( bv.TestNone([](size_t pos){ return pos == 6; }) == true );
 }
 
 TEST_CASE("8: Test printing and string functions.", "[bits]") {
