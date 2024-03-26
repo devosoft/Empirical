@@ -309,7 +309,7 @@ namespace emp {
     size_t num_roots;         ///< How many distinct injected ancestors are currently in population?
     mutable int max_depth;    ///< Depth of deepest taxon. -1 means needs to be recalculated
 
-    size_t next_id;           ///< What ID value should the next new taxon have?
+    long long size_t next_id;           ///< What ID value should the next new taxon have?
     size_t curr_update;
 
     DataManager<double, data::Current, data::Info, data::Range, data::Stats, data::Pull> data_nodes;
@@ -350,7 +350,7 @@ namespace emp {
     size_t GetNumRoots() const { return num_roots; }
 
     /// What ID will the next taxon have?
-    size_t GetNextID() const {return next_id;}
+    long long size_t GetNextID() const {return next_id;}
 
     /// What is the average phylogenetic depth of organisms in the population?
     double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
