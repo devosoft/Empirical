@@ -150,7 +150,7 @@ namespace emp {
     using this_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using info_t = ORG_INFO;
 
-    size_t id;                ///<  ID for this Taxon (Unique within this Systematics)
+    long long size_t id;                ///<  ID for this Taxon (Unique within this Systematics)
     const info_t info;        ///<  Details for the organisms associated within this taxanomic group.
     Ptr<this_t> parent;       ///<  Pointer to parent group (nullptr if injected)
     std::set<Ptr<this_t> > offspring; ///< Pointers to all immediate offspring taxa
@@ -167,7 +167,7 @@ namespace emp {
   public:
     using data_t = DATA_STRUCT;
 
-    Taxon(size_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
+    Taxon(long long size_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
      : id (_id), info(_info), parent(_parent)
      , num_orgs(0), tot_orgs(0), num_offspring(0), total_offspring(0)
      , depth(parent ? (parent->depth+1) : 0)
@@ -183,7 +183,7 @@ namespace emp {
     }
 
     /// Get a unique ID for this taxon; IDs are assigned sequentially, so newer taxa have higher IDs.
-    size_t GetID() const { return id; }
+    long long size_t GetID() const { return id; }
 
     /// Retrieve the tracked info associated with this Taxon.
     const info_t & GetInfo() const { return info; }
