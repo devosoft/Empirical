@@ -650,11 +650,13 @@ namespace emp {
 
     /// @brief Run the provided function on each one index.
     template <typename FUN_T>
-    void ForEach(FUN_T && fun) { for (size_t i = FindOne(); i < GetSize(); i=FindOne(i+1)) fun(i); }
+    void ForEach(FUN_T && fun) const {
+      for (size_t i = FindOne(); i < GetSize(); i=FindOne(i+1)) fun(i);
+    }
 
     /// @brief Run the provided function on each pair of one indices.
     template <typename FUN_T>
-    void ForEachPair(FUN_T && fun) {
+    void ForEachPair(FUN_T && fun) const {
       for (size_t i = FindOne(); i < GetSize(); i=FindOne(i+1)) {
         for (size_t j = FindOne(i+1); j < GetSize(); j=FindOne(j+1)) {
           fun(i, j);
