@@ -56,11 +56,18 @@ namespace emp {
     std::cerr << std::endl;
   }
 
-  /// emp_debug() will print its contents as a message in debug mode and BLOCK release mode until
+  /// emp_debug_only() will print its contents as a message in debug mode and BLOCK release mode until
   /// it is removed.  It's a useful too for printing "Ping1", "Ping2", etc, but no forgetting to
   /// remove them.
-  #define emp_debug(...) { BlockRelease(true); emp::emp_debug_print(__VA_ARGS__); }
+  #define emp_debug_only(...) { BlockRelease(true); emp::emp_debug_print(__VA_ARGS__); }
 
+
+  /// emp_debug(...) will print its contents in debug mode, but ignore them otherwise.
+#ifdef NDEBUG
+  #define emp_debug(...)
+#else
+  #define emp_debug(...) emp::emp_debug_print(__VA_ARGS__)
+#endif
 
   /// Track particular lines of code to report errors about them from elsewhere.
   static auto & GetDebugLineMap() {
@@ -76,7 +83,7 @@ namespace emp {
     return GetDebugLineMap()[name];
   }
 
-  static void AddDebugLine(std::string name, std::string file, size_t line) {
+  [[maybe_unused]] static void AddDebugLine(std::string name, std::string file, size_t line) {
     std::stringstream ss;
     ss << file << ':' << line;
     notify::TestError(HasDebugLine(name), "Adding a second debug line named '", name, "'.");
