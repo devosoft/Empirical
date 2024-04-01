@@ -4,9 +4,9 @@
 #include "../../../include/emp/bits/BitVector.hpp"
 #include "../../../include/emp/debug/debug.hpp"
 
+template <size_t MAX_BITS>
 class Graph {
 private:
-  static constexpr size_t MAX_BITS = 200;
   using bits_t = emp::StaticBitVector<MAX_BITS>;
 
   emp::vector<bits_t> edges;
@@ -41,7 +41,12 @@ public:
   const bits_t & GetKeys() const { return keys; }
   const bits_t & GetUnknown() const { return unknown; }
 
-  size_t GetNextID() const { return static_cast<size_t>(unknown.FindOne()); }
+  // size_t GetNextID() const { return static_cast<size_t>(unknown.FindOne()); }
+  size_t GetNextID() const {
+    // return unknown.FindOne();
+    // return unknown.MaxIndex([this](size_t id){ return GetDegree(id); });
+    return unknown.MaxIndex([this](size_t id){ return (edges[id] & keys).CountOnes()*5 +  GetDegree(id); });
+  }
 
   bool IsUnsolvable() const {
     if (IsSolved()) return false;
@@ -171,20 +176,32 @@ public:
 
     // First scan through active keys.
     for (size_t i = keys.FindOne(); i < keys.size() && GetKeyCount() > 1; i = keys.FindOne(i+1)) {
-      if (GetDegree(i) == 1) {
+      switch (GetDegree(i)) {
+      case 0:
+        return false; // No need for more optimizations; we are already done.
+      case 1:
         emp_debug("OPT: ", i, " is KEY degree one; removing and setting ", edges[i].FindOne(), " as key.");
         SetKey( edges[i].FindOne() );  // Set the neighbor as key before removing the current vertex.
         EraseNode(i);
         progress = true;
+        break;
+      // case 2:
+      //   // Degree 2 can remove an opposite edge.
+      //   size_t n1 = edges[i].FindOne();
+      //   size_t n2 = edges[i].FindOne(n1+1);
+      //   if (HasEdge(n1, n2)) {
+      //     RemoveEdge(n1, n2);
+      //     progress = true;
+      //   }
       }
     }
 
-    // Now scan through active non-keys.
+    // Then scan through active non-keys.
     for (size_t i = unknown.FindOne(); i < unknown.size(); i = unknown.FindOne(i+1)) {
       switch (GetDegree(i)) {
       case 0:
       case 1:
-        emp_debug("OPT: ", i, " is NON-key degree one; removing.");
+        emp_debug("OPT: ", i, " is NON-key degree zero or one; removing.");
         EraseNode(i);
         progress = true;
         break;
@@ -213,6 +230,25 @@ public:
       progress |= check_opts;
     }
     return progress;
+  }
+
+  bool TestOneNodeSolution() {
+    size_t id = unknown.FindIndex([this](size_t id){ return (edges[id] & keys) == keys; });
+    if (id < unknown.size()) { SetKey(id); return true; }
+    return false;
+  }
+
+  bool TestTwoNodeSolution() {
+    return unknown.HasIndexPair([this](size_t id1, size_t id2) {
+      if (((edges[id1] | edges[id2]) & keys) == keys) { // Do these two nodes cover everything?
+        if (HasEdge(id1, id2) || (edges[id1] & edges[id2] & keys)) { // Are the groups connected?
+          SetKey(id1);
+          SetKey(id2);
+          return true;
+        }
+      }
+      return false;
+    });
   }
 
   void PrintMatrix(std::ostream & os=std::cout) const {
