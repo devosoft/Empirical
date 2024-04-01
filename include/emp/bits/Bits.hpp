@@ -664,6 +664,52 @@ namespace emp {
       }
     }
 
+    /// @brief Scan through all of the one indices to determine which one maximizes a function.
+    template <typename FUN_T>
+    size_t MaxIndex(FUN_T && fun) const {
+      size_t max_id = FindOne();
+      if (max_id == npos) return npos;
+      auto max_value = fun(max_id);
+      for (size_t i = FindOne(max_id+1); i < GetSize(); i=FindOne(i+1)) {
+        const auto cur_val = fun(i);
+        if (cur_val > max_value) {
+          max_value = cur_val;
+          max_id = i;
+        }
+      }
+      return max_id;
+    }
+
+    /// @brief Find a one-index that makes a function true
+    template <typename FUN_T>
+    size_t FindIndex(FUN_T && fun, size_t start_pos=0) const {
+      for (size_t id = FindOne(start_pos); id < GetSize(); id=FindOne(id+1)) {
+        if (fun(id)) return id;
+      }
+      return npos;
+    }
+
+    /// @brief Identifies if an index exists that makes a function true
+    template <typename FUN_T>
+    bool HasIndex(FUN_T && fun, size_t start_pos=0) const {
+      for (size_t id = FindOne(start_pos); id < GetSize(); id=FindOne(id+1)) {
+        if (fun(id)) return true;
+      }
+      return false;
+    }
+
+    /// @brief Identifies if an index pair exists that makes a function true
+    template <typename FUN_T>
+    bool HasIndexPair(FUN_T && fun, size_t start_pos=0) const {
+      for (size_t i = FindOne(start_pos); i < GetSize(); i=FindOne(i+1)) {
+        for (size_t j = FindOne(i+1); j < GetSize(); j=FindOne(j+1)) {
+          if (fun(i, j)) return true;
+        }
+      }
+      return false;
+    }
+
+
     // @brief Test if ANY of the bit positions have a given property.
     template <typename FUN_T>
     bool TestAny(FUN_T && fun) {
