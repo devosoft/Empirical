@@ -14,6 +14,7 @@ private:
   graph_t start_graph;
   graph_t best_graph;
   size_t best_size = 10000000;
+  bool solvable = true;
 
   emp::array<graph_t, MAX_BITS> graphs;
 
@@ -45,6 +46,10 @@ public:
   }
 
   void Solve() {
+    if (!start_graph.TestSolvable()) {
+      solvable = false;
+      return;
+    }
     graphs[0] = start_graph;
     graphs[0].Setup();
     Solve(0);
@@ -90,6 +95,10 @@ public:
   void PrintBest(std::ostream & os=std::cout) const {
     // os << "Result: " << best_graph.GetIncluded() << std::endl;
     // start_graph.PrintSubgraph(best_graph.GetIncluded(), os);
-    os << best_graph.GetIncluded().CountOnes() << std::endl;
+    if (solvable) {
+      os << best_graph.GetIncluded().CountOnes() << std::endl;
+    } else {
+      os << 200 << std::endl;      
+    }
   }
 };
