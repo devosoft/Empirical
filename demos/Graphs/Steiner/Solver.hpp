@@ -62,6 +62,7 @@ public:
     if (graph.TestOneNodeSolution()) { MarkSolution(graph); return; } // Solved with one new node.
     if (graph.TestTwoNodeSolution()) { MarkSolution(graph); return; } // Solved with two new nodes.
     if (graph.GetIncludeSize()+3 >= best_size) return;                // Bounded!
+    if (graph.GetIncludeSize()+graph.CalcMinKeysNeeded() >= best_size) return; // Bounded!
     if (graph.GetUnknownSize() == 0) return;                          // No solution possible.
 
     size_t next_id = graph.GetNextID();
