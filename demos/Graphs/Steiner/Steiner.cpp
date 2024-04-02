@@ -37,7 +37,7 @@ int main(int argc, char * argv[])
     Load (graph, std::cin);
   }
 
-  graph.Setup();
+  // graph.Setup();
   // graph.PrintMatrix();
   // graph.PrintEdges();
   // graph.Optimize();
