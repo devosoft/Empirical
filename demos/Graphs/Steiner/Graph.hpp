@@ -26,6 +26,7 @@ public:
   bool HasKey(size_t id) const { return keys.Has(id); }
   bool HasEdge(size_t id1, size_t id2) const { return edges[id1].Has(id2); }
   size_t GetDegree(size_t id) const { return edges[id].CountOnes(); }
+  size_t GetKeyDegree(size_t id) const { return (edges[id] & keys).CountOnes(); }
 
   size_t GetKeyCount() const { return keys.CountOnes(); }
   size_t GetIncludeSize() const { return included.CountOnes(); }
@@ -45,7 +46,14 @@ public:
   size_t GetNextID() const {
     // return unknown.FindOne();
     // return unknown.MaxIndex([this](size_t id){ return GetDegree(id); });
-    return unknown.MaxIndex([this](size_t id){ return (edges[id] & keys).CountOnes()*5 +  GetDegree(id); });
+    return unknown.MaxIndex([this](size_t id){ return GetKeyDegree(id)*5 +  GetDegree(id); });
+  }
+
+  // Get a connection to a neighbor OTHER than the one specified.
+  size_t GetOtherNeighbor(size_t target_id, size_t known_id) const {
+    size_t out = edges[target_id].FindOne();
+    if (out == known_id) out = edges[target_id].FindOne(known_id+1);
+    return out;
   }
 
   bool IsUnsolvable() const {
@@ -185,14 +193,42 @@ public:
         EraseNode(i);
         progress = true;
         break;
-      // case 2:
-      //   // Degree 2 can remove an opposite edge.
-      //   size_t n1 = edges[i].FindOne();
-      //   size_t n2 = edges[i].FindOne(n1+1);
-      //   if (HasEdge(n1, n2)) {
-      //     RemoveEdge(n1, n2);
-      //     progress = true;
-      //   }
+      case 2:
+        // Degree 2 can remove an opposite edge.
+        const size_t n1 = edges[i].FindOne();
+        const size_t n2 = edges[i].FindOne(n1+1);
+        if (HasEdge(n1, n2)) {
+          RemoveEdge(n1, n2);
+          progress = true;
+          break;
+        }
+
+        // Can also follow a series of degree 2 vertices to key and connect in closer.
+        size_t dist1 = 1;
+        size_t prev_id = i;
+        size_t next_id = n1;
+        while (IsKey(next_id) == false && GetDegree(next_id) == 2) {
+          prev_id = GetOtherNeighbor(next_id, prev_id);
+          std::swap(prev_id, next_id);
+          ++dist1;
+        }
+        if (!IsKey(next_id)) break; // If we didn't make it to a key, no optimization.
+
+        size_t dist2 = 1;
+        prev_id = i;
+        next_id = n2;
+        while (IsKey(next_id) == false && GetDegree(next_id) == 2) {
+          prev_id = GetOtherNeighbor(next_id, prev_id);
+          std::swap(prev_id, next_id);
+          ++dist2;
+        }
+        if (!IsKey(next_id)) break; // If we didn't make it to a key, no optimization.
+
+        // We now have the two distances; connect to the closest!
+        if (dist1 <= dist2) SetKey(n1);
+        else SetKey(n2);
+        progress = true;
+        break;
       }
     }
 
@@ -230,6 +266,13 @@ public:
       progress |= check_opts;
     }
     return progress;
+  }
+
+  // Place a lower bound on the number of additional keys that will be needed.
+  size_t CalcMinKeysNeeded() const {
+    // Find the maximum number of keys a single node can link in.
+    size_t max_id = unknown.MaxIndex([this](size_t id){ return GetKeyDegree(id); });
+    return (GetKeyCount()-1) / GetKeyDegree(max_id) + 1;
   }
 
   bool TestOneNodeSolution() {
