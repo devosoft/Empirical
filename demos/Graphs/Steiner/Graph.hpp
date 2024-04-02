@@ -28,6 +28,7 @@ public:
   size_t GetDegree(size_t id) const { return edges[id].CountOnes(); }
   size_t GetKeyDegree(size_t id) const { return (edges[id] & keys).CountOnes(); }
 
+  size_t GetVertexCount() const { return included.size(); }
   size_t GetKeyCount() const { return keys.CountOnes(); }
   size_t GetIncludeSize() const { return included.CountOnes(); }
   size_t GetUnknownSize() const { return unknown.CountOnes(); }
@@ -62,6 +63,29 @@ public:
       if (GetDegree(i) == 0) return true;
     }
     return false;
+  }
+
+  bits_t CalcReachable(size_t start_id) const {
+    bits_t found(keys.size()), explored(keys.size());
+    found.Set(start_id);
+
+    while (found) {
+      size_t next_id = found.FindOne();  // Grab the next found vertex
+      found |= edges[next_id];           // Explore all of its edges
+      explored.set(next_id);             // Make it as explored
+      found &= ~explored;                // Remove all explored nodes from found
+    }
+
+    return explored;
+  }
+
+  bool TestSolvable() const {
+    if (keys.None()) return true; // Trivially solvable.
+    bits_t reachable = CalcReachable(keys.FindOne());
+    // std::cout << "Keys:             " << keys << std::endl;
+    // std::cout << "Reachable:        " << reachable << std::endl;
+    // std::cout << "Unreachable keys: " << (keys & ~reachable) << std::endl;
+    return !(keys & ~reachable);
   }
 
   void Resize(size_t new_size) {
