@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2022.
+ *  @date 2016-2024.
  *
  *  @file Ptr.hpp
  *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
@@ -799,7 +799,7 @@ namespace emp {
     TYPE * ptr;                 ///< The raw pointer associated with this Ptr object.
 
   public:
-    BasePtr(TYPE * in_ptr) : ptr(in_ptr) { }
+    BasePtr(TYPE * in_ptr=nullptr) : ptr(in_ptr) { }
 
     // Dereference a pointer.
     [[nodiscard]] TYPE & operator*() const { return *ptr; }
@@ -817,13 +817,13 @@ namespace emp {
 
   /// Base class with functionality only needed in void pointers.
   template <> class BasePtr<void> {
-  protected: void * ptr;                 ///< The raw pointer associated with this Ptr object.
-  public: BasePtr(void * in_ptr) : ptr(in_ptr) { }
+  protected: void * ptr;                ///< The raw pointer associated with this Ptr object.
+  public: BasePtr(void * in_ptr=nullptr) : ptr(in_ptr) { }
   };
 
   template <> class BasePtr<const void> {
   protected: const void * ptr;           ///< The raw pointer associated with this Ptr object.
-  public: BasePtr(const void * in_ptr) : ptr(in_ptr) { }
+  public: BasePtr(const void * in_ptr=nullptr) : ptr(in_ptr) { }
   };
 
   template <typename TYPE>
@@ -835,13 +835,13 @@ namespace emp {
     using element_type = TYPE;
 
     /// Default constructor
-    Ptr() : BasePtr<TYPE>(nullptr) {}
+    Ptr() = default;
 
     /// Copy constructor
     Ptr(const Ptr<TYPE> & _in) : BasePtr<TYPE>(_in.ptr) {}
 
     /// Construct from raw ptr
-    template <typename T2> Ptr(T2 * in_ptr, bool=false) : BasePtr<TYPE>(in_ptr) {}
+    template <typename T2> Ptr(T2 * _ptr, bool=false) : BasePtr<TYPE>(_ptr) {}
 
     /// Construct from array
     template <typename T2> Ptr(T2 * _ptr, size_t, bool) : BasePtr<TYPE>(_ptr) {}
@@ -853,7 +853,7 @@ namespace emp {
     Ptr(std::nullptr_t) : Ptr() {}
 
     /// Destructor
-    ~Ptr() { ; }
+    ~Ptr() = default;
 
     [[nodiscard]] bool IsNull() const { return ptr == nullptr; }
     [[nodiscard]] TYPE * Raw() const { return ptr; }
