@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
+ *  @date 2016-2024.
  *
  *  @file SolveState.hpp
  *  @brief Used as part of a branching solver to keep track of the current state.
@@ -18,11 +18,10 @@
 
 namespace emp {
 
-  /// Often in a branch-and-bound algorithm, we need to identify the sub-set of items that
-  /// maximizes (or minimizes) an optimization metric.  SolveState keeps track of the current
-  /// state for which items have been locked in as "included" in the current branks, which have
-  /// been "excluded", and which are still "unknown" (still to be decided upon.)
-  /// All tracking is performed with BitVectors for high efficiency.
+  /// Often in branch-and-bound algorithms, we must identify the sub-set of items that
+  /// maximizes (or minimizes) an optimization metric.  SolveState tracks the current
+  /// state for which items have been "included" in a prospective solution, which have
+  /// been "excluded", and which are still "unknown" (yet be decided upon.)
 
   class SolveState {
   private:
@@ -33,18 +32,21 @@ namespace emp {
     SolveState(size_t state_size=0) : in_items(state_size), unk_items(state_size) {
       unk_items.SetAll();
     }
-    SolveState(const SolveState & in) : in_items(in.in_items), unk_items(in.unk_items) { ; }
+    SolveState(const SolveState &) = default;
+    SolveState(SolveState &&) = default;
     ~SolveState() { ; }
 
-    /// Set this SolveState to be identical to another.
-    SolveState & operator=(const SolveState & in) {
-      in_items = in.in_items;
-      unk_items = in.unk_items;
-      return *this;
-    }
+    SolveState & operator=(const SolveState &) = default;
+    SolveState & operator=(SolveState &&) = default;
 
     /// How many items are being considered in the current SolveState?
     size_t GetSize() const { return in_items.GetSize(); }
+
+    // Change all states to Unknown
+    void Reset() {
+      in_items.Clear();
+      unk_items.SetAll();
+    }
 
     /// Test if a particular item is going to be included for sure in the current solve state.
     /// (If it has been excluded -OR- is yet to be decided upon, false will be returned)
@@ -77,28 +79,32 @@ namespace emp {
     const BitVector & GetUnkVector() const { return unk_items; }
 
     /// Get the BitVector associated with which iterm have been excluded for sure.
-    BitVector GetOutVector() const { return ~in_items & ~unk_items; }
+    BitVector GetOutVector() const { return ~(in_items | unk_items); }
 
     /// Get the ID of the next unknown item.
+    int GetNextUnk() const { return unk_items.FindOne(); }
+
+    /// Get the ID of the next unknown item after a specified position.
     int GetNextUnk(size_t prev_unk) const {
       return unk_items.FindOne(prev_unk+1);
     }
 
-    /// Mark a specific item as to be included.
+    /// Mark a specific item as to be included; okay if it was previously excluded.
     void Include(size_t id) {
       emp_assert(id >= 0 && id < in_items.size());
-      unk_items.Set(id, false);
-      in_items.Set(id, true);
+      unk_items.Clear(id);
+      in_items.Set(id);
     }
 
     /// Mark a specific item as to be excluded.
     void Exclude(size_t id) {
       emp_assert(id >= 0 && id < in_items.size());
+      emp_assert(!in_items.Has(id));  // Use ForceExclude if item may already be included.
       unk_items.Set(id, false);
     }
 
     /// Change our mind about a potentially included node (Be careful since many algorithms don't
-    /// requite this type of changes to be made.)
+    /// expect this type of change to be made.)
     void ForceExclude(size_t id) {
       unk_items.Set(id, false);
       in_items.Set(id, false);
