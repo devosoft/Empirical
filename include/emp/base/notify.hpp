@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021-2022.
+ *  @date 2021-2024.
  *
  *  @file notify.hpp
  *  @brief Tools to alert users of messages (including errors and warnings) in a consistant manner.
@@ -110,11 +110,6 @@ namespace notify {
     bool exit_on_fail = false;
 
   public:
-    HandlerSet() {}
-    HandlerSet(const HandlerSet &) = default;
-    HandlerSet(HandlerSet &&) = default;
-    ~HandlerSet() { }
-
     bool GetExitOnFail() const { return exit_on_fail; }
     HandlerSet & SetExitOnFail(bool _exit=true) {
       exit_on_fail = _exit;

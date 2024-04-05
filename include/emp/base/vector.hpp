@@ -233,6 +233,7 @@ namespace emp {
       revision++;
     }
     this_t & operator=(const this_t &) & = default;
+    this_t & operator=(this_t &&) & = default;
 
     T & operator[](size_t pos) {
       emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
@@ -304,8 +305,9 @@ namespace emp {
     using reference = typename stdv_t::reference;
     using const_reference = typename stdv_t::const_reference;
 
-    vector() : stdv_t() {};
-    vector(const this_t & _in) : stdv_t(_in) {};
+    vector() = default;
+    vector(const this_t & _in) = default;
+    vector(this_t && _in) = default;
     vector(size_t size) : stdv_t(size) { emp_assert(size < MAX_SIZE, size); }
     vector(size_t size, bool val) : stdv_t(size, val) { emp_assert(size < MAX_SIZE, size); }
     vector(std::initializer_list<bool> in_list) : stdv_t(in_list) { ; }
@@ -323,6 +325,7 @@ namespace emp {
       stdv_t::resize(new_size, val);
     }
     this_t & operator=(const this_t &) & = default;
+    this_t & operator=(this_t &&) & = default;
 
     auto operator[](size_t pos) -> decltype(stdv_t::operator[](pos)) {
       emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
