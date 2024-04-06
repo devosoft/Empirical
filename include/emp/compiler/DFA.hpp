@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
+ *  @date 2016-2024.
  *
  *  @file DFA.hpp
  *  @brief A Deterministic Finite Automata simulator.
@@ -51,6 +51,13 @@ namespace emp {
       transitions.resize(new_size);
       is_stop.resize(new_size, 0);
       for (auto i = old_size; i < transitions.size(); i++) transitions[i].fill(-1);
+    }
+
+    /// Add a single new, empty state and return its position.
+    size_t AddState() {
+      size_t out_id = GetSize();
+      Resize(out_id+1);
+      return out_id;
     }
 
     /// Return an array of all transitions associated with a specified state.
@@ -113,7 +120,7 @@ namespace emp {
     }
 
     /// Print details about this DFA.
-    void Print(std::ostream & os=std::cout) {
+    void Print(std::ostream & os=std::cout) const {
       os << "Num states = " << GetSize() << std::endl << "Stop IDs:";
       for (size_t i = 0; i < GetSize(); i++) if(IsStop(i)) os << " " << i;
       os << std::endl;

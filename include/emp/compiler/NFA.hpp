@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2024.
  *
  *  @file NFA.hpp
  *  @brief A Non-deterministic Finite Automata simulator
@@ -45,13 +45,13 @@ namespace emp {
   private:
     struct Transition {
       opts_t symbols;
-      Transition() : symbols() { }
+      Transition() = default;
     };
     struct State {
       std::map<size_t, Transition> trans;   ///< What symbol transitions are available?
       std::set<size_t> free_to;             ///< What other states can you move to for free?
       std::set<size_t> free_from;           ///< What other states can move here for free?
-      State() : trans(), free_to(), free_from() { }
+      State() = default;
     };
 
     emp::vector<State> states;           ///< Information about available states.
@@ -64,8 +64,10 @@ namespace emp {
         if (num_states > start) states[start].free_to.insert(start);
       }
     tNFA(const tNFA<S,STOP_TYPE> &) = default;
+    tNFA(tNFA<S,STOP_TYPE> &&) = default;
     ~tNFA() { ; }
     tNFA<S,STOP_TYPE> & operator=(const tNFA<S,STOP_TYPE> &) = default;
+    tNFA<S,STOP_TYPE> & operator=(tNFA<S,STOP_TYPE> &&) = default;
 
     /// Return the current number of states.
     size_t GetSize() const { return states.size(); }
@@ -257,6 +259,8 @@ namespace emp {
   private:
     const tNFA<NUM_SYMBOLS,STOP_TYPE> & nfa;  ///< Which NFA is this state set associated with?
     std::set<size_t> state_set;               ///< Which states are currently legal?
+
+    using this_t = tNFA_State<NUM_SYMBOLS,STOP_TYPE>;
   public:
     tNFA_State(const tNFA<NUM_SYMBOLS,STOP_TYPE> & _nfa) : nfa(_nfa), state_set() {
       state_set = nfa.GetStart();

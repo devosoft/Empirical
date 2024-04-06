@@ -147,7 +147,7 @@ namespace emp {
     protected:
       emp::vector<Ptr<re_base>> nodes;
     public:
-      re_parent() : nodes() { }
+      re_parent() = default;
       ~re_parent() { for (auto x : nodes) x.Delete(); }
       void Clear() { for (auto x : nodes) x.Delete(); nodes.resize(0); }
       virtual void push(Ptr<re_base> x) { emp_assert(x != nullptr); nodes.push_back(x); }
