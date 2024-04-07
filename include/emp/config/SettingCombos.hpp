@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
+ *  @date 2020-2024.
  *
  *  @file SettingCombos.hpp
  *  @brief A tool for exploring all parameter combinations
@@ -45,7 +45,7 @@ namespace emp {
                   const char _flag, const std::string & _args_label, const size_t _cap)
         : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name))
         , args_label(_args_label), cap(_cap) { }
-      virtual ~SettingBase() { }
+      virtual ~SettingBase() = default;
 
       virtual size_t GetSize() const = 0;                    ///< How many values are available?
       virtual std::string AsString() const = 0;              ///< All values, as a single string.
@@ -54,8 +54,10 @@ namespace emp {
       virtual void SetValueID(size_t) = 0;                   ///< Setup cur value in linked variable
       virtual bool OK() const = 0;                           ///< Any problems with this setting?
 
-      bool IsOptionMatch(const std::string & test_option) const { return test_option == option; }
-      bool IsFlagMatch(const char test_flag) const { return test_flag == flag; }
+      [[nodiscard]] bool IsOptionMatch(const std::string & test_option) const {
+        return test_option == option;
+      }
+      [[nodiscard]] bool IsFlagMatch(const char test_flag) const { return test_flag == flag; }
     };
 
     /// Full details about a single setting, including type information and values.
@@ -72,8 +74,8 @@ namespace emp {
                   emp::Ptr<T> _var=nullptr)
         : SettingBase(_name, _desc, _flag, _args_label, _cap), var_ptr(_var) { }
 
-      size_t GetSize() const override { return values.size(); }
-      std::string AsString() const override {
+      [[nodiscard]] size_t GetSize() const override { return values.size(); }
+      [[nodiscard]] std::string AsString() const override {
         std::stringstream ss;
         for (size_t i=0; i < values.size(); i++) {
           if (i) ss << ',';
@@ -81,7 +83,7 @@ namespace emp {
         }
         return ss.str();
       }
-      std::string AsString(size_t id) const override {
+      [[nodiscard]] std::string AsString(size_t id) const override {
         return emp::to_string(values[id]);
       }
 
@@ -137,7 +139,7 @@ namespace emp {
 
     /// Get the current value of a specified setting.
     template <typename T>
-    const T & GetValue(const std::string & name) const {
+    [[nodiscard]] const T & GetValue(const std::string & name) const {
       emp_assert(emp::Has(setting_map, name), name);
       emp::Ptr<SettingBase> base_ptr = setting_map.find(name)->second;
       emp::Ptr<SettingInfo<T>> ptr = base_ptr.Cast<SettingInfo<T>>();
@@ -147,7 +149,7 @@ namespace emp {
 
     /// Scan through all values and return the maximum.
     template <typename T>
-    T MaxValue(const std::string & name) const {
+    [[nodiscard]] T MaxValue(const std::string & name) const {
       emp_assert(emp::Has(setting_map, name), name);
       emp::Ptr<SettingBase> base_ptr = setting_map.find(name)->second;
       emp::Ptr<SettingInfo<T>> ptr = base_ptr.Cast<SettingInfo<T>>();
@@ -219,7 +221,7 @@ namespace emp {
 
     /// Access ALL values for a specified setting, to be modified freely.
     template <typename T>
-    emp::vector<T> & Values(const std::string & name) {
+    [[nodiscard]] emp::vector<T> & Values(const std::string & name) {
       emp_assert(emp::Has(setting_map, name));
       emp::Ptr<SettingInfo<T>> ptr = setting_map[name].DynamicCast<SettingInfo<T>>();
       return ptr->values;
@@ -242,7 +244,7 @@ namespace emp {
     }
 
     /// Determine how many unique combinations there currently are.
-    size_t CountCombos() {
+    [[nodiscard]] size_t CountCombos() {
       size_t result = 1;
       for (auto ptr : settings) result *= ptr->GetSize();
       return result;
@@ -273,7 +275,7 @@ namespace emp {
 
     /// Get the set of headers used for the CSV file.
     /// By default, don't include settings capped at one value.
-    std::string GetHeaders(const std::string & separator=",", bool include_fixed=false) {
+    [[nodiscard]] std::string GetHeaders(const std::string & separator=",", bool include_fixed=false) {
       std::string out_string;
       for (size_t i = 0; i < settings.size(); i++) {
         if (!include_fixed && settings[i]->cap == 1) continue;
@@ -284,7 +286,10 @@ namespace emp {
     }
 
     /// Convert all of the current values into a comma-separated string.
-    std::string CurString(const std::string & separator=",", bool include_fixed=false) const {
+    [[nodiscard]] std::string CurString(
+      const std::string & separator=",",
+      bool include_fixed=false) const
+    {
       std::string out_str;
       for (size_t i = 0; i < cur_combo.size(); i++) {
         if (!include_fixed && settings[i]->cap == 1) continue;
@@ -295,7 +300,7 @@ namespace emp {
     }
 
     /// Scan through all settings for a match option and return ID.
-    size_t FindOptionMatch(const std::string & option_name) {
+    [[nodiscard]] size_t FindOptionMatch(const std::string & option_name) {
       for (const auto & setting : settings) {
         if (setting->IsOptionMatch(option_name)) return setting->id;
       }
@@ -303,7 +308,7 @@ namespace emp {
     }
 
     /// Scan through all settings for a match option and return ID.
-    size_t FindFlagMatch(const char symbol) {
+    [[nodiscard]] size_t FindFlagMatch(const char symbol) {
       for (const auto & setting : settings) {
         if (setting->IsFlagMatch(symbol)) return setting->id;
       }

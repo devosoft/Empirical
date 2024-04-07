@@ -55,7 +55,7 @@ namespace emp {
     String group="none";  ///< Which option group does this belong to?
 
   public:
-    FlagInfo() { }
+    FlagInfo() = default;
     FlagInfo(String desc, size_t min_args, size_t max_args,
              fun_t fun, char shortcut='\0')
       : desc(desc), min_args(min_args), max_args(max_args), fun(fun), shortcut(shortcut)
@@ -63,17 +63,17 @@ namespace emp {
 
     FlagInfo & operator=(const FlagInfo &) = default;
 
-    const String & GetDesc() const { return desc; }
-    size_t GetMinArgs() const { return min_args; };
-    size_t GetMaxArgs() const { return max_args; };
-    fun_t GetFun() const { return fun; };
-    char GetShortcut() const { return shortcut; };
-    const String & GetGroup() const { return group; }
+    [[nodiscard]] const String & GetDesc() const { return desc; }
+    [[nodiscard]] size_t GetMinArgs() const { return min_args; };
+    [[nodiscard]] size_t GetMaxArgs() const { return max_args; };
+    [[nodiscard]] fun_t GetFun() const { return fun; };
+    [[nodiscard]] char GetShortcut() const { return shortcut; };
+    [[nodiscard]] const String & GetGroup() const { return group; }
 
-    FlagInfo SetDesc(const String & in) { desc = in; return *this; }
-    FlagInfo SetMinArgs(size_t in) { min_args = in; return *this; };
-    FlagInfo SetMaxArgs(size_t in) { max_args = in; return *this; };
-    FlagInfo SetFun(fun_t in) { fun = in; return *this; };
+    FlagInfo & SetDesc(const String & in) { desc = in; return *this; }
+    FlagInfo & SetMinArgs(size_t in) { min_args = in; return *this; };
+    FlagInfo & SetMaxArgs(size_t in) { max_args = in; return *this; };
+    FlagInfo & SetFun(fun_t in) { fun = in; return *this; };
     FlagInfo & SetShortcut(char in) { shortcut = in; return *this; }
     FlagInfo & SetGroup(String in) { group = in; return *this; }
 
@@ -111,7 +111,7 @@ namespace emp {
       return flag_options[name];
     }
   public:
-    FlagManager() { }
+    FlagManager() = default;
     FlagManager(int argc, char* argv[]) { AddFlags(argc, argv); }
 
     constexpr static size_t npos = static_cast<size_t>(-1);
@@ -119,7 +119,7 @@ namespace emp {
     [[nodiscard]] String & operator[](size_t pos) { return args[pos]; }
     [[nodiscard]] const String & operator[](size_t pos) const { return args[pos]; }
 
-    emp::vector<String> GetExtras() const { return extras; }
+    [[nodiscard]] const emp::vector<String> & GetExtras() const { return extras; }
 
     [[nodiscard]] size_t Find(String pattern) const {
       for (size_t i = 0; i < args.size(); ++i) if (args[i] == pattern) return i;
