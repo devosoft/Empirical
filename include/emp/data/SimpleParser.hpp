@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021-2022.
+ *  @date 2021-2024.
  *
  *  @file SimpleParser.hpp
  *  @brief Parser to convert function descriptions to lambdas using maps for variable lookup.
@@ -11,7 +11,7 @@
  *  lambda.  A map-typed object should be passed in to provide values associated with variables.
  *  Allowed map types include std::map<std::string,T>, std::unordered_map<std::string,T>,
  *  emp::DataMap, and (soon) derivations from emp::AnnotatedType.  For standard maps, T must be
- *  convertable to emp::Datum.
+ *  convertible to emp::Datum.
  *
  *  Developer TODO:
  *  - Setup operator RegEx to be built dynamically
@@ -48,12 +48,13 @@ namespace emp {
       using fun_t = std::function<emp::Datum(ARG_T)>;
       enum type_t { ERROR=0, VALUE, FUNCTION };
 
-      type_t type;
+      type_t type = ERROR;
       emp::Datum value;
       fun_t fun;
 
-      ValueType() : type(ERROR) {}
+      ValueType() = default;
       ValueType(const ValueType &) = default;
+      ValueType(ValueType &&) = default;
       ValueType(double in_val) : type(VALUE), value(in_val) { }
       ValueType(std::string in_val) : type(VALUE), value(in_val) { }
       ValueType(emp::Datum in_val) : type(VALUE), value(in_val) { }
@@ -77,7 +78,7 @@ namespace emp {
       using fun_t = std::function<emp::Datum(arg_t)>;
       using value_t = ValueType<arg_t>;
 
-      SymbolTable() { }
+      SymbolTable() = default;
       SymbolTable(arg_t) { }
 
       static_assert( std::is_same<typename MAP_T::key_type, std::string>(),
@@ -91,7 +92,7 @@ namespace emp {
         };
       }
 
-      /// By default, let the value handle its own converstion to a function.
+      /// By default, let the value handle its own conversion to a function.
       auto AsFunction(ValueType<arg_t> & val) const { return val.AsFunction(); }
     };
 
@@ -120,7 +121,7 @@ namespace emp {
         };
       }
 
-      /// By default, let the value handle its own converstion to a function.
+      /// By default, let the value handle its own conversion to a function.
       auto AsFunction(ValueType<arg_t> & val) const {
         // @CAO: Could check layout correctness in debug mode.
         return val.AsFunction();
@@ -525,7 +526,7 @@ namespace emp {
         // If we have an operator, act on it!
         if (Has(binary_ops, pos->lexeme)) {
           const BinaryOperator & op = binary_ops[pos->lexeme];
-          if (prec_limit >= op.prec) return val1; // Precedence not allowed; return currnet value.
+          if (prec_limit >= op.prec) return val1; // Precedence not allowed; return current value.
           ++pos;
           value_t val2 = ParseMath(symbols, pos, op.prec);
           if (val1.type == value_t::VALUE) {
