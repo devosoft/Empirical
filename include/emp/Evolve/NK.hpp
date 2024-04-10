@@ -49,14 +49,14 @@ namespace emp {
 
   class NKLandscape {
   private:
-    size_t N;             ///< The number of bits in each genome.
-    size_t K;             ///< The number of OTHER bits with which each bit is epistatic.
-    size_t state_count;   ///< The total number of states associated with each bit table.
-    size_t total_count;   ///< The total number of states in the entire landscape space.
+    size_t N = 0;             ///< The number of bits in each genome.
+    size_t K = 0;             ///< The number of OTHER bits with which each bit is epistatic.
+    size_t state_count = 0;   ///< The total number of states associated with each bit table.
+    size_t total_count = 0;   ///< The total number of states in the entire landscape space.
     emp::vector< emp::vector<double> > landscape;  ///< The actual values in the landscape.
 
   public:
-    NKLandscape() : N(0), K(0), state_count(0), total_count(0), landscape() { ; }
+    NKLandscape() = default;
     NKLandscape(const NKLandscape &) = default;
     NKLandscape(NKLandscape &&) = default;
 
@@ -71,7 +71,8 @@ namespace emp {
     {
       Reset(random);
     }
-    ~NKLandscape() { ; }
+    ~NKLandscape() = default;
+
     NKLandscape & operator=(const NKLandscape &) = delete;
     NKLandscape & operator=(NKLandscape &&) = default;
 
@@ -194,7 +195,7 @@ namespace emp {
         for (size_t k = 0; k < K; k++) masks[n][(n+k)%N] = 1;
       }
     }
-    ~NKLandscapeMemo() { ; }
+    ~NKLandscapeMemo() = default;
     NKLandscapeMemo & operator=(const NKLandscapeMemo &) = delete;
     NKLandscapeMemo & operator=(NKLandscapeMemo &&) = default;
 
