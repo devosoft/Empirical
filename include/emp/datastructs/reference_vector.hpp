@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
+ *  @date 2019-2024.
  *
  *  @file reference_vector.hpp
  *  @brief A version of vector that holds only references to objects.  Be careful!
@@ -71,14 +71,6 @@ namespace emp {
 
     using iterator_t = Iterator;
   public:
-    reference_vector() = default;
-    reference_vector(const reference_vector &) = default;
-    reference_vector(reference_vector &&) = default;
-    ~reference_vector() { }
-
-    this_t & operator=(const reference_vector &) = default;
-    this_t & operator=(reference_vector &&) = default;
-
     size_t size() const { return vals.size(); }
     void resize(size_t new_size) {
       emp_assert(new_size <= vals.size(),
