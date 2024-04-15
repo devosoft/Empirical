@@ -1,11 +1,11 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2020.
+ *  @date 2018-2024.
  *
  *  @file Distribution.hpp
  *  @brief A set of pre-calculated discrete distributions that can quickly generate random values.
- *  @note Status: ALPHA
+ *  @note Status: BETA
  *
  *  A Distribution is a pre-calculated set of probabilities to quickly pick a whole-number result.
  *  These should be used when either we need to draw from the same distribution many time (and
@@ -14,7 +14,7 @@
  *
  *  Currently, we have:
  *
- *    Uniform - All values in a range are equally likelty to be picked.
+ *    Uniform - All values in a range are equally likely to be picked.
  *    Binomial - How many successes with p probability will occur in N attempts?
  *    NegativeBinomial - How many attempts to reach N successes, with p probability per attempt?
  *
@@ -40,18 +40,18 @@ namespace emp {
     UnorderedIndexMap weights;
 
   public:
-    size_t GetSize() const { return weights.GetSize(); }
-    double GetTotalProb() const { return weights.GetWeight(); }
-    double operator[](size_t id) const { return weights.GetWeight(id); }
+    [[nodiscard]] size_t GetSize() const { return weights.GetSize(); }
+    [[nodiscard]] double GetTotalProb() const { return weights.GetWeight(); }
+    [[nodiscard]] double operator[](size_t id) const { return weights.GetWeight(id); }
 
     /// Pick an item from a distribution using a value between 0.0 and 1.0.
-    size_t PickPosition(double in_value) {
+    [[nodiscard]] size_t PickPosition(double in_value) {
       emp_assert(in_value >= 0.0 && in_value <= 1.0, in_value);
       return weights.Index( in_value * GetTotalProb() );
     }
 
     /// Pick a random item using this distribution.
-    size_t PickRandom(Random & random) const {
+    [[nodiscard]] size_t PickRandom(Random & random) const {
       emp_assert(weights.GetSize() > 0, "Distribution can only pick a random entry if it has at least one entry!");
       return weights.Index( random.GetDouble(GetTotalProb()) );
     }
@@ -65,8 +65,8 @@ namespace emp {
   public:
     Uniform(size_t _min, size_t _max) { Setup(_min, _max); }
 
-    size_t GetMin() const { return min_val; }
-    size_t GetMax() const { return max_val; }
+    [[nodiscard]] size_t GetMin() const { return min_val; }
+    [[nodiscard]] size_t GetMax() const { return max_val; }
 
     void Setup(size_t _min, size_t _max) {
       emp_assert(_min < _max);
@@ -94,11 +94,13 @@ namespace emp {
     size_t N = 0;
 
   public:
-    Binomial() { }
+    Binomial() = default;
+    Binomial(const Binomial &) = default;
+    Binomial(Binomial &&) = default;
     Binomial(double _p, size_t _N) { Setup(_p, _N); }
 
-    double GetP() const { return p; }
-    double GetN() const { return N; }
+    [[nodiscard]] double GetP() const { return p; }
+    [[nodiscard]] double GetN() const { return N; }
 
     void Setup(double _p, size_t _N) {
       emp_assert(_p >= 0.0 && _p <= 1.0);
@@ -135,8 +137,8 @@ namespace emp {
   public:
     NegativeBinomial(double _p, size_t _N) { Setup(_p, _N); }
 
-    double GetP() const { return p; }
-    double GetN() const { return N; }
+    [[nodiscard]] double GetP() const { return p; }
+    [[nodiscard]] double GetN() const { return N; }
 
     void Setup(double _p, size_t _N) {
       // If we're not changing these values, it's already setup!
