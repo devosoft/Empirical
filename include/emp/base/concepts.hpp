@@ -55,13 +55,13 @@ namespace emp {
   /// Does a type have a ToString() member function?
   template <typename OBJ_T>
   concept hasToString = requires(OBJ_T value) {
-    { value.ToString(std::cout) } -> std::same_as<std::string>;
+    { value.ToString() } -> std::same_as<std::string>;
   };
 
   /// Does a type have a ToDouble() member function?
   template <typename OBJ_T>
   concept hasToDouble = requires(OBJ_T value) {
-    { value.ToDouble(std::cout) } -> std::same_as<double>;
+    { value.ToDouble() } -> std::same_as<double>;
   };
 
   /// Does a type have a FromString() member function?
