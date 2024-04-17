@@ -107,7 +107,7 @@ namespace emp {
       bool init = false;                     ///< Has this info been initialized yet?
       std::string name = "[unknown type]";   ///< Unique (ideally human-readable) type name
 
-      virtual ~Info() { }
+      virtual ~Info() = default;
 
       virtual bool IsAbstract() const { return false; }
       virtual bool IsArithmetic() const { return false; }
@@ -340,65 +340,72 @@ namespace emp {
     ~TypeID() { ; }
     TypeID & operator=(const TypeID &) = default;
 
-    operator size_t() const noexcept { return (info_ptr->init) ? (size_t) info_ptr.Raw() : 0; }
-    operator bool() const noexcept { return info_ptr->init; }
-    bool operator==(TypeID in) const { return info_ptr == in.info_ptr; }
-    bool operator!=(TypeID in) const { return info_ptr != in.info_ptr; }
-    bool operator< (TypeID in) const { return info_ptr < in.info_ptr; }
-    bool operator<=(TypeID in) const { return info_ptr <=in.info_ptr; }
-    bool operator> (TypeID in) const { return info_ptr > in.info_ptr; }
-    bool operator>=(TypeID in) const { return info_ptr >= in.info_ptr; }
+    [[nodiscard]] operator size_t() const noexcept {
+      return (info_ptr->init) ? (size_t) info_ptr.Raw() : 0;
+    }
+    [[nodiscard]] operator bool() const noexcept { return info_ptr->init; }
+    [[nodiscard]] bool operator==(TypeID in) const { return info_ptr == in.info_ptr; }
+    [[nodiscard]] bool operator!=(TypeID in) const { return info_ptr != in.info_ptr; }
+    [[nodiscard]] bool operator< (TypeID in) const { return info_ptr < in.info_ptr; }
+    [[nodiscard]] bool operator<=(TypeID in) const { return info_ptr <=in.info_ptr; }
+    [[nodiscard]] bool operator> (TypeID in) const { return info_ptr > in.info_ptr; }
+    [[nodiscard]] bool operator>=(TypeID in) const { return info_ptr >= in.info_ptr; }
 
     /// Get a unique numerical ID for this TypeID object.
-    size_t GetID() const { return (size_t) info_ptr.Raw(); }
+    [[nodiscard]] size_t GetID() const { return (size_t) info_ptr.Raw(); }
 
     /// Get the name generated for this TypeID (ideally unique)
-    const std::string & GetName() const { return info_ptr->name; }
+    [[nodiscard]] const std::string & GetName() const { return info_ptr->name; }
 
     /// Update the name for ALL instances of this TypeID.
     void SetName(const std::string & in_name) { emp_assert(info_ptr); info_ptr->name = in_name; }
 
-    bool IsInitialized() const { return info_ptr->init; }
+    [[nodiscard]] bool IsInitialized() const { return info_ptr->init; }
     void SetInitialized(bool _in=true) { info_ptr->init = _in; }
 
-    bool IsAbstract() const { return info_ptr->IsAbstract(); }
-    bool IsArithmetic() const { return info_ptr->IsArithmetic(); }
-    bool IsArray() const { return info_ptr->IsArray(); }
-    bool IsClass() const { return info_ptr->IsClass(); }
-    bool IsConst() const { return info_ptr->IsConst(); }
-    bool IsEmpty() const { return info_ptr->IsEmpty(); }
-    bool IsObject() const { return info_ptr->IsObject(); }
-    bool IsPointer() const { return info_ptr->IsPointer(); }
-    bool IsReference() const { return info_ptr->IsReference(); }
-    bool IsTrivial() const { return info_ptr->IsTrivial(); }
-    bool IsVoid() const { return info_ptr->IsVoid(); }
-    bool IsVolatile() const { return info_ptr->IsVolatile(); }
+    [[nodiscard]] bool IsAbstract() const { return info_ptr->IsAbstract(); }
+    [[nodiscard]] bool IsArithmetic() const { return info_ptr->IsArithmetic(); }
+    [[nodiscard]] bool IsArray() const { return info_ptr->IsArray(); }
+    [[nodiscard]] bool IsClass() const { return info_ptr->IsClass(); }
+    [[nodiscard]] bool IsConst() const { return info_ptr->IsConst(); }
+    [[nodiscard]] bool IsEmpty() const { return info_ptr->IsEmpty(); }
+    [[nodiscard]] bool IsObject() const { return info_ptr->IsObject(); }
+    [[nodiscard]] bool IsPointer() const { return info_ptr->IsPointer(); }
+    [[nodiscard]] bool IsReference() const { return info_ptr->IsReference(); }
+    [[nodiscard]] bool IsTrivial() const { return info_ptr->IsTrivial(); }
+    [[nodiscard]] bool IsVoid() const { return info_ptr->IsVoid(); }
+    [[nodiscard]] bool IsVolatile() const { return info_ptr->IsVolatile(); }
 
-    bool IsTypePack() const { return info_ptr->IsTypePack(); }
+    [[nodiscard]] bool IsTypePack() const { return info_ptr->IsTypePack(); }
 
-    template <typename T> bool IsType() const { return *this == GetTypeID<T>(); }
+    template <typename T>
+    [[nodiscard]] bool IsType() const { return *this == GetTypeID<T>(); }
 
     template <typename T, typename... Ts>
-    bool IsTypeIn() const {
+    [[nodiscard]] bool IsTypeIn() const {
       if (IsType<T>()) return true;
       if constexpr (sizeof...(Ts) > 0) return IsTypeIn<Ts...>();
       else return false;
     }
 
-    TypeID GetDecayTypeID() const { return info_ptr->GetDecayID(); }
-    TypeID GetElementTypeID() const { return info_ptr->GetElementID(); }
-    TypeID GetRemoveConstTypeID() const { return info_ptr->GetRemoveConstID(); }
-    TypeID GetRemoveCVTypeID() const { return info_ptr->GetRemoveCVID(); }
-    TypeID GetRemoveExtentTypeID() const { return info_ptr->GetRemoveExtentID(); }
-    TypeID GetRemoveAllExtentsTypeID() const { return info_ptr->GetRemoveAllExtentsID(); }
-    TypeID GetRemovePointerTypeID() const { return info_ptr->GetRemovePtrID(); }
-    TypeID GetRemoveReferenceTypeID() const { return info_ptr->GetRemoveRefID(); }
-    TypeID GetRemoveVolatileTypeID() const { return info_ptr->GetRemoveVolatileID(); }
+    [[nodiscard]] TypeID GetDecayTypeID() const { return info_ptr->GetDecayID(); }
+    [[nodiscard]] TypeID GetElementTypeID() const { return info_ptr->GetElementID(); }
+    [[nodiscard]] TypeID GetRemoveConstTypeID() const { return info_ptr->GetRemoveConstID(); }
+    [[nodiscard]] TypeID GetRemoveCVTypeID() const { return info_ptr->GetRemoveCVID(); }
+    [[nodiscard]] TypeID GetRemoveExtentTypeID() const { return info_ptr->GetRemoveExtentID(); }
+    [[nodiscard]] TypeID GetRemoveAllExtentsTypeID() const { return info_ptr->GetRemoveAllExtentsID(); }
+    [[nodiscard]] TypeID GetRemovePointerTypeID() const { return info_ptr->GetRemovePtrID(); }
+    [[nodiscard]] TypeID GetRemoveReferenceTypeID() const { return info_ptr->GetRemoveRefID(); }
+    [[nodiscard]] TypeID GetRemoveVolatileTypeID() const { return info_ptr->GetRemoveVolatileID(); }
 
-    size_t GetSize() const { return info_ptr->GetSize(); }
+    [[nodiscard]] size_t GetSize() const { return info_ptr->GetSize(); }
 
-    double ToDouble(const emp::Ptr<const void> ptr) const { return info_ptr->ToDouble(ptr); }
-    std::string ToString(const emp::Ptr<const void> ptr) const { return info_ptr->ToString(ptr); }
+    [[nodiscard]] double ToDouble(const emp::Ptr<const void> ptr) const {
+      return info_ptr->ToDouble(ptr);
+    }
+    [[nodiscard]] std::string ToString(const emp::Ptr<const void> ptr) const {
+      return info_ptr->ToString(ptr);
+    }
     bool FromDouble(double value, const emp::Ptr<void> ptr) {
       return info_ptr->FromDouble(value, ptr);
     }
@@ -411,20 +418,20 @@ namespace emp {
 
   /// Retrieve the correct TypeID for a given type.
   template <typename T>
-  static TypeID GetTypeID() {
+  [[nodiscard]] static TypeID GetTypeID() {
     static emp::Ptr<TypeID::Info> info = BuildInfo<T>();  // Create static info so that it is persistent.
     return TypeID(info);
   }
 
   /// Retrieve a vector of TypeIDs for a pack of types passed in.
   template <typename... Ts>
-  emp::vector<TypeID> GetTypeIDs() {
+  [[nodiscard]] emp::vector<TypeID> GetTypeIDs() {
     return emp::vector<TypeID>{GetTypeID<Ts>()...};
   }
 
   /// Retrieve just the name for the type passed in.
   template <typename T>
-  std::string GetTypeName() {
+  [[nodiscard]] std::string GetTypeName() {
     return GetTypeID<T>().GetName();
   }
 
@@ -443,7 +450,7 @@ namespace emp {
 
   /// Retrieve a vector of TypeIDs for a TypePack of types passed in.
   template <typename T>
-  emp::vector<TypeID> GetTypePackIDs() {
+  [[nodiscard]] emp::vector<TypeID> GetTypePackIDs() {
     return internal::TypePackIDs_impl<T>::GetIDs();
   }
 
