@@ -40,6 +40,7 @@ get your working environment all set.
 ```shell
 git clone https://github.com/devosoft/Empirical
 cd Empirical/examples/ProjectTemplate
+git submodule update --init --depth 1 --recursive
 ```
 
 Let's take a look at what we want to compile.
