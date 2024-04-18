@@ -95,7 +95,9 @@ namespace web {
 #ifdef __EMSCRIPTEN__
         MAIN_THREAD_EM_ASM({
           var name = UTF8ToString($0);
-          emp_i.cur_obj.on( name, function(evt) { emp.Callback($1, evt); } );
+          emp_i.cur_obj.addEventListener(name, function(evt) {
+              emp.Callback($1, evt);
+          });
         }, event_pair.first.c_str(), event_pair.second);
 #else
         std::cout << "Setting '" << widget_id << "' listener '" << event_pair.first
