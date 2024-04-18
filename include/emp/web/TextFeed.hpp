@@ -122,8 +122,8 @@ namespace web {
         var content = document.createElement('span');
         content.innerHTML = UTF8ToString($1);
         var elementId = UTF8ToString($0);
-        var targetElement = document.getElementById(elementId);
-        targetElement.insertAdjacentHTML('beforeend', content);
+        var element = document.getElementById(elementId);
+        if (element) element.insertAdjacentHTML('beforeend', content);
       }, id.c_str(), to_append.c_str() );
     }
 

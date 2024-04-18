@@ -136,7 +136,8 @@ namespace web {
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);
           var value = UTF8ToString($2);
-          document.getElementById(id).setAttribute(setting, value);
+          var element = document.getElementById(id);
+          if (element) element.setAttribute(setting, value);
         }, widget_id.c_str(), setting.c_str(), settings[setting].c_str());
 #else
       std::cout << "Setting '" << widget_id << "' attribute '" << setting
@@ -152,7 +153,8 @@ namespace web {
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);
           var value = UTF8ToString($2);
-          document.getElementById(id).setAttribute(setting, value);
+          var element = document.getElementById(id);
+          if (element) element.setAttribute(setting, value);
         }, widget_id.c_str(), setting.c_str(), value.c_str());
 #else
       std::cout << "Setting '" << widget_id << "' attribute '" << setting
