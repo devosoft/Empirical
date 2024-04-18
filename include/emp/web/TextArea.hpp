@@ -91,7 +91,8 @@ namespace web {
         MAIN_THREAD_EM_ASM({
             var id = UTF8ToString($0);
             var text = UTF8ToString($1);
-            document.getElementById(id).value = text;
+            var element = document.getElementById(id);
+            if (element) element.value = text;
           }, id.c_str(), in_string.c_str());
       }
 
