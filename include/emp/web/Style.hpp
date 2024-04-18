@@ -122,7 +122,7 @@ namespace web {
         MAIN_THREAD_EM_ASM({
             var name = UTF8ToString($0);
             var value = UTF8ToString($1);
-            emp_i.cur_obj.css( name, value);
+            emp_i.cur_obj.style[name] = value;
           }, css_pair.first.c_str(), css_pair.second.c_str());
 #else
         std::cout << "Setting '" << widget_id << "' attribute '" << css_pair.first
