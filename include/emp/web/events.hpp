@@ -33,7 +33,11 @@ namespace web {
     const size_t fun_id = JSWrap(std::forward<FUN_TYPE>(fun), "", true);
     (void) fun_id;
 
-    MAIN_THREAD_EM_ASM({  $( document ).ready(function() { emp.Callback($0); });  }, fun_id);
+    MAIN_THREAD_EM_ASM({
+      document.addEventListener('DOMContentLoaded', function() {
+          emp.Callback($0);
+      });
+    }, fun_id);
   }
 
   /// Runs the specified function when the document is finished loading.
@@ -43,7 +47,9 @@ namespace web {
     (void) fun_id;
 
     MAIN_THREAD_EM_ASM({
-        $( window ).on( "load", function() { emp.Callback($0); });
+        window.addEventListener("load", function() {
+          emp.Callback($0);
+        });
       },
       fun_id
     );

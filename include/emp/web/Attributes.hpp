@@ -108,7 +108,7 @@ namespace web {
 #ifdef __EMSCRIPTEN__
       MAIN_THREAD_EM_ASM({
           var id = UTF8ToString($0);
-          emp_i.cur_obj = $( '#' + id );
+          emp_i.cur_obj = document.getElementById(id);
         }, widget_id.c_str());
 #endif
 
@@ -136,7 +136,7 @@ namespace web {
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);
           var value = UTF8ToString($2);
-          $( '#' + id ).attr( setting, value);
+          document.getElementById(id).setAttribute(setting, value);
         }, widget_id.c_str(), setting.c_str(), settings[setting].c_str());
 #else
       std::cout << "Setting '" << widget_id << "' attribute '" << setting
@@ -152,7 +152,7 @@ namespace web {
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);
           var value = UTF8ToString($2);
-          $( '#' + id ).attr( setting, value);
+          document.getElementById(id).setAttribute(setting, value);
         }, widget_id.c_str(), setting.c_str(), value.c_str());
 #else
       std::cout << "Setting '" << widget_id << "' attribute '" << setting

@@ -121,7 +121,9 @@ namespace web {
       MAIN_THREAD_EM_ASM({
         var content = document.createElement('span');
         content.innerHTML = UTF8ToString($1);
-        $( `#${UTF8ToString($0)}` ).append( content );
+        var elementId = UTF8ToString($0);
+        var targetElement = document.getElementById(elementId);
+        targetElement.insertAdjacentHTML('beforeend', content);
       }, id.c_str(), to_append.c_str() );
     }
 
@@ -131,7 +133,9 @@ namespace web {
 
       strings.pop_front();
       MAIN_THREAD_ASYNC_EM_ASM({
-        $(`#${UTF8ToString($0)}`).contents().first().remove();
+        var elementId = UTF8ToString($0);  // Convert UTF-8 encoded string to JavaScript string
+        var targetElement = document.getElementById(elementId);
+        targetElement.removeChild(targetElement.firstChild);
       }, id.c_str() );
 
     }

@@ -25,21 +25,23 @@ const modal_html = '<div class="modal bd-example-modal-lg" id="loading_modal" da
 /// Add loading modal html to body and show modal
 function AddLoadingModal() {
   document.body.innerHTML += modal_html;
-  $('#loading_modal').modal('show');
+  let loadingModal = document.getElementById('loading_modal');
+  loadingModal.modal('show');
   setTimeout(function () {
-    $('#loading_modal').modal('hide');
-    },
-    600000); // 10 mins for testing purposes
+    loadingModal.classList.remove('show');
+  }, 600000); // 10 mins for testing purposes
 }
 
 /// Show loading modal for 2 seconds for demonstration
 function DemoLoadingModal() {
-  $('#loading_modal').modal('show');
+  let loadingModal = document.getElementById('loading_modal');
+  loadingModal.modal('show');
   setTimeout(CloseLoadingModal, 2000);
 }
 
 function CloseLoadingModal() {
-  $('#loading_modal').modal('hide');
+  let loadingModal = document.getElementById('loading_modal');
+  loadingModal.modal('hide');
 }
 
 // Function called when script is added to HTML

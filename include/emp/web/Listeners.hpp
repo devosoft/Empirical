@@ -87,7 +87,7 @@ namespace web {
 #ifdef __EMSCRIPTEN__
       MAIN_THREAD_EM_ASM({
           var id = UTF8ToString($0);
-          emp_i.cur_obj = $( '#' + id );
+          emp_i.cur_obj = document.getElementById(id);
         }, widget_id.c_str());
 #endif
 
@@ -113,7 +113,9 @@ namespace web {
         MAIN_THREAD_EM_ASM({
           var id = UTF8ToString($0);
           var name = UTF8ToString($1);
-          $( '#' + id ).on( name, function(evt) { emp.Callback($2, evt); } );
+          document.getElementById(id).addEventListener(name, function(evt) {
+              emp.Callback($2, evt);
+          });
         }, widget_id.c_str(), event_name.c_str(), fun_id);
 #else
         std::cout << "Setting '" << widget_id << "' listener '" << event_name
