@@ -43,7 +43,7 @@ namespace emp {
     char_set_t char_set{};
 
   public:
-    CharSetBase() : char_set() { }
+    CharSetBase() = default;
 
     CharSetBase(CHAR_T c) { char_set[static_cast<size_t>(c)] = true; }
     CharSetBase(const std::string & in_chars) {
