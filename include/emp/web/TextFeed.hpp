@@ -135,7 +135,7 @@ namespace web {
       MAIN_THREAD_ASYNC_EM_ASM({
         var elementId = UTF8ToString($0);  // Convert UTF-8 encoded string to JavaScript string
         var targetElement = document.getElementById(elementId);
-        targetElement.removeChild(targetElement.firstChild);
+        if (targetElement) targetElement.removeChild(targetElement.firstChild);
       }, id.c_str() );
 
     }

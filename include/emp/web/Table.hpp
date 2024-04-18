@@ -221,9 +221,11 @@ namespace web {
               parent_id = UTF8ToString($0);
               child_id = UTF8ToString($1);
               let parent = document.getElementById(parent_id);
-              let span = document.createElement('span');
-              span.id = child_id;
-              parent.appendChild(span);
+              if (parent) {
+                let span = document.createElement('span');
+                span.id = child_id;
+                parent.appendChild(span);
+              }
           }, cell_id.c_str(), in.GetID().c_str());
 
           // Now that the new widget has some place to hook in, activate it!

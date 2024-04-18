@@ -113,7 +113,8 @@ namespace web {
         MAIN_THREAD_EM_ASM({
           var id = UTF8ToString($0);
           var name = UTF8ToString($1);
-          document.getElementById(id).addEventListener(name, function(evt) {
+          var element = document.getElementById(id);
+          if (element) element.addEventListener(name, function(evt) {
               emp.Callback($2, evt);
           });
         }, widget_id.c_str(), event_name.c_str(), fun_id);
