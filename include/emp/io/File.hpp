@@ -442,14 +442,16 @@ namespace emp {
       }
 
       // Get a block of lines, ending when a condition is met.
-      emp::vector<String> ReadUntil(auto test_fun) {
+      template <typename T>
+      emp::vector<String> ReadUntil(T test_fun) {
         auto out = file.ReadUntil(line, test_fun);
         line += out.size();
         return out;
       }
 
       // Get a block of lines for as lone as a condition is met.
-      emp::vector<String> ReadWhile(auto test_fun) {
+      template <typename T>
+      emp::vector<String> ReadWhile(T test_fun) {
         auto out = file.ReadWhile(line, test_fun);
         line += out.size();
         return out;
