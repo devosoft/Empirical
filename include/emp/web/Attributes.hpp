@@ -118,7 +118,7 @@ namespace web {
         MAIN_THREAD_EM_ASM({
             var name = UTF8ToString($0);
             var value = UTF8ToString($1);
-            emp_i.cur_obj.attr( name, value);
+            emp_i.cur_obj.setAttribute(name, value);
           }, attr_pair.first.c_str(), attr_pair.second.c_str());
 #else
         std::cout << "Setting '" << widget_id << "' attribute '" << attr_pair.first
