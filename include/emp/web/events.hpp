@@ -34,7 +34,8 @@ namespace web {
     (void) fun_id;
 
     MAIN_THREAD_EM_ASM({
-      document.addEventListener('DOMContentLoaded', function() {
+      if (document.readyState !== 'loading') emp.Callback($0);
+      else document.addEventListener('DOMContentLoaded', function() {
           emp.Callback($0);
       });
     }, fun_id);
