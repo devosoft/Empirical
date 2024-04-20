@@ -79,7 +79,7 @@ namespace emp {
       std::function<String(String)> to_control_fun; ///< Convert ARG description into CONTROL
 
       // Can this tag forgo a control sequence?
-      TagInfo() { }
+      TagInfo() = default;
       TagInfo(String start, char end='\0') : start(start), end(end) { }
       [[nodiscard]] bool IsUsed() const { return start.size(); }
       [[nodiscard]] bool IsSimple() const { return end == '\0'; }
@@ -104,7 +104,7 @@ namespace emp {
     char placeholder = ' ';  ///< Character to use internally in Text
 
   public:
-    Text_Rule() { }
+    Text_Rule() = default;
     Text_Rule(String open_tag_start, char open_tag_end, String close_tag,
               String base_type, char placeholder=' ')
       : main_tag(open_tag_start, open_tag_end), base_type(base_type), close_tag(close_tag)
