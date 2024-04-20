@@ -61,7 +61,7 @@ namespace emp {
   // A base class for any special encodings that should work with Text objects.
   struct TextEncoding_Interface {
     using this_t = TextEncoding_Interface;
-    virtual ~TextEncoding_Interface() { }
+    virtual ~TextEncoding_Interface() = default;
 
     [[nodiscard]] virtual String GetName() const = 0;              // Return name of encoding.
     virtual void Append(Text &, const String &) = 0;               // Add new text.
@@ -72,7 +72,6 @@ namespace emp {
 
   class TextEncoding_None : public TextEncoding_Interface {
   public:
-    TextEncoding_None() { }
     [[nodiscard]] String GetName() const override { return "text"; }
     void Append(Text & text, const String & in) override;
     [[nodiscard]] String Encode(const Text & text) const override;
