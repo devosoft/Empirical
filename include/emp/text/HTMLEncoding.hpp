@@ -32,9 +32,19 @@ namespace emp {
       }
 
       AddReplaceTag("&amp;", '&');
-      AddReplaceTag("&gt;", '>');
-      AddReplaceTag("&lt;", '<');
-      AddReplaceTag("&nbsp;", ' ', "no_break");
+      AddReplaceTag("&gt;",  '>');
+      AddReplaceTag("&lt;",  '<');
+      AddReplaceTag("&tab;", '\t');
+      AddReplaceTag("&nbsp;",    ' ', "no_break");
+
+      // For generic symbols
+      AddReplaceControl("&", ';', ' ', "symbol");
+
+
+      AddReplaceTag("<br>",  '\n');           // A line break
+      // AddReplaceTag("\\b",  ' ', "page_break");       // A page break
+      AddReplaceTag("<p>",  ' ', "para_break");       // A paragraph break
+      AddReplaceTag("<hr>",  '-', "horizontal_rule");  // A horizontal rule
     }
 
 

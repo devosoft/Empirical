@@ -40,7 +40,7 @@ namespace emp {
       std::set<size_t> rule_ids;   // Which rules manage this style?
 
     public:
-      Style() { }
+      Style() = default;
       Style(String name, size_t id) : name(name), id(id) { }
 
       const String & GetName() const { return name; }
@@ -68,7 +68,7 @@ namespace emp {
       String full_info;  // Style name and arguments, as should be stored.
       size_t rule_id=0;  // Which rule created this entry? (determines legal end)
 
-      StyleEntry() { }
+      StyleEntry() = default;
       StyleEntry(size_t style_id, String full_info, size_t rule_id)
         : style_id(style_id), full_info(full_info), rule_id(rule_id) { }
       StyleEntry(const StyleEntry &) = default;

@@ -61,10 +61,10 @@ namespace emp {
       AddReplaceTag("\\t",  '\t');           // A tab
       AddReplaceTag("\\.",  ' ', "empty");   // An empty tag
 
-      AddReplaceTag("\\ ",  ' ', "no_break");          // A non-breaking space
-      AddReplaceTag("\\b",  ' ', "page_break");        // A page break
-      AddReplaceTag("\\p",  ' ', "para_break");        // A paragraph break
-      AddReplaceTag("\\-",  '-', "horizontal_rule"); // A horizontal rule
+      AddReplaceTag("\\ ",  ' ', "no_break");         // A non-breaking space
+      AddReplaceTag("\\b",  ' ', "page_break");       // A page break
+      AddReplaceTag("\\p",  ' ', "para_break");       // A paragraph break
+      AddReplaceTag("\\-",  '-', "horizontal_rule");  // A horizontal rule
 
       AddReplaceTag("\\*",      '*', "bullet:1");  // Simple bullet
       AddReplaceTag("\\**",     '*', "bullet:2");  // Simple bullet (indented)
