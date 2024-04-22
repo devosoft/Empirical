@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
- *
- *  @file Animate.hpp
+ *  @file
  *  @brief Manage animations on a web site.
  *
  *  To build an animation, you must provide a function to be run repeatedly.  When Start()
@@ -80,6 +81,7 @@ namespace web {
     Button toggle_but;                  ///< A button to start/stop this animation.
     Button step_but;                    ///< A button to advance this animation one step.
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     void LoadTargets() { ; }
     template <typename... T>
     void LoadTargets(const web::Widget & target1, const T&... other_targets) {
@@ -106,6 +108,7 @@ namespace web {
 
       frame_count++;
     }
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     /// DoFrame() is called by default if no animation function is provided.  As such, an animation
     /// can be built by deriving a class from Animate and overriding this function.

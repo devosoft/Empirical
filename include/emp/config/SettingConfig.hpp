@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020-2024.
- *
- *  @file SettingConfig.hpp
+ *  @file
  *  @brief A tool for collecting settings, including from files and the command line.
  *  @note Status: DEPRECATED!  Use SettingCombos instead.
  */
@@ -382,7 +383,7 @@ namespace emp {
     }
 
     /// Convert all of the current values into a comma-separated string.
-    std::string CurComboString(const std::string & separator=",",
+    std::string CurComboString(const std::string & separator=",", ///< Delimiter separating values in string
                                bool use_labels=false,   ///< Print name with each value?
                                bool multi_only=false    ///< Only print values that can change?
                               ) const {

@@ -1,11 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2021.
- *
- *  @file Random.hpp
+ *  @file
  *  @brief A versatile and non-patterned pseudo-random-number generator.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  */
 
 #ifndef EMP_MATH_RANDOM_HPP_INCLUDE
@@ -26,7 +27,9 @@
 #include "Range.hpp"
 
 namespace emp {
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   using namespace emp;
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   ///  Middle Square Weyl Sequence: A versatile and non-patterned pseudo-random-number
   ///  generator.

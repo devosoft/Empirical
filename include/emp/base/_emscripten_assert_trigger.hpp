@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020-2023.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020-2023.
- *
- *  @file _emscripten_assert_trigger.hpp
+ *  @file
  *  @brief Assert trigger implementation.
  *  @note For internal use.
  */
@@ -19,6 +20,8 @@
 #include <emscripten.h>
 
 #include "concepts.hpp"
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 namespace emp {
 
@@ -63,5 +66,7 @@ namespace emp {
   }
 
 } // namespace emp
+
+#endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
 #endif // #ifndef EMP_BASE__EMSCRIPTEN_ASSERT_TRIGGER_HPP_INCLUDE

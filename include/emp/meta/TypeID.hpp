@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2024
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2024.
- *
- *  @file TypeID.hpp
+ *  @file
  *  @brief TypeID provides an easy way to convert types to strings.
  *
  *  TypeID provides an easy way to compare types, analyze them, and convert to strings.
@@ -549,7 +550,7 @@ namespace emp {
   }
 }
 
-
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
   /// Hash function to allow TypeID to be used with maps and sets (must be in std).
   template <>
@@ -565,5 +566,6 @@ namespace std {
     return out;
   }
 }
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_META_TYPEID_HPP_INCLUDE

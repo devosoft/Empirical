@@ -6,7 +6,7 @@ standard library, but provide extra protection against common memory use
 errors and additional information to the developer.  These protections
 can be turned off by comiling with -DNDEBUG.
 
-## base/assert.h
+## base/assert.hpp
 
 This file adds an `emp_assert` macro that can handle all of the same
 functionality as the standard library assert, but with additional
@@ -35,7 +35,7 @@ compiled using the `NDEBUG` option (for most compilers, this
 deactivation is accomplished by using the `-DNDEBUG` flag at compile
 time.)
 
-## base/array.h and base/vector.h
+## base/array.hpp and base/vector.hpp
 
 These files setup the `emp::array<...>` and `emp::vector<...>` template
 objects, which behave almost identically to `std::array<...>` and
@@ -44,7 +44,7 @@ bounds checking when they are indexed into or specific size matters. As
 with asserts, these additional bounds checks are removed when compiled
 with the `NDEBUG` option.
 
-## base/Ptr.h
+## base/Ptr.hpp
 
 The `emp::Ptr<...>` template provides an alternate method of building
 pointers, but with the ability to turn on additional debugging

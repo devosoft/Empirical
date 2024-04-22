@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2023.
- *
- *  @file map_utils.hpp
+ *  @file
  *  @brief A set of simple functions to manipulate maps.
  *  @note Status: BETA
  */
@@ -38,6 +39,19 @@ namespace emp {
   template <class MAP_T, class KEY_T>
   inline bool Has( const MAP_T & in_map, const KEY_T & key ) {
     return in_map.find(key) != in_map.end();
+  }
+
+  /// Take a map where the value is an integer and a key.
+  /// Increment value associated with that key if its present
+  /// or if its not add it and set it to 1
+  template <class MAP_T, class KEY_T>
+  inline void IncrementCounter( MAP_T & in_map, const KEY_T & key ) {
+    static_assert( std::is_same< typename MAP_T::key_type, int >::value);
+    if (emp::Has(in_map, key)) {
+      in_map[key]++;
+    } else {
+      in_map[key] = 1;
+    }
   }
 
   // Check to see if any of the elements in a map satisfy a function.

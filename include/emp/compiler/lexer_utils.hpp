@@ -24,6 +24,10 @@
 
 namespace emp {
 
+  /** \addtogroup <lexer_utilities>
+  *  @{
+  */
+
   /// Converting DFA to DFA -- no change needed.
   static inline const DFA & to_DFA(const DFA & dfa) { return dfa; }
 
@@ -139,6 +143,9 @@ namespace emp {
 
     return "";
   }
+
+  // Close Doxygen group
+  /** @}*/
 }
 
 #endif // #ifndef EMP_COMPILER_LEXER_UTILS_HPP_INCLUDE

@@ -1,13 +1,15 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2024
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file Systematics.cpp
+ *  @file
+ *  @brief TODO.
  */
 
+#include <filesystem>
 #include <iostream>
-#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
@@ -57,11 +59,13 @@ TEST_CASE("Test Systematics", "[Evolve]") {
   sys1.SetTrackSynchronous(true);
   CHECK(sys1.GetTrackSynchronous() == true);
   sys1.AddOrg(15.0, {0,0});
+  CHECK(sys1.CalcDiversity() == 0);
   CHECK(sys1.GetNumActive() == 1);
   CHECK(sys1.GetTaxonAt({0,0})->GetInfo() == "small");
   CHECK(sys1.IsTaxonAt({0,0}));
   sys1.AddOrg(56.0, {1,1});
   CHECK(sys1.GetNumActive() == 2);
+  CHECK(sys1.CalcDiversity() == 1);
   CHECK(sys1.GetTaxonAt({1,1})->GetInfo() == "large");
   CHECK(sys1.IsTaxonAt({1,1}));
   sys1.RemoveOrg({1,1});
@@ -171,6 +175,10 @@ TEST_CASE("Test Systematics", "[Evolve]") {
   double mpd = sys.GetMeanPairwiseDistance();
   // std::cout << "MPD: " << mpd <<std::endl;
   CHECK(mpd == Approx(2.8));
+
+  double sd = sys.GetSumDistance();
+  // std::cout << "MPD: " << mpd <<std::endl;
+  CHECK(sd == Approx(74.0));
 
   // std::cout << "\nAddOrg 31 (id8; parent id7)\n";
   sys.SetUpdate(11);
@@ -669,9 +677,7 @@ TEST_CASE("Test Data Struct", "[evo]") {
 
 TEST_CASE("World systematics integration", "[evo]") {
 
-  using taxon_t = emp::Taxon<emp::vector<int>, emp::datastruct::mut_landscape_info<int>>;
-  using setup_fun_t = std::function<void(emp::Ptr<taxon_t>, emp::vector<int> &)>;
-  setup_fun_t setup_phenotype = [](emp::Ptr<taxon_t> tax, emp::vector<int> & /* org */) {
+  std::function<void(emp::Ptr<emp::Taxon<emp::vector<int>, emp::datastruct::mut_landscape_info<int>>>, emp::vector<int> &)> setup_phenotype = [](emp::Ptr<emp::Taxon<emp::vector<int>, emp::datastruct::mut_landscape_info<int>>> tax, emp::vector<int> & org){
     tax->GetData().phenotype = emp::Sum(tax->GetInfo());
   };
 
@@ -686,7 +692,7 @@ TEST_CASE("World systematics integration", "[evo]") {
   sys.New([](const emp::vector<int> & v){return v;}, true, true, true);
   world.AddSystematics(sys);
 
-  world.SetMutFun([](emp::vector<int> & /* org */, emp::Random & /* r */){return 0;});
+  world.SetMutFun([](emp::vector<int> & org, emp::Random & r){return 0;});
 
   sys->OnNew(setup_phenotype);
   world.InjectAt(emp::vector<int>({1,2,3}), 0);
@@ -811,9 +817,7 @@ TEST_CASE("Run world", "[evo]") {
   world.AddSystematics(gene_sys);
   world.AddSystematics(phen_sys);
 
-  using gene_ptr_t = emp::Ptr<gene_systematics_t::taxon_t>;
-  using update_fun_t = std::function<void(gene_ptr_t, emp::AvidaGP&)>;
-  update_fun_t check_update = [&gene_sys, &world](gene_ptr_t tax, emp::AvidaGP & /* org */){
+  std::function<void(emp::Ptr<gene_systematics_t::taxon_t>, emp::AvidaGP&)> check_update = [&gene_sys, &world](emp::Ptr<gene_systematics_t::taxon_t> tax, emp::AvidaGP & org){
     CHECK(tax->GetOriginationTime() == gene_sys->GetUpdate());
     CHECK(tax->GetOriginationTime() == world.GetUpdate());
     CHECK(tax->GetNumOff() == 0);
@@ -857,9 +861,7 @@ TEST_CASE("Run world", "[evo]") {
 
   emp::Ptr<emp::SystematicsBase<org_t>> sys0 = world.GetSystematics(0);
   emp::Ptr<gene_systematics_t> sys0_cast = sys0.DynamicCast<gene_systematics_t>();
-  using sys_taxon_ptr_t = emp::Ptr<gene_systematics_t::taxon_t>;
-  using sys_fun_t = std::function<void(sys_taxon_ptr_t, emp::AvidaGP&)>;
-  sys_fun_t capture_mut_fun = [&last_mutation](sys_taxon_ptr_t tax, emp::AvidaGP & /* org */){
+  std::function<void(emp::Ptr<gene_systematics_t::taxon_t>, emp::AvidaGP&)> capture_mut_fun = [&last_mutation](emp::Ptr<gene_systematics_t::taxon_t> tax, emp::AvidaGP & org){
     tax->GetData().RecordMutation(last_mutation);
   };
   sys0_cast->OnNew(capture_mut_fun);
@@ -919,6 +921,12 @@ TEST_CASE("Run world", "[evo]") {
   for (size_t i = 0; i < 100; i++) {
       EliteSelect(world, 1, 1);
   }
+
+  for (size_t i = 0; i < world.GetSize(); i++) {
+    record_fit_sig.Trigger(i, world.CalcFitnessID(i));
+    record_phen_sig.Trigger(i, phen_fun(world.GetOrg(i)));
+  }
+
   world.Update();
 
   // Do the run...
@@ -1356,8 +1364,7 @@ TEST_CASE("Test Prune", "[Evolve]") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
 
   int prunes = 0;
-  using int_tax_ptr_t = emp::Ptr<emp::Taxon<int>>;
-  std::function<void(int_tax_ptr_t)> prune_fun = [&prunes](int_tax_ptr_t /* tax */){prunes++;};
+  std::function<void(emp::Ptr<emp::Taxon<int> >)> prune_fun = [&prunes](emp::Ptr<emp::Taxon<int>> tax){prunes++;};
   sys.OnPrune(prune_fun);
 
   sys.SetUpdate(0);
@@ -1442,4 +1449,232 @@ TEST_CASE("Test tracking position", "[Evolve]") {
   CHECK(id4->GetNumOrgs() == 0);
   CHECK(id4->GetNumOff() == 1);
   CHECK(Has(sys.GetAncestors(), id4));
+}
+
+TEST_CASE("Test Total Offspring") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+
+  auto org1 = sys.AddOrg(1, nullptr);
+  auto org2 = sys.AddOrg(2, org1);
+  auto org3 = sys.AddOrg(3, org2);
+  auto org4 = sys.AddOrg(4, org3);
+  auto org5 = sys.AddOrg(5, org3);
+  auto org6 = sys.AddOrg(6, org2);
+  auto org7 = sys.AddOrg(7, org6);
+  auto org8 = sys.AddOrg(8, org6);
+  auto org9 = sys.AddOrg(9, org1);
+  auto org10 = sys.AddOrg(10, org9);
+  auto org11 = sys.AddOrg(11, org9);
+
+  CHECK(org1->GetNumOff() == 2);
+  CHECK(org1->GetTotalOffspring() == 10);
+
+  CHECK(org2->GetNumOff() == 2);
+  CHECK(org2->GetTotalOffspring() == 6);
+
+  CHECK(org3->GetNumOff() == 2);
+  CHECK(org3->GetTotalOffspring() == 2);
+
+  CHECK(org4->GetNumOff() == 0);
+  CHECK(org4->GetTotalOffspring() == 0);
+
+  CHECK(org5->GetNumOff() == 0);
+  CHECK(org5->GetTotalOffspring() == 0);
+
+  CHECK(org6->GetNumOff() == 2);
+  CHECK(org6->GetTotalOffspring() == 2);
+
+  CHECK(org7->GetNumOff() == 0);
+  CHECK(org7->GetTotalOffspring() == 0);
+
+  CHECK(org8->GetNumOff() == 0);
+  CHECK(org8->GetTotalOffspring() == 0);
+
+  CHECK(org9->GetNumOff() == 2);
+  CHECK(org9->GetTotalOffspring() == 2);
+
+  CHECK(org10->GetNumOff() == 0);
+  CHECK(org10->GetTotalOffspring() == 0);
+
+  CHECK(org11->GetNumOff() == 0);
+  CHECK(org11->GetTotalOffspring() == 0);
+
+  sys.RemoveOrg(org1);
+
+  CHECK(org1->GetNumOff() == 2);
+  CHECK(org1->GetTotalOffspring() == 10);
+
+  sys.RemoveOrg(org2);
+
+  CHECK(org1->GetNumOff() == 2);
+  CHECK(org1->GetTotalOffspring() == 9);
+
+  CHECK(org2->GetNumOff() == 2);
+  CHECK(org2->GetTotalOffspring() == 6);
+
+  sys.RemoveOrg(org3);
+
+  CHECK(org3->GetNumOff() == 2);
+  CHECK(org3->GetTotalOffspring() == 2);
+  CHECK(org2->GetNumOff() == 2);
+  CHECK(org2->GetTotalOffspring() == 5);
+  CHECK(org1->GetNumOff() == 2);
+  CHECK(org1->GetTotalOffspring() == 8);
+
+  sys.RemoveOrg(org4);
+
+  CHECK(org3->GetNumOff() == 1);
+  CHECK(org3->GetTotalOffspring() == 1);
+  CHECK(org2->GetNumOff() == 2);
+  CHECK(org2->GetTotalOffspring() == 4);
+  CHECK(org1->GetNumOff() == 2);
+  CHECK(org1->GetTotalOffspring() == 7);
+
+
+  sys.RemoveOrg(org9);
+  CHECK(org1->GetNumOff() == 2);
+  CHECK(org1->GetTotalOffspring() == 6);
+
+}
+
+TEST_CASE("Test Degree Distribution") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+
+  auto org1 = sys.AddOrg(1, nullptr);
+  auto org2 = sys.AddOrg(2, org1);
+  auto org3 = sys.AddOrg(3, org2);
+  auto org4 = sys.AddOrg(4, org3);
+  auto org5 = sys.AddOrg(5, org3);
+  auto org6 = sys.AddOrg(6, org2);
+  auto org7 = sys.AddOrg(7, org6);
+  auto org8 = sys.AddOrg(8, org6);
+  auto org9 = sys.AddOrg(9, org1);
+  auto org10 = sys.AddOrg(10, org9);
+  auto org11 = sys.AddOrg(11, org9);
+  auto org12 = sys.AddOrg(12, org1);
+  auto org13 = sys.AddOrg(13, org4);
+  auto org14 = sys.AddOrg(14, org13);
+
+  std::unordered_map<int, int> dist = sys.GetOutDegreeDistribution();
+  CHECK(dist[0] == 7);
+  CHECK(dist[1] == 2);
+  CHECK(dist[2] == 4);
+  CHECK(dist[3] == 1);
+
+}
+
+TEST_CASE("Test Average Origin Time") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
+
+  sys.SetUpdate(0);
+  auto id1 = sys.AddOrg(25, nullptr);
+  CHECK(sys.GetAverageOriginTime() == 0);
+  CHECK(sys.GetAverageOriginTime(true) == 0);
+
+  sys.SetUpdate(6);
+  auto id2 = sys.AddOrg(-10, id1);
+  CHECK(sys.GetAverageOriginTime() == 3);
+  CHECK(sys.GetAverageOriginTime(true) == 0);
+
+  sys.SetUpdate(10);
+  auto id3 = sys.AddOrg(26, id1);
+  CHECK(sys.GetAverageOriginTime() == Approx(5.333333));
+  CHECK(sys.GetAverageOriginTime(true) == 0);
+
+  sys.SetUpdate(25);
+  auto id4 = sys.AddOrg(27, id2);
+  CHECK(sys.GetAverageOriginTime() == Approx(10.25));
+  CHECK(sys.GetAverageOriginTime(true) == Approx(0));
+
+  sys.SetUpdate(32);
+  auto id5 = sys.AddOrg(28, id2);
+  CHECK(sys.GetAverageOriginTime() == Approx(14.6));
+  CHECK(sys.GetAverageOriginTime(true) == Approx(3));
+
+  sys.SetUpdate(39);
+  auto id6 = sys.AddOrg(29, id2);
+  CHECK(sys.GetAverageOriginTime() == Approx(18.6666667));
+  CHECK(sys.GetAverageOriginTime(true) == Approx(4));
+
+  CHECK(sys.CalcDiversity() == Approx(2.58496));
+
+  sys.SetUpdate(39);
+  auto id7 = sys.AddOrg(30, id2);
+  CHECK(sys.GetAverageOriginTime() == Approx(21.571428571));
+  CHECK(sys.GetAverageOriginTime(true) == Approx(4.5));
+}
+
+TEST_CASE("Test Loading Phylogeny From File") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
+  sys.LoadFromFile("systematics_snapshot.csv", "genome");
+  CHECK(sys.GetNumRoots() == 1);
+  emp::Ptr<emp::Taxon<int>> mrca = sys.GetMRCA();
+  CHECK(mrca->GetID() == 1);
+  auto offspring = mrca->GetOffspring();
+  for (auto off : offspring) {
+    CHECK(((off->GetID() == 7) || (off->GetID() == 2) || (off->GetID() == 3)));
+  }
+  CHECK(sys.GetNumActive() == 6);
+  CHECK(sys.GetNumAncestors() == 4);
+  CHECK(sys.GetNumOutside() == 0);
+  CHECK(sys.GetNumTaxa() == 10);
+  CHECK(sys.GetMaxDepth() == 4);
+  CHECK(mrca->GetTotalOffspring() == 6);
+  CHECK(mrca->GetNumOff() == 3);
+  CHECK(mrca->GetNumOrgs() == 0);
+
+  for (auto tax : sys.GetActive()) {
+    CHECK(((tax->GetNumOrgs() == 1) || (tax->GetID() == 10 )));
+  }
+
+  sys.PrintStatus();
+
+  emp::Systematics<int, int> sys2([](const int & i){return i;}, true, true, true, true);
+  sys2.LoadFromFile("systematics_snapshot.csv", "genome", false, false);
+  CHECK(sys2.GetNumRoots() == 1);
+  emp::Ptr<emp::Taxon<int>> mrca2 = sys.GetMRCA();
+  CHECK(mrca2->GetID() == 1);
+  auto offspring2 = mrca2->GetOffspring();
+  for (auto off : offspring2) {
+    CHECK(((off->GetID() == 7) || (off->GetID() == 2) || (off->GetID() == 3)));
+  }
+  CHECK(sys2.GetNumActive() == 5);
+  CHECK(sys2.GetNumAncestors() == 2);
+  CHECK(sys2.GetNumOutside() == 3);
+  CHECK(sys2.GetNumTaxa() == 10);
+  CHECK(sys2.GetMaxDepth() == 3);
+  CHECK(mrca2->GetTotalOffspring() == 6);
+  CHECK(mrca2->GetNumOff() == 3);
+  CHECK(mrca2->GetNumOrgs() == 0);
+
+  for (auto tax : sys2.GetActive()) {
+    CHECK(tax->GetNumOrgs() == 1);
+  }
+
+  sys2.PrintStatus();
+}
+
+TEST_CASE("Test LoadFromFile and Snapshot behavior") {
+  for (const auto& file : std::filesystem::directory_iterator("assets/")) {
+    if (file.path().extension() == ".csv") {
+      // load systematics from original file
+      emp::Systematics<int, std::string> sys([](const int & i){ return emp::to_string(i); }, true, true, true, true);
+      sys.LoadFromFile(file.path(), "phenotype");
+
+      sys.AddSnapshotFun([](const emp::Systematics<int, std::string>::taxon_t& tax){ return emp::to_string(tax.GetInfo()); }, "phenotype");
+
+      // save systematics into temp file
+      const auto temp_path = std::filesystem::temp_directory_path() / file.path().filename();
+      sys.Snapshot(temp_path);
+
+      // load original systematics file
+      emp::File original{emp::String(file.path())};
+
+      // load saved file
+      emp::File saved{emp::String(temp_path)};
+
+      CHECK(saved.AsSet() == original.AsSet());
+    }
+  }
+
 }

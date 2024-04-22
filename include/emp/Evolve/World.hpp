@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
- *
- *  @file World.hpp
+ *  @file
  *  @brief Definition of a base class for a World template for use in evolutionary algorithms.
  *
  *  A definition of the emp::World template, linking in specialized file handling, iterators,
@@ -366,8 +367,8 @@ namespace emp {
       return *(pop[id]);
     }
 
-    /// Retrieve a const reference to the organsim as the specified x,y coordinates.
-    /// @CAO: Technically, we should set this up with any number of coordinates.
+    /// Retrieve a const reference to the organism as the specified x,y coordinates.
+    // @CAO: Technically, we should set this up with any number of coordinates.
     ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*GetWidth()); }
 
     /// Retrive a pointer to the contents of a specified cell; will be nullptr if the cell is
@@ -942,6 +943,7 @@ namespace emp {
 
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // =============================================================
   // ===                                                       ===
   // ===  Out-of-class member function definitions from above  ===
@@ -1019,7 +1021,7 @@ namespace emp {
 
     // Since neighbors are anywhere in the same population, all organisms in the same
     // population are neighbors.
-    fun_is_neighbor = [](WorldPosition /* pos1 */, WorldPosition /* pos2 */) { return true;};
+    fun_is_neighbor = [](WorldPosition pos1, WorldPosition pos2) { return true;};
 
     // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
@@ -1032,7 +1034,7 @@ namespace emp {
 
     if (synchronous_gen) {
       // Append births into the next population.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition /* parent_pos */) {
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
         emp_assert(new_org);      // New organism must exist.
         return WorldPosition(pops[1].size(), 1);   // Append it to the NEXT population
       };
@@ -1040,7 +1042,7 @@ namespace emp {
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always append to current population.
-      fun_find_birth_pos = [this](Ptr<ORG> /* new_org */, WorldPosition /* parent_pos */) {
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
         return WorldPosition(pop.size());
       };
       SetAttribute("SynchronousGen", "False");
@@ -1068,7 +1070,7 @@ namespace emp {
     fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
 
     // Neighbors are anywhere in same population, so all organisms are neighbors.
-    fun_is_neighbor = [](WorldPosition /* pos1 */, WorldPosition /* pos2 */) { return true; };
+    fun_is_neighbor = [](WorldPosition pos1, WorldPosition pos2) { return true; };
 
     // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
@@ -1079,15 +1081,15 @@ namespace emp {
 
     if (synchronous_gen) {
       // Append births into the next population.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition /* parent_id */) {
-        emp_assert(new_org);                       // New organism must exist.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_id) {
+        emp_assert(new_org);                        // New organism must exist.
         return WorldPosition(pops[1].size(), 1);   // Append it to the NEXT population
       };
 
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neighbor in current population.
-      fun_find_birth_pos = [this](Ptr<ORG> /* new_org */, WorldPosition parent_id) {
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_id) {
         return WorldPosition(fun_get_neighbor(parent_id)); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
@@ -1200,7 +1202,7 @@ namespace emp {
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neighbor in current population.
-      fun_find_birth_pos = [this](Ptr<ORG> /* new_org */, WorldPosition parent_pos) {
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
         return WorldPosition(fun_get_neighbor(parent_pos)); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
@@ -1372,7 +1374,7 @@ namespace emp {
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neighbor in current population.
-      fun_find_birth_pos = [this](Ptr<ORG> /* new_org */, WorldPosition parent_pos) {
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
         return WorldPosition(fun_get_neighbor(parent_pos)); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
@@ -1735,7 +1737,7 @@ namespace emp {
       os << std::endl;
     }
   }
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 
 #endif // #ifndef EMP_EVOLVE_WORLD_HPP_INCLUDE

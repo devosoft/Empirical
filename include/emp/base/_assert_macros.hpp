@@ -1,11 +1,12 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021.
- *
- *  @file _assert_macros.hpp
+ *  @file
  *  @brief Helper macros for building proper assert commands.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  */
 
@@ -17,6 +18,7 @@
 #define emp_assert_STRINGIFY_IMPL(...) #__VA_ARGS__
 #define emp_assert_TO_PAIR(X) emp_assert_STRINGIFY(X) , X
 #define emp_assert_GET_ARG_1(a, ...) a
+#define emp_assert_GET_ARG_2(a,b, ...) b
 #define emp_assert_GET_ARG_21(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t, u, ...) u
 #define emp_assert_MERGE(A, B) A ## B
 #define emp_assert_ASSEMBLE(BASE, ARG_COUNT, ...) emp_assert_MERGE(BASE, ARG_COUNT) (__VA_ARGS__)

@@ -1,33 +1,14 @@
 # Bits
 
-## BitMatrix
+Stuff about bits
 
+## API
+
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
 ```{eval-rst}
-.. doxygenfile:: emp/bits/BitMatrix.hpp
-  :project: Empirical
-  :no-link:
-```
+.. toctree::
+   :glob:
 
-## BitSet
-
-```{eval-rst}
-.. doxygenfile:: emp/bits/BitSet.hpp
-  :project: Empirical
-  :no-link:
-```
-
-## BitSet Utilities
-
-```{eval-rst}
-.. doxygenfile:: emp/bits/bitset_utils.hpp
-  :project: Empirical
-  :no-link:
-```
-
-## BitVector
-
-```{eval-rst}
-.. doxygenfile:: emp/bits/BitVector.hpp
-  :project: Empirical
-  :no-link:
+   api/*
 ```

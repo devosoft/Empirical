@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
- *
- *  @file DataManager.hpp
+ *  @file
  *  @brief DataManager handles a set of DataNode objects with the same tracking settings.
  */
 
@@ -51,6 +52,10 @@ namespace emp {
 
     bool HasNode(const std::string & name) {
       return Has(node_map, name);
+    }
+
+    bool HasNoNode(const std::string & name) {
+      return !Has(node_map, name);
     }
 
     /// Creates and adds a new DataNode

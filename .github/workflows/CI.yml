@@ -7,12 +7,13 @@ on:
       - '**'
   schedule:
     - cron: '0 0 * * 0'
+  workflow_dispatch:
 jobs:
   tidy:
     name: Enforce Tidyness
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
@@ -22,12 +23,20 @@ jobs:
     name: Test Tidy Enforcement on macOS
     runs-on: macos-11
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
+          # sometimes checkout action doesn't result in clean directory?
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
           submodules: 'recursive'
+      - run: git status --ignored
       - run: brew install coreutils findutils gnu-sed gawk grep rename sphinx-doc
       # adapted from https://stackoverflow.com/a/42878119
       - run: brew link sphinx-doc --force
+      # updates PATH to use Homebrew-installed tools first
+      # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-system-path
+      - run: echo "/usr/local/bin:$PATH" > $GITHUB_PATH
+      - run: echo $PATH
       - run: ./ci/test_tidy.sh
   test:
     name: Tests
@@ -47,7 +56,7 @@ jobs:
       CXX: ${{ matrix.cxx }}
       TEST_SET: ${{ matrix.test-set }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Set up GCC
@@ -72,7 +81,7 @@ jobs:
     name: Web Tests
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Set up GCC
@@ -94,7 +103,7 @@ jobs:
         uses: egor-tensin/setup-clang@v1
         with:
           version: 15
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
@@ -146,20 +155,39 @@ jobs:
       # github actions requires root to access mounted volumes
       options: --user root
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
-      - run: |
-          make -C doc html coverage | ./doc/headtail.sh
-          python doc/parse_documentation_coverage.py doc/_build/doc-coverage.json >> doc-coverage.json
-      - uses: sylvanld/action-storage@v1
-        if: github.ref == 'refs/heads/master'
+      - run: doxygen
+      - run: cd doc && python make_md.py
+      - run: cd doc && make html | ./headtail.sh
+      - run: cd doc && make coverage
+      - run: ls doc/ && ls doc/_build
+      - run: cd doc && python parse_documentation_coverage.py _build/doc-coverage.json >> doc-coverage.json
+      - uses: actions/upload-artifact@v2
         with:
-          src: doc-coverage.json
-          dst: stats/doc-coverage.json
+          name: doc-coverage
+          path: doc/doc-coverage.json
+  deploy-documentation-coverage:
+    name: Deploy Documentation Coverage
+    runs-on: ubuntu-22.04
+    if: github.ref == 'refs/heads/master'
+    needs: test-documentation
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: doc-coverage
+          path: data
+      - uses: sylvanld/action-storage@v1
+        with:
+          src: data/doc-coverage.json
+          dst: data/doc-coverage.json
   deploy-container:
     name: Deploy to DockerHub and ghcr.io
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
     if: github.ref == 'refs/heads/master'
     needs:
       - tidy
@@ -178,14 +206,5 @@ jobs:
           push: true
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: devosoft/empirical
-          tag_with_ref: true
-      - name: Push to GHCR
-        uses: docker/build-push-action@v1
-        with:
-          context: .
-          push: true
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
           repository: devosoft/empirical
           tag_with_ref: true

@@ -1,5 +1,5 @@
 # Pull base image.
-FROM ubuntu:bionic-20210416
+FROM ubuntu:focal-20230412
 
 COPY . /opt/Empirical
 
@@ -8,6 +8,7 @@ SHELL ["/bin/bash", "-c"]
 # Prevent interactive time zone config.
 # adapted from https://askubuntu.com/a/1013396
 ENV DEBIAN_FRONTEND=noninteractive
+ENV SPHINXBUILD="python3.10 -m sphinx"
 
 RUN \
   echo 'Acquire::http::Timeout "60";' >> "/etc/apt/apt.conf.d/99timeout" \
@@ -23,28 +24,21 @@ RUN \
 # remove -backports, -updates, -proposed, -security repositories
 # looks like we have to grab libxxhash0 from -updates now
 RUN \
-  apt-get update -y \
+  for n in $(seq 1 5); do apt-get update -y && sleep 5 && break; done \
     && \
-  apt-get install --no-install-recommends libxxhash0 \
+  apt-get install --no-install-recommends -y libxxhash0 software-properties-common \
     && \
-  apt-get clean \
+  for n in $(seq 1 5); do add-apt-repository -y ppa:ubuntu-toolchain-r/test && sleep 5 && break; done \
     && \
-  rm -rf /var/lib/apt/lists/* \
+  for n in $(seq 1 5); do add-apt-repository -y ppa:deadsnakes/ppa && sleep 5 && break; done \
     && \
-  find /etc/apt -type f -name '*.list' -exec sed -i 's/\(^deb.*-backports.*\)/#\1/; s/\(^deb.*-updates.*\)/#\1/; s/\(^deb.*-proposed.*\)/#\1/; s/\(^deb.*-security.*\)/#\1/' {} + \
-    && \
-  apt-get update -y \
-    && \
-  apt-get install -y software-properties-common=0.96.24.32.1 \
-    && \
-  add-apt-repository -y ppa:ubuntu-toolchain-r/test \
-    && \
-  apt-get update -y \
+  for n in $(seq 1 5); do apt-get update -y && sleep 5 && break; done \
     && \
   apt-get install --no-install-recommends --allow-downgrades -y \
+    build-essential \
     dpkg-dev \
     g++-11 \
-    libc6=2.27-3ubuntu1 \
+    libc6 \
     xvfb \
     x11vnc \
     x11-xkb-utils \
@@ -59,13 +53,9 @@ RUN \
     lsb-release \
     xdg-utils \
     cmake \
-    python-virtualenv \
-    python-pip-whl \
-    python-pip \
-    python-setuptools \
-    python3-setuptools \
-    python3-virtualenv \
-    python3-pip \
+    'python3\.10' \
+    'python3\.10-distutils' \
+    'python3\.10-venv' \
     nodejs \
     npm \
     tar \
@@ -75,7 +65,7 @@ RUN \
     doxygen \
     curl \
     perl \
-    perl-base=5.26.1-6 \
+    perl-base \
     git \
     htop \
     man \
@@ -88,12 +78,21 @@ RUN \
     ssh-client \
     libasound2 \
     gpg-agent \
+    doxygen \
     && \
   apt-get clean \
     && \
   rm -rf /var/lib/apt/lists/* \
     && \
   echo "installed apt packages"
+
+# Set Python 3.10 as the default version of Python 3
+RUN \
+  update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1 \
+  && \
+  update-alternatives --set python3 /usr/bin/python3.10 \
+  && \
+  ln -s /usr/bin/python3.10 /usr/bin/python
 
 RUN \
   echo $' \n\
@@ -159,6 +158,8 @@ RUN \
   && \
   n 14.17 \
   && \
+  hash -r \
+  && \
   export python="/usr/bin/python3" \
   && \
   npm install source-map \
@@ -166,11 +167,19 @@ RUN \
   echo "finalized set up dependency versions"
 
 RUN \
-  pip install wheel==0.30.0 \
+  python3.10 --version \
     && \
-  pip3 install wheel==0.30.0 \
+  python3 --version \
     && \
-  pip3 install -r /opt/Empirical/doc/requirements.txt \
+  curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10 \
+    && \
+  python3.10 -m pip install --upgrade --force-reinstall pip virtualenv \
+    && \
+  python3.10 -m pip install wheel==0.30.0 six==1.16.0 \
+    && \
+  python3.10 -m pip install -r /opt/Empirical/third-party/requirements.txt \
+    && \
+  python3.10 -m pip install -r /opt/Empirical/doc/requirements.txt \
     && \
   echo "installed documentation build requirements"
 
@@ -181,12 +190,18 @@ RUN \
     && \
   git submodule init \
     && \
-  git submodule update -f \
+  echo "nameserver 8.8.8.8" > /etc/resolv.conf \
+    && \
+  n=0; until [ $n -ge 3 ]; do git submodule update -f && break || ((n++)); sleep 5; done; if [ $n -eq 3 ]; then echo "Update failed after 3 attempts."; else echo "Update successful!"; fi \
     && \
   echo "initialized submodules"
 
 RUN \
   cd /opt/Empirical \
+    && \
+  curl -sS https://bootstrap.pypa.io/get-pip.py | python3 \
+    && \
+  python3 -m pip install virtualenv \
     && \
   make install-test-dependencies \
     && \
@@ -244,13 +259,6 @@ RUN \
   yarn install \
   && \
   echo "installed karma-firefox-launcher"
-
-# @mmore500 10-2021: python3 -m pip fixes UnicodeDecodeError
-# when installing charset-normalizer from github
-RUN \
-  python3 -m pip install -r /opt/Empirical/third-party/requirements.txt \
-    && \
-  echo "installed documentation build requirements"
 
 # Perform any further action as an unprivileged user.
 # adapted from https://stackoverflow.com/a/27703359

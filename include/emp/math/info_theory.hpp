@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021.
- *
- *  @file info_theory.hpp
+ *  @file
  *  @brief Tools to calculate Information Theory metrics.
  *  @note Status: ALPHA
  *
@@ -56,7 +57,7 @@ namespace emp {
     double entropy = 0.0;
     for (auto & o : objs) {
       double p = ((double) fun(o)) / total;
-      entropy -= p * Log2(p);
+      entropy -= p * log2(p);
     }
     return entropy;
   }

@@ -1,10 +1,13 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021-2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021-2022
- *
- *  @file VirtualCPU.cpp
- *
+ *  @file
+ */
+
+/*
  *  TODO
  *  [ ] *INSTRUCTIONS struct
  *    [ ] Constructors assign values correctly

@@ -1,10 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022
- *
- *  @file Result.hpp
- *
+ *  @file
  */
 
 #ifndef DEMOS_UTILS_WORDS_WORDLE_RESULT_HPP_INCLUDE

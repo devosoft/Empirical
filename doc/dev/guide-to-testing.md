@@ -122,7 +122,6 @@ which are detailed within [their
 documentation](https://github.com/philsquared/Catch/blob/master/docs/tutorial.md).
 
 ## Running Tests with Docker
--------------------------
 
 A [devosoft/empirical](https://hub.docker.com/r/devosoft/empirical) Docker image has been set up
 to make recreating a development environment on your machine easier.

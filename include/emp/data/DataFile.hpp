@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
- *
- *  @file DataFile.hpp
+ *  @file
  *  @brief DataFile objects use DataNode objects to dynamically fill out file contents.
  */
 
@@ -64,8 +65,11 @@ namespace emp {
       , line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(std::ostream & in_os,
              const std::string & b="", const std::string & s=",", const std::string & e="\n")
-      : filename(), os(&in_os), funs(), pre_funs(), keys(), descs(), timing_fun([](size_t){return true;})
-      , line_begin(b), line_spacer(s), line_end(e) { ; }
+      : filename(), os(&in_os), funs(), pre_funs(), keys(), descs(), timing_fun(
+        #ifndef DOXYGEN_SHOULD_SKIP_THIS
+        [](size_t){return true;}
+        #endif
+        ), line_begin(b), line_spacer(s), line_end(e) { ; }
 
     DataFile(const DataFile &) = default;
     DataFile(DataFile &&) = default;
@@ -90,9 +94,10 @@ namespace emp {
 
     /// Setup this file to print only once, at the specified update.  Note that this timing
     /// function can be replaced at any time, even after being triggered.
+    /// @param print_time The update the file should print at
     void SetTimingOnce(size_t print_time) {
-      timing_fun = [print_time](size_t update) { return update == print_time; };
-    }
+       timing_fun = [print_time](size_t update) { return update == print_time; };
+     }
 
     /// Setup this file to print every 'step' updates.
     void SetTimingRepeat(size_t step) {

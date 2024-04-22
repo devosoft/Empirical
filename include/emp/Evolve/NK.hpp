@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
- *
- *  @file NK.hpp
+ *  @file
  *  @brief This file provides code to build NK-based algorithms.
  *
  *  Two version of landscapes are provided.  NKLandscape pre-calculates the entire landscape, for
@@ -157,6 +158,21 @@ namespace emp {
       return GetFitness(n, cur_val);
     }
 
+   /// Get the fitness of a whole bitstring (pass by value so can be modified.)
+    emp::vector<double> GetFitnesses(emp::BitVector genome) const {
+      // Use a double-length genome to easily handle wrap-around.
+      genome.Resize(N*2);
+      genome |= (genome << N);
+      emp::vector<double> fits;
+
+      size_t mask = emp::MaskLow<size_t>(K+1);
+      for (size_t i = 0; i < N; i++) {
+        const size_t cur_val = (genome >> i).GetUInt(0) & mask;
+        const double cur_fit = GetFitness(i, cur_val);
+        fits.push_back(cur_fit);
+      }
+      return fits;
+    }
 
     void SetState(size_t n, size_t state, double in_fit) { landscape[n][state] = in_fit; }
 
