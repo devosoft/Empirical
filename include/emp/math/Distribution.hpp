@@ -1,9 +1,10 @@
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2024.
- *
- *  @file Distribution.hpp
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018-2024
+ */
+/** 
+ *  @file
  *  @brief A set of pre-calculated discrete distributions that can quickly generate random values.
  *  @note Status: BETA
  *

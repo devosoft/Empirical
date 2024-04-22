@@ -12,7 +12,7 @@
  *  @todo Make constexpr
  *  @todo Make handle non-'char' strings (i.e., use CharT template parameter)
  *  @todo Make handle allocators
- *  @todo Make work more broadly with stringviews
+ *  @todo Make work more broadly with string_views
  *  @todo Maybe add special construct types like RESERVE, REPEAT, and TO_STRING for special builds?
  *
  */
