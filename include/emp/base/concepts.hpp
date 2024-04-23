@@ -95,13 +95,14 @@ namespace emp {
 
 
   template <typename T> using is_std_function = is_template<T, std::function>;
+  template <typename T> using is_std_vector = is_template<T, std::vector>;
   template <typename T> using is_emp_vector = is_template<T, emp::vector>;
   template <typename T> using is_span = is_template_tn<T, std::span>;
 
 
-  // ===== For backward compatability only =====
+  // ===== For backward compatibility only =====
 
-  /// A type trait to identify if a type is streamable (for backward compatability)
+  /// A type trait to identify if a type is streamable (for backward compatibility)
   template <typename T>
   struct is_streamable : std::bool_constant<canStreamTo<std::ostream, T>> {};
 
