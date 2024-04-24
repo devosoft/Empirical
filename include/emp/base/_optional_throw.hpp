@@ -14,7 +14,7 @@
 #include <sstream>
 #include <string>
 
-#include "_is_streamable.hpp"
+#include "concepts.hpp"
 
 namespace emp {
 
@@ -24,7 +24,7 @@ namespace emp {
   /// Print out information about the next variable and recurse...
   template <typename T, typename... EXTRA>
   void assert_print_opt(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
-    if constexpr ( emp::is_streamable<std::stringstream, T>::value ) {
+    if constexpr ( emp::is_streamable<T>() ) {
       ss << name << ": [" << val << "]" << std::endl;
     } else ss << name << ": (non-streamable type)" << std::endl;
     assert_print_opt(ss, std::forward<EXTRA>(extra)...);
@@ -40,13 +40,13 @@ namespace emp {
 
   template <typename T, typename... EXTRA>
   void assert_print_first_opt(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
-    if constexpr ( emp::is_streamable<std::stringstream, T>::value ) {
+    if constexpr ( emp::is_streamable<T>() ) {
       ss << name << ": [" << val << "]" << std::endl;
     } else ss << name << ": (non-streamable type)" << std::endl;
     assert_print_second_opt(ss, std::forward<EXTRA>(extra)...);
   }
 
-  void assert_print_first_opt(std::stringstream & ss, int placeholder) {;}
+  void assert_print_first_opt(std::stringstream &, int) { }
 
   template <typename... EXTRA>
   void assert_throw_opt(std::string filename, size_t line, std::string expr, std::string message, EXTRA &&... extra) {
