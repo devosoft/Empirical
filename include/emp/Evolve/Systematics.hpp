@@ -2206,7 +2206,7 @@ namespace emp {
     // We can only load phylogenies from file if their info can be
     // converted to this systematics object's ORG_INFO type (if you
     // have a complex type, you can just use a string representation)
-    if constexpr (!emp::is_streamable<std::stringstream, ORG_INFO>::value) {
+    if constexpr (!emp::is_streamable<ORG_INFO>()) {
       emp_optional_throw(false, "Failed to load phylogeny from file. ORG_INFO template type cannot be created from string");
       return;
     }
