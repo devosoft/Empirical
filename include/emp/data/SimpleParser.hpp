@@ -562,7 +562,7 @@ namespace emp {
     template <typename T1, typename... Ts>
     void SetupStaticValues(T1 arg1, Ts... args) {
       // If we have a vector of incoming values, make sure it is valid and then just pass it along.
-      if constexpr (sizeof...(Ts) == 0 && emp::is_emp_vector<T1>()) {
+      if constexpr (sizeof...(Ts) == 0 && (emp::is_emp_vector<T1>() || emp::is_std_vector<T1>())) {
         using value_t = typename T1::value_type;
         static_assert(std::is_same<value_t, emp::Datum>(),
           "If BuildMathFunction is provided a vector, it must contain only emp::Datum.");
