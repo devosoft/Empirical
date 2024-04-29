@@ -606,6 +606,9 @@ namespace emp {
     String & Set(Ts... args) { return *this = MakeString(std::forward<Ts>(args)...); }
     template <typename T>
     T As() const { std::stringstream ss; ss << *this; T out; ss >> out; return out; }
+    double AsDouble() const { return std::stod(*this); }
+    int AsInt() const { return std::stoi(*this); }
+    unsigned long long AsULL() const { return std::stoull(*this); }
 
     String & AppendEscaped(char c) { *this += MakeEscaped(c); return *this; }
     String & SetEscaped(char c) { *this = MakeEscaped(c); return *this; }
