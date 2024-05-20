@@ -112,7 +112,7 @@ namespace web {
 #ifdef __EMSCRIPTEN__
       MAIN_THREAD_EM_ASM({
           var id = UTF8ToString($0);
-          emp_i.cur_obj = $( '#' + id );
+          emp_i.cur_obj = document.getElementById(id);
         }, widget_id.c_str());
 #endif
 
@@ -122,7 +122,7 @@ namespace web {
         MAIN_THREAD_EM_ASM({
             var name = UTF8ToString($0);
             var value = UTF8ToString($1);
-            emp_i.cur_obj.css( name, value);
+            if (emp_i.cur_obj) emp_i.cur_obj.style[name] = value;
           }, css_pair.first.c_str(), css_pair.second.c_str());
 #else
         std::cout << "Setting '" << widget_id << "' attribute '" << css_pair.first
@@ -135,7 +135,7 @@ namespace web {
 #ifdef EMSCRIPTEN
         EM_ASM_ARGS({
             var name = UTF8ToString($0);
-            emp_i.cur_obj.addClass( name );
+            if (emp_i.cur_obj) emp_i.cur_obj.classList.add(name);
           }, class_.c_str());
 #else
         std::cout << "Adding class to '" << widget_id << "': '" << class_;
@@ -154,7 +154,8 @@ namespace web {
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);
           var value = UTF8ToString($2);
-          $( '#' + id ).css( setting, value);
+          var element = document.getElementById(id);
+          if (element) element.style[setting] = value;
         }, widget_id.c_str(), setting.c_str(), settings[setting].c_str());
 #else
       std::cout << "Setting '" << widget_id << "' attribute '" << setting
@@ -170,7 +171,8 @@ namespace web {
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);
           var value = UTF8ToString($2);
-          $( '#' + id ).css( setting, value);
+          var element = document.getElementById(id);
+          if (element) element.style[setting] = value;
         }, widget_id.c_str(), setting.c_str(), value.c_str());
 #else
       std::cout << "Setting '" << widget_id << "' attribute '" << setting
@@ -184,7 +186,8 @@ namespace web {
       EM_ASM_ARGS({
           var id = UTF8ToString($0);
           var name = UTF8ToString($1);
-          $( '#' + id ).addClass( name);
+          var element = document.getElementById(id);
+          if (element) element.classList.add(name);
         }, widget_id.c_str(), clss.c_str());
 #else
       std::cout << "Adding class to '" << widget_id << "': '" << clss;
@@ -196,7 +199,8 @@ namespace web {
       EM_ASM_ARGS({
           var id = UTF8ToString($0);
           var name = UTF8ToString($1);
-          $( '#' + id ).removeClass( name);
+          var element = document.getElementById(id);
+          if (element) element.classList.remove(name);
         }, widget_id.c_str(), clss.c_str());
 #else
       std::cout << "Adding class to '" << widget_id << "': '" << clss;

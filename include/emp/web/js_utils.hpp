@@ -733,12 +733,10 @@ namespace emp {
       return Math.min(
         Math.max(
           document.documentElement.clientWidth,
-          $(window).width(),
           window.innerWidth || 0
         ),
         Math.max(
           document.documentElement.clientHeight,
-          $(window).height(),
           window.innerHeight || 0
         )
        );

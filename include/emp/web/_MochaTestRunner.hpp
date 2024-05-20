@@ -299,7 +299,9 @@ namespace web {
         MAIN_THREAD_EM_ASM(
           {
             const id = UTF8ToString($0);
-            $("body").append(`<div id="${id}"></div>`);
+            let newDiv = document.createElement('div');
+            newDiv.id = id;
+            document.body.appendChild(newDiv);
           },
           id.c_str()
         );
@@ -309,7 +311,7 @@ namespace web {
           MAIN_THREAD_EM_ASM(
             {
               const id = UTF8ToString($0);
-              $(`#${id}`).empty();
+              document.getElementById(id).innerHTML = '';
             },
             id.c_str()
           );
