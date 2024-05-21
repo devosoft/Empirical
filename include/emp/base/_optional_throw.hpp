@@ -46,7 +46,7 @@ namespace emp {
     assert_print_second_opt(ss, std::forward<EXTRA>(extra)...);
   }
 
-  void assert_print_first_opt(std::stringstream &, int) { }
+  static void assert_print_first_opt(std::stringstream &, int) { }
 
   template <typename... EXTRA>
   void assert_throw_opt(std::string filename, size_t line, std::string expr, std::string message, EXTRA &&... extra) {
