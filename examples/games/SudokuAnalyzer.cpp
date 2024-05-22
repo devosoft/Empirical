@@ -14,4 +14,9 @@
 
 int main()
 {
+  emp::SudokuAnalyzer sa;
+  sa.Load("sudoku_board.dat");
+  sa.Print();
+  sa.CalcProfile();
+  sa.Print();
 }
