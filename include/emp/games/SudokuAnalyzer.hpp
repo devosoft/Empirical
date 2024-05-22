@@ -42,11 +42,14 @@ namespace emp {
     
     static constexpr size_t UNKNOWN_STATE = NUM_STATES; // Lower values are actual states.
 
+    // Which symbols are we using in this puzzle?
+    emp::array<char, NUM_STATES> symbols = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
     emp::array<char,NUM_CELLS> value;         // Known value for cells
     emp::array<uint32_t, NUM_CELLS> options;  // Options still available to each cell
 
     // "members" tracks which cell ids are members of each region.
-    static constexpr int members[NUM_REGIONS][NUM_STATES] = {
+    static constexpr size_t members[NUM_REGIONS][NUM_STATES] = {
       // Rows (Overlaps: 111000000, 000111000, 000000111)
       {  0,  1,  2,  3,  4,  5,  6,  7,  8 },  // Region 0  (Overlap with 18, 19, 20)
       {  9, 10, 11, 12, 13, 14, 15, 16, 17 },  // Region 1  (Overlap with 18, 19, 20)
@@ -273,7 +276,7 @@ namespace emp {
     };
 
     // Which cells are in region overlaps (horizontal or vertical)?
-    static constexpr int overlaps[NUM_OVERLAPS][3] = {
+    static constexpr size_t overlaps[NUM_OVERLAPS][3] = {
       {  0,  1,  2 }, {  3,  4,  5 }, {  6,  7,  8 },  // Overlap sets  0,  1,  2 (Row 0)
       {  9, 10, 11 }, { 12, 13, 14 }, { 15, 16, 17 },  // Overlap sets  3,  4,  5 (Row 1)
       { 18, 19, 20 }, { 21, 22, 23 }, { 24, 25, 26 },  // Overlap sets  6,  7,  8 (Row 2)
@@ -296,7 +299,7 @@ namespace emp {
     };
 
     // Which overlaps are square regions made up from? (each square is listed twice).
-    static constexpr int square_overlaps[18][3] = {
+    static constexpr size_t square_overlaps[18][3] = {
       {  0,  3,  6 }, {  1,  4,  7 }, {  2,  5,  8 },
       {  9, 12, 15 }, { 10, 13, 16 }, { 11, 14, 17 },
       { 18, 21, 24 }, { 19, 22, 25 }, { 20, 23, 26 },
@@ -307,7 +310,7 @@ namespace emp {
     };
 
     // Which region is each overlap associated with? (raw row/col first, then square id)
-    static constexpr int overlap_regions[NUM_OVERLAPS][2] = {
+    static constexpr size_t overlap_regions[NUM_OVERLAPS][2] = {
       {  0, 0 }, {  0, 1 }, {  0, 2 },
       {  1, 0 }, {  1, 1 }, {  1, 2 },
       {  2, 0 }, {  2, 1 }, {  2, 2 },
@@ -329,7 +332,7 @@ namespace emp {
       { 17, 15 }, { 17, 16 }, { 17, 17 }
     };
 
-    // static constexpr int overlap_regions[NUM_OVERLAPS][2] = {
+    // static constexpr size_t overlap_regions[NUM_OVERLAPS][2] = {
     //   {  0, 18 }, {  0, 19 }, {  0, 20 },
     //   {  1, 18 }, {  1, 19 }, {  1, 20 },
     //   {  2, 18 }, {  2, 19 }, {  2, 20 },
@@ -358,19 +361,25 @@ namespace emp {
 
     SudokuAnalyzer& operator=(const SudokuAnalyzer &) = default;
 
-    int GetValue(int cell) const { return value[cell]; }
-    uint32_t GetOptions(int cell) const { return options[cell]; }
-    int CountOptions(int cell) const {
+    int GetValue(size_t cell) const { return value[cell]; }
+    uint32_t GetOptions(size_t cell) const { return options[cell]; }
+    int SymbolToState(char symbol) const {
+      for (size_t i=0; i < NUM_STATES; ++i) {
+        if (symbols[i] == symbol) return static_cast<int>(i);
+      }
+      return -1;
+    }
+    int CountOptions(size_t cell) const {
       // if (cell < 0 || cell >= 81) std::cout << "cell=" << cell << std::endl;
       emp_assert(cell >= 0 && cell < 81, cell);
       return opts_count[options[cell]];
     }
-    bool HasOption(int cell, int state) {
-      emp_assert(cell >= 0 && cell < 81, cell);
+    bool HasOption(size_t cell, int state) {
+      emp_assert(cell < 81, cell);
       emp_assert(state >= 0 && state < 9, state);
       return options[cell] & (1 << state);
     }
-    bool IsSet(int cell) const { return value[cell] != -1; }
+    bool IsSet(size_t cell) const { return value[cell] != -1; }
     bool IsSolved() {
       for (uint32_t o : options) if (o) return false;
       return true;
@@ -382,13 +391,38 @@ namespace emp {
       options.fill(511);  // Set all options to one.  or 0b111111111
     }
 
+    // Load a state from a stream.
+    void Load(std::istream & is) {
+      // Format: Provide site by site with a dash for empty; whitespace is ignored.
+      char cur_char;
+      size_t cell_id = 0;
+      while (cell_id < NUM_CELLS) {
+        is >> cur_char;
+        if (emp::is_whitespace(cur_char)) continue;
+        ++cell_id;
+        if (cur_char == '-') continue;
+        int state_id = SymbolToState(cur_char);
+        if (state_id == -1) {
+          emp::notify::Warning("Unknown sudoku symbol '", cur_char, "'.  Ignoring.");
+          continue;
+        }
+        Set(cell_id-1, state_id);
+      }
+    }
+
+    // Load a state from a file.
+    void Load(const emp::String & filename) {
+      std::ifstream file(filename);
+      return Load(file);
+    }
+
     // Find the next available option for a cell.
-    int FindNext(int cell) { return next_opt[options[cell]]; }
+    int FindNext(size_t cell) { return next_opt[options[cell]]; }
 
     // Set the value of an individual cell; remove option from linked cells.
     // Return true/false based on whether progress was made toward solving the puzzle.
-    bool Set(int cell, int state) {
-      emp_assert(cell >= 0 && cell < NUM_CELLS);    // Make sure cell is in a valid range.
+    bool Set(size_t cell, int state) {
+      emp_assert(cell < NUM_CELLS);    // Make sure cell is in a valid range.
       emp_assert(state >= 0 && state < NUM_STATES); // Make sure state is in a valid range.
 
       if (value[cell] == state) return false;       // If state is already set, SKIP!
@@ -404,7 +438,7 @@ namespace emp {
     }
     
     // Remove a symbol option from a particular cell.
-    void Block(int cell, int state) {
+    void Block(size_t cell, int state) {
       options[cell] &= ~(1 << state);
     }
 
@@ -427,7 +461,7 @@ namespace emp {
     }
 
     // Print the current state of the puzzle, including all options available.
-    void Print(const emp::array<char,9> & symbols, std::ostream & out=std::cout) {
+    void Print(std::ostream & out=std::cout) {
       out << " +-----------------------+-----------------------+-----------------------+"
           << std::endl;;
       for (int r = 0; r < 9; r++) {       // Puzzle row
@@ -563,7 +597,7 @@ namespace emp {
         if (!single_opts) continue;
 
         // If we made it this far, there is a move. Find the SQUARE region for this overlap.
-        const int square_id = overlap_regions[i][1];
+        const size_t square_id = overlap_regions[i][1];
         for (size_t oid : square_overlaps[square_id]) {
           if (oid == i) continue;
           uint32_t extra_opts = single_opts & overlap_options[oid];
@@ -572,7 +606,7 @@ namespace emp {
           while (extra_opts) {
             const int opt_id = next_opt[extra_opts];  // Determine this option.
             extra_opts &= ~(1 << opt_id);             // Remove this option for future checks.
-            for (int cell_id : overlaps[oid]) {
+            for (size_t cell_id : overlaps[oid]) {
               if (HasOption(cell_id, opt_id)) {
                 moves.emplace_back(PuzzleMove::BLOCK_STATE, cell_id, opt_id);
               }
@@ -635,7 +669,7 @@ namespace emp {
     // Make sure the current state is consistant.
     bool OK() {
       // Run tests on each cell...
-      for (int cell = 0; cell < 81; cell++) {
+      for (size_t cell = 0; cell < 81; cell++) {
         // Make sure any set values are the only allowed option.
         if (value[cell] != -1) {
           emp_assert(options[cell] == 0);
