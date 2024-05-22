@@ -40,12 +40,12 @@ namespace emp {
     static constexpr size_t NUM_REGIONS = NUM_ROWS + NUM_COLS + NUM_SQUARES;  // 27
     static constexpr size_t REGIONS_PER_CELL = 3;   // Each cell is part of three regions.
     
-    static constexpr size_t UNKNOWN_STATE = NUM_STATES; // Lower values are actual states.
+    static constexpr uint8_t UNKNOWN_STATE = NUM_STATES; // Lower values are actual states.
 
     // Which symbols are we using in this puzzle?
     emp::array<char, NUM_STATES> symbols = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-    emp::array<char,NUM_CELLS> value;         // Known value for cells
+    emp::array<uint8_t,NUM_CELLS> value;         // Known value for cells
     emp::array<uint32_t, NUM_CELLS> options;  // Options still available to each cell
 
     // "members" tracks which cell ids are members of each region.
@@ -85,7 +85,7 @@ namespace emp {
     };
     
     // "regions" tracks which regions each cell is a member of.
-    static constexpr int regions[NUM_CELLS][REGIONS_PER_CELL] = {
+    static constexpr size_t regions[NUM_CELLS][REGIONS_PER_CELL] = {
       // { ROW, COLUMN, BOX }
       { 0,  9, 18 }, { 0, 10, 18 }, { 0, 11, 18 },  // Cells  0- 2
       { 0, 12, 19 }, { 0, 13, 19 }, { 0, 14, 19 },  // Cells  3- 5
@@ -119,7 +119,7 @@ namespace emp {
     };
 
     // Which *other* cells is each cell linked to by at least one region?
-    static constexpr int links[NUM_CELLS][20] = {
+    static constexpr size_t links[NUM_CELLS][20] = {
       { 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 18, 19, 20, 27, 36, 45, 54, 63, 72 }, // Cell 0
       { 0,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 18, 19, 20, 28, 37, 46, 55, 64, 73 }, // Cell 1
       { 0,  1,  3,  4,  5,  6,  7,  8,  9, 10, 11, 18, 19, 20, 29, 38, 47, 56, 65, 74 },
@@ -204,8 +204,8 @@ namespace emp {
     };
     
     // Given a binary representation of options, which bit position is the first available?
-    static constexpr int next_opt[512] = {
-      -1, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    static constexpr uint8_t next_opt[512] = {
+      UNKNOWN_STATE, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
       4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
       5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
       4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
@@ -240,7 +240,7 @@ namespace emp {
     };
 
     // Given a binary representation of state options for a cell, how many are available?
-    static constexpr int opts_count[512] = {
+    static constexpr size_t opts_count[512] = {
       0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
       1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
       1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
@@ -361,25 +361,25 @@ namespace emp {
 
     SudokuAnalyzer& operator=(const SudokuAnalyzer &) = default;
 
-    int GetValue(size_t cell) const { return value[cell]; }
+    uint8_t GetValue(size_t cell) const { return value[cell]; }
     uint32_t GetOptions(size_t cell) const { return options[cell]; }
-    int SymbolToState(char symbol) const {
+    size_t SymbolToState(char symbol) const {
       for (size_t i=0; i < NUM_STATES; ++i) {
-        if (symbols[i] == symbol) return static_cast<int>(i);
+        if (symbols[i] == symbol) return i;
       }
-      return -1;
+      return UNKNOWN_STATE;
     }
-    int CountOptions(size_t cell) const {
+    size_t CountOptions(size_t cell) const {
       // if (cell < 0 || cell >= 81) std::cout << "cell=" << cell << std::endl;
       emp_assert(cell >= 0 && cell < 81, cell);
       return opts_count[options[cell]];
     }
-    bool HasOption(size_t cell, int state) {
+    bool HasOption(size_t cell, size_t state) {
       emp_assert(cell < 81, cell);
       emp_assert(state >= 0 && state < 9, state);
       return options[cell] & (1 << state);
     }
-    bool IsSet(size_t cell) const { return value[cell] != -1; }
+    bool IsSet(size_t cell) const { return value[cell] != UNKNOWN_STATE; }
     bool IsSolved() {
       for (uint32_t o : options) if (o) return false;
       return true;
@@ -387,7 +387,7 @@ namespace emp {
     
     // Clear out the old solution info when starting a new solve attempt.
     void Clear() {
-      value.fill(-1);
+      value.fill(UNKNOWN_STATE);
       options.fill(511);  // Set all options to one.  or 0b111111111
     }
 
@@ -401,8 +401,8 @@ namespace emp {
         if (emp::is_whitespace(cur_char)) continue;
         ++cell_id;
         if (cur_char == '-') continue;
-        int state_id = SymbolToState(cur_char);
-        if (state_id == -1) {
+        size_t state_id = SymbolToState(cur_char);
+        if (state_id == UNKNOWN_STATE) {
           emp::notify::Warning("Unknown sudoku symbol '", cur_char, "'.  Ignoring.");
           continue;
         }
@@ -417,11 +417,11 @@ namespace emp {
     }
 
     // Find the next available option for a cell.
-    int FindNext(size_t cell) { return next_opt[options[cell]]; }
+    uint8_t FindNext(size_t cell) { return next_opt[options[cell]]; }
 
     // Set the value of an individual cell; remove option from linked cells.
     // Return true/false based on whether progress was made toward solving the puzzle.
-    bool Set(size_t cell, int state) {
+    bool Set(size_t cell, uint8_t state) {
       emp_assert(cell < NUM_CELLS);    // Make sure cell is in a valid range.
       emp_assert(state >= 0 && state < NUM_STATES); // Make sure state is in a valid range.
 
@@ -432,13 +432,13 @@ namespace emp {
       options[cell] = 0;                     // No options available to locked cells.
       
       // Now make sure this state is blocked from all linked cells.
-      for (int id : links[cell]) Block(id, state);
+      for (size_t id : links[cell]) Block(id, state);
 
       return true;
     }
     
     // Remove a symbol option from a particular cell.
-    void Block(size_t cell, int state) {
+    void Block(size_t cell, size_t state) {
       options[cell] &= ~(1 << state);
     }
 
@@ -464,13 +464,13 @@ namespace emp {
     void Print(std::ostream & out=std::cout) {
       out << " +-----------------------+-----------------------+-----------------------+"
           << std::endl;;
-      for (int r = 0; r < 9; r++) {       // Puzzle row
-        for (int s = 0; s < 9; s+=3) {    // Subset row
-          for (int c = 0; c < 9; c++) {   // Puzzle col
-            int id = r*9+c;
+      for (size_t r = 0; r < 9; r++) {       // Puzzle row
+        for (size_t s = 0; s < 9; s+=3) {    // Subset row
+          for (size_t c = 0; c < 9; c++) {   // Puzzle col
+            size_t id = r*9+c;
             if (c%3==0) out << " |";
             else out << "  ";
-            if (value[id] == -1) {
+            if (value[id] == UNKNOWN_STATE) {
               out << " " << (char) (HasOption(id,s)   ? symbols[s] : '.')
                   << " " << (char) (HasOption(id,s+1) ? symbols[s+1] : '.')
                   << " " << (char) (HasOption(id,s+2) ? symbols[s+2] : '.');
@@ -502,7 +502,7 @@ namespace emp {
       
       // Advance the start position until we find a cell with a choice to be made.
       while (start < NUM_CELLS) {
-        const int opt_count = CountOptions(start);
+        const size_t opt_count = CountOptions(start);
         if (opt_count == 0 && !IsSet(start)) return false;      // No option & unlocked -> backtrack!
         else if (opt_count == 1) Set( start, FindNext(start) ); // One option -> lock it!
         else if (opt_count > 1) break;                          // Multiple options -> move on!
@@ -538,7 +538,7 @@ namespace emp {
       for (size_t i = 0; i < NUM_CELLS; i++) {
         if (CountOptions(i) == 1) {
           // Find last value.
-          moves.emplace_back(PuzzleMove::SET_STATE, i, FindNext(i));
+          moves.emplace_back(PuzzleMove{PuzzleMove::SET_STATE, i, FindNext(i)});
         }
       }
 
@@ -553,7 +553,7 @@ namespace emp {
       for (const auto & region : members) {
         uint32_t opt_any = 0;     // Is a state an option in ANY cell?
         uint32_t opt_multi = 0;   // Is a state an option in MULTIPLE cells?
-        for (const int c : region) {
+        for (const size_t c : region) {
           opt_multi |= (options[c] & opt_any);  // If we already had an option AND see a new one.
           opt_any |= options[c];                // Mark these options as possible.
         }
@@ -561,10 +561,10 @@ namespace emp {
 
         // If any options are only available in one cell, find them and lock them in.
         if (opt_once) {
-          for (const int c : region) {
+          for (const size_t c : region) {
             const uint32_t opt_unique = options[c] & opt_once;
             if (opt_unique) {
-              moves.emplace_back(PuzzleMove::SET_STATE, c, next_opt[opt_unique]);
+              moves.emplace_back(PuzzleMove{PuzzleMove::SET_STATE, c, next_opt[opt_unique]});
             }
           }
         }
@@ -580,7 +580,7 @@ namespace emp {
 
       // Determine what options are available in each overlap region.
       std::array<uint32_t, NUM_OVERLAPS> overlap_options;
-      for (int i = 0; i < 54; i++) {
+      for (size_t i = 0; i < 54; i++) {
         overlap_options[i] =
           options[overlaps[i][0]] | options[overlaps[i][1]] | options[overlaps[i][2]];
       }
@@ -604,11 +604,11 @@ namespace emp {
 
           // We found options to block!  Lets step through all of the cells and options.
           while (extra_opts) {
-            const int opt_id = next_opt[extra_opts];  // Determine this option.
+            const uint8_t opt_id = next_opt[extra_opts];  // Determine this option.
             extra_opts &= ~(1 << opt_id);             // Remove this option for future checks.
             for (size_t cell_id : overlaps[oid]) {
               if (HasOption(cell_id, opt_id)) {
-                moves.emplace_back(PuzzleMove::BLOCK_STATE, cell_id, opt_id);
+                moves.emplace_back(PuzzleMove{PuzzleMove::BLOCK_STATE, cell_id, opt_id});
               }
             }
           }
@@ -671,12 +671,12 @@ namespace emp {
       // Run tests on each cell...
       for (size_t cell = 0; cell < 81; cell++) {
         // Make sure any set values are the only allowed option.
-        if (value[cell] != -1) {
+        if (value[cell] != UNKNOWN_STATE) {
           emp_assert(options[cell] == 0);
         }
         
         // Make sure that the opt_counts are equal to the number of options available.
-        int count = 0;
+        [[maybe_unused]] int count = 0;
         for (int i = 0; i < 9; i++) {
           if (HasOption(cell,i)) count++;
         }
