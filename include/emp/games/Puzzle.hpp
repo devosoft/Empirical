@@ -19,8 +19,8 @@ namespace emp {
     enum MoveType { BLOCK_STATE, SET_STATE };
 
     MoveType type;
-    int pos_id;
-    int state;
+    size_t pos_id;
+    uint8_t state;
   };
 
 
