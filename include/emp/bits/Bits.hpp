@@ -67,6 +67,7 @@
 #include "../math/Random.hpp"
 #include "../math/Range.hpp"
 #include "../meta/type_traits.hpp"
+#include "../tools/String.hpp"
 
 #include "Bits_Data.hpp"
 #include "_bitset_helpers.hpp"
@@ -188,11 +189,11 @@ namespace emp {
     template <size_t NUM_BITS>
     explicit Bits(const std::bitset<NUM_BITS> & bitset);
 
-    /// @brief Constructor to generate a Bits from a string of '0's and '1's.
-    Bits(const std::string & bitstring);
+    /// @brief Constructor to generate a Bits from a string of '0's and '1's or indices
+    Bits(const emp::String & bitstring) { Set(bitstring); }
 
     /// @brief Constructor to generate a Bits from a literal string of '0's and '1's.
-    Bits(const char * bitstring) : Bits(std::string(bitstring)) {}
+    Bits(const char * bitstring) : Bits(emp::String(bitstring)) {}
 
     /// @brief Constructor to generate a random set of bits in the default size.
     /// @param random Random number generator to use.
@@ -251,10 +252,10 @@ namespace emp {
     Bits & operator=(const std::bitset<NUM_BITS> & bitset) &;
 
     /// @brief Assignment operator from a string of '0's and '1's.
-    Bits & operator=(const std::string & bitstring) &;
+    Bits & operator=(const emp::String & bitstring) & { return Set(bitstring); }
 
     /// @brief Assignment operator from a literal string of '0's and '1's.
-    Bits & operator=(const char * bitstring) & { return operator=(std::string(bitstring)); }
+    Bits & operator=(const char * bitstring) & { return Set(emp::String(bitstring)); }
 
     /// @brief Assignment from another Bits object without changing size.
     template <typename DATA2_T, bool ZERO_LEFT2>
@@ -307,6 +308,9 @@ namespace emp {
 
     /// @brief Update the bit value at the specified index.
     Bits & Set(size_t index, bool value=true);
+
+    /// @brief Set to the value in the bitstring.
+    Bits & Set(emp::String str);
 
     /// @brief Set all bits to 1.
     Bits & SetAll();
@@ -745,20 +749,20 @@ namespace emp {
     [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
 
     /// @brief Convert this Bits to a vector string [index 0 based on ZERO_LEFT]
-    [[nodiscard]] std::string ToString() const;
+    [[nodiscard]] emp::String ToString() const;
 
     /// @brief Convert this Bits to an array-based string [index 0 on left]
-    [[nodiscard]] std::string ToArrayString() const;
+    [[nodiscard]] emp::String ToArrayString() const;
 
     /// @brief Convert this Bits to a numerical string [index 0 on right]
-    [[nodiscard]] std::string ToBinaryString() const;
+    [[nodiscard]] emp::String ToBinaryString() const;
 
     /// @brief Convert this Bits to a series of IDs
-    [[nodiscard]] std::string ToIDString(const std::string & spacer=" ") const;
+    [[nodiscard]] emp::String ToIDString(const emp::String & spacer=" ") const;
 
     /// @brief Convert this Bits to a series of IDs with ranges condensed.
-    [[nodiscard]] std::string ToRangeString(const std::string & spacer=",",
-                                            const std::string & ranger="-") const;
+    [[nodiscard]] emp::String ToRangeString(const emp::String & spacer=",",
+                                            const emp::String & ranger="-") const;
 
     /// @brief Regular print function (from least significant bit to most)
     void Print(std::ostream & out=std::cout) const { out << ToString(); }
@@ -770,18 +774,18 @@ namespace emp {
     void PrintArray(std::ostream & out=std::cout) const { out << ToArrayString(); }
 
     /// @brief Print a space between each field (or other provided spacer)
-    void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const;
+    void PrintFields(std::ostream & out=std::cout, const emp::String & spacer=" ") const;
 
     /// @brief Print out details about the internals of Bits.
-    void PrintDebug(std::ostream & out=std::cout, const std::string & label="") const;
+    void PrintDebug(std::ostream & out=std::cout, const emp::String & label="") const;
 
     /// @brief Print the positions of all one bits, spaces are the default separator.
-    void PrintOneIDs(std::ostream & out=std::cout, const std::string & spacer=" ") const;
+    void PrintOneIDs(std::ostream & out=std::cout, const emp::String & spacer=" ") const;
 
     /// @brief Print the ones in a range format.  E.g., 2-5,7,10-15
     void PrintAsRange(std::ostream & out=std::cout,
-                      const std::string & spacer=",",
-                      const std::string & ranger="-") const;
+                      const emp::String & spacer=",",
+                      const emp::String & ranger="-") const;
 
     /// @brief Overload ostream operator to return Print.
     friend std::ostream& operator<<(std::ostream &out, const Bits & bits) {
@@ -935,7 +939,7 @@ namespace emp {
     void serialize(Archive & ar) { ar(_data); }
 
 
-    // =========  Standard Library Compatability  ========= //
+    // =========  Standard Library Compatibility  ========= //
     // A set of functions to allow drop-in replacement with std::bitset.
 
     [[nodiscard]] constexpr size_t size() const { return _data.NumBits(); }
@@ -1207,24 +1211,6 @@ namespace emp {
     for (size_t i = 0; i < NUM_BITS; ++i) Set(i, bitset[i]);
   }
 
-  /// Constructor to generate a Bits from a string of '0's and '1's.
-  template <typename DATA_T, bool ZERO_LEFT>
-  Bits<DATA_T,ZERO_LEFT>::Bits(const std::string & bitstring)
-    : _data(CountBits(bitstring))
-  {
-    Clear();
-
-    size_t pos = 0;
-    for (char c : bitstring) {
-      if (c == '1') {
-        if constexpr (ZERO_LEFT) Set(pos);
-        else Set(GetSize() - pos - 1);
-        pos++;
-      }
-      if (c == '0') ++pos; // Leave position as zero and move to next pos.
-    }
-  }
-
   /// Constructor to generate a random set of bits in the default size.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT>::Bits(Random & random)
@@ -1359,29 +1345,6 @@ namespace emp {
     return ClearExcessBits();                                 // Set excess bits to zeros.
   }
 
-  /// Assignment operator from a string of '0's and '1's.
-  template <typename DATA_T, bool ZERO_LEFT>
-  Bits<DATA_T,ZERO_LEFT> &
-  Bits<DATA_T,ZERO_LEFT>::operator=(const std::string & bitstring) &
-  {
-    const size_t new_size = CountBits(bitstring);
-    _data.RawResize(new_size);
-
-    Clear();
-
-    size_t pos = 0;
-    for (char c : bitstring) {
-      if (c == '1') {
-        if constexpr (ZERO_LEFT) Set(pos);
-        else Set(new_size - pos - 1);
-        pos++;
-      }
-      if (c == '0') ++pos; // Leave position as zero and move to next pos.
-    }
-
-    return *this;
-  }
-
 
   /// Assign from a Bits object of a different size, while keeping current size.
   /// If there are too many bits being imported, extras are cut off.
@@ -1458,6 +1421,42 @@ namespace emp {
 
     if (value) _data.bits[field_id] |= pos_mask;
     else       _data.bits[field_id] &= ~pos_mask;
+
+    return *this;
+  }
+
+  /// Set to the value in a string.
+  /// Two formats are allowed:
+  ///  1: a string of '0's and '1's. e.g.: "000010000101110101100" (resets size if allowed)
+  ///  2: a string of indexes between braces, e.g.: "{12,19,25,32,33,91}" (does not change size)
+  template <typename DATA_T, bool ZERO_LEFT>
+  Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::Set(emp::String str) {
+    if (str.size() == 0) return *this;
+
+    Clear();
+    if (str.PopIf('{')) {
+      while (str.PopIf(' ')); // Remove leading whitespace.
+      while (str.size() && str.HasDigitAt(0)) {
+        auto pos = str.PopUnsigned();
+        Set(pos);
+        while (str.PopIfAny(" \t,;:")); // Remove whitespace or common separators
+      }
+    } else {
+      // Change size if we are allowed to...
+      if (_data.IsFixedSize() == false) {
+        _data.RawResize( CountBits(str) );
+      }
+
+      size_t pos = 0;
+      for (char c : str) {
+        if (c == '1') {
+          if constexpr (ZERO_LEFT) Set(pos);
+          else Set(GetSize() - pos - 1);
+          pos++;
+        }
+        if (c == '0') ++pos; // Leave position as zero and move to next pos.
+      }
+    }
 
     return *this;
   }
@@ -2116,15 +2115,15 @@ namespace emp {
 
   /// Convert this Bits object to a vector string [0 index on left]
   template <typename DATA_T, bool ZERO_LEFT>
-  std::string Bits<DATA_T,ZERO_LEFT>::ToString() const {
+  emp::String Bits<DATA_T,ZERO_LEFT>::ToString() const {
     if constexpr (ZERO_LEFT) return ToArrayString();
     else return ToBinaryString();
   }
 
   /// Convert this Bits object to a vector string [0 index on left]
   template <typename DATA_T, bool ZERO_LEFT>
-  std::string Bits<DATA_T,ZERO_LEFT>::ToArrayString() const {
-    std::string out_string;
+  emp::String Bits<DATA_T,ZERO_LEFT>::ToArrayString() const {
+    emp::String out_string;
     out_string.reserve(GetSize());
     for (size_t i = 0; i < GetSize(); ++i) out_string.push_back(GetAsChar(i));
     return out_string;
@@ -2132,8 +2131,8 @@ namespace emp {
 
   /// Convert this Bits object to a numerical string [0 index on right]
   template <typename DATA_T, bool ZERO_LEFT>
-  std::string Bits<DATA_T,ZERO_LEFT>::ToBinaryString() const {
-    std::string out_string;
+  emp::String Bits<DATA_T,ZERO_LEFT>::ToBinaryString() const {
+    emp::String out_string;
     out_string.reserve(GetSize());
     for (size_t i = GetSize(); i > 0; --i) out_string.push_back(GetAsChar(i-1));
     return out_string;
@@ -2141,7 +2140,7 @@ namespace emp {
 
   /// Convert this Bits object to a series of IDs
   template <typename DATA_T, bool ZERO_LEFT>
-  std::string Bits<DATA_T,ZERO_LEFT>::ToIDString(const std::string & spacer) const {
+  emp::String Bits<DATA_T,ZERO_LEFT>::ToIDString(const emp::String & spacer) const {
     std::stringstream ss;
     PrintOneIDs(ss, spacer);
     return ss.str();
@@ -2149,8 +2148,8 @@ namespace emp {
 
   /// Convert this Bits object to a series of IDs with ranges condensed.
   template <typename DATA_T, bool ZERO_LEFT>
-  std::string Bits<DATA_T,ZERO_LEFT>::ToRangeString(const std::string & spacer,
-                                       const std::string & ranger) const
+  emp::String Bits<DATA_T,ZERO_LEFT>::ToRangeString(const emp::String & spacer,
+                                       const emp::String & ranger) const
   {
     std::stringstream ss;
     PrintAsRange(ss, spacer, ranger);
@@ -2159,7 +2158,7 @@ namespace emp {
 
   /// Print a space between each field (or other provided spacer)
   template <typename DATA_T, bool ZERO_LEFT>
-  void Bits<DATA_T,ZERO_LEFT>::PrintFields(std::ostream & out, const std::string & spacer) const {
+  void Bits<DATA_T,ZERO_LEFT>::PrintFields(std::ostream & out, const emp::String & spacer) const {
     for (size_t i = GetSize()-1; i < GetSize(); i--) {
       out << Get(i);
       if (i && (i % FIELD_BITS == 0)) out << spacer;
@@ -2170,7 +2169,7 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   void Bits<DATA_T,ZERO_LEFT>::PrintDebug(
     std::ostream & out,
-    const std::string & label
+    const emp::String & label
   ) const {
     if (label.size()) out << label << ":\n";
     for (size_t field = 0; field < _data.NumFields(); field++) {
@@ -2188,7 +2187,7 @@ namespace emp {
 
   /// Print the positions of all one bits, spaces are the default separator.
   template <typename DATA_T, bool ZERO_LEFT>
-  void Bits<DATA_T,ZERO_LEFT>::PrintOneIDs(std::ostream & out, const std::string & spacer) const {
+  void Bits<DATA_T,ZERO_LEFT>::PrintOneIDs(std::ostream & out, const emp::String & spacer) const {
     bool started = false;
     for (size_t i = 0; i < GetSize(); i++) {
       if (Get(i)) {
@@ -2202,8 +2201,8 @@ namespace emp {
   /// Print the ones in a range format.  E.g., 2-5,7,10-15
   template <typename DATA_T, bool ZERO_LEFT>
   void Bits<DATA_T,ZERO_LEFT>::PrintAsRange(std::ostream & out,
-                    const std::string & spacer,
-                    const std::string & ranger) const
+                    const emp::String & spacer,
+                    const emp::String & ranger) const
   {
     emp::vector<size_t> ones = GetOnes();
 
@@ -2425,6 +2424,26 @@ namespace emp {
   template <size_t NUM_BITS> using BitSet          = Bits<Bits_FixedData<NUM_BITS>, false>;
   template <size_t MAX_BITS> using StaticBitVector = Bits<Bits_StaticData<MAX_BITS>, true>;
   template <size_t MAX_BITS> using StaticBitValue  = Bits<Bits_StaticData<MAX_BITS>, false>;
+
+
+  // Some external functions to process collections of Bits objects.
+
+  /// Find bit positions where only a single sequence has a one in that position.  
+  template <typename CONTAINER_T>
+  auto FindUniqueOnes(const CONTAINER_T & container) {
+    using bits_t = CONTAINER_T::value_type;
+
+    // Identify cells where exactly one state is possible.
+    bits_t unique;
+    bits_t multi;
+    for (const bits_t & bits : container) {
+      multi |= (unique & bits);  // Identify new duplications
+      unique |= bits;            // Identify new possible uniques
+      unique &= ~multi;          // Remove duplications from unique
+    }
+
+    return unique;
+  }
 }
 
 
