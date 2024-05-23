@@ -348,6 +348,7 @@ namespace emp {
 
     inline bool PopIf(char c);
     inline bool PopIf(String in);
+    inline bool PopIfAny(CharSet chars);
     inline String PopAll();
     inline String PopFixed(std::size_t end_pos, size_t delim_size=0);
     inline String Pop(CharSet chars=" \n\t\r", const Syntax & syntax=Syntax::None());
@@ -1015,6 +1016,12 @@ namespace emp {
 
   bool String::PopIf(String in) {
     if (HasPrefix(in)) { PopFixed(in.size()); return true; }
+    return false;
+  }
+
+  /// Pop the next character if it is any of the provided chars.  Return true/false if popped.
+  bool String::PopIfAny(CharSet chars) {
+    if (size() && chars.Has(Get(0))) { erase(0,1); return true; }
     return false;
   }
 
