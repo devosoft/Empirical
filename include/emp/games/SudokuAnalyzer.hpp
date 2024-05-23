@@ -36,15 +36,19 @@ namespace emp {
     static constexpr size_t NUM_ROWS = 9;
     static constexpr size_t NUM_COLS = 9;
     static constexpr size_t NUM_SQUARES = 9;
-    static constexpr size_t NUM_OVERLAPS = 54;      // Multi-cell overlaps between two regions
+
     static constexpr size_t NUM_CELLS = NUM_ROWS * NUM_COLS;                  // 81
     static constexpr size_t NUM_REGIONS = NUM_ROWS + NUM_COLS + NUM_SQUARES;  // 27
     static constexpr size_t REGIONS_PER_CELL = 3;   // Each cell is part of three regions.
+
+    // Calculate multi-cell overlaps between regions; each row/col overlaps with 3 square regions.
+    static constexpr size_t NUM_OVERLAPS = (NUM_ROWS + NUM_COLS) * 3 ;        // 54
     
     static constexpr uint8_t UNKNOWN_STATE = NUM_STATES; // Lower values are actual states.
 
     using grid_bits_t = BitSet<NUM_CELLS>;
     using region_bits_t = BitSet<NUM_REGIONS>;
+    using region_pairs_t = std::pair<size_t, size_t>;
 
     // Track which cells are in each region.
     static const emp::array<grid_bits_t, NUM_REGIONS> & RegionMap() {
@@ -137,6 +141,27 @@ namespace emp {
       return CellLinks()[cell_id];
     }
 
+    // Track which pairs of regions have multiple cells in common.
+    static const emp::array<region_pairs_t, NUM_OVERLAPS> & RegionOverlaps() {
+      static emp::array<region_pairs_t, NUM_OVERLAPS> overlaps = BuildRegionOverlaps();
+      return overlaps;
+    }
+    static emp::array<region_pairs_t, NUM_OVERLAPS> BuildRegionOverlaps() {
+      emp::array<region_pairs_t, NUM_OVERLAPS> overlaps;
+      size_t overlap_id = 0;
+      for (size_t region1 = 0; region1 < NUM_REGIONS; ++region1) {
+        for (size_t region2 = 0; region2 < region1; ++region2) {
+          auto cur_overlap = RegionMap(region1) & RegionMap(region2);
+          if (cur_overlap.CountOnes() > 1) {
+            overlaps[overlap_id].first = region1;
+            overlaps[overlap_id].second = region2;
+            ++overlap_id;
+          }
+        }
+      }
+      emp_assert(overlap_id == NUM_OVERLAPS);
+      return overlaps;
+    }
 
     ////////////////////////////////////
     //                                //
@@ -691,6 +716,28 @@ namespace emp {
     // B, no other cell in region B can have that state as a possibility.
     emp::vector<PuzzleMove> Solve_FindRegionOverlap() {
       emp::vector<PuzzleMove> moves;
+
+      for (auto [r1, r2] : RegionOverlaps()) {
+        const auto overlap = RegionMap(r1) & RegionMap(r2);
+        if ((overlap & ~is_set).CountOnes() < 2) continue;       // Enough free cells to matter?
+        for (uint8_t state = 0; state < NUM_STATES; ++state) {
+          auto overlap_opts = bit_options[state] & overlap;
+          bool o1 = ((bit_options[state] & r1) == overlap_opts);
+          bool o2 = ((bit_options[state] & r2) == overlap_opts);
+          if (o1 == o2) continue;  // Neither region can limit the other.
+          if (o1) { // o1 limits o2
+            auto clear_options = (bit_options[state] & r2) & ~overlap_opts;
+            clear_options.ForEach([&moves,state](size_t pos){
+              moves.push_back(PuzzleMove{PuzzleMove::SET_STATE, pos, state});
+            });
+          } else { // o2 limits o1
+            auto clear_options = (bit_options[state] & r1) & ~overlap_opts;
+            clear_options.ForEach([&moves,state](size_t pos){
+              moves.push_back(PuzzleMove{PuzzleMove::SET_STATE, pos, state});
+            });
+          }
+        }
+      }
 
       // // Determine what options are available in each overlap region.
       // std::array<uint32_t, NUM_OVERLAPS> overlap_options;
