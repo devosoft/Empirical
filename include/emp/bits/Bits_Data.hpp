@@ -48,6 +48,8 @@ namespace emp {
 
       size_t num_bits;           ///< Total number of bits are we using
 
+      constexpr bool IsFixedSize() const { return false; }
+
       constexpr void SetSize(size_t new_size) { num_bits = new_size; }
 
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return num_bits; }
@@ -107,8 +109,10 @@ namespace emp {
       using field_t = bits_field_t;
       static constexpr size_t DEFAULT_SIZE = NUM_BITS;
 
+      constexpr bool IsFixedSize() const { return true; }
+
       constexpr void SetSize([[maybe_unused]] size_t new_size) {
-        emp_assert(new_size == NUM_BITS, "Cannot change to new_size");
+        emp_assert(new_size == NUM_BITS, "Cannot change to new_size", new_size, NUM_BITS);
       }
 
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return NUM_BITS; }
