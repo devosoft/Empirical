@@ -50,7 +50,7 @@ Specifically, the library sets out to fulfill the following goals:
 
 1. **Utility:** Empirical tools streamline common scientific computing tasks such as configuration, end-to-end data management, and mathematical manipulations.
 2. **Efficiency:** Empirical implements general-purpose data structures and algorithms that emphasize computational efficiency to support scientific computing workloads.
-3. **Reliability:** Empirical provides sophisticated debug-mode instrumentation including audited memory management and safety checked versions of standard library containers.
+3. **Reliability:** Empirical provides sophisticated debug-mode instrumentation including audited memory management and safety-checked versions of standard library containers.
 4. **Distributability:** Empirical is highly portable, uses common data formats, and facilitates compile-to-web app development with object-oriented bindings for Emscripten/WebAssembly GUI elements, all with the goal of building broadly accessible scientific software.
 
 # Statement of Need
@@ -105,9 +105,9 @@ More fundamentally, Empirical's header-only design prioritizes ease of use and r
 
 ## Debugging
 
-Although performant, C++'s permissiveness to out-of-bounds indexing or memory managment errors can emperil validity of generated data and analyses.
+Although performant, C++'s permissiveness to out-of-bounds indexing or memory management errors can undermine the validity of generated data and analyses.
 Standard library vendors --- like [`libstdc++`](https://web.archive.org/web/20210118212109/https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html), [`libc++`](https://web.archive.org/web/20210414014331/https://libcxx.llvm.org/docs/DesignDocs/DebugMode.html), and [`stl`](https://web.archive.org/web/20210121201948/https://docs.microsoft.com/en-us/cpp/standard-library/checked-iterators?view=msvc-160) --- provide some runtime safety features, but these are incomplete and poorly documented[^1].
-Empirical supplements vendor offerings with debug mode standins for standard library containers and even raw pointers that can identify memory leaks and invalid memory access.
+Empirical supplements vendor offerings with debug mode stand-ins for standard library containers and even raw pointers that can identify memory leaks and invalid memory access.
 
 Developers typically compensate for C++'s missing guardrails with external toolchains like Valgrind, GDB, and sanitizers.
 Although mature, such tooling suffers substantial limitations[^1], particularly for WASM compiled with Emscripten.
@@ -147,7 +147,7 @@ Empirical furnishes a complementary high-level interface to Emscripten intrinsic
 ### Cheerp
 
 Cheerp, another C++ to WebAssembly compiler, is available at <https://leaningtech.com/cheerp/>.
-Like Emscripten, Cheerp provides primariliy low-level APIs for browser interaction.
+Like Emscripten, Cheerp provides primarily low-level APIs for browser interaction.
 
 ### Non-C++ Comparable Software
 
