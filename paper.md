@@ -161,12 +161,13 @@ Like Emscripten, Cheerp provides primariliy low-level APIs for browser interacti
 
 ## Projects Using the Software
 
-* [Aagos](https://lalejini.com/Aagos/web/Aagos.html) [@gillespie2018changing]: model to test impact of environmental change on genetic architecture evolution.
-* [conduit](https://conduit.fyi) [@moreno2020conduit]: library for best-effort communication in high-performance computing.
-* [Dishtiny](https://mmore500.com/dishtiny) [@moreno2019toward]: agent-based model to studdy major transitions in evolution.
+* [AAGOS](https://lalejini.com/Aagos/web/Aagos.html) [@gillespie2018changing]: model to test impact of environmental change on genetic architecture evolution.
+* [Conduit](https://uit.readthedocs.io) [@moreno2022best]: library for best-effort communication in high-performance computing.
+* [DISHTINY](https://mmore500.com/dishtiny) [@moreno2019toward]: agent-based model to study major transitions in evolution.
 * [ecology in evolutionary computation explorer](https://emilydolson.github.io/ecology_of_evolutionary_computation/web/interaction_networks.html) [@dolson2018evological]: interactive visualization of ecological interaction networks in evolutionary computation.
 * [Symbulation](https://anyaevostinar.github.io/SymbulationEmp/web/symbulation.html) [@vostinar2017suicide]: agent-based model for evolution of parasitism, mutualism, and commensalism.
-* [SignalGP](https://github.com/amlalejini/signalgp) [@Lalejini2018-GECCO,@moreno2021signalgp]: an event-driven genetic programming substrate.
+* [SignalGP](https://github.com/amlalejini/signalgp) [@Lalejini2018-GECCO; @moreno2021signalgp]: an event-driven genetic programming substrate.
+* [PhylotrackPy](https://github.com/emilydolson/phylotrackpy) [@dolson2024phylotrackpy]: a phylogeny-tracking tool for agent-based evolution, closely integrated with Empirical codebase.
 * [Model of cancer evolution on an oxygen gradient](http://emilydolson.github.io/memic_model/web/memic_model.html).
 
 # Acknowledgements
