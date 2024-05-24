@@ -471,7 +471,43 @@ namespace emp {
     // Eliminate all other possibilities from K cells if they are the only
     // ones that can possess K states in a single region.
     emp::vector<PuzzleMove> Solve_FindLimitedStates() {
+      std::cout << "TESTING 4:LimitedStates" << std::endl;
+
       emp::vector<PuzzleMove> moves;
+
+      // Try all (9*8/2=36) pairs of states and measure which sites have both options.
+      for (uint8_t state1 = 0; state1 < NUM_STATES-1; ++state1) {
+        for (uint8_t state2 = state1+1; state2 < NUM_STATES; ++state2) {
+          grid_bits_t both_states = bit_options[state1] & bit_options[state2];
+
+          // If too few cells have exactly these two states, move on!
+          if (both_states.CountOnes() < 2) continue;
+
+          // Scan for relevant regions.
+          for (const auto & region : RegionMap()) {
+            // Does this region have exactly two instances for this pair?
+            grid_bits_t both_states_r = both_states & region;
+            if (both_states_r.CountOnes() != 2) continue;
+
+            size_t pos1 = both_states_r.FindOne();
+            size_t pos2 = both_states_r.FindOne(pos1+1);
+
+            // Do either of those have OTHER states to block?
+            for (uint8_t block_state = 0; block_state < NUM_STATES; ++block_state) {
+              if (block_state == state1 || block_state == state2) continue;
+              if (bit_options[block_state].Has(pos1)) {
+                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos1, block_state});                
+              }
+              if (bit_options[block_state].Has(pos2)) {
+                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos2, block_state});                
+              }
+            }
+          }
+        }
+      }
+
+      // Try all (9*8*7/6=84) triples of states?
+
       return moves;
     }
 
