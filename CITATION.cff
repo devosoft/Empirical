@@ -52,7 +52,6 @@ authors:
   affiliation: University of Washington
 - given-names: djrain
   family-names: ''
-version: 0.0.4
-date-released: 2020-10-27
+version: 1.0.0
 repository-code: https://github.com/devosoft/Empirical
 license: MIT
