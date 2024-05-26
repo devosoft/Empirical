@@ -2428,21 +2428,65 @@ namespace emp {
 
   // Some external functions to process collections of Bits objects.
 
-  /// Find bit positions where only a single sequence has a one in that position.  
+  /// Find bit positions where ANY sequence has a one in that position.  
   template <typename CONTAINER_T>
-  auto FindUniqueOnes(const CONTAINER_T & container) {
+  [[nodiscard]] auto FindAnyOnes(const CONTAINER_T & container) {
     using bits_t = CONTAINER_T::value_type;
 
     // Identify cells where exactly one state is possible.
-    bits_t unique;
-    bits_t multi;
+    bits_t found;
     for (const bits_t & bits : container) {
-      multi |= (unique & bits);  // Identify new duplications
-      unique |= bits;            // Identify new possible uniques
-      unique &= ~multi;          // Remove duplications from unique
+      found |= bits;
     }
 
-    return unique;
+    return found;
+  }
+
+  /// Find bit positions where only a single sequence has a one in that position.  
+  template <typename CONTAINER_T>
+  [[nodiscard]] auto FindUniqueOnes(const CONTAINER_T & container) {
+    using bits_t = CONTAINER_T::value_type;
+
+    bits_t any_ones;     // Are there any ones at a position?
+    bits_t multi_ones;   // Are there multiple ones at a position?
+    for (const bits_t & bits : container) {
+      multi_ones |= any_ones & bits;
+      any_ones |= bits;
+    }
+    return any_ones ^ multi_ones; // any_ones is a subset of multi_ones, so this gives extra bit
+  }
+
+  /// Find bit positions where multiple sequences have a one in that position.  
+  template <typename CONTAINER_T>
+  [[nodiscard]] auto FindMultiOnes(const CONTAINER_T & container) {
+    using bits_t = CONTAINER_T::value_type;
+
+    bits_t any_ones;
+    bits_t multi_ones;
+    for (const bits_t & bits : container) {
+      multi_ones |= any_ones & bits;
+      any_ones |= bits;
+    }
+
+    return multi_ones;
+  }
+
+  /// Find bit positions where exactly two sequences have a one in that position.  
+  template <typename CONTAINER_T>
+  [[nodiscard]] auto FindTwoOnes(const CONTAINER_T & container) {
+    using bits_t = CONTAINER_T::value_type;
+
+    // Identify cells where exactly one state is possible.
+    bits_t any_ones;
+    bits_t two_plus;
+    bits_t three_plus;
+    for (const bits_t & bits : container) {
+      three_plus |= two_plus & bits;
+      two_plus |= any_ones & bits;
+      any_ones |= bits;
+    }
+
+    return two_plus ^ three_plus; // two_plus is a subset of three_plus, so this gives extra bit
   }
 }
 
