@@ -40,6 +40,7 @@ namespace emp {
     static constexpr size_t NUM_CELLS = NUM_ROWS * NUM_COLS;                  // 81
     static constexpr size_t NUM_REGIONS = NUM_ROWS + NUM_COLS + NUM_SQUARES;  // 27
     static constexpr size_t REGIONS_PER_CELL = 3;   // Each cell is part of three regions.
+    static constexpr size_t NO_REGION = static_cast<size_t>(-1);
 
     // Calculate multi-cell overlaps between regions; each row/col overlaps with 3 square regions.
     static constexpr size_t NUM_OVERLAPS = (NUM_ROWS + NUM_COLS) * 3 ;        // 54
@@ -95,6 +96,9 @@ namespace emp {
       return bit_regions;
     }
     static inline const grid_bits_t & RegionMap(size_t id) { return RegionMap()[id]; }
+    static inline const grid_bits_t & RowMap(size_t id) { return RegionMap()[id]; }
+    static inline const grid_bits_t & ColMap(size_t id) { return RegionMap()[id+NUM_ROWS]; }
+    static inline const grid_bits_t & BoxMap(size_t id) { return RegionMap()[id+NUM_ROWS+NUM_COLS]; }
 
 
     // Track which region ids each cell belongs to.
@@ -116,7 +120,9 @@ namespace emp {
 
       return cell_regions;
     }
-
+    static const region_bits_t CellMemberships(size_t cell_id) {
+      return CellMemberships()[cell_id];
+    }
 
     // Track which cells are in the same regions as each other cell.
     // E.g., Cell 23 is at CellLinks()[23], with 1's in all positions with neighbor cell.
@@ -329,6 +335,17 @@ namespace emp {
       }      
     }
 
+    // Scan for contradictions or lack of options that would make puzzle unsolvable.
+    bool IsUnsolvable() {
+      // Identify which cells are either set or still have options.
+      grid_bits_t has_options = is_set;
+      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+        has_options |= bit_options[state];
+      }
+
+      return !has_options.All();
+    }
+
     // Use a brute-force approach to completely solve this puzzle.
     // Return true if solvable, false if unsolvable.
     // @CAO - Change to use a stack of backup states, remove recursion, and track set counts for faster ID of failure (i.e., no 3's left, but only 8 of 9 set)
@@ -426,7 +443,7 @@ namespace emp {
     
     // If K cells in a region are all limited to the same K states, eliminate those states
     // from all other cells in the same region.
-    emp::vector<PuzzleMove> Solve_FindLimitedCells() {
+    emp::vector<PuzzleMove> Solve_FindLimitedCells2() {
       std::cout << "TESTING 4:LimitedCells" << std::endl;
 
       emp::vector<PuzzleMove> moves;
@@ -470,8 +487,9 @@ namespace emp {
     
     // Eliminate all other possibilities from K cells if they are the only
     // ones that can possess K states in a single region.
-    emp::vector<PuzzleMove> Solve_FindLimitedStates() {
-      std::cout << "TESTING 4:LimitedStates" << std::endl;
+    emp::vector<PuzzleMove> Solve_FindLimitedStates2() {
+      std::cout << "TESTING 5:LimitedStates" << std::endl;
+      Print();
 
       emp::vector<PuzzleMove> moves;
 
@@ -479,6 +497,7 @@ namespace emp {
       for (uint8_t state1 = 0; state1 < NUM_STATES-1; ++state1) {
         for (uint8_t state2 = state1+1; state2 < NUM_STATES; ++state2) {
           grid_bits_t both_states = bit_options[state1] & bit_options[state2];
+          grid_bits_t one_state = bit_options[state1] ^ bit_options[state2];
 
           // If too few cells have exactly these two states, move on!
           if (both_states.CountOnes() < 2) continue;
@@ -489,6 +508,10 @@ namespace emp {
             grid_bits_t both_states_r = both_states & region;
             if (both_states_r.CountOnes() != 2) continue;
 
+            // These have to be the only two sites
+            grid_bits_t one_state_r = one_state & region;
+            if (one_state_r.Any()) continue;
+
             size_t pos1 = both_states_r.FindOne();
             size_t pos2 = both_states_r.FindOne(pos1+1);
 
@@ -496,7 +519,14 @@ namespace emp {
             for (uint8_t block_state = 0; block_state < NUM_STATES; ++block_state) {
               if (block_state == state1 || block_state == state2) continue;
               if (bit_options[block_state].Has(pos1)) {
+                // std::cout << "Target states " << (state1+1) << " and " << (state2+1) << ": "
+                //           << "blocking state " << (block_state+1) << " at position " << pos1
+                //           << " (" << (pos1%9) << "," << (pos1/9) << ")"
+                //           << std::endl;
                 moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos1, block_state});                
+                // static int prints = 0;
+                // prints++;
+                // if (prints == 10) exit(0);
               }
               if (bit_options[block_state].Has(pos2)) {
                 moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos2, block_state});                
@@ -513,8 +543,51 @@ namespace emp {
 
     // If there are X rows (cols) where a certain state can only be in one of 
     // X cols (rows), then no other row in this cols can be that state.
-    emp::vector<PuzzleMove> Solve_FindSwordfish() {
+    emp::vector<PuzzleMove> Solve_FindSwordfish2_ROW() {
       emp::vector<PuzzleMove> moves;
+
+      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+        emp::array<uint16_t, 9> row_size;
+        for (size_t row1_id = 0; row1_id < NUM_ROWS; ++row1_id) {
+          auto row1 = RowMap(row1_id) & bit_options[state];
+          row_size[row1_id] = row1.CountOnes();
+          if (row_size[row1_id] != 2) continue;
+          for (size_t row2_id = 0; row2_id < row1_id; ++row2_id) {
+            if (row_size[row2_id] != 2) continue;
+            auto row2 = RowMap(row2_id) & bit_options[state];
+            auto combo = row1 | row2;
+            // Both rows have two instances.  See if those instances are share two other regions
+            // (cols or boxes); only step through allowed options.
+            size_t region1 = NO_REGION;
+            size_t region2 = NO_REGION;
+            for (size_t test_region = NUM_ROWS; test_region < NUM_REGIONS; ++test_region ) {
+              if ((RegionMap(test_region) & combo).CountOnes() == 2) {
+                if (region1 == NO_REGION) {
+                  region1 = test_region;
+                  continue;
+                } else {
+                  region2 = test_region;
+                  break;
+                }
+              }
+            }
+
+            // If we have identified BOTH relevant regions, strip any extra states from them.
+            if (region2 != NO_REGION) {
+              auto clear_ids = (RegionMap(region1) | RegionMap(region2)) & ~combo & bit_options[state];
+              clear_ids.ForEach([state,&moves](size_t pos){
+                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos, state});
+              });
+            }
+
+            // size_t cell1a = row1.FindOne();
+            // size_t cell2a = row2.FindOne();
+            // auto mem1a = CellMemberships(cell1a);
+            // auto mem2a = CellMemberships(cell2a);
+          }
+        }
+      }
+
       return moves;
     }
 
@@ -523,50 +596,31 @@ namespace emp {
     {
       PuzzleProfile profile;
 
-      while (true) {    
-        auto moves = Solve_FindLastCellState();
-        if (moves.size() > 0) {
-          Move(moves);
-          profile.AddMoves(0, moves.size());
-          continue;
-        }
-        
-        moves = Solve_FindLastRegionState();
-        if (moves.size() > 0) {
-          Move(moves);
-          profile.AddMoves(1, moves.size());
-          continue;
-        }
-        
-        moves = Solve_FindRegionOverlap();
-        if (moves.size() > 0) {
-          Move(moves);
-          profile.AddMoves(2, moves.size());
-          continue;
-        }
+      using move_set_t = emp::vector<PuzzleMove>;
+      using solve_fun_t = move_set_t();
+      emp::vector<std::function<solve_fun_t>> solve_funs;
 
-        moves = Solve_FindLimitedCells();
-        if (moves.size() > 0) {
-          Move(moves);
-          profile.AddMoves(3, moves.size());
-          continue;
-        }
+      // The list of moves to try for this puzzle.
+      solve_funs.push_back([this](){ return Solve_FindLastCellState(); });
+      solve_funs.push_back([this](){ return Solve_FindLastRegionState(); });
+      solve_funs.push_back([this](){ return Solve_FindRegionOverlap(); });
+      solve_funs.push_back([this](){ return Solve_FindLimitedCells2(); });
+      solve_funs.push_back([this](){ return Solve_FindLimitedStates2(); });
+      solve_funs.push_back([this](){ return Solve_FindSwordfish2_ROW(); });
 
-        moves = Solve_FindLimitedStates();
+      move_set_t moves;
+      size_t move_id = 0;
+      while (move_id < solve_funs.size()) {
+        moves = solve_funs[move_id]();
         if (moves.size() > 0) {
-          Move(moves);
-          profile.AddMoves(4, moves.size());
-          continue;
+          Move(moves);                              // Trigger the full set of found moves.
+          profile.AddMoves(move_id, moves.size());  // Place move record into solve profile.
+          move_id = 0;                              // Start from the easiest move after a change.
+          if (IsUnsolvable()) break;
         }
-
-        moves = Solve_FindSwordfish();
-        if (moves.size() > 0) {
-          Move(moves);
-          profile.AddMoves(5, moves.size());
-          continue;
+        else {  
+          ++move_id;  // This move didn't work; shift to the next one.
         }
-
-        break;  // No new moves found!
       }
 
       return profile;
