@@ -30,8 +30,7 @@
 
 namespace emp {
 
-  class SudokuAnalyzer {
-  private:
+  struct SudokuInfo {
     static constexpr size_t NUM_STATES = 9;
     static constexpr size_t NUM_ROWS = 9;
     static constexpr size_t NUM_COLS = 9;
@@ -46,11 +45,15 @@ namespace emp {
     static constexpr size_t NUM_OVERLAPS = (NUM_ROWS + NUM_COLS) * 3 ;        // 54
     
     static constexpr uint8_t UNKNOWN_STATE = NUM_STATES; // Lower values are actual states.
+  };
 
+  class SudokuAnalyzer
+    : public SudokuInfo, public PuzzleAnalyzer<SudokuInfo::NUM_CELLS, SudokuInfo::NUM_STATES> {
+  private:
     using grid_bits_t = BitSet<NUM_CELLS>;
     using state_bits_t = BitSet<NUM_STATES>;
     using region_bits_t = BitSet<NUM_REGIONS>;
-    using region_pairs_t = std::pair<size_t, size_t>;
+    using region_pair_t = std::pair<size_t, size_t>;
 
     // Track which cells are in each region.
     static const emp::array<grid_bits_t, NUM_REGIONS> & RegionMap() {
@@ -149,12 +152,12 @@ namespace emp {
     }
 
     // Track which pairs of regions have multiple cells in common.
-    static const emp::array<region_pairs_t, NUM_OVERLAPS> & RegionOverlaps() {
-      static emp::array<region_pairs_t, NUM_OVERLAPS> overlaps = BuildRegionOverlaps();
+    static const emp::array<region_pair_t, NUM_OVERLAPS> & RegionOverlaps() {
+      static emp::array<region_pair_t, NUM_OVERLAPS> overlaps = BuildRegionOverlaps();
       return overlaps;
     }
-    static emp::array<region_pairs_t, NUM_OVERLAPS> BuildRegionOverlaps() {
-      emp::array<region_pairs_t, NUM_OVERLAPS> overlaps;
+    static emp::array<region_pair_t, NUM_OVERLAPS> BuildRegionOverlaps() {
+      emp::array<region_pair_t, NUM_OVERLAPS> overlaps;
       size_t overlap_id = 0;
       for (size_t region1 = 1; region1 < NUM_REGIONS; ++region1) {
         for (size_t region2 = 0; region2 < region1; ++region2) {
@@ -188,7 +191,6 @@ namespace emp {
     emp::array<char, NUM_STATES> symbols = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
     emp::array<uint8_t,NUM_CELLS> value;      // Known value for cells
-    // emp::array<uint32_t, NUM_CELLS> options;  // Options still available to each cell
 
     // Track the available options by state, across the whole puzzle.
     // E.g., symbol 5 is at bit_options[5] and has 81 bits indicating if each cell can be '5'.
@@ -578,9 +580,6 @@ namespace emp {
 
             target_cells.ForEach([&moves,state](size_t cell_id){
               moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, cell_id, state});
-              std::cout << "BLOCKING state " << (state+1) << " from pos " << cell_id
-                << " (row=" << (cell_id/9) << "; col=" << (cell_id%9) << ")"
-                << std::endl;
             });
 
 
