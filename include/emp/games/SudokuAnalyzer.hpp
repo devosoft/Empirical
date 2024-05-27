@@ -170,6 +170,13 @@ namespace emp {
       return overlaps;
     }
 
+    /// Convert a set of region bits into the combined grid cells in those regions.
+    grid_bits_t ComboRegion(region_bits_t region_ids) {
+      grid_bits_t out;
+      region_ids.ForEach([this,&out](size_t region_id){ out |= RegionMap(region_id); });
+      return out;
+    }
+
     ////////////////////////////////////
     //                                //
     //    --- Member Variables ---    //
@@ -547,43 +554,64 @@ namespace emp {
       emp::vector<PuzzleMove> moves;
 
       for (uint8_t state = 0; state < NUM_STATES; ++state) {
-        emp::array<uint16_t, 9> row_size;
         for (size_t row1_id = 0; row1_id < NUM_ROWS; ++row1_id) {
           auto row1 = RowMap(row1_id) & bit_options[state];
-          row_size[row1_id] = row1.CountOnes();
-          if (row_size[row1_id] != 2) continue;
+          if (row1.CountOnes() != 2) continue;
           for (size_t row2_id = 0; row2_id < row1_id; ++row2_id) {
-            if (row_size[row2_id] != 2) continue;
             auto row2 = RowMap(row2_id) & bit_options[state];
-            auto combo = row1 | row2;
-            // Both rows have two instances.  See if those instances are share two other regions
-            // (cols or boxes); only step through allowed options.
-            size_t region1 = NO_REGION;
-            size_t region2 = NO_REGION;
-            for (size_t test_region = NUM_ROWS; test_region < NUM_REGIONS; ++test_region ) {
-              if ((RegionMap(test_region) & combo).CountOnes() == 2) {
-                if (region1 == NO_REGION) {
-                  region1 = test_region;
-                  continue;
-                } else {
-                  region2 = test_region;
-                  break;
-                }
-              }
-            }
+            if (row2.CountOnes() != 2) continue;
 
-            // If we have identified BOTH relevant regions, strip any extra states from them.
-            if (region2 != NO_REGION) {
-              auto clear_ids = (RegionMap(region1) | RegionMap(region2)) & ~combo & bit_options[state];
-              clear_ids.ForEach([state,&moves](size_t pos){
-                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos, state});
-              });
-            }
+            size_t cell1a = row1.FindOne();
+            size_t cell1b = row1.FindOne(cell1a+1);
+            size_t cell2a = row2.FindOne();
+            size_t cell2b = row2.FindOne(cell2a+1);
 
-            // size_t cell1a = row1.FindOne();
-            // size_t cell2a = row2.FindOne();
-            // auto mem1a = CellMemberships(cell1a);
-            // auto mem2a = CellMemberships(cell2a);
+            region_bits_t a_regions = CellMemberships(cell1a) & CellMemberships(cell2a);
+            region_bits_t b_regions = CellMemberships(cell1b) & CellMemberships(cell2b);
+
+            // If both cell pairs don't share at least one region, we can't do a swordfish
+            if (a_regions.None() || b_regions.None()) continue;
+
+            // For each cross region, remove additional "state" options.
+            grid_bits_t target_cells = bit_options[state] & ~row1 & ~row2
+                & ComboRegion(a_regions | b_regions);
+
+            target_cells.ForEach([&moves,state](size_t cell_id){
+              moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, cell_id, state});
+              std::cout << "BLOCKING state " << (state+1) << " from pos " << cell_id
+                << " (row=" << (cell_id/9) << "; col=" << (cell_id%9) << ")"
+                << std::endl;
+            });
+
+
+            // auto combo = row1 | row2;
+            // // Both rows have two instances.  See if those instances are share two other regions
+            // // (cols or boxes); only step through allowed options.
+            // size_t region1 = NO_REGION;
+            // size_t region2 = NO_REGION;
+            // for (size_t test_region = NUM_ROWS; test_region < NUM_REGIONS; ++test_region ) {
+            //   if ((RegionMap(test_region) & combo).CountOnes() == 2) {
+            //     if (region1 == NO_REGION) {
+            //       region1 = test_region;
+            //       continue;
+            //     } else {
+            //       region2 = test_region;
+            //       break;
+            //     }
+            //   }
+            // }
+
+            // // If we have identified BOTH relevant regions, strip any extra states from them.
+            // if (region2 != NO_REGION) {
+            //   auto clear_ids = (RegionMap(region1) | RegionMap(region2)) & ~combo & bit_options[state];
+            //   clear_ids.ForEach([row1_id,row2_id,state,&moves](size_t pos){
+            //     std::cout << "Blocking state " << (state+1) << " from pos " << pos
+            //       << " (row1=" << row1_id << "; row=" << row2_id << ")"
+            //       << std::endl;
+            //     moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos, state});
+            //   });
+            // }
+
           }
         }
       }
