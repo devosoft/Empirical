@@ -11,6 +11,8 @@
 #ifndef EMP_GAMES_PUZZLE_HPP
 #define EMP_GAMES_PUZZLE_HPP
 
+#include <iostream>
+
 #include "../tools/String.hpp"
 
 namespace emp {
@@ -21,8 +23,29 @@ namespace emp {
     MoveType type;
     size_t pos_id;
     uint8_t state;
+
+    emp::String TypeString() const {
+      if (type == BLOCK_STATE) return "BLOCKING";
+      else return "SETTING";
+    }
+
+    emp::String ToString() const {
+      return MakeString(TypeString(), " state ", state+1, " at position ", pos_id);
+    }
+
+    std::ostream & Print(std::ostream & os=std::cout) const {
+      return os << ToString();
+    }
   };
 
+  struct PuzzleSolveFun {
+    using move_set_t = emp::vector<PuzzleMove>;
+    using solve_fun_t = move_set_t();
+
+    std::function<solve_fun_t> solve_fun;
+    String move_name;
+    double difficulty;
+  };
 
   struct PuzzleProfile {
     struct Slice {
@@ -62,6 +85,15 @@ namespace emp {
     }
   };
   
+
+  /// @brief A generic analyzer for puzzles that have a set of positions, each in a set of values.
+  template <size_t NUM_POSITIONS, size_t NUM_STATES>
+  struct PuzzleAnalyzer {
+    static constexpr size_t num_pos = NUM_POSITIONS;
+    static constexpr size_t num_vals = NUM_STATES;
+
+    using symbol_set_t = emp::array<char, NUM_STATES>;
+  };
 } // End namespace: emp
 
 #endif
