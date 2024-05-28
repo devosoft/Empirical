@@ -29,12 +29,12 @@ namespace emp {
       else return "SETTING";
     }
 
-    emp::String ToString() const {
-      return MakeString(TypeString(), " state ", state+1, " at position ", pos_id);
+    emp::String ToString(size_t num_cols) const {
+      return MakeString(TypeString(), " state ", state+1, " at position ", pos_id, "(", pos_id%num_cols, ",", pos_id/num_cols, ")");
     }
 
-    std::ostream & Print(std::ostream & os=std::cout) const {
-      return os << ToString();
+    std::ostream & Print(size_t row_size, std::ostream & os=std::cout) const {
+      return os << ToString(row_size);
     }
   };
 
@@ -42,9 +42,9 @@ namespace emp {
     using move_set_t = emp::vector<PuzzleMove>;
     using solve_fun_t = move_set_t();
 
-    std::function<solve_fun_t> solve_fun;
-    String move_name;
+    String name;
     double difficulty;
+    std::function<solve_fun_t> fun;
   };
 
   struct PuzzleProfile {
@@ -105,16 +105,26 @@ namespace emp {
 
     grid_bits_t is_set;
 
+    using move_set_t = emp::vector<PuzzleMove>;
+    using solve_fun_t = move_set_t();
+    emp::vector<PuzzleSolveFun> solve_funs;
 
     // ===== Helper Functions =====
 
+    virtual ~GridPuzzleAnalyzer() = default;
+
     uint8_t GetValue(size_t cell) const { return value[cell]; }
 
-    size_t SymbolToState(char symbol) const {
-      for (size_t i=0; i < NUM_STATES; ++i) {
+    uint8_t SymbolToState(char symbol) const {
+      for (uint8_t i=0; i < NUM_STATES; ++i) {
         if (symbols[i] == symbol) return i;
       }
       return UNKNOWN_STATE;
+    }
+
+    // Convert a cell ID to its coordinates.
+    emp::String CellToCoords(size_t id) {
+      return emp::MakeString(id%NUM_COLS, ',', id/NUM_COLS);
     }
 
     /// Test if a cell is allowed to be a particular state.
@@ -141,6 +151,15 @@ namespace emp {
         val_options.SetAll();
       }
       is_set.Clear();
+    }
+
+    /// @brief  Add a function solving method to this puzzle type.
+    /// @param name Unique name for this solving technique
+    /// @param difficulty Difficulty for a human to use this technique
+    /// @param fun Function to run to perform this technique and return moves
+    template <typename FUN_T>
+    void AddSolveFunction(emp::String name, double difficulty, FUN_T fun) {
+      solve_funs.push_back(PuzzleSolveFun{name, difficulty, fun});
     }
 
     // Set the value of an individual cell
@@ -184,6 +203,17 @@ namespace emp {
       for (const auto & move : moves) { Move(move); }
     }
 
+    // Print out info on a set of moves that were found.
+    void PrintMoves(const emp::vector<PuzzleMove> & moves, std::ostream & os=std::cout) const {
+      for (const auto & move : moves) { os << "  " << move.ToString(NUM_COLS) << std::endl; }
+    }
+
+    // Print the current state of the board (must be overridden)
+    virtual void Print(std::ostream & out=std::cout) {
+      out << "NO PRINT METHOD FOR BOARD - MUST OVERRIDE!" << std::endl;
+    }
+
+
     // Scan for contradictions or lack of options that would make puzzle unsolvable.
     bool IsUnsolvable() {
       // Identify which cells are either set or still have options.
@@ -193,6 +223,38 @@ namespace emp {
       }
 
       return !has_options.All();
+    }
+
+    // Calculate the full solving profile based on the other techniques.
+    PuzzleProfile CalcProfile()
+    {
+      PuzzleProfile profile;
+
+      constexpr bool verbose = true;
+
+      move_set_t moves;
+      size_t fun_id = 0;
+      while (fun_id < solve_funs.size()) {
+        if constexpr (verbose) std::cout << "TRYING: " << solve_funs[fun_id].name;
+        moves = solve_funs[fun_id].fun();
+        if constexpr (verbose) {
+          std::cout << " ... " << moves.size() << " moves found." << std::endl;
+          PrintMoves(moves);
+        }
+
+        if (moves.size() > 0) {          
+          Move(moves);                             // Trigger the full set of found moves.
+          if constexpr (verbose) Print();
+          profile.AddMoves(fun_id, moves.size());  // Place move record into solve profile.
+          fun_id = 0;                              // Start from the easiest move after a change.
+          if (IsUnsolvable()) break;
+        }
+        else {  
+          ++fun_id;  // This move type didn't work; shift to the next one.
+        }
+      }
+
+      return profile;
     }
 
   };
