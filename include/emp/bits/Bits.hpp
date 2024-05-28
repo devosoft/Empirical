@@ -2531,6 +2531,26 @@ namespace emp {
 
     return two_plus ^ three_plus; // two_plus is a subset of three_plus, so this gives extra bit
   }
+
+  /// Find bit positions where exactly three sequences have a one in that position.  
+  template <typename CONTAINER_T>
+  [[nodiscard]] auto FindThreeOnes(const CONTAINER_T & container) {
+    using bits_t = CONTAINER_T::value_type;
+
+    // Identify cells where exactly one state is possible.
+    bits_t any_ones;
+    bits_t two_plus;
+    bits_t three_plus;
+    bits_t four_plus;
+    for (const bits_t & bits : container) {
+      four_plus |= three_plus & bits;
+      three_plus |= two_plus & bits;
+      two_plus |= any_ones & bits;
+      any_ones |= bits;
+    }
+
+    return three_plus ^ four_plus; // two_plus is a subset of three_plus, so this gives extra bit
+  }
 }
 
 
