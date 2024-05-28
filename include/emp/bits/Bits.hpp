@@ -669,21 +669,19 @@ namespace emp {
       }
     }
 
-    /// @brief Scan through all of the one indices to determine which one maximizes a function.
-    template <typename FUN_T>
-    size_t MaxIndex(FUN_T && fun) const {
-      size_t max_id = FindOne();
-      if (max_id == npos) return npos;
-      auto max_value = fun(max_id);
-      for (size_t i = FindOne(max_id+1); i < GetSize(); i=FindOne(i+1)) {
-        const auto cur_val = fun(i);
-        if (cur_val > max_value) {
-          max_value = cur_val;
-          max_id = i;
+    /// @brief Run the provided function on each pair of one indices, one from each set of bits.
+    template <typename DATA_T2, bool ZERO_LEFT2, typename FUN_T>
+    void ForEachPair(Bits<DATA_T2, ZERO_LEFT2> bits2, FUN_T && fun) const {
+      for (size_t i = FindOne(); i < GetSize(); i=FindOne(i+1)) {
+        for (size_t j = bits2.FindOne(); j < bits2.GetSize(); j=bits2.FindOne(j+1)) {
+          fun(i, j);
         }
       }
-      return max_id;
     }
+
+    /// @brief Scan through all of the one indices to determine which one maximizes a function.
+    template <typename FUN_T>
+    size_t MaxIndex(FUN_T && fun) const;
 
     /// @brief Find a one-index that makes a function true
     template <typename FUN_T>
@@ -2110,6 +2108,23 @@ namespace emp {
     return false;
   }
 
+    /// Scan through all of the one indices to determine which one maximizes a function.
+    template <typename DATA_T, bool ZERO_LEFT>
+    template <typename FUN_T>
+    size_t Bits<DATA_T,ZERO_LEFT>::MaxIndex(FUN_T && fun) const {
+      size_t max_id = FindOne();
+      if (max_id == npos) return npos;
+      auto max_value = fun(max_id);
+      for (size_t i = FindOne(max_id+1); i < GetSize(); i=FindOne(i+1)) {
+        const auto cur_val = fun(i);
+        if (cur_val > max_value) {
+          max_value = cur_val;
+          max_id = i;
+        }
+      }
+      return max_id;
+    }
+
 
   // -------------------------  Printing and string conversion -------------------------
 
@@ -2442,7 +2457,35 @@ namespace emp {
     return found;
   }
 
-  /// Find bit positions where only a single sequence has a one in that position.  
+  /// Find bit positions where ALL sequences have a one in that position.  
+  template <typename CONTAINER_T>
+  [[nodiscard]] auto FindAllOnes(const CONTAINER_T & container) {
+    using bits_t = CONTAINER_T::value_type;
+
+    // Identify cells where exactly one state is possible.
+    bits_t found;
+    for (const bits_t & bits : container) {
+      found &= bits;
+    }
+
+    return found;
+  }
+
+  /// Find bit positions where NO sequences have a one in that position.  
+  template <typename CONTAINER_T>
+  [[nodiscard]] auto FindNoOnes(const CONTAINER_T & container) {
+    using bits_t = CONTAINER_T::value_type;
+
+    // Identify cells where exactly one state is possible.
+    bits_t ones_found;
+    for (const bits_t & bits : container) {
+      ones_found |= bits;
+    }
+
+    return ~ones_found;
+  }
+
+  /// Find bit positions where exactly one sequence has a one in that position.  
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindUniqueOnes(const CONTAINER_T & container) {
     using bits_t = CONTAINER_T::value_type;
