@@ -87,12 +87,114 @@ namespace emp {
   
 
   /// @brief A generic analyzer for puzzles that have a set of positions, each in a set of values.
-  template <size_t NUM_POSITIONS, size_t NUM_STATES>
-  struct PuzzleAnalyzer {
-    static constexpr size_t num_pos = NUM_POSITIONS;
-    static constexpr size_t num_vals = NUM_STATES;
+  template <size_t NUM_ROWS, size_t NUM_COLS, size_t NUM_STATES>
+  struct GridPuzzleAnalyzer {
+    static constexpr size_t NUM_CELLS = NUM_ROWS * NUM_COLS;
+    static constexpr uint8_t UNKNOWN_STATE = NUM_STATES; // Lower values are actual states.
 
+    // Which symbols are we using in this puzzle? (default to standard)
     using symbol_set_t = emp::array<char, NUM_STATES>;
+    symbol_set_t symbols = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
+    emp::array<uint8_t,NUM_CELLS> value;      // Known value for cells
+
+    // Track the available options by state, across the whole puzzle.
+    // E.g., symbol 5 is at bit_options[5] and has 81 bits indicating if each cell can be '5'.
+    using grid_bits_t = BitSet<NUM_CELLS>;
+    emp::array<grid_bits_t, NUM_STATES> bit_options;
+
+    grid_bits_t is_set;
+
+
+    // ===== Helper Functions =====
+
+    uint8_t GetValue(size_t cell) const { return value[cell]; }
+
+    size_t SymbolToState(char symbol) const {
+      for (size_t i=0; i < NUM_STATES; ++i) {
+        if (symbols[i] == symbol) return i;
+      }
+      return UNKNOWN_STATE;
+    }
+
+    /// Test if a cell is allowed to be a particular state.
+    bool HasOption(size_t cell, uint8_t state) {
+      emp_assert(cell < 81, cell);
+      emp_assert(state >= 0 && state < NUM_STATES, state);
+      return bit_options[state].Has(cell);
+    }
+
+    /// Return a currently valid option for provided cell; may not be correct solution
+    uint8_t FindOption(size_t cell) {
+      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+        if (HasOption(cell, state)) return state;
+      }
+      return UNKNOWN_STATE;
+    }
+    bool IsSet(size_t cell) const { return value[cell] != UNKNOWN_STATE; }
+    bool IsSolved() const { return is_set.All(); }
+    
+    // Clear out the old solution info when starting a new solve attempt.
+    void Clear() {
+      value.fill(UNKNOWN_STATE);
+      for (auto & val_options : bit_options) {
+        val_options.SetAll();
+      }
+      is_set.Clear();
+    }
+
+    // Set the value of an individual cell
+    // Return true/false based on whether progress was made toward solving the puzzle.
+    virtual bool Set(size_t cell, uint8_t state) {
+      emp_assert(cell < NUM_CELLS);   // Make sure cell is in a valid range.
+      emp_assert(state < NUM_STATES); // Make sure state is in a valid range.
+
+      if (value[cell] == state) return false;  // If state is already set, SKIP!
+
+      emp_assert(HasOption(cell,state));     // Make sure state is allowed.
+      is_set.Set(cell);
+      value[cell] = state;                   // Store found value!
+
+      // Clear this cell from all sets of options.
+      for (size_t s=0; s < NUM_STATES; ++s) bit_options[s].Clear(cell);
+      
+      return true;
+    }
+
+    // Remove a symbol option from a particular cell.
+    void Block(size_t cell, uint8_t state) {
+      bit_options[state].Clear(cell);
+    }
+
+    // Operate on a "move" object.
+    void Move(const PuzzleMove & move) {
+      emp_assert(move.pos_id >= 0 && move.pos_id < NUM_CELLS, move.pos_id);
+      emp_assert(move.state >= 0 && move.state < NUM_STATES, move.state);
+      
+      switch (move.type) {
+      case PuzzleMove::SET_STATE:   Set(move.pos_id, move.state);   break;
+      case PuzzleMove::BLOCK_STATE: Block(move.pos_id, move.state); break;
+      default:
+        emp_assert(false);   // One of the previous move options should have been triggered!
+      }
+    }
+    
+    // Operate on a set of "move" objects.
+    void Move(const emp::vector<PuzzleMove> & moves) {
+      for (const auto & move : moves) { Move(move); }
+    }
+
+    // Scan for contradictions or lack of options that would make puzzle unsolvable.
+    bool IsUnsolvable() {
+      // Identify which cells are either set or still have options.
+      grid_bits_t has_options = is_set;
+      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+        has_options |= bit_options[state];
+      }
+
+      return !has_options.All();
+    }
+
   };
 } // End namespace: emp
 
