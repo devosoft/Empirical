@@ -188,6 +188,8 @@ namespace emp {
       AddSolveFunction("LimitedStates2", 5.0, [this](){ return Solve_FindLimitedStates2(); });
       AddSolveFunction("Swordfish2-RC",  6.0, [this](){ return Solve_FindSwordfish2_ROW_COL(); });
       AddSolveFunction("Swordfish2-Box", 7.0, [this](){ return Solve_FindSwordfish2_BOX(); });
+      AddSolveFunction("LimitedCells3",  8.0, [this](){ return Solve_FindLimitedCells3(); });
+      AddSolveFunction("LimitedStates3", 9.0, [this](){ return Solve_FindLimitedStates3(); });
 
       symbols = symbol_set_t{'1', '2', '3', '4', '5', '6', '7', '8', '9'};
       Clear();
@@ -234,7 +236,7 @@ namespace emp {
     }
 
     // Print the current state of the puzzle, including all options available.
-    void Print(std::ostream & out=std::cout) override {
+    void Print(bool color=true, std::ostream & out=std::cout) override {
       out << " +-----------------------+-----------------------+-----------------------+"
           << std::endl;;
       for (size_t r = 0; r < 9; r++) {       // Puzzle row
@@ -244,12 +246,12 @@ namespace emp {
             if (c%3==0) out << " |";
             else out << "  ";
             if (value[id] == UNKNOWN_STATE) {
-              out << " " << (char) (HasOption(id,s)   ? symbols[s] : '.')
-                  << " " << (char) (HasOption(id,s+1) ? symbols[s+1] : '.')
-                  << " " << (char) (HasOption(id,s+2) ? symbols[s+2] : '.');
+              out << " " << (HasOption(id,s)   ? ColorSymbol(s) : ".")
+                  << " " << (HasOption(id,s+1) ? ColorSymbol(s+1) : ".")
+                  << " " << (HasOption(id,s+2) ? ColorSymbol(s+2) : ".");
             } else {
               if (s==0) out << "      ";
-              if (s==3) out << "   " << symbols[value[id]] << "  ";
+              if (s==3) out << "   " << ColorSymbol(value[id], true) << "  ";
               if (s==6) out << "      ";
               // if (s==0) out << " /   \\";
               // if (s==3) out << " | " << symbols[value[id]] << " |";
@@ -359,7 +361,7 @@ namespace emp {
       return moves;
     }
     
-    // If K cells in a region are all limited to the same K states, eliminate those states
+    // If 2 cells in a region are all limited to the same 2 states, eliminate those states
     // from all other cells in the same region.
     emp::vector<PuzzleMove> Solve_FindLimitedCells2() {
       emp::vector<PuzzleMove> moves;
@@ -396,11 +398,67 @@ namespace emp {
         }
       }
 
+      return moves;
+    }
+
+
+    // If 3 cells in a region are all limited to the same 3 states, eliminate those states
+    // from all other cells in the same region.
+    emp::vector<PuzzleMove> Solve_FindLimitedCells3() {
+      emp::vector<PuzzleMove> moves;
+
+      // Identify which sites have exactly two or three options.
+      grid_bits_t two_ones = FindTwoOnes(bit_options);
+      grid_bits_t three_ones = FindThreeOnes(bit_options);
+      grid_bits_t valid = two_ones | three_ones;
+
+      // Try all (9*8*7/6=84) triples of states and measure which sites have these options.
+      for (uint8_t state1 = 0; state1 < NUM_STATES-1; ++state1) {
+        for (uint8_t state2 = state1+1; state2 < NUM_STATES; ++state2) {
+          for (uint8_t state3 = state2+1; state3 < NUM_STATES; ++state3) {
+
+            // Which sites have at least two of these states and no others?
+            grid_bits_t test_sites =
+              (bit_options[state1] & bit_options[state2] & two_ones) |
+              (bit_options[state1] & bit_options[state3] & two_ones) |
+              (bit_options[state2] & bit_options[state3] & two_ones) |
+              (bit_options[state1] & bit_options[state2] & bit_options[state3] & three_ones);
+              
+            // If too few cells have exactly these two states, move on!
+            if (test_sites.CountOnes() < 3) continue;
+
+            // Scan for relevant regions.
+            for (const auto & region : RegionMap()) {
+              // Does this region have the two instances to qualify?
+              grid_bits_t test_sites_r = test_sites & region;
+              if (test_sites_r.CountOnes() < 3) continue;
+
+              // Does it have OTHER sites to clean up?
+              grid_bits_t state1_clear = bit_options[state1] & region & ~test_sites;
+              grid_bits_t state2_clear = bit_options[state2] & region & ~test_sites;
+              grid_bits_t state3_clear = bit_options[state3] & region & ~test_sites;
+
+              state1_clear.ForEach([state1,&moves](size_t pos){
+                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos, state1});
+              });
+              state2_clear.ForEach([state2,&moves](size_t pos){
+                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos, state2});
+              });
+              state3_clear.ForEach([state3,&moves](size_t pos){
+                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos, state3});
+              });
+
+            }
+          }
+        }
+      }
+
       // Try all (9*8*7/6=84) triples of states?
 
       return moves;
     }
-    
+
+
     // Eliminate all other possibilities from K cells if they are the only
     // ones that can possess K states in a single region.
     emp::vector<PuzzleMove> Solve_FindLimitedStates2() {
@@ -443,6 +501,74 @@ namespace emp {
       }
 
       // Try all (9*8*7/6=84) triples of states?
+
+      return moves;
+    }
+
+    emp::vector<PuzzleMove> Solve_FindLimitedStates3() {
+      emp::vector<PuzzleMove> moves;
+
+      // Check each region.
+      for (const auto & region : RegionMap()) {
+        // Try all (9*8*7/2*3=84) triples of states and measure which sites have both options.
+        for (uint8_t state1 = 0; state1 < NUM_STATES-1; ++state1) {
+          grid_bits_t state1_r = bit_options[state1] & region;
+          if (state1_r.None() || state1_r.CountOnes() > 3) continue;
+
+          for (uint8_t state2 = state1+1; state2 < NUM_STATES; ++state2) {
+            grid_bits_t state2_r = bit_options[state2] & region;
+            if (state2_r.None() || state2_r.CountOnes() > 3) continue;
+
+            for (uint8_t state3 = state2+1; state3 < NUM_STATES; ++state3) {
+              grid_bits_t state3_r = bit_options[state3] & region;
+              if (state3_r.None() || state3_r.CountOnes() > 3) continue;
+
+              // Are these states combined limited to just 3 sites?
+              grid_bits_t final_sites = state1_r | state2_r | state3_r;
+              if (final_sites.CountOnes() != 3) continue;
+
+              size_t pos1 = final_sites.FindOne();
+              size_t pos2 = final_sites.FindOne(pos1+1);
+              size_t pos3 = final_sites.FindOne(pos2+1);
+
+              // Do either of those have OTHER states to block?
+              for (uint8_t block_state = 0; block_state < NUM_STATES; ++block_state) {
+                if (block_state == state1 || block_state == state2 || block_state == state3) continue;
+                if (bit_options[block_state].Has(pos1)) {
+                  std::cout << "STATES " << (state1+1) << (state2+1) << (state3+1)
+                    << " at sites "
+                    << CellToCoords(pos1) << ", "
+                    << CellToCoords(pos2) << ", "
+                    << CellToCoords(pos3) << ", "
+                    << "blocking state " << (block_state+1) << " at pos1"
+                    << std::endl;
+                  moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos1, block_state});                
+                }
+                if (bit_options[block_state].Has(pos2)) {
+                  std::cout << "STATES " << (state1+1) << (state2+1) << (state3+1)
+                    << " at sites "
+                    << CellToCoords(pos1) << ", "
+                    << CellToCoords(pos2) << ", "
+                    << CellToCoords(pos3) << ", "
+                    << "blocking state " << (block_state+1) << " at pos2"
+                    << std::endl;
+                  moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos2, block_state});                
+                }
+                if (bit_options[block_state].Has(pos3)) {
+                  std::cout << "STATES " << (state1+1) << (state2+1) << (state3+1)
+                    << " at sites "
+                    << CellToCoords(pos1) << ", "
+                    << CellToCoords(pos2) << ", "
+                    << CellToCoords(pos3) << ", "
+                    << "blocking state " << (block_state+1) << " at pos3"
+                    << std::endl;
+                  moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos2, block_state});                
+                }
+              }
+            }
+          }
+        }
+      }
 
       return moves;
     }
@@ -500,7 +626,7 @@ namespace emp {
           for (size_t region2_id = 0; region2_id < NUM_ROWS+NUM_COLS; ++region2_id) {
             auto region2 = RegionMap(region2_id) & bit_options[state];
             if (region2.CountOnes() != 2) continue;
-            if ((region1 | region2).CountOnes() != 4) continue; // No double-counting of cells.
+            if ((region1 & region2).Any()) continue; // No double-counting of cells.
 
             size_t cell1a = region1.FindOne();
             size_t cell1b = region1.FindOne(cell1a+1);
@@ -520,9 +646,9 @@ namespace emp {
                 moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, cell_id, state});
               });
 
-              std::cout << "REGION 1 (" << box_id << "): " << CellToCoords(cell1a) << " and " << CellToCoords(cell1b)
-                << "; REGION 2 (" << region2_id << "): " << CellToCoords(cell2a) << " and " << CellToCoords(cell2b)
-                << std::endl;
+              // std::cout << "REGION 1 (" << box_id << "): " << CellToCoords(cell1a) << " and " << CellToCoords(cell1b)
+              //   << "; REGION 2 (" << region2_id << "): " << CellToCoords(cell2a) << " and " << CellToCoords(cell2b)
+              //   << std::endl;
             }
 
             region_bits_t ab_regions = CellMemberships(cell1a) & CellMemberships(cell2b);
@@ -537,8 +663,9 @@ namespace emp {
                 moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, cell_id, state});
               });
 
-              std::cout << "REGION 1: " << CellToCoords(cell1a) << " and " << CellToCoords(cell2b) << std::endl;
-              std::cout << "REGION 2: " << CellToCoords(cell2a) << " and " << CellToCoords(cell1b) << std::endl;
+              // std::cout << "REGION 1 (" << box_id << "): " << CellToCoords(cell1a) << " and " << CellToCoords(cell2b)
+              //   << "; REGION 2 (" << region2_id << "): " << CellToCoords(cell2a) << " and " << CellToCoords(cell1b)
+              //   << std::endl;
             }
 
           }
