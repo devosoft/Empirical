@@ -13,6 +13,7 @@
 
 #include <iostream>
 
+#include "../tools/string_utils.hpp"
 #include "../tools/String.hpp"
 
 namespace emp {
@@ -208,8 +209,31 @@ namespace emp {
       for (const auto & move : moves) { os << "  " << move.ToString(NUM_COLS) << std::endl; }
     }
 
+    emp::String ColorSymbol(uint8_t id, bool reverse=false) const {
+      emp::String out;
+      if (reverse) out += ANSI_Reverse();
+      if (id < 6) out += ANSI_Bold();
+      switch (id%12) {
+      case 0: out += ANSI_Red();     break;
+      case 1: out += ANSI_Green();   break;
+      case 2: out += ANSI_Yellow();  break;
+      case 3: out += ANSI_Blue();    break;
+      case 4: out += ANSI_Magenta(); break;
+      case 5: out += ANSI_Cyan();    break;
+      case 6: out += ANSI_BrightRed();      break;
+      case 7: out += ANSI_BrightGreen();    break;
+      case 8: out += ANSI_BrightYellow();   break;
+      case 9: out += ANSI_BrightBlue();     break;
+      case 10: out += ANSI_BrightMagenta(); break;
+      case 11: out += ANSI_BrightCyan();    break;
+      }
+      out += symbols[id];
+      out += ANSI_Reset();
+      return out;
+    }
+
     // Print the current state of the board (must be overridden)
-    virtual void Print(std::ostream & out=std::cout) {
+    virtual void Print(bool color=false, std::ostream & out=std::cout) {
       out << "NO PRINT METHOD FOR BOARD - MUST OVERRIDE!" << std::endl;
     }
 
