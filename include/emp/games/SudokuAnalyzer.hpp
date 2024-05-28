@@ -180,6 +180,15 @@ namespace emp {
 
   public:
     SudokuAnalyzer() {
+      // Set up the solver functions
+      AddSolveFunction("CellLastState",  1.0, [this](){ return Solve_FindLastCellState(); });
+      AddSolveFunction("RegionLastCell", 2.0, [this](){ return Solve_FindLastRegionState(); });
+      AddSolveFunction("RegionOverlap",  3.0, [this](){ return Solve_FindRegionOverlap(); });
+      AddSolveFunction("LimitedCells2",  4.0, [this](){ return Solve_FindLimitedCells2(); });
+      AddSolveFunction("LimitedStates2", 5.0, [this](){ return Solve_FindLimitedStates2(); });
+      AddSolveFunction("Swordfish2-RC",  6.0, [this](){ return Solve_FindSwordfish2_ROW_COL(); });
+      AddSolveFunction("Swordfish2-Box", 7.0, [this](){ return Solve_FindSwordfish2_BOX(); });
+
       symbols = symbol_set_t{'1', '2', '3', '4', '5', '6', '7', '8', '9'};
       Clear();
     }
@@ -225,11 +234,11 @@ namespace emp {
     }
 
     // Print the current state of the puzzle, including all options available.
-    void Print(std::ostream & out=std::cout) {
+    void Print(std::ostream & out=std::cout) override {
       out << " +-----------------------+-----------------------+-----------------------+"
           << std::endl;;
       for (size_t r = 0; r < 9; r++) {       // Puzzle row
-        for (size_t s = 0; s < 9; s+=3) {    // Subset row
+        for (uint8_t s = 0; s < 9; s+=3) {    // Subset row
           for (size_t c = 0; c < 9; c++) {   // Puzzle col
             size_t id = r*9+c;
             if (c%3==0) out << " |";
@@ -290,7 +299,6 @@ namespace emp {
 
     // If there's only one state a cell can be, pick it!
     emp::vector<PuzzleMove> Solve_FindLastCellState() {
-      std::cout << "TESTING 1:LastCState" << std::endl;
       emp::vector<PuzzleMove> moves;
 
       grid_bits_t unique_cells = emp::FindUniqueOnes(bit_options);
@@ -306,8 +314,6 @@ namespace emp {
 
     // If there's only one cell that can have a certain state in a region, choose it!
     emp::vector<PuzzleMove> Solve_FindLastRegionState() {
-      std::cout << "TESTING 2:LastRState" << std::endl;
-
       emp::vector<PuzzleMove> moves;
 
       // Loop through each state for each region testing.
@@ -326,7 +332,6 @@ namespace emp {
     // If only cells that can have a state in region A are all also in region
     // B, no other cell in region B can have that state as a possibility.
     emp::vector<PuzzleMove> Solve_FindRegionOverlap() {
-      std::cout << "TESTING 3:RegionOverlap" << std::endl;
       emp::vector<PuzzleMove> moves;
 
       for (auto [r1, r2] : RegionOverlaps()) {
@@ -357,8 +362,6 @@ namespace emp {
     // If K cells in a region are all limited to the same K states, eliminate those states
     // from all other cells in the same region.
     emp::vector<PuzzleMove> Solve_FindLimitedCells2() {
-      std::cout << "TESTING 4:LimitedCells" << std::endl;
-
       emp::vector<PuzzleMove> moves;
 
       // Identify which sites have exactly two options.
@@ -401,9 +404,6 @@ namespace emp {
     // Eliminate all other possibilities from K cells if they are the only
     // ones that can possess K states in a single region.
     emp::vector<PuzzleMove> Solve_FindLimitedStates2() {
-      std::cout << "TESTING 5:LimitedStates" << std::endl;
-      Print();
-
       emp::vector<PuzzleMove> moves;
 
       // Try all (9*8/2=36) pairs of states and measure which sites have both options.
@@ -432,14 +432,7 @@ namespace emp {
             for (uint8_t block_state = 0; block_state < NUM_STATES; ++block_state) {
               if (block_state == state1 || block_state == state2) continue;
               if (bit_options[block_state].Has(pos1)) {
-                // std::cout << "Target states " << (state1+1) << " and " << (state2+1) << ": "
-                //           << "blocking state " << (block_state+1) << " at position " << pos1
-                //           << " (" << (pos1%9) << "," << (pos1/9) << ")"
-                //           << std::endl;
                 moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos1, block_state});                
-                // static int prints = 0;
-                // prints++;
-                // if (prints == 10) exit(0);
               }
               if (bit_options[block_state].Has(pos2)) {
                 moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos2, block_state});                
@@ -454,23 +447,23 @@ namespace emp {
       return moves;
     }
 
-    // If there are X rows (cols) where a certain state can only be in one of 
-    // X cols (rows), then no other row in this cols can be that state.
-    emp::vector<PuzzleMove> Solve_FindSwordfish2_ROW() {
+    // If there are X rows/cols where a certain state can only be in one of X other regions,
+    // then no other cells in those latter regions can be that state.
+    emp::vector<PuzzleMove> Solve_FindSwordfish2_ROW_COL() {
       emp::vector<PuzzleMove> moves;
 
       for (uint8_t state = 0; state < NUM_STATES; ++state) {
-        for (size_t row1_id = 0; row1_id < NUM_ROWS; ++row1_id) {
-          auto row1 = RowMap(row1_id) & bit_options[state];
-          if (row1.CountOnes() != 2) continue;
-          for (size_t row2_id = 0; row2_id < row1_id; ++row2_id) {
-            auto row2 = RowMap(row2_id) & bit_options[state];
-            if (row2.CountOnes() != 2) continue;
+        for (size_t region1_id = 0; region1_id < NUM_ROWS+NUM_COLS; ++region1_id) {
+          auto region1 = RegionMap(region1_id) & bit_options[state];
+          if (region1.CountOnes() != 2) continue;
+          for (size_t region2_id = region1_id+1; region2_id % NUM_ROWS; ++region2_id) {
+            auto region2 = RegionMap(region2_id) & bit_options[state];
+            if (region2.CountOnes() != 2) continue;
 
-            size_t cell1a = row1.FindOne();
-            size_t cell1b = row1.FindOne(cell1a+1);
-            size_t cell2a = row2.FindOne();
-            size_t cell2b = row2.FindOne(cell2a+1);
+            size_t cell1a = region1.FindOne();
+            size_t cell1b = region1.FindOne(cell1a+1);
+            size_t cell2a = region2.FindOne();
+            size_t cell2b = region2.FindOne(cell2a+1);
 
             region_bits_t a_regions = CellMemberships(cell1a) & CellMemberships(cell2a);
             region_bits_t b_regions = CellMemberships(cell1b) & CellMemberships(cell2b);
@@ -479,41 +472,12 @@ namespace emp {
             if (a_regions.None() || b_regions.None()) continue;
 
             // For each cross region, remove additional "state" options.
-            grid_bits_t target_cells = bit_options[state] & ~row1 & ~row2
+            grid_bits_t target_cells = bit_options[state] & ~region1 & ~region2
                 & ComboRegion(a_regions | b_regions);
 
             target_cells.ForEach([&moves,state](size_t cell_id){
               moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, cell_id, state});
             });
-
-
-            // auto combo = row1 | row2;
-            // // Both rows have two instances.  See if those instances are share two other regions
-            // // (cols or boxes); only step through allowed options.
-            // size_t region1 = NO_REGION;
-            // size_t region2 = NO_REGION;
-            // for (size_t test_region = NUM_ROWS; test_region < NUM_REGIONS; ++test_region ) {
-            //   if ((RegionMap(test_region) & combo).CountOnes() == 2) {
-            //     if (region1 == NO_REGION) {
-            //       region1 = test_region;
-            //       continue;
-            //     } else {
-            //       region2 = test_region;
-            //       break;
-            //     }
-            //   }
-            // }
-
-            // // If we have identified BOTH relevant regions, strip any extra states from them.
-            // if (region2 != NO_REGION) {
-            //   auto clear_ids = (RegionMap(region1) | RegionMap(region2)) & ~combo & bit_options[state];
-            //   clear_ids.ForEach([row1_id,row2_id,state,&moves](size_t pos){
-            //     std::cout << "Blocking state " << (state+1) << " from pos " << pos
-            //       << " (row1=" << row1_id << "; row=" << row2_id << ")"
-            //       << std::endl;
-            //     moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos, state});
-            //   });
-            // }
 
           }
         }
@@ -522,40 +486,68 @@ namespace emp {
       return moves;
     }
 
-    // Calculate the full solving profile based on the other techniques.
-    PuzzleProfile CalcProfile()
-    {
-      PuzzleProfile profile;
 
-      using move_set_t = emp::vector<PuzzleMove>;
-      using solve_fun_t = move_set_t();
-      emp::vector<std::function<solve_fun_t>> solve_funs;
+    // If there are X regions where a certain state can only be in one of X other regions,
+    // then no other cells in those latter regions can be that state.  In this case, one
+    // of those original regions should be a box.
+    emp::vector<PuzzleMove> Solve_FindSwordfish2_BOX() {
+      emp::vector<PuzzleMove> moves;
 
-      // The list of moves to try for this puzzle.
-      solve_funs.push_back([this](){ return Solve_FindLastCellState(); });
-      solve_funs.push_back([this](){ return Solve_FindLastRegionState(); });
-      solve_funs.push_back([this](){ return Solve_FindRegionOverlap(); });
-      solve_funs.push_back([this](){ return Solve_FindLimitedCells2(); });
-      solve_funs.push_back([this](){ return Solve_FindLimitedStates2(); });
-      solve_funs.push_back([this](){ return Solve_FindSwordfish2_ROW(); });
+      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+        for (size_t box_id = NUM_ROWS+NUM_COLS; box_id < NUM_REGIONS; ++box_id) {
+          auto region1 = RegionMap(box_id) & bit_options[state];
+          if (region1.CountOnes() != 2) continue;
+          for (size_t region2_id = 0; region2_id < NUM_ROWS+NUM_COLS; ++region2_id) {
+            auto region2 = RegionMap(region2_id) & bit_options[state];
+            if (region2.CountOnes() != 2) continue;
+            if ((region1 | region2).CountOnes() != 4) continue; // No double-counting of cells.
 
-      move_set_t moves;
-      size_t move_id = 0;
-      while (move_id < solve_funs.size()) {
-        moves = solve_funs[move_id]();
-        if (moves.size() > 0) {
-          Move(moves);                              // Trigger the full set of found moves.
-          profile.AddMoves(move_id, moves.size());  // Place move record into solve profile.
-          move_id = 0;                              // Start from the easiest move after a change.
-          if (IsUnsolvable()) break;
-        }
-        else {  
-          ++move_id;  // This move didn't work; shift to the next one.
+            size_t cell1a = region1.FindOne();
+            size_t cell1b = region1.FindOne(cell1a+1);
+            size_t cell2a = region2.FindOne();
+            size_t cell2b = region2.FindOne(cell2a+1);
+
+            region_bits_t aa_regions = CellMemberships(cell1a) & CellMemberships(cell2a);
+            region_bits_t bb_regions = CellMemberships(cell1b) & CellMemberships(cell2b);
+
+            // If both cell pairs don't share at least one region, we can't do a swordfish
+            if (aa_regions.Any() && bb_regions.Any()) {
+              // For each cross region, remove additional "state" options.
+              grid_bits_t target_cells = bit_options[state] & ~region1 & ~region2
+                  & ComboRegion(aa_regions | bb_regions);
+
+              target_cells.ForEach([&moves,state](size_t cell_id){
+                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, cell_id, state});
+              });
+
+              std::cout << "REGION 1 (" << box_id << "): " << CellToCoords(cell1a) << " and " << CellToCoords(cell1b)
+                << "; REGION 2 (" << region2_id << "): " << CellToCoords(cell2a) << " and " << CellToCoords(cell2b)
+                << std::endl;
+            }
+
+            region_bits_t ab_regions = CellMemberships(cell1a) & CellMemberships(cell2b);
+            region_bits_t ba_regions = CellMemberships(cell1b) & CellMemberships(cell2a);
+
+            if (ab_regions.Any() && ba_regions.Any()) {
+              // For each cross region, remove additional "state" options.
+              grid_bits_t target_cells = bit_options[state] & ~region1 & ~region2
+                  & ComboRegion(ab_regions | ba_regions);
+
+              target_cells.ForEach([&moves,state](size_t cell_id){
+                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, cell_id, state});
+              });
+
+              std::cout << "REGION 1: " << CellToCoords(cell1a) << " and " << CellToCoords(cell2b) << std::endl;
+              std::cout << "REGION 2: " << CellToCoords(cell2a) << " and " << CellToCoords(cell1b) << std::endl;
+            }
+
+          }
         }
       }
 
-      return profile;
+      return moves;
     }
+
 
     // Make sure the current state is consistant.
     bool OK() {
