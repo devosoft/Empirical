@@ -190,6 +190,8 @@ namespace emp {
       AddSolveFunction("Swordfish2-Box", 7.0, [this](){ return Solve_FindSwordfish2_BOX(); });
       AddSolveFunction("LimitedCells3",  8.0, [this](){ return Solve_FindLimitedCells3(); });
       AddSolveFunction("LimitedStates3", 9.0, [this](){ return Solve_FindLimitedStates3(); });
+      AddSolveFunction("Swordfish3-RC",  10.0, [this](){ return Solve_FindSwordfish3_ROW_COL(); });
+      AddSolveFunction("Swordfish4-RC",  11.0, [this](){ return Solve_FindSwordfish4_ROW_COL(); });
 
       symbols = symbol_set_t{'1', '2', '3', '4', '5', '6', '7', '8', '9'};
       Clear();
@@ -459,8 +461,8 @@ namespace emp {
     }
 
 
-    // Eliminate all other possibilities from K cells if they are the only
-    // ones that can possess K states in a single region.
+    // Eliminate all other possibilities from 2 cells if they are the only
+    // ones that can possess 2 states in a single region.
     emp::vector<PuzzleMove> Solve_FindLimitedStates2() {
       emp::vector<PuzzleMove> moves;
 
@@ -505,6 +507,8 @@ namespace emp {
       return moves;
     }
 
+    // Eliminate all other possibilities from 3 cells if they are the only
+    // ones that can possess 3 states in a single region.
     emp::vector<PuzzleMove> Solve_FindLimitedStates3() {
       emp::vector<PuzzleMove> moves;
 
@@ -535,33 +539,19 @@ namespace emp {
               for (uint8_t block_state = 0; block_state < NUM_STATES; ++block_state) {
                 if (block_state == state1 || block_state == state2 || block_state == state3) continue;
                 if (bit_options[block_state].Has(pos1)) {
-                  std::cout << "STATES " << (state1+1) << (state2+1) << (state3+1)
-                    << " at sites "
-                    << CellToCoords(pos1) << ", "
-                    << CellToCoords(pos2) << ", "
-                    << CellToCoords(pos3) << ", "
-                    << "blocking state " << (block_state+1) << " at pos1"
-                    << std::endl;
+                  // std::cout << "STATES " << (state1+1) << (state2+1) << (state3+1)
+                  //   << " at sites "
+                  //   << CellToCoords(pos1) << ", "
+                  //   << CellToCoords(pos2) << ", "
+                  //   << CellToCoords(pos3) << ", "
+                  //   << "blocking state " << (block_state+1) << " at pos1"
+                  //   << std::endl;
                   moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos1, block_state});                
                 }
                 if (bit_options[block_state].Has(pos2)) {
-                  std::cout << "STATES " << (state1+1) << (state2+1) << (state3+1)
-                    << " at sites "
-                    << CellToCoords(pos1) << ", "
-                    << CellToCoords(pos2) << ", "
-                    << CellToCoords(pos3) << ", "
-                    << "blocking state " << (block_state+1) << " at pos2"
-                    << std::endl;
                   moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos2, block_state});                
                 }
                 if (bit_options[block_state].Has(pos3)) {
-                  std::cout << "STATES " << (state1+1) << (state2+1) << (state3+1)
-                    << " at sites "
-                    << CellToCoords(pos1) << ", "
-                    << CellToCoords(pos2) << ", "
-                    << CellToCoords(pos3) << ", "
-                    << "blocking state " << (block_state+1) << " at pos3"
-                    << std::endl;
                   moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos2, block_state});                
                 }
               }
@@ -613,7 +603,7 @@ namespace emp {
     }
 
 
-    // If there are X regions where a certain state can only be in one of X other regions,
+    // If there are 2 regions where a certain state can only be in one of 2 other regions,
     // then no other cells in those latter regions can be that state.  In this case, one
     // of those original regions should be a box.
     emp::vector<PuzzleMove> Solve_FindSwordfish2_BOX() {
@@ -668,6 +658,153 @@ namespace emp {
               //   << std::endl;
             }
 
+          }
+        }
+      }
+
+      return moves;
+    }
+
+
+    // If there are 3 rows/cols where a certain state can only be in one of 3 other regions,
+    // then no other cells in those latter regions can be that state.
+    emp::vector<PuzzleMove> Solve_FindSwordfish3_ROW_COL() {
+      emp::vector<PuzzleMove> moves;
+
+      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+        for (size_t region1_id = 0; region1_id < NUM_ROWS+NUM_COLS; ++region1_id) {
+          auto region1 = RegionMap(region1_id) & bit_options[state];
+          if (region1.CountOnes() != 3) continue;
+          for (size_t region2_id = region1_id+1; region2_id % NUM_ROWS; ++region2_id) {
+            auto region2 = RegionMap(region2_id) & bit_options[state];
+            if (region2.CountOnes() != 3) continue;
+            for (size_t region3_id = region2_id+1; region3_id % NUM_ROWS; ++region3_id) {
+              auto region3 = RegionMap(region3_id) & bit_options[state];
+              if (region3.CountOnes() != 3) continue;
+
+              size_t cell1a = region1.FindOne();
+              size_t cell1b = region1.FindOne(cell1a+1);
+              size_t cell1c = region1.FindOne(cell1b+1);
+              size_t cell2a = region2.FindOne();
+              size_t cell2b = region2.FindOne(cell2a+1);
+              size_t cell2c = region2.FindOne(cell2b+1);
+              size_t cell3a = region3.FindOne();
+              size_t cell3b = region3.FindOne(cell3a+1);
+              size_t cell3c = region3.FindOne(cell3b+1);
+
+              region_bits_t a_regions = CellMemberships(cell1a) & CellMemberships(cell2a) & CellMemberships(cell3a);
+              region_bits_t b_regions = CellMemberships(cell1b) & CellMemberships(cell2b) & CellMemberships(cell3b);
+              region_bits_t c_regions = CellMemberships(cell1c) & CellMemberships(cell2c) & CellMemberships(cell3c);
+
+              // If all cell groups don't share at least one region, we can't do a swordfish
+              if (a_regions.None() || b_regions.None() || c_regions.None()) continue;
+
+              // For each cross region, remove additional "state" options.
+              grid_bits_t target_cells = bit_options[state] & ~region1 & ~region2 & ~region3
+                  & ComboRegion(a_regions | b_regions | c_regions);
+
+              std::cout << "\nSF3 BLOCKING: state=" << (state+1)
+                << " cell1a=" << CellToCoords(cell1a)
+                << " cell1b=" << CellToCoords(cell1b)
+                << " cell1c=" << CellToCoords(cell1c)
+                << " cell2a=" << CellToCoords(cell2a)
+                << " cell2b=" << CellToCoords(cell2b)
+                << " cell2c=" << CellToCoords(cell2c)
+                << " cell3a=" << CellToCoords(cell3a)
+                << " cell3b=" << CellToCoords(cell3b)
+                << " cell3c=" << CellToCoords(cell3c)
+                << std::endl;
+
+              target_cells.ForEach([&moves,state](size_t cell_id){
+                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, cell_id, state});
+              });
+
+            }
+          }
+        }
+      }
+
+      return moves;
+    }
+
+
+    // If there are 3 rows/cols where a certain state can only be in one of 3 other regions,
+    // then no other cells in those latter regions can be that state.
+    emp::vector<PuzzleMove> Solve_FindSwordfish4_ROW_COL() {
+      emp::vector<PuzzleMove> moves;
+
+      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+        for (size_t region1_id = 0; region1_id < NUM_ROWS+NUM_COLS; ++region1_id) {
+          auto region1 = RegionMap(region1_id) & bit_options[state];
+          if (region1.CountOnes() != 4) continue;
+          for (size_t region2_id = region1_id+1; region2_id % NUM_ROWS; ++region2_id) {
+            auto region2 = RegionMap(region2_id) & bit_options[state];
+            if (region2.CountOnes() != 4) continue;
+            for (size_t region3_id = region2_id+1; region3_id % NUM_ROWS; ++region3_id) {
+              auto region3 = RegionMap(region3_id) & bit_options[state];
+              if (region3.CountOnes() != 4) continue;
+              for (size_t region4_id = region3_id+1; region4_id % NUM_ROWS; ++region4_id) {
+                auto region4 = RegionMap(region4_id) & bit_options[state];
+                if (region4.CountOnes() != 4) continue;
+
+                size_t cell1a = region1.FindOne();
+                size_t cell1b = region1.FindOne(cell1a+1);
+                size_t cell1c = region1.FindOne(cell1b+1);
+                size_t cell1d = region1.FindOne(cell1c+1);
+                size_t cell2a = region2.FindOne();
+                size_t cell2b = region2.FindOne(cell2a+1);
+                size_t cell2c = region2.FindOne(cell2b+1);
+                size_t cell2d = region2.FindOne(cell2c+1);
+                size_t cell3a = region3.FindOne();
+                size_t cell3b = region3.FindOne(cell3a+1);
+                size_t cell3c = region3.FindOne(cell3b+1);
+                size_t cell3d = region3.FindOne(cell3c+1);
+                size_t cell4a = region4.FindOne();
+                size_t cell4b = region4.FindOne(cell4a+1);
+                size_t cell4c = region4.FindOne(cell4b+1);
+                size_t cell4d = region4.FindOne(cell4c+1);
+
+                region_bits_t a_regions = CellMemberships(cell1a) & CellMemberships(cell2a)
+                                        & CellMemberships(cell3a) & CellMemberships(cell4a);
+                region_bits_t b_regions = CellMemberships(cell1b) & CellMemberships(cell2b)
+                                        & CellMemberships(cell3b) & CellMemberships(cell4b);
+                region_bits_t c_regions = CellMemberships(cell1c) & CellMemberships(cell2c)
+                                        & CellMemberships(cell3c) & CellMemberships(cell4c);
+                region_bits_t d_regions = CellMemberships(cell1d) & CellMemberships(cell2d)
+                                        & CellMemberships(cell3d) & CellMemberships(cell4d);
+
+                // If all cell groups don't share at least one region, we can't do a swordfish
+                if (a_regions.None() || b_regions.None() || c_regions.None() || d_regions.None()) continue;
+
+                // For each cross region, remove additional "state" options.
+                grid_bits_t target_cells = bit_options[state] & ~region1 & ~region2 & ~region3 & ~region4
+                    & ComboRegion(a_regions | b_regions | c_regions | d_regions);
+
+                std::cout << "\nSF4 BLOCKING: state=" << (state+1)
+                  << " cell1a=" << CellToCoords(cell1a)
+                  << " cell1b=" << CellToCoords(cell1b)
+                  << " cell1c=" << CellToCoords(cell1c)
+                  << " cell1d=" << CellToCoords(cell1d)
+                  << " cell2a=" << CellToCoords(cell2a)
+                  << " cell2b=" << CellToCoords(cell2b)
+                  << " cell2c=" << CellToCoords(cell2c)
+                  << " cell2d=" << CellToCoords(cell2d)
+                  << " cell3a=" << CellToCoords(cell3a)
+                  << " cell3b=" << CellToCoords(cell3b)
+                  << " cell3c=" << CellToCoords(cell3c)
+                  << " cell3d=" << CellToCoords(cell3d)
+                  << " cell4a=" << CellToCoords(cell4a)
+                  << " cell4b=" << CellToCoords(cell4b)
+                  << " cell4c=" << CellToCoords(cell4c)
+                  << " cell4d=" << CellToCoords(cell4d)
+                  << std::endl;
+
+                target_cells.ForEach([&moves,state](size_t cell_id){
+                  moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, cell_id, state});
+                });
+
+              }
+            }
           }
         }
       }
