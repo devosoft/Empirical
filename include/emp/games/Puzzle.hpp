@@ -61,6 +61,8 @@ namespace emp {
     std::vector<Slice> slices; // Actual solving profile.
     FinalState final_state = UNSOLVED;
 
+    size_t size() const { return slices.size(); }
+
     bool IsSolved() const { return final_state == SOLVED; }
     bool IsUnsolved() const { return final_state == UNSOLVED; }
     bool IsUnsolvable() const { return final_state == UNSOLVABLE; }
@@ -73,7 +75,32 @@ namespace emp {
     void SetUnsolved()   { final_state = UNSOLVED; }
     void SetUnsolvable() { final_state = UNSOLVABLE; }
     
-    void Clear() { slices.resize(0); }
+    void Clear() { slices.resize(0); final_state = UNSOLVED; }
+
+    size_t CountTypes() const {
+      BitVector types;
+      for (Slice slice : slices) {
+        if (types.size() <= slice.level) types.resize(slice.level+8);
+        types.Set(slice.level);
+      }
+      return types.CountOnes();
+    }
+
+    size_t CountMoves(size_t id) const {
+      size_t count = 0;
+      for (Slice slice : slices) {
+        if (slice.level == id) ++count;
+      }
+      return count;
+    }
+
+    double CalcScore() const {
+      double score = 0.0;
+      for (Slice slice : slices) {
+        score += slice.level + 1;
+      }
+      return score;
+    }
 
     String ToString() const {
       String out;
@@ -116,6 +143,10 @@ namespace emp {
 
     uint8_t GetValue(size_t cell) const { return value[cell]; }
 
+    bool HasValue(size_t cell) const { return GetValue() != UNKNOWN_STATE; }
+
+    size_t GetNumSolveFuns() const { return solve_funs.size(); }
+
     uint8_t SymbolToState(char symbol) const {
       for (uint8_t i=0; i < NUM_STATES; ++i) {
         if (symbols[i] == symbol) return i;
@@ -123,13 +154,13 @@ namespace emp {
       return UNKNOWN_STATE;
     }
 
-    // Convert a cell ID to its coordinates.
+    /// Convert a cell ID to its coordinates.
     emp::String CellToCoords(size_t id) {
       return emp::MakeString(id%NUM_COLS, ',', id/NUM_COLS);
     }
 
     /// Test if a cell is allowed to be a particular state.
-    bool HasOption(size_t cell, uint8_t state) {
+    bool HasOption(size_t cell, uint8_t state) const {
       emp_assert(cell < 81, cell);
       emp_assert(state >= 0 && state < NUM_STATES, state);
       return bit_options[state].Has(cell);
@@ -145,7 +176,7 @@ namespace emp {
     bool IsSet(size_t cell) const { return value[cell] != UNKNOWN_STATE; }
     bool IsSolved() const { return is_set.All(); }
     
-    // Clear out the old solution info when starting a new solve attempt.
+    /// Clear out the old solution info when starting a new solve attempt.
     void Clear() {
       value.fill(UNKNOWN_STATE);
       for (auto & val_options : bit_options) {
@@ -163,8 +194,8 @@ namespace emp {
       solve_funs.push_back(PuzzleSolveFun{name, difficulty, fun});
     }
 
-    // Set the value of an individual cell
-    // Return true/false based on whether progress was made toward solving the puzzle.
+    /// Set the value of an individual cell
+    /// Return true/false based on whether progress was made toward solving the puzzle.
     virtual bool Set(size_t cell, uint8_t state) {
       emp_assert(cell < NUM_CELLS);   // Make sure cell is in a valid range.
       emp_assert(state < NUM_STATES); // Make sure state is in a valid range.
@@ -181,32 +212,65 @@ namespace emp {
       return true;
     }
 
-    // Remove a symbol option from a particular cell.
+    /// Remove a symbol option from a particular cell.
     void Block(size_t cell, uint8_t state) {
       bit_options[state].Clear(cell);
     }
 
-    // Operate on a "move" object.
-    void Move(const PuzzleMove & move) {
+    /// Identify if a move will make progress in the puzzle.
+    bool MoveProgress(const PuzzleMove & move) const {
+      emp_assert(move.pos_id >= 0 && move.pos_id < NUM_CELLS, move.pos_id);
+      emp_assert(move.state >= 0 && move.state < NUM_STATES, move.state);
+      
+      if (move.type == PuzzleMove::SET_STATE) {
+        return GetValue(move.pos_id) != move.state;
+      }
+      return HasOption(move.pos_id, move.state);
+    }
+
+    /// Do any of the provided moves progress the puzzle?
+    bool MoveProgress(const emp::vector<PuzzleMove> & moves) const {
+      for (const auto & move : moves) {
+        if (MoveProgress(move)) return true;
+      }
+      return false;
+    }
+
+    /// Operate on a "move" object; return false if move is invalid.
+    bool Move(const PuzzleMove & move) {
       emp_assert(move.pos_id >= 0 && move.pos_id < NUM_CELLS, move.pos_id);
       emp_assert(move.state >= 0 && move.state < NUM_STATES, move.state);
       
       switch (move.type) {
-      case PuzzleMove::SET_STATE:   Set(move.pos_id, move.state);   break;
-      case PuzzleMove::BLOCK_STATE: Block(move.pos_id, move.state); break;
+      case PuzzleMove::SET_STATE:
+        if (!HasOption(move.pos_id, move.state)) return false;
+        Set(move.pos_id, move.state);
+        break;
+      case PuzzleMove::BLOCK_STATE:
+        Block(move.pos_id, move.state);
+        break;
       default:
         emp_assert(false);   // One of the previous move options should have been triggered!
       }
+
+      return true;
     }
     
     // Operate on a set of "move" objects.
-    void Move(const emp::vector<PuzzleMove> & moves) {
-      for (const auto & move : moves) { Move(move); }
+    bool Move(const emp::vector<PuzzleMove> & moves) {
+      for (const auto & move : moves) {
+        if (!Move(move)) return false;   // If any moves are invalid, return false.
+      }
+      return true;
     }
 
     // Print out info on a set of moves that were found.
     void PrintMoves(const emp::vector<PuzzleMove> & moves, std::ostream & os=std::cout) const {
       for (const auto & move : moves) { os << "  " << move.ToString(NUM_COLS) << std::endl; }
+    }
+
+    emp::String Symbol(uint8_t id) const {
+      return emp::MakeString(symbols[id]);
     }
 
     emp::String ColorSymbol(uint8_t id, bool reverse=false) const {
@@ -233,7 +297,7 @@ namespace emp {
     }
 
     // Print the current state of the board (must be overridden)
-    virtual void Print(bool color=false, std::ostream & out=std::cout) {
+    virtual void Print(bool /*verbose*/=true, std::ostream & out=std::cout) {
       out << "NO PRINT METHOD FOR BOARD - MUST OVERRIDE!" << std::endl;
     }
 
@@ -254,7 +318,7 @@ namespace emp {
     {
       PuzzleProfile profile;
 
-      constexpr bool verbose = true;
+      constexpr bool verbose = false;
 
       move_set_t moves;
       size_t fun_id = 0;
@@ -266,17 +330,22 @@ namespace emp {
           PrintMoves(moves);
         }
 
-        if (moves.size() > 0) {          
-          Move(moves);                             // Trigger the full set of found moves.
+        if (moves.size() > 0 && MoveProgress(moves)) {
+          if (!Move(moves)) break;                 // Trigger the full set moves; stop if any move fails.
           if constexpr (verbose) Print();
           profile.AddMoves(fun_id, moves.size());  // Place move record into solve profile.
           fun_id = 0;                              // Start from the easiest move after a change.
-          if (IsUnsolvable()) break;
+          if (IsUnsolvable()) {
+            profile.SetUnsolvable();
+            break;
+          }
         }
         else {  
           ++fun_id;  // This move type didn't work; shift to the next one.
         }
       }
+
+      if (IsSolved()) profile.SetSolved();
 
       return profile;
     }
