@@ -23,6 +23,7 @@
 #include "emp/base/array.hpp"
 #include "emp/base/assert.hpp"
 #include "emp/bits/BitSet.hpp"
+#include "emp/math/ComboSet.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/tools/String.hpp"
 
@@ -199,6 +200,9 @@ namespace emp {
     SudokuAnalyzer(const SudokuAnalyzer &) = default;
     ~SudokuAnalyzer() { ; }
 
+    static constexpr size_t GetNumCells() { return NUM_CELLS; }
+    static constexpr size_t GetNumMoveTypes() { return 11; }
+
     SudokuAnalyzer& operator=(const SudokuAnalyzer &) = default;
 
     // Set the value of an individual cell; remove option from linked cells.
@@ -214,6 +218,8 @@ namespace emp {
     
     // Load a board state from a stream.
     void Load(std::istream & is) {
+      Clear();
+
       // Format: Provide site by site with a dash for empty; whitespace is ignored.
       char cur_char;
       size_t cell_id = 0;
@@ -237,13 +243,47 @@ namespace emp {
       return Load(file);
     }
 
+    // Load from memory.  Return true if successful; false otherwise.
+    bool Load(std::span<size_t> board) {
+      notify::TestError(board.size() != NUM_CELLS,
+        "Attempting to load a Sudoku board of size ", board.size(), ", but ", NUM_CELLS, " required.");
+      Clear();
+
+      for (size_t i = 0; i < NUM_CELLS; ++i) {
+        notify::TestError(board[i] > NUM_STATES,
+          "Attempting to set Sudoku state to ", board[i], ", but max state is ", NUM_STATES);
+        if (board[i]) {
+          if (!HasOption(i, board[i]-1)) return false;
+          Set(i, board[i]-1); // Store as 0 to 8 instead of 1 to 9.
+        }
+      }
+
+      return true;
+    }
+
     // Print the current state of the puzzle, including all options available.
-    void Print(bool color=true, std::ostream & out=std::cout) override {
+    void Print(bool verbose=true, std::ostream & out=std::cout) override {
+      if (verbose) PrintDetails(out);
+      else PrintSimple(out);
+    }
+
+    void PrintSimple(std::ostream & out=std::cout) {
+      for (size_t r = 0; r < NUM_ROWS; ++r) {
+        for (size_t c = 0; c < NUM_COLS; ++c) {
+          size_t id = r*9+c;
+          if (value[id] == UNKNOWN_STATE) out << " -";
+          else out << " " << value[id];
+        }
+        out << std::endl;
+      }
+    }
+
+    void PrintDetails(std::ostream & out=std::cout) {      
       out << " +-----------------------+-----------------------+-----------------------+"
           << std::endl;;
-      for (size_t r = 0; r < 9; r++) {       // Puzzle row
-        for (uint8_t s = 0; s < 9; s+=3) {    // Subset row
-          for (size_t c = 0; c < 9; c++) {   // Puzzle col
+      for (size_t r = 0; r < NUM_ROWS; r++) {       // Puzzle row
+        for (uint8_t s = 0; s < NUM_STATES; s+=3) {    // Subset row
+          for (size_t c = 0; c < NUM_COLS; c++) {   // Puzzle col
             size_t id = r*9+c;
             if (c%3==0) out << " |";
             else out << "  ";
@@ -703,17 +743,17 @@ namespace emp {
               grid_bits_t target_cells = bit_options[state] & ~region1 & ~region2 & ~region3
                   & ComboRegion(a_regions | b_regions | c_regions);
 
-              std::cout << "\nSF3 BLOCKING: state=" << (state+1)
-                << " cell1a=" << CellToCoords(cell1a)
-                << " cell1b=" << CellToCoords(cell1b)
-                << " cell1c=" << CellToCoords(cell1c)
-                << " cell2a=" << CellToCoords(cell2a)
-                << " cell2b=" << CellToCoords(cell2b)
-                << " cell2c=" << CellToCoords(cell2c)
-                << " cell3a=" << CellToCoords(cell3a)
-                << " cell3b=" << CellToCoords(cell3b)
-                << " cell3c=" << CellToCoords(cell3c)
-                << std::endl;
+              // std::cout << "\nSF3 BLOCKING: state=" << (state+1)
+              //   << " cell1a=" << CellToCoords(cell1a)
+              //   << " cell1b=" << CellToCoords(cell1b)
+              //   << " cell1c=" << CellToCoords(cell1c)
+              //   << " cell2a=" << CellToCoords(cell2a)
+              //   << " cell2b=" << CellToCoords(cell2b)
+              //   << " cell2c=" << CellToCoords(cell2c)
+              //   << " cell3a=" << CellToCoords(cell3a)
+              //   << " cell3b=" << CellToCoords(cell3b)
+              //   << " cell3c=" << CellToCoords(cell3c)
+              //   << std::endl;
 
               target_cells.ForEach([&moves,state](size_t cell_id){
                 moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, cell_id, state});
@@ -728,7 +768,7 @@ namespace emp {
     }
 
 
-    // If there are 3 rows/cols where a certain state can only be in one of 3 other regions,
+    // If there are 4 rows/cols where a certain state can only be in one of 4 other regions,
     // then no other cells in those latter regions can be that state.
     emp::vector<PuzzleMove> Solve_FindSwordfish4_ROW_COL() {
       emp::vector<PuzzleMove> moves;
@@ -780,24 +820,24 @@ namespace emp {
                 grid_bits_t target_cells = bit_options[state] & ~region1 & ~region2 & ~region3 & ~region4
                     & ComboRegion(a_regions | b_regions | c_regions | d_regions);
 
-                std::cout << "\nSF4 BLOCKING: state=" << (state+1)
-                  << " cell1a=" << CellToCoords(cell1a)
-                  << " cell1b=" << CellToCoords(cell1b)
-                  << " cell1c=" << CellToCoords(cell1c)
-                  << " cell1d=" << CellToCoords(cell1d)
-                  << " cell2a=" << CellToCoords(cell2a)
-                  << " cell2b=" << CellToCoords(cell2b)
-                  << " cell2c=" << CellToCoords(cell2c)
-                  << " cell2d=" << CellToCoords(cell2d)
-                  << " cell3a=" << CellToCoords(cell3a)
-                  << " cell3b=" << CellToCoords(cell3b)
-                  << " cell3c=" << CellToCoords(cell3c)
-                  << " cell3d=" << CellToCoords(cell3d)
-                  << " cell4a=" << CellToCoords(cell4a)
-                  << " cell4b=" << CellToCoords(cell4b)
-                  << " cell4c=" << CellToCoords(cell4c)
-                  << " cell4d=" << CellToCoords(cell4d)
-                  << std::endl;
+                // std::cout << "\nSF4 BLOCKING: state=" << (state+1)
+                //   << " cell1a=" << CellToCoords(cell1a)
+                //   << " cell1b=" << CellToCoords(cell1b)
+                //   << " cell1c=" << CellToCoords(cell1c)
+                //   << " cell1d=" << CellToCoords(cell1d)
+                //   << " cell2a=" << CellToCoords(cell2a)
+                //   << " cell2b=" << CellToCoords(cell2b)
+                //   << " cell2c=" << CellToCoords(cell2c)
+                //   << " cell2d=" << CellToCoords(cell2d)
+                //   << " cell3a=" << CellToCoords(cell3a)
+                //   << " cell3b=" << CellToCoords(cell3b)
+                //   << " cell3c=" << CellToCoords(cell3c)
+                //   << " cell3d=" << CellToCoords(cell3d)
+                //   << " cell4a=" << CellToCoords(cell4a)
+                //   << " cell4b=" << CellToCoords(cell4b)
+                //   << " cell4c=" << CellToCoords(cell4c)
+                //   << " cell4d=" << CellToCoords(cell4d)
+                //   << std::endl;
 
                 target_cells.ForEach([&moves,state](size_t cell_id){
                   moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, cell_id, state});
