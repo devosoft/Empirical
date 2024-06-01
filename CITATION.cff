@@ -2,7 +2,7 @@
 # Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
 cff-version: 1.0.3
 message: If you use this software, please cite it using these metadata.
-title: 'Empirical: C++ library for efficient, reliable, and accessible scientific software'
+title: 'Empirical: A scientific software library for research, education, and public engagement'
 doi: 10.5281/zenodo.4141943
 authors:
 - given-names: Charles
