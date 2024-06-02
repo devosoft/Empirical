@@ -35,6 +35,27 @@ Tools in Empirical include:
 See <https://empirical.readthedocs.io/en/latest> for more detailed documentation
 on the available source files.
 
+# Citing
+
+If Empirical contributes to a scientific publication, please cite it as
+
+> Vostinar, A., Lalejini, A., Ofria, C., Dolson, E., & Moreno, M.A. (2024). Empirical: A scientific software library for research, education, and public engagement. Journal of Open Source Software. https://doi.org/10.21105/joss.06617
+
+```bibtex
+@article{devosoft2024empirical,
+  year = {2024},
+  publisher = {The Open Journal},
+  author = {Vostinar, Anya and Lalejini, Alexander and Ofria, Charles and Dolson, Emily and Moreno, Matthew Andres},
+  title = {Empirical: A scientific software library for research, education, and public engagement},
+  journal = {Journal of Open Source Software},
+  doi = {10.21105/joss.06617},
+  url = {https://doi.org/10.21105/joss.06617},
+}
+```
+
+Please cite phylogeny tracking tools separately as shown [here](https://github.com/emilydolson/phylotrackpy/blob/main/README.md#citing).
+And don't forget to leave a [star on GitHub](https://github.com/devosoft/Empirical/stargazers)!
+
 # Directory Structure
 
 | Folder       | Description
