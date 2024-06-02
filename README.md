@@ -39,7 +39,7 @@ on the available source files.
 
 If Empirical contributes to a scientific publication, please cite it as
 
-> Vostinar, A., Lalejini, A., Ofria, C., Dolson, E., & Moreno, M.A. (2024). Empirical: A scientific software library for research, education, and public engagement. Journal of Open Source Software. https://doi.org/10.21105/joss.06617
+> Vostinar, A., Lalejini, A., Ofria, C., Dolson, E., & Moreno, M.A. (2024). Empirical: A scientific software library for research, education, and public engagement. Journal of Open Source Software, 9(98), 6617, https://doi.org/10.21105/joss.06617
 
 ```bibtex
 @article{devosoft2024empirical,
@@ -48,6 +48,9 @@ If Empirical contributes to a scientific publication, please cite it as
   author = {Vostinar, Anya and Lalejini, Alexander and Ofria, Charles and Dolson, Emily and Moreno, Matthew Andres},
   title = {Empirical: A scientific software library for research, education, and public engagement},
   journal = {Journal of Open Source Software},
+  volume = {9},
+  number = {98},
+  pages = {6617},
   doi = {10.21105/joss.06617},
   url = {https://doi.org/10.21105/joss.06617},
 }
