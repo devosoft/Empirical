@@ -713,7 +713,7 @@ namespace emp {
     }
 
 
-    // @brief Test if ANY of the bit positions have a given property.
+    /// @brief Test if ANY of the bit positions have a given property.
     template <typename FUN_T>
     bool TestAny(FUN_T && fun) {
       for (size_t i = FindOne(); i < GetSize(); i=FindOne(i+1)) {
@@ -722,7 +722,7 @@ namespace emp {
       return false;
     }
 
-    // @brief Test if ALL of the bit positions have a given property.
+    /// @brief Test if ALL of the bit positions have a given property.
     template <typename FUN_T>
     bool TestAll(FUN_T && fun) {
       for (size_t i = FindOne(); i < GetSize(); i=FindOne(i+1)) {
@@ -731,13 +731,52 @@ namespace emp {
       return true;
     }
 
-    // @brief Test if NONE of the bit positions have a given property.
+    /// @brief Test if NONE of the bit positions have a given property.
     template <typename FUN_T>
     bool TestNone(FUN_T && fun) {
       for (size_t i = FindOne(); i < GetSize(); i=FindOne(i+1)) {
         if (fun(i)) return false;
       }
       return true;
+    }
+
+    /// Create a combination of one-bits to step through a series of combinations.
+    Bits & SetFirstBitCombo(size_t k) {
+      emp_assert(k < GetSize(), "Can only search through combos smaller than total bit count.", k, GetSize());
+      Clear();
+      SetRange(GetSize()-k, GetSize());
+      return *this;
+    }
+
+
+    /// Step through combinations, while keeping the same number of ones.
+    bool NextBitCombo() {
+      emp_assert(!All() && !None(), All(), None(), "Must have both zeros and ones to step through combos.");
+
+      // If the least significant position is empty, move a one over.
+      if (!Get(0)) {
+        size_t last1 = FindOne();
+        Clear(last1);
+        Set(last1 - 1);
+        return true;
+      }
+
+      // Count how many ones we do have at the end.
+      Clear(0);
+      size_t one_count=1;
+      while (Get(one_count)) Clear(one_count++);
+
+      // If all ones were cleared, restart and return false.
+      if (None()) {
+        SetFirstBitCombo(one_count);
+        return false;
+      }
+
+      // Otherwise move the right-most remaining one, filling in the rest.
+      size_t last1 = FindOne();
+      Clear(last1);
+      SetRange(last1-one_count-1, last1);
+      return true;      
     }
 
 
