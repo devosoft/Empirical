@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2021.
+ *  date: 2016-2024.
 */
 /**
  *  @file
@@ -27,6 +27,14 @@
 #include "Random.hpp"
 
 namespace emp {
+
+  template <size_t N>
+  inline constexpr std::array<size_t, N> MakeSequenceArray(size_t start=0) {
+    std::array<size_t, N> out;
+    for (size_t i=0; i < N; ++i) out[i] = i+start;
+    return out;
+  }
+
 
   /// % is actually remainder; Mod is a proper modulus command that handles negative #'s correctly
   inline constexpr int Mod(int in_val, int mod_val) {
