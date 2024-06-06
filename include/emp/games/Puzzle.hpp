@@ -143,6 +143,8 @@ namespace emp {
 
     uint8_t GetValue(size_t cell) const { return value[cell]; }
 
+    const emp::array<uint8_t,NUM_CELLS> & GetValues() const { return value; }
+
     bool HasValue(size_t cell) const { return GetValue() != UNKNOWN_STATE; }
 
     size_t GetNumSolveFuns() const { return solve_funs.size(); }
