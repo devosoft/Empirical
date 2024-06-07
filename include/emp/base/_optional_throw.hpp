@@ -31,12 +31,12 @@ namespace emp {
   }
 
   template <typename T, typename... EXTRA>
-  void assert_print_second_opt(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
+  void assert_print_second_opt(std::stringstream & ss, std::string /*name*/, T && /*val*/, EXTRA &&... extra) {
     assert_print_opt(ss, std::forward<EXTRA>(extra)...);
   }
 
   template <typename T>
-  void assert_print_second_opt(std::stringstream & ss, std::string name, T && val) {;}
+  void assert_print_second_opt(std::stringstream & /*ss*/, std::string /*name*/, T && /*val*/) {;}
 
   template <typename T, typename... EXTRA>
   void assert_print_first_opt(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
