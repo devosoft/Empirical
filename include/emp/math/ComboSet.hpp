@@ -37,16 +37,16 @@ namespace emp {
 
     // General Use manipulators
     const std::array<size_t,K> & Reset() { return cur_combo = MakeSequenceArray<K>(); }
-    bool NextCombo();
+    bool Next();
 
     // Make sure obvious operators also work plus standard library compatibility.
-    ComboSet & operator++() { NextCombo(); return *this; }
-    ComboSet & operator++(int) { NextCombo(); return *this; }
+    ComboSet & operator++() { Next(); return *this; }
+    ComboSet & operator++(int) { Next(); return *this; }
     constexpr size_t size();
   };
 
   template <size_t N, size_t K>
-  bool ComboSet<N,K>::NextCombo()
+  bool ComboSet<N,K>::Next()
   {
     size_t inc_pos = K - 1;
     cur_combo[inc_pos]++;
