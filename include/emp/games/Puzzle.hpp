@@ -118,42 +118,94 @@ namespace emp {
   template <size_t NUM_ROWS, size_t NUM_COLS, size_t NUM_STATES>
   struct GridPuzzleAnalyzer {
     static constexpr size_t NUM_CELLS = NUM_ROWS * NUM_COLS;
-    static constexpr uint8_t UNKNOWN_STATE = NUM_STATES; // Lower values are actual states.
+
+    // 0 for unset; 1 through NUM_STATES are actual states.
+    static constexpr uint8_t UNSET_STATE = 0;
+    static constexpr uint8_t UNKNOWN_STATE = NUM_STATES+1;
 
     // Which symbols are we using in this puzzle? (default to standard)
-    using symbol_set_t = emp::array<char, NUM_STATES>;
-    symbol_set_t symbols = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    using symbol_set_t = emp::array<char, NUM_STATES+1>;
+    symbol_set_t symbols = {'-', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-    emp::array<uint8_t,NUM_CELLS> value;      // Known value for cells
+    using values_t = emp::array<uint8_t,NUM_CELLS>;
+    values_t values;                                   // Known value for cells
 
     // Track the available options by state, across the whole puzzle.
-    // E.g., symbol 5 is at bit_options[5] and has 81 bits indicating if each cell can be '5'.
+    // E.g., symbol 5 is at bit_options[5] and has NUM_CELLS bits indicating if each cell can be '5'.
     using grid_bits_t = BitSet<NUM_CELLS>;
-    emp::array<grid_bits_t, NUM_STATES> bit_options;
+    emp::array<grid_bits_t, NUM_STATES+1> bit_options; // State 0 is unset.
 
     grid_bits_t is_set;
 
     using move_set_t = emp::vector<PuzzleMove>;
-    using solve_fun_t = move_set_t();
     emp::vector<PuzzleSolveFun> solve_funs;
 
     // ===== Helper Functions =====
 
     virtual ~GridPuzzleAnalyzer() = default;
 
-    uint8_t GetValue(size_t cell) const { return value[cell]; }
+    uint8_t GetValue(size_t cell) const { return values[cell]; }
 
-    const emp::array<uint8_t,NUM_CELLS> & GetValues() const { return value; }
+    const values_t & GetValues() const { return values; }
 
-    bool HasValue(size_t cell) const { return GetValue() != UNKNOWN_STATE; }
+    bool HasValue(size_t cell) const { return GetValue(cell); }
 
     size_t GetNumSolveFuns() const { return solve_funs.size(); }
 
     uint8_t SymbolToState(char symbol) const {
-      for (uint8_t i=0; i < NUM_STATES; ++i) {
+      for (uint8_t i=0; i <= NUM_STATES; ++i) {
         if (symbols[i] == symbol) return i;
       }
       return UNKNOWN_STATE;
+    }
+
+    static values_t LoadToArray(std::istream & is, emp::CharSet empty="-.") {
+      values_t values;
+
+      // Format: Provide site by site with a dash for empty; whitespace is ignored.
+      char cur_char;
+      
+      for (size_t cell_id = 0; cell_id < NUM_CELLS; ++cell_id) {
+        is >> cur_char;
+        if (emp::is_whitespace(cur_char)) { --cell_id; continue; }
+        uint8_t state_id = SymbolToState(cur_char);
+        if (state_id == UNKNOWN_STATE) {
+          if (empty.Has(cur_char)) state_id = UNSET_STATE;
+          else emp::notify::Warning("Unknown sudoku symbol '", cur_char, "'.  Ignoring.");
+        }
+        values[cell_id] = state_id;
+      }
+      
+      return values;
+    }
+
+    // Load from memory.  Return true if successful; false otherwise.
+    bool Load(std::span<size_t> board) {
+      notify::TestError(board.size() != NUM_CELLS,
+        "Attempting to load a board of size ", board.size(), ", but ", NUM_CELLS, " required.");
+      Clear();
+
+      for (size_t i = 0; i < NUM_CELLS; ++i) {
+        notify::TestError(board[i] > NUM_STATES,
+          "Attempting to set board state to ", board[i], ", but max state is ", NUM_STATES);
+        if (board[i]) {
+          if (!HasOption(i, board[i])) return false;
+          Set(i, board[i]);
+        }
+      }
+
+      return true;
+    }
+
+    // Load a board from a generic input stream.
+    void Load(std::istream & is, emp::CharSet empty="-.") {
+      Load( LoadToArray(is, empty) );
+    }
+
+    // Load a board state from a file.
+    void Load(const emp::String & filename, emp::CharSet empty="-") {
+      std::ifstream file(filename);
+      return Load( LoadToArray(file, empty) );
     }
 
     /// Convert a cell ID to its coordinates.
@@ -163,24 +215,24 @@ namespace emp {
 
     /// Test if a cell is allowed to be a particular state.
     bool HasOption(size_t cell, uint8_t state) const {
-      emp_assert(cell < 81, cell);
-      emp_assert(state >= 0 && state < NUM_STATES, state);
+      emp_assert(cell < NUM_CELLS, cell);
+      emp_assert(state > 0 && state <= NUM_STATES, state);
       return bit_options[state].Has(cell);
     }
 
     /// Return a currently valid option for provided cell; may not be correct solution
     uint8_t FindOption(size_t cell) {
-      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+      for (uint8_t state = 1; state <= NUM_STATES; ++state) {
         if (HasOption(cell, state)) return state;
       }
       return UNKNOWN_STATE;
     }
-    bool IsSet(size_t cell) const { return value[cell] != UNKNOWN_STATE; }
+    bool IsSet(size_t cell) const { return is_set[cell]; }
     bool IsSolved() const { return is_set.All(); }
     
     /// Clear out the old solution info when starting a new solve attempt.
     void Clear() {
-      value.fill(UNKNOWN_STATE);
+      values.fill(UNSET_STATE);
       for (auto & val_options : bit_options) {
         val_options.SetAll();
       }
@@ -199,17 +251,17 @@ namespace emp {
     /// Set the value of an individual cell
     /// Return true/false based on whether progress was made toward solving the puzzle.
     virtual bool Set(size_t cell, uint8_t state) {
-      emp_assert(cell < NUM_CELLS);   // Make sure cell is in a valid range.
-      emp_assert(state < NUM_STATES); // Make sure state is in a valid range.
+      emp_assert(cell < NUM_CELLS);                 // Make sure cell is in a valid range.
+      emp_assert(state > 0 && state <= NUM_STATES); // Make sure state is in a valid range.
 
-      if (value[cell] == state) return false;  // If state is already set, SKIP!
+      if (values[cell] == state) return false;  // If state is already set, SKIP!
 
       emp_assert(HasOption(cell,state));     // Make sure state is allowed.
-      is_set.Set(cell);
-      value[cell] = state;                   // Store found value!
+      values[cell] = state;                  // Store found value!
+      is_set.Set(cell);                      // Mark this cell as now set.
 
       // Clear this cell from all sets of options.
-      for (size_t s=0; s < NUM_STATES; ++s) bit_options[s].Clear(cell);
+      for (auto & val_options : bit_options) val_options.Clear(cell);
       
       return true;
     }
@@ -222,7 +274,7 @@ namespace emp {
     /// Identify if a move will make progress in the puzzle.
     bool MoveProgress(const PuzzleMove & move) const {
       emp_assert(move.pos_id >= 0 && move.pos_id < NUM_CELLS, move.pos_id);
-      emp_assert(move.state >= 0 && move.state < NUM_STATES, move.state);
+      emp_assert(move.state > 0 && move.state <= NUM_STATES, (size_t) move.state);
       
       if (move.type == PuzzleMove::SET_STATE) {
         return GetValue(move.pos_id) != move.state;
@@ -241,7 +293,7 @@ namespace emp {
     /// Operate on a "move" object; return false if move is invalid.
     bool Move(const PuzzleMove & move) {
       emp_assert(move.pos_id >= 0 && move.pos_id < NUM_CELLS, move.pos_id);
-      emp_assert(move.state >= 0 && move.state < NUM_STATES, move.state);
+      emp_assert(move.state > 0 && move.state <= NUM_STATES, move.state);
       
       switch (move.type) {
       case PuzzleMove::SET_STATE:
@@ -308,7 +360,7 @@ namespace emp {
     bool IsUnsolvable() {
       // Identify which cells are either set or still have options.
       grid_bits_t has_options = is_set;
-      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+      for (uint8_t state = 1; state <= NUM_STATES; ++state) {
         has_options |= bit_options[state];
       }
 
