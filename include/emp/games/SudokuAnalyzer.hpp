@@ -48,10 +48,10 @@ namespace emp {
 
     using base_t = GridPuzzleAnalyzer<NUM_ROWS, NUM_COLS, NUM_STATES>;
     using grid_bits_t = BitSet<NUM_CELLS>;
-    using state_bits_t = BitSet<NUM_STATES>;
+    using state_bits_t = BitSet<NUM_STATES+1>;
     using region_bits_t = BitSet<NUM_REGIONS>;
     using region_pair_t = std::pair<size_t, size_t>;
-    using symbol_set_t = emp::array<char, NUM_STATES>;
+    using symbol_set_t = emp::array<char, NUM_STATES+1>;
 
     // Track which cells are in each region.
     static const emp::array<grid_bits_t, NUM_REGIONS> & RegionMap() {
@@ -194,7 +194,7 @@ namespace emp {
       AddSolveFunction("Swordfish3-RC",  10.0, [this](){ return Solve_FindSwordfish3_ROW_COL(); });
       AddSolveFunction("Swordfish4-RC",  11.0, [this](){ return Solve_FindSwordfish4_ROW_COL(); });
 
-      symbols = symbol_set_t{'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+      symbols = symbol_set_t{'-', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
       Clear();
     }
     SudokuAnalyzer(const SudokuAnalyzer &) = default;
@@ -216,50 +216,6 @@ namespace emp {
       return false;
     }
     
-    // Load a board state from a stream.
-    void Load(std::istream & is) {
-      Clear();
-
-      // Format: Provide site by site with a dash for empty; whitespace is ignored.
-      char cur_char;
-      size_t cell_id = 0;
-      while (cell_id < NUM_CELLS) {
-        is >> cur_char;
-        if (emp::is_whitespace(cur_char)) continue;
-        ++cell_id;
-        if (cur_char == '-') continue;
-        uint8_t state_id = SymbolToState(cur_char);
-        if (state_id == UNKNOWN_STATE) {
-          emp::notify::Warning("Unknown sudoku symbol '", cur_char, "'.  Ignoring.");
-          continue;
-        }
-        Set(cell_id-1, state_id);
-      }
-    }
-
-    // Load a board state from a file.
-    void Load(const emp::String & filename) {
-      std::ifstream file(filename);
-      return Load(file);
-    }
-
-    // Load from memory.  Return true if successful; false otherwise.
-    bool Load(std::span<size_t> board) {
-      notify::TestError(board.size() != NUM_CELLS,
-        "Attempting to load a Sudoku board of size ", board.size(), ", but ", NUM_CELLS, " required.");
-      Clear();
-
-      for (size_t i = 0; i < NUM_CELLS; ++i) {
-        notify::TestError(board[i] > NUM_STATES,
-          "Attempting to set Sudoku state to ", board[i], ", but max state is ", NUM_STATES);
-        if (board[i]) {
-          if (!HasOption(i, board[i]-1)) return false;
-          Set(i, board[i]-1); // Store as 0 to 8 instead of 1 to 9.
-        }
-      }
-
-      return true;
-    }
 
     // Print the current state of the puzzle, including all options available.
     void Print(bool verbose=true, std::ostream & out=std::cout) override {
@@ -271,8 +227,8 @@ namespace emp {
       for (size_t r = 0; r < NUM_ROWS; ++r) {
         for (size_t c = 0; c < NUM_COLS; ++c) {
           size_t id = r*9+c;
-          if (value[id] == UNKNOWN_STATE) out << " -";
-          else out << " " << value[id];
+          if (!values[id]) out << " -";
+          else out << " " << values[id];
         }
         out << std::endl;
       }
@@ -282,22 +238,19 @@ namespace emp {
       out << " +-----------------------+-----------------------+-----------------------+"
           << std::endl;;
       for (size_t r = 0; r < NUM_ROWS; r++) {       // Puzzle row
-        for (uint8_t s = 0; s < NUM_STATES; s+=3) {    // Subset row
+        for (uint8_t s = 1; s <= NUM_STATES; s+=3) {    // Subset row
           for (size_t c = 0; c < NUM_COLS; c++) {   // Puzzle col
             size_t id = r*9+c;
             if (c%3==0) out << " |";
             else out << "  ";
-            if (value[id] == UNKNOWN_STATE) {
+            if (!values[id]) {
               out << " " << (HasOption(id,s)   ? ColorSymbol(s) : ".")
                   << " " << (HasOption(id,s+1) ? ColorSymbol(s+1) : ".")
                   << " " << (HasOption(id,s+2) ? ColorSymbol(s+2) : ".");
             } else {
-              if (s==0) out << "      ";
-              if (s==3) out << "   " << ColorSymbol(value[id], true) << "  ";
-              if (s==6) out << "      ";
-              // if (s==0) out << " /   \\";
-              // if (s==3) out << " | " << symbols[value[id]] << " |";
-              // if (s==6) out << " \\   /";
+              if (s==1) out << "      ";
+              if (s==4) out << "   " << ColorSymbol(values[id], true) << "  ";
+              if (s==7) out << "      ";
             }
           }
           out << " |" << std::endl;
@@ -315,11 +268,11 @@ namespace emp {
     // Use a brute-force approach to completely solve this puzzle.
     // Return true if solvable, false if unsolvable.
     // @CAO - Change to use a stack of backup states, remove recursion, and track set counts for faster ID of failure (i.e., no 3's left, but only 8 of 9 set)
-    bool ForceSolve(uint8_t cur_state=0) {
-      emp_assert(cur_state <= NUM_STATES);
+    bool ForceSolve(uint8_t cur_state=1) {
+      emp_assert(cur_state > 0 && cur_state <= NUM_STATES);
       
       // Continue for as long as we have a state that still needs to be considered.
-      while (cur_state < NUM_STATES) {
+      while (cur_state <= NUM_STATES) {
         // Advance the start state if the current one is done.
         if (bit_options[cur_state].None()) {
           ++cur_state;
@@ -350,6 +303,7 @@ namespace emp {
       // Create a move for each cell with a unique option left.
       unique_cells.ForEach([this,&moves](size_t cell_id){
         uint8_t state = FindOption(cell_id);
+        emp_assert(state != UNKNOWN_STATE);
         moves.push_back(PuzzleMove{PuzzleMove::SET_STATE, cell_id, state});
       });
 
@@ -361,7 +315,7 @@ namespace emp {
       emp::vector<PuzzleMove> moves;
 
       // Loop through each state for each region testing.
-      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+      for (uint8_t state = 1; state <= NUM_STATES; ++state) {
         for (const grid_bits_t & region : RegionMap()) {
           grid_bits_t region_map = bit_options[state] & region;
           if (region_map.CountOnes() == 1) {
@@ -381,7 +335,7 @@ namespace emp {
       for (auto [r1, r2] : RegionOverlaps()) {
         const auto overlap = RegionMap(r1) & RegionMap(r2);
         if ((overlap & ~is_set).CountOnes() < 2) continue;       // Enough free cells to matter?
-        for (uint8_t state = 0; state < NUM_STATES; ++state) {
+        for (uint8_t state = 1; state <= NUM_STATES; ++state) {
           auto overlap_opts = bit_options[state] & overlap;
           bool o1 = ((bit_options[state] & r1) == overlap_opts);
           bool o2 = ((bit_options[state] & r2) == overlap_opts);
@@ -412,8 +366,8 @@ namespace emp {
       grid_bits_t two_ones = FindTwoOnes(bit_options);
 
       // Try all (9*8/2=36) pairs of states and measure which sites have both options.
-      for (uint8_t state1 = 0; state1 < NUM_STATES-1; ++state1) {
-        for (uint8_t state2 = state1+1; state2 < NUM_STATES; ++state2) {
+      for (uint8_t state1 = 1; state1 < NUM_STATES; ++state1) {
+        for (uint8_t state2 = state1+1; state2 <= NUM_STATES; ++state2) {
           grid_bits_t both_states = bit_options[state1] & bit_options[state2] & two_ones;
 
           // If too few cells have exactly these two states, move on!
@@ -455,9 +409,9 @@ namespace emp {
       grid_bits_t valid = two_ones | three_ones;
 
       // Try all (9*8*7/6=84) triples of states and measure which sites have these options.
-      for (uint8_t state1 = 0; state1 < NUM_STATES-1; ++state1) {
+      for (uint8_t state1 = 1; state1 < NUM_STATES-1; ++state1) {
         for (uint8_t state2 = state1+1; state2 < NUM_STATES; ++state2) {
-          for (uint8_t state3 = state2+1; state3 < NUM_STATES; ++state3) {
+          for (uint8_t state3 = state2+1; state3 <= NUM_STATES; ++state3) {
 
             // Which sites have at least two of these states and no others?
             grid_bits_t test_sites =
@@ -507,8 +461,8 @@ namespace emp {
       emp::vector<PuzzleMove> moves;
 
       // Try all (9*8/2=36) pairs of states and measure which sites have both options.
-      for (uint8_t state1 = 0; state1 < NUM_STATES-1; ++state1) {
-        for (uint8_t state2 = state1+1; state2 < NUM_STATES; ++state2) {
+      for (uint8_t state1 = 1; state1 < NUM_STATES; ++state1) {
+        for (uint8_t state2 = state1+1; state2 <= NUM_STATES; ++state2) {
           grid_bits_t both_states = bit_options[state1] & bit_options[state2];
           grid_bits_t one_state = bit_options[state1] ^ bit_options[state2];
 
@@ -529,7 +483,7 @@ namespace emp {
             size_t pos2 = both_states_r.FindOne(pos1+1);
 
             // Do either of those have OTHER states to block?
-            for (uint8_t block_state = 0; block_state < NUM_STATES; ++block_state) {
+            for (uint8_t block_state = 1; block_state <= NUM_STATES; ++block_state) {
               if (block_state == state1 || block_state == state2) continue;
               if (bit_options[block_state].Has(pos1)) {
                 moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos1, block_state});                
@@ -555,7 +509,7 @@ namespace emp {
       // Check each region.
       for (const auto & region : RegionMap()) {
         // Try all (9*8*7/2*3=84) triples of states and measure which sites have both options.
-        for (uint8_t state1 = 0; state1 < NUM_STATES-1; ++state1) {
+        for (uint8_t state1 = 1; state1 < NUM_STATES-1; ++state1) {
           grid_bits_t state1_r = bit_options[state1] & region;
           if (state1_r.None() || state1_r.CountOnes() > 3) continue;
 
@@ -563,7 +517,7 @@ namespace emp {
             grid_bits_t state2_r = bit_options[state2] & region;
             if (state2_r.None() || state2_r.CountOnes() > 3) continue;
 
-            for (uint8_t state3 = state2+1; state3 < NUM_STATES; ++state3) {
+            for (uint8_t state3 = state2+1; state3 <= NUM_STATES; ++state3) {
               grid_bits_t state3_r = bit_options[state3] & region;
               if (state3_r.None() || state3_r.CountOnes() > 3) continue;
 
@@ -576,7 +530,7 @@ namespace emp {
               size_t pos3 = final_sites.FindOne(pos2+1);
 
               // Do either of those have OTHER states to block?
-              for (uint8_t block_state = 0; block_state < NUM_STATES; ++block_state) {
+              for (uint8_t block_state = 1; block_state <= NUM_STATES; ++block_state) {
                 if (block_state == state1 || block_state == state2 || block_state == state3) continue;
                 if (bit_options[block_state].Has(pos1)) {
                   // std::cout << "STATES " << (state1+1) << (state2+1) << (state3+1)
@@ -608,7 +562,7 @@ namespace emp {
     emp::vector<PuzzleMove> Solve_FindSwordfish2_ROW_COL() {
       emp::vector<PuzzleMove> moves;
 
-      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+      for (uint8_t state = 1; state <= NUM_STATES; ++state) {
         for (size_t region1_id = 0; region1_id < NUM_ROWS+NUM_COLS; ++region1_id) {
           auto region1 = RegionMap(region1_id) & bit_options[state];
           if (region1.CountOnes() != 2) continue;
@@ -649,7 +603,7 @@ namespace emp {
     emp::vector<PuzzleMove> Solve_FindSwordfish2_BOX() {
       emp::vector<PuzzleMove> moves;
 
-      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+      for (uint8_t state = 1; state <= NUM_STATES; ++state) {
         for (size_t box_id = NUM_ROWS+NUM_COLS; box_id < NUM_REGIONS; ++box_id) {
           auto region1 = RegionMap(box_id) & bit_options[state];
           if (region1.CountOnes() != 2) continue;
@@ -711,7 +665,7 @@ namespace emp {
     emp::vector<PuzzleMove> Solve_FindSwordfish3_ROW_COL() {
       emp::vector<PuzzleMove> moves;
 
-      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+      for (uint8_t state = 1; state <= NUM_STATES; ++state) {
         for (size_t region1_id = 0; region1_id < NUM_ROWS+NUM_COLS; ++region1_id) {
           auto region1 = RegionMap(region1_id) & bit_options[state];
           if (region1.CountOnes() != 3) continue;
@@ -773,7 +727,7 @@ namespace emp {
     emp::vector<PuzzleMove> Solve_FindSwordfish4_ROW_COL() {
       emp::vector<PuzzleMove> moves;
 
-      for (uint8_t state = 0; state < NUM_STATES; ++state) {
+      for (uint8_t state = 1; state <= NUM_STATES; ++state) {
         for (size_t region1_id = 0; region1_id < NUM_ROWS+NUM_COLS; ++region1_id) {
           auto region1 = RegionMap(region1_id) & bit_options[state];
           if (region1.CountOnes() != 4) continue;
