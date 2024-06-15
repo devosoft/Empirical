@@ -53,15 +53,19 @@ namespace emp {
   [[nodiscard]] inline String MakeLiteral(const std::string & value);
   template <typename T> [[nodiscard]] inline String MakeLiteral(const T & value);
   [[nodiscard]] inline char MakeFromLiteral_Char(const String & value);
-  [[nodiscard]] inline String MakeFromLiteral_String(const String & value);
+  [[nodiscard]] inline String MakeFromLiteral_String(const String & value, CharSet quotes="\"");
   template <typename T> [[nodiscard]] inline T MakeFromLiteral(const String & value);
   [[nodiscard]] inline String MakeUpper(const String & in);
   [[nodiscard]] inline String MakeLower(const String & in);
   [[nodiscard]] inline String MakeTitleCase(String in);
   [[nodiscard]] inline String MakeCount(int val, String item, const String & plural_suffix);
   [[nodiscard]] inline String MakeRoman(int val);
+  template <typename CONTAINER_T, typename FUN_T>
+  [[nodiscard]] inline String MakeEnglishList(const CONTAINER_T & container, FUN_T transform_fun);
   template <typename CONTAINER_T>
   [[nodiscard]] inline String MakeEnglishList(const CONTAINER_T & container);
+  template <typename CONTAINER_T>
+  [[nodiscard]] inline String MakeQuotedList(const CONTAINER_T & container);
   template <typename... Args>
   [[nodiscard]] inline String MakeFormatted(const String& format, Args... args);
   [[nodiscard]] inline String MakeRepeat(String base, size_t n);
@@ -277,10 +281,10 @@ namespace emp {
     [[nodiscard]] inline bool IsLiteralChar() const;
 
     /// Test if an string is formatted as a literal string.
-    [[nodiscard]] inline bool IsLiteralString(const String & quote_marks="\"") const;
+    [[nodiscard]] inline bool IsLiteralString(CharSet quote_marks="\"") const;
 
     /// Explain what string is NOT formatted as a literal string.
-    [[nodiscard]] inline String DiagnoseLiteralString(const String & quote_marks="\"") const;
+    [[nodiscard]] inline String DiagnoseLiteralString(CharSet quote_marks="\"") const;
 
     /// Is string composed only of a set of characters (can be provided as a string)
     [[nodiscard]] bool IsComposedOf(CharSet char_set) const { return char_set.Has(*this); }
@@ -662,10 +666,15 @@ namespace emp {
     String & AppendRoman(int val) { *this+=MakeRoman(val); return *this; }
     String & SetRoman(int val) { *this = MakeRoman(val); return *this; }
 
-    template <typename CONTAINER_T> String & AppendEnglishList(const CONTAINER_T & container)
-      { *this += MakeEnglishList(container); return *this;}
-    template <typename CONTAINER_T> String & SetEnglishList(const CONTAINER_T & container)
-      { *this = MakeEnglishList(container); return *this;}
+    template <typename... Ts> String & AppendEnglishList(const Ts &... args)
+      { *this += MakeEnglishList(std::forward<Ts>(args)...); return *this;}
+    template <typename... Ts> String & SetEnglishList(const Ts &... args)
+      { *this = MakeEnglishList(std::forward<Ts>(args)...); return *this;}
+
+    template <typename CONTAINER_T> String & AppendQuotedList(const CONTAINER_T & container)
+      { *this += MakeQuotedList(container); return *this;}
+    template <typename CONTAINER_T> String & SetQuotedList(const CONTAINER_T & container)
+      { *this = MakeQuotedList(container); return *this;}
 
     template<typename... ARG_Ts> String & AppendFormatted(const std::string& format, ARG_Ts... args)
       { return *this += MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
@@ -1325,9 +1334,9 @@ namespace emp {
   }
 
   /// Test if an input string is properly formatted as a literal string.
-  bool String::IsLiteralString(const String & quote_marks) const {
+  bool String::IsLiteralString(CharSet quote_marks) const {
     // Must begin and end with proper quote marks.
-    if (size() < 2 || !is_one_of(Get(0), quote_marks) || back() != Get(0)) return false;
+    if (size() < 2 || !quote_marks.Has(Get(0)) || back() != Get(0)) return false;
 
     // Are all of the characters valid?
     for (size_t pos = 1; pos < size() - 1; pos++) {
@@ -1345,10 +1354,10 @@ namespace emp {
   }
 
   /// Test if an input string is properly formatted as a literal string.
-  String String::DiagnoseLiteralString(const String & quote_marks) const {
+  String String::DiagnoseLiteralString(CharSet quote_marks) const {
     // A literal string must begin and end with a double quote and contain only valid characters.
     if (size() < 2) return "Too short!";
-    if (!is_one_of(Get(0), quote_marks)) return "Must begin and end in quotes.";
+    if (!quote_marks.Has(Get(0))) return "Must begin and end in quotes.";
     if (back() != Get(0)) return "Must have begin and end quotes that match.";
 
     // Are all of the characters valid?
@@ -1473,7 +1482,7 @@ namespace emp {
   }
 
   /// Take a string or iterable and convert it to a C++-style literal.
-  // This is the version for string. The version for an iterable is below.
+  /// This is the version for string. The version for an iterable is below.
   [[nodiscard]] String MakeLiteral(const std::string & value) {
     // Add quotes to the ends and convert each character.
     std::stringstream ss;
@@ -1530,9 +1539,8 @@ namespace emp {
 
 
   /// Convert a literal string representation to an actual string.
-  [[nodiscard]] String MakeFromLiteral_String(const String & value) {
-  /// Convert a literal string representation to an actual string.
-    emp_assert(value.IsLiteralString(), value, value.DiagnoseLiteralString());
+  [[nodiscard]] String MakeFromLiteral_String(const String & value, [[maybe_unused]] CharSet quotes) {
+    emp_assert(value.IsLiteralString(quotes), value, value.DiagnoseLiteralString(quotes));
     // Given the assert, we can assume string DOES contain a literal string representation.
 
     String out_string;
@@ -1625,21 +1633,34 @@ namespace emp {
     return out;
   }
 
-  template <typename CONTAINER_T>
-  String MakeEnglishList(const CONTAINER_T & container) {
+  template <typename CONTAINER_T, typename TRANSFORM_FUN_T>
+  String MakeEnglishList(const CONTAINER_T & container, TRANSFORM_FUN_T fun) {
     if (container.size() == 0) return "";
-    if (container.size() == 1) return MakeString(*container.begin());
+    if (container.size() == 1) return MakeString(fun(*container.begin()));
 
     auto back_it = container.end();  back_it--;
-    if (container.size() == 2) return MakeString(*container.begin(), " and ", *back_it);
+    if (container.size() == 2) return MakeString(fun(*container.begin()), " and ", fun(*back_it));
 
     String out;;
     for (auto it = container.begin(); it != back_it; ++it) {
-      out += MakeString(", ", *it);
+      out += MakeString(", ", fun(*it));
     }
-    out += MakeString("and ", *back_it);
+    out += MakeString("and ", fun(*back_it));
 
     return out;
+  }
+
+  /// Create a standard english list from a container of strings.
+  /// For example, the strings {"one", "two"} would become "one and two"
+  //  The strings {"one", "two", "three"} would become "one, two, and three"
+  template <typename CONTAINER_T>
+  String MakeEnglishList(const CONTAINER_T & container) {
+    return MakeEnglishList(container, [](CONTAINER_T::value_type x){ return x; });
+  }
+
+  template <typename CONTAINER_T>
+  String MakeQuotedList(const CONTAINER_T & container) {
+    return MakeEnglishList(container, [](CONTAINER_T::value_type x){ return MakeLiteral(x); });
   }
 
   /// Apply sprintf-like formatting to a string.
