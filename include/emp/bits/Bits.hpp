@@ -2526,12 +2526,13 @@ namespace emp {
 
   /// Find bit positions where exactly one sequence has a one in that position.  
   template <typename CONTAINER_T>
-  [[nodiscard]] auto FindUniqueOnes(const CONTAINER_T & container) {
+  [[nodiscard]] auto FindUniqueOnes(const CONTAINER_T & container, size_t start=0) {
     using bits_t = CONTAINER_T::value_type;
 
     bits_t any_ones;     // Are there any ones at a position?
     bits_t multi_ones;   // Are there multiple ones at a position?
     for (const bits_t & bits : container) {
+      if (start) { start--; continue; }
       multi_ones |= any_ones & bits;
       any_ones |= bits;
     }
