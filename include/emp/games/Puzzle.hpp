@@ -159,7 +159,7 @@ namespace emp {
       return UNKNOWN_STATE;
     }
 
-    static values_t LoadToArray(std::istream & is, emp::CharSet empty="-.") {
+    values_t LoadToArray(std::istream & is, emp::CharSet empty="-.") {
       values_t values;
 
       // Format: Provide site by site with a dash for empty; whitespace is ignored.
@@ -177,6 +177,11 @@ namespace emp {
       }
       
       return values;
+    }
+
+    values_t LoadToArray(String filename, emp::CharSet empty="-.") {
+      std::ifstream file(filename);
+      return LoadToArray(file, empty);
     }
 
     // Load from memory.  Return true if successful; false otherwise.
@@ -198,12 +203,12 @@ namespace emp {
     }
 
     // Load a board from a generic input stream.
-    void Load(std::istream & is, emp::CharSet empty="-.") {
-      Load( LoadToArray(is, empty) );
+    bool Load(std::istream & is, emp::CharSet empty="-.") {
+      return Load( LoadToArray(is, empty) );
     }
 
     // Load a board state from a file.
-    void Load(const emp::String & filename, emp::CharSet empty="-") {
+    bool Load(const emp::String & filename, emp::CharSet empty="-") {
       std::ifstream file(filename);
       return Load( LoadToArray(file, empty) );
     }
