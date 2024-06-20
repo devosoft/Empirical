@@ -298,7 +298,7 @@ namespace emp {
     emp::vector<PuzzleMove> Solve_FindLastCellState() {
       emp::vector<PuzzleMove> moves;
 
-      grid_bits_t unique_cells = emp::FindUniqueOnes(bit_options);
+      grid_bits_t unique_cells = emp::FindUniqueOnes(bit_options, 1);
 
       // Create a move for each cell with a unique option left.
       unique_cells.ForEach([this,&moves](size_t cell_id){
