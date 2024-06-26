@@ -592,6 +592,16 @@ namespace emp {
     //  bool operator>=(const String & in) const
     //  bool operator<=>(const String & in) const
     //  std::string operator+(const std::string & in) const
+
+    template <typename T>
+    String operator+(T && in) const {
+      if constexpr (std::derived_from<T,std::string> || std::same_as<T,std::string_view>) {
+        return str() + std::forward<T>(in);
+      } else {
+        return str() + MakeString(in);
+      }
+    }
+
     String operator*(size_t count) const {
       String out; out.reserve(size() * count);
       for (size_t i = 0; i < count; ++i) out += *this;
