@@ -75,7 +75,7 @@ TEST_CASE("Test DataMap in SimpleParser", "[data]")
   CHECK( fun(dmA) == 9.5 );
   CHECK( fun(dmB) == 72.375 );
 
-  std::set<std::string> names_used = parser.GetNamesUsed();
+  auto names_used = parser.GetNamesUsed();
   CHECK( names_used.size() == 3 );
   CHECK( emp::Has(names_used, "val1") );
   CHECK( emp::Has(names_used, "val2") );
