@@ -590,9 +590,9 @@ namespace emp {
 
     template <typename MAP_T, typename... EXTRA_Ts>
     auto BuildMathFunction(
-      const MAP_T & symbol_map,            ///< The map or layout to use, specifying variables.
-      const emp::String & expression,   ///< The primary expression to convert.
-      EXTRA_Ts... extra_args            ///< Extra value arguments (accessed as $1, $2, etc.)
+      const MAP_T & symbol_map,   ///< The map or layout to use, specifying variables.
+      std::string_view expression,     ///< The primary expression to convert.
+      EXTRA_Ts... extra_args      ///< Extra value arguments (accessed as $1, $2, etc.)
     ) {
       // If we have incoming values, store them appropriately.
       SetupStaticValues(extra_args...);
