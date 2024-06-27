@@ -15,8 +15,11 @@
 int main()
 {
   emp::SudokuAnalyzer sa;
-  sa.Load("sudoku_board.dat");
+  sa.Load("sudoku_board-hard.dat");
   sa.Print();
-  sa.CalcProfile();
+  auto profile = sa.CalcProfile();
+  std::cout << "============================================================================="
+            << std::endl;
+  profile.Print();
   sa.Print();
 }
