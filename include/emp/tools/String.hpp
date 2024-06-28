@@ -552,11 +552,14 @@ namespace emp {
       }
     }
 
-    inline void Slice(emp::vector<String> & out_set, String delim=",",
+    template <typename DELIM_T=emp::String>
+    inline void Slice(emp::vector<String> & out_set, DELIM_T delim=",",
                       const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=false) const;
 
+    template <typename DELIM_T=emp::String>
     [[nodiscard]]
-    inline emp::vector<String> Slice(String delim=",", const Syntax & syntax=Syntax::Quotes(),
+    inline emp::vector<String> Slice(DELIM_T delim=",",
+                                     const Syntax & syntax=Syntax::Quotes(),
                                      bool trim_whitespace=false) const;
 
     inline void ViewSlices(
@@ -1141,17 +1144,22 @@ namespace emp {
   /// @param delim delimiter to split on (default: ",")
   /// @param syntax identify quotes and parens that should be kept together.
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
+  template <typename DELIM_T>
   void String::Slice(
-    emp::vector<String> & out_set, String delim, const Syntax & syntax, bool trim_whitespace
+    emp::vector<String> & out_set, DELIM_T delim, const Syntax & syntax, bool trim_whitespace
   ) const {
     if (empty()) return; // Nothing to set!
 
     size_t start_pos = 0;
     size_t found_pos = Find(delim, 0, syntax);
+    const size_t delim_size = [delim](){
+      if constexpr (std::derived_from<DELIM_T, std::string>) return delim.size();
+      else return 1;
+    }();
     while (found_pos < size()) {
       out_set.push_back( GetRange(start_pos, found_pos) );
       if (trim_whitespace) out_set.back().Trim();
-      start_pos = found_pos+delim.size();
+      start_pos = found_pos+delim_size;
       found_pos = Find(delim, found_pos+1, syntax);
     }
     out_set.push_back( GetRange(start_pos, found_pos) );
@@ -1163,8 +1171,9 @@ namespace emp {
   /// @param delim delimiter to split on (default: ",")
   /// @param syntax identify quotes and parens that should be kept together.
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
+  template <typename DELIM_T>
   emp::vector<String> String::Slice(
-    String delim, const Syntax & syntax, bool trim_whitespace
+    DELIM_T delim, const Syntax & syntax, bool trim_whitespace
   ) const {
     emp::vector<String> result;
     Slice(result, delim, syntax, trim_whitespace);
