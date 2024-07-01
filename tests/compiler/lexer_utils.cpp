@@ -19,7 +19,8 @@
 
 TEST_CASE("Test lexer_utils", "[compiler]")
 {
-  emp::DFA dfa(3);
+  emp::DFA dfa;
+  dfa.Resize(3);
   dfa.SetTransition(0, 2, 'a');
   dfa.SetTransition(2, 1, 'b');
   dfa.SetTransition(1, 0, 'c');
@@ -36,7 +37,8 @@ TEST_CASE("Test lexer_utils", "[compiler]")
   dfa.SetStop(0);
   REQUIRE(dfa.Test(emp::FindExample(dfa)));
 
-  emp::DFA dfa2(3);
+  emp::DFA dfa2;
+  dfa2.Resize(3);
   REQUIRE(emp::FindExample(dfa2) == "");
 }
 

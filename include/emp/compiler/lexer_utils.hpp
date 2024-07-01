@@ -36,7 +36,8 @@ namespace emp {
 
   /// Systematic conversion of NFA to DFA...
   static inline DFA to_DFA(const NFA & nfa, int keep_invalid=false) {
-    DFA dfa(1);                                  // Setup zero to be the start state.
+    DFA dfa;
+    dfa.AddState();
     std::map<std::set<size_t>, size_t> id_map;   // Map nfa "state sets" to dfa states.
     std::vector<std::set<size_t>> state_stack;   // States that still need to be explored.
 
