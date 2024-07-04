@@ -19,7 +19,7 @@
 
 #include "../base/array.hpp"
 #include "../base/vector.hpp"
-
+#include "../io/CPPFile.hpp"
 #include "../tools/string_utils.hpp"
 
 namespace emp {
@@ -130,52 +130,54 @@ namespace emp {
     }
 
     // Print out this DFA as compilable C++ code.
-    void PrintCPP(std::ostream & os=std::cout,
-                  std::string object_name="AutoDFA",
-                  std::string indent=""
+    void WriteCPP(emp::CPPFile & file,
+                  std::string object_name="AutoDFA"
                  ) const {
-      os << indent << "class " << object_name << " {\n"
-         << indent << "private:\n"
-         << indent << "  static constexpr size_t NUM_SYMBOLS=" << NUM_SYMBOLS << ";\n"
-         << indent << "  static constexpr size_t NUM_STATES=" << GetSize() << ";\n"
-         << indent << "  using row_t = std::array<int, NUM_SYMBOLS>;\n"
-         << indent << "  static constexpr std::array<row_t, NUM_STATES> table = {\n";
+      file.Include("<array>");
+      file.Include("<string>");
+
+      file.AddCode("class ", object_name, " {")
+          .AddCode("private:")
+          .AddCode("  static constexpr size_t NUM_SYMBOLS=", NUM_SYMBOLS, ";")
+          .AddCode("  static constexpr size_t NUM_STATES=", GetSize(), ";")
+          .AddCode("  using row_t = std::array<int, NUM_SYMBOLS>;")
+          .AddCode("  static constexpr std::array<row_t, NUM_STATES> table = {{");
       for (size_t state=0; state < GetSize(); ++state) {
-        if (state) os << indent << "    ,{";
-        else       os << indent << "    {";
+        if (state) file.AddCode("    ,{");
+        else       file.AddCode("    {");
         for (size_t symbol=0; symbol < NUM_SYMBOLS; ++symbol) {
-          if (symbol) os << ",";
-          os << transitions[state][symbol];
+          if (symbol) file.AppendCode(",");
+          file.AppendCode(transitions[state][symbol]);
         }
-        os << "}\n";
+        file.AppendCode("}");
       }
-      os << indent << "  };\n"
-         << indent << "  static constexpr std::array<size_t, NUM_STATES> stop_id = {\n";
+      file.AddCode("  }};")
+          .AddCode("  static constexpr std::array<size_t, NUM_STATES> stop_id = {");
       for (size_t state=0; state < GetSize(); ++state) {
-        if (state) os << ",";
-        os << stop_id[state];
+        if (state) file.AppendCode(",");
+        file.AppendCode(static_cast<size_t>(stop_id[state]));
       }
-      os << indent << "  };\n";
+      file.AddCode("  };");
 
-      os << indent << "public:\n"
-         << indent << "  constexpr size_t size() const { return " << GetSize() << "; }\n"
-         << indent << "  constexpr size_t GetStop(int state) const {\n"
-         << indent << "    return (state >= 0) ? stop_id[state] : 0;\n"
-         << indent << "  }\n"
-         << indent << "  constexpr int GetNext(int state, size_t sym) const {\n"
-         << indent << "    return state >= 0 ? table[(size_t)state][sym] : -1;\n"
-         << indent << "  }\n"
-         << indent << "  constexpr int GetNext(int state, std::string syms) const {\n"
-         << indent << "    for (char x : syms) state = Next(state, (size_t) x);\n"
-         << indent << "    return state;\n"
-         << indent << "  }\n"
-         << indent << "  constexpr size_t Test(const std::string & str) const {\n"
-         << indent << "    int out = Next(0, str);\n"
-         << indent << "    return GetStop(out);\n"
-         << indent << "  }\n"
+      file.AddCode("public:")
+          .AddCode("  static constexpr size_t size() { return ", GetSize(), "; }")
+          .AddCode("  static constexpr size_t GetStop(int state) {")
+          .AddCode("    return (state >= 0) ? stop_id[state] : 0;")
+          .AddCode("  }")
+          .AddCode("  static constexpr int GetNext(int state, size_t sym) {")
+          .AddCode("    return state >= 0 ? table[(size_t)state][sym] : -1;")
+          .AddCode("  }")
+          .AddCode("  static constexpr int GetNext(int state, std::string syms) {")
+          .AddCode("    for (char x : syms) state = GetNext(state, (size_t) x);")
+          .AddCode("    return state;")
+          .AddCode("  }")
+          .AddCode("  static constexpr size_t Test(const std::string & str) {")
+          .AddCode("    int out = GetNext(0, str);")
+          .AddCode("    return GetStop(out);")
+          .AddCode("  }")
 
-         << indent << "  \n"
-         << indent << "};\n";
+          .AddCode("  ")
+          .AddCode("};");
     }
   };
 
