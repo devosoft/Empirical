@@ -35,7 +35,7 @@
 
 namespace emp {
 
-  /// A dynamic NFA class, for easily building non-determanistic finite automata.
+  /// A dynamic NFA class, for easily building non-deterministic finite automata.
   template <size_t S=128, typename STOP_TYPE=uint8_t>
   class tNFA {
   public:
