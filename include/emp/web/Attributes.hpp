@@ -108,7 +108,7 @@ namespace web {
 #ifdef __EMSCRIPTEN__
       MAIN_THREAD_EM_ASM({
           var id = UTF8ToString($0);
-          emp_i.cur_obj = $( '#' + id );
+          emp_i.cur_obj = document.getElementById(id);
         }, widget_id.c_str());
 #endif
 
@@ -118,7 +118,7 @@ namespace web {
         MAIN_THREAD_EM_ASM({
             var name = UTF8ToString($0);
             var value = UTF8ToString($1);
-            emp_i.cur_obj.attr( name, value);
+            if (emp_i.cur_obj) emp_i.cur_obj.setAttribute(name, value);
           }, attr_pair.first.c_str(), attr_pair.second.c_str());
 #else
         std::cout << "Setting '" << widget_id << "' attribute '" << attr_pair.first
@@ -136,7 +136,8 @@ namespace web {
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);
           var value = UTF8ToString($2);
-          $( '#' + id ).attr( setting, value);
+          var element = document.getElementById(id);
+          if (element) element.setAttribute(setting, value);
         }, widget_id.c_str(), setting.c_str(), settings[setting].c_str());
 #else
       std::cout << "Setting '" << widget_id << "' attribute '" << setting
@@ -144,7 +145,7 @@ namespace web {
 #endif
     }
 
-    /// Apply onlay a SPECIFIC attributes setting with a specifid value!
+    /// Apply only a SPECIFIC attributes setting with a specifid value!
     static void Apply(const std::string & widget_id, const std::string & setting,
                       const std::string & value) {
 #ifdef __EMSCRIPTEN__
@@ -152,7 +153,8 @@ namespace web {
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);
           var value = UTF8ToString($2);
-          $( '#' + id ).attr( setting, value);
+          var element = document.getElementById(id);
+          if (element) element.setAttribute(setting, value);
         }, widget_id.c_str(), setting.c_str(), value.c_str());
 #else
       std::cout << "Setting '" << widget_id << "' attribute '" << setting

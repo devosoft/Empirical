@@ -33,7 +33,6 @@ Here is `Example.html`:
 </head>
 <body>
 <div id="emp_base"></div>
-<script src="jquery-1.11.2.min.js"></script>
 <script type="text/javascript" src="Example.js"></script>
 
 </body>
