@@ -1247,7 +1247,7 @@ namespace emp {
     double CollessLikeIndex() const {
       GetMRCA();
       if (!mrca) {
-        emp_always_assert_warning("Warning: trying to calculate CollessLike Index on empty tree");
+        std::cout << "Warning: trying to calculate CollessLike Index on empty tree" << std::endl;
         return 0;
       }
       return RecursiveCollessStep(mrca).total;
