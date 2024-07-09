@@ -1246,6 +1246,10 @@ namespace emp {
      * "Sound Colless-like balance indices for multifurcating trees" (Mir, 2018, PLoS One)*/
     double CollessLikeIndex() const {
       GetMRCA();
+      if (!mrca) {
+        emp_always_assert_warning("Warning: trying to calculate CollessLike Index on empty tree");
+        return 0;
+      }
       return RecursiveCollessStep(mrca).total;
     }
 
@@ -2042,8 +2046,8 @@ namespace emp {
     double count = l1 + l2 + 2;
 
     if (branch_only) {
-      count -= std::count_if(lineage1.begin()+1, lineage1.begin() + l1, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1; });
-      count -= std::count_if(lineage2.begin()+1, lineage2.begin() + l2, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1; });
+      count -= std::count_if(lineage1.begin(), lineage1.begin() + l1, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1; });
+      count -= std::count_if(lineage2.begin(), lineage2.begin() + l2, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1; });
     }
 
     return count;
@@ -2321,6 +2325,10 @@ namespace emp {
       if (num_orgs_pos != -1) {
         size_t num_orgs = emp::from_string<size_t>(row[num_orgs_pos]);
         tax->SetNumOrgs(num_orgs);
+        if (num_orgs > 0 && emp::Has(ancestor_taxa, tax)) {
+          active_taxa.insert(tax);
+          ancestor_taxa.erase(tax);
+        }
       }
       if (tot_orgs_pos != -1) {
         size_t tot_orgs = emp::from_string<size_t>(row[tot_orgs_pos]);

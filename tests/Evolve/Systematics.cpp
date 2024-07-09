@@ -1678,3 +1678,11 @@ TEST_CASE("Test LoadFromFile and Snapshot behavior") {
   }
 
 }
+
+
+TEST_CASE("Test LoadFromFile MPD Hang") {
+  emp::Systematics<int, int> sys2([](const int & i){return i;}, true, true, true, true);
+  sys2.LoadFromFile("assets/hang_test.bad", "id", true, true);
+  sys2.GetMeanPairwiseDistance();
+
+}
