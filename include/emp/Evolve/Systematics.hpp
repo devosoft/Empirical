@@ -2216,6 +2216,12 @@ namespace emp {
 
     // Load files
     emp::File in_file(file_path);
+
+    if (in_file.HasError()) {
+      emp_optional_throw(false, "Error loading file from file_path: " + file_path + " " + in_file.GetError());
+      return;
+    }
+
     emp::vector<emp::String> header = in_file.ExtractRow();
 
     // Find column ids
