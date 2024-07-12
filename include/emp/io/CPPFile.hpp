@@ -42,6 +42,11 @@ namespace emp {
       return *this;
     }
 
+    CPPFile & SetNamespace(String ns) {
+      name_space = ns;
+      return *this;
+    }
+
     const emp::vector<String> & GetCode() const { return code; }
     const std::set<String> & GetIncludes() const { return includes; }
 
