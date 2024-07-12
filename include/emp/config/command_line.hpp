@@ -131,12 +131,42 @@ namespace emp {
       return 1;
     }
 
+    // Load the value from an argument with the provided pattern into the provided variable.
+    template <typename T>
+    int GetArgValue(emp::vector<emp::String> & args, const emp::String & pattern, T & var) {
+      const int pos = FindArg(args, pattern);         // Find the pattern in the set of arguments!
+      if (pos == -1) return 0;                        // Arg not found; abort, return 0 (not found)
+      if (pos >= (int) args.size() - 1) return -1;    // No value!  Abort, return -1 (error)
+      var = args[(size_t)pos+1].As<T>();              // Store the found value.
+      return 1;                                       // Indicate success!
+    }
+
+    // ...assume arg is a PAIR of strings.
+    int GetArgValue(emp::vector<emp::String> & args, const emp::String & pattern,
+                      emp::String & var1, emp::String & var2) {
+      const int pos = FindArg(args, pattern);
+      if (pos == -1) return 0;                      // Arg not found.
+      if (pos >= (int) args.size() - 2) return -1;  // No room for both values!
+      var1 = args[(size_t)pos+1];
+      var2 = args[(size_t)pos+2];
+      return 1;
+    }
+
 
     // Same as get arg_value, but ALSO remove the args.
     template <typename... Ts>
     int use_arg_value(emp::vector<std::string> & args, const std::string & pattern, Ts &... vars) {
       const int result = get_arg_value(args, pattern, vars...);
       const int pos = find_arg(args, pattern);
+      if (result == 1) args.erase(args.begin()+pos, args.begin()+pos+sizeof...(Ts)+1);
+      return result;
+    }
+
+    // Same as GetArgValue, but ALSO remove the args.
+    template <typename... Ts>
+    int UseArgValue(emp::vector<emp::String> & args, const emp::String & pattern, Ts &... vars) {
+      const int result = GetArgValue(args, pattern, vars...);
+      const int pos = FindArg(args, pattern);
       if (result == 1) args.erase(args.begin()+pos, args.begin()+pos+sizeof...(Ts)+1);
       return result;
     }
