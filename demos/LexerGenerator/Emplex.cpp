@@ -38,9 +38,21 @@ int main(int argc, char* argv[])
   const bool help = emp::cl::UseArg(args, "-h");
   const bool verbose = emp::cl::UseArg(args, "-v");
 
+  emp::String class_name("Lexer");
+  int result = emp::cl::UseArgValue(args, "-c", class_name);
+  emp::notify::TestError(result == -1, "The -c option must be followed by a class name.");
+
   emp::String out_filename("lexer.hpp");
   int result = emp::cl::UseArgValue(args, "-f", out_filename);
   emp::notify::TestError(result == -1, "The -f option must be followed by a filename.");
+
+  emp::String inc_guards("__AUTOMATED_LEXER__");
+  int result = emp::cl::UseArgValue(args, "-g", inc_guards);
+  emp::notify::TestError(result == -1, "The -g option must be followed by include guard name.");
+
+  emp::String name_space("emplex");
+  int result = emp::cl::UseArgValue(args, "-n", name_space);
+  emp::notify::TestError(result == -1, "The -n option must be followed by a namespace.");
 
   if (args.size() != 2 || help) {
     std::cerr << "Usage: " << args[0] << " {options} [config_file]\n"
@@ -50,9 +62,12 @@ int main(int argc, char* argv[])
       << "  Tokens with names starting with a minus sign are consumed and ignored, e.g.:\n"
       << "    -whitespace : [ \\t\\n\\r]+\n"
       << "  Options are:\n"
-      << "    -f [filename]  Specify output filename (default: " << out_filename << ")\n"
-      << "    -h             Print HELP (this message)\n"
-      << "    -v             Print VERBOSE output\n"
+      << "    -c [class_name]  Set the name of generated CLASS (default: " << class_name << ")\n"
+      << "    -f [filename]    Specify output FILENAME (default: " << out_filename << ")\n"
+      << "    -f [guard_name]  Set the include GUARDS to use (default: " << inc_guards << ")\n"
+      << "    -h               Print HELP (this message)\n"
+      << "    -n [namespace]   Set NAMESPACE for generated code (default: " << name_space << ")\n"
+      << "    -v               Print VERBOSE output\n"
       << std::endl;
     exit(1);
   }
@@ -61,9 +76,9 @@ int main(int argc, char* argv[])
   LoadTokens(lexer, args[1], verbose);
 
   emp::CPPFile file(out_filename);
-  file.SetGuards("__AUTOMATED_LEXER__");
-  file.SetNamespace("emplex");
-  lexer.WriteCPP(file, "Lexer");
+  file.SetGuards(inc_guards);
+  file.SetNamespace(name_space);
+  lexer.WriteCPP(file, class_name);
   file.Write();
 
   return 0;
