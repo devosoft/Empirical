@@ -302,6 +302,7 @@ namespace emp {
     bool archive;             ///< Set to true if we are supposed to do any archiving of extinct taxa.
     bool store_position;      ///< Keep a vector mapping  positions to pointers
     bool track_synchronous;   ///< Does this systematics manager need to keep track of current and next positions?
+    bool collapse_unifurcations; ///< Should this systematics manager collapse unifurcations?
 
     // Stats about active taxa... (totals are across orgs, not taxa)
     size_t org_count;         ///< How many organisms are currently active?
@@ -318,6 +319,7 @@ namespace emp {
     SystematicsBase(bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside), store_position(_pos), track_synchronous(false)
+      , collapse_unifurcations(false)
       , org_count(0), total_depth(0), num_roots(0), max_depth(0), next_id(0), curr_update(0) { ; }
 
     virtual ~SystematicsBase(){;}
@@ -342,6 +344,9 @@ namespace emp {
 
     /// Are we storing the positions of taxa?
     bool GetStorePosition() const { return store_position; }
+
+    /// Are we collapsing unifurcations?
+    bool GetCollapseUnifurcations() const {return collapse_unifurcations; }
 
     /// How many living organisms are currently being tracked?
     size_t GetTotalOrgs() const { return org_count; }
@@ -375,6 +380,9 @@ namespace emp {
 
     /// Are we storing the location of taxa?
     void SetStorePosition(bool new_val) { store_position = new_val; }
+
+    /// Are we collapsing unifurcations?
+    void SetCollapseUnifurcations(bool new_val) { collapse_unifurcations = new_val; }
 
     /// Sets the current update/time step
     void SetUpdate(size_t ud) {curr_update = ud;}
@@ -485,6 +493,7 @@ namespace emp {
     using parent_t::archive;
     using parent_t::store_position;
     using parent_t::track_synchronous;
+    using parent_t::collapse_unifurcations;
     using parent_t::org_count;
     using parent_t::total_depth;
     using parent_t::num_roots;
@@ -569,6 +578,9 @@ namespace emp {
 
     /// Called when there are no more living members of a taxon.  There may be descendants.
     void MarkExtinct(Ptr<taxon_t> taxon);
+
+    /// Called when a taxon has no living members and only a single offspring
+    void CollapseUnifurcation(Ptr<taxon_t> taxon);
 
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
     /// Helper function for RemoveBefore
@@ -1391,9 +1403,33 @@ namespace emp {
 
     // If the taxon is still active AND the is the current mrca AND now has only one offspring,
     // clear the MRCA for lazy re-evaluation later.
-    else if (taxon == mrca && taxon->GetNumOff() == 1) {
-      mrca = nullptr;
+    else if (taxon->GetNumOrgs() == 0 && taxon->GetNumOff() == 1) {
+      if (taxon == mrca) {
+        mrca = nullptr;
+      }
+      if (collapse_unifurcations) {
+        ancestor_taxa.erase(taxon);
+        CollapseUnifurcation(taxon);
+      }
     }
+
+  }
+
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::CollapseUnifurcation(Ptr<taxon_t> taxon) {
+    for (Ptr<taxon_t> off_tax : taxon->GetOffspring()) {
+      off_tax->parent = taxon->GetParent();
+      if (taxon->GetParent()) {
+        taxon->GetParent()->offspring.insert(off_tax);
+        taxon->GetParent()->num_offspring++;
+      }
+    }
+
+    if (taxon->GetParent()) {
+      taxon->GetParent()->RemoveOffspring(taxon);
+    }
+    taxon.Delete();      
+    return;
   }
 
   // Mark a taxon extinct if there are no more living members.  There may be descendants.
@@ -1401,6 +1437,10 @@ namespace emp {
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::MarkExtinct(Ptr<taxon_t> taxon) {
     emp_optional_throw(taxon, "Invalid taxon pointer");
     emp_optional_throw(taxon->GetNumOrgs() == 0, "Taxon already extinct");
+
+    if (taxon == mrca && taxon->GetNumOff() == 1) {
+      mrca = nullptr;
+    }
 
     // Track destruction time
     taxon->SetDestructionTime(curr_update);
@@ -1419,6 +1459,12 @@ namespace emp {
     }
 
     if (store_active) active_taxa.erase(taxon);
+
+    if (collapse_unifurcations && taxon->GetNumOff() == 1) {
+      CollapseUnifurcation(taxon);
+      return;
+    } 
+
     if (!archive) {   // If we don't archive taxa, delete them.
       for (Ptr<taxon_t> off_tax : taxon->GetOffspring()) {
         off_tax->NullifyParent();

@@ -1686,3 +1686,34 @@ TEST_CASE("Test LoadFromFile MPD Hang") {
   sys2.GetMeanPairwiseDistance();
 
 }
+
+TEST_CASE("Collapse Unifurcations") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
+  sys.SetCollapseUnifurcations(true);
+  CHECK(sys.GetCollapseUnifurcations());
+  auto id1 = sys.AddOrg(3, nullptr);
+  auto id2 = sys.AddOrg(4, id1);
+  auto id3 = sys.AddOrg(5, id2);
+  CHECK(!sys.RemoveOrg(id2));
+  CHECK(sys.GetNumAncestors() == 0);
+  CHECK(sys.GetNumTaxa() == 2);
+  CHECK(id3->GetParent() == id1);
+  CHECK(emp::Has(id1->GetOffspring(), id3));
+  CHECK(!emp::Has(id1->GetOffspring(), id2));
+  CHECK(id1->GetNumOff() == 1);
+  CHECK(!sys.RemoveOrg(id1));
+  CHECK(!id3->GetParent());
+  CHECK(sys.GetNumAncestors() == 0);
+  CHECK(sys.GetNumTaxa() == 1);
+  auto id4 = sys.AddOrg(6, id3);
+  auto id5 = sys.AddOrg(7, id4);
+  auto id6 = sys.AddOrg(8, id5);
+  auto id7 = sys.AddOrg(9, id5);
+  auto id8 = sys.AddOrg(10, id5);
+  sys.RemoveOrg(id5);
+  CHECK(sys.GetNumAncestors() == 1);
+  sys.RemoveOrg(id7);
+  CHECK(sys.GetNumAncestors() == 1);
+  sys.RemoveOrg(id6);    
+  CHECK(sys.GetNumAncestors() == 0);
+}
