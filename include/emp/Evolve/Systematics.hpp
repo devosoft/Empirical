@@ -560,7 +560,7 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
     Ptr<taxon_t> to_be_removed = nullptr; ///< Taxon to remove org from after next call to AddOrg
-    emp::WorldPosition removal_pos = {0, 0};   ///< Position of taxon to next be removed
+    emp::WorldPosition removal_pos = {emp::WorldPosition::invalid_id, emp::WorldPosition::invalid_id};   ///< Position of taxon to next be removed
 
     emp::vector<emp::vector<Ptr<taxon_t> > > taxon_locations; ///< Positions in this vector indicate taxon positions in world
 
@@ -1367,9 +1367,11 @@ namespace emp {
       // Clear pending removal
       if (to_be_removed != nullptr) {
         RemoveOrg(to_be_removed);
-        taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
+        if (store_position) {
+          taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
+          removal_pos.MarkInvalid();
+        }
         to_be_removed = nullptr;
-        removal_pos = {0, 0};
       }
 
       // Assumes that synchronous worlds have two populations, with 0
@@ -1592,6 +1594,12 @@ namespace emp {
     if (to_be_removed) {
       RemoveOrg(to_be_removed);
       to_be_removed = nullptr;
+      if (store_position && removal_pos.IsValid()) {
+        if ((pos.GetPopID() != removal_pos.GetPopID()) || (pos.GetIndex() != removal_pos.GetIndex())) {
+          taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
+        }
+        removal_pos.MarkInvalid();
+      }      
     }
 
     most_recent = cur_taxon;
@@ -1617,9 +1625,11 @@ namespace emp {
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(Ptr<taxon_t> taxon) {
     if (to_be_removed != nullptr) {
       RemoveOrg(to_be_removed);
-      taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
+      if (store_position) {
+        taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
+        removal_pos.MarkInvalid();
+      }
       to_be_removed = nullptr;
-      removal_pos = {0, 0};
     }
     to_be_removed = taxon;
   }
