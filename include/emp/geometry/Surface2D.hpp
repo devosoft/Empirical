@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief This file defines a templated class to represent a 2D suface capable of maintaining data
+ *  @brief This file defines a templated class to represent a 2D surface capable of maintaining data
  *  about which 2D bodies are currently on that surface and rapidly identifying if they are
  *  overlapping.
  *
@@ -39,12 +39,12 @@ namespace emp {
   template <typename BODY_TYPE>
   class Surface2D {
   private:
-    const Point max_pos;     // Lower-left corner of the surface.
+    const Point max_pos;                   // Lower-left corner of the surface.
     emp::vector<Ptr<BODY_TYPE>> body_set;  // Set of all bodies on surface
 
   public:
-    Surface2D(double _width, double _height)
-      : max_pos(_width, _height), body_set() { ; }
+    Surface2D(double width, double height)
+      : max_pos(width, height) { ; }
     ~Surface2D() { Clear(); }
 
     double GetWidth() const { return max_pos.GetX(); }
@@ -92,8 +92,8 @@ namespace emp {
       emp::vector< emp::vector<Ptr<BODY_TYPE>> > sector_set(num_sectors);
 
 
-      int hit_count = 0;
-      int test_count = 0;
+      // int hit_count = 0;
+      // int test_count = 0;
 
       // Loop through all of the bodies on this surface placing them in sectors and testing for
       // collisions with other bodies already in nearby sectors.
@@ -109,10 +109,10 @@ namespace emp {
             const int sector_id = i + num_cols * j;
             if (sector_set[sector_id].size() == 0) continue;
 
-            for (auto body2 : sector_set[sector_id]) {
-              test_count++;
-              if (collide_fun(*body, *body2)) hit_count++;
-            }
+            // for (auto body2 : sector_set[sector_id]) {
+            //   test_count++;
+            //   if (collide_fun(*body, *body2)) hit_count++;
+            // }
 
           }
         }
