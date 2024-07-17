@@ -11,6 +11,8 @@
 #ifndef EMP_GEOMETRY_CIRCLE2D_HPP_INCLUDE
 #define EMP_GEOMETRY_CIRCLE2D_HPP_INCLUDE
 
+#include "../math/constants.hpp"
+
 #include "Point2D.hpp"
 
 namespace emp {
@@ -30,6 +32,8 @@ namespace emp {
     constexpr TYPE GetCenterY() const { return center.GetY(); }
     constexpr TYPE GetRadius() const { return radius; }
     constexpr TYPE GetSquareRadius() const { return radius * radius; }
+    constexpr TYPE GetArea() const { return PI * radius * radius; }
+    constexpr TYPE GetCircumference() const { return PI * 2.0 * radius; }
 
     Circle2D<TYPE> & SetCenter(const Point2D<TYPE> & c) { center = c; return *this; }
     Circle2D<TYPE> & SetCenter(TYPE x, TYPE y) { center.Set(x,y); return *this; }
