@@ -90,7 +90,7 @@ namespace emp {
     Point2D & Rot270() { return Set(-y, x); }
 
     // Square-roots are slow to calculate; if we're just doing comparisons, square-distance
-    // is usualy going to be sufficient.
+    // is usually going to be sufficient.
     TYPE SquareDistance(const Point2D & _in) const {
       const TYPE x_dist = x - _in.x;
       const TYPE y_dist = y - _in.y;
