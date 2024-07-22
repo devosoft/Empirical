@@ -228,28 +228,28 @@ namespace emp {
       return *this;
     }
 
-    /// Keep only strings that contain a specific substring.
+    /// Keep only lines that contain a specific substring.
     File & KeepIfContains(const String & pattern) {
       return KeepIf(
         [&pattern](const String & line){ return line.find(pattern) != String::npos; }
       );
     }
 
-    /// Remove all strings that contain a specific substring.
+    /// Remove all lines that contain a specific substring.
     File & RemoveIfContains(const String & pattern) {
       return KeepIf(
         [&pattern](const String & line){ return line.find(pattern) == String::npos; }
       );
     }
 
-    /// Keep only strings that contain a specific substring.
+    /// Keep only lines that contain a specific substring.
     File & KeepIfBegins(const String & prefix) {
       return KeepIf(
         [&prefix](const String & line){ return line.find(prefix) == 0; }
       );
     }
 
-    /// Remove all strings that contain a specific substring.
+    /// Remove all lines that contain a specific substring.
     File & RemoveIfBegins(const String & prefix) {
       return KeepIf(
         [&prefix](const String & line){ return line.Find(prefix) != 0; }
