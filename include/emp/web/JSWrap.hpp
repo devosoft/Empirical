@@ -241,7 +241,7 @@ namespace emp {
   template <typename RETURN_TYPE>
   static emp::sfinae_decoy<void, decltype(&RETURN_TYPE::StoreAsReturn)>
   StoreReturn(const RETURN_TYPE & ret_var) {
-    ret_var.template StoreAsReturn();
+    ret_var.template StoreAsReturn<RETURN_TYPE>();
   }
 
   /// Helper functions to store values inside JSON objects
