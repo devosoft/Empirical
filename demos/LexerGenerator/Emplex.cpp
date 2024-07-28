@@ -43,15 +43,15 @@ int main(int argc, char* argv[])
   emp::notify::TestError(result == -1, "The -c option must be followed by a class name.");
 
   emp::String out_filename("lexer.hpp");
-  int result = emp::cl::UseArgValue(args, "-f", out_filename);
+  result = emp::cl::UseArgValue(args, "-f", out_filename);
   emp::notify::TestError(result == -1, "The -f option must be followed by a filename.");
 
   emp::String inc_guards("__AUTOMATED_LEXER__");
-  int result = emp::cl::UseArgValue(args, "-g", inc_guards);
+  result = emp::cl::UseArgValue(args, "-g", inc_guards);
   emp::notify::TestError(result == -1, "The -g option must be followed by include guard name.");
 
   emp::String name_space("emplex");
-  int result = emp::cl::UseArgValue(args, "-n", name_space);
+  result = emp::cl::UseArgValue(args, "-n", name_space);
   emp::notify::TestError(result == -1, "The -n option must be followed by a namespace.");
 
   if (args.size() != 2 || help) {
