@@ -15,6 +15,7 @@
 #define EMP_GEOMETRY_POINT2D_HPP_INCLUDE
 
 #include <cmath>
+#include <compare>
 #include <iostream>
 
 #include "../math/math.hpp"
@@ -36,8 +37,8 @@ namespace emp {
      { ; }
     // ~Point2D() { ; }
 
-    const Point2D & operator=(const Point2D & _in) = default;
-    constexpr int operator<=>(const Point2D &) const = default;
+    Point2D & operator=(const Point2D & _in) = default;
+    constexpr auto operator<=>(const Point2D &) const = default;
 
     constexpr TYPE GetX() const { return x; }
     constexpr TYPE GetY() const { return y; }

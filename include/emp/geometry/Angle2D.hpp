@@ -16,6 +16,7 @@
 #define EMP_GEOMETRY_ANGLE2D_HPP_INCLUDE
 
 #include <cmath>
+#include <compare>
 #include <cstdint>
 
 #include "../math/constants.hpp"
@@ -96,7 +97,7 @@ namespace emp {
     constexpr Angle(uint32_t in_angle, bool) : angle(in_angle) { ; } // directly set internal value
 
     Angle & operator=(const Angle &) = default;
-    constexpr int operator<=>(const Angle &) const = default;
+    constexpr auto operator<=>(const Angle &) const = default;
 
     constexpr double AsPortion() const { return ((double) (angle % 0xFFFF)) / ANGLE_CAP; }
     constexpr double AsRadians() const { return ((double) angle) * 2.0 * PI / ANGLE_CAP; }
