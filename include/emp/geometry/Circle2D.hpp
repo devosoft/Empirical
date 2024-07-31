@@ -26,8 +26,9 @@ namespace emp {
     constexpr Circle2D(const Point2D<TYPE> & _c, TYPE _r=0) : radius(_r), center(_c) { ; }
     constexpr Circle2D(TYPE _x, TYPE _y, TYPE _r=0) : radius(_r), center(_x,_y) { ; }
     constexpr Circle2D(TYPE _r=0) : radius(_r) { ; }
+    constexpr Circle2D(const Circle2D &) = default;
 
-    const Circle2D & operator=(const Circle2D & _in) = default;
+    Circle2D & operator=(const Circle2D & _in) = default;
     constexpr int operator<=>(const Circle2D &) const = default;
 
     constexpr const Point2D<TYPE> & GetCenter() const { return center; }
