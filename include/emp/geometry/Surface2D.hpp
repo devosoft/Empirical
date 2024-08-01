@@ -109,10 +109,11 @@ namespace emp {
             const int sector_id = i + num_cols * j;
             if (sector_set[sector_id].size() == 0) continue;
 
-            // for (auto body2 : sector_set[sector_id]) {
-            //   test_count++;
-            //   if (collide_fun(*body, *body2)) hit_count++;
-            // }
+            for (auto body2 : sector_set[sector_id]) {
+              // test_count++;
+              // if (collide_fun(*body, *body2)) hit_count++;
+              collide_fun(*body, *body2);
+            }
 
           }
         }
