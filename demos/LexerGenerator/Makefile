@@ -1,63 +1,50 @@
+# Project-specific settings
+PROJECT := Emplex
+EMP_DIR := ../../include
+
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wextra -Wno-unused-function -I../../include/
-CFLAGS_version := -std=c++20
+CFLAGS_all := -Wall -Wextra -Wno-unused-function -std=c++20 -I$(EMP_DIR)/
+
+# Native compiler information
+CXX_nat := g++
+CFLAGS_nat := -O3 -DNDEBUG $(CFLAGS_all)
+CFLAGS_nat_debug := -g $(CFLAGS_all)
 
 # Emscripten compiler information
 CXX_web := emcc
-CXX_native := g++
-#CXX_native := clang++
+EMP_METHODS = EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap', 'UTF8ToString', 'stringToUTF8', 'lengthBytesUTF8']"
+EMP_FUNCTIONS = EXPORTED_FUNCTIONS="['_main', "_malloc", "_free", '_empCppCallback']"
+JS_LIB = --js-library $(EMP_DIR)/emp/web/library_emp.js
+OFLAGS_web_all := -s $(EMP_METHODS) -s TOTAL_MEMORY=67108864 $(JS_LIB) -s $(EMP_FUNCTIONS) -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
+OFLAGS_web := -Oz -DNDEBUG
+OFLAGS_web_debug := -g4 -pedantic -Wno-dollar-in-identifier-extension
 
-OFLAGS_native_debug := -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion
-OFLAGS_native_fast_debug := -g -pedantic -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion
-OFLAGS_native_opt := -O3 -DNDEBUG
+CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) $(OFLAGS_web_all)
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) $(OFLAGS_web_all)
 
-OFLAGS_web_debug := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
-OFLAGS_web_opt := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
 
-CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
-CFLAGS_native_fast_debug := $(CFLAGS_all) $(OFLAGS_native_fast_debug)
-CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
+default: $(PROJECT)
+native: $(PROJECT)
+web: $(PROJECT).js
+all: $(PROJECT) $(PROJECT).js
 
-CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+debug:	CFLAGS_nat := $(CFLAGS_nat_debug)
+debug:	$(PROJECT)
 
-TARGETS := Emplex
+debug-web:	CFLAGS_web := $(CFLAGS_web_debug)
+debug-web:	$(PROJECT).js
 
-default: native
+web-debug:	debug-web
 
-CXX := $(CXX_native)
-CFLAGS := $(CFLAGS_native_opt)
+$(PROJECT):	source/native/$(PROJECT).cpp
+	$(CXX_nat) $(CFLAGS_nat) source/native/$(PROJECT).cpp -o $(PROJECT)
+	@echo To build the web version use: make web
 
-debug: CFLAGS := $(CFLAGS_native_debug)
-debug: all
-
-fast_debug: CFLAGS := $(CFLAGS_native_fast_debug)
-fast_debug: all
-
-web: CXX := $(CXX_web)
-web: CFLAGS := $(CFLAGS_web_opt)
-web: all
-
-web-debug: CXX := $(CXX_web)
-web-debug: CFLAGS := $(CFLAGS_web_debug)
-web-debug: all
-
-native: all
-
-all: $(TARGETS)
-
-$(TARGETS): % : %.cpp
-	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
-
-opt-%: %.cpp
-	$(CXX) $(CFLAGS_version) $(CFLAGS_native_opt) $< -o $@
-
-debug-%: %.cpp
-	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
+$(PROJECT).js: source/web/$(PROJECT)-web.cpp
+	$(CXX_web) $(CFLAGS_web) source/web/$(PROJECT)-web.cpp -o web/$(PROJECT).js
 
 clean:
-	rm -rf debug-* *~ *.dSYM $(TARGETS)
+	rm -f $(PROJECT) web/$(PROJECT).js web/$(PROJECT).js.mem *.js.map *~ source/*.o
 
 # Debugging information
-#print-%: ; @echo $*=$($*)
 print-%: ; @echo '$(subst ','\'',$*=$($*))'
