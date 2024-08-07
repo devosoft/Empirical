@@ -8,10 +8,10 @@
  *  @brief Manage an entire document.
  *
  *  The Document class is built off of Div, but initializes the EMP web framework, if
- *  neeeded, and activates itself.  It also provides quick ways to add and lookup
+ *  needed, and activates itself.  It also provides quick ways to add and lookup
  *  widgets.
  *
- *  For example, you can use doc.AddButon(...) to add a new button to the document,
+ *  For example, you can use doc.AddButton(...) to add a new button to the document,
  *  where the ... can be any of the mechanisms to build a new button.  This technique
  *  works for any widget type.
  *

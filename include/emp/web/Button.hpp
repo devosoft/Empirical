@@ -22,7 +22,7 @@
  *    Button & SetAutofocus(bool in_af)
  *    Button & SetDisabled(bool in_dis)
  *
- *  Retriving current state:
+ *  Retrieving current state:
  *    const std::string & GetLabel() const
  *    bool HasAutofocus() const
  *    bool IsDisabled() const
@@ -85,7 +85,7 @@ namespace web {
     #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 
-    // Get a properly cast version of indo.
+    // Get a properly cast version of info.
     ButtonInfo * Info() { return (ButtonInfo *) info; }
     const ButtonInfo * Info() const { return (ButtonInfo *) info; }
 
