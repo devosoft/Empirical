@@ -1,0 +1,137 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2024
+*/
+/**
+ *  @file
+ */
+
+
+#include "emp/base/array.hpp"
+#include "emp/base/notify.hpp"
+#include "emp/compiler/Lexer.hpp"
+#include "emp/io/CPPFile.hpp"
+#include "emp/tools/String.hpp"
+#include "emp/web/web.hpp"
+
+namespace UI = emp::web;
+constexpr size_t MAX_TOKENS = 100;
+
+UI::Document doc("emp_base");
+
+
+struct TokenInput {
+  emp::String name;
+  emp::String regex;
+};
+
+struct LexerInfo {
+  emp::array<TokenInput, MAX_TOKENS> token_info;
+  emp::String class_name{"Lexer"};
+  emp::String out_filename{"lexer.hpp"};
+  emp::String inc_guards{"EMPLEX_LEXER_HPP_INCLUDE_"};
+  emp::String name_space{"emplex"};
+};
+
+LexerInfo lexer_info;
+
+UI::Table token_table(4, 3, "token_table");
+
+void AddTableRow() {
+  size_t row_id = token_table.GetNumRows();
+  if (row_id > MAX_TOKENS) {
+    emp::notify::Warning("Maximum ", MAX_TOKENS, " token types allowed!");
+    return;
+  }
+  auto new_row = token_table.AddRow();
+  UI::TextArea name_area( [row_id](const std::string & str) {
+    // emp::notify::Message("Updating Name: ", str);
+    lexer_info.token_info[row_id-1].name = str;
+  }, emp::MakeString("token_table_name_", row_id) );
+  UI::TextArea regex_area( [row_id](const std::string & str) {
+    // emp::notify::Message("Updating RegEx: ", str);
+    lexer_info.token_info[row_id-1].regex = str;
+  }, emp::MakeString("token_table_regex_", row_id) );
+  new_row[0] << name_area;
+  new_row[1] << regex_area;
+}
+
+void Generate() {
+  emp::Lexer lexer;
+
+  // Load all of the tokens ino the lexer.
+  for (const auto & [name, regex] : lexer_info.token_info) {
+    if (name.empty() && regex.empty()) continue;
+    emp::notify::Message("name = ", name, "; regex = ", regex);
+  }
+
+  // emp::CPPFile file(out_filename);
+  // file.SetGuards(inc_guards);
+  // file.SetNamespace(name_space);
+  // lexer.WriteCPP(file, class_name);
+  // file.Write();
+}
+
+int main()
+{
+  emp::notify::MessageHandlers().Add([](const std::string & msg){ emp::Alert(msg); return true; });
+  emp::notify::WarningHandlers().Add([](const std::string & msg){ emp::Alert(msg); return true; });
+  emp::notify::ErrorHandlers().Add([](const std::string & msg){ emp::Alert(msg); return true; });
+
+  doc << "<h2>Emplex: A C++ Lexer Generator</h2>";
+
+  doc << "Emplex will take a series of token names and associated regular expressions and\n"
+         "generate a fast, table-driven lexer in C++.\n"
+      << "<br><br>\n";
+
+
+  // token_table.SetCSS("border-collapse", "collapse");
+  token_table.SetBackground("lightgrey");
+  token_table.GetCell(0,0).SetHeader() << "Token Name";
+  token_table.GetCell(0,1).SetHeader() << "Regular Expression";
+
+  // Start table with three rows?
+  AddTableRow();
+  AddTableRow();
+  AddTableRow();
+
+  doc << token_table;
+
+  doc << "<p>";
+  doc.AddButton([](){
+    AddTableRow();
+    doc.Redraw();
+  }, "Add Row", "row_but").SetBackground("#CCCCFF");
+
+  doc << "<p>";
+
+  auto settings_table = doc.AddTable(4, 2, "settings_table");
+  settings_table.SetBackground("tan");
+
+  settings_table[0][0].SetHeader().SetCSS("padding-bottom", "15px") << "<br>Class Name: ";
+  settings_table[0][1] << UI::TextArea([](const std::string & str) {
+    lexer_info.class_name = str;
+  }, "set_class").SetText(lexer_info.class_name).SetWidth(250);
+
+  settings_table[1][0].SetHeader().SetCSS("padding-bottom", "15px") << "<br>Filename: ";
+  settings_table[1][1] << UI::TextArea([](const std::string & str) {
+    lexer_info.out_filename = str;
+  }, "set_filename").SetText(lexer_info.out_filename).SetWidth(250);
+
+  settings_table[2][0].SetHeader().SetCSS("padding-bottom", "15px") << "<br>Include Guards: ";
+  settings_table[2][1] << UI::TextArea([](const std::string & str) {
+    lexer_info.inc_guards = str;
+  }, "set_includes").SetText(lexer_info.inc_guards).SetWidth(250);
+
+  settings_table[3][0].SetHeader().SetCSS("padding-bottom", "15px") << "<br>Namespace: ";
+  settings_table[3][1] << UI::TextArea([](const std::string & str) {
+    lexer_info.name_space = str;
+  }, "set_namespace").SetText(lexer_info.name_space).SetWidth(250);
+
+  doc << "<p>";
+  doc.AddButton([](){ Generate(); }, "Generate", "gen_but").SetBackground("#CCCCFF");;
+
+  doc << "<br>";
+
+}
