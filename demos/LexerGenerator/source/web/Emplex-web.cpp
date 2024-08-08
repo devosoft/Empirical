@@ -38,6 +38,7 @@ struct LexerInfo {
 LexerInfo lexer_info;
 
 UI::Table token_table(4, 3, "token_table");
+UI::Div output_div;
 UI::Text output_text;
 
 void AddTableRow() {
@@ -87,7 +88,8 @@ void Generate() {
   std::stringstream ss;
   file.Write(ss);
   output_text.Clear();
-  output_text << "<pre>\n" << ss.str() << "\n</pre>\n";
+  output_text.SetBorder("20px");
+  output_text << "<pre style=\"padding: 10px; border-radius: 5px; overflow-x: auto;\">\n" << emp::MakeWebSafe(ss.str()) << "\n</pre>\n";
   doc.Redraw();
 }
 
@@ -152,6 +154,11 @@ int main()
 
   doc << "<br>";
   doc << "<H3>Output:</H3>";
-  doc << output_text;
 
+  output_div.SetBackground("black");
+  output_div.SetColor("white");
+  output_div.SetBorder("20px");
+
+  doc << output_div;
+  output_div << output_text;
 }
