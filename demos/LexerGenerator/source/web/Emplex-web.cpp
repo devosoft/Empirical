@@ -21,10 +21,20 @@ constexpr size_t MAX_TOKENS = 100;
 UI::Document doc("emp_base");
 
 
-struct TokenInput {
+class TokenInput {
+private:
   emp::String name;
   emp::String regex;
   bool ignore = false;
+
+public:
+  const emp::String & GetName() const { return name; }
+  const emp::String & GetRegex() const { return regex; }
+  bool GetIgnore() const { return ignore; }
+
+  void SetName(emp::String in_name) { name = in_name; }
+  void SetRegex(emp::String in_regex) { regex = in_regex; }
+  void SetIgnore(bool in) { ignore = in; }
 };
 
 struct LexerInfo {
@@ -37,10 +47,11 @@ struct LexerInfo {
 
 LexerInfo lexer_info;
 
-UI::Table token_table(4, 3, "token_table");
+UI::Table token_table(4, 4, "token_table");
 UI::Div output_div;
 UI::Text output_text;
 
+// Add a row to the bottom of the token table.
 void AddTableRow() {
   size_t row_id = token_table.GetNumRows();
   if (row_id > MAX_TOKENS) {
@@ -49,22 +60,55 @@ void AddTableRow() {
   }
   auto new_row = token_table.AddRow();
   UI::TextArea name_area( [row_id](const std::string & str) {
-    // emp::notify::Message("Updating Name: ", str);
-    lexer_info.token_info[row_id-1].name = str;
+    lexer_info.token_info[row_id-1].SetName(str);
   }, emp::MakeString("token_table_name_", row_id) );
   UI::TextArea regex_area( [row_id](const std::string & str) {
-    // emp::notify::Message("Updating RegEx: ", str);
-    lexer_info.token_info[row_id-1].regex = str;
+    lexer_info.token_info[row_id-1].SetRegex(str);
   }, emp::MakeString("token_table_regex_", row_id) );
+  UI::CheckBox ignore_toggle( [row_id](bool setting) {
+    lexer_info.token_info[row_id-1].SetIgnore(setting);
+  }, emp::MakeString("token_table_ignore_", row_id)  );
   new_row[0] << name_area;
   new_row[1] << regex_area;
+  new_row[2] << ignore_toggle;
+}
+
+// void SwapTableRows(size_t row1, size_t row2) {
+//   const size_t num_rows = token_table.GetNumRows() - 1;
+//   emp_assert(row1 < num_rows && row2 < num_rows);
+
+//   /// Collect the names of text areas to look them up and swap values.
+//   emp::String name1 = emp::MakeString("token_table_name_", row1+1);
+//   emp::String regex1 = emp::MakeString("token_table_regex_", row1+1);
+//   emp::String ignore1 = emp::MakeString("token_table_ignore_", row1+1);
+
+//   emp::String name2 = emp::MakeString("token_table_name_", row2+1);
+//   emp::String regex2 = emp::MakeString("token_table_regex_", row2+1);
+//   emp::String ignore2 = emp::MakeString("token_table_ignore_", row2+1);
+
+//   lexer_info.token_info[row_id-1].name
+//   emp::String t1 = doc.TextArea(name1).GetText();
+// }
+
+// Remove a specified row from the table.
+void RemoveTableRow(size_t id) {
+  const size_t num_rows = token_table.GetNumRows() - 1;
+  emp_assert(id < num_rows);
+  while (id < num_rows) {
+    
+    ++id;
+  }
 }
 
 void Generate() {
   emp::Lexer lexer;
 
   // Load all of the tokens ino the lexer.
-  for (const auto & [name, regex, ignore] : lexer_info.token_info) {
+  for (const auto & t_info : lexer_info.token_info) {
+    emp::String name = t_info.GetName();
+    emp::String regex = t_info.GetRegex();
+    bool ignore = t_info.GetIgnore();
+
     if (name.empty() && regex.empty()) continue;
 
     if (!name.size()) {
@@ -110,6 +154,7 @@ int main()
   token_table.SetBackground("lightgrey");
   token_table.GetCell(0,0).SetHeader() << "Token Name";
   token_table.GetCell(0,1).SetHeader() << "Regular Expression";
+  token_table.GetCell(0,2).SetHeader() << "Ignore?";
 
   // Start table with three rows?
   AddTableRow();
