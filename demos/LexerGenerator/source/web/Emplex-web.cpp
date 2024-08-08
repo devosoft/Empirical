@@ -24,6 +24,7 @@ UI::Document doc("emp_base");
 struct TokenInput {
   emp::String name;
   emp::String regex;
+  bool ignore = false;
 };
 
 struct LexerInfo {
@@ -37,6 +38,7 @@ struct LexerInfo {
 LexerInfo lexer_info;
 
 UI::Table token_table(4, 3, "token_table");
+UI::Text output_text;
 
 void AddTableRow() {
   size_t row_id = token_table.GetNumRows();
@@ -61,16 +63,32 @@ void Generate() {
   emp::Lexer lexer;
 
   // Load all of the tokens ino the lexer.
-  for (const auto & [name, regex] : lexer_info.token_info) {
+  for (const auto & [name, regex, ignore] : lexer_info.token_info) {
     if (name.empty() && regex.empty()) continue;
-    emp::notify::Message("name = ", name, "; regex = ", regex);
+
+    if (!name.size()) {
+      emp::notify::Message("Empty token name has regular expression '", name, "'; must supply name.");
+      return;
+    }
+    if (!regex.size()) {
+      emp::notify::Message("Token '", name, "' does not have an associated regex.");
+      return;
+    }
+
+    if (ignore) lexer.IgnoreToken(name, regex);
+    else lexer.AddToken(name, regex);
   }
 
-  // emp::CPPFile file(out_filename);
-  // file.SetGuards(inc_guards);
-  // file.SetNamespace(name_space);
-  // lexer.WriteCPP(file, class_name);
-  // file.Write();
+  emp::CPPFile file;
+  file.SetGuards(lexer_info.inc_guards);
+  file.SetNamespace(lexer_info.name_space);
+  lexer.WriteCPP(file, lexer_info.class_name);
+
+  std::stringstream ss;
+  file.Write(ss);
+  output_text.Clear();
+  output_text << "<pre>\n" << ss.str() << "\n</pre>\n";
+  doc.Redraw();
 }
 
 int main()
@@ -133,5 +151,7 @@ int main()
   doc.AddButton([](){ Generate(); }, "Generate", "gen_but").SetBackground("#CCCCFF");;
 
   doc << "<br>";
+  doc << "<H3>Output:</H3>";
+  doc << output_text;
 
 }
