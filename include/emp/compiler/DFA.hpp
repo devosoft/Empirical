@@ -141,23 +141,27 @@ namespace emp {
           .AddCode("  static constexpr size_t NUM_SYMBOLS=", NUM_SYMBOLS, ";")
           .AddCode("  static constexpr size_t NUM_STATES=", GetSize(), ";")
           .AddCode("  using row_t = std::array<int, NUM_SYMBOLS>;")
+          .AddCode("")
+          .AddCode("  // DFA transition table")
           .AddCode("  static constexpr std::array<row_t, NUM_STATES> table = {{");
       for (size_t state=0; state < GetSize(); ++state) {
-        if (state) file.AddCode("    ,{");
-        else       file.AddCode("    {");
+        file.AddCode("    /* State ", state, " */ {");
         for (size_t symbol=0; symbol < NUM_SYMBOLS; ++symbol) {
           if (symbol) file.AppendCode(",");
           file.AppendCode(transitions[state][symbol]);
         }
-        file.AppendCode("}");
+        if (state == GetSize()-1) file.AppendCode("}");
+        else file.AppendCode("},");
       }
       file.AddCode("  }};")
+          .AddCode("  // DFA stop states (0 indicates NOT a stop)")
           .AddCode("  static constexpr std::array<size_t, NUM_STATES> stop_id = {");
       for (size_t state=0; state < GetSize(); ++state) {
         if (state) file.AppendCode(",");
         file.AppendCode(static_cast<size_t>(stop_id[state]));
       }
-      file.AddCode("  };");
+      file.AddCode("  };")
+          .AddCode("");
 
       file.AddCode("public:")
           .AddCode("  static constexpr size_t size() { return ", GetSize(), "; }")
@@ -175,8 +179,6 @@ namespace emp {
           .AddCode("    int out = GetNext(0, str);")
           .AddCode("    return GetStop(out);")
           .AddCode("  }")
-
-          .AddCode("  ")
           .AddCode("};");
     }
   };
