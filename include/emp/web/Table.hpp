@@ -219,8 +219,13 @@ namespace web {
           MAIN_THREAD_EM_ASM({
               parent_id = UTF8ToString($0);
               child_id = UTF8ToString($1);
-              $('#' + parent_id).append('<span id="' + child_id + '"></span>');
-            }, cell_id.c_str(), in.GetID().c_str());
+              let parent = document.getElementById(parent_id);
+              if (parent) {
+                let span = document.createElement('span');
+                span.id = child_id;
+                parent.appendChild(span);
+              }
+          }, cell_id.c_str(), in.GetID().c_str());
 
           // Now that the new widget has some place to hook in, activate it!
           in->DoActivate();
@@ -733,7 +738,7 @@ namespace web {
     }
 
     /// Apply CSS to all rows.
-    // (@CAO: Should we use fancier jquery here?)
+    // (@CAO: Should we use fancier javascript here?)
     template <typename SETTING_TYPE>
     Table & RowsCSS(const std::string & setting, SETTING_TYPE && value) {
       for (auto & row : Info()->rows) row.extras.style.Set(setting, emp::to_string(value));

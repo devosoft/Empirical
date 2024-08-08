@@ -66,7 +66,7 @@ namespace web {
         HTML << "<textarea ";                                   // Start the textarea tag.
         if (disabled) { HTML << " disabled=true"; }             // Check if should be disabled
         HTML << " id=\"" << id << "\"";                         // Indicate ID.
-        HTML << " onkeyup=\"emp.Callback(" << callback_id << ", this.value);\"";
+        HTML << " onkeyup=\"emp.Callback(" << callback_id << ", event.target.value)\"";
         HTML << " rows=\"" << rows << "\""
              << " cols=\"" << cols << "\"";
         if (max_length >= 0) { HTML << " maxlength=\"" << max_length << "\""; }
@@ -92,7 +92,8 @@ namespace web {
         MAIN_THREAD_EM_ASM({
             var id = UTF8ToString($0);
             var text = UTF8ToString($1);
-            $('#' + id).val(text);
+            var element = document.getElementById(id);
+            if (element) element.value = text;
           }, id.c_str(), in_string.c_str());
       }
 
