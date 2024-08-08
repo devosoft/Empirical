@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2022
+ *  date: 2015-2024
 */
 /**
  *  @file
@@ -918,6 +918,9 @@ namespace web {
 
       /// Align text to be centered.
       return_t & SetCenterText() { return SetCSS("text-align", "center"); }
+
+      /// Align text to be vertically centered.
+      return_t & SetMiddleText() { return SetCSS("vertical-align", "middle"); }
 
       /// Set the background color of this Widget.
       return_t & SetBackground(const std::string & v) { return SetCSS("background-color", v); }
