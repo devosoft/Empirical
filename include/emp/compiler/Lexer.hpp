@@ -257,7 +257,7 @@ namespace emp {
       while (best_pos < cur_pos) { is.unget(); cur_pos--; }
     }
 
-    // If we can't find a token, return 0 (for end or stream) or error (for no valid options)
+    // If we can't find a token, return 0 (for end of stream) or error (for no valid options)
     if (best_stop < 0) {
       if (!is) return { 0, "" };   // 0 = end of stream.
       return { ERROR_ID, lexeme }; // ERROR_ID = no valid tokens available!
@@ -357,28 +357,26 @@ namespace emp {
 
     file.Include("<algorithm>")
         .Include("<array>")
-        .Include("<assert.h>")
         .Include("<iostream>")
         .Include("<string>")
         .Include("<unordered_map>")
         .Include("<vector>");
 
-    file.AddCode("class ", object_name, " {")
-        .AddCode("public:")
-        .AddCode("  struct Token {")
-        .AddCode("    int id;                             // Type ID for token")
-        .AddCode("    std::string lexeme;                 // Sequence matched by token")
-        .AddCode("    size_t line_id;                     // Line token started on")
-        .AddCode("    operator int() const { return id; } // Auto-convert tokens to IDs.")
-        .AddCode("  };")
-        .AddCode("")
-        .AddCode("private:");
+    file.AddCode("// Struct to store information about a found Token")
+        .AddCode("struct Token {")
+        .AddCode("  int id;                             // Type ID for token")
+        .AddCode("  std::string lexeme;                 // Sequence matched by token")
+        .AddCode("  size_t line_id;                     // Line token started on")
+        .AddCode("  operator int() const { return id; } // Auto-convert tokens to IDs")
+        .AddCode("};")
+        .AddCode("");
 
-    file.IncIndent();
+    file.AddCode("// Deterministic Finite Automaton (DFA) for token recognition.");
     lexer_dfa.WriteCPP(file, "DFA");
-    file.DecIndent();
+    file.AddCode("");
 
-    file.AddCode("")
+    file.AddCode("class ", object_name, " {")
+        .AddCode("private:")
         .AddCode("  static constexpr size_t NUM_TOKENS=", token_set.size(), ";")
         .AddCode("  static constexpr int ERROR_ID = -1;     ///< Code for unknown token ID.")
         .AddCode("")
@@ -388,7 +386,10 @@ namespace emp {
         .AddCode("  std::string errors;  // Description of any errors encountered")
         .AddCode("")
         .AddCode("public:")
+        .AddCode("  // Return the number of token types the lexer recognizes.")
         .AddCode("  static constexpr size_t GetNumTokens() { return NUM_TOKENS; }")
+        .AddCode("")
+        .AddCode("  // Return the name of a token given its ID.")
         .AddCode("  static constexpr const char * GetTokenName(size_t id) {")
         .AddCode("    switch (id) {")
         .AddCode("    case 0: return \"_EOF_\";");
@@ -400,6 +401,7 @@ namespace emp {
         .AddCode("    };")
         .AddCode("  }")
         .AddCode("")
+        .AddCode("  // Generate and return the next token from the input stream.")
         .AddCode("  Token NextToken(std::istream & is) {")
         .AddCode("    size_t cur_pos = 0;   // Position in the input that we are actively analyzing")
         .AddCode("    size_t best_pos = 0;  // Best look-ahead we've found so far")
@@ -431,7 +433,7 @@ namespace emp {
         .AddCode("    const size_t out_line = cur_line;")
         .AddCode("    cur_line+=std::count(lexeme.begin(),lexeme.end(),'\\n');")
         .AddCode("")
-        .AddCode("    // If we can't find a token, return 0 (for end or stream) or error (for no valid options)")
+        .AddCode("    // If we can't find a token, return 0 (for end of stream) or error (for no valid options)")
         .AddCode("    if (best_stop < 0) {")
         .AddCode("      if (!is) return { 0, \"\", out_line };  // 0 = end of stream.")
         .AddCode("      return { ERROR_ID, lexeme, out_line };  // ERROR_ID = no valid tokens available!")
@@ -441,6 +443,7 @@ namespace emp {
         .AddCode("    return { best_stop, lexeme, out_line };")
         .AddCode("  }")
         .AddCode("")
+        .AddCode("  // Analyze an input stream and return a vector of all tokens.")
         .AddCode("  std::vector<Token> Tokenize(std::istream & is) {")
         .AddCode("    cur_line = 1;  // Assume we are starting at the first line of the input.")
         .AddCode("    std::vector<Token> out_tokens;")
