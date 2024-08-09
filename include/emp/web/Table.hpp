@@ -688,6 +688,12 @@ namespace web {
     // Add a single new Column to the table.
     TableCol AddCol();
 
+    // Remove the last row in the table.
+    TableRow RemoveRow();
+
+    // Remove the last column in the table.
+    TableCol RemoveCol();
+
     /// Fully resize the table (both rows and columns)
     Table & Resize(size_t r, size_t c) {
       Info()->Resize(r, c);
@@ -837,6 +843,19 @@ namespace web {
     return GetLastCol();
   }
 
+  // Add a single new Row to the table.
+  TableRow Table::RemoveRow() {
+    emp_assert(GetNumRows() > 0);
+    Rows(GetNumRows()-1);
+    return GetLastRow();
+  }
+
+  // Add a single new Column to the table.
+  TableCol Table::RemoveCol() {
+    emp_assert(GetNumCols() > 0);
+    Cols(GetNumCols()-1);
+    return GetLastCol();
+  }
 
 }
 }
