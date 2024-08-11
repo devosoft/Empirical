@@ -8,8 +8,8 @@
  */
 
 
-#include "emp/base/array.hpp"
 #include "emp/base/notify.hpp"
+#include "emp/base/vector.hpp"
 #include "emp/compiler/Lexer.hpp"
 #include "emp/io/CPPFile.hpp"
 #include "emp/tools/String.hpp"
@@ -23,23 +23,52 @@ UI::Document doc("emp_base");
 
 class TokenInput {
 private:
-  emp::String name;
-  emp::String regex;
-  bool ignore = false;
+  UI::TextArea name_text;
+  UI::TextArea regex_text;
+  UI::CheckBox ignore_toggle;
 
 public:
-  const emp::String & GetName() const { return name; }
-  const emp::String & GetRegex() const { return regex; }
-  bool GetIgnore() const { return ignore; }
+  TokenInput(size_t row_id, emp::String name="", emp::String regex="", bool ignore=false)
+    : name_text(emp::MakeString("token_table_name_", row_id+1))
+    , regex_text(emp::MakeString("token_table_regex_", row_id+1))
+    , ignore_toggle(emp::MakeString("token_table_ignore_", row_id+1))
+  {
+    name_text.SetText(name);
+    regex_text.SetText(regex);
+    ignore_toggle.SetChecked(ignore);
+  }
 
-  void SetName(emp::String in_name) { name = in_name; }
-  void SetRegex(emp::String in_regex) { regex = in_regex; }
-  void SetIgnore(bool in) { ignore = in; }
+  UI::TextArea GetNameWidget() { return name_text; }
+  UI::TextArea GetRegexWidget() { return regex_text; }
+  UI::CheckBox GetIgnoreWidget() { return ignore_toggle; }
+
+  emp::String GetName() const { return name_text.GetText(); }
+  emp::String GetRegex() const { return regex_text.GetText(); }
+  bool GetIgnore() const { return ignore_toggle.IsChecked(); }
+
+  void SetName(emp::String name) { name_text.SetText(name); }
+  void SetRegex(emp::String regex) { regex_text.SetText(regex); }
+  void SetIgnore(bool in) { ignore_toggle.SetChecked(in); }
+
+  void Set(emp::String name, emp::String regex, bool ignore=false) {
+    SetName(name);
+    SetRegex(regex);
+    SetIgnore(ignore);
+  }
+  void Clear() { Set("", "", false); }
+
+  void Swap(TokenInput & in) {
+    auto name_bak = GetName();
+    auto regex_bak = GetRegex();
+    auto ignore_bak = GetIgnore();
+    Set(in.GetName(), in.GetRegex(), in.GetIgnore());
+    in.Set(name_bak, regex_bak, ignore_bak);
+  }
 };
 
 struct LexerInfo {
-  emp::array<TokenInput, MAX_TOKENS> token_info;
-  emp::String class_name{"Lexer"};
+  emp::vector<TokenInput> token_info;
+  emp::String lexer_name{"Lexer"};
   emp::String out_filename{"lexer.hpp"};
   emp::String inc_guards{"EMPLEX_LEXER_HPP_INCLUDE_"};
   emp::String name_space{"emplex"};
@@ -47,57 +76,45 @@ struct LexerInfo {
 
 LexerInfo lexer_info;
 
-UI::Table token_table(4, 4, "token_table");
 UI::Div output_div;
+UI::Table token_table(1, 4, "token_table");
 UI::Text output_text;
 
 // Add a row to the bottom of the token table.
 void AddTableRow() {
-  size_t row_id = token_table.GetNumRows();
-  if (row_id > MAX_TOKENS) {
+  size_t token_id = token_table.GetNumRows() - 1; // Top row is labels, not token
+  if (token_id >= MAX_TOKENS) {
     emp::notify::Warning("Maximum ", MAX_TOKENS, " token types allowed!");
     return;
   }
   auto new_row = token_table.AddRow();
-  UI::TextArea name_area( [row_id](const std::string & str) {
-    lexer_info.token_info[row_id-1].SetName(str);
-  }, emp::MakeString("token_table_name_", row_id) );
-  UI::TextArea regex_area( [row_id](const std::string & str) {
-    lexer_info.token_info[row_id-1].SetRegex(str);
-  }, emp::MakeString("token_table_regex_", row_id) );
-  UI::CheckBox ignore_toggle( [row_id](bool setting) {
-    lexer_info.token_info[row_id-1].SetIgnore(setting);
-  }, emp::MakeString("token_table_ignore_", row_id)  );
-  new_row[0] << name_area;
-  new_row[1] << regex_area;
-  new_row[2] << ignore_toggle;
+  emp_assert(token_id <= lexer_info.token_info.size());
+  if (token_id == lexer_info.token_info.size()) {
+    // emp::notify::Message("Token_id = ", token_id, "; lexer_info.token_info.size() = ", lexer_info.token_info.size());
+    lexer_info.token_info.emplace_back(TokenInput(token_id));
+  }     
+  auto & row_info = lexer_info.token_info[token_id];
+  new_row[0] << row_info.GetNameWidget();
+  new_row[1] << row_info.GetRegexWidget();
+  new_row[2] << row_info.GetIgnoreWidget();
 }
 
-// void SwapTableRows(size_t row1, size_t row2) {
-//   const size_t num_rows = token_table.GetNumRows() - 1;
-//   emp_assert(row1 < num_rows && row2 < num_rows);
+void SwapTableRows(size_t row1, size_t row2) {
+  [[maybe_unused]] const size_t num_rows = token_table.GetNumRows() - 1;
+  emp_assert(row1 < num_rows && row2 < num_rows);
 
-//   /// Collect the names of text areas to look them up and swap values.
-//   emp::String name1 = emp::MakeString("token_table_name_", row1+1);
-//   emp::String regex1 = emp::MakeString("token_table_regex_", row1+1);
-//   emp::String ignore1 = emp::MakeString("token_table_ignore_", row1+1);
-
-//   emp::String name2 = emp::MakeString("token_table_name_", row2+1);
-//   emp::String regex2 = emp::MakeString("token_table_regex_", row2+1);
-//   emp::String ignore2 = emp::MakeString("token_table_ignore_", row2+1);
-
-//   lexer_info.token_info[row_id-1].name
-//   emp::String t1 = doc.TextArea(name1).GetText();
-// }
+  lexer_info.token_info[row1].Swap(lexer_info.token_info[row2]);
+}
 
 // Remove a specified row from the table.
 void RemoveTableRow(size_t id) {
   const size_t num_rows = token_table.GetNumRows() - 1;
-  emp_assert(id < num_rows);
-  while (id < num_rows) {
-    
-    ++id;
-  }
+  emp_assert(id < num_rows);  // Make sure row to be deleted actually exists.
+  // Swap rows to move deleted row to the end.
+  while (id < num_rows-1) SwapTableRows(id, id+1);
+  // Remove last row
+  lexer_info.token_info[id+1].Clear();
+  auto new_row = token_table.RemoveRow();
 }
 
 void Generate() {
@@ -127,7 +144,7 @@ void Generate() {
   emp::CPPFile file;
   file.SetGuards(lexer_info.inc_guards);
   file.SetNamespace(lexer_info.name_space);
-  lexer.WriteCPP(file, lexer_info.class_name);
+  lexer.WriteCPP(file, lexer_info.lexer_name);
 
   std::stringstream ss;
   file.Write(ss);
@@ -137,7 +154,7 @@ void Generate() {
   doc.Redraw();
 }
 
-int main()
+int emp_main()
 {
   emp::notify::MessageHandlers().Add([](const std::string & msg){ emp::Alert(msg); return true; });
   emp::notify::WarningHandlers().Add([](const std::string & msg){ emp::Alert(msg); return true; });
@@ -176,8 +193,8 @@ int main()
 
   settings_table[0][0].SetHeader().SetCSS("padding-bottom", "15px") << "<br>Class Name: ";
   settings_table[0][1] << UI::TextArea([](const std::string & str) {
-    lexer_info.class_name = str;
-  }, "set_class").SetText(lexer_info.class_name).SetWidth(250);
+    lexer_info.lexer_name = str;
+  }, "set_class").SetText(lexer_info.lexer_name).SetWidth(250);
 
   settings_table[1][0].SetHeader().SetCSS("padding-bottom", "15px") << "<br>Filename: ";
   settings_table[1][1] << UI::TextArea([](const std::string & str) {
