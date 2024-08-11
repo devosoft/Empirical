@@ -138,6 +138,7 @@ namespace web {
 
     bool IsButton()   const { return GetInfoTypeName() == "ButtonInfo"; }
     bool IsCanvas()   const { return GetInfoTypeName() == "CanvasInfo"; }
+    bool IsCheckBox() const { return GetInfoTypeName() == "CheckBoxInfo"; }
     bool IsDiv()      const { return GetInfoTypeName() == "DivInfo"; }
     bool IsImage()    const { return GetInfoTypeName() == "ImageInfo"; }
     bool IsInput()    const { return GetInfoTypeName() == "InputInfo"; }
@@ -164,13 +165,13 @@ namespace web {
     /// Determine is an attribute has been set on this Widget.
     virtual bool HasAttr(const std::string & setting);
 
-    /// Are two Widgets refering to the same HTML object?
+    /// Are two Widgets referring to the same HTML object?
     bool operator==(const Widget & in) const { return info == in.info; }
 
-    /// Are two Widgets refering to different HTML objects?
+    /// Are two Widgets referring to different HTML objects?
     bool operator!=(const Widget & in) const { return info != in.info; }
 
-    /// Conver Widget to bool (I.e., is this Widget active?)
+    /// Convert Widget to bool (I.e., is this Widget active?)
     operator bool() const { return info != nullptr; }
 
     const std::string & GetTitle() const { return GetAttr("title"); }  /// Get current tooltip on this widget.
@@ -900,7 +901,7 @@ namespace web {
         { return SetPosition(x, y, unit, "fixed", "left", "bottom"); }
 
 
-      /// Set this Widget to float appropriately within its containter.
+      /// Set this Widget to float appropriately within its container.
       return_t & SetFloat(const std::string & f="left") { return SetCSS("float", f); }
 
       /// Setup how this Widget should handle overflow.
