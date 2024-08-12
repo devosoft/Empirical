@@ -76,9 +76,14 @@ struct LexerInfo {
 
 LexerInfo lexer_info;
 
+UI::Div intro_div;
+UI::Div button_div;
 UI::Div output_div;
 UI::Table token_table(1, 4, "token_table");
 UI::Text output_text;
+
+void SwapTableRows(size_t row1, size_t row2);
+void RemoveTableRow(size_t id);
 
 // Add a row to the bottom of the token table.
 void AddTableRow() {
@@ -97,6 +102,7 @@ void AddTableRow() {
   new_row[0] << row_info.GetNameWidget();
   new_row[1] << row_info.GetRegexWidget();
   new_row[2] << row_info.GetIgnoreWidget();
+//  new_row[3] << UI::Button([token_id](){ emp::Alert("Deleting token ", token_id); RemoveTableRow(token_id); doc.Redraw(); }, "X");
 }
 
 void SwapTableRows(size_t row1, size_t row2) {
@@ -154,18 +160,40 @@ void Generate() {
   doc.Redraw();
 }
 
+void UpdateIntro(emp::String mode) {
+  intro_div.Clear();
+  if (mode == "home") {
+    intro_div << "Emplex will take a series of token names and associated regular expressions and "
+              << "generate a fast, table-driven lexer in C++.  Click on the buttons above to learn "
+              << "more about how Emplex works, or else try it out below.";
+  } else if (mode == "lexer") {
+    intro_div << "Lexical analysis is the process of tokenizing an input stream (i.e., breaking it into chunks of characters that form a whole input unit)";
+  } else if (mode == "regex") {
+    intro_div << "A regular expression is a mechanism to describe a pattern of characters, and in this case can be used to specify tokens for lexical analysis.";
+  } else if (mode == "under_hood") {
+    intro_div << "This page is written in C++ using the Empirical Library";
+  } else if (mode == "examples") {
+    intro_div << "Some examples...";
+  }
+}
+
 int emp_main()
 {
   emp::notify::MessageHandlers().Add([](const std::string & msg){ emp::Alert(msg); return true; });
   emp::notify::WarningHandlers().Add([](const std::string & msg){ emp::Alert(msg); return true; });
   emp::notify::ErrorHandlers().Add([](const std::string & msg){ emp::Alert(msg); return true; });
 
-  doc << "<h2>Emplex: A C++ Lexer Generator</h2>";
+  doc << "<h1>Emplex: A C++ Lexer Generator</h1>";
 
-  doc << "Emplex will take a series of token names and associated regular expressions and\n"
-         "generate a fast, table-driven lexer in C++.\n"
-      << "<br><br>\n";
-
+  UpdateIntro("home");
+  button_div << UI::Button([](){ UpdateIntro("home"); doc.Redraw(); }, "Home", "home_but");
+  button_div << UI::Button([](){ UpdateIntro("lexer"); doc.Redraw(); }, "Lexical Analysis", "lex_but");
+  button_div << UI::Button([](){ UpdateIntro("regex"); doc.Redraw(); }, "Regular Expressions", "regex_but");
+  button_div << UI::Button([](){ UpdateIntro("under_hood"); doc.Redraw(); }, "Under the Hood", "hood_but");
+  button_div << UI::Button([](){ UpdateIntro("examples"); doc.Redraw(); }, "Examples", "example_but");
+  doc << button_div;
+  doc << intro_div;
+  doc << "<br><br>\n";
 
   // token_table.SetCSS("border-collapse", "collapse");
   token_table.SetBackground("lightgrey");
