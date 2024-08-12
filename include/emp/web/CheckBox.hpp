@@ -33,6 +33,8 @@
 
 #include <cstdint>
 
+#include "../tools/String.hpp"
+
 #include "init.hpp"
 #include "Widget.hpp"
 
@@ -43,15 +45,16 @@ namespace web {
   class CheckBox : public internal::WidgetFacet<CheckBox> {
     friend class CheckBoxInfo;
   protected:
-    using cb_type = std::function<void(bool)>; 
+    using cb_type = std::function<void(size_t)>; 
 
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
     // CheckBoxes associated with the same DOM element share a single CheckBoxInfo object.
     class CheckBoxInfo : public internal::WidgetInfo {
       friend CheckBox;
     protected:
+      bool is_checked = false;
       cb_type callback;
-      uint32_t callback_id;
+      uint32_t callback_id = 0;
 
       CheckBoxInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
       CheckBoxInfo(const CheckBoxInfo &) = delete;               // No copies of INFO allowed
@@ -62,13 +65,18 @@ namespace web {
 
       std::string GetTypeName() const override { return "CheckBoxInfo"; }
 
-      void DoCallback(bool new_value) {
-        callback(new_value);
+      void DoCallback(size_t new_value) {
+        emp::notify::Message("Click! value=", new_value);
+        is_checked = new_value;
+        if (callback) callback(new_value);
         UpdateDependants();
       }
 
       virtual void GetHTML(std::stringstream & HTML) override {
-        HTML.str(to_string("<input type=\"checkbox\" id=\"", id, "\">"));
+        emp::String out = emp::MakeString("<input type=\"checkbox\" id=\"", id, "\"");
+        if (is_checked) out += " checked=\"checked\"";
+        out += ">";
+        HTML.str(out);
       }
 
       void UpdateCallback(const cb_type & in_cb) {
@@ -88,19 +96,22 @@ namespace web {
     CheckBox(CheckBoxInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
+    CheckBox(const std::string & in_id="")
+      : WidgetFacet(in_id)
+    {
+      info = new CheckBoxInfo(in_id);
+      auto cb_info = Info();
+      Info()->callback_id = JSWrap( (cb_type) [cb_info](size_t in){cb_info->DoCallback(in);} );
+      SetAttr("onclick", emp::to_string("emp.Callback(", Info()->callback_id, ", this.checked)"));
+    }
 
     /// Create a new checkbox.
     /// @param in_cb The function to call when the checkbox is toggled.
     /// @param in_id The HTML ID to use for this checkbox (leave blank for auto-generated)
     CheckBox(const cb_type & in_cb, const std::string & in_id="")
-      : WidgetFacet(in_id)
+      : CheckBox(in_id)
     {
-      info = new CheckBoxInfo(in_id);
-
       Info()->callback = in_cb;
-      CheckBoxInfo * b_info = Info();
-      Info()->callback_id = JSWrap( (cb_type) [b_info](bool in){b_info->DoCallback(in);} );
-      SetAttr("onclick", emp::to_string("emp.Callback(", Info()->callback_id, ", this.checked)"));
     }
 
     /// Link to an existing checkbox.
@@ -111,8 +122,8 @@ namespace web {
 
     using INFO_TYPE = CheckBoxInfo;
 
-    bool IsChecked() const { return GetAttr("checked") == "1"; }
-    CheckBox & SetChecked(bool in=true) { SetAttr("checked", in); return *this; }
+    bool IsChecked() const { return Info()->is_checked; }
+    CheckBox & SetChecked(bool in=true) { Info()->is_checked = in; return *this; }
 
     /// Set a new callback function to trigger when the checkbox is toggled.
     CheckBox & SetCallback(const cb_type & in_cb) {
