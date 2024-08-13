@@ -66,7 +66,6 @@ namespace web {
       std::string GetTypeName() const override { return "CheckBoxInfo"; }
 
       void DoCallback(size_t new_value) {
-        emp::notify::Message("Click! value=", new_value);
         is_checked = new_value;
         if (callback) callback(new_value);
         UpdateDependants();
