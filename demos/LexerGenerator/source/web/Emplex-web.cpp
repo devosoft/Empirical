@@ -101,13 +101,15 @@ void AddTableRow() {
   auto & row_info = lexer_info.token_info[token_id];
   new_row[0] << row_info.GetNameWidget();
   new_row[1] << row_info.GetRegexWidget();
-  new_row[2] << row_info.GetIgnoreWidget();
-//  new_row[3] << UI::Button([token_id](){ emp::Alert("Deleting token ", token_id); RemoveTableRow(token_id); doc.Redraw(); }, "X");
+  new_row[2] << "&nbsp;&nbsp;&nbsp;" << row_info.GetIgnoreWidget();
+  new_row[3] << UI::Button([token_id](){ RemoveTableRow(token_id); doc.Redraw(); }, "X").SetColor("red");
+  new_row[3] << UI::Button([token_id](){ SwapTableRows(token_id, token_id-1); doc.Redraw(); }, "&uarr;").SetColor("blue");
+  new_row[3] << UI::Button([token_id](){ SwapTableRows(token_id, token_id+1); doc.Redraw(); }, "&darr;").SetColor("blue");
 }
 
 void SwapTableRows(size_t row1, size_t row2) {
   [[maybe_unused]] const size_t num_rows = token_table.GetNumRows() - 1;
-  emp_assert(row1 < num_rows && row2 < num_rows);
+  if (row1 >= num_rows || row2 >= num_rows) return; // No place to move to.
 
   lexer_info.token_info[row1].Swap(lexer_info.token_info[row2]);
 }
@@ -117,9 +119,12 @@ void RemoveTableRow(size_t id) {
   const size_t num_rows = token_table.GetNumRows() - 1;
   emp_assert(id < num_rows);  // Make sure row to be deleted actually exists.
   // Swap rows to move deleted row to the end.
-  while (id < num_rows-1) SwapTableRows(id, id+1);
+  while (id < num_rows-1) {
+    SwapTableRows(id, id+1);
+    ++id;
+  }
   // Remove last row
-  lexer_info.token_info[id+1].Clear();
+  lexer_info.token_info[id].Clear();
   auto new_row = token_table.RemoveRow();
 }
 
