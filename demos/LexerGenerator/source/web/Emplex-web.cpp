@@ -167,18 +167,47 @@ void Generate() {
 
 void UpdateIntro(emp::String mode) {
   intro_div.Clear();
+  intro_div.SetBackground("#E0E0FF").SetPadding(5).SetCSS("border-radius", "10px");
   if (mode == "home") {
-    intro_div << "Emplex will take a series of token names and associated regular expressions and "
-              << "generate a fast, table-driven lexer in C++.  Click on the buttons above to learn "
-              << "more about how Emplex works, or else try it out below.";
+    intro_div <<
+      "<H2>Overview</H2>\n"
+      "Emplex uses a set of <b>token names</b> and associated <b>regular expressions</b> to "
+      "generate a fast, table-driven lexer in C++.<br><br>"
+      "Click on the buttons above to learn more about how Emplex works, or just try it out below.<br><br>";
   } else if (mode == "lexer") {
-    intro_div << "Lexical analysis is the process of tokenizing an input stream (i.e., breaking it into chunks of characters that form a whole input unit)";
+    intro_div <<
+      "<H2>Lexical analysis</H2>\n"
+      "A lexer will load in a stream of input character (typically a text file) and"
+      "break it into chunks of characters that form a whole input unit.  For example, if "
+      "we consider the following code where we might be calculating the area of a triangle:\n"
+      "<p>&nbsp;&nbsp;&nbsp;<code style=\"background-color: #FFFFE0;\">double area3 = base * height / 2.0;</code></p>"
+      "<p>We would probably want to convert this statement into the series pf tokens:</bp>"
+      "&nbsp;&nbsp;&nbsp;<table cellpadding=2px border=2px style=\"background-color: #FFFFE0;\">"
+      "<tr><th width=150px>Token Type</th><th width=150px>Lexeme</th></tr>"
+      "<tr><td>TYPE</td> <td><code>double</code></td></tr>"
+      "<tr><td>IDENTIFIER</td> <td><code>area3</code></td></tr>"
+      "<tr><td>OPERATOR</td> <td><code>=</code></td></tr>"
+      "<tr><td>IDENTIFIER</td> <td><code>base</code></td></tr>"
+      "<tr><td>OPERATOR</td> <td><code>*</code></td></tr>"
+      "<tr><td>IDENTIFIER</td> <td><code>height</code></td></tr>"
+      "<tr><td>OPERATOR</td> <td><code>/</code></td></tr>"
+      "<tr><td>FLOAT</td> <td><code>2.0</code></td></tr>"
+      "<tr><td>ENDLINE</td> <td><code>;</code></td></tr>"
+      "</table>"
+      "<br><br>";
   } else if (mode == "regex") {
-    intro_div << "A regular expression is a mechanism to describe a pattern of characters, and in this case can be used to specify tokens for lexical analysis.";
+    intro_div <<
+      "<H2>Regular Expressions</H2>\n"
+      "A regular expression is a mechanism to describe a pattern of characters, "
+      "and in this case can be used to specify tokens for lexical analysis.";
   } else if (mode == "under_hood") {
-    intro_div << "This page is written in C++ using the Empirical Library";
+    intro_div <<
+      "<H2>Under the Hood</H2>\n"
+      "This page is written in C++ using the Empirical Library";
   } else if (mode == "examples") {
-    intro_div << "Some examples...";
+    intro_div <<
+      "<H2>Examples</H2>\n"
+      "Some examples...";
   }
 }
 
@@ -191,11 +220,11 @@ int emp_main()
   doc << "<h1>Emplex: A C++ Lexer Generator</h1>";
 
   UpdateIntro("home");
-  button_div << UI::Button([](){ UpdateIntro("home"); doc.Redraw(); }, "Home", "home_but");
-  button_div << UI::Button([](){ UpdateIntro("lexer"); doc.Redraw(); }, "Lexical Analysis", "lex_but");
-  button_div << UI::Button([](){ UpdateIntro("regex"); doc.Redraw(); }, "Regular Expressions", "regex_but");
-  button_div << UI::Button([](){ UpdateIntro("under_hood"); doc.Redraw(); }, "Under the Hood", "hood_but");
-  button_div << UI::Button([](){ UpdateIntro("examples"); doc.Redraw(); }, "Examples", "example_but");
+  button_div << UI::Button([](){ UpdateIntro("home"); doc.Redraw(); }, "Home", "home_but").SetBackground("#CCCCFF");
+  button_div << UI::Button([](){ UpdateIntro("lexer"); doc.Redraw(); }, "Lexical Analysis", "lex_but").SetBackground("#CCCCFF");
+  button_div << UI::Button([](){ UpdateIntro("regex"); doc.Redraw(); }, "Regular Expressions", "regex_but").SetBackground("#CCCCFF");
+  button_div << UI::Button([](){ UpdateIntro("under_hood"); doc.Redraw(); }, "Under the Hood", "hood_but").SetBackground("#CCCCFF");
+  button_div << UI::Button([](){ UpdateIntro("examples"); doc.Redraw(); }, "Examples", "example_but").SetBackground("#CCCCFF");
   doc << button_div;
   doc << intro_div;
   doc << "<br><br>\n";
@@ -245,14 +274,13 @@ int emp_main()
   }, "set_namespace").SetText(lexer_info.name_space).SetWidth(250);
 
   doc << "<p>";
-  doc.AddButton([](){ Generate(); }, "Generate", "gen_but").SetBackground("#CCCCFF");;
+  doc.AddButton([](){ Generate(); }, "Generate", "gen_but").SetBackground("#CCCCFF");
 
   doc << "<br>";
   doc << "<H3>Output:</H3>";
 
-  output_div.SetBackground("black");
-  output_div.SetColor("white");
-  output_div.SetBorder("20px");
+  output_div.SetBackground("black").SetColor("white");
+  output_div.SetBorder("20px").SetCSS("border-radius", "10px");
 
   doc << output_div;
   output_div << output_text;
