@@ -167,22 +167,42 @@ void Generate() {
 
 void UpdateIntro(emp::String mode) {
   intro_div.Clear();
-  intro_div.SetBackground("#E0E0FF").SetPadding(5).SetCSS("border-radius", "10px", "border", "1px", "border-style", "solid", "padding", "10px");
+  emp::String text_color = "white";
+  emp::String active_color = "#0000AA";
+  emp::String button_color = "#000044";
+  intro_div.SetColor(text_color).SetBackground(button_color).SetPadding(5).SetCSS("border-radius", "10px", "border", "1px", "border-style", "solid", "padding", "10px");
+  doc.Button("home_but").SetBackground(button_color);
+  doc.Button("lexer_but").SetBackground(button_color);
+  doc.Button("regex_but").SetBackground(button_color);
+  doc.Button("cpp_but").SetBackground(button_color);
+  doc.Button("hood_but").SetBackground(button_color);
+  doc.Button("example_but").SetBackground(button_color);
+
+  UI::Style table_style;
+  table_style.Set("background-color", "#FFFFE0")
+             .Set("color", "white")
+             .Set("padding", "10px")
+             .Set("border", "1px solid black")
+             .Set("text_align", "center")
+  ;
+
   if (mode == "home") {
+    doc.Button("home_but").SetBackground(active_color);
     intro_div <<
       "<big><big><b>Overview</b></big></big><br>\n"
       "<p>Emplex uses a set of <b>token names</b> and associated <b>regular expressions</b> to "
       "generate code for a fast, table-driven lexer in C++.</p>"
       "<p>Click on the buttons above to learn more about how Emplex works, or just try it out below.</p>";
   } else if (mode == "lexer") {
+    doc.Button("lexer_but").SetBackground(active_color);
     intro_div <<
       "<big><big><b>Lexical analysis</b></big></big><br>\n"
       "<p>A lexer will read a stream of input characters (typically a text file) and"
       "break it into tokens that each form an atomic input unit.  For example, if "
       "we consider the following code where we might be calculating the area of a triangle:</p>\n"
-      "<p>&nbsp;&nbsp;<code style=\"background-color: #FFFFE0; padding:10px; border: 1px solid black\">double area3 = base * height / 2.0;</code></p>"
+      "<p>&nbsp;&nbsp;<code style=\"background-color: #FFFFE0; color: black; padding:10px; border: 1px solid black\">double area3 = base * height / 2.0;</code></p>"
       "<p>We could convert this statement into the series of tokens:</p>"
-      "&nbsp;&nbsp;&nbsp;<table cellpadding=2px border=2px style=\"background-color: #FFFFE0; text-align: center;\">"
+      "<p><table cellpadding=2px border=2px style=\"background-color: #FFFFE0; color: black; text-align: center;\">"
       "<tr><th width=150px>Lexeme</th><th width=150px>Token Type</th></tr>"
       "<tr><td><code>double</code></td> <td>TYPE</td>       </tr>"
       "<tr><td><code>area3</code></td>  <td>IDENTIFIER</td> </tr>"
@@ -193,19 +213,19 @@ void UpdateIntro(emp::String mode) {
       "<tr><td><code>/</code></td>      <td>OPERATOR</td>   </tr>"
       "<tr><td><code>2.0</code></td>    <td>FLOAT</td>      </tr>"
       "<tr><td><code>;</code></td>      <td>ENDLINE</td>    </tr>"
-      "</table>\n"
+      "</table></p>\n"
       "<p>In order to build a lexer, we define the set of token types that we want to use and "
       "build a <i>regular expression</i> for each that can identify the associated tokens.</p>\n"
       "<p>The lexer will always find the <i>longest</i> token that can be fully matched from the"
       "beginning of the input. If there is a tie for longest, the lexer will match the <i>first</i>"
       "token type listed</p>\n"
-      "<p>For example, if we define the following token types:</p><br>\n"
-      "<table cellpadding=2px border=2px style=\"background-color: #FFFFE0;\">\n"
-      "  <tr><td><code>(for)|(if)|(set)|(while)</code></td><td  width=150px>KEYWORD   </td></tr>\n"
-      "  <tr><td><code>[a-zA-Z_][a-zA-Z0-9_]*  </code></td><td>IDENTIFIER</td></tr>\n"
-      "  <tr><td><code>[0-9]+                  </code></td><td>INTEGER   </td></tr>\n"
-      "  <tr><td><code>[ \\t\\n\\r]            </code></td><td>WHITESPACE</td></tr>\n"
-      "</table>\n"
+      "<p>For example, we could define the following token types:</p>\n"
+      "<p><table cellpadding=2px border=2px style=\"background-color: #FFFFE0; color: black; text-align: center;\">\n"
+      "  <tr><td width=150px>KEYWORD</td> <td width=200px><code>(for)|(if)|(set)|(while)</code></td></tr>\n"
+      "  <tr><td>IDENTIFIER</td>          <td><code>[a-zA-Z_][a-zA-Z0-9_]*</code></td>              </tr>\n"
+      "  <tr><td>INTEGER   </td>          <td><code>[0-9]+                </code></td>              </tr>\n"
+      "  <tr><td>WHITESPACE</td>          <td><code>[ \\t\\n\\r]          </code></td>              </tr>\n"
+      "</table></p>\n"
       "<p>Then if we were parsing \"<code>set formula_id 5</code>\", "
       "the first token would be \"set\" and it would be type KEYWORD because while both "
       "KEYWORD and IDENTIFIER could match this series fo characters, KEYWORD comes first in the list. "
@@ -216,15 +236,16 @@ void UpdateIntro(emp::String mode) {
       "to match the longer \"formula_id\", and as such it would be chosen next.<p>\n"
       "<p>See the next tab if you want to learn about writing regular expressions in Emplex.</p>\n";
   } else if (mode == "regex") {
+    doc.Button("regex_but").SetBackground(active_color);
     intro_div <<
       "<big><big><b>Regular Expressions</b></big></big><br>\n"
-      "<p>A <a href=\"https://en.wikipedia.org/wiki/Regular_expression\">regular expression</a> "
+      "<p>A <a href=\"https://en.wikipedia.org/wiki/Regular_expression\" style=\"color: #C0C0FF;\">regular expression</a> "
       "(or \"regex\") is a mechanism to describe a pattern of characters "
-      "and, in particular, can be used to describe tokens for lexical analysis.</p> "
+      "and, in particular, they can be used to describe tokens for lexical analysis.</p> "
       "<p>In a regular expression, letters and digits always directly match themselves, but other "
       "characters often have a special function.  The following regular expression techniques are "
-      "implements in emplex:</p>"
-      "<p><table border=\"2\" cellpadding=\"3\" style=\"background: white\">"
+      "implemented in emplex:</p>"
+      "<p><table border=\"2\" cellpadding=\"3\" style=\"background: white; color: black\">"
       "<tr><th>Symbol</th><th>Description</th><th>Example</th><th>Explanation</th>\n"
       "<tr><th>|</th>       <td>A logical \"or\" (match just one side)</td>"
                            "<td><code>this|that</code></td>"
@@ -249,6 +270,7 @@ void UpdateIntro(emp::String mode) {
                            "<td>Match any single digit.</td>\n"
       "</table></p>";
   } else if (mode == "cpp") {
+    doc.Button("cpp_but").SetBackground(active_color);
     intro_div <<
       "<big><big><b>Working with the Generated C++ Code</b></big></big><br>\n"
       "<p>Emplex will generate C++ code that you can either copy-and-paste to wherever "
@@ -259,7 +281,7 @@ void UpdateIntro(emp::String mode) {
       "(\"emplex\" by default).</p>\n"
       "For example, if you make a lexer for a language called \"Cabbage\", you might want to compile "
       "the file \"mycode.cab\". To handle the lexical analysis on this file you might use code like:</p>\n"
-      "<pre style=\"background-color: #FFFFE0; padding:10px\">\n"
+      "<pre style=\"background-color: #FFFFE0; color: black; padding:10px\">\n"
       "   std::ifstream in_file(\"mycode.cab\");    // Load the input file\n"
       "   emplex::Lexer lexer;                   // Build the lexer object\n"
       "   std::vector<emplex::Token> tokens = lexer.Tokenize(in_file);\n"
@@ -267,7 +289,7 @@ void UpdateIntro(emp::String mode) {
       "</pre>\n"
       "<p>In practice, any input stream can be fed into a generated lexer to produce the vector of tokens. "
       "Once you do, each token is a simple <code>struct</code> for you to use:</p>\n"
-      "<pre style=\"background-color: #FFFFE0; padding:10px\">\n"
+      "<pre style=\"background-color: #FFFFE0; color: black; padding:10px\">\n"
       "   struct Token {\n"
       "     int id;              // Type ID for token\n"
       "     std::string lexeme;  // Sequence matched by token\n"
@@ -281,11 +303,13 @@ void UpdateIntro(emp::String mode) {
       "the input stream and can be useful for error reporting."
       "<br><br>";
   } else if (mode == "under_hood") {
+    doc.Button("hood_but").SetBackground(active_color);
     intro_div <<
       "<big><big><b>Under the Hood</b></big></big><br>\n"
       "This page is written in C++ using the Empirical Library"
       "<br><br>";
   } else if (mode == "examples") {
+    doc.Button("example_but").SetBackground(active_color);
     intro_div <<
       "<big><big><b>Examples</b></big></big><br>\n"
       "Some examples..."
@@ -302,12 +326,22 @@ int emp_main()
   doc << "<h1>Emplex: A C++ Lexer Generator</h1>";
 
   UpdateIntro("home");
-  button_div << UI::Button([](){ UpdateIntro("home"); doc.Redraw(); }, "Home", "home_but").SetBackground("#CCCCFF");
-  button_div << UI::Button([](){ UpdateIntro("lexer"); doc.Redraw(); }, "Lexical Analysis", "lex_but").SetBackground("#CCCCFF");
-  button_div << UI::Button([](){ UpdateIntro("regex"); doc.Redraw(); }, "Regular Expressions", "regex_but").SetBackground("#CCCCFF");
-  button_div << UI::Button([](){ UpdateIntro("cpp"); doc.Redraw(); }, "Generated C++ Code", "cpp_but").SetBackground("#CCCCFF");
-  button_div << UI::Button([](){ UpdateIntro("under_hood"); doc.Redraw(); }, "Under the Hood", "hood_but").SetBackground("#CCCCFF");
-  button_div << UI::Button([](){ UpdateIntro("examples"); doc.Redraw(); }, "Examples", "example_but").SetBackground("#CCCCFF");
+  UI::Style button_style;
+  button_style.Set("padding", "10px 15px")
+    .Set("background-color", "#000066") // Green background  (previous: #CCCCFF)
+    .Set("color", "white")              // White text
+    .Set("border", "1px solid white")
+    .Set("border-radius", "5px")        // Rounded corners
+    .Set("cursor", "pointer")
+    .Set("font-size", "14px")
+    .Set("transition", "background-color 0.3s ease, transform 0.3s ease"); // Smooth transition
+
+  button_div << UI::Button([](){ UpdateIntro("home"); doc.Redraw(); }, "Home", "home_but").SetCSS(button_style).SetBackground("#0000AA");
+  button_div << UI::Button([](){ UpdateIntro("lexer"); doc.Redraw(); }, "Lexical Analysis", "lexer_but").SetCSS(button_style);
+  button_div << UI::Button([](){ UpdateIntro("regex"); doc.Redraw(); }, "Regular Expressions", "regex_but").SetCSS(button_style);
+  button_div << UI::Button([](){ UpdateIntro("cpp"); doc.Redraw(); }, "Generated C++ Code", "cpp_but").SetCSS(button_style);
+  button_div << UI::Button([](){ UpdateIntro("under_hood"); doc.Redraw(); }, "Under the Hood", "hood_but").SetCSS(button_style);
+  button_div << UI::Button([](){ UpdateIntro("examples"); doc.Redraw(); }, "Examples", "example_but").SetCSS(button_style);
   doc << button_div;
   doc << "<small><small><br></small></small>";
   doc << intro_div;
