@@ -170,6 +170,8 @@ void UpdateIntro(emp::String mode) {
   emp::String text_color = "white";
   emp::String active_color = "#0000AA";
   emp::String button_color = "#000044";
+  emp::String table_color = "white"; // "#FFFFE0";
+  emp::String link_color = "#C0C0FF";
   intro_div.SetColor(text_color).SetBackground(button_color).SetPadding(5).SetCSS("border-radius", "10px", "border", "1px", "border-style", "solid", "padding", "10px");
   doc.Button("home_but").SetBackground(button_color);
   doc.Button("lexer_but").SetBackground(button_color);
@@ -179,7 +181,7 @@ void UpdateIntro(emp::String mode) {
   doc.Button("example_but").SetBackground(button_color);
 
   UI::Style table_style;
-  table_style.Set("background-color", "#FFFFE0")
+  table_style.Set("background-color", table_color)
              .Set("color", "white")
              .Set("padding", "10px")
              .Set("border", "1px solid black")
@@ -200,9 +202,9 @@ void UpdateIntro(emp::String mode) {
       "<p>A lexer will read a stream of input characters (typically a text file) and"
       "break it into tokens that each form an atomic input unit.  For example, if "
       "we consider the following code where we might be calculating the area of a triangle:</p>\n"
-      "<p>&nbsp;&nbsp;<code style=\"background-color: #FFFFE0; color: black; padding:10px; border: 1px solid black\">double area3 = base * height / 2.0;</code></p>"
+      "<p>&nbsp;&nbsp;<code style=\"background-color: " << table_color << "; color: black; padding:10px; border: 1px solid black\">double area3 = base * height / 2.0;</code></p>"
       "<p>We could convert this statement into the series of tokens:</p>"
-      "<p><table cellpadding=2px border=2px style=\"background-color: #FFFFE0; color: black; text-align: center;\">"
+      "<p><table cellpadding=2px border=2px style=\"background-color: " << table_color << "; color: black; text-align: center;\">"
       "<tr><th width=150px>Lexeme</th><th width=150px>Token Type</th></tr>"
       "<tr><td><code>double</code></td> <td>TYPE</td>       </tr>"
       "<tr><td><code>area3</code></td>  <td>IDENTIFIER</td> </tr>"
@@ -220,7 +222,7 @@ void UpdateIntro(emp::String mode) {
       "beginning of the input. If there is a tie for longest, the lexer will match the <i>first</i>"
       "token type listed</p>\n"
       "<p>For example, we could define the following token types:</p>\n"
-      "<p><table cellpadding=2px border=2px style=\"background-color: #FFFFE0; color: black; text-align: center;\">\n"
+      "<p><table cellpadding=2px border=2px style=\"background-color: " << table_color << "; color: black; text-align: center;\">\n"
       "  <tr><td width=150px>KEYWORD</td> <td width=200px><code>(for)|(if)|(set)|(while)</code></td></tr>\n"
       "  <tr><td>IDENTIFIER</td>          <td><code>[a-zA-Z_][a-zA-Z0-9_]*</code></td>              </tr>\n"
       "  <tr><td>INTEGER   </td>          <td><code>[0-9]+                </code></td>              </tr>\n"
@@ -239,7 +241,7 @@ void UpdateIntro(emp::String mode) {
     doc.Button("regex_but").SetBackground(active_color);
     intro_div <<
       "<big><big><b>Regular Expressions</b></big></big><br>\n"
-      "<p>A <a href=\"https://en.wikipedia.org/wiki/Regular_expression\" style=\"color: #C0C0FF;\">regular expression</a> "
+      "<p>A <a href=\"https://en.wikipedia.org/wiki/Regular_expression\" style=\"color: " << link_color << ";\">regular expression</a> "
       "(or \"regex\") is a mechanism to describe a pattern of characters "
       "and, in particular, they can be used to describe tokens for lexical analysis.</p> "
       "<p>In a regular expression, letters and digits always directly match themselves, but other "
@@ -268,6 +270,9 @@ void UpdateIntro(emp::String mode) {
       "<tr><th>[ ... ]</th> <td>Match any single character between the brackets; ranges of characters are allowed using a dash ('-'). If the first character is a caret ('^') match any character EXCEPT those listed.</td>"
                            "<td><code>[0-9]</code></td>"
                            "<td>Match any single digit.</td>\n"
+      "<tr><th>.</th>       <td>Match any single character <i>except</i> a newline ('\\n'); same as <code>[^\\n]</code></td>"
+                           "<td><code>.*</code></td>"
+                           "<td>Match all characters until the end of the current line.</td>\n"      
       "</table></p>";
   } else if (mode == "cpp") {
     doc.Button("cpp_but").SetBackground(active_color);
@@ -281,7 +286,7 @@ void UpdateIntro(emp::String mode) {
       "(\"emplex\" by default).</p>\n"
       "For example, if you make a lexer for a language called \"Cabbage\", you might want to compile "
       "the file \"mycode.cab\". To handle the lexical analysis on this file you might use code like:</p>\n"
-      "<pre style=\"background-color: #FFFFE0; color: black; padding:10px\">\n"
+      "<pre style=\"background-color: " << table_color << "; color: black; padding:10px\">\n"
       "   std::ifstream in_file(\"mycode.cab\");    // Load the input file\n"
       "   emplex::Lexer lexer;                   // Build the lexer object\n"
       "   std::vector<emplex::Token> tokens = lexer.Tokenize(in_file);\n"
@@ -289,7 +294,7 @@ void UpdateIntro(emp::String mode) {
       "</pre>\n"
       "<p>In practice, any input stream can be fed into a generated lexer to produce the vector of tokens. "
       "Once you do, each token is a simple <code>struct</code> for you to use:</p>\n"
-      "<pre style=\"background-color: #FFFFE0; color: black; padding:10px\">\n"
+      "<pre style=\"background-color: " << table_color << "; color: black; padding:10px\">\n"
       "   struct Token {\n"
       "     int id;              // Type ID for token\n"
       "     std::string lexeme;  // Sequence matched by token\n"
@@ -348,7 +353,7 @@ int emp_main()
   doc << "<br><br>\n";
 
   // token_table.SetCSS("border-collapse", "collapse");
-  token_table.SetBackground("lightgrey");
+  token_table.SetBackground("lightgrey").SetCSS("border-radius", "10px", "border", "1px solid black", "padding", "15px");
   token_table.GetCell(0,0).SetHeader() << "Token Name";
   token_table.GetCell(0,1).SetHeader() << "Regular Expression";
   token_table.GetCell(0,2).SetHeader() << "Ignore?";
@@ -358,6 +363,7 @@ int emp_main()
   AddTableRow();
   AddTableRow();
 
+  doc << "<big><big><b>Tokens</b></big></big><br>\n";
   doc << token_table;
 
   doc << "<p>";
