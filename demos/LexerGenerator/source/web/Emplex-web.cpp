@@ -19,6 +19,7 @@ namespace UI = emp::web;
 constexpr size_t MAX_TOKENS = 100;
 
 UI::Document doc("emp_base");
+emp::CPPFile file;
 
 
 class TokenInput {
@@ -102,9 +103,9 @@ void AddTableRow() {
   new_row[0] << row_info.GetNameWidget();
   new_row[1] << row_info.GetRegexWidget();
   new_row[2] << "&nbsp;&nbsp;&nbsp;" << row_info.GetIgnoreWidget();
-  new_row[3] << UI::Button([token_id](){ RemoveTableRow(token_id); doc.Redraw(); }, "X").SetColor("red");
-  new_row[3] << UI::Button([token_id](){ SwapTableRows(token_id, token_id-1); doc.Redraw(); }, "&uarr;").SetColor("blue");
-  new_row[3] << UI::Button([token_id](){ SwapTableRows(token_id, token_id+1); doc.Redraw(); }, "&darr;").SetColor("blue");
+  new_row[3] << UI::Button([token_id](){ RemoveTableRow(token_id); doc.Redraw(); }, "X").SetColor("red").SetTitle("Click to remove this row.");
+  new_row[3] << UI::Button([token_id](){ SwapTableRows(token_id, token_id-1); doc.Redraw(); }, "&uarr;").SetColor("blue").SetTitle("Click to swap this row with the one above it.");
+  new_row[3] << UI::Button([token_id](){ SwapTableRows(token_id, token_id+1); doc.Redraw(); }, "&darr;").SetColor("blue").SetTitle("Click to swap this row with the one below it.");
 }
 
 void SwapTableRows(size_t row1, size_t row2) {
@@ -152,7 +153,7 @@ void Generate() {
     else lexer.AddToken(name, regex);
   }
 
-  emp::CPPFile file;
+  file.Clear();
   file.SetGuards(lexer_info.inc_guards);
   file.SetNamespace(lexer_info.name_space);
   lexer.WriteCPP(file, lexer_info.lexer_name);
@@ -163,6 +164,14 @@ void Generate() {
   output_text.SetBorder("20px");
   output_text << "<pre style=\"padding: 10px; border-radius: 5px; overflow-x: auto;\">\n" << emp::MakeWebSafe(ss.str()) << "\n</pre>\n";
   doc.Redraw();
+
+  doc.Button("download_but").SetDisabled(false).SetBackground("#330066").SetTitle("Click to download the generated code.");
+}
+
+void DownloadCode() {
+  std::stringstream ss;
+  file.Write(ss);
+  emp::DownloadFile(lexer_info.out_filename, ss.str());
 }
 
 void UpdateIntro(emp::String mode) {
@@ -385,7 +394,7 @@ int emp_main()
   token_div << UI::Button([](){
     AddTableRow();
     doc.Redraw();
-  }, "Add Row", "row_but").SetCSS(button_style);
+  }, "Add Row", "row_but").SetCSS(button_style).SetTitle("Add an additional line for defining token types.");
 
   token_div << UI::Button([](){
     AddTableRow();
@@ -394,15 +403,19 @@ int emp_main()
     AddTableRow();
     AddTableRow();
     doc.Redraw();
-  }, "+5 Rows", "5row_but").SetCSS(button_style);
+  }, "+5 Rows", "5row_but").SetCSS(button_style).SetTitle("Add five more lines for defining additional tokens.");
 
   token_div << UI::Button([](){
     doc.Div("settings_div").ToggleActive();
-  }, "Advanced Settings", "settings_but").SetCSS(button_style);
+  }, "Advanced Settings", "settings_but").SetCSS(button_style).SetTitle("Adjust naming details for generated code.");
 
   token_div << UI::Button([](){
     Generate();
-  }, "Generate Output", "generate_but").SetCSS(button_style).SetBackground("#330066");
+  }, "Generate Output", "generate_but").SetCSS(button_style).SetBackground("#330066").SetTitle("Generate a lexer using the token types defined above.");
+
+  token_div << UI::Button([](){
+    DownloadCode();
+  }, "Download", "download_but").SetCSS(button_style).SetBackground("#808080").SetDisabled().SetTitle("Generate code to activate this button.");
 
   doc << token_div;
   doc << "<p>";
