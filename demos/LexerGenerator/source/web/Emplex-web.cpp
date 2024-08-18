@@ -167,17 +167,17 @@ void Generate() {
 
 void UpdateIntro(emp::String mode) {
   intro_div.Clear();
-  emp::String text_color = "white";
-  emp::String active_color = "#0000AA";
-  emp::String button_color = "#000044";
-  emp::String table_color = "white"; // "#FFFFE0";
-  emp::String link_color = "#C0C0FF";
+  const emp::String text_color = "white";
+  const emp::String active_color = "#0000AA";
+  const emp::String button_color = "#000044";
+  const emp::String table_color = "white"; // "#FFFFE0";
+  const emp::String link_color = "#C0C0FF";
   intro_div.SetColor(text_color).SetBackground(button_color).SetPadding(5).SetCSS("border-radius", "10px", "border", "1px", "border-style", "solid", "padding", "10px");
   doc.Button("home_but").SetBackground(button_color);
   doc.Button("lexer_but").SetBackground(button_color);
   doc.Button("regex_but").SetBackground(button_color);
   doc.Button("cpp_but").SetBackground(button_color);
-  doc.Button("hood_but").SetBackground(button_color);
+  doc.Button("about_but").SetBackground(button_color);
   doc.Button("example_but").SetBackground(button_color);
 
   UI::Style table_style;
@@ -199,9 +199,11 @@ void UpdateIntro(emp::String mode) {
     doc.Button("lexer_but").SetBackground(active_color);
     intro_div <<
       "<big><big><b>Lexical analysis</b></big></big><br>\n"
-      "<p>A lexer will read a stream of input characters (typically a text file) and"
-      "break it into tokens that each form an atomic input unit.  For example, if "
-      "we consider the following code where we might be calculating the area of a triangle:</p>\n"
+      "<p>A <a href=\"https://en.wikipedia.org/wiki/Lexical_analysis\" style=\"color: " << link_color << ";\">lexical analyzer</a> "
+      "(commonly called a \"lexer\", \"tokenizer\", or \"scanner\") reads a stream of input "
+      "characters, typically from a text file, and breaks it into tokens that each form an "
+      "atomic input unit.  For example, if we consider the following code where we might be "
+      "calculating the area of a triangle:</p>\n"
       "<p>&nbsp;&nbsp;<code style=\"background-color: " << table_color << "; color: black; padding:10px; border: 1px solid black\">double area3 = base * height / 2.0;</code></p>"
       "<p>We could convert this statement into the series of tokens:</p>"
       "<p><table cellpadding=2px border=2px style=\"background-color: " << table_color << "; color: black; text-align: center;\">"
@@ -218,8 +220,8 @@ void UpdateIntro(emp::String mode) {
       "</table></p>\n"
       "<p>In order to build a lexer, we define the set of token types that we want to use and "
       "build a <i>regular expression</i> for each that can identify the associated tokens.</p>\n"
-      "<p>The lexer will always find the <i>longest</i> token that can be fully matched from the"
-      "beginning of the input. If there is a tie for longest, the lexer will match the <i>first</i>"
+      "<p>The lexer will always find the <i>longest</i> token that can be fully matched from the "
+      "beginning of the input. If there is a tie for longest, the lexer will match the <i>first</i> "
       "token type listed</p>\n"
       "<p>For example, we could define the following token types:</p>\n"
       "<p><table cellpadding=2px border=2px style=\"background-color: " << table_color << "; color: black; text-align: center;\">\n"
@@ -307,11 +309,21 @@ void UpdateIntro(emp::String mode) {
       "The <code>line_id</code> gives the line number on which the token was found in "
       "the input stream and can be useful for error reporting."
       "<br><br>";
-  } else if (mode == "under_hood") {
-    doc.Button("hood_but").SetBackground(active_color);
+  } else if (mode == "about") {
+    doc.Button("about_but").SetBackground(active_color);
     intro_div <<
-      "<big><big><b>Under the Hood</b></big></big><br>\n"
-      "This page is written in C++ using the Empirical Library"
+      "<big><big><b>About</b></big></big><br>\n"
+      "<p>Emplex is written in C++ using the "
+      "<a href=\"https://github.com/devosoft/Empirical\" style=\"color: " << link_color << ";\">Empirical Library</a>, "
+      "and then compiled into "
+      "<a href=\"https://webassembly.org/\" style=\"color: " << link_color << ";\">WebAssembly</a> "
+      "with the <a href=\"https://emscripten.org/\" style=\"color: " << link_color << ";\">Emscripten</a> "
+      "LLVM compiler.</p>"
+      "<p>Emplex takes in the set of token types and associated regular expressions.  Each regular expression is then converted into a non-deterministic finite automaton (NFA).  The set of automata are merged together, while keeping track of which token type each end condition is associated with (using the first end condition listed when more than one can apply).  The resulting NFA is then converted into a DFA, which can be implemented as a table.  That table is then hard-coded into the C++ output that is generated, along with the associated helper functions.</p>"
+      "<p>The Emplex software and most of the associated tools in the underlying "
+      "Empirical library were written by "
+      "<a href=\"https://ofria.com/\" style=\"color: " << link_color << ";\">Dr. Charles Ofria</a> "
+      "at <a href=\"https://msu.edu/\" style=\"color: " << link_color << ";\">Michigan State University</a>."
       "<br><br>";
   } else if (mode == "examples") {
     doc.Button("example_but").SetBackground(active_color);
@@ -333,9 +345,9 @@ int emp_main()
   UpdateIntro("home");
   UI::Style button_style;
   button_style.Set("padding", "10px 15px")
-    .Set("background-color", "#000066") // Green background  (previous: #CCCCFF)
+    .Set("background-color", "#000066") // Dark Blue background
     .Set("color", "white")              // White text
-    .Set("border", "1px solid white")
+    .Set("border", "1px solid white")   // Thin white border
     .Set("border-radius", "5px")        // Rounded corners
     .Set("cursor", "pointer")
     .Set("font-size", "14px")
@@ -345,7 +357,7 @@ int emp_main()
   button_div << UI::Button([](){ UpdateIntro("lexer"); doc.Redraw(); }, "Lexical Analysis", "lexer_but").SetCSS(button_style);
   button_div << UI::Button([](){ UpdateIntro("regex"); doc.Redraw(); }, "Regular Expressions", "regex_but").SetCSS(button_style);
   button_div << UI::Button([](){ UpdateIntro("cpp"); doc.Redraw(); }, "Generated C++ Code", "cpp_but").SetCSS(button_style);
-  button_div << UI::Button([](){ UpdateIntro("under_hood"); doc.Redraw(); }, "Under the Hood", "hood_but").SetCSS(button_style);
+  button_div << UI::Button([](){ UpdateIntro("about"); doc.Redraw(); }, "About", "about_but").SetCSS(button_style);
   button_div << UI::Button([](){ UpdateIntro("examples"); doc.Redraw(); }, "Examples", "example_but").SetCSS(button_style);
   doc << button_div;
   doc << "<small><small><br></small></small>";
@@ -353,7 +365,11 @@ int emp_main()
   doc << "<br><br>\n";
 
   // token_table.SetCSS("border-collapse", "collapse");
-  token_table.SetBackground("lightgrey").SetCSS("border-radius", "10px", "border", "1px solid black", "padding", "15px");
+  UI::Div token_div;
+  token_div.SetBackground("lightgrey").SetCSS("border-radius", "10px", "border", "1px solid black", "padding", "15px", "width", "fit-content");
+  token_div << "<big><big><b>Tokens</b></big></big><br><br>\n";
+
+  token_table.SetColor("#000044");
   token_table.GetCell(0,0).SetHeader() << "Token Name";
   token_table.GetCell(0,1).SetHeader() << "Regular Expression";
   token_table.GetCell(0,2).SetHeader() << "Ignore?";
@@ -363,19 +379,39 @@ int emp_main()
   AddTableRow();
   AddTableRow();
 
-  doc << "<big><big><b>Tokens</b></big></big><br>\n";
-  doc << token_table;
+  token_div << token_table;
 
-  doc << "<p>";
-  doc.AddButton([](){
+  token_div << "<p>";
+  token_div << UI::Button([](){
     AddTableRow();
     doc.Redraw();
-  }, "Add Row", "row_but").SetBackground("#CCCCFF");
+  }, "Add Row", "row_but").SetCSS(button_style);
 
+  token_div << UI::Button([](){
+    AddTableRow();
+    AddTableRow();
+    AddTableRow();
+    AddTableRow();
+    AddTableRow();
+    doc.Redraw();
+  }, "+5 Rows", "5row_but").SetCSS(button_style);
+
+  token_div << UI::Button([](){
+    doc.Div("settings_div").ToggleActive();
+  }, "Advanced Settings", "settings_but").SetCSS(button_style);
+
+  token_div << UI::Button([](){
+    Generate();
+  }, "Generate Output", "generate_but").SetCSS(button_style);
+
+  doc << token_div;
   doc << "<p>";
 
-  auto settings_table = doc.AddTable(4, 2, "settings_table");
-  settings_table.SetBackground("tan");
+  UI::Div settings_div("settings_div");
+  settings_div.SetBackground("tan").SetCSS("border-radius", "10px", "border", "1px solid black", "padding", "15px", "width", "fit-content");
+  settings_div << "<big><big><b>Advanced Settings</b></big></big><br>\n";
+
+  UI::Table settings_table(4, 2, "settings_table");
 
   settings_table[0][0].SetHeader().SetCSS("padding-bottom", "15px") << "<br>Class Name: ";
   settings_table[0][1] << UI::TextArea([](const std::string & str) {
@@ -397,8 +433,9 @@ int emp_main()
     lexer_info.name_space = str;
   }, "set_namespace").SetText(lexer_info.name_space).SetWidth(250);
 
-  doc << "<p>";
-  doc.AddButton([](){ Generate(); }, "Generate", "gen_but").SetBackground("#CCCCFF");
+  settings_div << settings_table;
+  doc << settings_div;
+  settings_div.Deactivate();
 
   doc << "<br>";
   doc << "<H3>Output:</H3>";
