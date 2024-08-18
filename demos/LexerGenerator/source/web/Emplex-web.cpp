@@ -33,8 +33,8 @@ public:
     , regex_text(emp::MakeString("token_table_regex_", row_id+1))
     , ignore_toggle(emp::MakeString("token_table_ignore_", row_id+1))
   {
-    name_text.SetText(name);
-    regex_text.SetText(regex);
+    name_text.SetText(name).SetCSS("max-width", "250px", "font-size", "14px");
+    regex_text.SetText(regex).SetCSS("max-width", "250px", "font-size", "14px");
     ignore_toggle.SetChecked(ignore);
   }
 
@@ -172,13 +172,13 @@ void UpdateIntro(emp::String mode) {
   const emp::String button_color = "#000044";
   const emp::String table_color = "white"; // "#FFFFE0";
   const emp::String link_color = "#C0C0FF";
-  intro_div.SetColor(text_color).SetBackground(button_color).SetPadding(5).SetCSS("border-radius", "10px", "border", "1px", "border-style", "solid", "padding", "10px");
+  intro_div.SetColor(text_color).SetBackground(button_color).SetPadding(5).SetCSS("border-radius", "10px", "border", "1px", "border-style", "solid", "padding", "10px", "max-width", "800px");
   doc.Button("home_but").SetBackground(button_color);
   doc.Button("lexer_but").SetBackground(button_color);
   doc.Button("regex_but").SetBackground(button_color);
   doc.Button("cpp_but").SetBackground(button_color);
-  doc.Button("about_but").SetBackground(button_color);
   doc.Button("example_but").SetBackground(button_color);
+  doc.Button("about_but").SetBackground(button_color);
 
   UI::Style table_style;
   table_style.Set("background-color", table_color)
@@ -357,8 +357,8 @@ int emp_main()
   button_div << UI::Button([](){ UpdateIntro("lexer"); doc.Redraw(); }, "Lexical Analysis", "lexer_but").SetCSS(button_style);
   button_div << UI::Button([](){ UpdateIntro("regex"); doc.Redraw(); }, "Regular Expressions", "regex_but").SetCSS(button_style);
   button_div << UI::Button([](){ UpdateIntro("cpp"); doc.Redraw(); }, "Generated C++ Code", "cpp_but").SetCSS(button_style);
-  button_div << UI::Button([](){ UpdateIntro("about"); doc.Redraw(); }, "About", "about_but").SetCSS(button_style);
   button_div << UI::Button([](){ UpdateIntro("examples"); doc.Redraw(); }, "Examples", "example_but").SetCSS(button_style);
+  button_div << UI::Button([](){ UpdateIntro("about"); doc.Redraw(); }, "About", "about_but").SetCSS(button_style);
   doc << button_div;
   doc << "<small><small><br></small></small>";
   doc << intro_div;
@@ -402,7 +402,7 @@ int emp_main()
 
   token_div << UI::Button([](){
     Generate();
-  }, "Generate Output", "generate_but").SetCSS(button_style);
+  }, "Generate Output", "generate_but").SetCSS(button_style).SetBackground("#330066");
 
   doc << token_div;
   doc << "<p>";
