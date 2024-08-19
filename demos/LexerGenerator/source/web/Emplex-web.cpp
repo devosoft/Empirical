@@ -20,6 +20,7 @@ constexpr size_t MAX_TOKENS = 100;
 
 UI::Document doc("emp_base");
 emp::CPPFile file;
+emp::vector<emp::String> errors;
 
 
 class TokenInput {
@@ -79,9 +80,18 @@ LexerInfo lexer_info;
 
 UI::Div intro_div;
 UI::Div button_div;
+UI::Div error_div;
 UI::Div output_div;
 UI::Table token_table(1, 4, "token_table");
 UI::Text output_text;
+
+void UpdateErrors() {
+  error_div.Clear();
+  for (emp::String & error : errors)  {
+    error_div << emp::MakeWebSafe(error) << "<br>\n";
+  }
+  error_div.Redraw();
+}
 
 void SwapTableRows(size_t row1, size_t row2);
 void RemoveTableRow(size_t id);
@@ -129,8 +139,42 @@ void RemoveTableRow(size_t id) {
   auto new_row = token_table.RemoveRow();
 }
 
+template <typename... Ts>
+void Error(size_t line_num, Ts &&... args) {
+  errors.push_back(emp::MakeString("Error (line ", line_num, ") - ", args...));
+}
+
 void Generate() {
   emp::Lexer lexer;
+
+  // Make sure all of the token information is valid.
+  errors.resize(0);
+  size_t line_num = 0;
+  std::unordered_set<emp::String> token_names;
+  for (const auto & t_info : lexer_info.token_info) {
+    ++line_num;
+    emp::String name = t_info.GetName();
+    emp::String regex = t_info.GetRegex();
+    if (name.empty() && regex.empty()) continue;  // Completely empty slots can be skipped.
+
+    if (name.empty()) Error(line_num, "No name provided for RegEx: ", regex);
+    else if (regex.empty()) Error(line_num, "No regex provided for token '", name, "'");
+
+    if (token_names.contains(name)) {
+      Error(line_num, "Multiple token types named '", name, "'.");
+    }
+    token_names.insert(name);
+
+    emp::RegEx regex_text(regex);
+    for (const auto & note : regex_text.GetNotes()) {
+      Error(line_num, "Invalid Regular expression: ", note);
+    }
+  }
+
+  // Halt generation if any errors were triggered.
+  UpdateErrors();
+  if (errors.size()) return;
+
 
   // Load all of the tokens ino the lexer.
   for (const auto & t_info : lexer_info.token_info) {
@@ -411,11 +455,11 @@ int emp_main()
 
   token_div << UI::Button([](){
     Generate();
-  }, "Generate Output", "generate_but").SetCSS(button_style).SetBackground("#330066").SetTitle("Generate a lexer using the token types defined above.");
+  }, "Generate Code", "generate_but").SetCSS(button_style).SetBackground("#330066").SetTitle("Generate a lexer using the token types defined above.");
 
   token_div << UI::Button([](){
     DownloadCode();
-  }, "Download", "download_but").SetCSS(button_style).SetBackground("#808080").SetDisabled().SetTitle("Generate code to activate this button.");
+  }, "Download", "download_but").SetCSS(button_style).SetBackground("#606060").SetDisabled().SetTitle("Generate code to activate this button.");
 
   doc << token_div;
   doc << "<p>";
@@ -452,6 +496,9 @@ int emp_main()
 
   doc << "<br>";
   doc << "<H3>Output:</H3>";
+
+  error_div.SetBackground("white").SetColor("red");
+  doc << error_div;
 
   output_div.SetBackground("black").SetColor("white");
   output_div.SetBorder("20px").SetCSS("border-radius", "10px");
