@@ -528,6 +528,8 @@ namespace emp {
       return dfa.Test(str);
     }
 
+    const emp::vector<std::string> & GetNotes() const { return notes; }
+
     /// For debugging: print the internal representation of the regex.
     void PrintInternal() const { head.Print(std::cout); std::cout << std::endl; }
 
