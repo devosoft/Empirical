@@ -86,6 +86,12 @@ UI::Table token_table(1, 4, "token_table");
 UI::Text output_text;
 
 void UpdateErrors() {
+  if (errors.size()) {
+    output_text.Clear();
+    output_div.Redraw();
+    doc.Button("download_but").SetBackground("#606060").SetDisabled().SetTitle("Generate code to activate this button.");
+  }
+
   error_div.Clear();
   for (emp::String & error : errors)  {
     error_div << emp::MakeWebSafe(error) << "<br>\n";
@@ -160,6 +166,9 @@ void Generate() {
     if (name.empty()) Error(line_num, "No name provided for RegEx: ", regex);
     else if (regex.empty()) Error(line_num, "No regex provided for token '", name, "'");
 
+    if (!name.OnlyIDChars()) {
+      Error(line_num, "Invalid token name '", name, "'; only letters, digits, and '_' allowed.");
+    }
     if (token_names.contains(name)) {
       Error(line_num, "Multiple token types named '", name, "'.");
     }
