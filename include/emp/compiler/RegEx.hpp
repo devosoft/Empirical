@@ -419,9 +419,18 @@ namespace emp {
         case '\\':
           c = regex[pos++];  // Identify the specific escape char.
           switch(c) {
-            case 'n': c = '\n'; break;
-            case 'r': c = '\r'; break;
-            case 't': c = '\t'; break;
+            case 'd': result = NewPtr<re_charset>("0123456789"); break;
+            case 'D': result = NewPtr<re_charset>("0123456789", true); break;
+            case 'l': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"); break;
+            case 'L': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", true); break;
+            case 's': result = NewPtr<re_charset>(" \t\r\n"); break;
+            case 'S': result = NewPtr<re_charset>(" \t\r\n", true); break;
+            case 'w': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"); break;
+            case 'W': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_", true); break;
+
+            case 'n': result = NewPtr<re_string>('\n'); break;
+            case 'r': result = NewPtr<re_string>('\r'); break;
+            case 't': result = NewPtr<re_string>('\t'); break;
             // Any of these characters should just be themselves!
             case '\\':
             case '\"':
@@ -434,11 +443,11 @@ namespace emp {
             case ')':
             case '[':
             case ']':
+              result = NewPtr<re_string>(c);
               break;
             default:
-              Error("Unknown escape char for regex: '\\", c, "'.");
+              Error("Unknown escape char: '\\", c, "'.");
           }
-          result = NewPtr<re_string>(c);
           break;
 
         // Error cases
@@ -481,7 +490,7 @@ namespace emp {
           case ')': pos--; return cur_block;  // Must be ending segment (restore pos to check on return)
 
           default:     // Must be a regular "segment"
-            pos--;     // Restore to previous char to construct the next seqment.
+            pos--;     // Restore to previous char to construct the next segment.
             cur_block->push( ConstructSegment() );
         }
       }
@@ -491,15 +500,15 @@ namespace emp {
 
   public:
     RegEx() = delete;
-    RegEx(const std::string & r) : regex(r), dfa(), head() {
+    RegEx(const std::string & r) : regex(r) {
       if (regex.size()) Process(ToPtr(&head));
       while(head.Simplify());
     }
-    RegEx(const RegEx & r) : regex(r.regex), dfa(), head() {
+    RegEx(const RegEx & r) : regex(r.regex) {
       if (regex.size()) Process(ToPtr(&head));
       while(head.Simplify());
     }
-    ~RegEx() { ; }
+    ~RegEx() = default;
 
     /// Set this RegEx equal to another.
     RegEx & operator=(const RegEx & r) {
@@ -513,7 +522,7 @@ namespace emp {
       return *this;
     }
 
-    /// Convert the RegEx to an standard string, readable from outsite this class.
+    /// Convert the RegEx to an standard string, readable from outside this class.
     std::string AsString() const { return to_literal(regex); }
 
     /// Add this regex to an NFA being built.
@@ -522,7 +531,7 @@ namespace emp {
     /// Assume the RegEx is ready and setup processing for it.
     void Generate() const;
 
-    /// Test if a string statisfies this regex.
+    /// Test if a string satisfies this regex.
     bool Test(const std::string & str) const {
       if (!dfa_ready) Generate();
       return dfa.Test(str);
@@ -540,7 +549,7 @@ namespace emp {
       }
     }
 
-    /// Print general debuging information about this regex.
+    /// Print general debugging information about this regex.
     void PrintDebug() const {
       if (notes.size()) {
         std::cout << "NOTES:" << std::endl;
