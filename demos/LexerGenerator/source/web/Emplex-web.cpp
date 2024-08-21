@@ -53,6 +53,7 @@ public:
   void SetIgnore(bool in) { ignore_toggle.SetChecked(in); }
 
   void Set(emp::String name, emp::String regex, bool ignore=false) {
+    // emp::notify::Message("name=", name, " regex=", regex, " ignore=", ignore);
     SetName(name);
     SetRegex(regex);
     SetIgnore(ignore);
@@ -78,12 +79,19 @@ struct LexerInfo {
 
 LexerInfo lexer_info;
 
-UI::Div intro_div;
-UI::Div button_div;
-UI::Div error_div;
-UI::Div output_div;
-UI::Table token_table(1, 4, "token_table");
-UI::Text output_text;
+UI::Div intro_div{"intro_div"};
+UI::Div button_div{"button_div"};
+UI::Div token_div{"token_div"};
+UI::Div settings_div{"settings_div"};
+UI::Div error_div{"error_div"};
+UI::Div output_div{"output_div"};
+
+UI::Table token_table{1, 4, "token_table"};
+UI::Table settings_table{4, 2, "settings_table"};
+UI::Text output_text{"output_text"};
+
+UI::Style button_style;
+UI::Style button_style_dark;
 
 void UpdateErrors() {
   if (errors.size()) {
@@ -125,8 +133,9 @@ void AddTableRow() {
 }
 
 void AddTableRow(emp::String name, emp::String regex, bool ignore=false) {
+  const size_t row_id = token_table.GetNumRows()-1;
   AddTableRow();
-  lexer_info.token_info.back().Set(name, regex, ignore);
+  lexer_info.token_info[row_id].Set(name, regex, ignore);
 }
 
 void SwapTableRows(size_t row1, size_t row2) {
@@ -177,9 +186,8 @@ void Error(size_t line_num, Ts &&... args) {
   errors.push_back(emp::MakeString("Error (line ", line_num, ") - ", args...));
 }
 
-void Generate() {
-  emp::Lexer lexer;
-
+// Make sure that the token table contains only valid information.
+bool TestValidTable() {
   // Make sure all of the token information is valid.
   errors.resize(0);
   size_t line_num = 0;
@@ -209,25 +217,21 @@ void Generate() {
 
   // Halt generation if any errors were triggered.
   UpdateErrors();
-  if (errors.size()) return;
+  return !errors.size();
+}
 
+void Generate() {
+  if (!TestValidTable()) return;
 
-  // Load all of the tokens ino the lexer.
+  emp::Lexer lexer;
+
+  // Load all of the tokens ino the lexer (since they passed tests, assume they are valid)
   for (const auto & t_info : lexer_info.token_info) {
     emp::String name = t_info.GetName();
     emp::String regex = t_info.GetRegex();
     bool ignore = t_info.GetIgnore();
 
-    if (name.empty() && regex.empty()) continue;
-
-    if (!name.size()) {
-      emp::notify::Message("Empty token name has regular expression '", name, "'; must supply name.");
-      return;
-    }
-    if (!regex.size()) {
-      emp::notify::Message("Token '", name, "' does not have an associated regex.");
-      return;
-    }
+    if (name.empty()) continue;
 
     if (ignore) lexer.IgnoreToken(name, regex);
     else lexer.AddToken(name, regex);
@@ -432,7 +436,6 @@ int emp_main()
   doc << "<h1>Emplex: A C++ Lexer Generator</h1>";
 
   UpdateIntro("home");
-  UI::Style button_style;
   button_style.Set("padding", "10px 15px")
     .Set("background-color", "#000066") // Dark Blue background
     .Set("color", "white")              // White text
@@ -442,7 +445,6 @@ int emp_main()
     .Set("font-size", "14px")
     .Set("transition", "background-color 0.3s ease, transform 0.3s ease"); // Smooth transition
 
-  UI::Style button_style_dark;
   button_style_dark.Set("padding", "10px 15px")
     .Set("background-color", "#B2946C") // Dark Blue background
     .Set("color", "black")              // Black text
@@ -464,7 +466,6 @@ int emp_main()
   doc << "<br><br>\n";
 
   // token_table.SetCSS("border-collapse", "collapse");
-  UI::Div token_div("token_div");
   token_div.SetBackground("lightgrey").SetCSS("border-radius", "10px", "border", "1px solid black", "padding", "15px", "width", "fit-content");
   token_div << "<big><big><b>Token Types</b></big></big><br><br>\n";
 
@@ -524,12 +525,9 @@ int emp_main()
   doc << token_div;
   doc << "<p>";
 
-  UI::Div settings_div("settings_div");
   settings_div.SetBackground("tan")
     .SetCSS("border-radius", "10px", "border", "1px solid black", "padding", "15px", "width", "fit-content");
   settings_div << "<big><big><b>Advanced Options</b></big></big><br>\n";
-
-  UI::Table settings_table(4, 2, "settings_table");
 
   settings_table[0][0].SetHeader().SetCSS("padding-bottom", "15px") << "<br>Class Name: ";
   settings_table[0][1] << UI::TextArea([](const std::string & str) {
@@ -562,7 +560,6 @@ int emp_main()
     ClearTable();
 
     for (emp::String line : file) {
-      emp::notify::Message("Loading: ", line);
       bool ignore = line.PopIf('-');
       emp::String name = line.PopWord();  // First entry on a line is the token name.
       emp::String regex = line.Trim();    // Regex is remainder, minus start & end whitespace.
