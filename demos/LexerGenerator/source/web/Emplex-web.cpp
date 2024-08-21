@@ -396,11 +396,14 @@ void UpdateIntro(emp::String mode) {
       "     size_t line_id;      // Line token started on\n"
       "   };\n"
       "</pre>\n"
-      "<p>If you want to translate a token ID back to a token type, you can use "
-      "\"<code>lexer.GetTokenName(id);</code>\".  The <code>lexeme</code> field provides "
+      "<p>If you want to translate a token <code>id</code> back to a token type, you can use "
+      "\"<code>emplex::TokenID::Name(id);</code>\".  The <code>lexeme</code> field provides "
       "the specific set of characters that were matched in the input stream. "
       "The <code>line_id</code> gives the line number on which the token was found in "
-      "the input stream and can be useful for error reporting."
+      "the input stream and can be useful for error reporting.</p>"
+      "<p>Finally, you can look up the ID value for a particular token type by finding its name "
+      "in TokenID.  For example, if you had created a token type called \"INT\" that was assigned "
+      "the value 248, then <code>emplex::TokenID::INT</code> would equal 248.</p>"
       "<br><br>";
   } else if (mode == "about") {
     doc.Button("about_but").SetBackground(active_color);
@@ -507,20 +510,46 @@ int emp_main()
   }, "Reset", "reset_but").SetCSS(button_style)
   .SetTitle("Reset tokens back to the starting setup.");
 
-  token_div << UI::Button([](){
-    doc.Div("settings_div").ToggleActive();
-  }, "Advanced Options", "settings_but").SetCSS(button_style)
-  .SetTitle("Adjust naming details for generated code.");
+  token_div << UI::Button([](){ SaveTable(); }, "Save Token Types")
+    .SetCSS(button_style)
+    .SetTitle("Save token names and regular expressions to a file.");
+
+  token_div << UI::FileInput([](emp::File file){
+    file.RemoveIfBegins("#");  // Remove all lines that are comments
+    file.RemoveEmpty();
+    ClearTable();
+
+    for (emp::String line : file) {
+      bool ignore = line.PopIf('-');
+      emp::String name = line.PopWord();  // First entry on a line is the token name.
+      emp::String regex = line.Trim();    // Regex is remainder, minus start & end whitespace.
+      AddTableRow(name, regex, ignore);
+    }
+    doc.Div("token_div").Redraw();
+
+  }, "load_input").SetCSS("display", "none");
+
+  token_div << UI::Button([](){ doc.FileInput("load_input").DoClick(); }, "Load Token Types", "load_but")
+    .SetCSS(button_style)
+    .SetTitle("Load previously save token types from file.");
+
+  token_div << "<br>";
 
   token_div << UI::Button([](){
     Generate();
-  }, "Generate Code", "generate_but").SetCSS(button_style).SetBackground("#330066")
+  }, "Generate C++ Code", "generate_but").SetCSS(button_style).SetBackground("#330066")
   .SetTitle("Generate a lexer using the token types defined above.");
 
   token_div << UI::Button([](){
     DownloadCode();
-  }, "Download", "download_but").SetCSS(button_style).SetBackground("#606060").SetDisabled()
+  }, "Download C++ Code", "download_but").SetCSS(button_style).SetBackground("#606060").SetDisabled()
   .SetTitle("Generate code to activate this button.");
+
+  token_div << UI::Button([](){
+    doc.Div("settings_div").ToggleActive();
+  }, "Advanced Options", "settings_but")
+    .SetCSS(button_style).SetCSS("float", "right")
+    .SetTitle("Adjust naming details for generated code.");
 
   doc << token_div;
   doc << "<p>";
@@ -550,24 +579,6 @@ int emp_main()
   }, "set_namespace").SetText(lexer_info.name_space).SetWidth(250);
 
   settings_div << settings_table;
-  settings_div << UI::Button([](){  SaveTable(); }, "Save Token Types")
-    .SetCSS(button_style_dark)
-    .SetTitle("Save token names and regular expressions entered above.");
-
-  settings_div << UI::FileInput([](emp::File file){
-    file.RemoveIfBegins("#");  // Remove all lines that are comments
-    file.RemoveEmpty();
-    ClearTable();
-
-    for (emp::String line : file) {
-      bool ignore = line.PopIf('-');
-      emp::String name = line.PopWord();  // First entry on a line is the token name.
-      emp::String regex = line.Trim();    // Regex is remainder, minus start & end whitespace.
-      AddTableRow(name, regex, ignore);
-    }
-    doc.Div("token_div").Redraw();
-
-  }).SetCSS(button_style_dark);
 
   doc << settings_div;
   settings_div.Deactivate();
