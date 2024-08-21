@@ -562,6 +562,7 @@ int emp_main()
     ClearTable();
 
     for (emp::String line : file) {
+      emp::notify::Message("Loading: ", line);
       bool ignore = line.PopIf('-');
       emp::String name = line.PopWord();  // First entry on a line is the token name.
       emp::String regex = line.Trim();    // Regex is remainder, minus start & end whitespace.
