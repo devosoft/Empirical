@@ -119,9 +119,14 @@ void AddTableRow() {
   new_row[0] << row_info.GetNameWidget();
   new_row[1] << row_info.GetRegexWidget();
   new_row[2] << "&nbsp;&nbsp;&nbsp;" << row_info.GetIgnoreWidget();
-  new_row[3] << UI::Button([token_id](){ RemoveTableRow(token_id); doc.Redraw(); }, "X").SetColor("red").SetTitle("Click to remove this row.");
-  new_row[3] << UI::Button([token_id](){ SwapTableRows(token_id, token_id-1); doc.Redraw(); }, "&uarr;").SetColor("blue").SetTitle("Click to swap this row with the one above it.");
-  new_row[3] << UI::Button([token_id](){ SwapTableRows(token_id, token_id+1); doc.Redraw(); }, "&darr;").SetColor("blue").SetTitle("Click to swap this row with the one below it.");
+  new_row[3] << UI::Button([token_id](){ RemoveTableRow(token_id); doc.Div("token_div").Redraw(); }, "X").SetColor("red").SetTitle("Click to remove this row.");
+  new_row[3] << UI::Button([token_id](){ SwapTableRows(token_id, token_id-1); doc.Div("token_div").Redraw(); }, "&uarr;").SetColor("blue").SetTitle("Click to swap this row with the one above it.");
+  new_row[3] << UI::Button([token_id](){ SwapTableRows(token_id, token_id+1); doc.Div("token_div").Redraw(); }, "&darr;").SetColor("blue").SetTitle("Click to swap this row with the one below it.");
+}
+
+void AddTableRow(emp::String name, emp::String regex, bool ignore=false) {
+  AddTableRow();
+  lexer_info.token_info.back().Set(name, regex, ignore);
 }
 
 void SwapTableRows(size_t row1, size_t row2) {
@@ -143,6 +148,12 @@ void RemoveTableRow(size_t id) {
   // Remove last row
   lexer_info.token_info[id].Clear();
   auto new_row = token_table.RemoveRow();
+}
+
+// Remove all rows in the table.
+void ClearTable() {
+  for (auto & row : lexer_info.token_info) row.Clear();
+  token_table.Rows(1);
 }
 
 template <typename... Ts>
@@ -216,7 +227,7 @@ void Generate() {
   output_text.Clear();
   output_text.SetBorder("20px");
   output_text << "<pre style=\"padding: 10px; border-radius: 5px; overflow-x: auto;\">\n" << emp::MakeWebSafe(ss.str()) << "\n</pre>\n";
-  doc.Redraw();
+  output_div.Redraw();
 
   doc.Button("download_but").SetDisabled(false).SetBackground("#330066").SetTitle("Click to download the generated code.");
 }
@@ -391,17 +402,32 @@ void UpdateIntro(emp::String mode) {
     doc.Button("example_but").SetBackground(active_color);
     intro_div <<
       "<big><big><b>Examples</b></big></big><br>\n"
-      "Some examples..."
+      "<p>When you are performing lexical analysis on input text, you must first decide "
+      "what types of elements you are working with and make a corresponding token type "
+      "for each."
       "<br><br>";
   }
 }
 
+void SaveTokens() {
+  emp::String out;
+
+  for (const auto & t_info : lexer_info.token_info) {
+    emp::String name = t_info.GetName();
+    emp::String regex = t_info.GetRegex();
+    bool ignore = t_info.GetIgnore();
+    if (name.empty()) continue;  // Unnamed token types can be skipped.
+
+    if (ignore) out += "-";
+    out += name + ' ' + regex + '\n';
+  }
+
+  emp::DownloadFile("lexer.emplex", out);
+}
+
+
 int emp_main()
 {
-  emp::notify::MessageHandlers().Add([](const std::string & msg){ emp::Alert(msg); return true; });
-  emp::notify::WarningHandlers().Add([](const std::string & msg){ emp::Alert(msg); return true; });
-  emp::notify::ErrorHandlers().Add([](const std::string & msg){ emp::Alert(msg); return true; });
-
   doc << "<h1>Emplex: A C++ Lexer Generator</h1>";
 
   UpdateIntro("home");
@@ -415,21 +441,31 @@ int emp_main()
     .Set("font-size", "14px")
     .Set("transition", "background-color 0.3s ease, transform 0.3s ease"); // Smooth transition
 
-  button_div << UI::Button([](){ UpdateIntro("home"); doc.Redraw(); }, "Home", "home_but").SetCSS(button_style).SetBackground("#0000AA");
-  button_div << UI::Button([](){ UpdateIntro("lexer"); doc.Redraw(); }, "Lexical Analysis", "lexer_but").SetCSS(button_style);
-  button_div << UI::Button([](){ UpdateIntro("regex"); doc.Redraw(); }, "Regular Expressions", "regex_but").SetCSS(button_style);
-  button_div << UI::Button([](){ UpdateIntro("cpp"); doc.Redraw(); }, "Generated C++ Code", "cpp_but").SetCSS(button_style);
-  button_div << UI::Button([](){ UpdateIntro("examples"); doc.Redraw(); }, "Examples", "example_but").SetCSS(button_style);
-  button_div << UI::Button([](){ UpdateIntro("about"); doc.Redraw(); }, "About", "about_but").SetCSS(button_style);
+  UI::Style button_style_dark;
+  button_style_dark.Set("padding", "10px 15px")
+    .Set("background-color", "#B2946C") // Dark Blue background
+    .Set("color", "black")              // Black text
+    .Set("border", "1px solid black")   // Thin black border
+    .Set("border-radius", "5px")        // Rounded corners
+    .Set("cursor", "pointer")
+    .Set("font-size", "14px")
+    .Set("transition", "background-color 0.3s ease, transform 0.3s ease"); // Smooth transition
+
+  button_div << UI::Button([](){ UpdateIntro("home"); intro_div.Redraw(); }, "Home", "home_but").SetCSS(button_style).SetBackground("#0000AA");
+  button_div << UI::Button([](){ UpdateIntro("lexer"); intro_div.Redraw(); }, "Lexical Analysis", "lexer_but").SetCSS(button_style);
+  button_div << UI::Button([](){ UpdateIntro("regex"); intro_div.Redraw(); }, "Regular Expressions", "regex_but").SetCSS(button_style);
+  button_div << UI::Button([](){ UpdateIntro("cpp"); intro_div.Redraw(); }, "Generated C++ Code", "cpp_but").SetCSS(button_style);
+  button_div << UI::Button([](){ UpdateIntro("examples"); intro_div.Redraw(); }, "Examples", "example_but").SetCSS(button_style);
+  button_div << UI::Button([](){ UpdateIntro("about"); intro_div.Redraw(); }, "About", "about_but").SetCSS(button_style);
   doc << button_div;
   doc << "<small><small><br></small></small>";
   doc << intro_div;
   doc << "<br><br>\n";
 
   // token_table.SetCSS("border-collapse", "collapse");
-  UI::Div token_div;
+  UI::Div token_div("token_div");
   token_div.SetBackground("lightgrey").SetCSS("border-radius", "10px", "border", "1px solid black", "padding", "15px", "width", "fit-content");
-  token_div << "<big><big><b>Tokens</b></big></big><br><br>\n";
+  token_div << "<big><big><b>Token Types</b></big></big><br><br>\n";
 
   token_table.SetColor("#000044");
   token_table.GetCell(0,0).SetHeader() << "Token Name";
@@ -446,8 +482,9 @@ int emp_main()
   token_div << "<p>";
   token_div << UI::Button([](){
     AddTableRow();
-    doc.Redraw();
-  }, "Add Row", "row_but").SetCSS(button_style).SetTitle("Add an additional line for defining token types.");
+    doc.Div("token_div").Redraw();
+  }, "Add Row", "row_but").SetCSS(button_style)
+  .SetTitle("Add an additional line for defining token types.");
 
   token_div << UI::Button([](){
     AddTableRow();
@@ -455,27 +492,41 @@ int emp_main()
     AddTableRow();
     AddTableRow();
     AddTableRow();
-    doc.Redraw();
-  }, "+5 Rows", "5row_but").SetCSS(button_style).SetTitle("Add five more lines for defining additional tokens.");
+    doc.Div("token_div").Redraw();
+  }, "+5 Rows", "5row_but").SetCSS(button_style)
+  .SetTitle("Add five more lines for defining additional tokens.");
+
+  token_div << UI::Button([](){
+    ClearTable();
+    AddTableRow();
+    AddTableRow();
+    AddTableRow();
+    doc.Div("token_div").Redraw();
+  }, "Reset", "reset_but").SetCSS(button_style)
+  .SetTitle("Reset tokens back to the starting setup.");
 
   token_div << UI::Button([](){
     doc.Div("settings_div").ToggleActive();
-  }, "Advanced Settings", "settings_but").SetCSS(button_style).SetTitle("Adjust naming details for generated code.");
+  }, "Advanced Options", "settings_but").SetCSS(button_style)
+  .SetTitle("Adjust naming details for generated code.");
 
   token_div << UI::Button([](){
     Generate();
-  }, "Generate Code", "generate_but").SetCSS(button_style).SetBackground("#330066").SetTitle("Generate a lexer using the token types defined above.");
+  }, "Generate Code", "generate_but").SetCSS(button_style).SetBackground("#330066")
+  .SetTitle("Generate a lexer using the token types defined above.");
 
   token_div << UI::Button([](){
     DownloadCode();
-  }, "Download", "download_but").SetCSS(button_style).SetBackground("#606060").SetDisabled().SetTitle("Generate code to activate this button.");
+  }, "Download", "download_but").SetCSS(button_style).SetBackground("#606060").SetDisabled()
+  .SetTitle("Generate code to activate this button.");
 
   doc << token_div;
   doc << "<p>";
 
   UI::Div settings_div("settings_div");
-  settings_div.SetBackground("tan").SetCSS("border-radius", "10px", "border", "1px solid black", "padding", "15px", "width", "fit-content");
-  settings_div << "<big><big><b>Advanced Settings</b></big></big><br>\n";
+  settings_div.SetBackground("tan")
+    .SetCSS("border-radius", "10px", "border", "1px solid black", "padding", "15px", "width", "fit-content");
+  settings_div << "<big><big><b>Advanced Options</b></big></big><br>\n";
 
   UI::Table settings_table(4, 2, "settings_table");
 
@@ -500,11 +551,25 @@ int emp_main()
   }, "set_namespace").SetText(lexer_info.name_space).SetWidth(250);
 
   settings_div << settings_table;
+  settings_div << UI::Button([](){  SaveTokens(); }, "Save Token Types")
+    .SetCSS(button_style_dark)
+    .SetTitle("Save token names and regular expressions entered above.");
+
+  settings_div << UI::FileInput([](emp::File file){
+    file.RemoveIfBegins("#");  // Remove all lines that are comments
+    file.RemoveEmpty();
+    ClearTable();
+
+    for (emp::String line : file) {
+      bool ignore = line.PopIf('-');
+      emp::String name = line.PopWord();  // First entry on a line is the token name.
+      emp::String regex = line.Trim();    // Regex is remainder, minus start & end whitespace.
+      AddTableRow(name, regex, ignore);
+    }
+  }).SetCSS(button_style_dark);
+
   doc << settings_div;
   settings_div.Deactivate();
-
-  doc << "<br>";
-  doc << "<H3>Output:</H3>";
 
   error_div.SetBackground("white").SetColor("red");
   doc << error_div;
