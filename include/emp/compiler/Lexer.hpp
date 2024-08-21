@@ -371,6 +371,28 @@ namespace emp {
         .AddCode("};")
         .AddCode("");
 
+    file.AddCode("// ID values associated with token types.")
+        .AddCode("struct TokenID {")
+        .AddCode("  constexpr size_t _EOF_ = 0;");
+    for (size_t i = token_set.size(); i > 0; --i) {
+      const auto & token = token_set[i-1];
+      file.AddCode("  static constexpr size_t ", token.name, " = ", token.id, ";");
+    }
+    file.AddCode("")
+        .AddCode("  // Return the name of a token given its ID.")
+        .AddCode("  static constexpr const char * Name(size_t id) {")
+        .AddCode("    switch (id) {")
+        .AddCode("    case 0: return \"_EOF_\";");
+    for (size_t i = token_set.size(); i > 0; --i) {
+      const auto & token = token_set[i-1];
+      file.AddCode("    case ", token.id, ": return ", token.name.AsLiteral(), ";");
+    }
+    file.AddCode("    default: return \"_UNKNOWN_\";" )
+        .AddCode("    };")
+        .AddCode("  }")
+        .AddCode("};")
+        .AddCode("");
+
     file.AddCode("// Deterministic Finite Automaton (DFA) for token recognition.");
     lexer_dfa.WriteCPP(file, "DFA");
     file.AddCode("");
@@ -388,18 +410,6 @@ namespace emp {
         .AddCode("public:")
         .AddCode("  // Return the number of token types the lexer recognizes.")
         .AddCode("  static constexpr size_t GetNumTokens() { return NUM_TOKENS; }")
-        .AddCode("")
-        .AddCode("  // Return the name of a token given its ID.")
-        .AddCode("  static constexpr const char * GetTokenName(size_t id) {")
-        .AddCode("    switch (id) {")
-        .AddCode("    case 0: return \"_EOF_\";");
-    for (size_t i = token_set.size(); i > 0; --i) {
-      const auto & token = token_set[i-1];
-      file.AddCode("    case ", token.id, ": return ", token.name.AsLiteral(), ";");
-    }
-    file.AddCode("    default: return \"_UNKNOWN_\";" )
-        .AddCode("    };")
-        .AddCode("  }")
         .AddCode("")
         .AddCode("  // Generate and return the next token from the input stream.")
         .AddCode("  Token NextToken(std::istream & is) {")
