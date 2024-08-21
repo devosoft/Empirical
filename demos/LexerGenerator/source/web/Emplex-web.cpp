@@ -156,6 +156,22 @@ void ClearTable() {
   token_table.Rows(1);
 }
 
+void SaveTable() {
+  emp::String out;
+
+  for (const auto & t_info : lexer_info.token_info) {
+    emp::String name = t_info.GetName();
+    emp::String regex = t_info.GetRegex();
+    bool ignore = t_info.GetIgnore();
+    if (name.empty()) continue;  // Unnamed token types can be skipped.
+
+    if (ignore) out += "-";
+    out += name + ' ' + regex + '\n';
+  }
+
+  emp::DownloadFile("lexer.emplex", out);
+}
+
 template <typename... Ts>
 void Error(size_t line_num, Ts &&... args) {
   errors.push_back(emp::MakeString("Error (line ", line_num, ") - ", args...));
@@ -409,21 +425,6 @@ void UpdateIntro(emp::String mode) {
   }
 }
 
-void SaveTokens() {
-  emp::String out;
-
-  for (const auto & t_info : lexer_info.token_info) {
-    emp::String name = t_info.GetName();
-    emp::String regex = t_info.GetRegex();
-    bool ignore = t_info.GetIgnore();
-    if (name.empty()) continue;  // Unnamed token types can be skipped.
-
-    if (ignore) out += "-";
-    out += name + ' ' + regex + '\n';
-  }
-
-  emp::DownloadFile("lexer.emplex", out);
-}
 
 
 int emp_main()
@@ -551,7 +552,7 @@ int emp_main()
   }, "set_namespace").SetText(lexer_info.name_space).SetWidth(250);
 
   settings_div << settings_table;
-  settings_div << UI::Button([](){  SaveTokens(); }, "Save Token Types")
+  settings_div << UI::Button([](){  SaveTable(); }, "Save Token Types")
     .SetCSS(button_style_dark)
     .SetTitle("Save token names and regular expressions entered above.");
 
@@ -566,6 +567,8 @@ int emp_main()
       emp::String regex = line.Trim();    // Regex is remainder, minus start & end whitespace.
       AddTableRow(name, regex, ignore);
     }
+    doc.Div("token_div").Redraw();
+
   }).SetCSS(button_style_dark);
 
   doc << settings_div;
