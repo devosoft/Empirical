@@ -371,28 +371,6 @@ namespace emp {
         .AddCode("};")
         .AddCode("");
 
-    file.AddCode("// ID values associated with token types.")
-        .AddCode("struct TokenID {")
-        .AddCode("  constexpr size_t _EOF_ = 0;");
-    for (size_t i = token_set.size(); i > 0; --i) {
-      const auto & token = token_set[i-1];
-      file.AddCode("  static constexpr size_t ", token.name, " = ", token.id, ";");
-    }
-    file.AddCode("")
-        .AddCode("  // Return the name of a token given its ID.")
-        .AddCode("  static constexpr const char * Name(size_t id) {")
-        .AddCode("    switch (id) {")
-        .AddCode("    case 0: return \"_EOF_\";");
-    for (size_t i = token_set.size(); i > 0; --i) {
-      const auto & token = token_set[i-1];
-      file.AddCode("    case ", token.id, ": return ", token.name.AsLiteral(), ";");
-    }
-    file.AddCode("    default: return \"_UNKNOWN_\";" )
-        .AddCode("    };")
-        .AddCode("  }")
-        .AddCode("};")
-        .AddCode("");
-
     file.AddCode("// Deterministic Finite Automaton (DFA) for token recognition.");
     lexer_dfa.WriteCPP(file, "DFA");
     file.AddCode("");
@@ -408,6 +386,38 @@ namespace emp {
         .AddCode("  std::string errors;  // Description of any errors encountered")
         .AddCode("")
         .AddCode("public:")
+        .AddCode("  static constexpr size_t ID__EOF_ = 0;");
+    for (size_t i = token_set.size(); i > 0; --i) {
+      const auto & token = token_set[i-1];
+      file.AddCode("  static constexpr size_t ID_", token.name, " = ", token.id, ";");
+    }
+    file.AddCode("")
+        .AddCode("  // Return the name of a token given its ID.")
+        .AddCode("  static constexpr const char * TokenName(size_t id) {")
+        .AddCode("    switch (id) {")
+        .AddCode("    case 0: return \"_EOF_\";");
+    for (size_t i = token_set.size(); i > 0; --i) {
+      const auto & token = token_set[i-1];
+      file.AddCode("    case ", token.id, ": return ", token.name.AsLiteral(), ";");
+    }
+    file.AddCode("    default: return \"_UNKNOWN_\";" )
+        .AddCode("    };")
+        .AddCode("  }")
+        .AddCode("")
+        .AddCode("  // Identify if a token (by ID) should be skipped during tokenizing.")
+        .AddCode("  static constexpr bool IgnoreToken(size_t id) {")
+        .AddCode("    switch (id) {")
+        .AddCode("    case 0:");
+    for (size_t i = token_set.size(); i > 0; --i) {
+      const auto & token = token_set[i-1];
+      if (token.save_lexeme == false)
+      file.AddCode("    case ", token.id, ":");
+    }
+    file.AddCode("      return true;")
+        .AddCode("    default: return false;")
+        .AddCode("    };")
+        .AddCode("  }")
+        .AddCode("")
         .AddCode("  // Return the number of token types the lexer recognizes.")
         .AddCode("  static constexpr size_t GetNumTokens() { return NUM_TOKENS; }")
         .AddCode("")
@@ -458,7 +468,7 @@ namespace emp {
         .AddCode("    cur_line = 1;  // Assume we are starting at the first line of the input.")
         .AddCode("    std::vector<Token> out_tokens;")
         .AddCode("    while (Token token = NextToken(is)) {")
-        .AddCode("      out_tokens.push_back(token);")
+        .AddCode("      if (!IgnoreToken(token.id)) out_tokens.push_back(token);")
         .AddCode("    }")
         .AddCode("    return out_tokens;")
         .AddCode("  }")
