@@ -37,6 +37,16 @@ namespace emp {
   public:
     CPPFile(String filename="") : filename(filename) { }
 
+    void Clear() {
+      filename.clear();
+      header.resize(0);
+      include_guard.clear();
+      includes.clear();
+      name_space.clear();
+      code.resize(0);
+      indent.clear();
+    }
+
     CPPFile & SetGuards(String guard_str) {
       include_guard = guard_str;
       return *this;
