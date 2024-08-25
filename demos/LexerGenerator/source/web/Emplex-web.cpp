@@ -439,14 +439,14 @@ void UpdateIntro(emp::String mode) {
       "<p>Click here to load some example tokens:</p>"
       << UI::Button([](){
           ClearTable();
-          AddTableRow("whitespace", "[ \t\n\r]+", true);
+          AddTableRow("whitespace", "[ \\t\\n\\r]+", true);
           AddTableRow("comment",    "#.*", true);
           AddTableRow("integer",    "[0-9]+");
           AddTableRow("float",      "([0-9]+.[0-9]*)|(.[0-9]+)");
           AddTableRow("keyword",    "(break)|(continue)|(else)|(for)|(if)|(return)|(while)");
           AddTableRow("identifier", "[a-zA-Z_][a-zA-Z0-9_]*");
           // AddTableRow("string",     "(\\\"([^\"\\\\]|(\\\\.))*\\\")|('([^'\\\\]|(\\\\.))*')");
-          AddTableRow("symbol",     ".|\"::\"|\"==\"|\"!=\"|\"<=\"|\">=\"|\"->\"|\"&&\"|\"||\"|\"<<\"|\">>\"|\"++\"|\"--\"|\"**\"");
+          AddTableRow("symbol",     ".|\"::\"|\"==\"|\"!=\"|\"<=\"|\">=\"|\"->\"|\"&&\"|\"||\"|\"<<\"|\">>\"|\"++\"|\"--\"");
           doc.Div("token_div").Redraw();
         }, "Load Example", "example_load_but")
       <<
