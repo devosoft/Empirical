@@ -619,14 +619,14 @@ namespace web {
     class WidgetFacet : public Widget {
     protected:
       /// WidgetFacet cannot be built unless within derived class, so constructors are protected
-      WidgetFacet(const std::string & in_id="") : Widget(in_id) { ; }
-      WidgetFacet(const WidgetFacet & in) : Widget(in) { ; }
+      WidgetFacet(const std::string & in_id="") : Widget(in_id) { }
+      WidgetFacet(const WidgetFacet & in) : Widget(in) { }
       WidgetFacet(const Widget & in) : Widget(in) {
         // Converting from a generic widget; make sure type is correct or non-existant!
         emp_assert(!in || dynamic_cast<typename RETURN_TYPE::INFO_TYPE *>( Info(in) ) != NULL,
                    in.GetID());
       }
-      WidgetFacet(WidgetInfo * in_info) : Widget(in_info) { ; }
+      WidgetFacet(WidgetInfo * in_info) : Widget(in_info) { }
       WidgetFacet & operator=(const WidgetFacet & in) { Widget::operator=(in); return *this; }
       virtual ~WidgetFacet() { ; }
 
@@ -833,6 +833,21 @@ namespace web {
 
       /// Provide a function to be called whenever text is pasted in this Widget.
       template <typename T> return_t & OnPaste(T && arg) { return On("paste", arg); }
+
+      /// Trigger a click on this widget.
+
+      return_t & DoClick() {
+#ifdef __EMSCRIPTEN__
+        MAIN_THREAD_EM_ASM({
+          var id = UTF8ToString($0);
+          var element = document.getElementById(id);
+          if (element) element.click();
+        }, info->id.c_str());
+#else
+        emp::notify::Message("Triggering click on '", info->id, "'.");
+#endif
+        return (return_t &) *this;
+      }
 
       /// Create a tooltip for this Widget.
       return_t & SetTitle(const std::string & _in) { return SetAttr("title", _in); }
