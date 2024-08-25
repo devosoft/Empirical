@@ -107,19 +107,35 @@ namespace emp {
     return html.str();
   }
 
-    /// Get the value of @param attribute in the element with @param id as its id.
-    inline std::string GetElementAttribute(const std::string & id, const std::string & attribute) {
-      char * buffer = (char * )MAIN_THREAD_EM_ASM_INT({
-        var text = document.getElementById(UTF8ToString($0))[UTF8ToString($1)];
-        var buffer = Module._malloc(text.length+1);
-        Module.stringToUTF8(text, buffer, text.length*4+1);
-        return buffer;
-      }, id.c_str(), attribute.c_str());
+  /// Get the value of @param attribute in the element with @param id as its id.
+  inline std::string GetElementAttribute(const std::string & id, const std::string & attribute) {
+    char * buffer = (char * )MAIN_THREAD_EM_ASM_INT({
+      var text = document.getElementById(UTF8ToString($0))[UTF8ToString($1)];
+      var buffer = Module._malloc(text.length+1);
+      Module.stringToUTF8(text, buffer, text.length*4+1);
+      return buffer;
+    }, id.c_str(), attribute.c_str());
 
-      std::string result = std::string(buffer);
-      free(buffer);
-      return result;
-    }
+    std::string result = std::string(buffer);
+    free(buffer);
+    return result;
+  }
+
+  inline void DownloadFile(std::string filename, std::string content) {    
+    MAIN_THREAD_ASYNC_EM_ASM({
+      var filename = UTF8ToString($0);
+      var content = UTF8ToString($1);
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, filename.c_str(), content.c_str());
+  }
 
 }
 
