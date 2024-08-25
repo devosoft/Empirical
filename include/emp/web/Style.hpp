@@ -28,7 +28,7 @@ namespace emp {
 namespace web {
 
   ///  Class to maintain a map of setting names to values that can be easily ported
-  ///  over to JavaScript.  A companial class, Attributes, also exists.
+  ///  over to JavaScript.  A companion class, Attributes, also exists.
   class Style {
   private:
     std::map<std::string, std::string> settings;  ///< CSS Setting values being tracked.
@@ -46,8 +46,8 @@ namespace web {
     /// Return a count of the number of classes that have been added.
     size_t GetNClasses() const { return classes.size(); }
 
-   Style & AddClass(const std::string & in_clss) {
-      classes.insert(in_clss);
+   Style & AddClass(const std::string & in_class) {
+      classes.insert(in_class);
       return *this;
     }
 
