@@ -107,7 +107,7 @@ namespace web {
 
       Info()->callback = in_cb;
       ButtonInfo * b_info = Info();
-      Info()->callback_id = JSWrap( std::function<void()>( [b_info](){b_info->DoCallback();} )  );
+      Info()->callback_id = JSWrap( (std::function<void()>)( [b_info](){b_info->DoCallback();} )  );
       SetAttr("onclick", emp::to_string("emp.Callback(", Info()->callback_id, ")"));
     }
 
