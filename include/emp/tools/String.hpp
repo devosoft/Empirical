@@ -301,6 +301,7 @@ namespace emp {
     [[nodiscard]] bool OnlyDigits() const { return DigitCharSet().Has(*this); }
     [[nodiscard]] bool OnlyAlphanumeric() const { return AlphanumericCharSet().Has(*this); }
     [[nodiscard]] bool OnlyWhitespace() const { return WhitespaceCharSet().Has(*this); }
+    [[nodiscard]] bool OnlyIDChars() const { return IDCharSet().Has(*this); }
 
     [[nodiscard]] bool HasOneOf(CharSet char_set) const { return char_set.HasAny(*this); }
     [[nodiscard]] bool Has(char c) const { return Find(c) != npos; }
