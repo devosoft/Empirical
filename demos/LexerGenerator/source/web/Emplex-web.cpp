@@ -442,7 +442,7 @@ void UpdateIntro(emp::String mode) {
           AddTableRow("whitespace", "[ \\t\\n\\r]+", true);
           AddTableRow("comment",    "#.*", true);
           AddTableRow("integer",    "[0-9]+");
-          AddTableRow("float",      "([0-9]+.[0-9]*)|(.[0-9]+)");
+          AddTableRow("float",      "([0-9]+\\.[0-9]*)|(\\.[0-9]+)");
           AddTableRow("keyword",    "(break)|(continue)|(else)|(for)|(if)|(return)|(while)");
           AddTableRow("identifier", "[a-zA-Z_][a-zA-Z0-9_]*");
           // AddTableRow("string",     "(\\\"([^\"\\\\]|(\\\\.))*\\\")|('([^'\\\\]|(\\\\.))*')");
