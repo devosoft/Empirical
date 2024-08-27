@@ -138,8 +138,8 @@ namespace emp {
 
       file.AddCode("class ", object_name, " {")
           .AddCode("private:")
-          .AddCode("  static constexpr size_t NUM_SYMBOLS=", NUM_SYMBOLS, ";")
-          .AddCode("  static constexpr size_t NUM_STATES=", GetSize(), ";")
+          .AddCode("  static constexpr int NUM_SYMBOLS=", NUM_SYMBOLS, ";")
+          .AddCode("  static constexpr int NUM_STATES=", GetSize(), ";")
           .AddCode("  using row_t = std::array<int, NUM_SYMBOLS>;")
           .AddCode("")
           .AddCode("  // DFA transition table")
@@ -155,7 +155,7 @@ namespace emp {
       }
       file.AddCode("  }};")
           .AddCode("  // DFA stop states (0 indicates NOT a stop)")
-          .AddCode("  static constexpr std::array<size_t, NUM_STATES> stop_id = {");
+          .AddCode("  static constexpr std::array<int, NUM_STATES> stop_id = {");
       for (size_t state=0; state < GetSize(); ++state) {
         if (state) file.AppendCode(",");
         file.AppendCode(static_cast<size_t>(stop_id[state]));
@@ -165,17 +165,20 @@ namespace emp {
 
       file.AddCode("public:")
           .AddCode("  static constexpr size_t size() { return ", GetSize(), "; }")
-          .AddCode("  static constexpr size_t GetStop(int state) {")
-          .AddCode("    return (state >= 0) ? stop_id[state] : 0;")
+          .AddCode("  static constexpr int GetStop(int state) {")
+          .AddCode("    return (state >= 0) ? stop_id[static_cast<size_t>(state)] : 0;")
           .AddCode("  }")
-          .AddCode("  static constexpr int GetNext(int state, size_t sym) {")
-          .AddCode("    return state >= 0 ? table[(size_t)state][sym] : -1;")
+          .AddCode("  static constexpr int GetNext(int state, int sym) {")
+          .AddCode("    if (state >= 0 && sym >= 0) {")
+          .AddCode("      return table[static_cast<size_t>(state)][static_cast<size_t>(sym)];")
+          .AddCode("    }")
+          .AddCode("    return -1;")
           .AddCode("  }")
-          .AddCode("  static constexpr int GetNext(int state, std::string syms) {")
-          .AddCode("    for (char x : syms) state = GetNext(state, (size_t) x);")
+          .AddCode("  static constexpr int GetNext(int state, const std::string & syms) {")
+          .AddCode("    for (char x : syms) state = GetNext(state, x);")
           .AddCode("    return state;")
           .AddCode("  }")
-          .AddCode("  static constexpr size_t Test(const std::string & str) {")
+          .AddCode("  static constexpr int Test(const std::string & str) {")
           .AddCode("    int out = GetNext(0, str);")
           .AddCode("    return GetStop(out);")
           .AddCode("  }")
