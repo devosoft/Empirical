@@ -377,23 +377,23 @@ namespace emp {
 
     file.AddCode("class ", object_name, " {")
         .AddCode("private:")
-        .AddCode("  static constexpr size_t NUM_TOKENS=", token_set.size(), ";")
+        .AddCode("  static constexpr int NUM_TOKENS=", token_set.size(), ";")
         .AddCode("  static constexpr int ERROR_ID = -1;     ///< Code for unknown token ID.")
         .AddCode("")
         .AddCode("  // -- Current State --")
-        .AddCode("  size_t cur_line = 1; // Lexeme found for the current token")
-        .AddCode("  std::string lexeme;  // Lexeme found for the current token")
-        .AddCode("  std::string errors;  // Description of any errors encountered")
+        .AddCode("  size_t cur_line = 1;   // Lexeme found for the current token")
+        .AddCode("  std::string lexeme{};  // Lexeme found for the current token")
+        .AddCode("  std::string errors{};  // Description of any errors encountered")
         .AddCode("")
         .AddCode("public:")
-        .AddCode("  static constexpr size_t ID__EOF_ = 0;");
+        .AddCode("  static constexpr int ID__EOF_ = 0;");
     for (size_t i = token_set.size(); i > 0; --i) {
       const auto & token = token_set[i-1];
-      file.AddCode("  static constexpr size_t ID_", token.name, " = ", token.id, ";");
+      file.AddCode("  static constexpr int ID_", token.name, " = ", token.id, ";");
     }
     file.AddCode("")
         .AddCode("  // Return the name of a token given its ID.")
-        .AddCode("  static constexpr const char * TokenName(size_t id) {")
+        .AddCode("  static constexpr const char * TokenName(int id) {")
         .AddCode("    switch (id) {")
         .AddCode("    case 0: return \"_EOF_\";");
     for (size_t i = token_set.size(); i > 0; --i) {
@@ -405,7 +405,7 @@ namespace emp {
         .AddCode("  }")
         .AddCode("")
         .AddCode("  // Identify if a token (by ID) should be skipped during tokenizing.")
-        .AddCode("  static constexpr bool IgnoreToken(size_t id) {")
+        .AddCode("  static constexpr bool IgnoreToken(int id) {")
         .AddCode("    switch (id) {")
         .AddCode("    case 0:");
     for (size_t i = token_set.size(); i > 0; --i) {
@@ -419,12 +419,12 @@ namespace emp {
         .AddCode("  }")
         .AddCode("")
         .AddCode("  // Return the number of token types the lexer recognizes.")
-        .AddCode("  static constexpr size_t GetNumTokens() { return NUM_TOKENS; }")
+        .AddCode("  static constexpr int GetNumTokens() { return NUM_TOKENS; }")
         .AddCode("")
         .AddCode("  // Generate and return the next token from the input stream.")
         .AddCode("  Token NextToken(std::istream & is) {")
-        .AddCode("    size_t cur_pos = 0;   // Position in the input that we are actively analyzing")
-        .AddCode("    size_t best_pos = 0;  // Best look-ahead we've found so far")
+        .AddCode("    int cur_pos = 0;      // Position in the input that we are actively analyzing")
+        .AddCode("    int best_pos = 0;     // Best look-ahead we've found so far")
         .AddCode("    int cur_state = 0;    // Next state for the DFA analysis")
         .AddCode("    int cur_stop = 0;     // Current \"stop\" state (or 0 if we can't stop here)")
         .AddCode("    int best_stop = -1;   // Best stop state found so far?")
@@ -438,7 +438,7 @@ namespace emp {
         .AddCode("      const char next_char = static_cast<char>(is.get());")
         .AddCode("      if (next_char < 0) break;")      
         .AddCode("      cur_pos++;")
-        .AddCode("      cur_state = DFA::GetNext(cur_state, static_cast<size_t>(next_char));")
+        .AddCode("      cur_state = DFA::GetNext(cur_state, next_char);")
         .AddCode("      cur_stop = DFA::GetStop(cur_state);")
         .AddCode("      if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }")
         .AddCode("      lexeme.push_back( next_char );")
@@ -446,13 +446,13 @@ namespace emp {
         .AddCode("")
         .AddCode("    // If best_pos < cur_pos, rewind the input stream and adjust the lexeme.")
         .AddCode("    if (best_pos > 0 && best_pos < cur_pos) {")
-        .AddCode("      lexeme.resize(best_pos);")
+        .AddCode("      lexeme.resize(static_cast<size_t>(best_pos));")
         .AddCode("      while (best_pos < cur_pos) { is.unget(); cur_pos--; }")
         .AddCode("    }")
         .AddCode("")
         .AddCode("    // Update the line number we are on.")
         .AddCode("    const size_t out_line = cur_line;")
-        .AddCode("    cur_line+=std::count(lexeme.begin(),lexeme.end(),'\\n');")
+        .AddCode("    cur_line += static_cast<size_t>(std::count(lexeme.begin(),lexeme.end(),'\\n'));")
         .AddCode("")
         .AddCode("    // If we can't find a token, return 0 (for end of stream) or error (for no valid options)")
         .AddCode("    if (best_stop < 0) {")
