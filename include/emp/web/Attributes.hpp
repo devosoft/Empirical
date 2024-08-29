@@ -40,9 +40,10 @@ namespace web {
     /// Return a count of the number of attributes that have been set.
     int GetSize() const { return (int) settings.size(); }
 
-    /// Set the specified setting to the specified value
-    Attributes & DoSet(const std::string & in_set, const std::string & in_val) {
-      settings[in_set] = in_val;
+    /// Record that attribute "a" is set to value "v" (converted to string) and return this object.
+    template <typename SET_TYPE>
+    Attributes & Set(const std::string & s, SET_TYPE v) {
+      settings[s] = emp::to_string(v);
       return *this;
     }
 
@@ -51,8 +52,8 @@ namespace web {
     /// @param in_val attribute value to be added
     Attributes & DoAddAttr(const std::string in_attr, const std::string & in_val) {
       if (!Has(in_attr)){
-        // Attribute has not been assigned to this Widget. Add it with DoSet instead
-        DoSet(in_attr, in_val);
+        // Attribute has not been assigned to this Widget. Add it with Set instead
+        Set(in_attr, in_val);
       } else if(settings[in_attr].find(in_val) == std::string::npos){
         // New value is not a duplicate of any values assigned to this attribute. Append it.
         settings[in_attr] += " " + in_val;
@@ -62,12 +63,6 @@ namespace web {
 
     std::string GetAttrValue(const std::string & in_set){
       return settings[in_set];
-    }
-
-    /// Record that attribute "a" is set to value "v" (converted to string) and return this object.
-    template <typename SET_TYPE>
-    Attributes & Set(const std::string & s, SET_TYPE v) {
-      return DoSet(s, emp::to_string(v));
     }
 
     /// Set all values from in_attr here as well.  Return this object.
