@@ -423,14 +423,16 @@ namespace emp {
             case 'D': result = NewPtr<re_charset>("0123456789", true); break;
             case 'l': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"); break;
             case 'L': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", true); break;
-            case 's': result = NewPtr<re_charset>(" \t\r\n"); break;
-            case 'S': result = NewPtr<re_charset>(" \t\r\n", true); break;
+            case 's': result = NewPtr<re_charset>(" \f\n\r\t\v"); break;
+            case 'S': result = NewPtr<re_charset>(" \f\n\r\t\v", true); break;
             case 'w': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"); break;
             case 'W': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_", true); break;
-
+            
+            case 'f': result = NewPtr<re_string>('\f'); break;
             case 'n': result = NewPtr<re_string>('\n'); break;
             case 'r': result = NewPtr<re_string>('\r'); break;
             case 't': result = NewPtr<re_string>('\t'); break;
+            case 'v': result = NewPtr<re_string>('\v'); break;
             // Any of these characters should just be themselves!
             case '\\':
             case '\"':
