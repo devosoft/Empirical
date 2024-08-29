@@ -39,9 +39,7 @@ namespace web {
     Style(const Style &) = default;
     Style(Style &&) = default;
     template <typename... Ts>
-    Style(Ts &&... args) {
-      Set(std::forward<EXTRA_Ts>(args)...);
-    }
+    Style(Ts &&... args) { Set(std::forward<Ts>(args)...); }
 
     Style & operator=(const Style &) = default;
     Style & operator=(Style &&) = default;
