@@ -40,7 +40,9 @@ private:
   UI::Div token_div{"token_div"};
   UI::Div settings_div{"settings_div"};
   UI::Div error_div{"error_div"};
+  UI::Div sandbox_div{"sandbox_div"};
   UI::Div output_div{"output_div"};
+  UI::Div footer_div{"footer_div"};
 
   UI::Table token_table{1, 4, "token_table"};
   UI::Table settings_table{4, 2, "settings_table"};
@@ -63,6 +65,13 @@ private:
     "padding", "10px",
     "border", "1px solid black",
     "text_align", "center"
+  };
+
+  UI::Style div_style {
+    "border-radius", "10px",
+    "border",        "1px solid black",
+    "padding",       "15px",
+    "width",         "800px"
   };
 
 
@@ -239,6 +248,11 @@ private:
     emp::DownloadFile(out_filename, ss.str());
   }
 
+  void UpdateSandbox() {
+    sandbox_div.ToggleActive();
+    if (sandbox_div.IsInactive()) return;
+  }
+
   emp::String HeadingName(emp::String name) {
     return emp::MakeString("<big><big><b>", name, "</b></big></big><br>\n");
   }
@@ -253,7 +267,7 @@ private:
     const emp::String active_color = "#0000AA";
     const emp::String button_color = "#000044";
     const emp::String table_color = "white"; // "#FFFFE0";
-    intro_div.SetColor(text_color).SetBackground(button_color).SetCSS("border-radius", "10px", "border", "1px", "border-style", "solid", "padding", "15px", "width", "800px");
+    intro_div.SetColor(text_color).SetBackground(button_color).SetCSS(div_style);
     doc.Button("home_but").SetBackground(button_color);
     doc.Button("lexer_but").SetBackground(button_color);
     doc.Button("regex_but").SetBackground(button_color);
@@ -452,12 +466,7 @@ private:
     }
   }
 
-public:
-  Emplex() {
-    doc << "<h1>Emplex: A C++ Lexer Generator</h1>";
-
-    UpdateIntro("home");
-
+  void InitializeButtonDiv() {
     button_div << UI::Button([this](){
       UpdateIntro("home"); intro_div.Redraw(); 
     }, "Home", "home_but").SetCSS(button_style).SetBackground("#0000AA").SetCSS("width", "106px");
@@ -476,11 +485,9 @@ public:
     button_div << UI::Button([this](){
       UpdateIntro("about"); intro_div.Redraw(); 
     }, "About", "about_but").SetCSS(button_style).SetCSS("width", "106px");
-    doc << button_div;
-    doc << "<small><small><br></small></small>";
-    doc << intro_div;
-    doc << "<br>\n";
+  }
 
+  void InitializeTokenDiv() {
     // token_table.SetCSS("border-collapse", "collapse");
     token_div.SetBackground("lightgrey").SetCSS("border-radius", "10px", "border", "1px solid black", "padding", "15px", "width", "800px");
     token_div << HeadingName("Token Types");
@@ -559,14 +566,19 @@ public:
     .SetTitle("Generate code to activate this button.");
 
     token_div << UI::Button([this](){
+      UpdateSandbox();
+      sandbox_div.Redraw();
+    }, "Open Sandbox", "sandbox_but").SetCSS(button_style).SetBackground("#330066")
+    .SetTitle("Try out the current set of tokens live");
+
+    token_div << UI::Button([this](){
       doc.Div("settings_div").ToggleActive();
     }, "Advanced Options", "settings_but")
       .SetCSS(button_style).SetCSS("float", "right", "border-radius", "15px", "font-size", "12px")
       .SetTitle("Adjust naming details for generated code.");
+  }
 
-    doc << token_div;
-    doc << "<p>";
-
+  void InitializeSettingsDiv() {
     settings_div.SetBackground("tan")
       .SetCSS("border-radius", "10px", "border", "1px solid black", "padding", "15px", "width", "fit-content");
     settings_div << HeadingName("Advanced Options");
@@ -593,17 +605,54 @@ public:
 
     settings_div << settings_table;
 
-    doc << settings_div;
     settings_div.Deactivate();
+  }
 
-    error_div.SetBackground("white").SetColor("red");
-    doc << error_div;
+  void InitializeSandboxDiv() {
+    sandbox_div.SetBackground("#220022").SetColor("white").SetCSS(div_style);
+    sandbox_div << "Testing.";
+  }
 
+  void InitializeOutputDiv() {
     output_div.SetBackground("black").SetColor("white");
     output_div.SetBorder("20px").SetCSS("border-radius", "10px");
-
-    doc << output_div;
     output_div << output_text;
+  }
+
+  void InitializeFooterDiv() {
+    footer_div.SetBackground("#000044").SetColor("white").SetCSS(div_style).SetCSS("padding", "0px 20px");
+    footer_div <<
+      "<p>Emplex was developed by Dr. Charles Ofria at Michigan State University, 2024. "
+      "See \"About\" for more information.</p>";
+  }
+
+public:
+  Emplex() {
+    InitializeButtonDiv();
+
+    UpdateIntro("home");
+
+    InitializeTokenDiv();
+    InitializeSettingsDiv();
+
+    error_div.SetBackground("white").SetColor("red");
+
+    InitializeSandboxDiv();
+    InitializeOutputDiv();
+    InitializeFooterDiv();
+
+    // Place all of the divs into the document.
+    doc << "<h1>Emplex: A C++ Lexer Generator</h1>";
+    doc << button_div;
+    doc << "<small><small><br></small></small>";
+    doc << intro_div;
+    doc << "<br>" << token_div;
+    //doc << "<p>";
+    doc << "<br>" << settings_div;
+    doc << error_div;
+    doc << "<br>" << sandbox_div;
+    doc << output_div;
+    doc << "<br>" << footer_div;
   }
 };
 
