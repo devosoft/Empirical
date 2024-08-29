@@ -342,7 +342,7 @@ void UpdateIntro(emp::String mode) {
       "<p>In a regular expression, letters and digits always directly match themselves, but other "
       "characters often have a special function.  The following regular expression techniques are "
       "implemented in emplex:</p>"
-      "<p><table border=\"2\" cellpadding=\"3\" style=\"background: white; color: black\">"
+      "<p><table border=\"2\" cellpadding=\"3\" style=\"background: white; color: black\">\n"
       "<tr><th>Symbol</th><th>Description</th><th>Example</th><th>Explanation</th>\n"
       "<tr><th>|</th>       <td>A logical \"or\" (match just one side)</td>"
                            "<td><code>this|that</code></td>"
@@ -365,10 +365,31 @@ void UpdateIntro(emp::String mode) {
       "<tr><th>[ ... ]</th> <td>Match any single character between the brackets; ranges of characters are allowed using a dash ('-'). If the first character is a caret ('^') match any character EXCEPT those listed.</td>"
                            "<td><code>[0-9]</code></td>"
                            "<td>Match any single digit.</td>\n"
-      "<tr><th>.</th>       <td>Match any single character <i>except</i> a newline ('\\n'); same as <code>[^\\n]</code></td>"
-                           "<td><code>.*</code></td>"
-                           "<td>Match all characters until the end of the current line.</td>\n"      
-      "</table></p>";
+      "</table></p>\n"
+
+      "<p>We also have many different shortcuts that can be used inside of a regular expression:</p>\n"
+      "<p><table border=\"2\" cellpadding=\"3\" style=\"background: white; color: black\">\n"
+      "<tr><th>Shortcut</th> <th>Expansion</th>      <th>Meaning</th> </tr></tr>\n"
+      "<tr><th>.</th>        <td><code>[^\\n]</code> <td>Match any single character <i>except</i> a newline ('\\n')</td></tr>\n"
+      "<tr><th>\\d</th>      <td><code>[0-9]</code>  <td>Match any single digit</td></tr>\n"
+      "<tr><th>\\D</th>      <td><code>[^0-9]</code> <td>Match any single non-digit character</td></tr>\n"
+      "<tr><th>\\l</th>      <td><code>[a-zA-Z]</code>  <td>Match any single letter</td></tr>\n"
+      "<tr><th>\\L</th>      <td><code>[^a-zA-Z]</code> <td>Match any single non-letter character</td></tr>\n"
+      "<tr><th>\\s</th>      <td><code>[ \\f\\n\\r\\t\\v]</code> <td>Match any single whitespace character</td></tr>\n"
+      "<tr><th>\\S</th>      <td><code>[^\\f\\n\\r\\t\\v]</code> <td>Match any single non-whitespace character</td></tr>\n"
+      "<tr><th>\\w</th>      <td><code>[A-Za-z0-9_]</code>  <td>Match any identifier (\"word\") character</td></tr>\n"
+      "<tr><th>\\W</th>      <td><code>[^A-Za-z0-9_]</code> <td>Match any single non-identifier character</td></tr>\n"
+      "</table></p>\n"
+
+      "<p>Here are some examples of regular expression techniques:</p>\n"
+      "<p><table border=\"2\" cellpadding=\"3\" style=\"background: white; color: black\">\n"
+      "<tr><td><code>.*</code></td> <td>Match all characters until the end of the current line.</td></tr>\n"
+      "<tr><td><code>\"if\"|\"while\"|\"for\"</code></td> <td>Match common keywords.</td></tr>\n"      
+      "<tr><td><code>x0[0-9a-fA-F]+</code></td> <td>Match hexadecimal values</td></tr>\n"
+      "<tr><td><code>(http(s?)\"://\")?\\w+([./]\\w+)+</code></td> <td>A simple URL matcher</td></tr>\n"      
+      "</table></p>\n"
+
+      ;
   } else if (mode == "cpp") {
     doc.Button("cpp_but").SetBackground(active_color);
     intro_div <<
