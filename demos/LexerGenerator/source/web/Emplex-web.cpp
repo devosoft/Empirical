@@ -26,6 +26,7 @@ private:
   UI::Document doc{"emp_base"};
   emp::CPPFile file;
   emp::vector<emp::String> errors;
+  emp::Lexer lexer;
 
   // Lexer information
   emp::vector<TokenInput> token_info;
@@ -47,6 +48,8 @@ private:
   UI::Table token_table{1, 4, "token_table"};
   UI::Table settings_table{4, 2, "settings_table"};
   UI::Text output_text{"output_text"};
+  UI::TextArea sandbox_input{"sandbox_input"};
+  UI::Text sandbox_text{"sandbox_text"};
 
   UI::Style button_style {
     "padding", "10px 15px",
@@ -71,7 +74,8 @@ private:
     "border-radius", "10px",
     "border",        "1px solid black",
     "padding",       "15px",
-    "width",         "800px"
+    "width",         "800px",
+    "margin-top",    "10pt"
   };
 
 
@@ -213,7 +217,7 @@ private:
   void Generate() {
     if (!TestValidTable()) return;
 
-    emp::Lexer lexer;
+    lexer.Reset();
 
     // Load all of the tokens ino the lexer (since they passed tests, assume they are valid)
     for (const auto & t_info : token_info) {
@@ -489,7 +493,7 @@ private:
 
   void InitializeTokenDiv() {
     // token_table.SetCSS("border-collapse", "collapse");
-    token_div.SetBackground("lightgrey").SetCSS("border-radius", "10px", "border", "1px solid black", "padding", "15px", "width", "800px");
+    token_div.SetBackground("lightgrey").SetCSS("margin-top", "10pt", "border-radius", "10px", "border", "1px solid black", "padding", "15px", "width", "800px");
     token_div << HeadingName("Token Types");
 
     token_table.SetColor("#000044");
@@ -579,8 +583,7 @@ private:
   }
 
   void InitializeSettingsDiv() {
-    settings_div.SetBackground("tan")
-      .SetCSS("border-radius", "10px", "border", "1px solid black", "padding", "15px", "width", "fit-content");
+    settings_div.SetBackground("tan").SetCSS(div_style);
     settings_div << HeadingName("Advanced Options");
 
     settings_table[0][0].SetHeader().SetCSS("padding-bottom", "15px") << "<br>Class Name: ";
@@ -604,13 +607,24 @@ private:
     }, "set_namespace").SetText(name_space).SetWidth(250);
 
     settings_div << settings_table;
-
-    settings_div.Deactivate();
   }
 
   void InitializeSandboxDiv() {
     sandbox_div.SetBackground("#220022").SetColor("white").SetCSS(div_style);
-    sandbox_div << "Testing.";
+    sandbox_div << sandbox_input.SetWidth(750);
+    sandbox_div << "<p>" << sandbox_text.SetWidth(750);
+    sandbox_div << "</p>";
+
+    sandbox_input.SetCallback([this](const std::string & in){
+      auto tokens = lexer.Tokenize(in);
+
+      sandbox_text.Freeze();
+      sandbox_text.Clear();
+      for (auto token : tokens) {
+        sandbox_text << "[" << token.lexeme << "]";
+      }
+      sandbox_text.Activate();
+    });
   }
 
   void InitializeOutputDiv() {
@@ -620,10 +634,10 @@ private:
   }
 
   void InitializeFooterDiv() {
-    footer_div.SetBackground("#000044").SetColor("white").SetCSS(div_style).SetCSS("padding", "0px 20px");
+    footer_div.SetBackground("#000044").SetColor("white").SetCSS(div_style);
     footer_div <<
-      "<p>Emplex was developed by Dr. Charles Ofria at Michigan State University, 2024. "
-      "See \"About\" for more information.</p>";
+      "Emplex was developed by Dr. Charles Ofria at Michigan State University, 2024. "
+      "See \"About\" for more information.";
   }
 
 public:
@@ -644,15 +658,16 @@ public:
     // Place all of the divs into the document.
     doc << "<h1>Emplex: A C++ Lexer Generator</h1>";
     doc << button_div;
-    doc << "<small><small><br></small></small>";
     doc << intro_div;
-    doc << "<br>" << token_div;
-    //doc << "<p>";
-    doc << "<br>" << settings_div;
+    doc << token_div;
+    doc << settings_div;
     doc << error_div;
-    doc << "<br>" << sandbox_div;
+    doc << sandbox_div;
     doc << output_div;
-    doc << "<br>" << footer_div;
+    doc << footer_div;
+
+    settings_div.Deactivate();
+    sandbox_div.Deactivate();
   }
 };
 
