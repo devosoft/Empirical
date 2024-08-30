@@ -123,17 +123,17 @@ namespace emp {
     Token ToToken(std::string_view in_str) const;
 
     /// Perform a single step in the Tokenize process, tracking line number as we go.
-    emp::Token TokenizeNext(std::istream & is, size_t & cur_line) const;
+    emp::Token TokenizeNext(std::istream & is, size_t & cur_line, bool keep_all=false) const;
 
     /// Turn an input stream of text into a vector of tokens.
-    TokenStream Tokenize(std::istream & is, String name="in_stream") const;
+    TokenStream Tokenize(std::istream & is, String name="in_stream", bool keep_all=false) const;
 
     /// Turn an input string into a vector of tokens.
-    TokenStream Tokenize(std::string_view str, String name="in_view") const;
+    TokenStream Tokenize(std::string_view str, String name="in_view", bool keep_all=false) const;
 
     /// Turn a vector of strings into a vector of tokens.
     TokenStream Tokenize(const emp::vector<String> & str_v,
-                         String name="in_string vector") const;
+                         String name="in_string vector", bool keep_all=false) const;
 
     /// Get the lexeme associated with the last token identified.
     const String & GetLexeme() const { return lexeme; }
@@ -284,42 +284,42 @@ namespace emp {
   }
 
   template <int MAX_ID>
-  emp::Token Lexer_Base<MAX_ID>::TokenizeNext(std::istream & is, size_t & cur_line) const {
+  emp::Token Lexer_Base<MAX_ID>::TokenizeNext(std::istream & is, size_t & cur_line, bool keep_all) const {
     // Loop until we get a token to return or hit the end of the stream.
     while (true) {
       emp::Token token = Process(is);
       token.line_id = cur_line;
       cur_line += emp::count(token.lexeme, '\n');
-      if (GetSaveToken(token)) return token;      // Skip ignored tokens and search for another.
+      if (keep_all || GetSaveToken(token)) return token;    // Skip ignored tokens and search for another.
     }
   }
 
   template <int MAX_ID>
-  TokenStream Lexer_Base<MAX_ID>::Tokenize(std::istream & is, String name) const {
+  TokenStream Lexer_Base<MAX_ID>::Tokenize(std::istream & is, String name, bool keep_all) const {
     emp::vector<Token> out_tokens;
     size_t cur_line = 1;
-    while (emp::Token token = TokenizeNext(is, cur_line)) {
+    while (emp::Token token = TokenizeNext(is, cur_line, keep_all)) {
       out_tokens.push_back(token);
     }
     return TokenStream{out_tokens, name};
   }
 
   template <int MAX_ID>
-  TokenStream Lexer_Base<MAX_ID>::Tokenize(std::string_view str, String name) const {
+  TokenStream Lexer_Base<MAX_ID>::Tokenize(std::string_view str, String name, bool keep_all) const {
     std::stringstream ss;
     ss << str;
-    return Tokenize(ss, name);
+    return Tokenize(ss, name, keep_all);
   }
 
   template <int MAX_ID>
-  TokenStream Lexer_Base<MAX_ID>::Tokenize(const emp::vector<String> & sv, String name) const
+  TokenStream Lexer_Base<MAX_ID>::Tokenize(const emp::vector<String> & sv, String name, bool keep_all) const
   {
     std::stringstream ss;
     for (auto & str : sv) {
       ss << str << '\n';
     }
 
-    return Tokenize(ss, name);
+    return Tokenize(ss, name, keep_all);
   }
 
   template <int MAX_ID>
