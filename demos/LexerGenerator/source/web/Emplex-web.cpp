@@ -52,8 +52,10 @@ private:
   UI::Text sandbox_text{"sandbox_text"};
 
   // Sandbox state
-  bool sandbox_show_ignore = false;  // Should we show token types marked as "ignore"?
-  bool sandbox_show_types = false;   // Should we show the type of each token?
+  bool sandbox_show_ignore = false;        // Should we show token types marked as "ignore"?
+  bool sandbox_show_types = false;         // Should we show the type of each token?
+  emp::vector<emp::String> sandbox_colors; // Foreground colors to use for tokens
+  emp::vector<emp::String> sandbox_bgs;    // Background colors to use for tokens
 
   UI::Style button_style {
     "padding", "10px 15px",
@@ -656,7 +658,8 @@ private:
   void InitializeSandboxDiv() {
     sandbox_input.SetText("# This is some sample text.\n# Replace this with whatever you want to have tokenized.\n# Feel free to resize this box to your liking.");
 
-    sandbox_div.SetBackground("#330033").SetColor("white").SetCSS(div_style);
+    //sandbox_div.SetBackground("#330033").SetColor("white").SetCSS(div_style);
+    sandbox_div.SetBackground("black").SetColor("white").SetCSS(div_style);
     sandbox_div << UI::Button([this](){
       GenerateLexer();
       UpdateSandbox();
@@ -680,6 +683,41 @@ private:
     sandbox_div << "</p>";
 
     sandbox_input.SetCallback([this](std::string){ UpdateSandbox(); });
+
+    sandbox_colors.push_back("#8888FF"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#88FF88"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#FFFF88"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#FF88FF"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#88FFFF"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#f58231"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#ffe119"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#bfef45"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#3cb44b"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#42d4f4"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#4363d8"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#911eb4"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#f032e6"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#fabed4"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#ffd8b1"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#aaffc3"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#dcbeff"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#8888FF"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#88FF88"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#FFFF88"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#FF88FF"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#88FFFF"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#f58231"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#ffe119"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#bfef45"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#3cb44b"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#42d4f4"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#4363d8"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#911eb4"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#f032e6"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#fabed4"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#ffd8b1"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#aaffc3"); sandbox_bgs.push_back("#404040");
+    sandbox_colors.push_back("#dcbeff"); sandbox_bgs.push_back("#404040");
   }
 
   void UpdateSandbox() {
@@ -687,17 +725,28 @@ private:
 
     auto tokens = lexer.Tokenize(sandbox_input.GetText(), "Emplex textbox", sandbox_show_ignore);
 
+    // EM_ASM({ alert(UTF8ToString($0)); }, emp::MakeString("# tokens = ", tokens.size()).c_str());
+
     sandbox_text.Freeze();
     sandbox_text.Clear();
     if (tokens.size() == 0) {
       sandbox_text << "NO VISIBLE TOKENS.";
     }
     for (auto token : tokens) {
+      sandbox_text << "[";
       if (sandbox_show_types) {
-        sandbox_text << "[" << lexer.GetTokenType(token.id).name << ":" << token.lexeme << "]";
-      } else {
-        sandbox_text << "[" << token.lexeme << "]";
+        sandbox_text << lexer.GetTokenType(token.id).name << ":";
       }
+      if (token.id == -1) {
+        sandbox_text << "<span style=\"background-color:#440000; color:#FFCCCC\">";
+      } else {
+        size_t color_id = (255 - token.id) % sandbox_colors.size();
+        sandbox_text << "<span style=\"color:" << sandbox_colors[color_id]
+                     << "; background-color:" << sandbox_bgs[color_id] << "\">";
+      }
+      sandbox_text << emp::MakeWebSafe(emp::MakeEscaped(token.lexeme), true);
+      sandbox_text << "</span>";
+      sandbox_text << "]";
     }
     sandbox_text.Activate();
   }
