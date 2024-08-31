@@ -51,6 +51,10 @@ private:
   UI::TextArea sandbox_input{"sandbox_input"};
   UI::Text sandbox_text{"sandbox_text"};
 
+  // Sandbox state
+  bool sandbox_show_ignore = false;  // Should we show token types marked as "ignore"?
+  bool sandbox_show_types = false;   // Should we show the type of each token?
+
   UI::Style button_style {
     "padding", "10px 15px",
     "background-color", "#000066",   // Dark Blue background
@@ -78,6 +82,16 @@ private:
     "margin-top",    "10pt"
   };
 
+  UI::Style sandbox_but_style {
+    "padding", "5px 10px",
+    "background-color", "#220022",   // Dark Blue background
+    "color", "white",                // White text
+    "border", "1px solid white",     // Thin white border
+    "border-radius", "5px",          // Rounded corners
+    "cursor", "pointer",
+    "font-size", "12px",
+    "transition", "background-color 0.3s ease, transform 0.3s ease" // Smooth transition
+  }; 
 
   // ---- HELPER FUNCTIONS ----
 
@@ -109,7 +123,20 @@ private:
     emp_assert(token_id <= token_info.size());
     if (token_id == token_info.size()) {
       // emp::notify::Message("Token_id = ", token_id, "; token_info.size() = ", token_info.size());
-      token_info.emplace_back(TokenInput(token_id));
+      // token_info.emplace_back(TokenInput(token_id));
+      token_info.emplace_back(token_id);
+      token_info.back().GetNameWidget().SetCallback([this](std::string){
+        GenerateLexer();
+        UpdateSandbox();
+      });
+      token_info.back().GetRegexWidget().SetCallback([this](std::string){
+        GenerateLexer();
+        UpdateSandbox();
+      });
+      token_info.back().GetIgnoreWidget().SetCallback([this](bool){
+        GenerateLexer();
+        UpdateSandbox();
+      });
     }     
     auto & row_info = token_info[token_id];
     new_row[0] << row_info.GetNameWidget();
@@ -214,8 +241,10 @@ private:
     return !errors.size();
   }
 
-  void Generate() {
-    if (!TestValidTable()) return;
+  /// Try to generate a lexer based on the current regular expressions.
+  /// @return success
+  bool GenerateLexer() {
+    if (!TestValidTable()) return false;
 
     lexer.Reset();
 
@@ -231,6 +260,14 @@ private:
       else lexer.AddToken(name, regex);
     }
 
+    return true;
+  }
+
+  /// Try to generate CPP code based on the current regular expressions.
+  /// @return success
+  bool GenerateCPP() {
+    if (!GenerateLexer()) return false;
+
     file.Clear();
     file.SetGuards(inc_guards);
     file.SetNamespace(name_space);
@@ -244,6 +281,8 @@ private:
     output_div.Redraw();
 
     doc.Button("download_but").SetDisabled(false).SetBackground("#330066").SetTitle("Click to download the generated code.");
+
+    return true;
   }
 
   void DownloadCode() {
@@ -252,7 +291,7 @@ private:
     emp::DownloadFile(out_filename, ss.str());
   }
 
-  void UpdateSandbox() {
+  void ToggleSandbox() {
     sandbox_div.ToggleActive();
     if (sandbox_div.IsInactive()) return;
   }
@@ -383,6 +422,10 @@ private:
         "<tr><td><code>x0[0-9a-fA-F]+</code></td> <td>Match hexadecimal values</td></tr>\n"
         "<tr><td><code>(http(s?)\"://\")?\\w+([./]\\w+)+</code></td> <td>A simple URL matcher</td></tr>\n"      
         "</table></p>\n"
+
+        "Note that traditionally regular expressions will pick the FIRST match that's possible, but a lexer uses "
+        "a principle called " << MakeLink("maximal munch", "https://en.wikipedia.org/wiki/Maximal_munch") << 
+        " which means that it will always take the LONGEST match it can find."
 
         ;
     } else if (mode == "cpp") {
@@ -560,7 +603,7 @@ private:
     token_div << "<br>";
 
     token_div << UI::Button([this](){
-      Generate();
+      GenerateCPP();
     }, "Generate C++ Code", "generate_but").SetCSS(button_style).SetBackground("#330066")
     .SetTitle("Generate a lexer using the token types defined above.");
 
@@ -570,6 +613,7 @@ private:
     .SetTitle("Generate code to activate this button.");
 
     token_div << UI::Button([this](){
+      ToggleSandbox();
       UpdateSandbox();
       sandbox_div.Redraw();
     }, "Open Sandbox", "sandbox_but").SetCSS(button_style).SetBackground("#330066")
@@ -610,21 +654,52 @@ private:
   }
 
   void InitializeSandboxDiv() {
-    sandbox_div.SetBackground("#220022").SetColor("white").SetCSS(div_style);
-    sandbox_div << sandbox_input.SetWidth(750);
-    sandbox_div << "<p>" << sandbox_text.SetWidth(750);
+    sandbox_input.SetText("# This is some sample text.\n# Replace this with whatever you want to have tokenized.\n# Feel free to resize this box to your liking.");
+
+    sandbox_div.SetBackground("#330033").SetColor("white").SetCSS(div_style);
+    sandbox_div << UI::Button([this](){
+      GenerateLexer();
+      UpdateSandbox();
+    }, "Refresh", "sandbox_refresh_but").SetCSS(sandbox_but_style);
+    sandbox_div << UI::Button([this](){
+      sandbox_show_types = !sandbox_show_types;
+      if (sandbox_show_types) doc.Button("sandbox_types_but").SetLabel("Types: ON");
+      else doc.Button("sandbox_types_but").SetLabel("Types: OFF");
+      UpdateSandbox();
+    }, "Types: OFF", "sandbox_types_but").SetCSS(sandbox_but_style);
+    sandbox_div << UI::Button([this](){
+      sandbox_show_ignore = !sandbox_show_ignore;
+      if (sandbox_show_ignore) doc.Button("sandbox_ignore_but").SetLabel("Ignored: VISIBLE");
+      else doc.Button("sandbox_ignore_but").SetLabel("Ignored: HIDDEN");
+      GenerateLexer();
+      UpdateSandbox();
+    }, "Ignored: HIDDEN", "sandbox_ignore_but").SetCSS(sandbox_but_style);
+    sandbox_div << sandbox_input.SetSize(750, 50);
+    sandbox_div << "<p>";
+    sandbox_div << sandbox_text.SetWidth(750).SetBackground("black").SetColor("white");
     sandbox_div << "</p>";
 
-    sandbox_input.SetCallback([this](const std::string & in){
-      auto tokens = lexer.Tokenize(in);
+    sandbox_input.SetCallback([this](std::string){ UpdateSandbox(); });
+  }
 
-      sandbox_text.Freeze();
-      sandbox_text.Clear();
-      for (auto token : tokens) {
+  void UpdateSandbox() {
+    if (sandbox_div.IsInactive()) return;
+
+    auto tokens = lexer.Tokenize(sandbox_input.GetText(), "Emplex textbox", sandbox_show_ignore);
+
+    sandbox_text.Freeze();
+    sandbox_text.Clear();
+    if (tokens.size() == 0) {
+      sandbox_text << "NO VISIBLE TOKENS.";
+    }
+    for (auto token : tokens) {
+      if (sandbox_show_types) {
+        sandbox_text << "[" << lexer.GetTokenType(token.id).name << ":" << token.lexeme << "]";
+      } else {
         sandbox_text << "[" << token.lexeme << "]";
       }
-      sandbox_text.Activate();
-    });
+    }
+    sandbox_text.Activate();
   }
 
   void InitializeOutputDiv() {
