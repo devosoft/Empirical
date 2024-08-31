@@ -330,9 +330,13 @@ namespace emp {
           c = regex[pos++];  // Identify the specific escape char.
           char c2, c3;       // In case they are needed.
           switch(c) {
+            // Escape sequences
+            case 'f': c = '\f'; break;
             case 'n': c = '\n'; break;
             case 'r': c = '\r'; break;
             case 't': c = '\t'; break;
+            case 'v': c = '\v'; break;
+
             // A backslash followed by a digit indicates we should expect an ascii code.
             case '0': case '1': case '2': case '3': case '4':
             case '5': case '6': case '7': case '8': case '9':
@@ -348,15 +352,21 @@ namespace emp {
               c = c*100 + c2*10 + c3;
               pos += 3;
               break;
-            // Any of these characters should just be themselves!
+            // Any of these characters should just be themselves; escaping may be only way to get them.
             case '-':
             case '\\':
             case ']':
-            case '[': // technically doesn't need to be escaped, but allowed.
+            case '[':  // Technically not needed. 
             case '^':
+
+            // These technically don't need to be escaped, but any symbol should be allowed to be escaped.
+            case '!':  case '\"':  case '#':  case '$':  case '%':  case '&':  case '\'':
+            case '(':  case ')':   case '*':  case '+':  case ',':  case '.':  case '/':
+            case ':':  case ';':   case '<':  case '=':  case '>':  case '?':  case '@':
+            case '_':  case '`':   case '{':  case '|':  case '}':  case '~':
               break;
-            default:
-              Error("Unknown escape char for char sets: '\\", c, "'.");
+            default:  // Give error for other characters, but use them directly.
+              Error("Unknown escape char for char set: '\\", c, "'; using directly.");
           }
         }
         out->char_set[(size_t)c] = true;
@@ -419,6 +429,7 @@ namespace emp {
         case '\\':
           c = regex[pos++];  // Identify the specific escape char.
           switch(c) {
+            // Shortcuts for character sets.
             case 'd': result = NewPtr<re_charset>("0123456789"); break;
             case 'D': result = NewPtr<re_charset>("0123456789", true); break;
             case 'l': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"); break;
@@ -428,27 +439,24 @@ namespace emp {
             case 'w': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"); break;
             case 'W': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_", true); break;
             
+            // Special escape sequences
             case 'f': result = NewPtr<re_string>('\f'); break;
             case 'n': result = NewPtr<re_string>('\n'); break;
             case 'r': result = NewPtr<re_string>('\r'); break;
             case 't': result = NewPtr<re_string>('\t'); break;
             case 'v': result = NewPtr<re_string>('\v'); break;
+
             // Any of these characters should just be themselves!
-            case '\\':
-            case '\"':
-            case '*':
-            case '+':
-            case '?':
-            case '.':
-            case '|':
-            case '(':
-            case ')':
-            case '[':
-            case ']':
+            case '!':  case '\"':  case '#':   case '$':  case '%':  case '&':  case '\'':
+            case '(':  case ')':   case '*':   case '+':  case ',':  case '-':  case '.':
+            case '/':  case ':':   case ';':   case '<':  case '=':  case '>':  case '?':
+            case '@':  case '[':   case '\\':  case ']':  case '^':  case '_':  case '`':
+            case '{':  case '|':   case '}':   case '~':
               result = NewPtr<re_string>(c);
               break;
             default:
-              Error("Unknown escape char: '\\", c, "'.");
+              Error("Unknown escape char: '\\", c, "'; ignoring backslash.");
+              result = NewPtr<re_string>(c);
           }
           break;
 
@@ -463,7 +471,7 @@ namespace emp {
           break;
 
         default:
-          // Take this char directly.
+          // Take this character directly.
           result = NewPtr<re_string>(c);
       }
 
