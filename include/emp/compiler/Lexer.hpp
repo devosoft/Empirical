@@ -251,8 +251,11 @@ namespace emp {
       lexeme.push_back( next_char );
     }
 
+    // If we did not find any options, peel off one character by setting best_pos to 1.
+    if (best_pos == 0) best_pos = 1;
+
     // If best_pos < cur_pos, rewind the input stream and adjust the lexeme.
-    if (best_pos > 0 && best_pos < cur_pos) {
+    if (best_pos < cur_pos) {
       lexeme.resize(best_pos);
       while (best_pos < cur_pos) { is.unget(); cur_pos--; }
     }
@@ -444,8 +447,10 @@ namespace emp {
         .AddCode("      lexeme.push_back( next_char );")
         .AddCode("    }")
         .AddCode("")
+        .AddCode("    // If we did not find any options, peel off just one character.")
+        .AddCode("    if (best_pos == 0) best_pos = 1;")
         .AddCode("    // If best_pos < cur_pos, rewind the input stream and adjust the lexeme.")
-        .AddCode("    if (best_pos > 0 && best_pos < cur_pos) {")
+        .AddCode("    if (best_pos < cur_pos) {")
         .AddCode("      lexeme.resize(static_cast<size_t>(best_pos));")
         .AddCode("      while (best_pos < cur_pos) { is.unget(); cur_pos--; }")
         .AddCode("    }")
