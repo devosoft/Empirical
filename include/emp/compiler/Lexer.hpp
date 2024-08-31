@@ -66,7 +66,7 @@ namespace emp {
     mutable String lexeme;                  ///< Current state of lexeme being generated.
 
     static const TokenType & ERROR_TOKEN() {
-      static const TokenType token;
+      static const TokenType token{"ERROR", "", -1};
       return token;
     }
 
