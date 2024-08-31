@@ -48,7 +48,7 @@ namespace emp {
   [[nodiscard]] inline String MakeEscaped(char c);
   [[nodiscard]] inline String MakeEscaped(const String & in);
   [[nodiscard]] inline String MakeCSVSafe(const String & in);
-  [[nodiscard]] inline String MakeWebSafe(const String & in);
+  [[nodiscard]] inline String MakeWebSafe(const String & in, bool convert_space=false);
   [[nodiscard]] inline String MakeLiteral(char value);
   [[nodiscard]] inline String MakeLiteral(const std::string & value);
   template <typename T> [[nodiscard]] inline String MakeLiteral(const T & value);
@@ -1478,7 +1478,7 @@ namespace emp {
   }
 
   /// Take a string and replace reserved HTML characters with character entities
-  String MakeWebSafe(const String & in) {
+  String MakeWebSafe(const String & in, bool convert_space) {
     String out;
     out.reserve(in.size());
     for (char c : in) {
@@ -1488,6 +1488,7 @@ namespace emp {
       case '>': out += "&gt;"; break;
       case '\'': out += "&apos;"; break;
       case '"': out += "&quot;"; break;
+      case ' ': out += convert_space ? "&nbsp" : " "; break;
       default: out += c;
       }
     }
