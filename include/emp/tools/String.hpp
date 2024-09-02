@@ -45,8 +45,8 @@ namespace emp {
   // Some stand-alone functions to generate String objects.
   template <typename... Ts> [[nodiscard]] inline String MakeString(Ts &&... args);
   [[nodiscard]] inline const String & MakeString(const String & in) { return in; };
-  [[nodiscard]] inline String MakeEscaped(char c);
-  [[nodiscard]] inline String MakeEscaped(const String & in);
+  [[nodiscard]] inline String MakeEscaped(char c, bool include_visible=true);
+  [[nodiscard]] inline String MakeEscaped(const String & in, bool include_visible=true);
   [[nodiscard]] inline String MakeCSVSafe(const String & in);
   [[nodiscard]] inline String MakeWebSafe(const String & in, bool convert_space=false);
   [[nodiscard]] inline String MakeLiteral(char value);
@@ -629,13 +629,13 @@ namespace emp {
     int AsInt() const { return std::stoi(*this); }
     unsigned long long AsULL() const { return std::stoull(*this); }
 
-    String & AppendEscaped(char c) { *this += MakeEscaped(c); return *this; }
-    String & SetEscaped(char c) { *this = MakeEscaped(c); return *this; }
+    String & AppendEscaped(char c, bool inc_visible=true) { *this += MakeEscaped(c, inc_visible); return *this; }
+    String & SetEscaped(char c, bool inc_visible=true) { *this = MakeEscaped(c, inc_visible); return *this; }
 
-    String & AppendEscaped(const String & in) { *this+=MakeEscaped(in); return *this; }
-    String & SetEscaped(const String & in) { *this = MakeEscaped(in); return *this; }
-    String & SetEscaped() { *this = MakeEscaped(*this); return *this; }
-    [[nodiscard]] String AsEscaped() const { return MakeEscaped(*this); }
+    String & AppendEscaped(const String & in, bool inc_visible=true) { *this+=MakeEscaped(in, inc_visible); return *this; }
+    String & SetEscaped(const String & in, bool inc_visible=true) { *this = MakeEscaped(in, inc_visible); return *this; }
+    String & SetEscaped(bool inc_visible=true) { *this = MakeEscaped(*this, inc_visible); return *this; }
+    [[nodiscard]] String AsEscaped(bool inc_visible=true) const { return MakeEscaped(*this, inc_visible); }
 
     String & AppendCSVSafe(String in) { *this+=MakeCSVSafe(in); return *this; }
     String & SetCSVSafe(const String & in) { *this = MakeCSVSafe(in); return *this; }
@@ -1410,7 +1410,11 @@ namespace emp {
     return String::Make(std::forward<Ts>(args)...);
   }
 
-  String MakeEscaped(char c) {
+  /// @brief Convert a character into a escape sequence, if needed.
+  /// @param c Character to convert
+  /// @param include_visible Should we convert visible character that are often escaped (like " or \)
+  /// @return A string representing the escaped character
+  String MakeEscaped(char c, bool include_visible) {
     // If we just append as a normal character, do so!
     if ( (c >= 40 && c < 91) || (c > 96 && c < 127)) return emp::MakeString(c);
     switch (c) {
@@ -1447,17 +1451,21 @@ namespace emp {
     case 30: return "\\036";
     case 31: return "\\037";
 
-    case '\"': return "\\\"";  // case 34
-    case '\'': return "\\\'";  // case 39
-    case '\\': return "\\\\";  // case 92
+    case '\"': return include_visible ? "\\\"" : "\"";  // case 34
+    case '\'': return include_visible ? "\\\'" : "\'";  // case 39
+    case '\\': return include_visible ? "\\\\" : "\\";  // case 92
     case 127: return "\\177";  // (delete)
     }
 
     return emp::MakeString(c);
   }
 
-  String MakeEscaped(const String & in) {
-    return String(in, [](char c){ return MakeEscaped(c); });
+  /// @brief Convert chars in a string into escape sequences, as needed.
+  /// @param in String to convert
+  /// @param inc_visible Should we convert visible character that are often escaped (like " or \)
+  /// @return A string representing the escaped sequence of chars
+  String MakeEscaped(const String & in, bool inc_visible) {
+    return String(in, [inc_visible](char c){ return MakeEscaped(c, inc_visible); });
   }
 
   String MakeCSVSafe(const String & in) {
