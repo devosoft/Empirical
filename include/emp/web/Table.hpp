@@ -56,7 +56,7 @@ namespace web {
       size_t colspan=1;    ///< How many columns wide is this TableData?
       size_t rowspan=1;    ///< How many rows deep is this TableData?
       bool header=false;   ///< Is this TableData a header (<th> vs <td>)?
-      bool masked=false;   ///< Is this cell masked by another cell?
+      bool masked=false;   ///< Is this cell masked by the span of another cell?
       WidgetExtras extras; ///< Extra annotations (attributes, style, listeners)
 
       emp::vector<Widget> children;  ///< Widgets contained in this cell.
@@ -132,6 +132,19 @@ namespace web {
       std::string GetTypeName() const override { return "TableInfo"; }
 
       void Resize(size_t new_rows, size_t new_cols) {
+        // Clear children from all cells being removed; start with cols on kept rows.
+        size_t min_rows = std::min(row_count, new_rows);
+        for (size_t col_id = new_cols; col_id < col_count; col_id++) {
+          for (size_t row_id = 0; row_id < min_rows; ++row_id) {
+            ClearCellChildren(row_id, col_id);
+          }
+        }
+  
+        // Clear removed rows.
+        for (size_t row_id = new_rows; row_id < row_count; ++row_id) {
+          ClearRowChildren(row_id);
+        }
+
         // Resize preexisting rows if remaining
         if (new_cols != col_count) {
           for (size_t r = 0; r < rows.size() && r < new_rows; r++) {
