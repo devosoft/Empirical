@@ -123,6 +123,7 @@ private:
     }
     auto new_row = token_table.AddRow();
     emp_assert(token_id <= token_info.size());
+    // Grow the table if we need to.
     if (token_id == token_info.size()) {
       // emp::notify::Message("Token_id = ", token_id, "; token_info.size() = ", token_info.size());
       // token_info.emplace_back(TokenInput(token_id));
@@ -139,20 +140,23 @@ private:
         GenerateLexer();
         UpdateSandbox();
       });
+      token_info.back().GetRemoveButton().SetCallback([this, token_id](){
+        RemoveTableRow(token_id); doc.Div("token_div").Redraw();
+      });
+      token_info.back().GetSwapUpButton().SetCallback([this, token_id](){
+        SwapTableRows(token_id, token_id-1); doc.Div("token_div").Redraw();
+      });
+      token_info.back().GetSwapDownButton().SetCallback([this, token_id](){
+        SwapTableRows(token_id, token_id+1); doc.Div("token_div").Redraw();
+      });
     }     
     auto & row_info = token_info[token_id];
     new_row[0] << row_info.GetNameWidget();
     new_row[1] << row_info.GetRegexWidget();
     new_row[2] << "&nbsp;&nbsp;&nbsp;" << row_info.GetIgnoreWidget();
-    new_row[3] << UI::Button([this, token_id](){
-      RemoveTableRow(token_id); doc.Div("token_div").Redraw();
-    }, "X").SetColor("red").SetTitle("Click to remove this row.");
-    new_row[3] << UI::Button([this, token_id](){
-      SwapTableRows(token_id, token_id-1); doc.Div("token_div").Redraw();
-    }, "&uarr;").SetColor("blue").SetTitle("Click to swap this row with the one above it.");
-    new_row[3] << UI::Button([this, token_id](){
-      SwapTableRows(token_id, token_id+1); doc.Div("token_div").Redraw();
-    }, "&darr;").SetColor("blue").SetTitle("Click to swap this row with the one below it.");
+    new_row[3] << row_info.GetRemoveButton();
+    new_row[3] << row_info.GetSwapUpButton();
+    new_row[3] << row_info.GetSwapDownButton();
   }
 
   void AddTableRow(emp::String name, emp::String regex, bool ignore=false) {
@@ -377,7 +381,10 @@ private:
         "and, in particular, they can be used to describe tokens for lexical analysis.</p> "
         "<p>In a regular expression, letters and digits always directly match themselves, but other "
         "characters often have a special function.  The following regular expression techniques are "
-        "implemented in emplex:</p>"
+        "implemented in Emplex (a subset of the regex rules that were used in GNU's " <<
+        MakeLink("Flex", "https://ftp.gnu.org/old-gnu/Manuals/flex-2.5.4/html_mono/flex.html#SEC7") <<
+        "):</p>\n"
+
         "<p><table border=\"2\" cellpadding=\"3\" style=\"background: white; color: black\">\n"
         "<tr><th>Symbol</th><th>Description</th><th>Example</th><th>Explanation</th>\n"
         "<tr><th>|</th>       <td>A logical \"or\" (match just one side)</td>"
@@ -425,10 +432,10 @@ private:
         "<tr><td><code>(http(s?)\"://\")?\\w+([./]\\w+)+</code></td> <td>A simple URL matcher</td></tr>\n"      
         "</table></p>\n"
 
-        "Note that traditionally regular expressions will pick the FIRST match that's possible, but a lexer uses "
-        "a principle called " << MakeLink("maximal munch", "https://en.wikipedia.org/wiki/Maximal_munch") << 
-        " which means that it will always take the LONGEST match it can find."
-
+        "<p>Note that traditionally regular expressions will pick the FIRST match that's "
+        "possible, but a lexer uses a principle called " <<
+        MakeLink("maximal munch", "https://en.wikipedia.org/wiki/Maximal_munch") << 
+        " which means that it will always take the LONGEST match it can find.</p>\n"
         ;
     } else if (mode == "cpp") {
       doc.Button("cpp_but").SetBackground(active_color);
@@ -600,7 +607,7 @@ private:
 
     token_div << UI::Button([this](){ doc.FileInput("load_input").DoClick(); }, "Load Token Types", "load_but")
       .SetCSS(button_style)
-      .SetTitle("Load previously save token types from file.");
+      .SetTitle("Load previously saved token types from file.");
 
     token_div << "<br>";
 
@@ -723,7 +730,10 @@ private:
   void UpdateSandbox() {
     if (sandbox_div.IsInactive()) return;
 
-    auto tokens = lexer.Tokenize(sandbox_input.GetText(), "Emplex textbox", sandbox_show_ignore);
+    emp::TokenStream tokens("Emplex Sandbox");
+    if (lexer.GetNumTokens()) {
+      tokens = lexer.Tokenize(sandbox_input.GetText(), "Emplex Sandbox", sandbox_show_ignore);
+    }
 
     // EM_ASM({ alert(UTF8ToString($0)); }, emp::MakeString("# tokens = ", tokens.size()).c_str());
 
@@ -744,7 +754,7 @@ private:
         sandbox_text << "<span style=\"color:" << sandbox_colors[color_id]
                      << "; background-color:" << sandbox_bgs[color_id] << "\">";
       }
-      sandbox_text << emp::MakeWebSafe(emp::MakeEscaped(token.lexeme), true);
+      sandbox_text << emp::MakeWebSafe(emp::MakeEscaped(token.lexeme, false), true);
       sandbox_text << "</span>";
       sandbox_text << "]";
     }
@@ -767,14 +777,9 @@ private:
 public:
   Emplex() {
     InitializeButtonDiv();
-
-    UpdateIntro("home");
-
     InitializeTokenDiv();
     InitializeSettingsDiv();
-
     error_div.SetBackground("white").SetColor("red");
-
     InitializeSandboxDiv();
     InitializeOutputDiv();
     InitializeFooterDiv();
@@ -790,6 +795,7 @@ public:
     doc << output_div;
     doc << footer_div;
 
+    UpdateIntro("home");
     settings_div.Deactivate();
     sandbox_div.Deactivate();
   }
