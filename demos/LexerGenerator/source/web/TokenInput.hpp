@@ -16,6 +16,9 @@ private:
   UI::TextArea name_text;
   UI::TextArea regex_text;
   UI::CheckBox ignore_toggle;
+  UI::Button remove_but{[](){}, "X"};
+  UI::Button swap_up_but{[](){}, "&uarr;"};
+  UI::Button swap_down_but{[](){}, "&darr;"};
 
 public:
   TokenInput(size_t row_id, emp::String name="", emp::String regex="", bool ignore=false)
@@ -26,11 +29,18 @@ public:
     name_text.SetText(name).SetCSS("width", "150px", "font-size", "14px");
     regex_text.SetText(regex).SetCSS("width", "450px", "font-size", "14px");
     ignore_toggle.SetChecked(ignore);
+
+    remove_but.SetColor("red").SetTitle("Click to remove this row.");
+    swap_up_but.SetColor("blue").SetTitle("Click to swap this row with the one above it.");
+    swap_down_but.SetColor("blue").SetTitle("Click to swap this row with the one below it.");
   }
 
   UI::TextArea GetNameWidget() { return name_text; }
   UI::TextArea GetRegexWidget() { return regex_text; }
   UI::CheckBox GetIgnoreWidget() { return ignore_toggle; }
+  UI::Button GetRemoveButton() { return remove_but; }
+  UI::Button GetSwapUpButton() { return swap_up_but; }
+  UI::Button GetSwapDownButton() { return swap_down_but; }
 
   emp::String GetName() const { return name_text.GetText(); }
   emp::String GetRegex() const { return regex_text.GetText(); }
