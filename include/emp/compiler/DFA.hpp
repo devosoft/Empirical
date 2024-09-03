@@ -20,7 +20,7 @@
 #include "../base/array.hpp"
 #include "../base/vector.hpp"
 #include "../io/CPPFile.hpp"
-#include "../tools/string_utils.hpp"
+#include "../tools/String.hpp"
 
 namespace emp {
 
@@ -100,13 +100,13 @@ namespace emp {
     }
 
     /// Return the new state after a series of symbols.
-    int Next(int state, std::string sym_set) const {
+    int Next(int state, emp::String sym_set) const {
       for (char x : sym_set) state = Next(state, (size_t) x);
       return state;
     }
 
     /// Determine if an entire series of symbols is valid.
-    stop_t Test(const std::string & str) const {
+    stop_t Test(const emp::String & str) const {
       int out = Next(0, str);
       return GetStop(out);
     }
@@ -121,7 +121,7 @@ namespace emp {
         os << " " << i << " ->";
         for (size_t s = 0; s < NUM_SYMBOLS; s++) {
           if (transitions[i][s] == -1) continue;
-          os << " " << to_literal((char) s) << ":" << transitions[i][s];
+          os << " " << MakeLiteral((char) s) << ":" << transitions[i][s];
         }
         if (IsStop(i)) os << " [STOP=" << ((int) GetStop(i)) << "]";
         os << std::endl;
@@ -131,7 +131,7 @@ namespace emp {
 
     // Print out this DFA as compilable C++ code.
     void WriteCPP(emp::CPPFile & file,
-                  std::string object_name="AutoDFA"
+                  emp::String object_name="AutoDFA"
                  ) const {
       file.Include("<array>");
       file.Include("<string>");
