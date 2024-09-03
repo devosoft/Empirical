@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2022.
+ *  date: 2016-2024.
 */
 /**
  *  @file
@@ -32,7 +32,6 @@
  *
  *  @todo Implement  ^ and $ (beginning and end of line)
  *  @todo Implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respectively)
- *  @todo Implement \d (for digits), \s (for whitespace), etc.
  *  @todo Consider a separator (maybe backtick?) to divide up a regex expression;
  *        the result can be returned by each section as a vector of strings.
  */
@@ -294,7 +293,7 @@ namespace emp {
       }
     };
 
-    re_block head;
+    emp::Ptr<re_parent> head_ptr = nullptr;
 
     /// Make sure that there is another element in the RegEx (e.g., after an '|') or else
     /// trigger and error to report the problem.
@@ -480,43 +479,46 @@ namespace emp {
     }
 
     /// Process the input regex into a tree representation.
-    Ptr<re_block> Process(Ptr<re_block> cur_block=nullptr) {
-      emp_assert(pos < regex.size(), pos, regex.size(), regex);
+    Ptr<re_parent> Process() {
+      if (pos >= regex.size()) {
+        if (regex.size() == 0) Error("Cannot process an empty RegEx");
+        else if (regex.back() == '|') Error("Another option must follow OR ('|'); use '?' to make a segment optional.");
+        else Error("Cannot end a RegEx with '", regex.back(), "'.");
+      }
 
-      // If caller does not provide current block, create one (and return it.)
-      if (cur_block==nullptr) cur_block = NewPtr<re_block>();
+      Ptr<re_parent> cur_parent = NewPtr<re_block>();
 
       // All blocks need to start with a single token.
-      cur_block->push( ConstructSegment() );
+      cur_parent->push( ConstructSegment() );
 
       while (pos < regex.size()) {
         const char c = regex[pos++];
         switch (c) {
-          // case '|': cur_block->push( new re_or( cur_block->pop(), ConstructSegment() ) ); break;
-          case '|': cur_block->push( NewPtr<re_or>( cur_block->pop(), Process() ) ); break;
-          case '*': cur_block->push( NewPtr<re_star>( cur_block->pop() ) ); break;
-          case '+': cur_block->push( NewPtr<re_plus>( cur_block->pop() ) ); break;
-          case '?': cur_block->push( NewPtr<re_qm>( cur_block->pop() ) ); break;
-          case ')': pos--; return cur_block;  // Must be ending segment (restore pos to check on return)
+          // case '|': cur_parent->push( NewPtr<re_or>( cur_parent->pop(), Process() ) ); break;
+          case '|': cur_parent = NewPtr<re_or>( cur_parent, Process() ); break;
+          case '*': cur_parent->push( NewPtr<re_star>( cur_parent->pop() ) ); break;
+          case '+': cur_parent->push( NewPtr<re_plus>( cur_parent->pop() ) ); break;
+          case '?': cur_parent->push( NewPtr<re_qm>( cur_parent->pop() ) ); break;
+          case ')': pos--; return cur_parent;  // Must be ending segment (restore pos to check on return)
 
           default:     // Must be a regular "segment"
             pos--;     // Restore to previous char to construct the next segment.
-            cur_block->push( ConstructSegment() );
+            cur_parent->push( ConstructSegment() );
         }
       }
 
-      return cur_block;
+      return cur_parent;
     }
 
   public:
     RegEx() = delete;
     RegEx(const std::string & r) : regex(r) {
-      if (regex.size()) Process(ToPtr(&head));
-      while(head.Simplify());
+      if (regex.size()) head_ptr = Process();
+      while(head_ptr->Simplify());
     }
     RegEx(const RegEx & r) : regex(r.regex) {
-      if (regex.size()) Process(ToPtr(&head));
-      while(head.Simplify());
+      if (regex.size()) head_ptr = Process();
+      while(head_ptr->Simplify());
     }
     ~RegEx() = default;
 
@@ -526,9 +528,9 @@ namespace emp {
       notes.resize(0);
       valid = true;
       pos = 0;
-      head.Clear();
-      Process(ToPtr(&head));
-      while (head.Simplify());
+      head_ptr.Delete();
+      head_ptr = Process();
+      while (head_ptr->Simplify());
       return *this;
     }
 
@@ -536,7 +538,10 @@ namespace emp {
     std::string AsString() const { return to_literal(regex); }
 
     /// Add this regex to an NFA being built.
-    void AddToNFA(NFA & nfa, size_t start, size_t stop) const { head.AddToNFA(nfa, start, stop); }
+    void AddToNFA(NFA & nfa, size_t start, size_t stop) const {
+      emp_assert(head_ptr);
+      head_ptr->AddToNFA(nfa, start, stop);
+    }
 
     /// Assume the RegEx is ready and setup processing for it.
     void Generate() const;
@@ -550,7 +555,10 @@ namespace emp {
     const emp::vector<std::string> & GetNotes() const { return notes; }
 
     /// For debugging: print the internal representation of the regex.
-    void PrintInternal() const { head.Print(std::cout); std::cout << std::endl; }
+    void PrintInternal() const {
+      emp_assert(head_ptr);
+      head_ptr->Print(std::cout); std::cout << std::endl;
+    }
 
     /// For debugging: print any internal notes generated about this regex.
     void PrintNotes() const {
