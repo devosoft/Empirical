@@ -32,6 +32,7 @@
 #include "../base/vector.hpp"
 #include "../bits/BitSet.hpp"
 #include "../datastructs/set_utils.hpp"
+#include "../tools/String.hpp"
 
 namespace emp {
 
@@ -146,13 +147,13 @@ namespace emp {
     }
 
     /// Add a transition between states 'from' and 'to' that can be taken with the provided symbols.
-    void AddTransition(size_t from, size_t to, const std::string & sym_set) {
+    void AddTransition(size_t from, size_t to, const emp::String & sym_set) {
       for (char x : sym_set) AddTransitionSymbol(from, to, (size_t) x);
     }
 
     /// Add a transition between states 'from' and 'to' that can be taken with the provided symbols.
     void AddTransition(size_t from, size_t to, const char * sym_set) {
-      AddTransition(from, to, std::string(sym_set));
+      AddTransition(from, to, emp::String(sym_set));
     }
 
     /// Add a transition between states 'from' and 'to' that can be taken with the provided symbols.
@@ -301,7 +302,7 @@ namespace emp {
     }
 
     /// Update states given a new series of input symbols (as a string)
-    void Next(const std::string & sym_set) {
+    void Next(const emp::String & sym_set) {
       for (char x : sym_set) Next((size_t) x);
     }
 
