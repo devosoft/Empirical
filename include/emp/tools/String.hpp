@@ -271,7 +271,7 @@ namespace emp {
 
     // Count the number of occurrences of a specific character.
     [[nodiscard]] size_t Count(char c, size_t start=0) const
-      { return (size_t) std::count(_Iterator(start), end(), c); }
+      { return (size() == 0) ? 0 : (size_t) std::count(_Iterator(start), end(), c); }
 
     // Count the number of occurrences of a specific character within a range.
     [[nodiscard]] size_t Count(char c, size_t start, size_t end) const
@@ -524,34 +524,16 @@ namespace emp {
     std::string_view ScanNestedBlock(size_t & pos) const { auto out=ViewNestedBlock(pos); pos+=out.size(); return out; }
     std::string_view ScanQuote(size_t & pos) const { auto out=ViewQuote(pos); pos+=out.size(); return out; }
 
+    // Additional scanning that also converts type.
+    char ScanAsChar(size_t & pos) const { return Get(pos++); }
+    int ScanAsInt(size_t & pos) const;
 
     // ------ Transformations into non-Strings ------
     // Note: For efficiency there are two versions of most of these: one where the output
     // data structure is provided and one where it must be generated.
 
     template <typename T>
-    T ConvertTo() {
-      // Is it already a string?
-      if constexpr (std::is_same<T, std::string>() || std::is_same<T, emp::String>()) return *this;
-
-      else if constexpr (std::is_same<T, int>()) return std::stoi(*this);
-      else if constexpr (std::is_same<T, long>()) return std::stol(*this);
-      else if constexpr (std::is_same<T, long long>()) return std::stoll(*this);
-      else if constexpr (std::is_same<T, unsigned long>()) return std::stoul(*this);
-      else if constexpr (std::is_same<T, unsigned long long>()) return std::stoull(*this);
-      else if constexpr (std::is_same<T, float>()) return std::stof(*this);
-      else if constexpr (std::is_same<T, double>()) return std::stod(*this);
-      else if constexpr (std::is_same<T, long double>()) return std::stold(*this);
-
-      // All other printable cases:
-      else {
-        std::stringstream ss;
-        ss << *this;
-        T out_val;
-        ss >> out_val;
-        return out_val;
-      }
-    }
+    T ConvertTo();
 
     template <typename DELIM_T=emp::String>
     inline void Slice(emp::vector<String> & out_set, DELIM_T delim=",",
@@ -1139,6 +1121,43 @@ namespace emp {
   T String::PopFromLiteral(const Syntax & syntax) {
     return MakeFromLiteral<T>(PopLiteral<T>(syntax));
   }
+
+  // Scanning that converts type.
+  int String::ScanAsInt(size_t & pos) const {
+    int result = 0;
+    while (pos < size() && is_digit(Get(pos))) {
+      result = result * 10 + (Get(pos) - '0');
+      ++pos;
+    }
+    return result;
+  }
+
+  // ------ Transformations into non-Strings ------
+
+  template <typename T>
+  T String::ConvertTo() {
+    // Is it already a string?
+    if constexpr (std::is_same<T, std::string>() || std::is_same<T, emp::String>()) return *this;
+
+    else if constexpr (std::is_same<T, int>()) return std::stoi(*this);
+    else if constexpr (std::is_same<T, long>()) return std::stol(*this);
+    else if constexpr (std::is_same<T, long long>()) return std::stoll(*this);
+    else if constexpr (std::is_same<T, unsigned long>()) return std::stoul(*this);
+    else if constexpr (std::is_same<T, unsigned long long>()) return std::stoull(*this);
+    else if constexpr (std::is_same<T, float>()) return std::stof(*this);
+    else if constexpr (std::is_same<T, double>()) return std::stod(*this);
+    else if constexpr (std::is_same<T, long double>()) return std::stold(*this);
+
+    // All other printable cases:
+    else {
+      std::stringstream ss;
+      ss << *this;
+      T out_val;
+      ss >> out_val;
+      return out_val;
+    }
+  }
+
 
   /// @brief Cut up a string based on the provided delimiter; fill them in to the provided vector.
   /// @param out_set destination vector
