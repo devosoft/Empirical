@@ -48,7 +48,7 @@
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../bits/BitSet.hpp"
-#include "../tools/string_utils.hpp"
+#include "../tools/String.hpp"
 
 #include "lexer_utils.hpp"
 #include "NFA.hpp"
@@ -60,17 +60,22 @@ namespace emp {
   private:
     constexpr static size_t NUM_SYMBOLS = 128; ///< Maximum number of symbol the RegEx can handle.
     using opts_t = BitSet<NUM_SYMBOLS>;
-    std::string regex;                         ///< Original string to define this RegEx.
-    emp::vector<std::string> notes;            ///< Any warnings or errors would be provided here.
+    emp::String regex;                         ///< Original string to define this RegEx.
+    emp::vector<emp::String> notes;            ///< Any warnings or errors would be provided here.
     bool valid = true;                         ///< Set to false if regex cannot be processed.
     size_t pos = 0;                            ///< Position being read in regex.
 
     mutable DFA dfa;                           ///< DFA that this RegEx translates to.
     mutable bool dfa_ready = false;            ///< Is the dfa ready? (or does it need to be generated?)
 
+    struct RepeatInfo {
+      int min_repeat = 1;
+      int max_repeat = 1;
+    };
+
     template <typename... T>
     void Error(T &&... args) {
-      notes.push_back(emp::to_string(std::forward<T>(args)...));
+      notes.push_back(emp::MakeString(std::forward<T>(args)...));
       valid = false;
     }
 
@@ -95,11 +100,11 @@ namespace emp {
 
     /// Representation of strings stored in a RegEx.
     struct re_string : public re_base {  // Series of specific chars
-      std::string str;
-      re_string() : str() { ; }
-      re_string(char c) : str() { str.push_back(c); }
-      re_string(const std::string & s) : str(s) { ; }
-      void Print(std::ostream & os) const override { os << "STR[" << to_escaped_string(str) << "]"; }
+      emp::String str{};
+      re_string() = default;
+      re_string(char c) { str.push_back(c); }
+      re_string(const emp::String & s) : str(s) { ; }
+      void Print(std::ostream & os) const override { os << "STR[" << str.AsEscaped() << "]"; }
       Ptr<re_string> AsString() override { return ToPtr(this); }
       size_t GetSize() const override { return str.size(); }
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
@@ -121,7 +126,7 @@ namespace emp {
         char_set[(size_t)x]=true;
         if (neg) char_set.NOT_SELF();
       }
-      re_charset(const std::string & s, bool neg=false) : char_set() {
+      re_charset(const emp::String & s, bool neg=false) : char_set() {
         for (char x : s) char_set[(size_t)x]=true;
         if (neg) char_set.NOT_SELF();
       }
@@ -131,7 +136,7 @@ namespace emp {
         if (chars.size() > 64) { chars = (~char_set).GetOnes(); use_not = true; }
         os << "SET[";
         if (use_not) os << "NOT ";
-        for (auto c : chars) os << to_escaped_string((char) c);
+        for (auto c : chars) os << MakeEscaped((char) c);
         os << "]";
       }
       Ptr<re_charset> AsCharSet() override { return ToPtr(this); }
@@ -293,10 +298,53 @@ namespace emp {
       }
     };
 
+    /// Representations of specified number of instances of a component.  e.g., a{m,n}
+    struct re_repeat : public re_parent {      // From m to n times.
+      RepeatInfo repeat;
+      re_repeat(Ptr<re_base> c, RepeatInfo in_repeat) : repeat(in_repeat) { push(c); }
+      void Print(std::ostream & os) const override {
+        os << "{" << repeat.min_repeat << "," << repeat.max_repeat << "}[";
+        nodes[0]->Print(os);
+        os << "]"; }
+      virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        size_t state1 = nfa.AddNewState();
+        nfa.AddFreeTransition(start, state1);
+
+        // Start by making REQUIRED transitions.
+        for (int i = 0; i < repeat.min_repeat; ++i) {
+          size_t state2 = nfa.AddNewState();
+          nodes[0]->AddToNFA(nfa, state1, state2);
+          state1 = state2;
+        }
+
+        // If we are allowed to have any number of additional transitions, do so.
+        if (repeat.max_repeat == -1) {
+          size_t state2 = nfa.AddNewState();
+          nodes[0]->AddToNFA(nfa, state1, state2);
+          nfa.AddFreeTransition(state1, state2);    // Allow skipping over.
+          nfa.AddFreeTransition(state2, state1);    // Allow repeating.
+          state1 = state2;
+        }
+
+        // Otherwise allow for specific count of additional transitions.
+        else {
+          int opt_count = repeat.max_repeat - repeat.min_repeat;
+          for (int i = 0; i < opt_count; ++i) {
+            size_t state2 = nfa.AddNewState();
+            nodes[0]->AddToNFA(nfa, state1, state2);
+            nfa.AddFreeTransition(state1, state2);    // Allow skipping over.
+            state1 = state2;
+          }
+        }
+
+        nfa.AddFreeTransition(state1, stop);
+      }
+    };
+
     emp::Ptr<re_parent> head_ptr = nullptr;
 
-    /// Make sure that there is another element in the RegEx (e.g., after an '|') or else
-    /// trigger and error to report the problem.
+    /// Make sure that there is another element in the RegEx (e.g., that '[' is followed by ']') or else
+    /// trigger an error to report the problem.
     bool EnsureNext(char x) {
       if (pos >= regex.size()) Error("Expected ", x, " before end.");
       else if (regex[pos] != x) Error("Expected ", x, " at position ", pos,
@@ -478,15 +526,37 @@ namespace emp {
       return result;
     }
 
+    // Read the body of an {m,n} style repeat, advancing pos past it.
+    RepeatInfo ReadRepeat() {
+      int min_repeat = regex.ScanAsInt(pos);
+      int max_repeat = min_repeat;
+      if (pos < regex.size() && regex[pos] == ',') {
+        ++pos;
+        if (pos < regex.size() && regex[pos] == '}') max_repeat = -1;
+        else max_repeat = regex.ScanAsInt(pos);
+      }
+      if (pos >= regex.size()) {
+        Error("Expected close brace ('}') at end of repeat.");
+      } else if (regex[pos] != '}') {
+        Error("Unexpected '", regex[pos], "' in repeat specifier.");
+      } else if (max_repeat != -1 && max_repeat < min_repeat) {
+        Error("In repeat block {m,n}, m must be <= n, but ", min_repeat, " > ", max_repeat, ".");
+      }
+      pos++; // Skip past '}'
+      return RepeatInfo{min_repeat,max_repeat};
+    }
+
     /// Process the input regex into a tree representation.
     Ptr<re_parent> Process() {
+      Ptr<re_parent> cur_parent = NewPtr<re_block>();
+
+      // Make sure the input stream is good to load from.
       if (pos >= regex.size()) {
         if (regex.size() == 0) Error("Cannot process an empty RegEx");
         else if (regex.back() == '|') Error("Another option must follow OR ('|'); use '?' to make a segment optional.");
         else Error("Cannot end a RegEx with '", regex.back(), "'.");
+        return cur_parent;
       }
-
-      Ptr<re_parent> cur_parent = NewPtr<re_block>();
 
       // All blocks need to start with a single token.
       cur_parent->push( ConstructSegment() );
@@ -500,6 +570,7 @@ namespace emp {
           case '+': cur_parent->push( NewPtr<re_plus>( cur_parent->pop() ) ); break;
           case '?': cur_parent->push( NewPtr<re_qm>( cur_parent->pop() ) ); break;
           case ')': pos--; return cur_parent;  // Must be ending segment (restore pos to check on return)
+          case '{': cur_parent->push( NewPtr<re_repeat>( cur_parent->pop(), ReadRepeat() ) ); break;
 
           default:     // Must be a regular "segment"
             pos--;     // Restore to previous char to construct the next segment.
@@ -512,7 +583,7 @@ namespace emp {
 
   public:
     RegEx() = delete;
-    RegEx(const std::string & r) : regex(r) {
+    RegEx(const emp::String & r) : regex(r) {
       if (regex.size()) head_ptr = Process();
       while(head_ptr->Simplify());
     }
@@ -535,7 +606,7 @@ namespace emp {
     }
 
     /// Convert the RegEx to an standard string, readable from outside this class.
-    std::string AsString() const { return to_literal(regex); }
+    emp::String AsString() const { return regex.AsLiteral(); }
 
     /// Add this regex to an NFA being built.
     void AddToNFA(NFA & nfa, size_t start, size_t stop) const {
@@ -547,12 +618,12 @@ namespace emp {
     void Generate() const;
 
     /// Test if a string satisfies this regex.
-    bool Test(const std::string & str) const {
+    bool Test(const emp::String & str) const {
       if (!dfa_ready) Generate();
       return dfa.Test(str);
     }
 
-    const emp::vector<std::string> & GetNotes() const { return notes; }
+    const emp::vector<emp::String> & GetNotes() const { return notes; }
 
     /// For debugging: print the internal representation of the regex.
     void PrintInternal() const {
@@ -562,7 +633,7 @@ namespace emp {
 
     /// For debugging: print any internal notes generated about this regex.
     void PrintNotes() const {
-      for (const std::string & n : notes) {
+      for (const emp::String & n : notes) {
         std::cout << n << std::endl;
       }
     }
@@ -573,7 +644,7 @@ namespace emp {
         std::cout << "NOTES:" << std::endl;
         PrintNotes();
       }
-      std::cout << "RegEx: " << to_escaped_string(regex) << std::endl;
+      std::cout << "RegEx: " << regex.AsEscaped() << std::endl;
       std::cout << "INTERNAL: ";
       PrintInternal();
     }
