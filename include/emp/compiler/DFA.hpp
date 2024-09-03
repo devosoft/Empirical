@@ -94,7 +94,7 @@ namespace emp {
 
     /// Return the new state after a symbol occurs.
     int Next(int state, size_t sym) const {
-      emp_assert(state >= -1 && state < (int) transitions.size());
+      emp_assert(state >= -1 && state < (int) transitions.size(), state, transitions.size());
       // emp_assert(sym >= 0 && sym < NUM_SYMBOLS, sym, (char) sym);
       return (state < 0 || sym >= NUM_SYMBOLS) ? -1 : transitions[(size_t)state][sym];
     }
@@ -160,7 +160,7 @@ namespace emp {
         if (state) file.AppendCode(",");
         file.AppendCode(static_cast<size_t>(stop_id[state]));
       }
-      file.AddCode("  };")
+      file.AppendCode("};")
           .AddCode("");
 
       file.AddCode("public:")
