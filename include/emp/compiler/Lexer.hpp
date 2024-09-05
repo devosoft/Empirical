@@ -37,7 +37,6 @@
 #include <iterator>
 #include <map>
 #include <stddef.h>
-#include <string>
 
 #include "../base/map.hpp"
 #include "../base/vector.hpp"
@@ -204,11 +203,11 @@ namespace emp {
 
   template <int MAX_ID>
   String Lexer_Base<MAX_ID>::GetTokenName(int id) const {
-    if (id < 0) return emp::to_string("Error (", id, ")");   // Negative tokens specify errors.
-    if (id == 0) return "EOF";                               // Token zero is end-of-file.
-    if (id < 128) return emp::to_escaped_string((char) id);  // Individual characters.
-    if (id <= cur_token_id) return emp::to_string("Error (", id, ")"); // Invalid token range!
-    return GetTokenType(id).name;                            // User-defined tokens.
+    if (id < 0) return MakeString("Error (", id, ")");             // Negative tokens specify errors.
+    if (id == 0) return "EOF";                                     // Token zero is end-of-file.
+    if (id < 128) return MakeEscaped((char) id);                   // Individual characters.
+    if (id <= cur_token_id) return MakeString("Error (", id, ")"); // Invalid token range!
+    return GetTokenType(id).name;                                  // User-defined tokens.
   }
 
   template <int MAX_ID>
@@ -276,7 +275,7 @@ namespace emp {
   template <int MAX_ID>
   Token Lexer_Base<MAX_ID>::Process(std::istream & in_stream) const {
     return Process(
-      std::string(std::istreambuf_iterator<char>(in_stream), std::istreambuf_iterator<char>())
+      emp::String(std::istreambuf_iterator<char>(in_stream), std::istreambuf_iterator<char>())
     );
   }
 
@@ -292,7 +291,7 @@ namespace emp {
     while (true) {
       emp::Token token = Process(str);
       token.line_id = cur_line;
-      cur_line += emp::count(token.lexeme, '\n');
+      cur_line += token.lexeme.Count('\n');
       if (keep_all || GetSaveToken(token)) return token;    // Skip ignored tokens and try again.
     }
   }
@@ -303,7 +302,7 @@ namespace emp {
     start_pos = 0;
     size_t cur_line = 1;
     while (emp::Token token = TokenizeNext(str, cur_line, keep_all)) {
-      out_tokens.push_back(token);
+    out_tokens.push_back(token);
     }
     return TokenStream{out_tokens, name};
   }
@@ -315,7 +314,7 @@ namespace emp {
     bool keep_all
   ) const {
     return Tokenize(
-      std::string(std::istreambuf_iterator<char>(in_stream), std::istreambuf_iterator<char>()),
+      emp::String(std::istreambuf_iterator<char>(in_stream), std::istreambuf_iterator<char>()),
       name,
       keep_all
     );
@@ -456,12 +455,12 @@ namespace emp {
         .AddCode("    // If we did not find any options, peel off just one character.")
         .AddCode("    if (best_pos == start_pos) best_pos++;")
         .AddCode("")
+        .AddCode("    lexeme = in.substr(start_pos, best_pos-start_pos);")
+        .AddCode("    start_pos += std::ssize(lexeme);")
+        .AddCode("")
         .AddCode("    // Update the line number we are on.")
         .AddCode("    const size_t out_line = cur_line;")
         .AddCode("    cur_line += static_cast<size_t>(std::count(lexeme.begin(),lexeme.end(),'\\n'));")
-        .AddCode("")
-        .AddCode("    lexeme = in.substr(start_pos, best_pos-start_pos);")
-        .AddCode("    start_pos += lexeme.size();")
         .AddCode("")
         .AddCode("    // If we can't find a token, return error token.")
         .AddCode("    if (best_stop < 0) return { ERROR_ID, lexeme, out_line };")
