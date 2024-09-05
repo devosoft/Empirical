@@ -3861,3 +3861,28 @@ TEST_CASE("29: Test Append()", "[tools]") {
 
   CHECK( bv1 == exp_result );
 }
+
+TEST_CASE("30: Test Iterators", "[tools]") {
+  emp::BitVector bv1( "001001" );
+
+  auto it1 = bv1.begin();
+  CHECK(*it1 == 2);
+  ++it1;
+  CHECK(*it1 == 5);
+  CHECK(*(it1++) == 5);
+  CHECK(*it1 == emp::String::npos);
+
+  emp::BitVector bv2( "1000000000000000000100000000" );
+  auto it2 = bv2.begin();
+  CHECK(*it2 == 0);
+  CHECK(*++it2 == 19);
+  CHECK(*++it2 == emp::String::npos);
+
+  emp::BitVector bv3( "1111100010100100" );
+  size_t sum = 0;
+  for (size_t x : bv3) {
+    sum += x;
+  }
+  CHECK( sum == 41 );
+
+}
