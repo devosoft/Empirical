@@ -18,6 +18,7 @@
 
 #include "../base/vector.hpp"
 #include "../bits/BitVector.hpp"
+#include "../tools/String.hpp"
 
 #include "DFA.hpp"
 #include "NFA.hpp"
@@ -117,12 +118,12 @@ namespace emp {
   /// Structure to track the current status of a DFA.
   struct DFAStatus {
     size_t state;
-    std::string sequence;
-    DFAStatus(size_t _state, const std::string & _seq) : state(_state), sequence(_seq) { ; }
+    emp::String sequence;
+    DFAStatus(size_t _state, const emp::String & _seq) : state(_state), sequence(_seq) { ; }
   };
 
   /// Method to find an example string that satisfies a DFA.
-  std::string FindExample(const DFA & dfa, const size_t min_size=1) {
+  emp::String FindExample(const DFA & dfa, const size_t min_size=1) {
     emp::vector< DFAStatus > traverse_set;
     traverse_set.emplace_back(0, "");
     // BitVector state_found(dfa.GetSize());
@@ -133,7 +134,7 @@ namespace emp {
       for (size_t sym = 0; sym < t.size(); sym++) {
         const int next_state = t[sym];
         if (next_state == -1) continue;                      // Ignore non-transitions
-        std::string cur_str(cur_status.sequence);
+        emp::String cur_str(cur_status.sequence);
         cur_str += (char) sym;                               // Figure out current string
         if (min_size <= cur_str.size() ) {                   // If the DFA is big enough...
           if (dfa.IsStop(next_state)) return cur_str;        //  return if this is a legal answer
