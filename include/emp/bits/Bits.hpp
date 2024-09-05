@@ -349,6 +349,9 @@ namespace emp {
     Bits & Toggle(size_t start, size_t stop)
       { return ApplyRange([](field_t x){ return ~x; }, start, stop); }
 
+    /// @brief Set a specified bit even if resizing is required.
+    Bits & Include(size_t index, bool value=true);
+    
     /// @brief Return true if ANY bits are set to 1, otherwise return false.
     [[nodiscard]] bool Any() const;
 
@@ -362,6 +365,40 @@ namespace emp {
     /// @brief Resize this Bits object to have the specified number of bits (if allowed)
     Bits & Resize(size_t new_bits) { _data.RawResize(new_bits, true); return *this; }
 
+    // =========  Iterator Management  ========== //
+    class Iterator {
+    private:
+      emp::Ptr<const Bits<DATA_T,ZERO_LEFT>> bits_ptr;
+      size_t index = npos;
+
+    public:
+      Iterator(const Bits<DATA_T,ZERO_LEFT> & bits, size_t index=0)
+        : bits_ptr(&bits), index(bits.FindOne(index)) { }
+      Iterator(const Iterator &) = default;
+
+      Iterator & operator=(const Iterator &) = default;
+
+      bool operator==(const Iterator & in) const {
+        return bits_ptr == in.bits_ptr && index == in.index;
+      }
+      bool operator!=(const Iterator & in) const { return !operator==(in); }
+
+      size_t operator*() const { return index; }
+
+      Iterator & operator++() {
+        if (index != npos) index = bits_ptr->FindOne(index+1);
+        return *this;
+      }
+
+      Iterator operator++(int) {
+        auto temp = *this;
+        if (index != npos) index = bits_ptr->FindOne(index+1);
+        return temp;
+      }
+    };
+
+    Iterator begin() const { return Iterator(*this); }
+    Iterator end() const { return Iterator(*this, npos); }
 
     // =========  Randomization functions  ========= //
 
@@ -1528,7 +1565,19 @@ namespace emp {
   }
 
 
-  // ------  @CAO CONTINUE HERE!!! ------
+  /// Update the bit value at the specified index, resizing if needed
+  template <typename DATA_T, bool ZERO_LEFT>
+  Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::Include(size_t index, bool value) {
+    if (index >= GetSize()) Resize(index+1);
+    const size_t field_id = FieldID(index);
+    const size_t pos_id = FieldPos(index);
+    const field_t pos_mask = FIELD_1 << pos_id;
+
+    if (value) _data.bits[field_id] |= pos_mask;
+    else       _data.bits[field_id] &= ~pos_mask;
+
+    return *this;
+  }
 
 
   template <typename DATA_T, bool ZERO_LEFT>
