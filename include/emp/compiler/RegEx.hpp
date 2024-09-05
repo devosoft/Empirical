@@ -355,10 +355,15 @@ namespace emp {
 
     /// Construct a character range.
     Ptr<re_charset> ConstructSet() {
+      auto out = NewPtr<re_charset>();
+      if (pos >= regex.size()) return out;
       char c = regex[pos++];
       bool neg = false;
-      if (c == '^') { neg = true; c = regex[pos++]; }
-      auto out = NewPtr<re_charset>();
+      if (c == '^') {
+        neg = true;
+        if (pos >= regex.size()) return out;
+        c = regex[pos++];
+      }
       char prev_c = -1;
       while (c != ']' && pos < regex.size()) {
         // Hyphens indicate a range UNLESS they are the first character in the set.
@@ -374,6 +379,7 @@ namespace emp {
         }
         // Sets need to have certain escape characters identified.
         else if (c == '\\') {
+          if (pos >= regex.size()) break;
           c = regex[pos++];  // Identify the specific escape char.
           char c2, c3;       // In case they are needed.
           switch(c) {
@@ -427,11 +433,16 @@ namespace emp {
 
     /// Construct a string, loading everything needed.
     Ptr<re_string> ConstructString() {
-      char c = regex[pos++];
       auto out = NewPtr<re_string>();
+      if (pos >= regex.size()) {
+        Error("String must end with a close quote");
+        return out;
+      }
+      char c = regex[pos++];
       while (c != '\"' && pos < regex.size()) {
         // @CAO Error if we run out of chars before close '"'
         if (c == '\\') {
+          if (pos >= regex.size()) break;
           c = regex[pos++];  // Identify the specific escape char.
           switch(c) {
             case 'n': c = '\n'; break;
@@ -442,7 +453,10 @@ namespace emp {
             case '\\':
               break;
             default:
-              Error("Unknown escape char for literal string: '\\", c, "'.");
+              // Non-alphanumeric characters should also just be themselves.
+              if (is_alphanumeric(c)) {
+                Error("Unknown escape char for literal string: '\\", c, "'.");
+              }
           }
         }
         out->str.push_back(c);
@@ -474,6 +488,11 @@ namespace emp {
           EnsureNext('"');            // Make sure last char is a quote and advance.
           break;
         case '\\':
+          if (pos >= regex.size()) {
+            Error("Backslash must be followed by an character to escape.");
+            result = NewPtr<re_string>(c);
+            break;
+          }
           c = regex[pos++];  // Identify the specific escape char.
           switch(c) {
             // Shortcuts for character sets.
