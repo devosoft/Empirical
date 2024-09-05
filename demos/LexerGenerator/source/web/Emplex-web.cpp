@@ -54,6 +54,7 @@ private:
   // Sandbox state
   bool sandbox_show_ignore = false;        // Should we show token types marked as "ignore"?
   bool sandbox_show_types = false;         // Should we show the type of each token?
+  bool sandbox_show_lines = false;         // Should we show the line number of each token?
   emp::vector<emp::String> sandbox_colors; // Foreground colors to use for tokens
   emp::vector<emp::String> sandbox_bgs;    // Background colors to use for tokens
 
@@ -605,7 +606,11 @@ private:
 
     }, "load_input").SetCSS("display", "none");
 
-    token_div << UI::Button([this](){ doc.FileInput("load_input").DoClick(); }, "Load Token Types", "load_but")
+    token_div << UI::Button([this](){
+      doc.FileInput("load_input").DoClick();
+      GenerateLexer();
+      UpdateSandbox();
+    }, "Load Token Types", "load_but")
       .SetCSS(button_style)
       .SetTitle("Load previously saved token types from file.");
 
@@ -623,8 +628,8 @@ private:
 
     token_div << UI::Button([this](){
       ToggleSandbox();
+      GenerateLexer();
       UpdateSandbox();
-      sandbox_div.Redraw();
     }, "Open Sandbox", "sandbox_but").SetCSS(button_style).SetBackground("#330066")
     .SetTitle("Try out the current set of tokens live");
 
@@ -678,6 +683,12 @@ private:
       UpdateSandbox();
     }, "Types: OFF", "sandbox_types_but").SetCSS(sandbox_but_style);
     sandbox_div << UI::Button([this](){
+      sandbox_show_lines = !sandbox_show_lines;
+      if (sandbox_show_lines) doc.Button("sandbox_lines_but").SetLabel("Line Nums: ON");
+      else doc.Button("sandbox_lines_but").SetLabel("Line Nums: OFF");
+      UpdateSandbox();
+    }, "Line Nums: OFF", "sandbox_lines_but").SetCSS(sandbox_but_style);
+    sandbox_div << UI::Button([this](){
       sandbox_show_ignore = !sandbox_show_ignore;
       if (sandbox_show_ignore) doc.Button("sandbox_ignore_but").SetLabel("Ignored: VISIBLE");
       else doc.Button("sandbox_ignore_but").SetLabel("Ignored: HIDDEN");
@@ -692,15 +703,14 @@ private:
     sandbox_input.SetCallback([this](std::string){ UpdateSandbox(); });
 
     sandbox_colors.push_back("#8888FF"); sandbox_bgs.push_back("black");
-    sandbox_colors.push_back("#88FF88"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#99FF99"); sandbox_bgs.push_back("black");
     sandbox_colors.push_back("#FFFF88"); sandbox_bgs.push_back("black");
     sandbox_colors.push_back("#FF88FF"); sandbox_bgs.push_back("black");
     sandbox_colors.push_back("#88FFFF"); sandbox_bgs.push_back("black");
     sandbox_colors.push_back("#f58231"); sandbox_bgs.push_back("black");
     sandbox_colors.push_back("#ffe119"); sandbox_bgs.push_back("black");
     sandbox_colors.push_back("#bfef45"); sandbox_bgs.push_back("black");
-    sandbox_colors.push_back("#3cb44b"); sandbox_bgs.push_back("black");
-    sandbox_colors.push_back("#42d4f4"); sandbox_bgs.push_back("black");
+    //sandbox_colors.push_back("#42d4f4"); sandbox_bgs.push_back("black");// Too similar to #88FFFF
     sandbox_colors.push_back("#4363d8"); sandbox_bgs.push_back("black");
     sandbox_colors.push_back("#911eb4"); sandbox_bgs.push_back("black");
     sandbox_colors.push_back("#f032e6"); sandbox_bgs.push_back("black");
@@ -708,6 +718,7 @@ private:
     sandbox_colors.push_back("#ffd8b1"); sandbox_bgs.push_back("black");
     sandbox_colors.push_back("#aaffc3"); sandbox_bgs.push_back("black");
     sandbox_colors.push_back("#dcbeff"); sandbox_bgs.push_back("black");
+    sandbox_colors.push_back("#3cb44b"); sandbox_bgs.push_back("black");
     sandbox_colors.push_back("#8888FF"); sandbox_bgs.push_back("#404040");
     sandbox_colors.push_back("#88FF88"); sandbox_bgs.push_back("#404040");
     sandbox_colors.push_back("#FFFF88"); sandbox_bgs.push_back("#404040");
@@ -746,6 +757,9 @@ private:
       sandbox_text << "[";
       if (sandbox_show_types) {
         sandbox_text << lexer.GetTokenType(token.id).name << ":";
+      }
+      if (sandbox_show_lines) {
+        sandbox_text << token.line_id << ":";
       }
       if (token.id == -1) {
         sandbox_text << "<span style=\"background-color:#440000; color:#FFCCCC\">";
