@@ -67,6 +67,7 @@
 #include "../math/Random.hpp"
 #include "../math/Range.hpp"
 #include "../meta/type_traits.hpp"
+#include "../meta/TypeID.hpp"
 #include "../tools/String.hpp"
 
 #include "Bits_Data.hpp"
@@ -163,18 +164,6 @@ namespace emp {
   public:
     static constexpr size_t npos = static_cast<size_t>(-1);
 
-    /// @brief Default constructor; will build the default number of bits (often 0, but not always)
-    /// @param init_val Initial value of all default bits.
-    Bits(bool init_val=0) { if (init_val) SetAll(); else Clear(); }
-
-    /// @brief Build a new Bits with specified bit count and initialization (default 0)
-    Bits(size_t in_num_bits, bool init_val=false);
-
-    // Prevent ambiguous conversions...
-    /// @brief Anything not otherwise defined for first argument, convert to size_t.
-    template <typename T, typename std::enable_if<std::is_arithmetic<T>::value, int>::type = 0>
-    Bits(T in_num_bits, bool init_val=false) : Bits(static_cast<size_t>(in_num_bits), init_val) {}
-
     /// @brief Copy constructor of existing bits object.
     Bits(const Bits & in) = default;
 
@@ -184,6 +173,18 @@ namespace emp {
 
     /// @brief Move constructor of existing bit field.
     Bits(this_t && in) = default;
+
+    /// @brief Default constructor; will build the default number of bits (often 0, but not always)
+    /// @param init_val Initial value of all default bits.
+    Bits(bool init_val=false) { SetAll(init_val); }
+
+    /// @brief Build a new Bits with specified bit count; default to initializing with 0's.
+    Bits(std::integral auto num_bits) : _data(static_cast<size_t>(num_bits)) { Clear(); }
+
+    /// @brief Build a new Bits with specified bit count and initialization
+    template <typename T>
+    Bits(std::integral auto num_bits, T && init_val)
+      : _data(static_cast<size_t>(num_bits)) { SetAll(std::forward<T>(init_val)); }
 
     /// @brief Constructor to generate a Bits from a std::bitset.
     template <size_t NUM_BITS>
@@ -214,18 +215,15 @@ namespace emp {
     /// @param target_ones Number of ones to include in the Bits.
     Bits(Random & random, const int target_ones) : Bits(random, (size_t) target_ones) { }
 
-    /// @brief Constructor to generate a specified number of random Bits (with equal prob of 0 or 1).
-    Bits(size_t in_num_bits, Random & random);
-
     /// @brief Constructor to generate a random Bits with provided prob of 1's.
-    Bits(size_t in_num_bits, Random & random, const double p1);
+    Bits(std::integral auto num_bits, Random & random, const double p1);
 
     /// @brief Constructor to generate a random Bits with provided number of 1's.
-    Bits(size_t in_num_bits, Random & random, const size_t target_ones);
+    Bits(std::integral auto num_bits, Random & random, const size_t target_ones);
 
     /// @brief Constructor to generate a random Bits with provided number of 1's.
-    Bits(size_t in_num_bits, Random & random, const int target_ones)
-      : Bits(in_num_bits, random, (size_t) target_ones) { }
+    Bits(std::integral auto num_bits, Random & random, const int target_ones)
+      : Bits(num_bits, random, (size_t) target_ones) { }
 
     /// @brief Initializer list constructor.
     template <typename T> Bits(const std::initializer_list<T> l);
@@ -312,7 +310,14 @@ namespace emp {
     /// @brief Set to the value in the bitstring.
     Bits & Set(emp::String str);
 
-    /// @brief Set all bits to 1.
+    /// @brief Set all bits using the provided technique.
+    /// - A `bool` value (true or false) will set to that
+    /// - A `bool(size_t)` function will run at each index
+    /// - A `Random` object will set each position uniform randomly
+    template <typename T>
+    Bits & SetAll(T && value);
+
+    /// @brief SetAll with no arguments sets all bits to one.
     Bits & SetAll();
 
     /// @brief Set a range of bits to value (default one): [start, stop)
@@ -321,6 +326,13 @@ namespace emp {
       return Clear(start, stop);
     }
 
+    /// @brief Set each bit if the index passes a test.
+    template <typename TEST_FUN_T>
+    Bits & SetIf(TEST_FUN_T test_fun) {
+      for (size_t i=0; i < GetSize(); ++i) Set(i, test_fun(i));
+      return *this;
+    }
+    
     /// @brief Set all bits to 0.
     Bits & Clear();
 
@@ -1256,12 +1268,6 @@ namespace emp {
 
   // ------------------- Implementations of Constructors and Assignments --------------------
 
-  /// Build a new Bits object with specified bit count and initialization (default 0)
-  template <typename DATA_T, bool ZERO_LEFT>
-  Bits<DATA_T,ZERO_LEFT>::Bits(size_t _num_bits, bool init_val) : _data(_num_bits) {
-    if (init_val) SetAll(); else Clear();
-  }
-
   /// Constructor from other type of Bits field.
   template <typename DATA_T, bool ZERO_LEFT>
   template <typename DATA2_T, bool ZERO_LEFT2>
@@ -1313,19 +1319,10 @@ namespace emp {
     ClearExcessBits();
   }
 
-  /// Constructor to generate a random Bits (with equal prob of 0 or 1).
-  template <typename DATA_T, bool ZERO_LEFT>
-  Bits<DATA_T,ZERO_LEFT>::Bits(size_t in_num_bits, Random & random)
-    : _data(in_num_bits)
-  {
-    Clear();
-    Randomize(random);
-  }
-
   /// Constructor to generate a random Bits with provided prob of 1's.
   template <typename DATA_T, bool ZERO_LEFT>
-  Bits<DATA_T,ZERO_LEFT>::Bits(size_t in_num_bits, Random & random, const double p1)
-    : _data(in_num_bits)
+  Bits<DATA_T,ZERO_LEFT>::Bits(std::integral auto num_bits, Random & random, const double p1)
+    : _data(num_bits)
   {
     emp_assert(p1 >= 0.0 && p1 <= 1.0, "Probability of ones out of range", p1);
     Clear();
@@ -1334,8 +1331,8 @@ namespace emp {
 
   /// Constructor to generate a random Bits with provided number of 1's.
   template <typename DATA_T, bool ZERO_LEFT>
-  Bits<DATA_T,ZERO_LEFT>::Bits(size_t in_num_bits, Random & random, const size_t target_ones)
-    : _data(in_num_bits)
+  Bits<DATA_T,ZERO_LEFT>::Bits(std::integral auto num_bits, Random & random, const size_t target_ones)
+    : _data(num_bits)
   {
     Clear();
     ChooseRandom(random, target_ones);
@@ -1534,6 +1531,29 @@ namespace emp {
 
     return *this;
   }
+
+    /// @brief Set all bits using the provided technique.
+    /// - A `bool` value (true or false) will set to that
+    /// - A `bool(size_t)` function will run at each index
+    /// - A `Random` object will set each position uniform randomly
+    template <typename DATA_T, bool ZERO_LEFT>
+    template <typename T>
+    Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::SetAll(T && value) {
+      if constexpr (std::invocable<T,size_t>) {
+        SetIf(std::forward<T>(value));
+      }
+      else if constexpr (std::integral<std::remove_reference_t<T>>) {
+        if (value == true) SetAll();
+        else Clear();
+      }
+      else if constexpr (std::same_as<std::remove_reference_t<T>, Random>) {
+        Randomize(std::forward<T>(value)); // Pass random generator to Randomize.
+      }
+      else {
+        emp::notify::Error("Calling SetAll with unknown setting type: ", GetTypeName<T>());
+      }
+      return *this;
+    }
 
   /// Set all bits to 1.
   template <typename DATA_T, bool ZERO_LEFT>
