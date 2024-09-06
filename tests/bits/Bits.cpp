@@ -449,6 +449,17 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   CHECK(bv_empty.None() == true);
   CHECK(bv_mixed.None() == false);
   CHECK(bv_full.None() == false);
+
+  // Test SetIf()
+  emp::BitVector mod3_1a(20, [](size_t x){return x%3==1;});
+  // std::function<bool(size_t)> setup_fun = [](size_t x){return x%3==1;};
+  // emp::BitVector mod3_1a(20, setup_fun);
+  emp::BitVector mod3_1b(20);
+  mod3_1b.SetIf([](size_t x){return x%3==1;});
+  emp::BitVector mod3_1c("01001001001001001001");
+
+  CHECK(mod3_1a == mod3_1b);
+  CHECK(mod3_1b == mod3_1c);
 }
 
 TEST_CASE("5: Test Randomize() and variants", "[bits]") {
@@ -695,11 +706,11 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   CHECK(bv.PopOne() == 12);
   CHECK(bv.PopOne() == 13);
   CHECK(bv.PopOne() == 14);
-  CHECK(bv.PopOne() == -1);
+  CHECK(bv.PopOne() == emp::BitVector::npos);
 
   CHECK(bv.CountOnes() == 0);
   CHECK(bv.LongestSegmentOnes() == 0);
-  CHECK(bv.FindMaxOne() == -1);
+  CHECK(bv.FindMaxOne() == emp::BitVector::npos);
 
   bv.SetAll();                             // 1111111111111111
   CHECK(bv.LongestSegmentOnes() == 16);
@@ -714,7 +725,7 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   size_t target = bv.CountOnes();
 
   size_t count = 0;
-  for (int i = bv.FindOne(); i != -1; i = bv.FindOne(i+1)) count++;
+  for (size_t i = bv.FindOne(); i != emp::BitVector::npos; i = bv.FindOne(i+1)) count++;
   CHECK(count == target);
 
   // Try again with the built-in ForEach function.
@@ -1185,9 +1196,10 @@ TEST_CASE("11: Test BitVector", "[bits]")
   CHECK((bv3.FindOne(4) == 6));
   bv3.PopOne();
   bv3.PopOne();
-  CHECK((bv3.FindOne() == -1));
-  CHECK((bv3.FindOne(2) == -1));
-  CHECK((bv3.PopOne() == -1));
+  CHECK((bv3.FindOne() == emp::BitVector::npos));
+  size_t next_id = 2;
+  CHECK((bv3.FindOne(next_id) == emp::BitVector::npos));
+  CHECK((bv3.PopOne() == emp::BitVector::npos));
 
   // Get Ones
   emp::vector<size_t> ones = bv3.GetOnes();
@@ -1819,7 +1831,7 @@ TEST_CASE("20: Test BitArray Set*, Clear* and Toggle* Accessors", "[bits]") {
   ba8.Toggle();         CHECK(ba8.GetValue() ==  88.0);  // 01011000
 
   // Test a full field.
-  constexpr double ALL_64 = (double) ((uint64_t) -1);
+  constexpr double ALL_64 = static_cast<double>( static_cast<uint64_t>(-1) );
   emp::BitArray<64> ba64( "11011000110110001101" );
   CHECK(ba64.GetValue() == 727835.0);
   ba64.Set(6);          CHECK(ba64.GetValue() == 727899.0);        // ...0 010110001101101011011
@@ -1839,7 +1851,7 @@ TEST_CASE("20: Test BitArray Set*, Clear* and Toggle* Accessors", "[bits]") {
   emp::BitArray<75> ba75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
 
   // Test a full + partial field.
-  constexpr double ALL_88 = ((double) ((uint64_t) -1)) * emp::Pow2(24);
+  constexpr double ALL_88 = static_cast<double>( static_cast<uint64_t>(-1) ) * emp::Pow2(24);
   emp::BitArray<88> ba88( "11011000110110001101" ); CHECK(ba88.GetValue() == 727835.0);
   CHECK(ba88.GetValue() == 727835.0);                              // ...0 010110001101100011011
 
@@ -2151,11 +2163,11 @@ TEST_CASE("23: Test functions that analyze and manipulate ones", "[bits]") {
   CHECK(ba.PopOne() == 12);
   CHECK(ba.PopOne() == 13);
   CHECK(ba.PopOne() == 14);
-  CHECK(ba.PopOne() == -1);
+  CHECK(ba.PopOne() == emp::BitVector::npos);
 
   CHECK(ba.CountOnes() == 0);
   CHECK(ba.LongestSegmentOnes() == 0);
-  CHECK(ba.FindMaxOne() == -1);
+  CHECK(ba.FindMaxOne() == emp::BitVector::npos);
 
 
   ba.SetAll();                             // 1111111111111111
@@ -2176,7 +2188,7 @@ TEST_CASE("23: Test functions that analyze and manipulate ones", "[bits]") {
   emp::Random random(1);
   ba.Randomize(random);
   size_t count = 0;
-  for (int i = ba.FindOne(); i != -1; i = ba.FindOne(i+1)) count++;
+  for (size_t i = ba.FindOne(); i != emp::BitVector::npos; i = ba.FindOne(i+1)) count++;
   CHECK(count == ba.CountOnes());
 
 }
@@ -2452,7 +2464,7 @@ void test_find(){
   ba10.flip(3);          // ba10 = 00 00001000
   CHECK(ba10.FindOne() == 3);
   ba10.PopOne();        // ba10 = 00 00000000
-  CHECK(ba10.PopOne() == -1);
+  CHECK(ba10.PopOne() == emp::BitVector::npos);
   ba10.flip(3);
   ba10.flip(1);
   CHECK(ba10.FindOne(2) == 3);
