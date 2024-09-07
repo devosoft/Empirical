@@ -208,22 +208,13 @@ namespace emp {
     /// @brief Constructor to generate random Bits with specified # of ones, default size.
     /// @param random Random number generator to use.
     /// @param target_ones Number of ones to include in the Bits.
-    Bits(Random & random, const size_t target_ones);
-
-    /// @brief Constructor to generate random Bits with specified # of ones, default size.
-    /// @param random Random number generator to use.
-    /// @param target_ones Number of ones to include in the Bits.
-    Bits(Random & random, const int target_ones) : Bits(random, (size_t) target_ones) { }
+    Bits(Random & random, const std::integral auto target_ones);
 
     /// @brief Constructor to generate a random Bits with provided prob of 1's.
     Bits(std::integral auto num_bits, Random & random, const double p1);
 
     /// @brief Constructor to generate a random Bits with provided number of 1's.
-    Bits(std::integral auto num_bits, Random & random, const size_t target_ones);
-
-    /// @brief Constructor to generate a random Bits with provided number of 1's.
-    Bits(std::integral auto num_bits, Random & random, const int target_ones)
-      : Bits(num_bits, random, (size_t) target_ones) { }
+    Bits(std::integral auto num_bits, Random & random, const std::integral auto target_ones);
 
     /// @brief Initializer list constructor.
     template <typename T> Bits(const std::initializer_list<T> l);
@@ -426,7 +417,7 @@ namespace emp {
                      const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
     /// @brief Set all bits randomly, with a given number of ones.
-    Bits & ChooseRandom(Random & random, const size_t target_ones,
+    Bits & ChooseRandom(Random & random, const std::integral auto target_ones,
                         const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
     /// @brief Flip random bits with a given probability.
@@ -979,10 +970,12 @@ namespace emp {
     }
 
     /// @brief Operator shift left...
-    [[nodiscard]] inline Bits operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
+    [[nodiscard]] inline Bits operator<<(const size_t shift_size) const
+      { return SHIFT(-static_cast<int>(shift_size)); }
 
     /// @brief Operator shift right...
-    [[nodiscard]] inline Bits operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
+    [[nodiscard]] inline Bits operator>>(const size_t shift_size) const
+      { return SHIFT(static_cast<int>(shift_size)); }
 
     /// @brief Compound operator bitwise AND...
     Bits & operator&=(const Bits & ar2) { return AND_SELF(ar2); }
@@ -994,10 +987,12 @@ namespace emp {
     Bits & operator^=(const Bits & ar2) { return XOR_SELF(ar2); }
 
     /// @brief Compound operator for shift left...
-    Bits & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
+    Bits & operator<<=(const size_t shift_size)
+      { return SHIFT_SELF(-static_cast<int>(shift_size)); }
 
     /// @brief Compound operator for shift right...
-    Bits & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
+    Bits & operator>>=(const size_t shift_size)
+      { return SHIFT_SELF(static_cast<int>(shift_size)); }
 
     /// @brief Operator plus...
     [[nodiscard]] Bits operator+(const Bits & ar2) const { return ADD(ar2); }
@@ -1082,7 +1077,7 @@ namespace emp {
     if (move_size == 0 || from_start == to) return;
 
     const size_t to_stop = to + move_size;           // Where is the end to move it to?
-    const int shift = (int) from_start - (int) to;   // How far will the moved piece shift?
+    const int shift = static_cast<int>(from_start) - static_cast<int>(to);  // How far will the moved piece shift?
     this_t move_bits(*this);                         // Place to hold moved bits.
     move_bits.SHIFT_SELF(shift);                     // Put the moved bits in place.
     Clear(to, to_stop);                              // Make room for the moved bits.
@@ -1306,7 +1301,7 @@ namespace emp {
 
   /// Constructor to generate random Bits with specified number of ones.
   template <typename DATA_T, bool ZERO_LEFT>
-  Bits<DATA_T,ZERO_LEFT>::Bits(Random & random, const size_t target_ones)
+  Bits<DATA_T,ZERO_LEFT>::Bits(Random & random, const std::integral auto target_ones)
   {
     emp_assert(GetSize() > 0, "Trying to construct a random series of bits, but with no bits!");
     ChooseRandom(random, target_ones);
@@ -1325,8 +1320,11 @@ namespace emp {
 
   /// Constructor to generate a random Bits with provided number of 1's.
   template <typename DATA_T, bool ZERO_LEFT>
-  Bits<DATA_T,ZERO_LEFT>::Bits(std::integral auto num_bits, Random & random, const size_t target_ones)
-    : _data(num_bits)
+  Bits<DATA_T,ZERO_LEFT>::Bits(
+    std::integral auto num_bits,
+    Random & random,
+    const std::integral auto target_ones
+  ) : _data(num_bits)
   {
     Clear();
     ChooseRandom(random, target_ones);
@@ -1643,8 +1641,8 @@ namespace emp {
   /// Set all bits randomly, with a given number of them being on.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> &
-  Bits<DATA_T,ZERO_LEFT>::ChooseRandom(Random & random, const size_t target_ones,
-                                      const size_t start_pos, size_t stop_pos) {
+  Bits<DATA_T,ZERO_LEFT>::ChooseRandom(Random & random, const std::integral auto target_ones,
+                                       const size_t start_pos, size_t stop_pos) {
     if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
 
     emp_assert(start_pos <= stop_pos);
@@ -1654,7 +1652,7 @@ namespace emp {
     emp_assert(target_ones <= target_size);
 
     // Approximate the probability of ones as a starting point.
-    double p = ((double) target_ones) / (double) target_size;
+    double p = static_cast<double>(target_ones) / static_cast<double>(target_size);
 
     // If we are not randomizing the whole sequence, we need to track the number of ones
     // in the NON-randomized region to subtract off later.
@@ -1679,7 +1677,7 @@ namespace emp {
     size_t cur_ones = CountOnes() - kept_ones;
 
     // Do we need to add more ones?
-    while (cur_ones < (size_t) target_ones) {
+    while (cur_ones < static_cast<size_t>(target_ones)) {
       size_t pos = random.GetUInt(start_pos, stop_pos);
       auto bit = operator[](pos);
       if (!bit) {
@@ -1689,7 +1687,7 @@ namespace emp {
     }
 
     // See if we have too many ones.
-    while (cur_ones > (size_t) target_ones) {
+    while (cur_ones > static_cast<size_t>(target_ones)) {
       size_t pos = random.GetUInt(start_pos, stop_pos);
       auto bit = operator[](pos);
       if (bit) {
@@ -1866,11 +1864,11 @@ namespace emp {
     if (max_one == npos) return 0.0;
 
     // If all ones are in the least-significant field, just return it.
-    if (max_one < 64) return (double) GetUInt64(0);
+    if (max_one < 64) return static_cast<double>(GetUInt64(0));
 
     // To grab the most significant field, figure out how much to shift it by.
     const size_t shift_bits = static_cast<size_t>(max_one) - 63;
-    double out_value = (double) (*this >> shift_bits).GetUInt64(0);
+    double out_value = static_cast<double>((*this >> shift_bits).GetUInt64(0));
 
     out_value *= emp::Pow2(shift_bits);
 
@@ -2034,7 +2032,7 @@ namespace emp {
   void Bits<DATA_T,ZERO_LEFT>::Insert(const size_t index, const bool val, const size_t num) {
     Resize(GetSize() + num);                // Adjust to new number of bits.
     Bits<DATA_T,ZERO_LEFT> low_bits(*this); // Copy current bits
-    SHIFT_SELF(-(int)num);                  // Shift the high bits into place.
+    SHIFT_SELF(-static_cast<int>(num));     // Shift the high bits into place.
     Clear(0, index+num);                    // Reduce current to just high bits.
     low_bits.Clear(index, GetSize());       // Reduce copy to just low bits.
     if (val) SetRange(index, index+num);    // If new bits should be ones, make it so.
@@ -2150,7 +2148,7 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   size_t Bits<DATA_T,ZERO_LEFT>::PopOne() {
     const size_t out_bit = FindOne();
-    if (out_bit < size()) Clear((size_t) out_bit);
+    if (out_bit < size()) Clear(static_cast<size_t>(out_bit));
     return out_bit;
   }
 
@@ -2418,16 +2416,16 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> Bits<DATA_T,ZERO_LEFT>::SHIFT(const int shift_size) const {
     Bits<DATA_T,ZERO_LEFT> out_bits(*this);
-    if (shift_size > 0) out_bits.ShiftRight((size_t) shift_size);
-    else if (shift_size < 0) out_bits.ShiftLeft((size_t) -shift_size);
+    if (shift_size > 0) out_bits.ShiftRight(static_cast<size_t>(shift_size));
+    else if (shift_size < 0) out_bits.ShiftLeft(static_cast<size_t>(-shift_size));
     return out_bits;
   }
 
   /// Positive shifts go left and negative go right; store result here, and return this object.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::SHIFT_SELF(const int shift_size) {
-    if (shift_size > 0) ShiftRight((size_t) shift_size);
-    else if (shift_size < 0) ShiftLeft((size_t) -shift_size);
+    if (shift_size > 0) ShiftRight(static_cast<size_t>(shift_size));
+    else if (shift_size < 0) ShiftLeft(static_cast<size_t>(-shift_size));
     return *this;
   }
 
