@@ -26,11 +26,11 @@
 
 #include <cstdint>
 #include <map>
-#include <set>
 #include <stddef.h>
 
 #include "../base/vector.hpp"
 #include "../bits/BitSet.hpp"
+#include "../bits/Bits.hpp"
 #include "../datastructs/set_utils.hpp"
 #include "../tools/String.hpp"
 
@@ -41,18 +41,16 @@ namespace emp {
   class tNFA {
   public:
     static const constexpr size_t NUM_SYMBOLS = S;
-    using opts_t = BitSet<NUM_SYMBOLS>;
     using stop_t = STOP_TYPE;
 
   private:
     struct Transition {
-      opts_t symbols;
-      Transition() = default;
+      BitSet<NUM_SYMBOLS> symbols{};
     };
     struct State {
       std::map<size_t, Transition> trans;   ///< What symbol transitions are available?
-      std::set<size_t> free_to;             ///< What other states can you move to for free?
-      std::set<size_t> free_from;           ///< What other states can move here for free?
+      DynamicBits free_to;             ///< What other states can you move to for free?
+      DynamicBits free_from;           ///< What other states can move here for free?
       State() = default;
     };
 
@@ -63,7 +61,7 @@ namespace emp {
   public:
     tNFA(size_t num_states=1, size_t start_state=0)
       : states(num_states), start(start_state), is_stop(num_states, 0) {
-        if (num_states > start) states[start].free_to.insert(start);
+        if (num_states > start) states[start].free_to.Include(start);
       }
     tNFA(const tNFA<S,STOP_TYPE> &) = default;
     tNFA(tNFA<S,STOP_TYPE> &&) = default;
@@ -75,31 +73,38 @@ namespace emp {
     size_t GetSize() const { return states.size(); }
 
     /// Return start state and all others reachable through empty transitions.
-    const std::set<size_t> & GetStart() const {
+    const DynamicBits & GetStart() const {
       emp_assert(start < states.size());
       return states[start].free_to;
     }
 
     /// Return the states reachable from the current state given the provided symbol.
-    std::set<size_t> GetNext(size_t sym, size_t from_id=0) const {
-      std::set<size_t> to_set;
-      for (auto & t : states[from_id].trans) {
-        if (t.second.symbols[sym]) {
-          to_set.insert(t.first);
-          insert(to_set, states[t.first].free_to);
+    DynamicBits GetNext(size_t sym, size_t from_id=0) const {
+      DynamicBits to_states(states.size());
+      // Loop through all possible next states.
+      for (auto [next_state, symbol_set] : states[from_id].trans) {
+        // If the current next_state can be reached with the provided symbol...
+        if (symbol_set.symbols.Has(sym)) {
+          // ...include both the next state and an free transitions from it.
+          to_states.Set(next_state);
+          to_states |= states[next_state].free_to;
         }
       }
-      return to_set;
+      return to_states;
     }
 
     /// return the states reachable from the current set of states given the provided symbol.
-    std::set<size_t> GetNext(size_t sym, const std::set<size_t> from_set) const {
-      std::set<size_t> to_set;
+    DynamicBits GetNext(size_t sym, const DynamicBits from_set) const {
+      DynamicBits to_set(states.size());
+      // For each starting state...
       for (size_t from_id : from_set) {
-        for (auto & t : states[from_id].trans) {
-          if (t.second.symbols[sym]) {
-            to_set.insert(t.first);
-            insert(to_set, states[t.first].free_to);
+        // ...loop through all possible next states.
+        for (auto [next_state, symbol_set] : states[from_id].trans) {
+          // If the current next_state can be reached with the provided symbol...
+          if (symbol_set.symbols[sym]) {
+            // ...include both the next state and an free transitions from it.
+            to_set.Set(next_state);
+            to_set |= states[next_state].free_to;
           }
         }
       }
@@ -107,14 +112,14 @@ namespace emp {
     }
 
     /// Does the provided state have free transitions?
-    bool HasFreeTransitions(size_t id) const { return states[id].free_to.size(); }
+    bool HasFreeTransitions(size_t id) const { return states[id].free_to.Any(); }
 
     /// Does the provided state have symbol-transitions?
     bool HasSymTransitions(size_t id) const { return states[id].trans.size(); }
 
     /// Return an emp::BitSet indicating the symbols available from the provided set of states.
-    opts_t GetSymbolOptions(const std::set<size_t> & test_set) const {
-      opts_t options;
+    BitSet<NUM_SYMBOLS> GetSymbolOptions(const DynamicBits & test_set) const {
+      BitSet<NUM_SYMBOLS> options;
       for (size_t id : test_set) {
         for (const auto & t : states[id].trans) {
           options |= t.second.symbols;
@@ -127,36 +132,40 @@ namespace emp {
     void Resize(size_t new_size) {
       states.resize(new_size);
       is_stop.resize(new_size, 0);
-      if (new_size > start) states[start].free_to.insert(start);
+      if (new_size > start) states[start].free_to.Include(start);
     }
 
     /// Add a new state into the NFA and return its id.
-    size_t AddNewState() { size_t new_state = GetSize(); Resize(new_state+1); return new_state; }
+    size_t AddNewState() {
+      Resize(GetSize()+1);
+      return GetSize() - 1;
+    }
 
     /// Add a transition between states 'from' and 'to' that can be taken with the provided symbol.
     void AddTransitionSymbol(size_t from, size_t to, size_t sym) {
       emp_assert(from < states.size(), from, states.size());
       emp_assert(to < states.size(), to, states.size());
 
-      states[from].trans[to].symbols[sym] = true;
+      states[from].trans[to].symbols.Set(sym);
     }
 
     /// Add a transition between states 'from' and 'to' that can be taken with a char symbol.
     void AddTransition(size_t from, size_t to, const char sym) {
-      AddTransitionSymbol(from, to, sym);
+      emp_assert(sym >= 0);
+      AddTransitionSymbol(from, to, static_cast<size_t>(sym));
     }
 
-    /// Add a transition between states 'from' and 'to' that can be taken with the provided symbols.
+    /// Add a transition between states 'from' and 'to' that can be taken with all provided symbols.
     void AddTransition(size_t from, size_t to, const emp::String & sym_set) {
-      for (char x : sym_set) AddTransitionSymbol(from, to, (size_t) x);
+      for (char x : sym_set) AddTransition(from, to, x);
     }
 
-    /// Add a transition between states 'from' and 'to' that can be taken with the provided symbols.
+    /// Add a transition between states 'from' and 'to' that can be taken with all provided symbols.
     void AddTransition(size_t from, size_t to, const char * sym_set) {
       AddTransition(from, to, emp::String(sym_set));
     }
 
-    /// Add a transition between states 'from' and 'to' that can be taken with the provided symbols.
+    /// Add a transition between states 'from' and 'to' that can be taken with all provided symbols.
     void AddTransition(size_t from, size_t to, const BitSet<NUM_SYMBOLS> & sym_set) {
       emp_assert(from < states.size(), from, states.size());
       emp_assert(to < states.size(), to, states.size());
@@ -172,22 +181,22 @@ namespace emp {
       // Keep track of where free transitions could have come from and can continue to.
       auto extend_to = states[to].free_to;
       auto extend_from = states[from].free_from;
-      extend_to.insert(to);
-      extend_from.insert(from);
+      extend_to.Include(to);
+      extend_from.Include(from);
 
       // Insert all combinations of where new moves can be coming from or going to.
-      for (auto x : extend_from) {
-        for (auto y : extend_to) {
-          states[x].free_to.insert(y);
-          states[y].free_from.insert(x);
-        }
+      for (size_t from_state : extend_from) {
+        states[from_state].free_to |= extend_to;
+      }
+      for (size_t to_state : extend_to) {
+        states[to_state].free_from |= extend_from;
       }
 
     }
 
     /// Set the specified state to be a stop state (with an optional stop value.)
     template <typename T=stop_t>
-    void SetStop(size_t state, T stop_val=1) { is_stop[state] = (stop_t) stop_val; }
+    void SetStop(size_t state, T stop_val=1) { is_stop[state] = static_cast<stop_t>(stop_val); }
 
     /// Get any stop value associated with the provided state.
     stop_t GetStop(size_t state) const { return is_stop[state]; }
@@ -200,6 +209,11 @@ namespace emp {
 
     ///  Test if this state has only empty transitions from it, and not stop state.
     bool IsEmpty(size_t state) const { return !HasSymTransitions(state) && !IsStop(state); }
+
+    ///  Return a vector of all empty states.
+    DynamicBits GetEmptyStates() const {
+      return DynamicBits{ states.size(), [this](size_t id){ return IsEmpty(id); } };
+    }
 
     /// Merge another NFA into this one.
     void Merge(const tNFA<NUM_SYMBOLS,STOP_TYPE> & nfa2) {
@@ -233,7 +247,7 @@ namespace emp {
           for (size_t s = 0; s < NUM_SYMBOLS; s++) if (t.second.symbols[s]) std::cout << ((char) s);
           std::cout << "):" << t.first << " ";
         }
-        if (states[i].free_to.size()) {
+        if (states[i].free_to.CountOnes()) {
           std::cout << "free to:";
           for (auto f : states[i].free_to) std::cout << " " << f;
         }
@@ -260,23 +274,22 @@ namespace emp {
   class tNFA_State {
   private:
     const tNFA<NUM_SYMBOLS,STOP_TYPE> & nfa;  ///< Which NFA is this state set associated with?
-    std::set<size_t> state_set;               ///< Which states are currently legal?
+    DynamicBits state_set;                    ///< Which states are currently legal?
 
     using this_t = tNFA_State<NUM_SYMBOLS,STOP_TYPE>;
   public:
-    tNFA_State(const tNFA<NUM_SYMBOLS,STOP_TYPE> & _nfa) : nfa(_nfa), state_set() {
-      state_set = nfa.GetStart();
-    }
+    tNFA_State(const tNFA<NUM_SYMBOLS,STOP_TYPE> & _nfa)
+      : nfa(_nfa), state_set(_nfa.GetStart()) { }
     ~tNFA_State() { ; }
 
     /// Get the NFA associated with this state.
     const tNFA<NUM_SYMBOLS,STOP_TYPE> & GetNFA() const { return nfa; }
 
     /// Get a set of states that are currently active.
-    const std::set<size_t> & GetStateSet() const { return state_set; }
+    const DynamicBits & GetStateSet() const { return state_set; }
 
     /// Are there currently any legal NFA states?
-    bool IsActive() const { return state_set.size(); }
+    bool IsActive() const { return state_set.Any(); }
 
     /// Can we legally stop in any of the current states?
     bool IsStop() const {
@@ -285,13 +298,13 @@ namespace emp {
     }
 
     /// Is a particular NFA state currently included?
-    bool HasState(size_t id) { return state_set.count(id); }
+    bool HasState(size_t id) { return state_set.Has(id); }
 
     /// How many states are currently included?
-    size_t GetSize() { return state_set.size(); }
+    size_t GetSize() { return state_set.CountOnes(); }
 
     /// Set the current states.
-    void SetStateSet(const std::set<size_t> & in) { state_set = in; }
+    void SetStateSet(const BitVector & in) { state_set = in; }
 
     /// Change current states to start + free transitions from start.
     void Reset() { state_set = nfa.GetStart(); }
