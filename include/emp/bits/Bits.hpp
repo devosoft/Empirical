@@ -26,6 +26,7 @@
  *    StaticBitValue  : Like BitValue, but max size and fixed memory.
  *    BitArray        : A replacement for std::array<bool> (index 0 is on left)
  *    BitSet          : A replacement for std::bitset (index 0 is on right)
+ *    DynamicBits     : A collection of bits that automatically resize when used.
  *
  *  In the case of replacements, the aim was for identical functionality, but many additional
  *  features, especially associated with bitwise logic operations.
@@ -40,9 +41,6 @@
  *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
  *  @todo For large BitVectors we can use a factory to preserve/adjust bit info.  That should be
  *        just as efficient than a reserve, but without the need to store extra in-class info.
- *  @todo Think about how iterators should work for Bit collections.  It should probably go
- *        bit-by-bit, but there are very few circumstances where that would be useful.  Going
- *        through the positions of all ones would be more useful, but perhaps less intuitive.
  */
 
 #ifndef EMP_BITS_BITS_HPP_INCLUDE
@@ -273,6 +271,14 @@ namespace emp {
     [[nodiscard]] bool OK() const { return _data.OK(); }
 
 
+    // =========  Type Status  ========= //
+    
+    [[nodiscard]] static constexpr bool ZeroLeft() { return ZERO_LEFT; }
+    [[nodiscard]] static constexpr bool IsFixedSize() { return DATA_T::IsFixedSize(); }
+    [[nodiscard]] static constexpr bool IsAutoResize() { return DATA_T::IsAutoResize(); }
+    [[nodiscard]] static constexpr size_t GetDefaultSize() { return DATA_T::GetDefaultSize(); }
+
+
     // =========  Accessors  ========= //
 
     /// @brief How many bits do we currently have?
@@ -285,14 +291,14 @@ namespace emp {
     [[nodiscard]] constexpr auto GetNumBytes() const { return _data.NumBytes(); }
 
     /// @brief How many distinct values could be held in this Bits?
-    [[nodiscard]] constexpr double GetNumStates() const { return emp::Pow2(_data.NumBits()); }
+    [[nodiscard]] constexpr double GetNumStates() const { return emp::Pow2(GetSize()); }
 
     /// @brief Retrieve the bit value from the specified index.
     [[nodiscard]] constexpr bool Get(size_t index) const;
 
     /// @brief A safe version of Get() for indexing out of range. Useful for representing collections.
     [[nodiscard]] constexpr bool Has(size_t index) const {
-      return (index < _data.NumBits()) ? Get(index) : false;
+      return (index < GetSize()) ? Get(index) : false;
     }
 
     /// @brief Update the bit value at the specified index.
@@ -953,19 +959,19 @@ namespace emp {
 
     /// @brief Operator bitwise AND...
     [[nodiscard]] inline Bits operator&(const Bits & ar2) const {
-      emp_assert(size() == ar2.size(), size(), ar2.size());
+      emp_assert(IsAutoResize() || size() == ar2.size(), size(), ar2.size());
       return AND(ar2);
     }
 
     /// @brief Operator bitwise OR...
     [[nodiscard]] inline Bits operator|(const Bits & ar2) const {
-      emp_assert(size() == ar2.size(), size(), ar2.size());
+      emp_assert(IsAutoResize() || size() == ar2.size(), size(), ar2.size());
       return OR(ar2);
     }
 
     /// @brief Operator bitwise XOR...
     [[nodiscard]] inline Bits operator^(const Bits & ar2) const {
-      emp_assert(size() == ar2.size(), size(), ar2.size());
+      emp_assert(IsAutoResize() || size() == ar2.size(), size(), ar2.size());
       return XOR(ar2);
     }
 
@@ -1017,7 +1023,7 @@ namespace emp {
     // =========  Standard Library Compatibility  ========= //
     // A set of functions to allow drop-in replacement with std::bitset.
 
-    [[nodiscard]] constexpr size_t size() const { return _data.NumBits(); }
+    [[nodiscard]] constexpr size_t size() const { return GetSize(); }
     [[nodiscard]] auto & at(size_t pos) { return operator[](pos); }
     [[nodiscard]] auto at(size_t pos) const { return operator[](pos); }
     [[nodiscard]] auto & front() { return at(0); }
@@ -1067,11 +1073,11 @@ namespace emp {
     RawMove(const size_t from_start, const size_t from_stop, const size_t to)
   {
     emp_assert(from_start <= from_stop);             // Must move legal region.
-    emp_assert(from_stop <= _data.NumBits());         // Cannot move from past end.
-    emp_assert(to <= _data.NumBits());                // Must move to somewhere legal.
+    emp_assert(from_stop <= GetSize());         // Cannot move from past end.
+    emp_assert(to <= GetSize());                // Must move to somewhere legal.
 
     const size_t move_size = from_stop - from_start; // How big is the chunk to move?
-    emp_assert(to + move_size <= _data.NumBits());    // Must fit in new position.
+    emp_assert(to + move_size <= GetSize());    // Must fit in new position.
 
     // If nothing to copy OR already in place, stop right there.
     if (move_size == 0 || from_start == to) return;
@@ -1082,7 +1088,7 @@ namespace emp {
     move_bits.SHIFT_SELF(shift);                     // Put the moved bits in place.
     Clear(to, to_stop);                              // Make room for the moved bits.
     move_bits.Clear(0, to);                          // Clear everything BEFORE moved bits.
-    move_bits.Clear(to_stop, _data.NumBits());        // Clear everything AFTER moved bits.
+    move_bits.Clear(to_stop, GetSize());        // Clear everything AFTER moved bits.
     OR_SELF(move_bits);                              // Merge bit strings together.
   }
 
@@ -1091,8 +1097,12 @@ namespace emp {
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::
     ApplyRange(const FUN_T & fun, size_t start, size_t stop)
   {
-    emp_assert(start <= stop, start, stop, _data.NumBits());   // Start cannot be after stop.
-    emp_assert(stop <= _data.NumBits(), stop, _data.NumBits()); // Stop must be in range.
+    if constexpr (IsAutoResize()) {
+      if (stop > GetSize()) Resize(stop);
+    }
+
+    emp_assert(start <= stop, start, stop, GetSize());   // Start cannot be after stop.
+    emp_assert(stop <= GetSize(), stop, GetSize()); // Stop must be in range.
 
     if (start == stop) return *this;  // Empty range.
 
@@ -1468,6 +1478,9 @@ namespace emp {
   /// Retrieve the bit value from the specified index.
   template <typename DATA_T, bool ZERO_LEFT>
   constexpr bool Bits<DATA_T,ZERO_LEFT>::Get(size_t index) const {
+    if constexpr (IsAutoResize()) {
+      if (index >= GetSize()) return false;
+    }
     emp_assert(index < GetSize(), index, GetSize());
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
@@ -1477,6 +1490,9 @@ namespace emp {
   /// Update the bit value at the specified index.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::Set(size_t index, bool value) {
+    if constexpr (IsAutoResize()) {
+      if (index >= GetSize()) Resize(index + 1);
+    }
     emp_assert(index < GetSize(), index, GetSize());
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
@@ -1566,6 +1582,9 @@ namespace emp {
   /// Change a specified bit to the opposite value
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::Toggle(size_t index) {
+    if constexpr (IsAutoResize()) {
+      if (index >= GetSize()) Resize(index + 1);
+    }
     emp_assert(index < GetSize(), index, GetSize());
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
@@ -1606,7 +1625,7 @@ namespace emp {
   /// Set all bits randomly, with a 50% probability of being a 0 or 1.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::Randomize(Random & random) {
-    random.RandFill(BytePtr(), _data.NumBytes());
+    random.RandFill(BytePtr(), GetNumBytes());
     return ClearExcessBits();
   }
 
@@ -1618,8 +1637,11 @@ namespace emp {
     if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
 
     emp_assert(start_pos <= stop_pos);
+    if constexpr (IsAutoResize()) {
+      if (stop_pos > GetSize()) Resize(stop_pos);
+    }
     emp_assert(stop_pos <= GetSize());
-    random.RandFillP<P>(BytePtr(), _data.NumBytes(), start_pos, stop_pos);
+    random.RandFillP<P>(BytePtr(), GetNumBytes(), start_pos, stop_pos);
     return *this;
   }
 
@@ -1632,9 +1654,12 @@ namespace emp {
     if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
 
     emp_assert(start_pos <= stop_pos, start_pos, stop_pos);
-    emp_assert(stop_pos <= GetSize(), stop_pos, GetSize());
     emp_assert(p >= 0.0 && p <= 1.0, p);
-    random.RandFill(BytePtr(), _data.NumBytes(), p, start_pos, stop_pos);
+    if constexpr (IsAutoResize()) {
+      if (stop_pos > GetSize()) Resize(stop_pos + 1);
+    }
+    emp_assert(stop_pos <= GetSize(), stop_pos, GetSize());
+    random.RandFill(BytePtr(), GetNumBytes(), p, start_pos, stop_pos);
     return *this;
   }
 
@@ -1646,6 +1671,9 @@ namespace emp {
     if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
 
     emp_assert(start_pos <= stop_pos);
+    if constexpr (IsAutoResize()) {
+      if (stop_pos > GetSize()) Resize(stop_pos + 1);
+    }
     emp_assert(stop_pos <= GetSize());
 
     const size_t target_size = stop_pos - start_pos;
@@ -1711,8 +1739,11 @@ namespace emp {
     if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
 
     emp_assert(start_pos <= stop_pos);
-    emp_assert(stop_pos <= GetSize());
     emp_assert(p >= 0.0 && p <= 1.0, p);
+    if constexpr (IsAutoResize()) {
+      if (stop_pos > GetSize()) Resize(stop_pos + 1);
+    }
+    emp_assert(stop_pos <= GetSize());
 
     for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Toggle(i);
 
@@ -1727,6 +1758,9 @@ namespace emp {
                       size_t stop_pos)
   {
     if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
+    else if constexpr (IsAutoResize()) {
+      if (stop_pos > GetSize()) Resize(stop_pos + 1);
+    }
 
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= GetSize());
@@ -1745,6 +1779,9 @@ namespace emp {
                       size_t stop_pos)
   {
     if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
+    else if constexpr (IsAutoResize()) {
+      if (stop_pos > GetSize()) Resize(stop_pos + 1);
+    }
 
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= GetSize());
@@ -1761,7 +1798,7 @@ namespace emp {
     Random & random,
     const size_t target_bits
   ) {
-    emp_assert(GetSize() <= GetSize());
+    emp_assert(target_bits <= GetSize());
     Bits<DATA_T,ZERO_LEFT> choice(GetSize(), random, target_bits);
     return XOR_SELF(choice);
   }
@@ -1772,7 +1809,7 @@ namespace emp {
     Random & random,
     const size_t target_bits
   ) {
-    emp_assert(GetSize() <= GetSize());
+    emp_assert(target_bits <= GetSize());
     Bits<DATA_T,ZERO_LEFT> choice(GetSize(), random, target_bits);
     return OR_SELF(choice);
   }
@@ -1783,7 +1820,7 @@ namespace emp {
     Random & random,
     const size_t target_bits
   ) {
-    emp_assert(GetSize() <= GetSize());
+    emp_assert(target_bits <= GetSize());
     Bits<DATA_T,ZERO_LEFT> choice(GetSize(), random, GetSize() - target_bits);
     return AND_SELF(choice);
   }
@@ -1838,7 +1875,10 @@ namespace emp {
   /// Retrieve the byte at the specified byte index.
   template <typename DATA_T, bool ZERO_LEFT>
   uint8_t Bits<DATA_T,ZERO_LEFT>::GetByte(size_t index) const {
-    emp_assert(index < _data.NumBytes(), index, _data.NumBytes());
+    if constexpr (IsAutoResize()) {
+      if (index >= GetNumBytes()) return 0;
+    }
+    emp_assert(index < GetNumBytes(), index, GetNumBytes());
     const size_t field_id = Byte2Field(index);
     const size_t pos_id = Byte2FieldPos(index);
     return (_data.bits[field_id] >> pos_id) & 255U;
@@ -1847,7 +1887,10 @@ namespace emp {
   /// Update the byte at the specified byte index.
   template <typename DATA_T, bool ZERO_LEFT>
   void Bits<DATA_T,ZERO_LEFT>::SetByte(size_t index, uint8_t value) {
-    emp_assert(index < _data.NumBytes(), index, _data.NumBytes());
+    if constexpr (IsAutoResize()) {
+      if (index >= GetNumBytes()) Resize(index+8+8);
+    }
+    emp_assert(index < GetNumBytes(), index, GetNumBytes());
     const size_t field_id = Byte2Field(index);
     const size_t pos_id = Byte2FieldPos(index);
     const field_t val_uint = value;
@@ -1879,7 +1922,7 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   template <typename T>
   T Bits<DATA_T,ZERO_LEFT>::GetValueAtIndex(const size_t index) const {
-    // For the moment, must fit inside bounds; eventually should pad with zeros.
+    // @CAO For the moment, must fit inside bounds; eventually should pad with zeros.
     emp_assert((index + 1) * sizeof(T) <= _data.TotalBytes());
 
     T out_value;
@@ -1892,7 +1935,7 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   template <typename T>
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::SetValueAtIndex(const size_t index, T in_value) {
-    // For the moment, must fit inside bounds; eventually should pad with zeros.
+    // @CAO For the moment, must fit inside bounds; eventually should pad with zeros.
     emp_assert((index + 1) * sizeof(T) <= _data.TotalBytes());
     std::memcpy( BytePtr().Raw() + index * sizeof(T), &in_value, sizeof(T) );
     return ClearExcessBits();
@@ -1903,7 +1946,7 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   template <typename T>
   T Bits<DATA_T,ZERO_LEFT>::GetValueAtBit(const size_t index) const {
-    // For the moment, must fit inside bounds; eventually should pad with zeros.
+    // @CAO For the moment, must fit inside bounds; eventually should pad with zeros.
     emp_assert((index+7)/8 + sizeof(T) < _data.TotalBytes());
 
     Bits<DATA_T,ZERO_LEFT> out_bits(*this);
@@ -1918,7 +1961,7 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   template <typename T>
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::SetValueAtBit(const size_t index, T value) {
-    // For the moment, must fit inside bounds; eventually should (?) pad with zeros.
+    // @CAO For the moment, must fit inside bounds; eventually should (?) pad with zeros.
     emp_assert((index+7)/8 + sizeof(T) < _data.TotalBytes());
     constexpr size_t type_bits = sizeof(T) * 8;
 
@@ -1974,6 +2017,10 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   constexpr size_t Bits<DATA_T,ZERO_LEFT>::CountOnes(size_t start, size_t end) const {
     emp_assert(start <= end);
+    if constexpr (IsAutoResize()) {
+      if (end > GetSize()) end = GetSize();  // No ones past end.
+    }
+
     emp_assert(end <= GetSize());
     if (start == end) return 0;
     const size_t range_size = end-start;
@@ -2347,8 +2394,12 @@ namespace emp {
   /// Perform a Boolean AND with this Bits object, store result here, and return this object.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::AND_SELF(const Bits<DATA_T,ZERO_LEFT> & bits2) {
+    if constexpr (IsAutoResize()) {
+      if (GetSize() < bits2.GetSize()) Resize(bits2.GetSize());
+    }
     const size_t NUM_FIELDS = NumFields();
     const size_t NUM_FIELDS2 = bits2.NumFields();
+
     emp_assert(GetSize() >= bits2.GetSize());
     for (size_t i = 0; i < NUM_FIELDS2; ++i) _data.bits[i] = _data.bits[i] & bits2._data.bits[i];
 
@@ -2360,6 +2411,9 @@ namespace emp {
   /// Perform a Boolean OR with this Bits object, store result here, and return this object.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::OR_SELF(const Bits<DATA_T,ZERO_LEFT> & bits2) {
+    if constexpr (IsAutoResize()) {
+      if (GetSize() < bits2.GetSize()) Resize(bits2.GetSize());
+    }
     const size_t NUM_FIELDS2 = bits2.NumFields();  // bits2 may be smaller than bits.
     emp_assert(GetSize() >= bits2.GetSize());
     for (size_t i = 0; i < NUM_FIELDS2; i++) _data.bits[i] = _data.bits[i] | bits2._data.bits[i];
@@ -2369,6 +2423,9 @@ namespace emp {
   /// Perform a Boolean NAND with this Bits object, store result here, and return this object.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::NAND_SELF(const Bits<DATA_T,ZERO_LEFT> & bits2) {
+    if constexpr (IsAutoResize()) {
+      if (GetSize() < bits2.GetSize()) Resize(bits2.GetSize());
+    }
     const size_t NUM_FIELDS = NumFields();
     const size_t NUM_FIELDS2 = bits2.NumFields();
     emp_assert(GetSize() >= bits2.GetSize());
@@ -2381,6 +2438,9 @@ namespace emp {
   /// Perform a Boolean NOR with this Bits object, store result here, and return this object.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::NOR_SELF(const Bits<DATA_T,ZERO_LEFT> & bits2) {
+    if constexpr (IsAutoResize()) {
+      if (GetSize() < bits2.GetSize()) Resize(bits2.GetSize());
+    }
     const size_t NUM_FIELDS = NumFields();
     const size_t NUM_FIELDS2 = bits2.NumFields();
     emp_assert(GetSize() >= bits2.GetSize());
@@ -2393,6 +2453,9 @@ namespace emp {
   /// Perform a Boolean XOR with this Bits object, store result here, and return this object.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::XOR_SELF(const Bits<DATA_T,ZERO_LEFT> & bits2) {
+    if constexpr (IsAutoResize()) {
+      if (GetSize() < bits2.GetSize()) Resize(bits2.GetSize());
+    }
     const size_t NUM_FIELDS2 = bits2.NumFields();
     emp_assert(GetSize() >= bits2.GetSize());
     for (size_t i = 0; i < NUM_FIELDS2; i++) _data.bits[i] = _data.bits[i] ^ bits2._data.bits[i];
@@ -2403,6 +2466,9 @@ namespace emp {
   /// Perform a Boolean EQU with this Bits object, store result here, and return this object.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::EQU_SELF(const Bits<DATA_T,ZERO_LEFT> & bits2) {
+    if constexpr (IsAutoResize()) {
+      if (GetSize() < bits2.GetSize()) Resize(bits2.GetSize());
+    }
     const size_t NUM_FIELDS = NumFields();
     const size_t NUM_FIELDS2 = bits2.NumFields();
     emp_assert(GetSize() >= bits2.GetSize());
@@ -2547,11 +2613,14 @@ namespace emp {
   }
 
   // Set up some aliases from common types of Bit strings.
-  // BitVector and BitArray function like vectors and arrays, which is to say that the zero
-  // index is on the left-hand side.  BitSet and BitValue are treated like numerical
-  // representations, with the zero-position on the right-hand side.
+  // BitVector and BitArray function like vectors and arrays, with the zero
+  //   index on the left-hand side.
+  // BitSet and BitValue are treated like numerical representations, with the
+  //   zero-index on the right-hand side.
+  // StaticBitVector and StaticBitArray have their max capacity specified in
+  //   their type.
+  // DynamicBits are like BitVectors, but will automatically resize as needed.
 
-  // using BitVector = Bits<BitsMode::DYNAMIC, 0, true>;
   using BitVector = Bits<Bits_WatermarkData, true>;
   using BitValue  = Bits<Bits_DynamicData, false>;
 
@@ -2560,6 +2629,7 @@ namespace emp {
   template <size_t MAX_BITS> using StaticBitVector = Bits<Bits_StaticData<MAX_BITS>, true>;
   template <size_t MAX_BITS> using StaticBitValue  = Bits<Bits_StaticData<MAX_BITS>, false>;
 
+  using DynamicBits = Bits<Bits_AutoData, true>;
 
   // Some external functions to process collections of Bits objects.
 
