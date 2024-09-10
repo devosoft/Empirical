@@ -34,13 +34,16 @@
  *  @note Compile with -O3 and -msse4.2 for fast bit counting.
  *
  *
- *  @todo Most of the operators don't check to make sure that both Bit groups are the same size.
- *        We should create versions (Intersection() and Union()?) that adjust sizes if needed.
+ *  @todo Make sure that all operations check that both Bit groups are the same size, as needed.
+ *  @todo Several functions have alternatives that ignore size; e.g., Include() rather than Set(),
+ *        Has() instead of Get(), etc.  We should add more, such as Intersection() and Union()
+ *        instead of & and |.
  *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
  *        pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
  *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
+ *  @todo Consider moving ZERO_LEFT into Bits_Data so Bits can have a cleaner interface.
  *  @todo For large BitVectors we can use a factory to preserve/adjust bit info.  That should be
- *        just as efficient than a reserve, but without the need to store extra in-class info.
+ *        just as efficient as a reserve, but without the need to store extra in-class info.
  */
 
 #ifndef EMP_BITS_BITS_HPP_INCLUDE
@@ -1832,12 +1835,31 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   template <typename DATA2_T, bool ZL2>
   bool Bits<DATA_T,ZERO_LEFT>::operator==(const Bits<DATA2_T,ZL2> & in) const {
-    if (GetSize() != in.GetSize()) return false;
+    // If either comparator is "auto resize" then missing bits should count as 0's.
+    if constexpr (IsAutoResize() || in.IsAutoResize()) {
+      const size_t NUM_FIELDS = NumFields();
+      const size_t NUM_FIELDS2 = in.NumFields();
+      const size_t MIN_FIELDS = std::min(NUM_FIELDS, NUM_FIELDS2);
 
-    const size_t NUM_FIELDS = NumFields();
-    auto in_fields = in.FieldSpan();
-    for (size_t i = 0; i < NUM_FIELDS; ++i) {
-      if (_data.bits[i] != in_fields[i]) return false;
+      auto in_fields = in.FieldSpan();
+      for (size_t i = 0; i < MIN_FIELDS; ++i) {
+        if (_data.bits[i] != in_fields[i]) return false;
+      }
+      for (size_t i = MIN_FIELDS; i < NUM_FIELDS; ++i) {
+        if (_data.bits[i] != 0) return false;
+      }
+      for (size_t i = MIN_FIELDS; i < NUM_FIELDS2; ++i) {
+        if (in_fields[i] != 0) return false;
+      }
+    }
+    else {
+      if (GetSize() != in.GetSize()) return false;
+
+      const size_t NUM_FIELDS = NumFields();
+      auto in_fields = in.FieldSpan();
+      for (size_t i = 0; i < NUM_FIELDS; ++i) {
+        if (_data.bits[i] != in_fields[i]) return false;
+      }
     }
     return true;
   }
@@ -1846,14 +1868,34 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   template <typename DATA2_T, bool ZL2>
   bool Bits<DATA_T,ZERO_LEFT>::operator<(const Bits<DATA2_T,ZL2> & in) const {
-    if (GetSize() != in.GetSize()) return GetSize() < in.GetSize();
+    // If either comparator is "auto resize" then missing bits should count as 0's.
+    if constexpr (IsAutoResize() || in.IsAutoResize()) {
+      const size_t NUM_FIELDS = NumFields();
+      const size_t NUM_FIELDS2 = in.NumFields();
+      const size_t MIN_FIELDS = std::min(NUM_FIELDS, NUM_FIELDS2);
+      auto in_fields = in.FieldSpan();
+      // Start comparisons at the largest field.
+      for (size_t i = NUM_FIELDS; i > MIN_FIELDS; --i) {
+        if (_data.bits[i-1] != 0) return false;
+      }
+      for (size_t i = NUM_FIELDS2; i > MIN_FIELDS; --i) {
+        if (in_fields[i-1] != 0) return true;
+      }
+      for (size_t i = MIN_FIELDS; i > 0; --i) {
+        const size_t pos = i-1;
+        if (_data.bits[pos] == in_fields[pos]) continue;  // If same, keep looking!
+        return (_data.bits[pos] < in_fields[pos]);        // Otherwise, do comparison
+      }
+    } else {
+      if (GetSize() != in.GetSize()) return GetSize() < in.GetSize();
 
-    const size_t NUM_FIELDS = NumFields();
-    auto in_fields = in.FieldSpan();
-    for (size_t i = NUM_FIELDS; i > 0; --i) {   // Start loop at the largest field.
-      const size_t pos = i-1;
-      if (_data.bits[pos] == in_fields[pos]) continue;  // If same, keep looking!
-      return (_data.bits[pos] < in_fields[pos]);        // Otherwise, do comparison
+      const size_t NUM_FIELDS = NumFields();
+      auto in_fields = in.FieldSpan();
+      for (size_t i = NUM_FIELDS; i > 0; --i) {   // Start loop at the largest field.
+        const size_t pos = i-1;
+        if (_data.bits[pos] == in_fields[pos]) continue;  // If same, keep looking!
+        return (_data.bits[pos] < in_fields[pos]);        // Otherwise, do comparison
+      }
     }
     return false; // Bit vectors are identical.
   }
