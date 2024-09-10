@@ -1836,7 +1836,7 @@ namespace emp {
   template <typename DATA2_T, bool ZL2>
   bool Bits<DATA_T,ZERO_LEFT>::operator==(const Bits<DATA2_T,ZL2> & in) const {
     // If either comparator is "auto resize" then missing bits should count as 0's.
-    if constexpr (IsAutoResize() || in.IsAutoResize()) {
+    if constexpr (IsAutoResize() || DATA2_T::IsAutoResize()) {
       const size_t NUM_FIELDS = NumFields();
       const size_t NUM_FIELDS2 = in.NumFields();
       const size_t MIN_FIELDS = std::min(NUM_FIELDS, NUM_FIELDS2);
@@ -1869,7 +1869,7 @@ namespace emp {
   template <typename DATA2_T, bool ZL2>
   bool Bits<DATA_T,ZERO_LEFT>::operator<(const Bits<DATA2_T,ZL2> & in) const {
     // If either comparator is "auto resize" then missing bits should count as 0's.
-    if constexpr (IsAutoResize() || in.IsAutoResize()) {
+    if constexpr (IsAutoResize() || DATA2_T::IsAutoResize()) {
       const size_t NUM_FIELDS = NumFields();
       const size_t NUM_FIELDS2 = in.NumFields();
       const size_t MIN_FIELDS = std::min(NUM_FIELDS, NUM_FIELDS2);
