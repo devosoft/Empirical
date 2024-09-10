@@ -3896,5 +3896,31 @@ TEST_CASE("30: Test Iterators", "[tools]") {
     sum += x;
   }
   CHECK( sum == 41 );
+}
+
+TEST_CASE("31: Dynamic Bits", "[tools]") {
+  emp::DynamicBits db(20);
+  emp::DynamicBits db2("0001010110");
+  CHECK(db.GetSize() == 20);
+  CHECK(db2.GetSize() == 10);
+
+  emp::DynamicBits db3 = db | db2;
+  CHECK(db3.ToString() == "00010101100000000000");
+  CHECK(db2.GetSize() == 10);
+
+  db2.Set(12);
+  CHECK(db2.GetSize() == 13);
+
+  emp::BitVector bv2("00010101100010000");
+  CHECK(db2 == bv2);
+  CHECK(bv2 == db2);
+
+  bv2.Resize(200);
+  CHECK(db2 == bv2);
+  CHECK(bv2 == db2);
+
+  bv2.Set(105);
+  CHECK(db2 != bv2);
+  CHECK(bv2 != db2);
 
 }
