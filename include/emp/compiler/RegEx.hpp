@@ -31,9 +31,10 @@
  *
  *
  *  @todo Implement  ^ and $ (beginning and end of line)
- *  @todo Implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respectively)
+ *  @todo Implement / to separate a regex from another regex that must follow it
  *  @todo Consider a separator (maybe backtick?) to divide up a regex expression;
  *        the result can be returned by each section as a vector of strings.
+ *  @todo Consolidate most errors to a single pre-processing checker (perhaps using a lexer?)
  */
 
 #ifndef EMP_COMPILER_REGEX_HPP_INCLUDE
@@ -368,12 +369,14 @@ namespace emp {
       while (c != ']' && pos < regex.size()) {
         // Hyphens indicate a range UNLESS they are the first character in the set.
         if (c == '-' && prev_c != -1) {
+          if (pos >= regex.size()) { Error("Character range must have end char: ", prev_c, '-'); continue; }
           c = regex[pos++];
           if (c < prev_c) { Error("Invalid character range ", prev_c, '-', c); continue; }
           for (char x = prev_c; x <= c; x++) {
             out->char_set[(size_t)x] = true;
           }
           prev_c = -1;
+          if (pos >= regex.size()) { Error("Character set must have closing ']'"); continue; }
           c = regex[pos++];
           continue;
         }
@@ -424,6 +427,7 @@ namespace emp {
         }
         out->char_set[(size_t)c] = true;
         prev_c = c;
+        if (pos >= regex.size()) { Error("Character set must have closing ']'"); continue; }
         c = regex[pos++];
       }
       if (neg) out->char_set.NOT_SELF();
@@ -460,6 +464,7 @@ namespace emp {
           }
         }
         out->str.push_back(c);
+        if (pos >= regex.size()) { Error("Literal strings must end with a close quote."); continue; }
         c = regex[pos++];
       }
       if (c == '\"') --pos;
@@ -610,7 +615,7 @@ namespace emp {
       if (regex.size()) head_ptr = Process();
       while(head_ptr->Simplify());
     }
-    ~RegEx() = default;
+    ~RegEx() { head_ptr.Delete(); }
 
     /// Set this RegEx equal to another.
     RegEx & operator=(const RegEx & r) {
