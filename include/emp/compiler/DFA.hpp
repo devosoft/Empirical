@@ -33,6 +33,9 @@ namespace emp {
     using this_t = tDFA<NUM_SYMBOLS, STOP_TYPE>;
   public:
     using stop_t = STOP_TYPE;
+    constexpr static size_t SYMBOL_START = 2;     ///< Symbol to indicate a start of line.
+    constexpr static size_t SYMBOL_STOP = 3;      ///< Symbol to indicate an end of line.
+    constexpr static size_t SYMBOL_MIN_INPUT = 9; ///< All symbols below this are control symbols.
 
     /// How many states is this DFA using?
     size_t GetSize() const { return transitions.size(); }
@@ -95,8 +98,12 @@ namespace emp {
     /// Return the new state after a symbol occurs.
     int Next(int state, size_t sym) const {
       emp_assert(state >= -1 && state < (int) transitions.size(), state, transitions.size());
-      // emp_assert(sym >= 0 && sym < NUM_SYMBOLS, sym, (char) sym);
-      return (state < 0 || sym >= NUM_SYMBOLS) ? -1 : transitions[(size_t)state][sym];
+      // If the incoming state is invalid OR the symbol is too high, return -1.
+      if (state < 0 || sym >= NUM_SYMBOLS) return -1;
+      const int next_state = transitions[(size_t)state][sym];
+      // If an uncaptured control symbol was sent in, ignore it.
+      if (next_state == -1 && sym < SYMBOL_MIN_INPUT) return state;
+      return next_state;
     }
 
     /// Return the new state after a series of symbols.
@@ -107,7 +114,9 @@ namespace emp {
 
     /// Determine if an entire series of symbols is valid.
     stop_t Test(const emp::String & str) const {
-      int out = Next(0, str);
+      int out = Next(0, SYMBOL_START);
+      out = Next(out, str);
+      out = Next(out, SYMBOL_STOP);
       return GetStop(out);
     }
 
