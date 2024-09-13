@@ -58,18 +58,26 @@ namespace emp {
   private:
     static constexpr int ERROR_ID = -1;   ///< Code for unknown token ID.
 
-    emp::vector<TokenType> token_set;     ///< List of all active tokens types.
-    emp::map<String, int> token_map;      ///< Map of token names to id.
+    emp::vector<TokenType> token_set{};   ///< List of all active tokens types.
+    emp::map<String, int> token_map{};    ///< Map of token names to id.
     int cur_token_id = MAX_ID;            ///< ID for next new token (higher has priority)
     mutable bool generate_lexer = false;  ///< Do we need to regenerate the lexer?
-    mutable DFA lexer_dfa;                ///< Table driven lexer implementation.
-    mutable String lexeme;                ///< Current state of lexeme being generated.
-    mutable size_t start_pos;             ///< Where does the current/next lexeme start?
+    mutable DFA lexer_dfa{};              ///< Table driven lexer implementation.
+    mutable String lexeme{};              ///< Current state of lexeme being generated.
 
     static const TokenType & ERROR_TOKEN() {
       static const TokenType token{"ERROR", "", -1};
       return token;
     }
+
+    /// Get the next token found in an input string.  Do so by examining one character at a time.
+    /// Keep going as long as there is a chance of a valid lexeme (since we need to choose the
+    /// longest one available), saving best option so far.  Once no more other valid lexemes are
+    /// possible, stop and return the best we've found so far.
+    Token Process(std::string_view in_str, size_t & start_pos) const;
+
+    /// Shortcut to process a stream rather than a string.
+    Token Process(std::istream & is) const;
 
   public:
     // All constructors and assignment operators are default.
@@ -110,21 +118,20 @@ namespace emp {
     /// Create the NFA that will identify the current set of tokens in a sequence.
     void Generate() const;
 
-    /// Get the next token found in an input string.  Do so by examining one character at a time.
-    /// Keep going as long as there is a chance of a valid lexeme (since we want to choose the
-    /// longest one we can find.)  Every time we do hit a valid lexeme, store it as the current
-    /// "best" and keep going.  Once we hit a point where no other valid lexemes are possible,
-    /// stop and return the best we've found so far.
-    Token Process(std::string_view in_str) const;
-
-    /// Shortcut to process a stream rather than a string.
-    Token Process(std::istream & is) const;
-
     /// Shortcut to just get a single token.
     Token ToToken(std::string_view in_str) const;
 
-    /// Perform a single step in the Tokenize process, tracking line number as we go.
-    emp::Token TokenizeNext(std::string_view in_str, size_t & cur_line, bool keep_all=false) const;
+    /// Perform a single step in the Tokenize process, updating line number and start position as we go.
+    Token TokenizeNext(std::string_view in_str, size_t & cur_line, size_t & start_pos, bool keep_all=false) const;
+
+    /// Perform a single step in the Tokenize process, updating line number as we go.
+    Token TokenizeNext(std::istream & in_stream, size_t & cur_line, bool keep_all=false) const;
+
+    /// Perform a single step in the Tokenize process.
+    Token TokenizeNext(std::istream & in_stream) const {
+      size_t cur_line = 0;
+      return TokenizeNext(in_stream, cur_line, false);
+    }
 
     /// Turn an input string into a vector of tokens.
     TokenStream Tokenize(std::string_view str, String name="in_view", bool keep_all=false) const;
@@ -197,13 +204,17 @@ namespace emp {
 
   template <int MAX_ID>
   const TokenType & Lexer_Base<MAX_ID>::GetTokenType(int id) const {
+    // emp::notify::Message("id=", id, "; MAX_ID=", MAX_ID, "; cur_token_id=", cur_token_id);
     if (id > MAX_ID || id <= cur_token_id) return ERROR_TOKEN();
-    return token_set[(size_t)(MAX_ID - id)];
+    const size_t token_pos = static_cast<size_t>(MAX_ID - id);
+    // emp::notify::Message("token_pos=", token_pos);
+    return token_set[token_pos];
   }
 
   template <int MAX_ID>
   String Lexer_Base<MAX_ID>::GetTokenName(int id) const {
-    if (id < 0) return MakeString("Error (", id, ")");             // Negative tokens specify errors.
+    // if (id < 0) return MakeString("Error (", id, ")");          // Negative tokens specify errors.
+    if (id < 0) return MakeString("ERROR");                        // Negative tokens specify errors.
     if (id == 0) return "EOF";                                     // Token zero is end-of-file.
     if (id < 128) return MakeEscaped((char) id);                   // Individual characters.
     if (id <= cur_token_id) return MakeString("Error (", id, ")"); // Invalid token range!
@@ -227,11 +238,11 @@ namespace emp {
   }
 
   template <int MAX_ID>
-  Token Lexer_Base<MAX_ID>::Process(std::string_view in) const {
+  Token Lexer_Base<MAX_ID>::Process(std::string_view in, size_t & start_pos) const {
+    emp_assert(start_pos <= in.size());
+
     // If we do not have any tokens, just give an error.
-    if (token_set.size() == 0) {
-      return { 0, "No Token Types available." };
-    }
+    if (token_set.size() == 0) return { -1, "No Token Types available." };
 
     // If we cannot read in, return an "EOF" token.
     if (start_pos >= in.size()) return { 0, "" };
@@ -245,6 +256,11 @@ namespace emp {
     int cur_stop = 0;            // Current "stop" state (if we can stop here)
     int best_stop = -1;          // Best stop state found so far?
 
+    // If we are at the START OF A LINE, send a DFA::SYMBOL_START
+    if (start_pos == 0 || in[start_pos-1] == '\n') {
+      cur_state = lexer_dfa.Next(0, DFA::SYMBOL_START);
+    }
+
     // Keep looking as long as:
     // 1: We may be able to continue the current lexeme, and
     // 2: We have not entered an invalid state, and
@@ -254,6 +270,12 @@ namespace emp {
       cur_state = lexer_dfa.Next(cur_state, static_cast<size_t>(next_char));
       cur_stop = lexer_dfa.GetStop(cur_state);
       if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }
+      // Look ahead to see if we are at the END OF A LINE.
+      if (cur_pos == in.size() || in[cur_pos] == '\n') {
+        cur_state = lexer_dfa.Next(cur_state, static_cast<size_t>(DFA::SYMBOL_STOP));
+        cur_stop = lexer_dfa.GetStop(cur_state);
+        if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }
+      }
     }
 
     // If we did not find any options, advance best_pos to return a single error char.
@@ -272,24 +294,78 @@ namespace emp {
     return { best_stop, lexeme };
   }
 
+  static bool AtEOF(std::istream & is) { return is.peek() == std::istream::traits_type::eof(); }
+
   template <int MAX_ID>
-  Token Lexer_Base<MAX_ID>::Process(std::istream & in_stream) const {
-    return Process(
-      emp::String(std::istreambuf_iterator<char>(in_stream), std::istreambuf_iterator<char>())
-    );
+  Token Lexer_Base<MAX_ID>::Process(std::istream & is) const {
+    // If we do not have any tokens, just give an error.
+    if (token_set.size() == 0) return { -1, "No Token Types available." };
+
+    // If we cannot read in, return an "EOF" token.
+    if (AtEOF(is)) return { 0, "" };
+
+    // If we still need to generate the DFA for the lexer, do so.
+    if (generate_lexer) Generate();
+
+    size_t cur_pos = 0;  // Position in the input that we are actively analyzing
+    size_t best_pos = 0; // Best look-ahead we've found so far
+    int cur_state = 0;           // Next state for the DFA analysis
+    int cur_stop = 0;            // Current "stop" state (if we can stop here)
+    int best_stop = -1;          // Best stop state found so far?
+
+    // Keep looking as long as:
+    // 1: We may be able to continue the current lexeme, and
+    // 2: We have not entered an invalid state, and
+    // 3: Our input stream has more symbols.
+    lexeme.resize(0);
+    while (cur_stop >= 0 && cur_state >= 0 && !AtEOF(is)) {
+      const char next_char = static_cast<char>(is.get());
+      lexeme.push_back(next_char);
+      ++cur_pos;
+      cur_state = lexer_dfa.Next(cur_state, static_cast<size_t>(next_char));
+      cur_stop = lexer_dfa.GetStop(cur_state);
+      if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }
+    }
+
+    // If we did not find any options, advance best_pos to return a single error char.
+    if (best_pos == 0) best_pos = 1;
+
+    // If best_pos < cur_pos, rewind the input stream.
+    int pos_diff = static_cast<int>(cur_pos - best_pos);
+    if (pos_diff) {
+      is.seekg(-pos_diff, std::ios::cur);
+      lexeme.Resize(lexeme.size() - static_cast<std::size_t>(pos_diff));
+    }
+
+    // If we can't find a token, return error (for no valid options)
+    if (best_stop < 0) return { ERROR_ID, lexeme }; // ERROR_ID = no valid tokens available!
+
+    // Otherwise return the best token we've found so far.
+    return { best_stop, lexeme };
   }
 
   template <int MAX_ID>
   Token Lexer_Base<MAX_ID>::ToToken(std::string_view in_str) const {
-    start_pos = 0;
-    return Process(in_str);
+    size_t start_pos = 0;
+    return Process(in_str, start_pos);
   }
 
   template <int MAX_ID>
-  emp::Token Lexer_Base<MAX_ID>::TokenizeNext(std::string_view str, size_t & cur_line, bool keep_all) const {
+  Token Lexer_Base<MAX_ID>::TokenizeNext(std::string_view str, size_t & cur_line, size_t & start_pos, bool keep_all) const {
     // Loop until we get a token to return or hit the end of the stream.
     while (true) {
-      emp::Token token = Process(str);
+      Token token = Process(str, start_pos);
+      token.line_id = cur_line;
+      cur_line += token.lexeme.Count('\n');
+      if (keep_all || GetSaveToken(token)) return token;    // Skip ignored tokens and try again.
+    }
+  }
+
+  template <int MAX_ID>
+  Token Lexer_Base<MAX_ID>::TokenizeNext(std::istream & is, size_t & cur_line, bool keep_all) const {
+    // Loop until we get a token to return or hit the end of the stream.
+    while (true) {
+      Token token = Process(is);
       token.line_id = cur_line;
       cur_line += token.lexeme.Count('\n');
       if (keep_all || GetSaveToken(token)) return token;    // Skip ignored tokens and try again.
@@ -299,26 +375,23 @@ namespace emp {
   template <int MAX_ID>
   TokenStream Lexer_Base<MAX_ID>::Tokenize(std::string_view str, String name, bool keep_all) const {
     emp::vector<Token> out_tokens;
-    start_pos = 0;
+    size_t start_pos = 0;
     size_t cur_line = 1;
-    while (emp::Token token = TokenizeNext(str, cur_line, keep_all)) {
-    out_tokens.push_back(token);
+    while (Token token = TokenizeNext(str, cur_line, start_pos, keep_all)) {
+      out_tokens.push_back(token);
     }
     return TokenStream{out_tokens, name};
   }
 
   template <int MAX_ID>
-  TokenStream Lexer_Base<MAX_ID>::Tokenize(
-    std::istream & in_stream,
-    String name,
-    bool keep_all
-  ) const {
-    return Tokenize(
-      emp::String(std::istreambuf_iterator<char>(in_stream), std::istreambuf_iterator<char>()),
-      name,
-      keep_all
-    );
- }
+  TokenStream Lexer_Base<MAX_ID>::Tokenize(std::istream & is, String name, bool keep_all) const {
+    emp::vector<Token> out_tokens;
+    size_t cur_line = 1;
+    while (Token token = TokenizeNext(is, cur_line, keep_all)) {
+      out_tokens.push_back(token);
+    }
+    return TokenStream{out_tokens, name};
+  }
 
   template <int MAX_ID>
   TokenStream Lexer_Base<MAX_ID>::Tokenize(
@@ -341,7 +414,7 @@ namespace emp {
     std::stringstream ss;
     ss << test_string;
 
-    emp::Token token = 1;
+    Token token = 1;
     while (token > 0) {
       token = Process(ss);
       std::cout << GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
@@ -389,7 +462,7 @@ namespace emp {
         .AddCode("")
         .AddCode("  // -- Current State --")
         .AddCode("  size_t cur_line = 1;   // Track LINE we are reading in the input.")
-        .AddCode("  int start_pos = 0;  // Track INDEX for the start of current lexeme.")
+        .AddCode("  int start_pos = 0;     // Track INDEX for the start of current lexeme.")
         .AddCode("  std::string lexeme{};  // Lexeme found for the current token")
         .AddCode("  std::string errors{};  // Description of any errors encountered")
         .AddCode("")
