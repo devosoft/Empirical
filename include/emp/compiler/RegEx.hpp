@@ -121,20 +121,27 @@ namespace emp {
 
     /// Representation of a character set e.g., [abc]
     struct re_charset : public re_base { // Any char from set.
-      opts_t char_set;
-      re_charset() : char_set() { ; }
-      re_charset(char x, bool neg=false) : char_set() {
-        char_set[(size_t)x]=true;
-        if (neg) char_set.NOT_SELF();
+      opts_t char_set{};
+      re_charset() { ; }
+      re_charset(char x, bool neg=false) {
+        char_set.Set(x);
+        if (neg) Negate();
       }
-      re_charset(const emp::String & s, bool neg=false) : char_set() {
-        for (char x : s) char_set[(size_t)x]=true;
-        if (neg) char_set.NOT_SELF();
+      re_charset(const emp::String & s, bool neg=false) {
+        for (char x : s) char_set.Set(x);
+        if (neg) Negate();
+      }
+      void Negate() {
+        char_set.NOT_SELF();
+        char_set.Clear(0, DFA::SYMBOL_MIN_INPUT);
       }
       void Print(std::ostream & os) const override {
         auto chars = char_set.GetOnes();
         bool use_not = false;
-        if (chars.size() > 64) { chars = (~char_set).GetOnes(); use_not = true; }
+        if (chars.size() > 64) {
+          chars = (~char_set).Clear(0,DFA::SYMBOL_MIN_INPUT).GetOnes();
+          use_not = true;
+        }
         os << "SET[";
         if (use_not) os << "NOT ";
         for (auto c : chars) os << MakeEscaped((char) c);
@@ -373,7 +380,7 @@ namespace emp {
           c = regex[pos++];
           if (c < prev_c) { Error("Invalid character range ", prev_c, '-', c); continue; }
           for (char x = prev_c; x <= c; x++) {
-            out->char_set[(size_t)x] = true;
+            out->char_set.Set(x);
           }
           prev_c = -1;
           if (pos >= regex.size()) { Error("Character set must have closing ']'"); continue; }
@@ -425,12 +432,12 @@ namespace emp {
               Error("Unknown escape char for char set: '\\", c, "'; using directly.");
           }
         }
-        out->char_set[(size_t)c] = true;
+        out->char_set.Set(c);
         prev_c = c;
         if (pos >= regex.size()) { Error("Character set must have closing ']'"); continue; }
         c = regex[pos++];
       }
-      if (neg) out->char_set.NOT_SELF();
+      if (neg) out->Negate();
       if (c == ']') --pos;  // SHOULD be the case, but is checked after return.
       return out;
     }
@@ -479,6 +486,12 @@ namespace emp {
       switch (c) {
         case '.':
           result = NewPtr<re_charset>('\n', true);  // Anything except newline.
+          break;
+        case '^':
+          result = NewPtr<re_string>(DFA::SYMBOL_START);  // Must be a line start.
+          break;
+        case '$':
+          result = NewPtr<re_string>(DFA::SYMBOL_STOP);  // Must be a line end.
           break;
         case '(':
           result = Process();         // Process the internal contents of parens.
@@ -588,7 +601,6 @@ namespace emp {
       while (pos < regex.size()) {
         const char c = regex[pos++];
         switch (c) {
-          // case '|': cur_parent->push( NewPtr<re_or>( cur_parent->pop(), Process() ) ); break;
           case '|': cur_parent = NewPtr<re_or>( cur_parent, Process() ); break;
           case '*': cur_parent->push( NewPtr<re_star>( cur_parent->pop() ) ); break;
           case '+': cur_parent->push( NewPtr<re_plus>( cur_parent->pop() ) ); break;
