@@ -17,7 +17,7 @@
 #include <utility> // std::pair
 
 #include "../base/vector.hpp"
-#include "../bits/BitVector.hpp"
+#include "../bits/Bits.hpp"
 #include "../tools/String.hpp"
 
 #include "DFA.hpp"
@@ -39,8 +39,8 @@ namespace emp {
   static inline DFA to_DFA(const NFA & nfa, int keep_invalid=false) {
     DFA dfa;
     dfa.AddState();
-    std::map<std::set<size_t>, size_t> id_map;   // Map nfa "state sets" to dfa states.
-    std::vector<std::set<size_t>> state_stack;   // States that still need to be explored.
+    std::map<DynamicBits, size_t> id_map;   // Map nfa "state sets" to dfa states.
+    std::vector<DynamicBits> state_stack;   // States that still need to be explored.
 
     state_stack.emplace_back(nfa.GetStart());    // Place the starting state in the state_stack.
     id_map[state_stack[0]] = 0;                  // Give starting point ID 0.
@@ -48,7 +48,7 @@ namespace emp {
     // Loop through all states not full explored; remove top state and add new states.
     while (state_stack.size()) {
       // Get the next state to test.
-      const std::set<size_t> cur_state = state_stack.back();
+      const DynamicBits cur_state = state_stack.back();
       const size_t cur_id = id_map[cur_state];
       state_stack.pop_back();
 
@@ -56,12 +56,13 @@ namespace emp {
       for (auto s : cur_state) dfa.AddStop(cur_id, nfa.GetStop(s));
 
       // Account for all possible transitions
+      DynamicBits non_empty_states = ~nfa.GetEmptyStates();
       for (size_t sym = 0; sym < NFA::NUM_SYMBOLS; sym++) {
-        std::set<size_t> next_state = nfa.GetNext(sym, cur_state);
-        if (next_state.size() == 0 && !keep_invalid) continue;  // Discard invalid transitions.
+        DynamicBits next_state = nfa.GetNext(sym, cur_state);
+        if (next_state.None() && !keep_invalid) continue;  // Discard invalid transitions.
 
         // Remove NFA states with ONLY free transitions (they will all have been taken already)
-        std::erase_if(next_state, [&nfa](size_t x) { return nfa.IsEmpty(x); });
+        next_state &= non_empty_states;
 
         // If we need a new state in the DFA, add it and put it on the stack to explore.
         if (!id_map.contains(next_state)) {
@@ -126,19 +127,18 @@ namespace emp {
   emp::String FindExample(const DFA & dfa, const size_t min_size=1) {
     emp::vector< DFAStatus > traverse_set;
     traverse_set.emplace_back(0, "");
-    // BitVector state_found(dfa.GetSize());
 
     for (size_t next_id = 0; next_id < traverse_set.size(); ++next_id) {
-      const auto cur_status = traverse_set[next_id];         // pair: cur state and cur sequence
-      const auto & t = dfa.GetTransitions(cur_status.state); // int array of TO states (or -1 if none)
-      for (size_t sym = 0; sym < t.size(); sym++) {
+      const emp::DFAStatus cur_status = traverse_set[next_id];  // pair: cur state and cur sequence
+      const emp::array<int,128> & t = dfa.GetTransitions(cur_status.state); // Array of TO states (or -1 if none)
+      // Ignore symbols 0 through 8 since they are special characters and unprintable (plus beginning/end symbols)
+      for (size_t sym = 9; sym < 128; sym++) {
         const int next_state = t[sym];
         if (next_state == -1) continue;                      // Ignore non-transitions
         emp::String cur_str(cur_status.sequence);
         cur_str += (char) sym;                               // Figure out current string
-        if (min_size <= cur_str.size() ) {                   // If the DFA is big enough...
-          if (dfa.IsStop(next_state)) return cur_str;        //  return if this is a legal answer
-        }
+        // If this is a valid answer, return it.
+        if (min_size <= cur_str.size() && dfa.IsStop(next_state)) return cur_str;
         traverse_set.emplace_back(next_state, cur_str);      // Continue searching from here.
       }
     }
