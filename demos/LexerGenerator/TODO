@@ -1,0 +1,2 @@
+- Add $ and ^ regex's to work in stream input.
+- Make {alias} tokens work as aliases only in Lexers.
