@@ -218,28 +218,37 @@ private:
   bool TestValidTable() {
     // Make sure all of the token information is valid.
     errors.resize(0);
-    size_t line_num = 0;
     std::unordered_set<emp::String> token_names;
-    for (const auto & t_info : token_info) {
-      ++line_num;
+    for (size_t line_num = 0; line_num < token_info.size(); ++line_num) {
+      auto & t_info = token_info[line_num];
       emp::String name = t_info.GetName();
       emp::String regex = t_info.GetRegex();
-      if (name.empty() && regex.empty()) continue;  // Completely empty slots can be skipped.
+  
+      if (name.empty() && regex.empty()) continue;  // Completely empty slots can be skipped.      
 
-      if (name.empty()) Error(line_num, "No name provided for RegEx: ", regex);
-      else if (regex.empty()) Error(line_num, "No regex provided for token '", name, "'");
+      if (name.empty()) {
+        Error(line_num, "No name provided for RegEx: ", regex);
+        continue;
+      }
+      else if (regex.empty()) {
+        Error(line_num, "No regex provided for token '", name, "'");
+        continue;
+      }
 
       if (!name.OnlyIDChars()) {
         Error(line_num, "Invalid token name '", name, "'; only letters, digits, and '_' allowed.");
+        continue;
       }
       if (token_names.contains(name)) {
         Error(line_num, "Multiple token types named '", name, "'.");
+        continue;
       }
       token_names.insert(name);
 
       emp::RegEx regex_text(regex);
       for (const auto & note : regex_text.GetNotes()) {
         Error(line_num, "Invalid Regular expression: ", note);
+        continue;
       }
     }
 
@@ -751,7 +760,7 @@ private:
   }
 
   void UpdateSandbox() {
-    if (sandbox_div.IsInactive()) return;
+    if (sandbox_div.IsInactive() || !TestValidTable()) return;
 
     emp::TokenStream tokens("Emplex Sandbox");
     if (lexer.GetNumTokens()) {
@@ -768,7 +777,8 @@ private:
     for (auto token : tokens) {
       sandbox_text << "[";
       if (sandbox_show_types) {
-        sandbox_text << lexer.GetTokenType(token.id).name << ":";
+        const emp::String token_type_name = lexer.GetTokenName(token.id);
+        sandbox_text << token_type_name << ":";
       }
       if (sandbox_show_lines) {
         sandbox_text << token.line_id << ":";
