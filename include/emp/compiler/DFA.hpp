@@ -120,6 +120,14 @@ namespace emp {
       return GetStop(out);
     }
 
+    bool UsesSymbol(size_t symbol_id) const {
+      emp_assert(symbol_id < NUM_SYMBOLS, symbol_id);
+      for (const auto & state_trans : transitions) {
+        if (state_trans[symbol_id] != -1) return true;
+      }
+      return false;
+    }
+
     /// Print details about this DFA.
     void Print(std::ostream & os=std::cout) const {
       os << "Num states = " << GetSize() << std::endl << "Stop IDs:";
@@ -145,9 +153,17 @@ namespace emp {
       file.Include("<array>");
       file.Include("<string>");
 
+      const bool uses_control = UsesSymbol(SYMBOL_START) || UsesSymbol(SYMBOL_STOP);
+
       file.AddCode("class ", object_name, " {")
           .AddCode("private:")
-          .AddCode("  static constexpr int NUM_SYMBOLS=", NUM_SYMBOLS, ";")
+          .AddCode("  static constexpr int NUM_SYMBOLS=", NUM_SYMBOLS, ";");
+
+      if (uses_control) {
+        file.AddCode("  constexpr static int SYMBOL_START = 2;     ///< Symbol to indicate a start of line.");
+        file.AddCode("  constexpr static int SYMBOL_STOP = 3;      ///< Symbol to indicate an end of line.");
+      }
+      file.AddCode("  constexpr static int SYMBOL_MIN_INPUT = 9; ///< All symbols below this are control symbols.")
           .AddCode("  static constexpr int NUM_STATES=", GetSize(), ";")
           .AddCode("  using row_t = std::array<int, NUM_SYMBOLS>;")
           .AddCode("")
@@ -178,19 +194,28 @@ namespace emp {
           .AddCode("    return (state >= 0) ? stop_id[static_cast<size_t>(state)] : 0;")
           .AddCode("  }")
           .AddCode("  static constexpr int GetNext(int state, int sym) {")
+          .AddCode("    int next_state = -1;")
           .AddCode("    if (state >= 0 && sym >= 0) {")
-          .AddCode("      return table[static_cast<size_t>(state)][static_cast<size_t>(sym)];")
+          .AddCode("      next_state = table[static_cast<size_t>(state)][static_cast<size_t>(sym)];")
           .AddCode("    }")
-          .AddCode("    return -1;")
+          .AddCode("    // If sym is a control symbol (line begin/end) and not used, keep old state.")
+          .AddCode("    if (sym < SYMBOL_MIN_INPUT && next_state == -1) next_state = state;")
+          .AddCode("    return next_state;")
           .AddCode("  }")
           .AddCode("  static int GetNext(int state, const std::string & syms) {")
           .AddCode("    for (char x : syms) state = GetNext(state, x);")
           .AddCode("    return state;")
           .AddCode("  }")
-          .AddCode("  static int Test(const std::string & str) {")
-          .AddCode("    int out = GetNext(0, str);")
-          .AddCode("    return GetStop(out);")
-          .AddCode("  }")
+          .AddCode("  static int Test(const std::string & str) {");
+      if (uses_control) {
+        file.AddCode("    int state = GetNext(0, SYMBOL_START);")
+            .AddCode("    state = GetNext(state, str);")
+            .AddCode("    state = GetNext(state, SYMBOL_STOP);")
+            .AddCode("    return GetStop(state);");
+      } else {
+        file.AddCode("    return GetStop(GetNext(0, str));");
+      }
+      file.AddCode("  }")
           .AddCode("};");
     }
   };
