@@ -8,6 +8,7 @@
 #include "emp/config/command_line.hpp"
 #include "emp/io/File.hpp"
 #include "emp/io/CPPFile.hpp"
+#include "emp/tools/String.hpp"
 
 void LoadTokens(emp::Lexer & lexer, emp::String filename, bool verbose) {
   emp::File file(filename);
