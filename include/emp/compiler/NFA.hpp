@@ -72,6 +72,8 @@ namespace emp {
     /// Return the current number of states.
     size_t GetSize() const { return states.size(); }
 
+    size_t GetStartID() const { return start; }
+
     /// Return start state and all others reachable through empty transitions.
     const DynamicBits & GetStart() const {
       emp_assert(start < states.size());
