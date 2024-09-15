@@ -642,7 +642,10 @@ namespace emp {
     }
 
     /// Convert the RegEx to an standard string, readable from outside this class.
-    emp::String AsString() const { return regex.AsLiteral(); }
+    emp::String ToString() const { return regex.AsEscaped(false); }
+
+    /// Convert the RegEx to an standard string, readable from outside this class.
+    emp::String ToLiteral() const { return regex.AsLiteral(); }
 
     /// Add this regex to an NFA being built.
     void AddToNFA(NFA & nfa, size_t start, size_t stop) const {
