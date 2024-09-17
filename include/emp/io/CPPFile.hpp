@@ -72,6 +72,16 @@ namespace emp {
       return *this;
     }
 
+    /// Add spaces (or other character) to make current line at least a specified length.
+    /// (usually used to align code or comments)
+    CPPFile & AppendPadding(size_t target_size, char c=' ') {
+      const size_t cur_size = code.back().size();
+      if (cur_size < target_size) {
+        code.back() += emp::String(target_size - cur_size, c);
+      }
+      return *this;
+    }
+
     CPPFile & IncIndent(size_t size=2) {
       indent += std::string(size, ' ');
       return *this;
