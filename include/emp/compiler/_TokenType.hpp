@@ -40,7 +40,7 @@ namespace emp {
     /// Print out the status of this token (for debugging)
     void Print(std::ostream & os=std::cout) const {
       os << "Name:" << name
-         << "  RegEx:" << regex.AsString()
+         << "  RegEx:" << regex.ToString()
          << "  ID:" << id
          << "  save_lexeme:" << save_lexeme
          << "  save_token:" << save_token
