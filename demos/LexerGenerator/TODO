@@ -6,6 +6,7 @@ FEATURES:
 
 CLEANUP:
 - Expand the advanced options to allow more naming in the generated code.  (Or allow DFA / TOKENS to be placed INSIDE the lexer?)
+- Fix up and down arrows.  Make a single row highlighted and up/down are at the top, just moving that row.
 
 FOLLOW-UP: Empala!  Parser generator.
 
@@ -31,8 +32,9 @@ EXPR{9}   ::VALUE
 STATEMENT ::EXPR ';'
           VAR IDENTIFIER ('=' :EXPR)? ';'
           IF '(' :EXPR ')' :STATEMENT
-          WHILE '(' EXPR ')' :STATEMENT
+          WHILE '(' :EXPR ')' :STATEMENT
+          PRINT '(' :EXPR (',' :EXPR)+ ')'
           '{' ::STATEMENT_LIST '}'
-          :: ';'                  // :: Alone means leave out of AST, just use for shaping.
+          :: ';'                  // :: with a rule means leave out of AST, just use for shaping.
 
 STATEMENT_LIST  :STATEMENT*       // * Means "any number of" (+ is at least one; ? is optional)
