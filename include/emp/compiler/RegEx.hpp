@@ -695,6 +695,8 @@ namespace emp {
     NFA nfa(2);  // State 0 = start, state 1 = stop.
     nfa.SetStop(1, stop_id);
     regex.AddToNFA(nfa, 0, 1);
+    nfa.AddTransition(0, 0, DFA::SYMBOL_START);
+    nfa.AddTransition(1, 1, DFA::SYMBOL_STOP);
     return nfa;
   }
 
