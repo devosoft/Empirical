@@ -483,12 +483,13 @@ namespace emp {
         .AddCode("  // Return the name of a token given its ID.")
         .AddCode("  static constexpr const char * TokenName(int id) {")
         .AddCode("    switch (id) {")
+        .AddCode("    case -1: return \"_ERROR_\";")
         .AddCode("    case 0: return \"_EOF_\";");
     for (size_t i = token_set.size(); i > 0; --i) {
       const auto & token = token_set[i-1];
       file.AddCode("    case ", token.id, ": return ", token.name.AsLiteral(), ";");
     }
-    file.AddCode("    default: return \"_UNKNOWN_\";" )
+    file.AddCode("    default: return \"_ASCII_\";" )
         .AddCode("    };")
         .AddCode("  }")
         .AddCode("")
@@ -542,10 +543,7 @@ namespace emp {
         .AddCode("    const size_t out_line = cur_line;")
         .AddCode("    cur_line += static_cast<size_t>(std::count(lexeme.begin(),lexeme.end(),'\\n'));")
         .AddCode("")
-        .AddCode("    // If we can't find a token, return error token.")
-        .AddCode("    if (best_stop < 0) return { ERROR_ID, lexeme, out_line };")
-        .AddCode("")
-        .AddCode("    // Otherwise return the best token we've found so far.")
+        .AddCode("    // Return the token we found.")
         .AddCode("    return { best_stop, lexeme, out_line };")
         .AddCode("  }")
         .AddCode("")
