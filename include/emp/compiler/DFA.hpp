@@ -102,7 +102,7 @@ namespace emp {
       if (state < 0 || sym >= NUM_SYMBOLS) return -1;
       const int next_state = transitions[(size_t)state][sym];
       // If an uncaptured control symbol was sent in, ignore it.
-      if (next_state == -1 && sym < SYMBOL_MIN_INPUT) return state;
+//      if (next_state == -1 && sym < SYMBOL_MIN_INPUT) return state;
       return next_state;
     }
 
