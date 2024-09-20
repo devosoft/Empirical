@@ -233,6 +233,8 @@ namespace emp {
     for (const auto & t : token_set) {
       lexer_nfa.Merge( to_NFA(t.regex, (uint8_t) t.id) );
     }
+    const size_t start_id = lexer_nfa.GetStartID();
+    lexer_nfa.AddTransitionSymbol(start_id, start_id, DFA::SYMBOL_START);
     generate_lexer = false; // We just generated it!  Don't again until another change is made.
     lexer_dfa = to_DFA(lexer_nfa);
   }
@@ -279,7 +281,7 @@ namespace emp {
     }
 
     // If we did not find any options, advance best_pos to return a single error char.
-    if (best_pos == start_pos) best_pos++;
+    if (best_pos == start_pos) { best_stop = in[start_pos]; best_pos++; }
 
     // If best_pos < cur_pos, rewind the input stream.
     if (best_pos < cur_pos) cur_pos = best_pos;
@@ -307,11 +309,11 @@ namespace emp {
     // If we still need to generate the DFA for the lexer, do so.
     if (generate_lexer) Generate();
 
-    size_t cur_pos = 0;  // Position in the input that we are actively analyzing
-    size_t best_pos = 0; // Best look-ahead we've found so far
-    int cur_state = 0;           // Next state for the DFA analysis
-    int cur_stop = 0;            // Current "stop" state (if we can stop here)
-    int best_stop = -1;          // Best stop state found so far?
+    size_t cur_pos = 0;    // Position in the input that we are actively analyzing
+    size_t best_pos = 0;   // Best look-ahead we've found so far
+    int cur_state = 0;     // Next state for the DFA analysis
+    int cur_stop = 0;      // Current "stop" state (if we can stop here)
+    int best_stop = -1;    // Best stop state found so far?
 
     // Keep looking as long as:
     // 1: We may be able to continue the current lexeme, and
@@ -327,15 +329,18 @@ namespace emp {
       if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }
     }
 
-    // If we did not find any options, advance best_pos to return a single error char.
-    if (best_pos == 0) best_pos = 1;
-
-    // If best_pos < cur_pos, rewind the input stream.
-    int pos_diff = static_cast<int>(cur_pos - best_pos);
-    if (pos_diff) {
-      is.seekg(-pos_diff, std::ios::cur);
-      lexeme.Resize(lexeme.size() - static_cast<std::size_t>(pos_diff));
+    // If we did not find any options, advance best_pos to return a single char.
+    if (best_pos == 0) {
+      is.seekg(-static_cast<int>(cur_pos), std::ios::cur);
+      best_stop = is.get();
+      best_pos = 1;
     }
+
+    // Otherwise, if cur_pos went past best_pos, rewind the input stream.
+    else if (cur_pos > best_pos) {
+      is.seekg(best_pos - cur_pos, std::ios::cur); // Note: negative; Seeking backwards
+    }
+    lexeme.Resize(best_pos);
 
     // If we can't find a token, return error (for no valid options)
     if (best_stop < 0) return { ERROR_ID, lexeme }; // ERROR_ID = no valid tokens available!
@@ -470,7 +475,9 @@ namespace emp {
         .AddCode("  static constexpr int ID__EOF_ = 0;");
     for (size_t i = token_set.size(); i > 0; --i) {
       const auto & token = token_set[i-1];
-      file.AddCode("  static constexpr int ID_", token.name, " = ", token.id, ";");
+      file.AddCode("  static constexpr int ID_", token.name, " = ", token.id, "; ")
+          .AppendPadding(50)
+          .AppendCode("// Regex: ", token.regex.ToString());
     }
     file.AddCode("")
         .AddCode("  // Return the name of a token given its ID.")
@@ -525,8 +532,8 @@ namespace emp {
         .AddCode("      if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }")
         .AddCode("    }")
         .AddCode("")
-        .AddCode("    // If we did not find any options, peel off just one character.")
-        .AddCode("    if (best_pos == start_pos) best_pos++;")
+        .AddCode("    // If we did not find any options, peel off just one character and use it as id.")
+        .AddCode("    if (best_pos == start_pos) { best_stop=in[start_pos]; best_pos++;}")
         .AddCode("")
         .AddCode("    lexeme = in.substr(start_pos, best_pos-start_pos);")
         .AddCode("    start_pos += std::ssize(lexeme);")
