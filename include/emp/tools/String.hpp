@@ -624,10 +624,14 @@ namespace emp {
     String & SetCSVSafe() { *this = MakeCSVSafe(*this); return *this; }
     [[nodiscard]] String AsCSVSafe() const { return MakeCSVSafe(*this); }
 
-    String & AppendWebSafe(String in) { *this+=MakeWebSafe(in); return *this; }
-    String & SetWebSafe(const String & in) { *this = MakeWebSafe(in); return *this; }
-    String & SetWebSafe() { *this = MakeWebSafe(*this); return *this; }
-    [[nodiscard]] String AsWebSafe() const { return MakeWebSafe(*this); }
+    String & AppendWebSafe(String in, bool convert_space=false)
+      { *this+=MakeWebSafe(in, convert_space); return *this; }
+    String & SetWebSafe(const String & in, bool convert_space=false)
+      { *this = MakeWebSafe(in, convert_space); return *this; }
+    String & SetWebSafe(bool convert_space=false)
+      { *this = MakeWebSafe(*this, convert_space); return *this; }
+    [[nodiscard]] String AsWebSafe(bool convert_space=false) const
+      { return MakeWebSafe(*this, convert_space); }
 
     // <= Creating Literals =>
     template <typename T>
@@ -1516,6 +1520,7 @@ namespace emp {
       case '\'': out += "&apos;"; break;
       case '"': out += "&quot;"; break;
       case ' ': out += convert_space ? "&nbsp" : " "; break;
+      case '\n': out += convert_space ? "<br>" : "\n"; break;
       default: out += c;
       }
     }
