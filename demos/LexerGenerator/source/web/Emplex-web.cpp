@@ -53,6 +53,7 @@ private:
 
   // Sandbox state
   bool sandbox_show_ignore = false;        // Should we show token types marked as "ignore"?
+  bool sandbox_show_token_info = false;     // Should we isolate tokens with brackets and show more info?
   bool sandbox_show_types = false;         // Should we show the type of each token?
   bool sandbox_show_lines = false;         // Should we show the line number of each token?
   emp::vector<emp::String> sandbox_colors; // Foreground colors to use for tokens
@@ -87,7 +88,7 @@ private:
 
   UI::Style sandbox_but_style {
     "padding", "5px 10px",
-    "background-color", "#220022",   // Dark Blue background
+    "background-color", "#220022",   // Dark Purple background
     "color", "white",                // White text
     "border", "1px solid white",     // Thin white border
     "border-radius", "5px",          // Rounded corners
@@ -518,7 +519,7 @@ private:
         "<br><br>";
     } else if (mode == "examples") {
       doc.Button("example_but").SetBackground(active_color);
-      intro_div << HeadingName("Examples") <<
+      intro_div << HeadingName("Example") <<
         "<p>When you are performing lexical analysis on input text, you must first decide "
         "what types of elements you are working with and make a corresponding token type "
         "for each.</p>"
@@ -530,9 +531,10 @@ private:
             AddTableRow("integer",    "[0-9]+");
             AddTableRow("float",      "([0-9]+\\.[0-9]*)|(\\.[0-9]+)");
             AddTableRow("keyword",    "(break)|(continue)|(else)|(for)|(if)|(return)|(while)");
+            AddTableRow("type",       "(char)|(double)|(int)|(string)");
             AddTableRow("identifier", "[a-zA-Z_][a-zA-Z0-9_]*");
             // AddTableRow("string",     "(\\\"([^\"\\\\]|(\\\\.))*\\\")|('([^'\\\\]|(\\\\.))*')");
-            AddTableRow("symbol",     ".|\"::\"|\"==\"|\"!=\"|\"<=\"|\">=\"|\"->\"|\"&&\"|\"||\"|\"<<\"|\">>\"|\"++\"|\"--\"");
+            AddTableRow("operator",     "\"::\"|\"==\"|\"!=\"|\"<=\"|\">=\"|\"->\"|\"&&\"|\"||\"|\"<<\"|\">>\"|\"++\"|\"--\"");
             doc.Div("token_div").Redraw();
           }, "Load Example", "example_load_but")
         <<
@@ -559,7 +561,7 @@ private:
     }, "Generated C++ Code", "cpp_but").SetCSS(button_style); // .SetCSS("width", "170px");
     button_div << UI::Button([this](){
       UpdateIntro("examples"); intro_div.Redraw(); 
-    }, "Examples", "example_but").SetCSS(button_style).SetCSS("width", "106px");
+    }, "Example", "example_but").SetCSS(button_style).SetCSS("width", "106px");
     button_div << UI::Button([this](){
       UpdateIntro("about"); intro_div.Redraw(); 
     }, "About", "about_but").SetCSS(button_style).SetCSS("width", "106px");
@@ -689,7 +691,14 @@ private:
   }
 
   void InitializeSandboxDiv() {
-    sandbox_input.SetText("# This is some sample text.\n# Replace this with whatever you want to have tokenized.\n# Feel free to resize this box to your liking.");
+    // sandbox_input.SetText("# This is some sample text.\n# Replace this with whatever you want to have tokenized.\n# Feel free to resize this box to your liking.");
+    sandbox_input.SetText("# Sample text; replace with whatever you want to try tokenizing.\n"
+                          "int countdown = 10;\n"
+                          "while (countdown > 0) {\n"
+                          "  print(countdown);\n"
+                          "  countdown = countdown - 1;\n"
+                          "}\n"
+                          "print(\"Boom!\");\n");
 
     //sandbox_div.SetBackground("#330033").SetColor("white").SetCSS(div_style);
     sandbox_div.SetBackground("black").SetColor("white").SetCSS(div_style);
@@ -698,25 +707,40 @@ private:
       UpdateSandbox();
     }, "Refresh", "sandbox_refresh_but").SetCSS(sandbox_but_style);
     sandbox_div << UI::Button([this](){
+      sandbox_show_token_info = !sandbox_show_token_info;
+      if (sandbox_show_token_info) {
+        doc.Button("sandbox_token_info_but").SetLabel("Token Info: ON");
+        doc.Button("sandbox_types_but").SetBackground("#220022").SetDisabled(false);
+        doc.Button("sandbox_lines_but").SetBackground("#220022").SetDisabled(false);
+        doc.Button("sandbox_ignore_but").SetBackground("#220022").SetDisabled(false);
+      } else {
+        doc.Button("sandbox_token_info_but").SetLabel("Token Info: OFF");
+        doc.Button("sandbox_types_but").SetBackground("#606060").SetDisabled(true);
+        doc.Button("sandbox_lines_but").SetBackground("#606060").SetDisabled(true);
+        doc.Button("sandbox_ignore_but").SetBackground("#606060").SetDisabled(true);
+      }
+      UpdateSandbox();
+    }, "Token Info: OFF", "sandbox_token_info_but").SetCSS(sandbox_but_style);
+    sandbox_div << UI::Button([this](){
       sandbox_show_types = !sandbox_show_types;
       if (sandbox_show_types) doc.Button("sandbox_types_but").SetLabel("Types: ON");
       else doc.Button("sandbox_types_but").SetLabel("Types: OFF");
       UpdateSandbox();
-    }, "Types: OFF", "sandbox_types_but").SetCSS(sandbox_but_style);
+    }, "Types: OFF", "sandbox_types_but").SetCSS(sandbox_but_style).SetBackground("#606060").SetDisabled(true);
     sandbox_div << UI::Button([this](){
       sandbox_show_lines = !sandbox_show_lines;
       if (sandbox_show_lines) doc.Button("sandbox_lines_but").SetLabel("Line Nums: ON");
       else doc.Button("sandbox_lines_but").SetLabel("Line Nums: OFF");
       UpdateSandbox();
-    }, "Line Nums: OFF", "sandbox_lines_but").SetCSS(sandbox_but_style);
+    }, "Line Nums: OFF", "sandbox_lines_but").SetCSS(sandbox_but_style).SetBackground("#606060").SetDisabled(true);
     sandbox_div << UI::Button([this](){
       sandbox_show_ignore = !sandbox_show_ignore;
       if (sandbox_show_ignore) doc.Button("sandbox_ignore_but").SetLabel("Ignored: VISIBLE");
       else doc.Button("sandbox_ignore_but").SetLabel("Ignored: HIDDEN");
       GenerateLexer();
       UpdateSandbox();
-    }, "Ignored: HIDDEN", "sandbox_ignore_but").SetCSS(sandbox_but_style);
-    sandbox_div << sandbox_input.SetSize(750, 50);
+    }, "Ignored: HIDDEN", "sandbox_ignore_but").SetCSS(sandbox_but_style).SetBackground("#606060").SetDisabled(true);
+    sandbox_div << sandbox_input.SetSize(750, 115);
     sandbox_div << "<p>";
     sandbox_div << sandbox_text.SetWidth(750).SetBackground("black").SetColor("white");
     sandbox_div << "</p>";
@@ -764,7 +788,8 @@ private:
 
     emp::TokenStream tokens("Emplex Sandbox");
     if (lexer.GetNumTokens()) {
-      tokens = lexer.Tokenize(sandbox_input.GetText(), "Emplex Sandbox", sandbox_show_ignore);
+      tokens = lexer.Tokenize(sandbox_input.GetText(), "Emplex Sandbox",
+                              sandbox_show_ignore || !sandbox_show_token_info);
     }
 
     // EM_ASM({ alert(UTF8ToString($0)); }, emp::MakeString("# tokens = ", tokens.size()).c_str());
@@ -775,14 +800,19 @@ private:
       sandbox_text << "NO VISIBLE TOKENS.";
     }
     for (auto token : tokens) {
-      sandbox_text << "[";
-      if (sandbox_show_types) {
-        const emp::String token_type_name = lexer.GetTokenName(token.id);
-        sandbox_text << token_type_name << ":";
+      // Print information about the next token, if needed.
+      if (sandbox_show_token_info) {
+        sandbox_text << "[";
+        if (sandbox_show_types) {
+          const emp::String token_type_name = lexer.GetTokenName(token.id);
+          sandbox_text << token_type_name << ":";
+        }
+        if (sandbox_show_lines) {
+          sandbox_text << token.line_id << ":";
+        }
       }
-      if (sandbox_show_lines) {
-        sandbox_text << token.line_id << ":";
-      }
+
+      // Determine the color of the next token.
       if (token.id == -1) {
         sandbox_text << "<span style=\"background-color:#440000; color:#FFCCCC\">";
       } else {
@@ -790,9 +820,13 @@ private:
         sandbox_text << "<span style=\"color:" << sandbox_colors[color_id]
                      << "; background-color:" << sandbox_bgs[color_id] << "\">";
       }
-      sandbox_text << emp::MakeWebSafe(emp::MakeEscaped(token.lexeme, false), true);
-      sandbox_text << "</span>";
-      sandbox_text << "]";
+
+      if (sandbox_show_token_info) {
+        sandbox_text << token.lexeme.AsEscaped(false).AsWebSafe(true) << "</span>]";
+      } else {
+        sandbox_text << token.lexeme.AsWebSafe(true) << "</span>";
+      }
+
     }
     sandbox_text.Activate();
   }
