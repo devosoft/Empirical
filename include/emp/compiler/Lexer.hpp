@@ -213,12 +213,11 @@ namespace emp {
 
   template <int MAX_ID>
   String Lexer_Base<MAX_ID>::GetTokenName(int id) const {
-    // if (id < 0) return MakeString("Error (", id, ")");          // Negative tokens specify errors.
-    if (id < 0) return MakeString("ERROR");                        // Negative tokens specify errors.
-    if (id == 0) return "EOF";                                     // Token zero is end-of-file.
-    if (id < 128) return MakeEscaped((char) id);                   // Individual characters.
-    if (id <= cur_token_id) return MakeString("Error (", id, ")"); // Invalid token range!
-    return GetTokenType(id).name;                                  // User-defined tokens.
+    if (id < 0) return MakeString("ERROR");                            // Negative tokens is error.
+    if (id == 0) return "EOF";                                         // Token 0 is end-of-file.
+    if (id < 128) return MakeString("'", MakeEscaped((char) id), "'"); // Individual character.
+    if (id <= cur_token_id) return MakeString("Error (", id, ")");     // Invalid token range!
+    return GetTokenType(id).name;                                      // User-defined tokens.
   }
 
   template <int MAX_ID>
