@@ -114,10 +114,10 @@ namespace emp {
 
     /// Determine if an entire series of symbols is valid.
     stop_t Test(const emp::String & str) const {
-      int out = Next(0, SYMBOL_START);
-      out = Next(out, str);
-      out = Next(out, SYMBOL_STOP);
-      return GetStop(out);
+      int state = Next(0, SYMBOL_START);
+      state = Next(state, str);
+      int eol_state = Next(state, SYMBOL_STOP);
+      return std::max(GetStop(state), GetStop(eol_state));
     }
 
     bool UsesSymbol(size_t symbol_id) const {
@@ -153,17 +153,9 @@ namespace emp {
       file.Include("<array>");
       file.Include("<string>");
 
-      const bool uses_control = UsesSymbol(SYMBOL_START) || UsesSymbol(SYMBOL_STOP);
-
       file.AddCode("class ", object_name, " {")
           .AddCode("private:")
-          .AddCode("  static constexpr int NUM_SYMBOLS=", NUM_SYMBOLS, ";");
-
-      if (uses_control) {
-        file.AddCode("  constexpr static int SYMBOL_START = 2;     ///< Symbol to indicate a start of line.");
-        file.AddCode("  constexpr static int SYMBOL_STOP = 3;      ///< Symbol to indicate an end of line.");
-      }
-      file.AddCode("  constexpr static int SYMBOL_MIN_INPUT = 9; ///< All symbols below this are control symbols.")
+          .AddCode("  static constexpr int NUM_SYMBOLS=", NUM_SYMBOLS, ";")
           .AddCode("  static constexpr int NUM_STATES=", GetSize(), ";")
           .AddCode("  using row_t = std::array<int, NUM_SYMBOLS>;")
           .AddCode("")
@@ -186,9 +178,12 @@ namespace emp {
         file.AppendCode(static_cast<size_t>(stop_id[state]));
       }
       file.AppendCode("};")
-          .AddCode("");
-
-      file.AddCode("public:")
+          .AddCode("")
+          .AddCode("public:")
+          .AddCode("  constexpr static int SYMBOL_START = 2;     ///< Symbol to indicate a start of line.")
+          .AddCode("  constexpr static int SYMBOL_STOP = 3;      ///< Symbol to indicate an end of line.")
+          .AddCode("  constexpr static int SYMBOL_MIN_INPUT = 9; ///< Symbols below this are control symbols.")
+          .AddCode("")
           .AddCode("  static constexpr size_t size() { return ", GetSize(), "; }")
           .AddCode("  static constexpr int GetStop(int state) {")
           .AddCode("    return (state >= 0) ? stop_id[static_cast<size_t>(state)] : 0;")
@@ -206,16 +201,12 @@ namespace emp {
           .AddCode("    for (char x : syms) state = GetNext(state, x);")
           .AddCode("    return state;")
           .AddCode("  }")
-          .AddCode("  static int Test(const std::string & str) {");
-      if (uses_control) {
-        file.AddCode("    int state = GetNext(0, SYMBOL_START);")
-            .AddCode("    state = GetNext(state, str);")
-            .AddCode("    state = GetNext(state, SYMBOL_STOP);")
-            .AddCode("    return GetStop(state);");
-      } else {
-        file.AddCode("    return GetStop(GetNext(0, str));");
-      }
-      file.AddCode("  }")
+          .AddCode("  static int Test(const std::string & str) {")
+          .AddCode("    int state = GetNext(0, SYMBOL_START);")
+          .AddCode("    state = GetNext(state, str);")
+          .AddCode("    int eol_state = GetNext(state, SYMBOL_STOP);")
+          .AddCode("    return std::max(GetStop(state), GetStop(eol_state));")
+          .AddCode("  }")
           .AddCode("};");
     }
   };
