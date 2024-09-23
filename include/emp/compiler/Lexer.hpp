@@ -271,11 +271,11 @@ namespace emp {
       cur_state = lexer_dfa.Next(cur_state, static_cast<size_t>(next_char));
       cur_stop = lexer_dfa.GetStop(cur_state);
       if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }
-      // Look ahead to see if we are at the END OF A LINE.
+      // Look ahead to see if we are at the END OF A LINE that can finish a token.
       if (cur_pos == in.size() || in[cur_pos] == '\n') {
-        cur_state = lexer_dfa.Next(cur_state, static_cast<size_t>(DFA::SYMBOL_STOP));
-        cur_stop = lexer_dfa.GetStop(cur_state);
-        if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }
+        int eol_state = lexer_dfa.Next(cur_state, static_cast<size_t>(DFA::SYMBOL_STOP));
+        int eol_stop = lexer_dfa.GetStop(eol_state);
+        if (eol_stop > 0) { best_pos = cur_pos; best_stop = eol_stop; }
       }
     }
 
@@ -296,6 +296,12 @@ namespace emp {
   }
 
   static bool AtEOF(std::istream & is) { return is.peek() == std::istream::traits_type::eof(); }
+  static bool AtLineStart(std::istream & is) {
+    if (!is.good()) return false;                 // If the stream is bad, not at start of line
+    if (is.tellg() <= 0) return true;             // At beginning of stream must be line start
+    is.seekg(-1, std::ios::cur);                  // Move back one position
+    return (static_cast<char>(is.get()) == '\n'); // Return whether prev char was a newline.
+  }
 
   template <int MAX_ID>
   Token Lexer_Base<MAX_ID>::Process(std::istream & is) const {
@@ -314,6 +320,11 @@ namespace emp {
     int cur_stop = 0;      // Current "stop" state (if we can stop here)
     int best_stop = -1;    // Best stop state found so far?
 
+    // If we are at the START OF A LINE, send a DFA::SYMBOL_START
+    if (AtLineStart(is)) {
+      cur_state = lexer_dfa.Next(0, DFA::SYMBOL_START);
+    }
+
     // Keep looking as long as:
     // 1: We may be able to continue the current lexeme, and
     // 2: We have not entered an invalid state, and
@@ -326,6 +337,12 @@ namespace emp {
       cur_state = lexer_dfa.Next(cur_state, static_cast<size_t>(next_char));
       cur_stop = lexer_dfa.GetStop(cur_state);
       if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }
+      // Look ahead to see if we are at the END OF A LINE that can finish a token.
+      if (AtEOF(is) || is.peek() == '\n') {
+        int eol_state = lexer_dfa.Next(cur_state, static_cast<size_t>(DFA::SYMBOL_STOP));
+        int eol_stop = lexer_dfa.GetStop(eol_state);
+        if (eol_stop > 0) { best_pos = cur_pos; best_stop = eol_stop; }
+      }
     }
 
     // If we did not find any options, advance best_pos to return a single char.
