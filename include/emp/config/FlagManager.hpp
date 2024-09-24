@@ -57,6 +57,7 @@ namespace emp {
 
   public:
     FlagInfo() = default;
+    FlagInfo(const FlagInfo &) = default;
     FlagInfo(String desc, size_t min_args, size_t max_args,
              fun_t fun, char shortcut='\0')
       : desc(desc), min_args(min_args), max_args(max_args), fun(fun), shortcut(shortcut)
