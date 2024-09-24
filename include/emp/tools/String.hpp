@@ -526,7 +526,7 @@ namespace emp {
 
     // Additional scanning that also converts type.
     char ScanAsChar(size_t & pos) const { return Get(pos++); }
-    int ScanAsInt(size_t & pos) const;
+    inline int ScanAsInt(size_t & pos) const;
 
     // ------ Transformations into non-Strings ------
     // Note: For efficiency there are two versions of most of these: one where the output
@@ -1176,14 +1176,12 @@ namespace emp {
 
     size_t start_pos = 0;
     size_t found_pos = Find(delim, 0, syntax);
-    const size_t delim_size = [delim](){
-      if constexpr (std::derived_from<DELIM_T, std::string>) return delim.size();
-      else return 1;
-    }();
     while (found_pos < size()) {
       out_set.push_back( GetRange(start_pos, found_pos) );
       if (trim_whitespace) out_set.back().Trim();
-      start_pos = found_pos+delim_size;
+      if constexpr (std::derived_from<DELIM_T, std::string>) {
+        start_pos = found_pos + delim.size();
+      } else start_pos = found_pos+1; // Just a char.
       found_pos = Find(delim, found_pos+1, syntax);
     }
     out_set.push_back( GetRange(start_pos, found_pos) );
