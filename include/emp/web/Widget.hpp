@@ -633,7 +633,7 @@ namespace web {
       /// CSS-related options may be overridden in derived classes that have multiple styles.
       /// By default DoCSS will track the new information and apply it (if active) to the widget.
       virtual void DoCSS(const std::string & setting, const std::string & value) {
-        info->extras.style.DoSet(setting, value);
+        info->extras.style.Set(setting, value);
         if (IsActive()) Style::Apply(info->id, setting, value);
       }
 
@@ -645,7 +645,7 @@ namespace web {
       /// Attr-related options may be overridden in derived classes that have multiple attributes.
       /// By default DoAttr will track the new information and apply it (if active) to the widget.
       virtual void DoAttr(const std::string & setting, const std::string & value) {
-        info->extras.attr.DoSet(setting, value);
+        info->extras.attr.Set(setting, value);
         if (IsActive()) Attributes::Apply(info->id, setting, value);
       }
 
