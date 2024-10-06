@@ -5,11 +5,11 @@
 */
 /**
  *  @file
- *  @brief Event handlers that use JQuery.
+ *  @brief Event handlers
  *
  *  @todo Events can be further sub-divided and built up (similar to DataNode objects) so that we
  *    save only the information that we're planning to use.  This may be slightly faster (given
- *    how frequently some of these like mouse move might be used), but likely to be more compelx.
+ *    how frequently some of these like mouse move might be used), but likely to be more complex.
  *  @todo An alternative speed-up might be to save the current event somewhere in emp_i on the
  *    Javascript side, and then just request the information that we might need.  This approach
  *    should be easier to implement, but since everything would be copied anyway in such as case,
