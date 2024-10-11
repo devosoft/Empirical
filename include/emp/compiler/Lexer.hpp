@@ -552,7 +552,7 @@ namespace emp {
         .AddCode("      cur_stop = DFA::GetStop(cur_state);")
         .AddCode("      if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }")
         .AddCode("      // Look ahead to see if we are at the END OF A LINE that can finish a token.")
-        .AddCode("      if (cur_pos == in.size() || in[cur_pos] == '\\n') {")
+        .AddCode("      if (cur_pos == std::ssize(in) || in[cur_pos] == '\\n') {")
         .AddCode("        int eol_state = DFA::GetNext(cur_state, DFA::SYMBOL_STOP);")
         .AddCode("        int eol_stop = DFA::GetStop(eol_state);")
         .AddCode("        if (eol_stop > 0) { best_pos = cur_pos; best_stop = eol_stop; }")
