@@ -505,7 +505,7 @@ namespace emp {
       const auto & token = token_set[i-1];
       file.AddCode("    case ", token.id, ": return ", token.name.AsLiteral(), ";");
     }
-    file.AddCode("    default: return \"_ASCII_\";" )
+    file.AddCode("    default: return std::string(\"'\") + static_cast<char>(id) + \"'\";" )
         .AddCode("    };")
         .AddCode("  }")
         .AddCode("")
