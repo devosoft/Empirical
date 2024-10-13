@@ -458,6 +458,7 @@ namespace emp {
 
     file.Include("<algorithm>")
         .Include("<array>")
+        .Include("<cctype>")
         .Include("<iostream>")
         .Include("<string>")
         .Include("<unordered_map>")
@@ -505,8 +506,17 @@ namespace emp {
       const auto & token = token_set[i-1];
       file.AddCode("    case ", token.id, ": return ", token.name.AsLiteral(), ";");
     }
-    file.AddCode("    default: return std::string(\"'\") + static_cast<char>(id) + \"'\";" )
-        .AddCode("    };")
+    file.AddCode("    default:")
+        .AddCode("      // If ID is a visible character print it, otherwise provide ID.")
+        .AddCode("      if (id > 0 && id < 128 && std::isprint(id)) {")
+        .AddCode("        return std::string(\"'\") + static_cast<char>(id) + \"'\";")
+        .AddCode("      }")
+        .AddCode("      if (id == '\\n') return \"'\\\\n'\";")
+        .AddCode("      if (id == '\\r') return \"'\\\\r'\";")
+        .AddCode("      if (id == '\\t') return \"'\\\\t'\";")
+        .AddCode("      if (id == '\\\\') return \"'\\\\n'\";")
+        .AddCode("      return std::string(\"Token ID: \") + std::to_string(id);")
+        .AddCode("    }; // End switch.")
         .AddCode("  }")
         .AddCode("")
         .AddCode("  // Identify if a token (by ID) should be skipped during tokenizing.")
