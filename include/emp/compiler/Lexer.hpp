@@ -154,7 +154,13 @@ namespace emp {
 
     void DebugToken(int token_id) const;
 
-    void WriteCPP(emp::CPPFile & file, emp::String object_name="AutoLexer") const;
+    void WriteCPP(emp::CPPFile & file,
+      emp::String object_name="Lexer",
+      emp::String DFA_name="DFA",
+      emp::String token_name="Token",
+      bool save_lexeme=true,
+      bool save_line_num=true,
+      bool save_col_num=true) const;
   };
 
   using Lexer = Lexer_Base<255>;
@@ -451,7 +457,9 @@ namespace emp {
   }
 
   template <int MAX_ID>
-  void Lexer_Base<MAX_ID>::WriteCPP(emp::CPPFile & file, emp::String object_name) const
+  void Lexer_Base<MAX_ID>::WriteCPP(emp::CPPFile & file,
+    emp::String object_name, emp::String DFA_name, emp::String token_name,
+    bool save_lexeme, bool save_line_num, bool save_col_num) const
   {
     // If we still need to generate the DFA for the lexer, do so.
     if (generate_lexer) Generate();
@@ -465,7 +473,7 @@ namespace emp {
         .Include("<vector>");
 
     file.AddCode("// Struct to store information about a found Token")
-        .AddCode("struct Token {")
+        .AddCode("struct ", token_name, " {")
         .AddCode("  int id;                             // Type ID for token")
         .AddCode("  std::string lexeme;                 // Sequence matched by token")
         .AddCode("  size_t line_id;                     // Line token started on")
@@ -537,7 +545,7 @@ namespace emp {
         .AddCode("  static constexpr int GetNumTokens() { return NUM_TOKENS; }")
         .AddCode("")
         .AddCode("  // Generate and return the next token from the input stream.")
-        .AddCode("  Token NextToken(std::string_view in) {")
+        .AddCode("  ", token_name, " NextToken(std::string_view in) {")
         .AddCode("    // If we cannot read in, return an \"EOF\" token.")
         .AddCode("    if (start_pos >= std::ssize(in)) return { 0, \"\", cur_line };")
         .AddCode("")
@@ -584,18 +592,18 @@ namespace emp {
         .AddCode("  }")
         .AddCode("")
         .AddCode("  // Convert an input string into a vector of tokens.")
-        .AddCode("  std::vector<Token> Tokenize(std::string_view in) {")
+        .AddCode("  std::vector<", token_name, "> Tokenize(std::string_view in) {")
         .AddCode("    start_pos = 0; // Start processing at beginning of string.")
         .AddCode("    cur_line = 1;  // Start processing at the first line of the input.")
-        .AddCode("    std::vector<Token> out_tokens;")
-        .AddCode("    while (Token token = NextToken(in)) {")
+        .AddCode("    std::vector<", token_name, "> out_tokens;")
+        .AddCode("    while (", token_name, " token = NextToken(in)) {")
         .AddCode("      if (!IgnoreToken(token.id)) out_tokens.push_back(token);")
         .AddCode("    }")
         .AddCode("    return out_tokens;")
         .AddCode("  }")
         .AddCode("")
         .AddCode("  // Convert an input stream to a string, then tokenize.")
-        .AddCode("  std::vector<Token> Tokenize(std::istream & is) {")
+        .AddCode("  std::vector<", token_name, "> Tokenize(std::istream & is) {")
         .AddCode("    return Tokenize(")
         .AddCode("      std::string(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>())")
         .AddCode("    );")
