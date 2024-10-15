@@ -482,7 +482,7 @@ namespace emp {
         .AddCode("");
 
     file.AddCode("// Deterministic Finite Automaton (DFA) for token recognition.");
-    lexer_dfa.WriteCPP(file, "DFA");
+    lexer_dfa.WriteCPP(file, DFA_name);
     file.AddCode("");
 
     file.AddCode("class ", object_name, " {")
@@ -555,9 +555,9 @@ namespace emp {
         .AddCode("    int cur_stop = 0;          // Current \"stop\" state (or 0 if we can't stop here)")
         .AddCode("    int best_stop = -1;        // Best stop state found so far?")
         .AddCode("")
-        .AddCode("    // If we are at the START OF A LINE, send a DFA::SYMBOL_START")
+        .AddCode("    // If we are at the START OF A LINE, send a ", DFA_name, "::SYMBOL_START")
         .AddCode("    if (start_pos == 0 || in[start_pos-1] == '\\n') {")
-        .AddCode("      cur_state = DFA::GetNext(0, DFA::SYMBOL_START);")
+        .AddCode("      cur_state = ", DFA_name, "::GetNext(0, ", DFA_name, "::SYMBOL_START);")
         .AddCode("    }")
         .AddCode("    // Keep looking as long as:")
         .AddCode("    // 1: We may be able to continue the current lexeme, and")
@@ -566,13 +566,13 @@ namespace emp {
         .AddCode("    while (cur_stop >= 0 && cur_state >= 0 && cur_pos < std::ssize(in)) {")
         .AddCode("      const char next_char = in[cur_pos++];")
         .AddCode("      if (next_char < 0) break; // Ignore invalid chars.")
-        .AddCode("      cur_state = DFA::GetNext(cur_state, next_char);")
-        .AddCode("      cur_stop = DFA::GetStop(cur_state);")
+        .AddCode("      cur_state = ", DFA_name, "::GetNext(cur_state, next_char);")
+        .AddCode("      cur_stop = ", DFA_name, "::GetStop(cur_state);")
         .AddCode("      if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }")
         .AddCode("      // Look ahead to see if we are at the END OF A LINE that can finish a token.")
         .AddCode("      if (cur_pos == std::ssize(in) || in[cur_pos] == '\\n') {")
-        .AddCode("        int eol_state = DFA::GetNext(cur_state, DFA::SYMBOL_STOP);")
-        .AddCode("        int eol_stop = DFA::GetStop(eol_state);")
+        .AddCode("        int eol_state = ", DFA_name, "::GetNext(cur_state, ", DFA_name, "::SYMBOL_STOP);")
+        .AddCode("        int eol_stop = ", DFA_name, "::GetStop(eol_state);")
         .AddCode("        if (eol_stop > 0) { best_pos = cur_pos; best_stop = eol_stop; }")
         .AddCode("      }")
         .AddCode("    }")
