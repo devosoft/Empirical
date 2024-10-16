@@ -324,7 +324,7 @@ struct std::tuple_size<emp::array<T, N>> : public integral_constant<size_t, N> {
 
 #endif // NDEBUG off
 
-
+#ifndef UIT_VENDORIZE_EMP
 namespace std {
   // A crude, generic printing function for arrays.
   template <typename T, size_t N>
@@ -340,5 +340,6 @@ namespace std {
   }
 
 }
+#endif // UIT_VENDORIZE_EMP
 
 #endif // Include guards
