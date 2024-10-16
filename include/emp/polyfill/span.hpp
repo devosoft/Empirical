@@ -1,6 +1,12 @@
 #ifndef POLYFILL_SPAN_H
 #define POLYFILL_SPAN_H
 
+#if __cplusplus >= 202002L
+
+#include <span>
+
+#else
+
 #include "../../../third-party/span-lite/include/nonstd/span.hpp"
 
 // alias span-lite's nonstd::span to std::span
@@ -10,5 +16,7 @@ namespace std {
   template <typename ...Args>
   using span = nonstd::span<Args...>;
 }
+
+#endif
 
 #endif
