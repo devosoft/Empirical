@@ -159,8 +159,8 @@ namespace emp {
       emp::String DFA_name="DFA",
       emp::String token_name="Token",
       bool save_lexeme=true,
-      bool save_line_num=true,
-      bool save_col_num=true) const;
+      bool save_line_id=true,
+      bool save_col_id=true) const;
   };
 
   using Lexer = Lexer_Base<255>;
@@ -459,7 +459,7 @@ namespace emp {
   template <int MAX_ID>
   void Lexer_Base<MAX_ID>::WriteCPP(emp::CPPFile & file,
     emp::String object_name, emp::String DFA_name, emp::String token_name,
-    bool save_lexeme, bool save_line_num, bool save_col_num) const
+    bool save_lexeme, bool save_line_id, bool save_col_id) const
   {
     // If we still need to generate the DFA for the lexer, do so.
     if (generate_lexer) Generate();
@@ -474,10 +474,11 @@ namespace emp {
 
     file.AddCode("// Struct to store information about a found Token")
         .AddCode("struct ", token_name, " {")
-        .AddCode("  int id;                             // Type ID for token")
-        .AddCode("  std::string lexeme;                 // Sequence matched by token")
-        .AddCode("  size_t line_id;                     // Line token started on")
-        .AddCode("  operator int() const { return id; } // Auto-convert tokens to IDs")
+        .AddCode("  int id;                             // Type ID for token");
+    if (save_lexeme) file.AddCode("  std::string lexeme;                 // Sequence matched by token");
+    if (save_line_id) file.AddCode("  size_t line_id;                     // Line token started on");
+    if (save_col_id) file.AddCode("  size_t col_id;                      // Column token started on");
+    file.AddCode("  operator int() const { return id; } // Auto-convert tokens to IDs")
         .AddCode("};")
         .AddCode("");
 
@@ -492,6 +493,7 @@ namespace emp {
         .AddCode("")
         .AddCode("  // -- Current State --")
         .AddCode("  size_t cur_line = 1;   // Track LINE we are reading in the input.")
+        .AddCode("  size_t cur_col = 0;    // Track COLUMN we are reading in the input.")
         .AddCode("  int start_pos = 0;     // Track INDEX for the start of current lexeme.")
         .AddCode("  std::string lexeme{};  // Lexeme found for the current token")
         .AddCode("  std::string errors{};  // Description of any errors encountered")
@@ -547,8 +549,12 @@ namespace emp {
         .AddCode("  // Generate and return the next token from the input stream.")
         .AddCode("  ", token_name, " NextToken(std::string_view in) {")
         .AddCode("    // If we cannot read in, return an \"EOF\" token.")
-        .AddCode("    if (start_pos >= std::ssize(in)) return { 0, \"\", cur_line };")
-        .AddCode("")
+        .AddCode("    if (start_pos >= std::ssize(in)) return { 0 };")
+    if (save_lexeme)  file.AppendCode(", \"\"");
+    if (save_line_id) file.AppendCode(", cur_line");
+    if (save_col_id)  file.AppendCode(", cur_col");
+    file.AppendCode(" };");
+    file.AddCode("")
         .AddCode("    int cur_pos = start_pos;   // Position in the input that we are actively analyzing")
         .AddCode("    int best_pos = start_pos;  // Best look-ahead we've found so far")
         .AddCode("    int cur_state = 0;         // Next state for the DFA analysis")
@@ -585,16 +591,27 @@ namespace emp {
         .AddCode("")
         .AddCode("    // Update the line number we are on.")
         .AddCode("    const size_t out_line = cur_line;")
-        .AddCode("    cur_line += static_cast<size_t>(std::count(lexeme.begin(),lexeme.end(),'\\n'));")
+        .AddCode("    const size_t out_col = cur_col;")
+        .AddCode("    if (cur_col = lexeme.rfind('\n') == std::string::npos) { // No newlines")
+        .AddCode("      cur_col = out_col + lexeme.size();")
+        .AddCode("    } else {")
+        .AddCode("      cur_col = lexeme.size() - cur_col - 1;")
+        .AddCode("      cur_line += static_cast<size_t>(std::count(lexeme.begin(),lexeme.end(),'\\n'));")
+        .AddCode("    }")
         .AddCode("")
         .AddCode("    // Return the token we found.")
-        .AddCode("    return { best_stop, lexeme, out_line };")
-        .AddCode("  }")
+        .AddCode("    return { best_stop");
+    if (save_lexeme)  file.AppendCode(", lexeme");
+    if (save_line_id) file.AppendCode(", out_line");
+    if (save_col_id) file.AppendCode(", out_col");
+    file.AppendCode(" };");
+    file.AddCode("  }")
         .AddCode("")
         .AddCode("  // Convert an input string into a vector of tokens.")
         .AddCode("  std::vector<", token_name, "> Tokenize(std::string_view in) {")
         .AddCode("    start_pos = 0; // Start processing at beginning of string.")
         .AddCode("    cur_line = 1;  // Start processing at the first line of the input.")
+        .AddCode("    cur_col = 0;   // Start processing at the first position of the input.")
         .AddCode("    std::vector<", token_name, "> out_tokens;")
         .AddCode("    while (", token_name, " token = NextToken(in)) {")
         .AddCode("      if (!IgnoreToken(token.id)) out_tokens.push_back(token);")
