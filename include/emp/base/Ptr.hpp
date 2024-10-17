@@ -416,7 +416,9 @@ namespace emp {
     template <typename T2>
     Ptr(T2 * in_ptr, bool track=false) : BasePtr<TYPE>(in_ptr, UNTRACKED_ID)
     {
+      #ifndef UIT_VENDORIZE_EMP
       if (internal::ptr_debug) std::cout << "raw construct: " << ptr << ". track=" << track << std::endl;
+      #endif // #ifndef UIT_VENDORIZE_EMP
       emp_assert( (PtrIsConvertable<T2, TYPE>(in_ptr)) );
 
       // If this pointer is already active, link to it.
@@ -471,8 +473,10 @@ namespace emp {
     ~Ptr() {
       if (internal::ptr_debug) {
         std::cout << "destructing Ptr instance ";
+        #ifndef UIT_VENDORIZE_EMP
         if (ptr) std::cout << id << " (" << ptr << ")\n";
         else std::cout << "(nullptr)\n";
+        #endif // #ifndef UIT_VENDORIZE_EMP
       }
       Tracker().DecID(id);
     }
