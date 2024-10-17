@@ -31,6 +31,8 @@ private:
   // Lexer information
   emp::vector<TokenInput> token_info;
   emp::String lexer_name{"Lexer"};
+  emp::String token_name{"Token"};
+  emp::String dfa_name{"DFA"};
   emp::String out_filename{"lexer.hpp"};
   emp::String inc_guards{"EMPLEX_LEXER_HPP_INCLUDE_"};
   emp::String name_space{"emplex"};
@@ -46,7 +48,7 @@ private:
   UI::Div footer_div{"footer_div"};
 
   UI::Table token_table{1, 4, "token_table"};
-  UI::Table settings_table{4, 2, "settings_table"};
+  UI::Table settings_table{15, 3, "settings_table"};
   UI::Text output_text{"output_text"};
   UI::TextArea sandbox_input{"sandbox_input"};
   UI::Text sandbox_text{"sandbox_text"};
@@ -288,7 +290,7 @@ private:
     file.Clear();
     file.SetGuards(inc_guards);
     file.SetNamespace(name_space);
-    lexer.WriteCPP(file, lexer_name);
+    lexer.WriteCPP(file, lexer_name, dfa_name, token_name);
 
     std::stringstream ss;
     file.Write(ss);
@@ -667,25 +669,75 @@ private:
     settings_div.SetBackground("tan").SetCSS(div_style);
     settings_div << HeadingName("Advanced Options");
 
-    settings_table[0][0].SetHeader().SetCSS("padding-bottom", "15px") << "<br>Class Name: ";
-    settings_table[0][1] << UI::TextArea([this](const std::string & str) {
-      lexer_name = str;
-    }, "set_class").SetText(lexer_name).SetWidth(250);
-
-    settings_table[1][0].SetHeader().SetCSS("padding-bottom", "15px") << "<br>Filename: ";
-    settings_table[1][1] << UI::TextArea([this](const std::string & str) {
+    size_t row_id = 0;
+    settings_table[row_id][0] << "&nbsp;";
+    settings_table[row_id][1].SetCSS("padding-bottom", "15px", "font-weight", "bold") << "<br>Generated Filename: ";
+    settings_table[row_id][2] << UI::TextArea([this](const std::string & str) {
       out_filename = str;
-    }, "set_filename").SetText(out_filename).SetWidth(250);
+    }, "set_filename").SetText(out_filename).SetWidth(250)
+      .SetTitle("Filename to use if you download the generated lexer.");
+    ++row_id;
 
-    settings_table[2][0].SetHeader().SetCSS("padding-bottom", "15px") << "<br>Include Guards: ";
-    settings_table[2][1] << UI::TextArea([this](const std::string & str) {
+    settings_table[row_id][0].SetColSpan(3).SetColor("darkblue")
+      << "<big><b>Token Data to Store</b></big>";
+    ++row_id;
+
+    settings_table[row_id][1].SetCSS("padding-bottom", "15px", "font-weight", "bold")
+      << "Store lexemes?";
+    settings_table[row_id][2] << UI::CheckBox("checkbox_lexemes").SetChecked()
+      .SetTitle("Should we store found lexemes as part of the generated Token class?");
+    ++row_id;
+    // .SetCSS("vertical-align", "middle")
+
+    settings_table[row_id][1].SetCSS("padding-bottom", "15px", "font-weight", "bold") << "Store line numbers?";
+    settings_table[row_id][2] << UI::CheckBox("checkbox_line_nums").SetChecked()
+      .SetTitle("Should we store the line number where a token was found as part of the generated Token class?");
+    ++row_id;
+
+    settings_table[row_id][1].SetCSS("padding-bottom", "15px", "font-weight", "bold") << "Store columns?";
+    settings_table[row_id][2] << UI::CheckBox("checkbox_cols").SetChecked()
+      .SetTitle("Should we store the column where a token was found as part of the generated Token class?");
+    ++row_id;
+
+
+    settings_table[row_id][0].SetColSpan(3).SetColor("darkblue")
+      << "<big><b>Names to use in the generated C++ code</b></big>";
+    ++row_id;
+
+    settings_table[row_id][1].SetCSS("padding-bottom", "15px", "font-weight", "bold") << "<br>Include Guards: ";
+    settings_table[row_id][2] << UI::TextArea([this](const std::string & str) {
       inc_guards = str;
-    }, "set_includes").SetText(inc_guards).SetWidth(250);
+    }, "set_includes").SetText(inc_guards).SetWidth(250)
+      .SetTitle("Unique name of include guards at top and bottom of generated C++ file.");
+    ++row_id;
 
-    settings_table[3][0].SetHeader().SetCSS("padding-bottom", "15px") << "<br>Namespace: ";
-    settings_table[3][1] << UI::TextArea([this](const std::string & str) {
+    settings_table[row_id][1].SetCSS("padding-bottom", "15px", "font-weight", "bold") << "<br>Namespace: ";
+    settings_table[row_id][2] << UI::TextArea([this](const std::string & str) {
       name_space = str;
-    }, "set_namespace").SetText(name_space).SetWidth(250);
+    }, "set_namespace").SetText(name_space).SetWidth(250)
+      .SetTitle("Namespace where generated classes should be placed.");
+    ++row_id;
+
+    settings_table[row_id][1].SetCSS("padding-bottom", "15px", "font-weight", "bold") << "<br>Lexer class Name: ";
+    settings_table[row_id][2] << UI::TextArea([this](const std::string & str) {
+      lexer_name = str;
+    }, "set_lexer_class").SetText(lexer_name).SetWidth(250)
+      .SetTitle("Identifier name to use for the generated C++ Lexer class.");
+    ++row_id;
+
+    settings_table[row_id][1].SetCSS("padding-bottom", "15px", "font-weight", "bold") << "<br>Token class Name: ";
+    settings_table[row_id][2] << UI::TextArea([this](const std::string & str) {
+      token_name = str;
+    }, "set_token_class").SetText(token_name).SetWidth(250)
+      .SetTitle("Identifier name to use for the generated C++ Token class.");
+    ++row_id;
+
+    settings_table[row_id][1].SetCSS("padding-bottom", "15px", "font-weight", "bold") << "<br>DFA class Name: ";
+    settings_table[row_id][2] << UI::TextArea([this](const std::string & str) {
+      dfa_name = str;
+    }, "set_dfa_class").SetText(dfa_name).SetWidth(250)
+      .SetTitle("Identifier name to use for the generated C++ DFA class.");
+    ++row_id;
 
     settings_div << settings_table;
   }
