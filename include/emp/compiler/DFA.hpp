@@ -148,7 +148,7 @@ namespace emp {
 
     // Print out this DFA as compilable C++ code.
     void WriteCPP(emp::CPPFile & file,
-                  emp::String object_name="AutoDFA"
+                  emp::String object_name="DFA"
                  ) const {
       file.Include("<array>");
       file.Include("<string>");
