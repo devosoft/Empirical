@@ -549,7 +549,7 @@ namespace emp {
         .AddCode("  // Generate and return the next token from the input stream.")
         .AddCode("  ", token_name, " NextToken(std::string_view in) {")
         .AddCode("    // If we cannot read in, return an \"EOF\" token.")
-        .AddCode("    if (start_pos >= std::ssize(in)) return { 0 };")
+        .AddCode("    if (start_pos >= std::ssize(in)) return { 0 };");
     if (save_lexeme)  file.AppendCode(", \"\"");
     if (save_line_id) file.AppendCode(", cur_line");
     if (save_col_id)  file.AppendCode(", cur_col");
