@@ -105,7 +105,7 @@ namespace web {
     }
 
     /// Create a new checkbox.
-    /// @param in_cb The function to call when the checkbox is toggled.
+    /// @param in_cb The void(size_t) function to call when the checkbox is toggled.
     /// @param in_id The HTML ID to use for this checkbox (leave blank for auto-generated)
     CheckBox(const cb_type & in_cb, const std::string & in_id="")
       : CheckBox(in_id)
@@ -116,7 +116,6 @@ namespace web {
     /// Link to an existing checkbox.
     CheckBox(const CheckBox & in) : WidgetFacet(in) { ; }
     CheckBox(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsCheckBox()); }
-    CheckBox() : WidgetFacet("") { info = nullptr; }
     virtual ~CheckBox() { ; }
 
     using INFO_TYPE = CheckBoxInfo;
