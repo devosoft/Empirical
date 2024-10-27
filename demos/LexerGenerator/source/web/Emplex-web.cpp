@@ -30,12 +30,17 @@ private:
 
   // Lexer information
   emp::vector<TokenInput> token_info;
+
+  // Lexer C++ Output Configuration
+  emp::String out_filename{"lexer.hpp"};
   emp::String lexer_name{"Lexer"};
   emp::String token_name{"Token"};
   emp::String dfa_name{"DFA"};
-  emp::String out_filename{"lexer.hpp"};
   emp::String inc_guards{"EMPLEX_LEXER_HPP_INCLUDE_"};
   emp::String name_space{"emplex"};
+  bool use_token_lexemes = true;
+  bool use_token_line_num = true;
+  bool use_token_column = true;
 
   // Sections of web page
   UI::Div intro_div{"intro_div"};
@@ -290,7 +295,8 @@ private:
     file.Clear();
     file.SetGuards(inc_guards);
     file.SetNamespace(name_space);
-    lexer.WriteCPP(file, lexer_name, dfa_name, token_name);
+    lexer.WriteCPP(file, lexer_name, dfa_name, token_name,
+                   use_token_lexemes, use_token_line_num, use_token_column);
 
     std::stringstream ss;
     file.Write(ss);
@@ -682,20 +688,21 @@ private:
       << "<big><b>Token Data to Store</b></big>";
     ++row_id;
 
-    settings_table[row_id][1].SetCSS("font-weight", "bold")
-      << "Store lexemes?";
-    settings_table[row_id][2] << UI::CheckBox("checkbox_lexemes").SetChecked()
+    settings_table[row_id][1].SetCSS("font-weight", "bold") << "Store lexemes?";
+    settings_table[row_id][2] << UI::CheckBox([this](bool in){ use_token_lexemes = in; }, "checkbox_lexemes")
+      .SetChecked(use_token_lexemes)
       .SetTitle("Should we store found lexemes as part of the generated Token class?");
     ++row_id;
-    // .SetCSS("vertical-align", "middle")
 
     settings_table[row_id][1].SetCSS("font-weight", "bold") << "Store line numbers?";
-    settings_table[row_id][2] << UI::CheckBox("checkbox_line_nums").SetChecked()
+    settings_table[row_id][2] << UI::CheckBox([this](bool in){ use_token_line_num = in; }, "checkbox_line_nums")
+      .SetChecked(use_token_line_num)
       .SetTitle("Should we store the line number where a token was found as part of the generated Token class?");
     ++row_id;
 
     settings_table[row_id][1].SetCSS("font-weight", "bold") << "Store columns?";
-    settings_table[row_id][2] << UI::CheckBox("checkbox_cols").SetChecked()
+    settings_table[row_id][2] << UI::CheckBox([this](bool in){ use_token_column = in; }, "checkbox_cols")
+      .SetChecked(use_token_column)
       .SetTitle("Should we store the column where a token was found as part of the generated Token class?");
     ++row_id;
 
