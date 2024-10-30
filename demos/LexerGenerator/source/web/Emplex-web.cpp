@@ -60,7 +60,7 @@ private:
 
   // Sandbox state
   bool sandbox_show_ignore = false;        // Should we show token types marked as "ignore"?
-  bool sandbox_show_token_info = false;     // Should we isolate tokens with brackets and show more info?
+  bool sandbox_show_token_info = false;    // Should we isolate tokens with brackets and show more info?
   bool sandbox_show_types = false;         // Should we show the type of each token?
   bool sandbox_show_lines = false;         // Should we show the line number of each token?
   emp::vector<emp::String> sandbox_colors; // Foreground colors to use for tokens
@@ -119,9 +119,6 @@ private:
     }
     error_div.Redraw();
   }
-
-  // void SwapTableRows(size_t row1, size_t row2);
-  // void RemoveTableRow(size_t id);
 
   // Add a row to the bottom of the token table.
   void AddTableRow() {
