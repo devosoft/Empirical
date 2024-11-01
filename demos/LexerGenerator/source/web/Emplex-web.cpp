@@ -120,6 +120,31 @@ private:
     error_div.Redraw();
   }
 
+  // Set up the callback functions for a table row (or RESET a row if line numbers change)
+  void SetupTableRowCallbacks(size_t row_id) {
+    token_info[row_id].GetNameWidget().SetCallback([this](std::string){
+      GenerateLexer();
+      UpdateSandbox();
+    });
+    token_info[row_id].GetRegexWidget().SetCallback([this](std::string){
+      GenerateLexer();
+      UpdateSandbox();
+    });
+    token_info[row_id].GetIgnoreWidget().SetCallback([this](bool){
+      GenerateLexer();
+      UpdateSandbox();
+    });
+    token_info[row_id].GetRemoveButton().SetCallback([this, row_id](){
+      RemoveTableRow(row_id); doc.Div("token_div").Redraw();
+    });
+    token_info[row_id].GetSwapUpButton().SetCallback([this, row_id](){
+      SwapTableRows(row_id, row_id-1); doc.Div("token_div").Redraw();
+    });
+    token_info[row_id].GetSwapDownButton().SetCallback([this, row_id](){
+      SwapTableRows(row_id, row_id+1); doc.Div("token_div").Redraw();
+    });
+  }
+
   // Add a row to the bottom of the token table.
   void AddTableRow() {
     size_t token_id = token_table.GetNumRows() - 1; // Top row is labels, not token
@@ -134,27 +159,7 @@ private:
       // emp::notify::Message("Token_id = ", token_id, "; token_info.size() = ", token_info.size());
       // token_info.emplace_back(TokenInput(token_id));
       token_info.emplace_back(token_id);
-      token_info.back().GetNameWidget().SetCallback([this](std::string){
-        GenerateLexer();
-        UpdateSandbox();
-      });
-      token_info.back().GetRegexWidget().SetCallback([this](std::string){
-        GenerateLexer();
-        UpdateSandbox();
-      });
-      token_info.back().GetIgnoreWidget().SetCallback([this](bool){
-        GenerateLexer();
-        UpdateSandbox();
-      });
-      token_info.back().GetRemoveButton().SetCallback([this, token_id](){
-        RemoveTableRow(token_id); doc.Div("token_div").Redraw();
-      });
-      token_info.back().GetSwapUpButton().SetCallback([this, token_id](){
-        SwapTableRows(token_id, token_id-1); doc.Div("token_div").Redraw();
-      });
-      token_info.back().GetSwapDownButton().SetCallback([this, token_id](){
-        SwapTableRows(token_id, token_id+1); doc.Div("token_div").Redraw();
-      });
+      SetupTableRowCallbacks(token_id);
     }     
     auto & row_info = token_info[token_id];
     new_row[0] << row_info.GetNameWidget();
