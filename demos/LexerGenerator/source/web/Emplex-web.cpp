@@ -30,6 +30,7 @@ private:
 
   // Lexer information
   emp::vector<TokenInput> token_info;
+  size_t active_token = 0;
 
   // Lexer C++ Output Configuration
   emp::String out_filename{"lexer.hpp"};
@@ -120,19 +121,33 @@ private:
     error_div.Redraw();
   }
 
+  // Highlight a specified table row.
+  void ActivateTableRow(size_t row_id) {
+    if (active_token < token_info.size()) {
+      token_info[active_token].GetNameWidget().SetBackground("white");
+      token_info[active_token].GetRegexWidget().SetBackground("white");
+    }
+    token_info[row_id].GetNameWidget().SetBackground("#ccccff");
+    token_info[row_id].GetRegexWidget().SetBackground("#ccccff");
+    active_token = row_id;
+  }
+
   // Set up the callback functions for a table row (or RESET a row if line numbers change)
   void SetupTableRowCallbacks(size_t row_id) {
-    token_info[row_id].GetNameWidget().SetCallback([this](std::string){
+    token_info[row_id].GetNameWidget().SetCallback([this,row_id](std::string){
       GenerateLexer();
       UpdateSandbox();
+      ActivateTableRow(row_id);
     });
-    token_info[row_id].GetRegexWidget().SetCallback([this](std::string){
+    token_info[row_id].GetRegexWidget().SetCallback([this,row_id](std::string){
       GenerateLexer();
       UpdateSandbox();
+      ActivateTableRow(row_id);
     });
-    token_info[row_id].GetIgnoreWidget().SetCallback([this](bool){
+    token_info[row_id].GetIgnoreWidget().SetCallback([this,row_id](bool){
       GenerateLexer();
       UpdateSandbox();
+      ActivateTableRow(row_id);
     });
     token_info[row_id].GetRemoveButton().SetCallback([this, row_id](){
       RemoveTableRow(row_id); doc.Div("token_div").Redraw();
@@ -153,6 +168,8 @@ private:
       return;
     }
     auto new_row = token_table.AddRow();
+    new_row.OnClick([this,token_id](){ ActivateTableRow(token_id); });
+
     emp_assert(token_id <= token_info.size());
     // Grow the table if we need to.
     if (token_id == token_info.size()) {
