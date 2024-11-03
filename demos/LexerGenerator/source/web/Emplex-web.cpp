@@ -168,7 +168,7 @@ private:
       return;
     }
     auto new_row = token_table.AddRow();
-    new_row.OnClick([this,token_id](){ ActivateTableRow(token_id); });
+    new_row.OnMouseDown([this,token_id](){ ActivateTableRow(token_id); });
 
     emp_assert(token_id <= token_info.size());
     // Grow the table if we need to.
@@ -193,11 +193,12 @@ private:
     token_info[row_id].Set(name, regex, ignore);
   }
 
-  void SwapTableRows(size_t row1, size_t row2) {
+  bool SwapTableRows(size_t row1, size_t row2) {
     [[maybe_unused]] const size_t num_rows = token_table.GetNumRows() - 1;
-    if (row1 >= num_rows || row2 >= num_rows) return; // No place to move to.
+    if (row1 >= num_rows || row2 >= num_rows) return false; // No place to move to.
 
     token_info[row1].Swap(token_info[row2]);
+    return true;
   }
 
   // Remove a specified row from the table.
@@ -663,6 +664,21 @@ private:
     }, "Load Token Types", "load_but")
       .SetCSS(button_style)
       .SetTitle("Load previously saved token types from file.");
+
+    token_div << UI::Button{[this](){
+      if (SwapTableRows(active_token, active_token-1)) {
+        ActivateTableRow(active_token-1);
+      }
+      doc.Div("token_div").Redraw();
+    }, "&uarr;"};
+
+    token_div << UI::Button{[this](){
+      if (SwapTableRows(active_token, active_token+1)) {
+        ActivateTableRow(active_token+1);
+      }
+      doc.Div("token_div").Redraw();
+    }, "&darr;"};
+
 
     token_div << "<br>";
 
