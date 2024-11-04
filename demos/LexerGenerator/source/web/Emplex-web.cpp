@@ -670,14 +670,19 @@ private:
         ActivateTableRow(active_token-1);
       }
       doc.Div("token_div").Redraw();
-    }, "&uarr;"};
+    }, "&uarr;"}
+      .SetCSS(button_style)
+      .SetTitle("Move active row UP.");
+    
 
     token_div << UI::Button{[this](){
       if (SwapTableRows(active_token, active_token+1)) {
         ActivateTableRow(active_token+1);
       }
       doc.Div("token_div").Redraw();
-    }, "&darr;"};
+    }, "&darr;"}
+      .SetCSS(button_style)
+      .SetTitle("Move active row DOWN.");
 
 
     token_div << "<br>";
