@@ -30,7 +30,7 @@ private:
 
   // Lexer information
   emp::vector<TokenInput> token_info;
-  size_t active_token = 0;
+  size_t active_token = 1024;
 
   // Lexer C++ Output Configuration
   emp::String out_filename{"lexer.hpp"};
@@ -66,6 +66,8 @@ private:
   bool sandbox_show_lines = false;         // Should we show the line number of each token?
   emp::vector<emp::String> sandbox_colors; // Foreground colors to use for tokens
   emp::vector<emp::String> sandbox_bgs;    // Background colors to use for tokens
+
+  std::string highlight_color = "#ddddff";
 
   UI::Style button_style {
     "padding", "10px 15px",
@@ -127,8 +129,8 @@ private:
       token_info[active_token].GetNameWidget().SetBackground("white");
       token_info[active_token].GetRegexWidget().SetBackground("white");
     }
-    token_info[row_id].GetNameWidget().SetBackground("#ccccff");
-    token_info[row_id].GetRegexWidget().SetBackground("#ccccff");
+    token_info[row_id].GetNameWidget().SetBackground(highlight_color);
+    token_info[row_id].GetRegexWidget().SetBackground(highlight_color);
     active_token = row_id;
   }
 
@@ -666,23 +668,23 @@ private:
       .SetTitle("Load previously saved token types from file.");
 
     token_div << UI::Button{[this](){
-      if (SwapTableRows(active_token, active_token-1)) {
-        ActivateTableRow(active_token-1);
-      }
-      doc.Div("token_div").Redraw();
-    }, "&uarr;"}
-      .SetCSS(button_style)
-      .SetTitle("Move active row UP.");
-    
-
-    token_div << UI::Button{[this](){
       if (SwapTableRows(active_token, active_token+1)) {
         ActivateTableRow(active_token+1);
       }
       doc.Div("token_div").Redraw();
     }, "&darr;"}
-      .SetCSS(button_style)
+      .SetCSS(button_style).SetCSS("float", "right", "padding", "5px 10px")
       .SetTitle("Move active row DOWN.");
+
+    token_div << UI::Button{[this](){
+      if (SwapTableRows(active_token, active_token-1)) {
+        ActivateTableRow(active_token-1);
+      }
+      doc.Div("token_div").Redraw();
+    }, "&uarr;"}
+      .SetCSS(button_style).SetCSS("float", "right", "padding", "5px 10px")
+      .SetTitle("Move active row UP.");
+    
 
 
     token_div << "<br>";
