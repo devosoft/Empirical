@@ -136,29 +136,20 @@ private:
 
   // Set up the callback functions for a table row (or RESET a row if line numbers change)
   void SetupTableRowCallbacks(size_t row_id) {
-    token_info[row_id].GetNameWidget().SetCallback([this,row_id](std::string){
+    token_info[row_id].GetNameWidget().SetCallback([this](std::string){
       GenerateLexer();
       UpdateSandbox();
-      ActivateTableRow(row_id);
     });
-    token_info[row_id].GetRegexWidget().SetCallback([this,row_id](std::string){
+    token_info[row_id].GetRegexWidget().SetCallback([this](std::string){
       GenerateLexer();
       UpdateSandbox();
-      ActivateTableRow(row_id);
     });
-    token_info[row_id].GetIgnoreWidget().SetCallback([this,row_id](bool){
+    token_info[row_id].GetIgnoreWidget().SetCallback([this](bool){
       GenerateLexer();
       UpdateSandbox();
-      ActivateTableRow(row_id);
     });
     token_info[row_id].GetRemoveButton().SetCallback([this, row_id](){
       RemoveTableRow(row_id); doc.Div("token_div").Redraw();
-    });
-    token_info[row_id].GetSwapUpButton().SetCallback([this, row_id](){
-      SwapTableRows(row_id, row_id-1); doc.Div("token_div").Redraw();
-    });
-    token_info[row_id].GetSwapDownButton().SetCallback([this, row_id](){
-      SwapTableRows(row_id, row_id+1); doc.Div("token_div").Redraw();
     });
   }
 
@@ -185,8 +176,6 @@ private:
     new_row[1] << row_info.GetRegexWidget();
     new_row[2] << "&nbsp;&nbsp;&nbsp;" << row_info.GetIgnoreWidget();
     new_row[3] << row_info.GetRemoveButton();
-    new_row[3] << row_info.GetSwapUpButton();
-    new_row[3] << row_info.GetSwapDownButton();
   }
 
   void AddTableRow(emp::String name, emp::String regex, bool ignore=false) {
@@ -672,7 +661,7 @@ private:
         ActivateTableRow(active_token+1);
       }
       doc.Div("token_div").Redraw();
-    }, "&darr;"}
+    }, "Row &darr;"}
       .SetCSS(button_style).SetCSS("float", "right", "padding", "5px 10px")
       .SetTitle("Move active row DOWN.");
 
@@ -681,7 +670,7 @@ private:
         ActivateTableRow(active_token-1);
       }
       doc.Div("token_div").Redraw();
-    }, "&uarr;"}
+    }, "Row &uarr;"}
       .SetCSS(button_style).SetCSS("float", "right", "padding", "5px 10px")
       .SetTitle("Move active row UP.");
     
