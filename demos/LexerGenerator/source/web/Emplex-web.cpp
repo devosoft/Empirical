@@ -357,9 +357,23 @@ private:
     if (mode == "home") {
       doc.Button("home_but").SetBackground(active_color);
       intro_div << HeadingName("Overview") <<
-        "<p>Emplex uses a set of <b>token names</b> and associated <b>regular expressions</b> to "
-        "generate C++ code for a fast, table-driven lexer for ASCII input.</p>"
-        "<p>Click on the buttons above to learn more about how Emplex works, or just try it out below.</p>";
+          "<p>Emplex uses a set of <b>token names</b> and associated <b>regular expressions</b> to "
+          "generate C++ code for a fast, table-driven lexer for ASCII input. "
+          "Click on the buttons above to learn more about how Emplex works, or "
+        << UI::Button([this](){
+            ClearTable();
+            AddTableRow("whitespace", "[ \\t\\n\\r]+", true);
+            AddTableRow("comment",    "#.*", true);
+            AddTableRow("integer",    "[0-9]+");
+            AddTableRow("float",      "([0-9]+\\.[0-9]*)|(\\.[0-9]+)");
+            AddTableRow("keyword",    "(break)|(continue)|(else)|(for)|(if)|(return)|(while)");
+            AddTableRow("type",       "(char)|(double)|(int)|(string)");
+            AddTableRow("identifier", "[a-zA-Z_][a-zA-Z0-9_]*");
+            // AddTableRow("string",     "(\\\"([^\"\\\\]|(\\\\.))*\\\")|('([^'\\\\]|(\\\\.))*')");
+            AddTableRow("operator",     "\"::\"|\"==\"|\"!=\"|\"<=\"|\">=\"|\"->\"|\"&&\"|\"||\"|\"<<\"|\">>\"|\"++\"|\"--\"");
+            doc.Div("token_div").Redraw();
+          }, "Load an Example", "example_load_but")
+        << "</p>";
     } else if (mode == "lexer") {
       doc.Button("lexer_but").SetBackground(active_color);
       intro_div << HeadingName("Lexical analysis") <<
@@ -482,37 +496,36 @@ private:
     } else if (mode == "cpp") {
       doc.Button("cpp_but").SetBackground(active_color);
       intro_div << HeadingName("Working with the Generated C++ Code") <<
-        "<p>Emplex will generate C++ code that you can either copy-and-paste to wherever "
-        "you need it, or download the generated file that will have a name of your "
-        "choosing (\"lexer.hpp\" by default.)</p>\n"
-        "<p>Once you have the file set up, you can simply #include it into your code.  It will contain "
-        "a lexer object (with the class name \"Lexer\" by default), held in a C++ namespace "
-        "(\"emplex\" by default).</p>\n"
-        "For example, if you make a lexer for a language called \"Cabbage\", you might want to compile "
-        "the file \"mycode.cab\". To handle the lexical analysis on this file you might use code like:</p>\n"
+        "<p>Emplex will generate C++ code that you can either copy or download "
+        "(as \"lexer.hpp\" by default) and simply <code>#include</code> into your code. "
+        "The generated code will contain a lexer class (called \"Lexer\" by default) in a namespace "
+        "(\"emplex\" by default). "
+        "Create a lexer object and run Tokenize() on input text to convert it to a vector of Tokens.</p>\n"
+        "<p>For example, if you make a lexer for the language \"Cabbage\" and want to tokenize "
+        "\"mycode.cab\", you could write:</p>\n"
         "<pre style=\"background-color: " << table_color << "; color: black; padding:10px\">\n"
         "   std::ifstream in_file(\"mycode.cab\");    // Load the input file\n"
         "   emplex::Lexer lexer;                    // Build the lexer object\n"
         "   std::vector&lt;emplex::Token&gt; tokens = lexer.Tokenize(in_file);\n"
         "   // ... Use the vector of tokens ...\n"
         "</pre>\n"
-        "<p>In practice, any input stream can be fed into a generated lexer to produce the vector of tokens. "
-        "Once you do, each token is a simple <code>struct</code> for you to use:</p>\n"
+        "<p>Each token is a simple <code>struct</code>:</p>\n"
         "<pre style=\"background-color: " << table_color << "; color: black; padding:10px\">\n"
         "   struct Token {\n"
-        "     int id;              // Type ID for token\n"
-        "     std::string lexeme;  // Sequence matched by token\n"
-        "     size_t line_id;      // Line token started on\n"
+        "     int id;              // Type ID for this token\n"
+        "     std::string lexeme;  // Sequence of chars matched by this token\n"
+        "     size_t line_id;      // Line this token started on\n"
+        "     size_t col_id;       // Column this token started on\n"
         "   };\n"
         "</pre>\n"
-        "<p>If you want to translate a token <code>id</code> back to a token type, you can use "
-        "\"<code>emplex::Lexer::TokenName(id);</code>\".  The <code>lexeme</code> field provides "
-        "the specific set of characters that were matched in the input stream. "
-        "The <code>line_id</code> gives the line number on which the token was found in "
-        "the input stream and can be useful for error reporting.</p>"
-        "<p>Finally, you can look up the ID value for a particular token type by finding its name "
-        "in the Lexer, prepended with \"ID_\".  For example, if you had created a token type called \"INT\" that was assigned "
-        "the value 248, then <code>emplex::ID_INT</code> would equal 248.</p>"
+        "<p>The <code>id</code> value for a token will indicate its type and will match one of "
+        "the \"ID_\" values defined in the lexer.  For example, if the characters in the source"
+        "file are \"100\" this would be the token's lexeme, but it's ID would match the value of "
+        "<code>emplex::ID_INT</code>.</p>"
+        "The <code>line_id</code> and <code>col_id</code> fields give the position in the file "
+        "where the token was found, which can be useful for error reporting.</p>\n"
+        "<p>Finally, if you want to retrieve a token's name, you can use: "
+        "<code>emplex::Lexer::TokenName(token);</code></p>"
         "<br><br>";
     } else if (mode == "about") {
       doc.Button("about_but").SetBackground(active_color);
@@ -536,39 +549,13 @@ private:
         << MakeLink("Dr. Charles Ofria", "https://ofria.com/") << " at "
         << MakeLink("Michigan State University", "https://msu.edu/") <<
         "<br><br>";
-    } else if (mode == "examples") {
-      doc.Button("example_but").SetBackground(active_color);
-      intro_div << HeadingName("Example") <<
-        "<p>When you are performing lexical analysis on input text, you must first decide "
-        "what types of elements you are working with and make a corresponding token type "
-        "for each.</p>"
-        "<p>Click here to load some example tokens:</p>"
-        << UI::Button([this](){
-            ClearTable();
-            AddTableRow("whitespace", "[ \\t\\n\\r]+", true);
-            AddTableRow("comment",    "#.*", true);
-            AddTableRow("integer",    "[0-9]+");
-            AddTableRow("float",      "([0-9]+\\.[0-9]*)|(\\.[0-9]+)");
-            AddTableRow("keyword",    "(break)|(continue)|(else)|(for)|(if)|(return)|(while)");
-            AddTableRow("type",       "(char)|(double)|(int)|(string)");
-            AddTableRow("identifier", "[a-zA-Z_][a-zA-Z0-9_]*");
-            // AddTableRow("string",     "(\\\"([^\"\\\\]|(\\\\.))*\\\")|('([^'\\\\]|(\\\\.))*')");
-            AddTableRow("operator",     "\"::\"|\"==\"|\"!=\"|\"<=\"|\">=\"|\"->\"|\"&&\"|\"||\"|\"<<\"|\">>\"|\"++\"|\"--\"");
-            doc.Div("token_div").Redraw();
-          }, "Load Example", "example_load_but")
-        <<
-        "<p>NOTE: loading this example will clear all existing token information. "
-        "You can save (or load) your own token types at any time. "
-        "The save file uses a simple format with each line starting with a token name "
-        "followed by whitespace and then the associated regular expression; "
-        "you can prepend a minus sign ('-') to a token name to have that token ignored in output.<p>";
     }
   }
 
   void InitializeButtonDiv() {
     button_div << UI::Button([this](){
       UpdateIntro("home"); intro_div.Redraw(); 
-    }, "Home", "home_but").SetCSS(button_style).SetBackground("#0000AA").SetCSS("width", "106px");
+    }, "Home", "home_but").SetCSS(button_style).SetBackground("#0000AA").SetCSS("width", "159px");
     button_div << UI::Button([this](){
       UpdateIntro("lexer"); intro_div.Redraw(); 
     }, "Lexical Analysis", "lexer_but").SetCSS(button_style); // .SetCSS("width", "170px");
@@ -579,11 +566,8 @@ private:
       UpdateIntro("cpp"); intro_div.Redraw(); 
     }, "Generated C++ Code", "cpp_but").SetCSS(button_style); // .SetCSS("width", "170px");
     button_div << UI::Button([this](){
-      UpdateIntro("examples"); intro_div.Redraw(); 
-    }, "Example", "example_but").SetCSS(button_style).SetCSS("width", "106px");
-    button_div << UI::Button([this](){
       UpdateIntro("about"); intro_div.Redraw(); 
-    }, "About", "about_but").SetCSS(button_style).SetCSS("width", "106px");
+    }, "About", "about_but").SetCSS(button_style).SetCSS("width", "159px");
   }
 
   void InitializeTokenDiv() {
