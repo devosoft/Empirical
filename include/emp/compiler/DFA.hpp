@@ -155,11 +155,9 @@ namespace emp {
 
       file.AddCode("class ", object_name, " {")
           .AddCode("private:")
-          .AddCode("  static constexpr int NUM_SYMBOLS=", NUM_SYMBOLS, ";")
-          .AddCode("  static constexpr int NUM_STATES=", GetSize(), ";")
-          .AddCode("  using row_t = std::array<int, NUM_SYMBOLS>;")
-          .AddCode("")
           .AddCode("  // DFA transition table")
+          .AddCode("  static constexpr int NUM_STATES=", GetSize(), ";")
+          .AddCode("  using row_t = std::array<int, ", NUM_SYMBOLS, ">;")
           .AddCode("  static constexpr std::array<row_t, NUM_STATES> table = {{");
       for (size_t state=0; state < GetSize(); ++state) {
         file.AddCode("    /* State ", state, " */ {");
