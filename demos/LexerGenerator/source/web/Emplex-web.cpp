@@ -794,7 +794,6 @@ private:
                           "}\n"
                           "print(\"Boom!\");\n");
 
-    //sandbox_div.SetBackground("#330033").SetColor("white").SetCSS(div_style);
     sandbox_div.SetBackground("black").SetColor("white").SetCSS(div_style);
     sandbox_div << UI::Button([this](){
       GenerateLexer();
@@ -926,6 +925,7 @@ private:
   }
 
   void InitializeOutputDiv() {
+    output_div.SetCSS("width", "830px");
     output_div.SetBackground("black").SetColor("white");
     output_div.SetBorder("20px").SetCSS("border-radius", "10px");
     output_div << output_text;
