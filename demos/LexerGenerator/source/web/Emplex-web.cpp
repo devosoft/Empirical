@@ -316,9 +316,27 @@ private:
     output_text << "<pre style=\"padding: 10px; border-radius: 5px; overflow-x: auto;\">\n" << emp::MakeWebSafe(ss.str()) << "\n</pre>\n";
     output_div.Redraw();
 
+    doc.Button("download_icon").Hide(false);
+    doc.Button("copy_icon").Hide(false);
+    doc.Button("close_icon").Hide(false);
+
     doc.Button("download_but").SetDisabled(false).SetBackground("#330066").SetTitle("Click to download the generated code.");
 
     return true;
+  }
+
+  void ClearOutput() {
+    output_text.Clear();
+    doc.Button("download_icon").Hide();
+    doc.Button("copy_icon").Hide();
+    doc.Button("close_icon").Hide();
+    output_div.Redraw();
+  }
+
+  void CopyCode() {
+    std::stringstream ss;
+    file.Write(ss);
+    emp::CopyText(ss.str());
   }
 
   void DownloadCode() {
@@ -925,9 +943,26 @@ private:
   }
 
   void InitializeOutputDiv() {
-    output_div.SetCSS("width", "830px");
+    UI::Style icon_style{
+      "background-color", "black",
+      "position", "absolute",
+      "top", "10px",
+      "right", "10px",
+      "border", "none"      
+   };
+
+    output_div.SetCSS("width", "830px", "position", "relative");
     output_div.SetBackground("black").SetColor("white");
     output_div.SetBorder("20px").SetCSS("border-radius", "10px");
+    output_div << UI::Button([this](){ DownloadCode(); },
+      "<img src=\"Icons/ICON-Save.png\" width=\"40px\">", "download_icon")
+      .SetTitle("Download Code").SetCSS(icon_style).SetCSS("right", "120px").Hide();
+    output_div << UI::Button([this](){ CopyCode(); },
+      "<img src=\"Icons/ICON-Copy.png\" width=\"50px\">", "copy_icon")
+      .SetTitle("Copy Code to Clipboard").SetCSS(icon_style).SetCSS("right", "60px").Hide();
+    output_div << UI::Button([this](){ ClearOutput(); },
+      "<img src=\"Icons/ICON-Close.png\" width=\"40px\">", "close_icon")
+      .SetTitle("Close Code").SetCSS(icon_style).SetCSS("right", "10px").Hide();
     output_div << output_text;
   }
 
