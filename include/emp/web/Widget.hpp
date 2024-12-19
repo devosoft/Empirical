@@ -980,6 +980,11 @@ namespace web {
         return SetCSS("padding", emp::to_string(p, unit));
       }
 
+      /// Make a widget appear or disappear.
+      return_t & Hide(bool hide=true, String display_type="block") {
+        return SetCSS("display", hide ? "none" : display_type);
+      }
+
       /// Wrap a wrapper around this Widget.
       /// @param wrapper the wrapper that will be placed around this Widget
       /// @return this Widget
