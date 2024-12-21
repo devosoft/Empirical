@@ -121,7 +121,17 @@ namespace emp {
     return result;
   }
 
-  inline void DownloadFile(std::string filename, std::string content) {    
+  // Place text into the user's clipboard.  Return success.
+  inline void CopyText(const std::string & text) {
+    MAIN_THREAD_ASYNC_EM_ASM({
+      const copy_text = UTF8ToString($0);
+      navigator.clipboard.writeText(copy_text)
+        .catch(err => { alert("Unable to copy text to clipboard. Is your connection secure?"); });
+    }, text.c_str());
+  }
+
+  // Generate a file that the user can then download.
+  inline void DownloadFile(std::string filename, const std::string & content) {    
     MAIN_THREAD_ASYNC_EM_ASM({
       var filename = UTF8ToString($0);
       var content = UTF8ToString($1);
