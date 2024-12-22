@@ -355,7 +355,11 @@ private:
   }
 
   emp::String MakeLink(emp::String text, emp::String link) {
-    return emp::MakeString("<a href=\"", link, "\" style=\"color: #C0C0FF;\">", text, "</a>");
+    return emp::MakeHTMLLink(text, link, "#C0C0FF");
+  }
+
+  emp::String MakeTrigger(emp::String text, std::function<void()> fun) {
+    return emp::MakeHTMLTrigger(text, fun, "#C0C0FF");
   }
 
   // Load a set of example regular expressions into the lexer input.
@@ -389,12 +393,12 @@ private:
 
     if (mode == "home") {
       doc.Button("home_but").SetBackground(active_color);
+      static emp::String trigger_text =
+        MakeTrigger("load an example", [this](){ LoadExampleLexer(); });
       intro_div << HeadingName("Overview") <<
           "<p>Emplex uses a set of <b>token names</b> and associated <b>regular expressions</b> to "
           "generate C++ code for a fast, table-driven lexer for ASCII input. "
-          "Click on the buttons above to learn more or "
-        << UI::Button([this](){ LoadExampleLexer(); }, "Load an Example", "example_load_but")
-        << "</p>";
+          "Click on the buttons above to learn more or " << trigger_text << ".</p>"; 
     } else if (mode == "lexer") {
       doc.Button("lexer_but").SetBackground(active_color);
       intro_div << HeadingName("Lexical analysis") <<
@@ -707,11 +711,6 @@ private:
       GenerateCPP();
     }, "Generate C++ Code", "generate_but").SetCSS(button_style).SetBackground("#330066")
     .SetTitle("Generate a lexer using the token types defined above.");
-
-    token_div << UI::Button([this](){
-      DownloadCode();
-    }, "Download C++ Code", "download_but").SetCSS(button_style).SetBackground("#606060").SetDisabled()
-    .SetTitle("Generate code to activate this button.");
 
     token_div << UI::Button([this](){
       ToggleSandbox();
