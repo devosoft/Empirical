@@ -358,6 +358,21 @@ private:
     return emp::MakeString("<a href=\"", link, "\" style=\"color: #C0C0FF;\">", text, "</a>");
   }
 
+  // Load a set of example regular expressions into the lexer input.
+  void LoadExampleLexer() {
+    ClearTable();
+    AddTableRow("whitespace", "[ \\t\\n\\r]+", true);
+    AddTableRow("comment",    "#.*", true);
+    AddTableRow("integer",    "[0-9]+");
+    AddTableRow("float",      "([0-9]+\\.[0-9]*)|(\\.[0-9]+)");
+    AddTableRow("keyword",    "(break)|(continue)|(else)|(for)|(if)|(return)|(while)");
+    AddTableRow("type",       "(char)|(double)|(int)|(string)");
+    AddTableRow("identifier", "[a-zA-Z_][a-zA-Z0-9_]*");
+    // AddTableRow("string",     "(\\\"([^\"\\\\]|(\\\\.))*\\\")|('([^'\\\\]|(\\\\.))*')");
+    AddTableRow("operator",     "\"::\"|\"==\"|\"!=\"|\"<=\"|\">=\"|\"->\"|\"&&\"|\"||\"|\"<<\"|\">>\"|\"++\"|\"--\"");
+    doc.Div("token_div").Redraw();
+  }
+
   void UpdateIntro(emp::String mode) {
     intro_div.Clear();
     const emp::String text_color = "white";
@@ -377,20 +392,8 @@ private:
       intro_div << HeadingName("Overview") <<
           "<p>Emplex uses a set of <b>token names</b> and associated <b>regular expressions</b> to "
           "generate C++ code for a fast, table-driven lexer for ASCII input. "
-          "Click on the buttons above to learn more about how Emplex works, or "
-        << UI::Button([this](){
-            ClearTable();
-            AddTableRow("whitespace", "[ \\t\\n\\r]+", true);
-            AddTableRow("comment",    "#.*", true);
-            AddTableRow("integer",    "[0-9]+");
-            AddTableRow("float",      "([0-9]+\\.[0-9]*)|(\\.[0-9]+)");
-            AddTableRow("keyword",    "(break)|(continue)|(else)|(for)|(if)|(return)|(while)");
-            AddTableRow("type",       "(char)|(double)|(int)|(string)");
-            AddTableRow("identifier", "[a-zA-Z_][a-zA-Z0-9_]*");
-            // AddTableRow("string",     "(\\\"([^\"\\\\]|(\\\\.))*\\\")|('([^'\\\\]|(\\\\.))*')");
-            AddTableRow("operator",     "\"::\"|\"==\"|\"!=\"|\"<=\"|\">=\"|\"->\"|\"&&\"|\"||\"|\"<<\"|\">>\"|\"++\"|\"--\"");
-            doc.Div("token_div").Redraw();
-          }, "Load an Example", "example_load_but")
+          "Click on the buttons above to learn more or "
+        << UI::Button([this](){ LoadExampleLexer(); }, "Load an Example", "example_load_but")
         << "</p>";
     } else if (mode == "lexer") {
       doc.Button("lexer_but").SetBackground(active_color);
