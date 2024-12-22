@@ -35,7 +35,6 @@ namespace emp {
   /// Provide a function to call whenever a window's size changes (no arguments).
   static void OnResize(const std::function<void()> & in_fun) {
     uint32_t callback_id = JSWrap(in_fun);
-    (void)callback_id;
     MAIN_THREAD_ASYNC_EM_ASM({
         window.addEventListener("resize", function() { emp.Callback($0); });
       }, callback_id);
@@ -105,6 +104,27 @@ namespace emp {
       };
     }
     return html.str();
+  }
+
+  emp::String MakeHTMLLink(emp::String text, emp::String link, emp::String color="") {
+    emp::String style;
+    if (color.size()) style += emp::MakeString("color: ", color, "; ");
+    if (style.size()) style = emp::MakeString(" style=\"", style, "\"");
+    return emp::MakeString("<a href=\"", link, "\"", style, ">", text, "</a>");
+  }
+
+  /// @brief Generate a string that will associate text with a clickable link to call a function.
+  /// @param text The text you want in the link.
+  /// @param in_fun The function to call when the text is clicked on.
+  /// @return The generated string
+  /// NOTE: This will wrap a new function each time you call, so minimize calls!
+  emp::String MakeHTMLTrigger(emp::String text, std::function<void()> in_fun, emp::String color="") {
+    emp::String style;
+    if (color.size()) style += emp::MakeString("color: ", color, "; ");
+    if (style.size()) style = emp::MakeString(" style=\"", style, "\"");
+    uint32_t callback_id = JSWrap(in_fun);
+    return MakeString("<a href=\"#\" onclick=\"emp.Callback(", callback_id, "); return false;\"",
+                      style, ">", text, "</a>");
   }
 
   /// Get the value of @param attribute in the element with @param id as its id.
