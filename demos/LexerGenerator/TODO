@@ -1,14 +1,12 @@
 FEATURES:
-- Add $ and ^ regex's to work in stream input.
+- Set up language choice in compilation: Python, Java, C, and Rust are all good options.
+- In advanced options, allow toggling of helper functions.
+- Add $ and ^ regex's to work directly in stream input.
 - Make {alias} tokens work as aliases only in Lexers.
 - Make REGA/REGB work (match REGA iff REGB follows; REGB counts toward length.)
   - Probably easiest to combine REGA/REGB in first pass, and then fix it AFTER match us known.
 
-CLEANUP:
-- Expand the advanced options to allow more naming in the generated code.  (Or allow DFA / TOKENS to be placed INSIDE the lexer?)
-- Fix up and down arrows.  Make a single row highlighted and up/down are at the top, just moving that row.
-
-FOLLOW-UP: Empala!  Parser generator.
+FOLLOW-UP: Empala!  Parser generator (name based off of Yak and Bison)
 
 VALUE     LIT_NUMBER
           LIT_STRING
