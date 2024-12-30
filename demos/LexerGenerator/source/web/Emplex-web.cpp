@@ -337,6 +337,10 @@ private:
     std::stringstream ss;
     file.Write(ss);
     emp::CopyText(ss.str());
+    doc.Button("copy_icon").SetLabel("<img src=\"Icons/ICON-Copied.png\" width=\"50px\">").Redraw();
+    emp::DelayCall([this](){
+      doc.Button("copy_icon").SetLabel("<img src=\"Icons/ICON-Copy.png\" width=\"50px\">").Redraw();
+    }, 1500);
   }
 
   void DownloadCode() {
