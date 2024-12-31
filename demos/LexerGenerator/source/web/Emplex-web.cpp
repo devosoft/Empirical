@@ -952,6 +952,7 @@ private:
     UI::Style icon_style{
       "background-color", "black",
       "position", "absolute",
+      "cursor", "pointer",
       "top", "10px",
       "right", "10px",
       "border", "none"      
