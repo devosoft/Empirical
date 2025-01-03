@@ -1,6 +1,9 @@
 FEATURES:
 - Set up language choice in compilation: Python, Java, C, and Rust are all good options.
-- In advanced options, allow toggling of helper functions.
+- Colorize code examples on "Generated C++ Code" page.
+- In advanced options allow toggling of helper functions.
+- SAVE advanced settings when saving regex's
+- Add examples of building a parser.
 - Add $ and ^ regex's to work directly in stream input.
 - Make {alias} tokens work as aliases only in Lexers.
 - Make REGA/REGB work (match REGA iff REGB follows; REGB counts toward length.)
