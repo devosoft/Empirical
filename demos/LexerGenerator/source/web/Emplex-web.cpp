@@ -631,10 +631,21 @@ private:
         "associated helper functions.  When tokenization is performed, the longest possible input "
         "string is matched and the ID associated with that end condition is returned.</p>"
         "<p>The Emplex software and most of the associated tools in the underlying "
-        "Empirical library were written by "
-        << MakeLink("Dr. Charles Ofria", "https://ofria.com/") << " at "
-        << MakeLink("Michigan State University", "https://msu.edu/") <<
-        "<br><br>";
+        "Empirical library were written by:<br><br> "
+        << "<b>" << MakeLink("Dr. Charles Ofria", "https://ofria.com/") << "</b><br>"
+        << MakeLink("Michigan State University", "https://msu.edu/") << "<br>"
+        "<a href=\"mailto:ofria@cse.msu.edu\" style=\"color: #C0C0FF\">ofria@cse.msu.edu</a><br><br>\n"
+
+        "<a href=\"https://scholar.google.com/citations?user=nYLuKDAAAAAJ\" target=\"_blank\" rel=\"noopener noreferrer\">"
+        "  <img src=\"https://img.shields.io/badge/Google%20Scholar-Follow-blue?style=social&logo=google-scholar\" alt=\"Follow on Google Scholar\">"
+        "</a><br>  "
+        "<a href=\"https://bsky.app/profile/ofria.bsky.social\">"
+        "  <img src=\"https://img.shields.io/badge/Bluesky-0285FF?logo=bluesky&logoColor=fff&label=@ofria\" alt=\"Follow on Bluesky\">"
+        "</a><br>"
+        "<a href=\"https://github.com/mercere99\" target=\"_blank\" rel=\"noopener noreferrer\">"
+        "  <img src=\"https://img.shields.io/github/followers/mercere99?label=Github&style=social\" alt=\"Follow on GitHub\">"
+        "</a><br>"
+        "<br>";
     }
   }
 
