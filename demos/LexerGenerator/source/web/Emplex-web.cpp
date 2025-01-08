@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2024
+ *  date: 2024-2025.
 */
 /**
  *  @file
@@ -645,7 +645,20 @@ private:
         "<a href=\"https://github.com/mercere99\" target=\"_blank\" rel=\"noopener noreferrer\">"
         "  <img src=\"https://img.shields.io/github/followers/mercere99?label=Github&style=social\" alt=\"Follow on GitHub\">"
         "</a><br>"
-        "<br>";
+        "<br>"
+        
+        "<h3>My current To-Do list for the site includes:</h3>\n"
+        "<ul>\n"
+        "<li>Set up alternate languages to generate to, including Python, Java, C, and Rust.</li>"
+        "<li>Colorize code examples on 'Generated C++ Code' page.</li>"
+        "<li>Allow more output customization in the advanced settings, including turning off helper functions.</li>"
+        "<li>When saving token type information, also save advanced settings for easy restore.</li>"
+        "<li>Make {alias} tokens that work as aliases only in Lexers.  For example, if you define a token as {abc} it won't be used for matching, but you can put {abc} inside of another regular expression to include it.</li>"
+        "<li>Make RegExA/RegExB work (match RegExA if and only if RegExB follows; RegExB counts toward length.)</li>"
+        "<li>Follow up with Empala, a Parser generator!</li>"
+        "</ul>\n"
+        "<br><br>"
+        ;
     }
   }
 
@@ -1024,7 +1037,7 @@ private:
   void InitializeFooterDiv() {
     footer_div.SetBackground("#000044").SetColor("white").SetCSS(div_style);
     footer_div <<
-      "Emplex was developed by Dr. Charles Ofria at Michigan State University, 2024. "
+      "Emplex was developed by Dr. Charles Ofria at Michigan State University, 2024-2025. "
       "See \"About\" for more information.";
   }
 
