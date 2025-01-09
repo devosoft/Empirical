@@ -23,7 +23,7 @@ namespace emp {
 
 #define AlertVar(VAR) emp::Alert(std::string(#VAR) + std::string("=") + std::to_string(VAR))
 
-  /// Call a function after a specified amount of time.
+  /// Call a function after a specified amount of time (in milliseconds)
   static void DelayCall(const std::function<void()> & in_fun, int delay) {
     uint32_t callback_id = JSWrapOnce(in_fun); // Wrap and dispose when called.
     (void)callback_id;
