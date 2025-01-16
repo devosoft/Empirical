@@ -87,7 +87,7 @@ namespace emp {
       const auto & t = dfa.GetTransitions(from);
       for (size_t sym = 0; sym < t.size(); sym++) {
         if (t[sym] == -1) continue;
-        nfa.AddTransition(from, (size_t) t[sym], sym);
+        nfa.AddTransition(from, static_cast<size_t>(t[sym]), static_cast<char>(sym));
       }
       if (dfa.IsStop(from)) nfa.SetStop(from, dfa.GetStop(from));
     }
