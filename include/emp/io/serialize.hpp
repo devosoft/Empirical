@@ -188,7 +188,7 @@ namespace serialize {
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
-    // Base implementaion to specialize on.
+    // Base implementation to specialize on.
     template <typename... IGNORE> struct serial_impl;
 
     // Specialized to recurse, storing or loading individual vars.
@@ -196,13 +196,8 @@ namespace serialize {
     struct serial_impl<FIRST_TYPE, OTHER_TYPES...> {
       static void Store(DataPod & pod, FIRST_TYPE & arg1, OTHER_TYPES&... others) {
         StoreVar(pod, arg1, true);
-        serial_impl<OTHER_TYPES...>::Store(pod, others...);
+        if constexpr (sizeof...(others)) serial_impl<OTHER_TYPES...>::Store(pod, others...);
       }
-    };
-
-    // End condition for recursion when no vars remaining.
-    template <> struct serial_impl<> {
-      static void Store(DataPod &) { ; }
     };
   }
   #endif // DOXYGEN_SHOULD_SKIP_THIS
