@@ -112,22 +112,30 @@ namespace emp {
       return std::move(values[cur_size]);
     }
 
-    template <typename INS_T>
-    void Insert(size_t pos, INS_T && value, size_t count=1) {
+    template <typename T>
+    void Insert(size_t pos, T && value, size_t count=1) {
       emp_assert(cur_size + count <= MAX_SIZE);
       emp_assert(pos <= cur_size);
 
       // If we are inserting at the end, use push.
-      if (pos == cur_size) return Push(std::forward<INS_T>(value), count);
+      if (!count) return; // Nothing to insert.
+      if (pos == cur_size) return Push(std::forward<T>(value), count);
 
-      RawMove(pos, cur_size, count);                 // Move current values out of the way.
-      Fill(std::forward<INS_T>(value), pos, count);  // Insert new values.
+      RawMove(pos, cur_size, count);             // Move current values out of the way.
+      Fill(std::forward<T>(value), pos, count);  // Insert new values.
     }
 
-    template <typename... ARGS>
-    iterator erase(ARGS &&... /* args */) {
-      emp_assert(false, "invalid operation for array!");
-      return end();
+    template <typename T>
+    void Erase(size_t pos, size_t count=1) {
+      if (!count) return; // Nothing to erase.
+      const size_t end_pos = pos+count;
+      if (end_pos == cur_size) {
+        cur_size -= count;
+        return;
+      }
+      const size_t move_size = cur_size-end_pos;
+      RawMove(end_pos, pos, move_size);
+      cur_size = pos + move_size;
     }
 
   };
