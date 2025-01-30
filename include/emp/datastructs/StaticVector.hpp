@@ -9,8 +9,8 @@
  *  @note Status: ALPHA
  */
 
-#ifndef EMP_BASE_STATIC_VECTOR_HPP_INCLUDE
-#define EMP_BASE_STATIC_VECTOR_HPP_INCLUDE
+#ifndef EMP_DATASTRUCT_STATIC_VECTOR_HPP_INCLUDE
+#define EMP_DATASTRUCT_STATIC_VECTOR_HPP_INCLUDE
 
 
 #include <initializer_list>
@@ -20,16 +20,17 @@
 #include <vector>
 
 #include "base/assert.hpp"
+#include "base/array.hpp"
 
 namespace emp {
 
   template <typename VALUE_T, size_t MAX_SIZE>
   class StaticVector {
   private:
-    std::array<T, MAX_SIZE> values{};
+    std::array<VALUE_T, MAX_SIZE> values{};
     size_t cur_size = 0;
 
-    using this_t = StaticVector<T, MAX_SIZE>;
+    using this_t = StaticVector<VALUE_T, MAX_SIZE>;
 
     // Move a chunk of vector from one place to another.
     void RawMove(size_t from_id, size_t to_id, size_t count) {
@@ -142,4 +143,4 @@ namespace emp {
 
 }
 
-#endif // #ifndef EMP_BASE_STATIC_VECTOR_HPP_INCLUDE
+#endif // #ifndef EMP_DATASTRUCT_STATIC_VECTOR_HPP_INCLUDE
