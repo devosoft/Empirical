@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief This file defines a Random Access Set template.
+ *  @brief A Random Access Set template.
  *  @note Status: ALPHA
  */
 
