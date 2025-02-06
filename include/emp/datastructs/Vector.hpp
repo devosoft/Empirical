@@ -105,13 +105,13 @@ namespace emp {
 
     template <typename T>
     void Insert(size_t pos, T && value, size_t count=1) {
-      if constexpr (IS_STATIC) { values.Insert(pos, std::forward<T>(value)), count);
+      if constexpr (IS_STATIC) { values.Insert(pos, std::forward<T>(value)), count); }
       else values.insert(values.begin()+pos, count, std::forward<T>(value));
     }
 
     template <typename T>
     void Erase(size_t pos, size_t count=1) {
-      if constexpr (IS_STATIC) { values.Erase(pos, count);
+      if constexpr (IS_STATIC) { values.Erase(pos, count); }
       else values.erase(values.begin()+pos, count);
     }
 
