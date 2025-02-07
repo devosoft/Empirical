@@ -19,8 +19,8 @@
 #include <utility>
 #include <vector>
 
-#include "base/assert.hpp"
-#include "base/array.hpp"
+#include "../base/assert.hpp"
+#include "../base/array.hpp"
 
 namespace emp {
 
