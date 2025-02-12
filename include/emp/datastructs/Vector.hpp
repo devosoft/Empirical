@@ -37,7 +37,7 @@ namespace emp {
     using this_t = Vector<VALUE_T, MAX_SIZE>;
     using static_t = StaticVector<VALUE_T, MAX_SIZE>;
     using dynamic_t = emp::vector<VALUE_T>;
-    using vec_t = std::conditional<IS_STATIC, dynamic_t, static_t>;
+    using vec_t = std::conditional_t<IS_STATIC, dynamic_t, static_t>;
     vec_t values;
 
   public:
@@ -45,6 +45,13 @@ namespace emp {
     using size_type = std::size_t;
     using reference = value_type&;
     using const_reference = const value_type&;
+
+    Vector() = default;
+    Vector(const Vector &) = default;
+    Vector(Vector &&) = default;
+    Vector(size_t count, const VALUE_T & value=VALUE_T()) : values(count, value) { }
+    Vector(std::initializer_list<VALUE_T> init) : values(init) { }
+    ~Vector() = default;
 
     auto operator<=>(const this_t &) const = default;
 
@@ -62,6 +69,10 @@ namespace emp {
     this_t & Resize(size_t new_size, const VALUE_T & default_value) {
       values.resize(new_size, default_value);
       return *this;
+    }
+    void reserve(size_t size_cap) {
+      static_assert(size_cap < MAX_SIZE || !IS_STATIC, "Static vector size too small for reserve.");
+      if constexpr (!IS_STATIC) values.reserve(size_cap);
     }
 
     VALUE_T & back() { return values.back(); }
@@ -83,7 +94,7 @@ namespace emp {
     // Allow fill to have optional arguments, with no "count" meaning to end of vector.
     template <typename T>
     this_t & Fill(T && value, size_t start=0) {
-      Fill(std::forward<T>(value, start, cur_size-start));
+      Fill(std::forward<T>(value, start, size()-start));
       return *this;
     }
 
@@ -105,7 +116,7 @@ namespace emp {
 
     template <typename T>
     void Insert(size_t pos, T && value, size_t count=1) {
-      if constexpr (IS_STATIC) { values.Insert(pos, std::forward<T>(value)), count); }
+      if constexpr (IS_STATIC) { values.Insert(pos, std::forward<T>(value), count); }
       else values.insert(values.begin()+pos, count, std::forward<T>(value));
     }
 
@@ -115,6 +126,27 @@ namespace emp {
       else values.erase(values.begin()+pos, count);
     }
 
+    // Remove [start_pos, end_pos) from this Vector and return it.
+    this_t Copy(size_t start_pos, size_t count) {
+      size_t end_pos = start_pos + count;
+      emp_assert(start_pos <= size() && count <= size() && end_pos <= size());
+      this_t out;
+      if constexpr (MAX_SIZE) {
+        std::copy(begin() + start_pos, begin() + end_pos, out.begin());
+      }
+      else { // Variable size vector
+        out.reserve(count);
+        std::copy(begin() + start_pos, begin() + end_pos, std::back_inserter(out));
+      }
+      return out;
+    }
+
+    // Remove [start_pos, end_pos) from this Vector and return it.
+    this_t Extract(size_t start_pos, size_t count) {
+      this_t out(Copy(start_pos, count));
+      Erase(start_pos, count);
+      return out;
+    }
   };
 
 }
