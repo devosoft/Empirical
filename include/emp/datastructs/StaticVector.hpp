@@ -27,7 +27,7 @@ namespace emp {
   template <typename VALUE_T, size_t MAX_SIZE>
   class StaticVector {
   private:
-    std::array<VALUE_T, MAX_SIZE> values{};
+    emp::array<VALUE_T, MAX_SIZE> values{};
     size_t cur_size = 0;
 
     using this_t = StaticVector<VALUE_T, MAX_SIZE>;
@@ -49,6 +49,13 @@ namespace emp {
     using reference = value_type&;
     using const_reference = const value_type&;
 
+    StaticVector() = default;
+    StaticVector(const StaticVector &) = default;
+    StaticVector(StaticVector &&) = default;
+    StaticVector(size_t count, const VALUE_T & value=VALUE_T()) : cur_size(count) { values.fill(value); }
+    StaticVector(std::initializer_list<VALUE_T> init) : values(init), cur_size(init.size()) { }
+    ~StaticVector() = default;
+
     auto operator<=>(const this_t &) const = default;
 
     VALUE_T & operator[](size_t pos) { return values[pos]; }
@@ -56,8 +63,8 @@ namespace emp {
 
     auto begin() noexcept { return values.begin(); }
     auto begin() const noexcept { return values.begin(); }
-    auto end() noexcept { return cur_size < MAX_SIZE ? values.begin() + cur_size : values.end(); }
-    auto end() const noexcept { return cur_size < MAX_SIZE ? values.begin() + cur_size : values.end(); }
+    auto end() noexcept { return values.begin() + cur_size; }
+    auto end() const noexcept { return values.begin() + cur_size; }
 
     size_t size() const { return cur_size; }
 
@@ -98,16 +105,17 @@ namespace emp {
     // Allow fill to have optional arguments.
     template <typename T>
     void Fill(T && value, size_t start=0) {
-      Fill(std::forward<T>(value, start, cur_size-start));
+      Fill(std::forward<T>(value), start, cur_size-start));
     }
 
     template <typename T>
-    void Push(T && value, size_t count=1) {
+    this_t & Push(T && value, size_t count=1) {
       emp_assert(cur_size + count <= MAX_SIZE);
       Fill(std::forward<T>(value), cur_size, count);
       cur_size += count;
+      return *this;
     }
-    VALUE_T && Pop() {
+    VALUE_T Pop() {
       emp_assert(cur_size > 0);
       --cur_size;
       return std::move(values[cur_size]);
@@ -124,6 +132,7 @@ namespace emp {
 
       RawMove(pos, cur_size, count);             // Move current values out of the way.
       Fill(std::forward<T>(value), pos, count);  // Insert new values.
+      cur_size += count;
     }
 
     template <typename T>
