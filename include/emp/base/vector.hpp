@@ -51,10 +51,10 @@ namespace emp {
     /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2000000001; // 2x10^9 + 1
 
-  public:
     /// Setup a revision number - iterators must match the revision of their vector.
-    int revision;
+    int revision = 0;
 
+  public:
     /// Setup an iterator wrapper to make sure that they're not used again after a vector changes.
     template<typename ITERATOR_T>
     struct iterator_wrapper : public ITERATOR_T {
