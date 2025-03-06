@@ -30,7 +30,7 @@
 
 #include <stddef.h>
 
-#include "../datastructs/UnorderedIndexMap.hpp"
+#include "../datastructs/StaticIndexMap.hpp"
 
 #include "Random.hpp"
 
@@ -38,6 +38,7 @@ namespace emp {
 
   class Distribution {
   protected:
+    // StaticIndexMap<> weights;
     UnorderedIndexMap weights;
 
   public:
@@ -81,10 +82,11 @@ namespace emp {
       size_t num_vals = max_val - min_val;
       double val_prob = 1.0 / (double) num_vals;
 
-      weights.Resize(max_val);
+      emp::vector<double> probs(max_val);
       for (size_t k = min_val; k < max_val; k++) {
-        weights.Adjust(k, val_prob);
+        probs[k] = val_prob;
       }
+      weights.Set(probs);
     }
   };
 
@@ -111,7 +113,8 @@ namespace emp {
 
       p = _p;
       N = _N;
-      weights.Resize(N+1);
+
+      emp::vector<double> probs(N+1);
       // p^k * (1-p)^(N-k) * N!/k!(N-k)!
 
       // Loop through all of the results and calculate their probabilities.
@@ -123,8 +126,9 @@ namespace emp {
           prob *= (double) (N-i);
           prob /= (double) ((i < k) ? (k-i) : (N-i));
         }
-        weights.Adjust(k, prob);
+        probs[k] = prob;
       }
+      weights.Set(probs);
     }
 
   };
@@ -136,25 +140,26 @@ namespace emp {
     size_t N = 0;
 
   public:
-    NegativeBinomial(double _p, size_t _N) { Setup(_p, _N); }
+    NegativeBinomial() { }
+    NegativeBinomial(double _p, size_t _N=1) { Setup(_p, _N); }
 
     [[nodiscard]] double GetP() const { return p; }
     [[nodiscard]] double GetN() const { return N; }
 
-    void Setup(double _p, size_t _N) {
+    void Setup(double _p, size_t _N=1) {
+      emp_assert(_p > 0.0 && _p <= 1.0, _p);
+      emp_assert(_N > 0, _N);
+
       // If we're not changing these values, it's already setup!
       if (p == _p && N == _N) return;
 
       p = _p;
       N = _N;
-      emp_assert(p > 0.0 && p <= 1.0, p);
-      emp_assert(N > 0, N);
-
       // Track the probability of each number of successes at each point in time.
       emp::vector<double> cur_probs(N, 0.0);
       cur_probs[0] = 1.0;        // Initially we start with zero successes.
       double found_probs = 0.0;  // Tally the total probability found so far.
-      double q = 1.0 - p;        // Probability of failure.
+      const double q = 1.0 - p;        // Probability of failure.
 
       emp::vector<double> outcome_probs(1, 0.0);
 
@@ -170,7 +175,7 @@ namespace emp {
         cur_probs[0] = cur_probs[0] * q;
       }
 
-      weights.Adjust(outcome_probs);
+      weights.Set(outcome_probs);
     }
 
   };
