@@ -123,9 +123,9 @@ namespace emp {
     static constexpr uint8_t UNSET_STATE = 0;
     static constexpr uint8_t UNKNOWN_STATE = NUM_STATES+1;
 
-    // Which symbols are we using in this puzzle? (default to standard)
-    using symbol_set_t = emp::array<char, NUM_STATES+1>;
-    symbol_set_t symbols = {'-', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    // Which symbols are we using in this puzzle? (default to sudoku standard)
+    emp::array<char, NUM_STATES+1> symbols; // sudoku_symbols = {'-', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    emp::array<uint8_t, 128> symbol_map;  // What symbols ID do different characters map to?
 
     using values_t = emp::array<uint8_t,NUM_CELLS>;
     values_t values;                                   // Known value for cells
@@ -140,9 +140,24 @@ namespace emp {
     using move_set_t = emp::vector<PuzzleMove>;
     emp::vector<PuzzleSolveFun> solve_funs;
 
-    // ===== Helper Functions =====
+    // ===== Constructors / Destructors / etc =====
+    GridPuzzleAnalyzer() {
+      static_assert(NUM_STATES >= 2, "Fewer than two cell states does not allow for a puzzle.");
 
+      // Set up the symbols in this puzzle, defaulting to unknown state if a symbol is not used.
+      symbol_map.fill(UNKNOWN_STATE);
+      symbols[0] = '-';
+      for (size_t i = 0; i <= NUM_STATES; ++i) {
+        if (i < 10) symbols[i] = '0' + i;
+        else if (i < 36) symbols[i] = 'A' + i - 10;
+        else if (i < 62) symbols[i] = 'a' + 1 - 36;
+        else symbols[i] = '?';
+        symbol_map[symbols[i]] = i;
+      }
+    }
     virtual ~GridPuzzleAnalyzer() = default;
+
+    // ===== Helper Functions =====
 
     uint8_t GetValue(size_t cell) const { return values[cell]; }
 
@@ -152,17 +167,24 @@ namespace emp {
 
     size_t GetNumSolveFuns() const { return solve_funs.size(); }
 
-    uint8_t SymbolToState(char symbol) const {
-      for (uint8_t i=0; i <= NUM_STATES; ++i) {
-        if (symbols[i] == symbol) return i;
+    void SetSymbols(String in_symbols) {
+      in_symbols.RemoveWhitespace();
+      emp_assert(symbols.size() == in_symbols.size()+1);
+      symbol_map.fill(UNKNOWN_STATE);
+      symbols[0] = '-';
+      for (size_t i = 0; i < in_symbols.size(); ++i) {
+        symbols[i+1] = in_symbols[i];
+        symbol_map[in_symbols[i]] = i+1;
       }
-      return UNKNOWN_STATE;
+    }
+
+    uint8_t SymbolToState(char symbol) const {
+      return symbol_map[symbol];
     }
 
     values_t LoadToArray(std::istream & is, emp::CharSet empty="-.") {
-      values_t values;
-
       // Format: Provide site by site with a dash for empty; whitespace is ignored.
+      values_t values;
       char cur_char;
       
       for (size_t cell_id = 0; cell_id < NUM_CELLS; ++cell_id) {
@@ -171,7 +193,7 @@ namespace emp {
         uint8_t state_id = SymbolToState(cur_char);
         if (state_id == UNKNOWN_STATE) {
           if (empty.Has(cur_char)) state_id = UNSET_STATE;
-          else emp::notify::Warning("Unknown sudoku symbol '", cur_char, "'.  Ignoring.");
+          else emp::notify::Warning("Unknown puzzle symbol '", cur_char, "'.  Ignoring.");
         }
         values[cell_id] = state_id;
       }
