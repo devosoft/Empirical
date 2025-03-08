@@ -32,7 +32,7 @@ namespace emp {
   #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   ///  Middle Square Weyl Sequence: A versatile and non-patterned pseudo-random-number
-  ///  generator.
+  ///  generator. https://arxiv.org/abs/1704.00358
   ///  Based on: https://en.wikipedia.org/wiki/Middle-square_method
   class Random {
   protected:
@@ -45,7 +45,8 @@ namespace emp {
     double expRV = 0.0;    ///< Exponential Random Variable for the randNormal function
 
     // Constants ////////////////////////////////////////////////////////////////
-    static constexpr const uint64_t RAND_CAP = 4294967296;  // 2^32
+    static constexpr const uint64_t RAND_CAP = 4294967296;     // 2^32
+    static constexpr const uint64_t RAND_CAP_D = 4294967296.0;  // 2.0^32
     static constexpr const uint64_t STEP_SIZE = 0xb5ad4eceda1ce2a9;  ///< Weyl sequence step size
 
     static constexpr const unsigned char BYTE1 = (unsigned char) 1;
@@ -56,8 +57,19 @@ namespace emp {
       value *= value;                       // Square the current value.
       value += (weyl_state += STEP_SIZE);   // Take a step in the Weyl sequence
       value = (value>>32) | (value<<32);    // Return the middle of the value
-      return (uint32_t) value;
+      return static_cast<uint32_t>(value);
     }
+
+    // Get() from Paper:
+    //
+    //     uint64_t x = 0, w = 0, s = 0xb5ad4eceda1ce2a9;
+    //     inline static uint32_t msws32() {
+    //       x *= x; x += (w += s); return x = (x>>32) | (x<<32);
+    //     }
+    //
+    // x => value
+    // w => weyl_state
+    // s => STEP_SIZE
 
   public:
     /// Set up the random generator object with an optional seed value.
@@ -104,7 +116,7 @@ namespace emp {
     // Random Number Generation /////////////////////////////////////////////////
 
     /// @return A pseudo-random double value between 0.0 and 1.0
-    inline double GetDouble() noexcept { return Get() / (double) RAND_CAP; }
+    inline double GetDouble() noexcept { return Get() / RAND_CAP_D; }
 
     /// @return A pseudo-random double value between 0.0 and max
     inline double GetDouble(const double max) noexcept { return GetDouble() * max; }
@@ -121,8 +133,8 @@ namespace emp {
 
     /// @return A pseudo-random double value between (0.0, 1.0]
     inline double GetDoubleNonZero() noexcept {
-      double d = Get() / (double) RAND_CAP;
-      while(d == 0.0) {d = Get() / (double) RAND_CAP;}
+      double d = Get() / RAND_CAP_D;
+      while(d == 0.0) {d = Get() / RAND_CAP_D;}
       return d;
     }
 
@@ -172,6 +184,7 @@ namespace emp {
 
 
     /// @return A pseudo-random 64-bit (8 byte) unsigned int value.
+    // @CAO: Check original paper (at top) for 64-bit acceleration.
     inline uint64_t GetUInt64() noexcept {
       return ( static_cast<uint64_t>(GetUInt()) << 32 )
              + static_cast<uint64_t>(GetUInt());
@@ -238,7 +251,7 @@ namespace emp {
       } else if constexpr (PROB == PROB_87_5) {
         dest.FillMemoryFunction( num_bytes, [this](){ return GetBits87_5(); } );
       } else if constexpr (PROB == PROB_100) {
-        dest.FillMemoryFunction( num_bytes, [](){ return (size_t) -1; } );
+        dest.FillMemoryFunction( num_bytes, [](){ return static_cast<size_t>(-1); } );
       }
     }
 
@@ -253,7 +266,7 @@ namespace emp {
       const size_t end_byte_id = stop_bit >> 3;        // At which byte do we stop?
       const size_t start_bit_id = start_bit & 7;       // Which bit to start at in byte?
       const size_t end_bit_id = stop_bit & 7;          // Which bit to stop before in byte?
-      constexpr double p = ((double) PROB) / 1000.0;   // Determine actual probability of a 1
+      constexpr double p = PROB / 1000.0;   // Determine actual probability of a 1
 
       // If the start byte and end byte are the same, just fill those in.
       if (start_byte_id == end_byte_id) {
@@ -373,7 +386,7 @@ namespace emp {
     /// @param p The probability of the result being "true".
     inline bool P(const double p) noexcept {
       emp_assert(p >= 0.0 && p <= 1.0, p);
-      return (Get() < (p * RAND_CAP));
+      return (Get() < (p * RAND_CAP_D));
     }
 
     /// Full random byte with each bit being a one with a given probability.
