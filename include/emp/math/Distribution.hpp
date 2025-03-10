@@ -90,6 +90,43 @@ namespace emp {
     }
   };
 
+  /// How many attempts before a probability p succeeds?
+  class GeometricDistribution : public Distribution {
+  private:
+    double p = 0.0;
+    double precision;
+
+  public:
+    GeometricDistribution() { }
+    GeometricDistribution(double _p, double _precision=0.0000000001, size_t max_size=1000000) {
+      Setup(_p, _precision, max_size);
+    }
+
+    [[nodiscard]] double GetP() const { return p; }
+
+    bool Setup(double _p, const double _precision, const size_t max_size) {
+      emp_assert(_p > 0.0 && _p <= 1.0, _p);
+
+      // If we're not changing p or precision, it's already setup!
+      if (p == _p && precision == _precision) return true;
+
+      p = _p;
+      precision = _precision;
+
+      emp::vector<double> outcome_probs(1, 0.0);
+      for (double cur_prob = 1.0; cur_prob > _precision; ) {
+        const double next_prob = cur_prob * p;  // Probability of succeeding next time!
+        outcome_probs.push_back(next_prob);
+        cur_prob -= next_prob;
+        if (outcome_probs.size() == max_size) return false;
+      }
+
+      weights.Set(outcome_probs);
+      return true;
+    }
+
+  };
+  
   /// How many successes with p probability and N attempts?
   class Binomial : public Distribution {
   private:
