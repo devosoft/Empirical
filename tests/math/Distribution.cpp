@@ -25,6 +25,47 @@
     REQUIRE(A == B);                     \
   }
 
+TEST_CASE("Test Geometric Distribution", "[math]")
+{
+  emp::Random random(1000);
+
+  // Try a set of p's
+
+  std::vector<double> p_tests = { 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.10, 0.2, 0.5, 0.8, 0.9, 0.95, 0.99, 0.999 };
+
+  for (double p : p_tests) {
+    emp::GeometricDistribution geo(p);
+
+    const size_t num_tests = 1000000;
+    size_t total = 0;
+    size_t min = static_cast<size_t>(-1);
+    size_t max = 0;
+
+    for (size_t test_id = 0; test_id < num_tests; ++test_id) {
+      size_t value = geo.PickRandom(random);
+      total += value;
+      min = std::min(min, value);
+      max = std::max(max, value);
+    }
+
+    const double exp = 1.0 / p;                 // Expected value.
+    const double ave = total/(double)num_tests; // Actual average.
+
+    CHECK(min > 0); // Minimum should never be zero.
+    CHECK(ave > exp * 0.995);
+    CHECK(ave < exp * 1.005);
+
+    std::cout << "\n---------- GEOMETRIC"
+              << "\np = " << p
+              << "\nmin = " << min
+              << "\nave = " << ave
+              << "\nmax = " << max
+              << "\nexp = " << exp
+              << "\narray size = " << geo.GetSize()
+              << std::endl;
+  }
+
+}
 
 TEST_CASE("Test Binomial", "[math]")
 {
@@ -73,7 +114,7 @@ TEST_CASE("Test Binomial", "[math]")
 
 TEST_CASE("Test Negative Binomial", "[math]")
 {
-  emp::Random random(1000);
+  emp::Random random(2000);
 
   // Try a set of p's and N's.
 
@@ -106,7 +147,7 @@ TEST_CASE("Test Negative Binomial", "[math]")
     CHECK(ave > exp * 0.995);
     CHECK(ave < exp * 1.005);
 
-    std::cout << "\n----------"
+    std::cout << "\n---------- NEGATIVE BINOMIAL"
               << "\np = " << p
               << "\nN = " << N
               << "\nmin = " << min
