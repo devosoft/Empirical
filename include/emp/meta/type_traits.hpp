@@ -233,6 +233,18 @@ namespace emp {
   template <size_t BIT_COUNT, typename DEFAULT=void>
   using uint_bit_count_t = typename uint_bit_count<BIT_COUNT, DEFAULT>::type;
 
+  // Determine the type of each state given the number of possible states.
+  template <size_t NUM_STATES>
+  static constexpr auto StateBitCount() {
+    if constexpr (NUM_STATES <= 256) return uint8_t{8};
+    else if constexpr (NUM_STATES <= 65536) return uint16_t{16};
+    else if constexpr (NUM_STATES <= 4294967296) return uint32_t{32};
+    else return uint64_t{64};
+  }
+
+  template <size_t NUM_STATES>
+  using min_uint_type = decltype(StateBitCount<NUM_STATES>());
+
   /// Figure out which type is an integer with a specified number of bits.
   template <size_t BIT_COUNT, typename DEFAULT=void> struct int_bit_count {
     using type = DEFAULT;
