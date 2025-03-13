@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2021.
+ *  date: 2015-2025.
 */
 /**
  *  @file
@@ -39,15 +39,18 @@ namespace emp {
 
     uint64_t value = 0;                       ///< Current squaring value
     uint64_t weyl_state = 0;                  ///< Weyl sequence state
+    uint64_t value2 = 0;                      ///< Extra squaring value for 64 bit
+    uint64_t weyl_state2 = 0;                 ///< Extra Weyl sequence state for 64 bit
     uint64_t original_seed = 0;               ///< Seed to start sequence; initialized weyl_state
 
     // Members & functions for stat functions
     double expRV = 0.0;    ///< Exponential Random Variable for the randNormal function
 
     // Constants ////////////////////////////////////////////////////////////////
-    static constexpr const uint64_t RAND_CAP = 4294967296;     // 2^32
-    static constexpr const uint64_t RAND_CAP_D = 4294967296.0;  // 2.0^32
-    static constexpr const uint64_t STEP_SIZE = 0xb5ad4eceda1ce2a9;  ///< Weyl sequence step size
+    static constexpr const uint64_t RAND_CAP = 4294967296;           // 2^32
+    static constexpr const double   RAND_CAP_D = 4294967296.0;       // 2.0^32
+    static constexpr const uint64_t STEP_SIZE = 0xb5ad4eceda1ce2a9;  // Weyl sequence step size
+    static constexpr const uint64_t STEP_SIZE2 = 0x278c5a4d8419fe6b; // Extra step size for 64 bit
 
     static constexpr const unsigned char BYTE1 = (unsigned char) 1;
 
@@ -64,13 +67,42 @@ namespace emp {
     //
     //     uint64_t x = 0, w = 0, s = 0xb5ad4eceda1ce2a9;
     //     inline static uint32_t msws32() {
-    //       x *= x; x += (w += s); return x = (x>>32) | (x<<32);
+    //       x *= x; x += (w += s);
+    //       return x = (x>>32) | (x<<32);
     //     }
     //
     // x => value
     // w => weyl_state
     // s => STEP_SIZE
 
+    /// Returns a random number [0, max-64-bit-uint)
+    uint64_t Get64() noexcept {
+      // Square both values
+      value *= value;  value2 *= value2;
+
+      // Advance the weyl states and the values
+      value += (weyl_state += STEP_SIZE);
+      value2 += (weyl_state2 += STEP_SIZE2);
+
+      // Backup the first value before swap (only swapped second value in result)
+      const uint64_t nonswap_value = value;
+      value = (value >> 32) | (value << 32);
+      value2 = (value2 >> 32) | (value2 << 32);
+
+      return nonswap_value ^ value2;
+    }
+
+    // Get64() from Paper:
+    //
+    //    uint64_t x1 = 0, w1 = 0, s1 = 0xb5ad4eceda1ce2a9;
+    //    uint64_t x2 = 0, w2 = 0, s2 = 0x278c5a4d8419fe6b;
+    //    inline static uint64_t msws64() {
+    //      uint64_t xx;
+    //      x1 *= x1; xx = x1 += (w1 += s1); x1 = (x1 >> 32) | (x1 << 32);
+    //      x2 *= x2; x2 += (w2 += s2); x2 = (x2 >> 32) | (x2 << 32);
+    //      return xx ^ x2;
+    //    }
+    
   public:
     /// Set up the random generator object with an optional seed value.
     Random(const int seed = -1) noexcept {
@@ -89,25 +121,23 @@ namespace emp {
     /// number generator gets its seed from the current system time and the process memory.
     void ResetSeed(const int64_t seed) noexcept {
       value = 0;
+      value2 = 0;
       expRV = 0.0;
 
       // If the provided seed is <= 0, choose a unique seed based on time and memory location.
       if (seed <= 0) {
-        uint64_t seed_time = (uint64_t) time(NULL);
-        uint64_t seed_mem = (uint64_t) this;
-        weyl_state = seed_time ^ seed_mem;
+        uint64_t seed_time = static_cast<uint64_t>(time(NULL));
+        uint64_t seed_mem = std::bit_cast<uint64_t>(this);
+        weyl_state2 = weyl_state = seed_time ^ seed_mem;
       }
 
-      else weyl_state = (uint64_t) seed;
+      else weyl_state2 = weyl_state = static_cast<uint64_t>(seed);
 
       // Save the seed that was ultimately used to start this pseudo-random sequence.
       original_seed = weyl_state;
 
       weyl_state *= 2;  // Make sure starting state is even.
-
-      // Reset other internal state
-      value = 0;
-      expRV = 0.0;
+      weyl_state2 *= 2;
 
       Get(); // Prime the new sequence by skipping the first number.
     }
@@ -184,15 +214,15 @@ namespace emp {
 
 
     /// @return A pseudo-random 64-bit (8 byte) unsigned int value.
-    // @CAO: Check original paper (at top) for 64-bit acceleration.
     inline uint64_t GetUInt64() noexcept {
-      return ( static_cast<uint64_t>(GetUInt()) << 32 )
-             + static_cast<uint64_t>(GetUInt());
+      return Get64();
+      // return ( static_cast<uint64_t>(GetUInt()) << 32 )
+      //        + static_cast<uint64_t>(GetUInt());
     }
 
     /// @return A pseudo-random 64-bit unsigned int value between 0 and max
     inline uint64_t GetUInt64(const uint64_t max) noexcept {
-      if (max <= RAND_CAP) return (uint64_t) GetUInt(max);  // Don't need extra precision.
+      if (max <= RAND_CAP) return GetUInt(max);      // Don't need extra precision.
 
       uint64_t mask = emp::MaskUsed(max);            // Create a mask for just the bits we need.
       uint64_t val = GetUInt64() & mask;             // Grab a value using just the current bits.
@@ -201,6 +231,11 @@ namespace emp {
       return val;
     }
 
+    /// @return A pseudo-random 64-bit unsigned int value between 0 and max
+    inline uint64_t GetUInt64(const uint64_t min, const uint64_t max) noexcept {
+      return GetUInt64(max - min) + min;
+    }
+    
 
     /// @return A pseudo-random 32-bit (4 byte) int value between 0 and max
     inline int32_t GetInt(const int32_t max) noexcept {
@@ -266,7 +301,7 @@ namespace emp {
       const size_t end_byte_id = stop_bit >> 3;        // At which byte do we stop?
       const size_t start_bit_id = start_bit & 7;       // Which bit to start at in byte?
       const size_t end_bit_id = stop_bit & 7;          // Which bit to stop before in byte?
-      constexpr double p = PROB / 1000.0;   // Determine actual probability of a 1
+      constexpr double p = static_cast<double>(PROB) / 1000.0;   // Determine actual probability of a 1
 
       // If the start byte and end byte are the same, just fill those in.
       if (start_byte_id == end_byte_id) {

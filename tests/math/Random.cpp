@@ -28,7 +28,7 @@
 #include "emp/math/Random.hpp"
 #include "emp/math/random_utils.hpp"
 
-TEST_CASE("Test Random", "[math]")
+TEST_CASE("Test Random", "[Random]")
 {
   // Get Seed
   emp::Random rnd(1);
@@ -68,13 +68,6 @@ TEST_CASE("Test Random", "[math]")
   REQUIRE(r_i >= -5);
   REQUIRE(r_i < 5);
 
-  // Get UInt64
-  uint64_t ui64 = rnd.GetUInt64(100);
-  REQUIRE(ui64 < 100);
-
-  ui64 = rnd.GetUInt64(100000000000);
-  REQUIRE(ui64 < 100000000000);
-
   // Values are consistent when random seeded with 5
   double rndNormal = rnd.GetNormal(5.0, 0.1);
   REQUIRE( std::abs(rndNormal - 5.0) < 0.5 );
@@ -96,7 +89,7 @@ TEST_CASE("Test Random", "[math]")
   // REQUIRE(rnd.GetGeometric(0) == std::numeric_limits<uint32_t>::infinity());
 }
 
-TEST_CASE("Another Test random", "[math]")
+TEST_CASE("Another Test random", "[Random]")
 {
 
   std::unordered_map<std::string, std::pair<size_t, size_t>> n_fails;
@@ -314,7 +307,7 @@ TEST_CASE("Another Test random", "[math]")
   }
 }
 
-TEST_CASE("Calling ResetSeed should reset all generator internal state", "[math]") {
+TEST_CASE("Calling ResetSeed should reset all generator internal state", "[Random]") {
 
   SECTION("Test internal 'value'") {
     // Get Seed
@@ -356,5 +349,60 @@ TEST_CASE("Calling ResetSeed should reset all generator internal state", "[math]
     // Tests internal expV
     REQUIRE(norm_seq_a == norm_seq_b);
   }
+}
 
+TEST_CASE("Test 64bit outputs", "[Random]") {
+  emp::Random rnd(1);
+
+  const uint64_t value1 = rnd.GetUInt64(100);
+  REQUIRE(value1 < 100);
+
+  const uint64_t value2 = rnd.GetUInt64(100'000'000'000);
+  REQUIRE(value2 < 100'000'000'000);
+
+  const uint64_t value3 = rnd.GetUInt64(100'000'000'000, 200'000'000'000);
+  REQUIRE(value3 >= 100'000'000'000);
+  REQUIRE(value3 < 200'000'000'000);
+
+  // Make sure we are consistent with values...
+  emp::Random rnd2(1);
+  REQUIRE(rnd2.GetUInt64(100) == value1);
+  REQUIRE(rnd2.GetUInt64(100'000'000'000) == value2);
+  REQUIRE(rnd2.GetUInt64(100'000'000'000, 200'000'000'000) == value3);
+
+  rnd.ResetSeed(1);
+  REQUIRE(rnd.GetUInt64(100) == value1);
+  REQUIRE(rnd.GetUInt64(100'000'000'000) == value2);
+  REQUIRE(rnd.GetUInt64(100'000'000'000, 200'000'000'000) == value3);
+
+  // Make sure the average of 1 million values is right around where it should be.
+  uint64_t total = 0;
+  uint64_t low_tot = 0;
+  uint64_t high_tot = 0;
+  size_t low_count = 0;
+  size_t high_count = 0;
+  for (size_t i = 0; i < 1'000'000; ++i) {
+    const auto value = rnd.GetUInt64(100'000'000'000);
+    total += value;
+    if (value < 10'000'000'000) { low_tot += value;  ++low_count; }
+    if (value > 90'000'000'000) { high_tot += value; ++high_count; }
+  }
+  const uint64_t ave = total / 1'000'000;
+  const uint64_t low_ave = low_tot / low_count;
+  const uint64_t high_ave = high_tot / high_count;
+
+  // Make sure the overall average is around what we expect.
+  REQUIRE(ave > 49'900'000'000);
+  REQUIRE(ave < 50'100'000'000);
+
+  // Make sure the low and high counts are where we expect and the average is good within each.
+  REQUIRE(low_count > 99'000);
+  REQUIRE(low_count < 101'000);
+  REQUIRE(high_count > 99'000);
+  REQUIRE(high_count < 101'000);
+
+  REQUIRE(low_ave > 4'900'000'000);
+  REQUIRE(low_ave < 5'100'000'000);
+  REQUIRE(high_ave > 94'900'000'000);
+  REQUIRE(high_ave < 95'100'000'000);
 }
