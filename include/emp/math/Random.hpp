@@ -27,9 +27,6 @@
 #include "Range.hpp"
 
 namespace emp {
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  using namespace emp;
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   ///  Middle Square Weyl Sequence: A versatile and non-patterned pseudo-random-number
   ///  generator. https://arxiv.org/abs/1704.00358
@@ -47,15 +44,20 @@ namespace emp {
     double expRV = 0.0;    ///< Exponential Random Variable for the randNormal function
 
     // Constants ////////////////////////////////////////////////////////////////
-    static constexpr const uint64_t RAND_CAP = 4294967296;           // 2^32
-    static constexpr const double   RAND_CAP_D = 4294967296.0;       // 2.0^32
-    static constexpr const uint64_t STEP_SIZE = 0xb5ad4eceda1ce2a9;  // Weyl sequence step size
-    static constexpr const uint64_t STEP_SIZE2 = 0x278c5a4d8419fe6b; // Extra step size for 64 bit
+    static constexpr uint64_t VAL32_CAP   = uint64_t{1} << 32; // 4'294'967'296 (1^32)
+    static constexpr double   VAL32_CAP_D = static_cast<double>(VAL32_CAP);
+    static constexpr double   VAL32_FRAC  = 1.0 / VAL32_CAP_D;
+    static constexpr uint64_t VAL53_CAP   = uint64_t{1} << 53; // 9'007'199'254'740'992 (1^53)
+    static constexpr double   VAL53_CAP_D = static_cast<double>(VAL53_CAP);
+    static constexpr double   VAL53_FRAC  = 1.0 / VAL53_CAP_D;
 
-    static constexpr const unsigned char BYTE1 = (unsigned char) 1;
+    static constexpr uint64_t STEP_SIZE   = 0xb5ad4eceda1ce2a9; // Weyl sequence step size
+    static constexpr uint64_t STEP_SIZE2  = 0x278c5a4d8419fe6b; // Extra step size for 64 bit
+
+    static constexpr unsigned char BYTE1 = (unsigned char) 1;
 
     /// Basic Random number
-    /// Returns a random number [0, RAND_CAP)
+    /// Returns a random number [0, VAL32_CAP)
     uint32_t Get() noexcept {
       value *= value;                       // Square the current value.
       value += (weyl_state += STEP_SIZE);   // Take a step in the Weyl sequence
@@ -145,13 +147,13 @@ namespace emp {
 
     // Random Number Generation /////////////////////////////////////////////////
 
-    /// @return A pseudo-random double value between 0.0 and 1.0
-    [[nodiscard]] double GetDouble() noexcept { return Get() / RAND_CAP_D; }
+    /// @return A pseudo-random double value between [0.0, 1.0)
+    [[nodiscard]] double GetDouble() noexcept { return Get() * VAL32_FRAC; }
 
-    /// @return A pseudo-random double value between 0.0 and max
+    /// @return A pseudo-random double value between [0.0, max)
     [[nodiscard]] double GetDouble(const double max) noexcept { return GetDouble() * max; }
 
-    /// @return A pseudo-random double value between min and max
+    /// @return A pseudo-random double value between [min, max)
     [[nodiscard]] double GetDouble(const double min, const double max) noexcept {
       return GetDouble() * (max - min) + min;
     }
@@ -161,24 +163,47 @@ namespace emp {
       return GetDouble(range.GetLower(), range.GetUpper());
     }
 
-    /// @return A pseudo-random double value between (0.0, 1.0]
+    /// @return A pseudo-random double value between (0.0, 1.0)
     [[nodiscard]] double GetDoubleNonZero() noexcept {
-      double d = Get() / RAND_CAP_D;
-      while(d == 0.0) {d = Get() / RAND_CAP_D;}
-      return d;
+      double result;
+      do { result = GetDouble(); } while (result == 0.0);
+      return result;
     }
 
+    /// @return A higher precision (53 bit) pseudo-random double value between [0.0, 1.0)
+    [[nodiscard]] double GetDouble64() noexcept { return (Get64() >> 11) * VAL53_FRAC; }
+
+    /// @return A pseudo-random double value between [0.0, max)
+    [[nodiscard]] double GetDouble64(const double max) noexcept { return GetDouble64() * max; }
+
+    /// @return A pseudo-random double value between [min, max)
+    [[nodiscard]] double GetDouble64(const double min, const double max) noexcept {
+      return GetDouble64() * (max - min) + min;
+    }
+
+    /// @return A pseudo-random double in the provided range.
+    [[nodiscard]] double GetDouble64(const Range<double> range) noexcept {
+      return GetDouble64(range.GetLower(), range.GetUpper());
+    }
+
+    /// @return A pseudo-random double value between (0.0, 1.0)
+    [[nodiscard]] double GetDouble64NonZero() noexcept {
+      double result;
+      do { result = GetDouble64(); } while (result == 0.0);
+      return result;
+    }
+    
 
     /// @return A pseudo-random 32-bit (4 byte) unsigned int value.
     [[nodiscard]] uint32_t GetUInt() noexcept { return Get(); }
 
-    /// @return A pseudo-random 32-bit unsigned int value between 0 and max
+    /// @return A pseudo-random 32-bit unsigned int value between [0, max)
     template <typename T>
     [[nodiscard]] uint32_t GetUInt(const T max) noexcept {
       return static_cast<uint32_t>(GetDouble() * static_cast<double>(max));
     }
 
-    /// @return A pseudo-random 32-bit unsigned int value between min and max
+    /// @return A pseudo-random 32-bit unsigned int value between [min, max)
     template <typename T1, typename T2>
     [[nodiscard]] uint32_t GetUInt(const T1 min, const T2 max) noexcept {
       return GetUInt<uint32_t>((uint32_t) max - (uint32_t) min) + (uint32_t) min;
@@ -216,13 +241,11 @@ namespace emp {
     /// @return A pseudo-random 64-bit (8 byte) unsigned int value.
     [[nodiscard]] uint64_t GetUInt64() noexcept {
       return Get64();
-      // return ( static_cast<uint64_t>(GetUInt()) << 32 )
-      //        + static_cast<uint64_t>(GetUInt());
     }
 
     /// @return A pseudo-random 64-bit unsigned int value between 0 and max
     [[nodiscard]] uint64_t GetUInt64(const uint64_t max) noexcept {
-      if (max <= RAND_CAP) return GetUInt(max);      // Don't need extra precision.
+      if (max <= VAL32_CAP) return GetUInt(max);      // Don't need extra precision.
 
       uint64_t mask = emp::MaskUsed(max);            // Create a mask for just the bits we need.
       uint64_t val = GetUInt64() & mask;             // Grab a value using just the current bits.
@@ -423,7 +446,7 @@ namespace emp {
     /// @param p The probability of the result being "true".
     [[nodiscard]] bool P(const double p) noexcept {
       emp_assert(p >= 0.0 && p <= 1.0, p);
-      return (Get() < (p * RAND_CAP_D));
+      return (Get() < p * VAL32_CAP_D);
     }
 
     /// Full random byte with each bit being a one with a given probability.
@@ -524,10 +547,10 @@ namespace emp {
     typedef int argument_type;
     typedef int result_type;
 
-    RandomStdAdaptor(Random& rng) : _rng(rng) { }
+    RandomStdAdaptor(Random & rng) : _rng(rng) { }
     int operator()(int n) { return _rng.GetInt(n); }
 
-    Random& _rng;
+    Random & _rng;
   };
 
 
