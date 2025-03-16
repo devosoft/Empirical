@@ -172,35 +172,36 @@ namespace emp {
     return (in1 < cur_result) ? cur_result : in1;
   }
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  namespace internal {
-    // A compile-time log calculator for values [1,2)
-    static constexpr double Log2_base(double x) {
-      emp_assert(x > 0);
-      return log2_chart_1_2[(int)((x-1.0)*1024)];
-      // return InterpolateTable(log2_chart_1_2, x-1.0, 1024);
-    }
-
-    // A compile-time log calculator for values < 1
-    static constexpr double Log2_frac(double x) {
-      emp_assert(x > 0);
-      return (x >= 1.0) ? Log2_base(x) : (Log2_frac(x*2.0) - 1.0);
-    }
-
-    // A compile-time log calculator for values >= 2
-    static constexpr double Log2_pos(double x) {
-      emp_assert(x > 0);
-      emp_assert(x != INFINITY);
-      return (x < 2.0) ? Log2_base(x) : (Log2_pos(x/2.0) + 1.0);
-    }
-
-  }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
-
   /// Compile-time log base 2 calculator.
-  static constexpr double Log2(double x) {
-    emp_assert(x > 0);
-    return (x < 1.0) ? internal::Log2_frac(x) : internal::Log2_pos(x);
+  [[nodiscard]] static constexpr double Log2(double x) {
+    emp_assert(x > 0 && x != INFINITY);
+
+    // If we are not between 1.0 and 2.0, do a recursive call to bring into range.
+    if (x >= 256.0) return Log2(x/256.0) + 8.0;
+    if (x >= 2.0) return Log2(x/2.0) + 1.0;
+    if (x < 1.0) return Log2(x*2.0) - 1.0;
+
+    emp_assert(x >= 1 && x < 2);
+
+    double sum = 0.0;
+    double term = (x - 1) / (x + 1);
+    double term2 = term * term;
+
+    sum += (1.0 / 1) * term;   term *= term2;
+    sum += (1.0 / 3) * term;   term *= term2;
+    sum += (1.0 / 5) * term;   term *= term2;
+    sum += (1.0 / 7) * term;   term *= term2;
+    sum += (1.0 / 9) * term;   term *= term2;
+    sum += (1.0 / 11) * term;  term *= term2;
+    sum += (1.0 / 13) * term;  term *= term2;
+    sum += (1.0 / 15) * term;  term *= term2;
+    sum += (1.0 / 17) * term;  term *= term2;
+    sum += (1.0 / 19) * term;  term *= term2;
+
+    return (2.0 * sum) / emp::LN2;
+
+    // const size_t index = static_cast<size_t>((x-1.0)*1024);
+    // return log2_chart_1_2[index];
   }
 
   /// Compile-time log calculator
