@@ -1659,7 +1659,7 @@ namespace emp {
     emp_assert(start_pos <= stop_pos, start_pos, stop_pos);
     emp_assert(p >= 0.0 && p <= 1.0, p);
     if constexpr (IsAutoResize()) {
-      if (stop_pos > GetSize()) Resize(stop_pos + 1);
+      if (stop_pos > GetSize()) Resize(stop_pos);
     }
     emp_assert(stop_pos <= GetSize(), stop_pos, GetSize());
     random.RandFill(BytePtr(), GetNumBytes(), p, start_pos, stop_pos);

@@ -12,7 +12,7 @@
 #ifndef EMP_BASE__ASSERT_TRIGGER_HPP_INCLUDE
 #define EMP_BASE__ASSERT_TRIGGER_HPP_INCLUDE
 
-/// TDEBUG hould trigger its EMP equivalent.
+/// TDEBUG should trigger its EMP equivalent.
 #ifdef TDEBUG
 #define EMP_TDEBUG 1
 #endif

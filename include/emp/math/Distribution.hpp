@@ -94,11 +94,12 @@ namespace emp {
   class GeometricDistribution : public Distribution {
   private:
     double p = 0.0;
-    double precision;
+    double precision = 0.0;
 
   public:
     GeometricDistribution() { }
     GeometricDistribution(double _p, double _precision=0.0000000001, size_t max_size=1000000) {
+      emp_assert(_precision > 0.0);
       Setup(_p, _precision, max_size);
     }
 
