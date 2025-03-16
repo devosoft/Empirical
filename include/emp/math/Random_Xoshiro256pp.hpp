@@ -91,6 +91,8 @@ namespace emp {
     /// Starts a new sequence of pseudo random numbers.  A negative seed means that the random
     /// number generator gets its seed from the current system time and the process memory.
     void ResetSeed(uint64_t seed) noexcept {
+      expRV = 0.0;
+
       // If the provided seed is 0, choose a unique seed based on time and memory location.
       if (seed == 0) {
         uint64_t seed_time = static_cast<uint64_t>(time(NULL));
@@ -461,6 +463,14 @@ namespace emp {
       emp_assert(p > 0.0 && p <= 1.0, p);
       return static_cast<uint64_t>( GetExponential(p) ) + 1;
     }
+
+    // ====== DEPRECATED FUNCTIONS ======
+    [[deprecated("Just use GetUInt() which is now 64 bits by default")]]
+    uint64_t GetUInt64() noexcept { return Get(); }
+    [[deprecated("Just use GetUInt() which is now 64 bits by default")]]
+    uint64_t GetUInt64(uint64_t max) noexcept { return GetUInt(max); }
+    [[deprecated("Just use GetUInt() which is now 64 bits by default")]]
+    uint64_t GetUInt64(uint64_t min, uint64_t max) noexcept { return GetUInt(min, max); }
 
   };
 
