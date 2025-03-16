@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
+ *  date: 2021-2025.
 */
 /**
  *  @file
@@ -235,7 +235,7 @@ TEST_CASE("Another Test random", "[Random]")
     total = 0.0;
     double total2 = 0.0;
     for (size_t i = 0; i < num_tests; i++) {
-      const uint64_t cur_value = rng.GetUInt64();
+      const uint64_t cur_value = rng.GetUInt();
       uint64_draws.push_back(cur_value);
 
       uint32_t temp;
@@ -332,7 +332,7 @@ TEST_CASE("Calling ResetSeed should reset all generator internal state", "[Rando
 
   SECTION("Test internal expV") {
     emp::Random rnd(10);
-    rnd.GetNormal(); // Adjusts expV with time-based seed generator
+    [[maybe_unused]] auto nval = rnd.GetNormal(); // Adjusts expV with time-based seed generator
 
     rnd.ResetSeed(4); // Should reset expV
     emp::vector<double> norm_seq_a;
@@ -354,26 +354,26 @@ TEST_CASE("Calling ResetSeed should reset all generator internal state", "[Rando
 TEST_CASE("Test 64bit outputs", "[Random]") {
   emp::Random rnd(1);
 
-  const uint64_t value1 = rnd.GetUInt64(100);
+  const uint64_t value1 = rnd.GetUInt(100);
   REQUIRE(value1 < 100);
 
-  const uint64_t value2 = rnd.GetUInt64(100'000'000'000);
+  const uint64_t value2 = rnd.GetUInt(100'000'000'000);
   REQUIRE(value2 < 100'000'000'000);
 
-  const uint64_t value3 = rnd.GetUInt64(100'000'000'000, 200'000'000'000);
+  const uint64_t value3 = rnd.GetUInt(100'000'000'000, 200'000'000'000);
   REQUIRE(value3 >= 100'000'000'000);
   REQUIRE(value3 < 200'000'000'000);
 
   // Make sure we are consistent with values...
   emp::Random rnd2(1);
-  REQUIRE(rnd2.GetUInt64(100) == value1);
-  REQUIRE(rnd2.GetUInt64(100'000'000'000) == value2);
-  REQUIRE(rnd2.GetUInt64(100'000'000'000, 200'000'000'000) == value3);
+  REQUIRE(rnd2.GetUInt(100) == value1);
+  REQUIRE(rnd2.GetUInt(100'000'000'000) == value2);
+  REQUIRE(rnd2.GetUInt(100'000'000'000, 200'000'000'000) == value3);
 
   rnd.ResetSeed(1);
-  REQUIRE(rnd.GetUInt64(100) == value1);
-  REQUIRE(rnd.GetUInt64(100'000'000'000) == value2);
-  REQUIRE(rnd.GetUInt64(100'000'000'000, 200'000'000'000) == value3);
+  REQUIRE(rnd.GetUInt(100) == value1);
+  REQUIRE(rnd.GetUInt(100'000'000'000) == value2);
+  REQUIRE(rnd.GetUInt(100'000'000'000, 200'000'000'000) == value3);
 
   // Make sure the average of 1 million values is right around where it should be.
   uint64_t total = 0;
@@ -382,7 +382,7 @@ TEST_CASE("Test 64bit outputs", "[Random]") {
   size_t low_count = 0;
   size_t high_count = 0;
   for (size_t i = 0; i < 1'000'000; ++i) {
-    const auto value = rnd.GetUInt64(100'000'000'000);
+    const auto value = rnd.GetUInt(100'000'000'000);
     total += value;
     if (value < 10'000'000'000) { low_tot += value;  ++low_count; }
     if (value > 90'000'000'000) { high_tot += value; ++high_count; }
