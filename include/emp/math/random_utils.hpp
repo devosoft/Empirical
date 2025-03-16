@@ -18,9 +18,6 @@
 #include "../base/vector.hpp"
 #include "../bits/BitVector.hpp"
 
-#include "Distribution.hpp"
-#include "../tools/String.hpp"
-
 namespace emp {
 
   /// Choose a random element from an indexable container.
@@ -207,91 +204,6 @@ namespace emp {
     }
   };
   
-  // Use Geometric Distribution in all cases.
-  class DistProbability {
-  private:
-    GeometricDistribution dist;
-    size_t next=0;
-  public:
-    DistProbability(double p) : dist(p) { }
-    template <typename RAND_T>
-    bool Test(RAND_T & random) {
-      if (!next) next = dist.PickRandom(random);
-      return !(--next);
-    }
-  };
-
-  class BufferedLowProbability {
-  private:
-    static constexpr uint32_t BUFFER_SIZE=256;
-    emp::array<uint32_t, BUFFER_SIZE> buffer;
-    uint32_t next_buff = BUFFER_SIZE;
-    const double scale;
-    uint32_t next = 0;
-
-    double CalcScale(double p) const {
-      // emp_assert(p < 0.25, "Ideally, low probabilities are below 0.05");
-      return 1.0 / std::log(1.0 - p);
-    }
-
-    template <typename RAND_T>
-    void ResetBuffer(RAND_T & random) {
-      for (uint32_t & buffer_entry : buffer) {
-        const double U = random.GetDouble();
-        buffer_entry = (U==0.0) ? 1 : (static_cast<size_t>(std::log(U) * scale) + 1);
-      }
-      next_buff = 0;
-    }
-  public:
-    BufferedLowProbability(double p) : scale(CalcScale(p)) {
-      emp_assert(p > 0.0 && p < 1.0);
-    }
-    template <typename RAND_T>
-    bool Test(RAND_T & random) {
-      if (!next) {
-        if (next_buff == BUFFER_SIZE) ResetBuffer(random);
-        next = buffer[next_buff];
-        ++next_buff;
-      }
-      return !(--next);
-    }
-  };
-
-  class BufferedHighProbability {
-  private:
-    static constexpr uint32_t BUFFER_SIZE=256;
-    emp::array<uint32_t, BUFFER_SIZE> buffer;
-    uint32_t next_buff = BUFFER_SIZE;
-    const double scale;
-    uint32_t next = 0;
-
-    double CalcScale(double p) const {
-      return 1.0 / std::log(p);
-    }
-
-    template <typename RAND_T>
-    void ResetBuffer(RAND_T & random) {
-      for (uint32_t & buffer_entry : buffer) {
-        const double U = random.GetDouble();
-        buffer_entry = (U==0.0) ? 1 : (static_cast<size_t>(std::log(U) * scale) + 1);
-      }
-      next_buff = 0;
-    }
-  public:
-    BufferedHighProbability(double p) : scale(CalcScale(p)) {
-      emp_assert(p > 0.0 && p < 1.0);
-    }
-    template <typename RAND_T>
-    bool Test(RAND_T & random) {
-      if (!next) {
-        if (next_buff == BUFFER_SIZE) ResetBuffer(random);
-        next = buffer[next_buff];
-        ++next_buff;
-      }
-      return --next;
-    }
-  };
-
   class BufferedProbability {
   private:
     static constexpr uint32_t BUFFER_SIZE=256;
@@ -318,54 +230,10 @@ namespace emp {
     }
   };
 
-  // DEVELOPER NOTE: Pre-recording probabilities with bits was always slower.
+  // DEVELOPER NOTE:
+  // - Pre-recording probabilities with bits was always slower.
+  // - Distribution objects didn't help above calculating distribution on the fly.
 
-  class Probability {
-  private:
-    BufferedLowProbability low_prob;
-    BufferedProbability med_prob;
-    BufferedHighProbability high_prob;
-
-    enum class Type { ZERO, LOW, MID, HIGH, ONE };
-    Type type;
-
-  public:
-    Probability(double p) : low_prob(p), med_prob(p), high_prob(p) {
-      if (p == 0) type = Type::ZERO;
-      else if (p < 0.125) type = Type::LOW;
-      // else if (p == 0.5) type = Type::LOW;
-      else if (p < 0.875) type = Type::MID;
-      else if (p < 1.0) type = Type::HIGH;
-      else type = Type::ONE;
-    }
-    bool TestZero(emp::Random &) const noexcept { return false; }
-    bool TestLow(emp::Random & random) { return low_prob.Test(random); }
-    bool TestMed(emp::Random & random) { return med_prob.Test(random); }
-    bool TestHigh(emp::Random & random) { return high_prob.Test(random); }
-    bool TestOne(emp::Random &) const noexcept { return true; }
-
-    // auto GetTestFun(emp::Random & random) {
-    //   switch (type) {
-    //   case Type::ZERO: return [](){ return false; };
-    //   case Type::LOW:  return [this,&random](){ return low_prob.Test(random); };
-    //   case Type::MID:  return [this,&random](){ return med_prob.Test(random); };
-    //   case Type::HIGH: return [this,&random](){ return high_prob.Test(random); };
-    //   case Type::ONE:  return [](){ return true; };
-    //   }
-    // }
-
-    template <typename RAND_T>
-    bool Test(RAND_T & random) {
-      switch (type) {
-      case Type::ZERO: return false;
-      case Type::LOW:  return low_prob.Test(random);
-      case Type::MID:  return med_prob.Test(random);
-      case Type::HIGH: return high_prob.Test(random);
-      case Type::ONE:  return true;     
-      };
-      return false; // Should never get here.
-    }
-  };
 
 
 // TIMINGS WITH JUST NEGATIVE BINOMIAL DISTRIBUTION TRICK.
