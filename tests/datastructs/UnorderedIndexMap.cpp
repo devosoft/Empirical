@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
+ *  date: 2021-2025
 */
 /**
  *  @file
@@ -27,30 +27,30 @@ TEST_CASE("Test UnorderedIndexMap", "[datastructs]")
   vecd.push_back(3);
   vecd.push_back(2);
   vecd.push_back(1);
-  uim.Adjust(vecd);
+  uim.Set(vecd);
   REQUIRE(uim.GetSize() == 5);
   REQUIRE(uim.GetWeight() == 15);
   REQUIRE(uim.GetProb(0) ==  (1.0/3.0));
   uim.Clear();
   REQUIRE(uim.GetWeight() == 0);
-  uim.AdjustAll(2.0);
+  uim.SetAll(2.0);
   REQUIRE(uim.GetWeight() == 10);
   uim.ResizeClear(10);
   REQUIRE(uim.GetWeight() == 0);
   REQUIRE(uim.GetSize() == 10);
-  uim.AdjustAll(2.0);
+  uim.SetAll(2.0);
 
   // Index
   size_t ind = uim.Index(0);
   REQUIRE(uim[ind] == 2);
-  uim.Adjust(ind, 3.0);
+  uim.Set(ind, 3.0);
   REQUIRE(uim[ind] == 3);
   uim[ind] = 4;
   REQUIRE(uim[ind] == 4);
 
   // -= +=
   emp::UnorderedIndexMap uim2(10);
-  uim2.AdjustAll(2.0);
+  uim2.SetAll(2.0);
   uim -= uim2;
   REQUIRE(uim.GetWeight() == 2);
   uim2 += uim;
