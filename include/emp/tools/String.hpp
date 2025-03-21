@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2023-2024
+ *  date: 2023-2025
 */
 /**
  *  @file
@@ -23,6 +23,7 @@
 #include <algorithm>              // std::count
 #include <cctype>                 // std::toupper and std::tolower
 #include <functional>             // std::function
+#include <concepts>
 #include <initializer_list>
 #include <map>
 #include <sstream>
@@ -60,6 +61,10 @@ namespace emp {
   [[nodiscard]] inline String MakeTitleCase(String in);
   [[nodiscard]] inline String MakeCount(int val, String item, const String & plural_suffix);
   [[nodiscard]] inline String MakeRoman(int val);
+  template <typename CONTAINER_T>
+  [[nodiscard]] inline String MakeList(const CONTAINER_T & container, emp::String separator=",");
+  template <typename... ARG_Ts>
+  [[nodiscard]] inline String MakeArgList(ARG_Ts &&... args);
   template <typename CONTAINER_T, typename FUN_T>
   [[nodiscard]] inline String MakeEnglishList(const CONTAINER_T & container, FUN_T transform_fun);
   template <typename CONTAINER_T>
@@ -288,6 +293,12 @@ namespace emp {
 
     /// Is string composed only of a set of characters (can be provided as a string)
     [[nodiscard]] bool IsComposedOf(CharSet char_set) const { return char_set.Has(*this); }
+
+    /// Is this string one of the strings provided?
+    template <typename... ARG_Ts>
+    [[nodiscard]] bool IsOneOf(ARG_Ts &&... args) const
+      requires (std::equality_comparable_with<emp::String, ARG_Ts> && ...)
+      { return ((*this == args) || ...); }
 
     /// Is string a valid number (int, floating point, or scientific notation all valid)
     [[nodiscard]] inline bool IsNumber() const;
@@ -665,6 +676,16 @@ namespace emp {
 
     String & AppendRoman(int val) { *this+=MakeRoman(val); return *this; }
     String & SetRoman(int val) { *this = MakeRoman(val); return *this; }
+
+    template <typename... Ts> String & AppendList(const Ts &... args)
+      { *this += MakeList(std::forward<Ts>(args)...); return *this;}
+    template <typename... Ts> String & SetList(const Ts &... args)
+      { *this = MakeList(std::forward<Ts>(args)...); return *this;}
+
+    template <typename... Ts> String & AppendArgList(const Ts &... args)
+      { *this += MakeArgList(std::forward<Ts>(args)...); return *this;}
+    template <typename... Ts> String & SetArgList(const Ts &... args)
+      { *this = MakeArgList(std::forward<Ts>(args)...); return *this;}
 
     template <typename... Ts> String & AppendEnglishList(const Ts &... args)
       { *this += MakeEnglishList(std::forward<Ts>(args)...); return *this;}
@@ -1682,6 +1703,35 @@ namespace emp {
     }
 
     return out;
+  }
+
+  template <typename CONTAINER_T>
+  String MakeList(const CONTAINER_T & container, emp::String separator) {
+    if (container.size() == 0) return "";
+
+    // Print the first element in the list.
+    auto it = container.begin();
+    String out = MakeString(*it);
+    ++it;
+
+    // Print any additional elements with separator in between.
+    while (it != container.end) {
+      out.Append(separator, *it);
+      ++it;
+    }
+
+    return out;
+  }
+
+  template <typename... ARG_Ts>
+  [[nodiscard]] inline String MakeArgList(ARG_Ts &&... args) {
+    if constexpr (sizeof...(args) == 0) return "";
+    else {
+      emp::String out;
+      bool first = true;
+      ((out.Append((first ? "" : ","), args), first = false), ...);
+      return out;
+    }
   }
 
   template <typename CONTAINER_T, typename TRANSFORM_FUN_T>
