@@ -9,17 +9,100 @@
  */
 
 #include <algorithm>     // For std::sort
-#include <ctime>         // For std::clock
-#include <vector>
+#include <chrono>
 
+#include "emp/base/vector.hpp"
 #include "emp/math/Random.hpp"
+#include "emp/tools/String.hpp"
 
-constexpr const size_t N = 1048576; // 10^20
+struct TimingData {
+  struct Entry {
+    emp::String rng_name;
+    double time;
+    double result;
+  };
+
+  using treatment_info_t = emp::vector<Entry>;
+  std::map<emp::String, treatment_info_t> result_map;
+
+  void Add(emp::String treatment, emp::String in_rng, double time, double result) {
+    result_map[treatment].push_back( Entry{in_rng, time / 1'000'000.0, result} );
+  }
+
+  void Print(std::ostream & os=std::cout) {
+    for (auto [treatment, info] : result_map) {
+      os << "TREATMENT: " << treatment << std::endl;
+      for (Entry x : info) {
+        os << "  TIME: " << x.time
+           << "  RESULT: " << x.result
+           << "  RNG:" << x.rng_name
+           << std::endl;
+      }
+    }
+  }
+};
+
+TimingData data;
+
+constexpr const size_t N = 100'000'000;
+
+template <typename RNG_T, typename... ARG_Ts>
+double TestGetUInt64(ARG_Ts &&... args) {
+  RNG_T random;
+  double total = 0.0;
+  auto start_time = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < N; ++i) {
+    total += random.GetUInt64(args...);
+  }
+  auto end_time = std::chrono::high_resolution_clock::now();
+  auto total_time = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+
+  emp::String args_str = emp::MakeArgList(args...);
+  emp::String treatment = emp::MakeString("GetUInt64(", args_str, ")");
+  data.Add(treatment, random.GetEngineType(), total_time, total);
+
+  return total;
+}
+
+template <typename RNG_T, typename... ARG_Ts>
+double TestGetDouble(ARG_Ts &&... args) {
+  RNG_T random;
+  double total = 0.0;
+  auto start_time = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < N; ++i) {
+    total += random.GetDouble(args...);
+  }
+  auto end_time = std::chrono::high_resolution_clock::now();
+  auto total_time = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+
+  emp::String args_str = emp::MakeArgList(args...);
+  emp::String treatment = emp::MakeString("GetDouble(", args_str, ")");
+  data.Add(treatment, random.GetEngineType(), total_time, total);
+
+  return total;
+}
 
 int main()
 {
-  emp::Random random;
+  TestGetUInt64<emp::RandomBest>();
+  TestGetUInt64<emp::Random32>();
+  TestGetUInt64<emp::RandomFast>();
+  
+  TestGetDouble<emp::RandomBest>();
+  TestGetDouble<emp::Random32>();
+  TestGetDouble<emp::RandomFast>();
 
+  TestGetDouble<emp::RandomBest>(100.0);
+  TestGetDouble<emp::Random32>(100.0);
+  TestGetDouble<emp::RandomFast>(100.0);
+
+  TestGetDouble<emp::RandomBest>(1000000.0, 2000000.5);
+  TestGetDouble<emp::Random32>(1000000.0, 2000000.5);
+  TestGetDouble<emp::RandomFast>(1000000.0, 2000000.5);
+
+  data.Print();
+/*
+  emp::Random random;
 
   //
   // Test GetUInt()
@@ -101,6 +184,6 @@ int main()
       << "  num hits = " << success_count
             << ";  time = " << ((double) total_time) / (double) CLOCKS_PER_SEC
             << " seconds." << std::endl;
-
+*/
 
 }
