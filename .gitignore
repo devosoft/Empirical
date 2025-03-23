@@ -30,6 +30,8 @@ a.out.js
 
 incoming/
 tmp/
+**/bak/
+**/BAK/
 
 .vscode/
 
@@ -44,6 +46,7 @@ doc/_build
 
 demos/Graphs/Steiner/Steiner
 demos/Graphs/Steiner/hw-tests/
+demos/LexerGenerator/Emplex
 demos/LexerGenerator/web/Emplex.js
 demos/MAP-Elites-Arm/web/MAP-Elites-Arm.js
 demos/NK/NK
