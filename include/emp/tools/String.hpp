@@ -62,7 +62,7 @@ namespace emp {
   [[nodiscard]] inline String MakeCount(int val, String item, const String & plural_suffix);
   [[nodiscard]] inline String MakeRoman(int val);
   template <typename CONTAINER_T>
-  [[nodiscard]] inline String MakeList(const CONTAINER_T & container, emp::String separator=",");
+  [[nodiscard]] inline String MakeList(const CONTAINER_T & container, std::string separator=",");
   template <typename... ARG_Ts>
   [[nodiscard]] inline String MakeArgList(ARG_Ts &&... args);
   template <typename CONTAINER_T, typename FUN_T>
@@ -1706,7 +1706,7 @@ namespace emp {
   }
 
   template <typename CONTAINER_T>
-  String MakeList(const CONTAINER_T & container, emp::String separator) {
+  String MakeList(const CONTAINER_T & container, std::string separator) {
     if (container.size() == 0) return "";
 
     // Print the first element in the list.
