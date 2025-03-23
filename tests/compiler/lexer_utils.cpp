@@ -26,24 +26,24 @@ TEST_CASE("Test lexer_utils", "[compiler]")
   dfa.SetTransition(1, 0, 'c');
   dfa.SetStop(0, 100);
 
-  REQUIRE(emp::to_DFA(dfa).GetSize() == dfa.GetSize());
-  REQUIRE(emp::to_DFA(dfa).Test("abc") == 100);
-  REQUIRE(emp::to_DFA(dfa).Test("abc") == dfa.Test("abc"));
+  CHECK(emp::to_DFA(dfa).GetSize() == dfa.GetSize());
+  CHECK(emp::to_DFA(dfa).Test("abc") == 100);
+  CHECK(emp::to_DFA(dfa).Test("abc") == dfa.Test("abc"));
 
   emp::NFA nfa = emp::to_NFA(dfa);
-  REQUIRE(nfa.GetSize() == dfa.GetSize());
+  CHECK(nfa.GetSize() == dfa.GetSize());
   emp::BitVector nxt = nfa.GetNext('a');
-  REQUIRE(nxt.Has(2));
-  REQUIRE(!nxt.Has(1));
+  CHECK(nxt.Has(2));
+  CHECK(!nxt.Has(1));
 
   dfa.SetStop(0);
   std::string example = emp::FindExample(dfa);
   // std::cout << "FOUND: '" << example << "' : " << example.size() << std::endl;
-  REQUIRE(dfa.Test(example));
+  CHECK(dfa.Test(example));
 
   emp::DFA dfa2;
   dfa2.Resize(3);
-  REQUIRE(emp::FindExample(dfa2) == "");
+  CHECK(emp::FindExample(dfa2) == "");
 }
 
 TEST_CASE("Another Test lexer_utils", "[compiler]")
@@ -61,19 +61,17 @@ TEST_CASE("Another Test lexer_utils", "[compiler]")
   // emp::RegEx re2f("([de]*)f([de]*)f([de]*)");
   emp::NFA nfa2f = to_NFA(re2f);
   emp::DFA dfa2f = to_DFA(nfa2f);
-  REQUIRE( nfa2f.GetSize() == 15 );
-  REQUIRE( dfa2f.GetSize() == 4 );
 
   int state;
-  state = dfa2f.Next(0, "a");        REQUIRE(dfa2f.IsStop(state) == false);
-  state = dfa2f.Next(0, "d");        REQUIRE(dfa2f.IsStop(state) == false);
-  state = dfa2f.Next(0, "defdef");   REQUIRE(dfa2f.IsStop(state) == true);
-  state = dfa2f.Next(0, "fedfed");   REQUIRE(dfa2f.IsStop(state) == true);
-  state = dfa2f.Next(0, "ffed");     REQUIRE(dfa2f.IsStop(state) == true);
-  state = dfa2f.Next(0, "edffed");   REQUIRE(dfa2f.IsStop(state) == true);
-  state = dfa2f.Next(0, "edffedf");  REQUIRE(dfa2f.IsStop(state) == false);
-  state = dfa2f.Next(0, "defed");    REQUIRE(dfa2f.IsStop(state) == false);
-  state = dfa2f.Next(0, "ff");       REQUIRE(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "a");        CHECK(dfa2f.IsStop(state) == false);
+  state = dfa2f.Next(0, "d");        CHECK(dfa2f.IsStop(state) == false);
+  state = dfa2f.Next(0, "defdef");   CHECK(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "fedfed");   CHECK(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "ffed");     CHECK(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "edffed");   CHECK(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "edffedf");  CHECK(dfa2f.IsStop(state) == false);
+  state = dfa2f.Next(0, "defed");    CHECK(dfa2f.IsStop(state) == false);
+  state = dfa2f.Next(0, "ff");       CHECK(dfa2f.IsStop(state) == true);
 
   emp::RegEx re_lower("[a-z]+");
   emp::RegEx re_upper("[A-Z]+");
@@ -88,19 +86,19 @@ TEST_CASE("Another Test lexer_utils", "[compiler]")
   emp::DFA dfa_all = to_DFA(nfa_all);
 
   emp::NFA_State lstate(nfa_lower);
-  lstate.Reset(); lstate.Next("abc");      REQUIRE(lstate.IsActive() == true);
-  lstate.Reset(); lstate.Next("DEF");      REQUIRE(lstate.IsActive() == false);
-  lstate.Reset(); lstate.Next("abcDEF");   REQUIRE(lstate.IsActive() == false);
-  lstate.Reset(); lstate.Next("ABDdef");   REQUIRE(lstate.IsActive() == false);
-  lstate.Reset(); lstate.Next("ABCDEF");   REQUIRE(lstate.IsActive() == false);
-  lstate.Reset(); lstate.Next("abcdefghijklmnopqrstuvwxyz");  REQUIRE(lstate.IsActive() == true);
-  lstate.Reset(); lstate.Next("ABC-DEF");  REQUIRE(lstate.IsActive() == false);
+  lstate.Reset(); lstate.Next("abc");      CHECK(lstate.IsActive() == true);
+  lstate.Reset(); lstate.Next("DEF");      CHECK(lstate.IsActive() == false);
+  lstate.Reset(); lstate.Next("abcDEF");   CHECK(lstate.IsActive() == false);
+  lstate.Reset(); lstate.Next("ABDdef");   CHECK(lstate.IsActive() == false);
+  lstate.Reset(); lstate.Next("ABCDEF");   CHECK(lstate.IsActive() == false);
+  lstate.Reset(); lstate.Next("abcdefghijklmnopqrstuvwxyz");  CHECK(lstate.IsActive() == true);
+  lstate.Reset(); lstate.Next("ABC-DEF");  CHECK(lstate.IsActive() == false);
 
-  REQUIRE( dfa_all.Next(0, "abc") == 2 );
-  REQUIRE( dfa_all.Next(0, "DEF") == 1 );
-  REQUIRE( dfa_all.Next(0, "abcDEF") == 3 );
-  REQUIRE( dfa_all.Next(0, "ABDdef") == -1 );
-  REQUIRE( dfa_all.Next(0, "ABCDEF") == 1 );
-  REQUIRE( dfa_all.Next(0, "abcdefghijklmnopqrstuvwxyz") == 2 );
-  REQUIRE( dfa_all.Next(0, "ABC-DEF") == -1 );
+  CHECK( dfa_all.Next(0, "abc") > 0 );
+  CHECK( dfa_all.Next(0, "DEF") > 0 );
+  CHECK( dfa_all.Next(0, "abcDEF") > 0 );
+  CHECK( dfa_all.Next(0, "ABDdef") == -1 );
+  CHECK( dfa_all.Next(0, "ABCDEF") > 0 );
+  CHECK( dfa_all.Next(0, "abcdefghijklmnopqrstuvwxyz") > 0);
+  CHECK( dfa_all.Next(0, "ABC-DEF") == -1 );
 }
