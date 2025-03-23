@@ -33,14 +33,14 @@ namespace emp {
   template <typename VALUE_T, size_t MAX_SIZE=0>
   class Vector {
   private:
-    static constexpr bool IS_STATIC = !MAX_SIZE;
     using this_t = Vector<VALUE_T, MAX_SIZE>;
     using static_t = StaticVector<VALUE_T, MAX_SIZE>;
     using dynamic_t = emp::vector<VALUE_T>;
-    using vec_t = std::conditional_t<IS_STATIC, dynamic_t, static_t>;
+    using vec_t = std::conditional_t<MAX_SIZE, static_t, dynamic_t>;
     vec_t values;
 
   public:
+    static constexpr bool IS_STATIC = MAX_SIZE;
     using value_type = VALUE_T;
     using size_type = std::size_t;
     using reference = value_type&;
