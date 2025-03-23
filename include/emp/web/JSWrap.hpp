@@ -9,7 +9,7 @@
  *
  *  To wrap a function, call:
  *
- *     `uint32_t fun_id = emp::JSWrap(FunctionToBeWrapped, "JS_Function_Name");``
+ *     `uint32_t fun_id = emp::JSWrap(FunctionToBeWrapped, "JS_Function_Name");`
  *
  *  To manually callback a function from Javascript, first set `emp_i.cb_args` to an array of
  *  function arguments, then call `empCppCallback( fun_id );`   This all happens automatically
@@ -47,6 +47,8 @@
 #include <tuple>
 #include <type_traits>
 
+#include <emscripten/threading.h>
+
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/tuple_struct.hpp"
@@ -75,7 +77,7 @@ namespace emp {
   template <typename JSON_TYPE, int ARG_ID, int FIELD>
   struct LoadTuple;
 
-  /// This needs to go before LoadTuple is defined, in case there are nested tuple structs
+  // This needs to go before LoadTuple is defined, in case there are nested tuple structs
   template <int ARG_ID, typename T> static
   void LoadArg(T & arg_var) {
     if constexpr ( is_introspective_tuple<T>() ) {
@@ -626,7 +628,13 @@ void empCppCallback(const size_t cb_id) {
 
     });
 
-    emscripten_async_queue_on_thread(
+    // Preserve backward compatibility (EM_FUNC_SIG_VI is not defined in newer Emscripten)
+    #ifndef EM_FUNC_SIG_VI
+    #define EM_FUNC_SIG_VI "v(i)"
+    #endif
+
+//    emscripten_async_queue_on_thread(
+    emscripten_dispatch_to_thread(
       proxy_pthread_id,
       EM_FUNC_SIG_VI, // VI = no return value, one argument
       (void*) &empDoCppCallback,
