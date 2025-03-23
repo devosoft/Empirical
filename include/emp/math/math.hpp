@@ -174,38 +174,33 @@ namespace emp {
 
   /// Compile-time log base 2 calculator.
   [[nodiscard]] static constexpr double Log2(double x) {
-    emp_assert(x > 0 && x != INFINITY);
+    // emp_assert(x > 0 && x != INFINITY);
+
+    if (x == 1.0) return 0.0; // Ensure a perfect answer if given a power of 2.
 
     // If we are not between 1.0 and 2.0, do a recursive call to bring into range.
-    if (x >= 256.0) return Log2(x/256.0) + 8.0;
     if (x >= 2.0) return Log2(x/2.0) + 1.0;
     if (x < 1.0) return Log2(x*2.0) - 1.0;
 
-    emp_assert(x >= 1 && x < 2);
-
+    // Apply Taylor series for log2(x)
     double sum = 0.0;
     double term = (x - 1) / (x + 1);
     double term2 = term * term;
 
-    sum += (1.0 / 1) * term;   term *= term2;
-    sum += (1.0 / 3) * term;   term *= term2;
-    sum += (1.0 / 5) * term;   term *= term2;
-    sum += (1.0 / 7) * term;   term *= term2;
-    sum += (1.0 / 9) * term;   term *= term2;
-    sum += (1.0 / 11) * term;  term *= term2;
-    sum += (1.0 / 13) * term;  term *= term2;
-    sum += (1.0 / 15) * term;  term *= term2;
-    sum += (1.0 / 17) * term;  term *= term2;
-    sum += (1.0 / 19) * term;  term *= term2;
+    for (int i = 1; i <= 19; i += 2) {
+      sum += (1.0 / i) * term;
+      term *= term2;
+    }
 
     return (2.0 * sum) / emp::LN2;
-
-    // const size_t index = static_cast<size_t>((x-1.0)*1024);
-    // return log2_chart_1_2[index];
   }
 
   /// Compile-time log calculator
-  static constexpr double Log(double x, double base=10.0) { return Log2(x) / Log2(base); }
+  static constexpr double Log(double x, double base=10.0) {
+    if (x > base) return Log(x/base, base) + 1.0;
+    if (x < 1.0) return Log(x*base, base) - 1.0;
+    return Log2(x) / Log2(base);
+  }
   /// Compile-time natural log calculator
   static constexpr double Ln(double x) { return Log(x, emp::E); }   // Natural Log...
   /// Compile-time log base 10 calculator.
