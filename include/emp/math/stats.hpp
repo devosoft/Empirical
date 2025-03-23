@@ -76,7 +76,7 @@ namespace emp {
     double result = 0;
     for (auto & element : counts) {
       double p = double(element.second)/elements.size();
-      result +=  p * Log2(p);
+      result +=  p * std::log2(p);
     }
 
     return -1 * result;
