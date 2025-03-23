@@ -20,17 +20,21 @@ namespace emp {
   constexpr const double PHI    = 1.61803398874;          ///< Golden ratio
   constexpr const double PI     = 3.14159265358979;       ///< pi
   constexpr const double SQRT2  = 1.41421356237310;       ///< sqrt(2)
+  constexpr const double LN2    = 0.6931471805599453;     ///< ln(2)
+  
 
-  constexpr const uint32_t MAX_BYTE  = 255;           ///< (2^8 - 1)
-  constexpr const uint32_t MAX_2BYTE = 65535;         ///< (2^16 - 1)
-  constexpr const uint32_t MAX_WORD  = 65535;         ///< (2^16 - 1)
-  constexpr const uint32_t MAX_3BYTE = 16777215;      ///< (2^24 - 1)
-  constexpr const uint32_t MAX_UINT  = 4294967295;    ///< (2^32 - 1)
-  constexpr const uint32_t MAX_4BYTE = 4294967295;    ///< (2^32 - 1)
+  constexpr uint8_t  MAX_BYTE  =            255;  ///< 2^8 - 1
+  constexpr uint16_t MAX_2BYTE =         65'535;  ///< 2^16 - 1
+  constexpr uint16_t MAX_WORD  =         65'535;  ///< 2^16 - 1
+  constexpr uint32_t MAX_3BYTE =     16'777'215;  ///< 2^24 - 1
+  constexpr uint32_t MAX_UINT  =  4'294'967'295;  ///< 2^32 - 1
+  constexpr uint32_t MAX_4BYTE =  4'294'967'295;  ///< 2^32 - 1
 
-  constexpr const int32_t MIN_INT = -2147483648;      ///< (- 2^31)
+  constexpr int32_t MAX_INT    =  2'147'483'647;  ///< 2^31 - 1
+  constexpr int32_t MIN_INT    = -2'147'483'648;  ///< -(2^31)
 
-  constexpr const size_t MAX_SIZE_T = static_cast<size_t>(-1);
+  constexpr uint64_t MAX_8BYTE = static_cast<uint64_t>(-1);
+  constexpr size_t MAX_SIZE_T  = static_cast<size_t>(-1);
 
   /// Determine the maximum value for any type.
   // @CAO: Prevent inf to get more realistic numbers for double/float?
