@@ -35,6 +35,20 @@ namespace emp {
   #endif
 
 
+  // === Concepts to check for Standard Library member functions.
+  template<typename T>
+  concept has_size = requires(T & v) { v.size(); };
+
+  template<typename T>
+  concept has_resize = requires(T & v, size_t size) { v.resize(size); };
+
+  template<typename T>
+  concept has_begin = requires(T & v) { v.begin(); };
+
+  template<typename T>
+  concept has_end = requires(T & v) { v.end(); };
+
+
   // === Concepts to determine if a type can be streamed ===
 
   /// Concept to identify if a type can be sent into an ostream.
