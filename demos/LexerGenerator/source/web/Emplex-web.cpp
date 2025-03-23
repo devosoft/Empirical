@@ -536,7 +536,7 @@ private:
         ;
     } else if (mode == "cpp") {
       doc.Button("cpp_but").SetBackground(active_color);
-      intro_div << HeadingName("Working with the Generated C++ Code") <<
+      intro_div << HeadingName("User Guide: Working with the Generated C++ Code") <<
         "<p>Emplex will generate a C++ file that you can either copy or download "
         "(as \"lexer.hpp\" by default) and simply <code>#include</code> into your own code. "
         "The generated file will contain a lexer class (called \"Lexer\" by default) in a namespace "
@@ -664,7 +664,7 @@ private:
         "<ul>\n"
         "<li>Set up alternate languages to generate to, including Python, Java, C, and Rust.</li>\n"
         "<li>Improve auto-updating to sandbox when changes are made to token rules.</li>\n"
-        "<li>Colorize code examples on 'Generated C++ Code' page.</li>\n"
+        "<li>Colorize code examples on 'User Guide' page.</li>\n"
         "<li>Allow more output customization in the advanced settings, including turning off helper functions.</li>\n"
         "<li>When saving token type information, also save advanced settings for easy restore.</li>\n"
         "<li>Make {alias} tokens that work as aliases only in Lexers.  For example, if you define a token as {abc} it won't be used for matching, but you can put {abc} inside of another regular expression to include it.</li>\n"
@@ -681,14 +681,14 @@ private:
       UpdateIntro("home"); intro_div.Redraw(); 
     }, "Home", "home_but").SetCSS(button_style).SetBackground("#0000AA").SetCSS("width", "159px");
     button_div << UI::Button([this](){
+      UpdateIntro("cpp"); intro_div.Redraw(); 
+    }, "User Guide", "cpp_but").SetCSS(button_style); // .SetCSS("width", "170px");
+    button_div << UI::Button([this](){
       UpdateIntro("lexer"); intro_div.Redraw(); 
     }, "Lexical Analysis", "lexer_but").SetCSS(button_style); // .SetCSS("width", "170px");
     button_div << UI::Button([this](){
       UpdateIntro("regex"); intro_div.Redraw(); 
     }, "Regular Expressions", "regex_but").SetCSS(button_style); // .SetCSS("width", "170px");
-    button_div << UI::Button([this](){
-      UpdateIntro("cpp"); intro_div.Redraw(); 
-    }, "Generated C++ Code", "cpp_but").SetCSS(button_style); // .SetCSS("width", "170px");
     button_div << UI::Button([this](){
       UpdateIntro("about"); intro_div.Redraw(); 
     }, "About", "about_but").SetCSS(button_style).SetCSS("width", "159px");
