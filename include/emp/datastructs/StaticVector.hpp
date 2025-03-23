@@ -34,8 +34,8 @@ namespace emp {
 
     // Move a chunk of vector from one place to another.
     void RawMove(size_t from_id, size_t to_id, size_t count) {
-      assert(from_id+count <= MAX_SIZE);
-      assert(to_id+count <= MAX_SIZE);
+      emp_assert(from_id+count <= MAX_SIZE);
+      emp_assert(to_id+count <= MAX_SIZE);
       // Move current values out of the way.
       auto start = values.begin()+from_id;
       auto stop = start+count;
@@ -63,8 +63,8 @@ namespace emp {
 
     auto begin() noexcept { return values.begin(); }
     auto begin() const noexcept { return values.begin(); }
-    auto end() noexcept { return values.begin() + cur_size; }
-    auto end() const noexcept { return values.begin() + cur_size; }
+    auto end() noexcept { return begin() + cur_size; }
+    auto end() const noexcept { return begin() + cur_size; }
 
     size_t size() const { return cur_size; }
 
@@ -105,7 +105,7 @@ namespace emp {
     // Allow fill to have optional arguments.
     template <typename T>
     void Fill(T && value, size_t start=0) {
-      Fill(std::forward<T>(value), start, cur_size-start));
+      Fill(std::forward<T>(value), start, cur_size-start);
     }
 
     template <typename T>
