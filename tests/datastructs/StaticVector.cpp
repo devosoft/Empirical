@@ -13,7 +13,7 @@
 
 TEST_CASE("Test StaticVector", "[datastructs]")
 {
-  emp::StaticVector<int, 10> v1 = {1,2,3,4,5};
+  emp::StaticVector<int, 10> v1{1,2,3,4,5};
   CHECK(v1.size() == 5);
   CHECK(v1[3] == 4);
 
@@ -26,7 +26,7 @@ TEST_CASE("Test StaticVector", "[datastructs]")
   CHECK(v3[7] == 'a');
 
   emp::StaticVector<double, 12> v4;
-  v4.resize(11, 1.5);
+  v4.resize(11, 1.5);      // v4 is eleven 1.5's
   CHECK(v4.size() == 11);
   CHECK(v4[3] == 1.5);
 
@@ -34,9 +34,11 @@ TEST_CASE("Test StaticVector", "[datastructs]")
   for (double x : v4) total += x;
   CHECK(total == 16.5);
 
-  v4.Fill(10.5, 4, 2);
+  v4.Fill(10.5, 4, 2);  // Put 10.5 in positions 4 and 5.
+  total = 0.0;
   for (double x : v4) total += x;
-  CHECK(total == 34.5);
+  CHECK(v4.size() == 11);
+  CHECK(total == 34.5);  // 9*1.5 + 2*10.5 = 13.5 + 21 = 34.5
 
   v1.Push(10).Push(11).Push(12);
   CHECK(v1.size() == 8);
