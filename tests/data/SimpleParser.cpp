@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022
+ *  date: 2022-2025
 */
 /**
  *  @file
@@ -284,7 +284,7 @@ TEST_CASE("Test DataMap in SimpleParser", "[data]")
 
 TEST_CASE("Test std::map in SimpleParser", "[data]")
 {
-  std::map<std::string, double> var_map;
+  std::map<emp::String, double> var_map;
   var_map["x"] = 5;
   var_map["y"] = 10;
 
@@ -301,7 +301,7 @@ TEST_CASE("Test std::map in SimpleParser", "[data]")
 
 TEST_CASE("Test emp::ra_map in SimpleParser", "[data]")
 {
-  emp::ra_map<std::string, double> var_map;
+  emp::ra_map<emp::String, double> var_map;
   var_map["x"] = 5;
   var_map["y"] = 10;
 

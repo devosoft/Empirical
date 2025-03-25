@@ -27,6 +27,7 @@ TEST_CASE("Test lexer_utils", "[compiler]")
   dfa.SetStop(0, 100);
 
   CHECK(emp::to_DFA(dfa).GetSize() == dfa.GetSize());
+  CHECK(dfa.Test("abc") == 100);
   CHECK(emp::to_DFA(dfa).Test("abc") == 100);
   CHECK(emp::to_DFA(dfa).Test("abc") == dfa.Test("abc"));
 
