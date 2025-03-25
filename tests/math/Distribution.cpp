@@ -55,14 +55,14 @@ TEST_CASE("Test Geometric Distribution", "[math]")
     CHECK(ave > exp * 0.995);
     CHECK(ave < exp * 1.005);
 
-    std::cout << "\n---------- GEOMETRIC"
-              << "\np = " << p
-              << "\nmin = " << min
-              << "\nave = " << ave
-              << "\nmax = " << max
-              << "\nexp = " << exp
-              << "\narray size = " << geo.GetSize()
-              << std::endl;
+    // std::cout << "\n---------- GEOMETRIC"
+    //           << "\np = " << p
+    //           << "\nmin = " << min
+    //           << "\nave = " << ave
+    //           << "\nmax = " << max
+    //           << "\nexp = " << exp
+    //           << "\narray size = " << geo.GetSize()
+    //           << std::endl;
   }
 
 }
