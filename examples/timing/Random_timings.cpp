@@ -51,7 +51,7 @@ double TestGetUInt64(ARG_Ts &&... args) {
   RNG_T random;
   double total = 0.0;
   auto start_time = std::chrono::high_resolution_clock::now();
-    for (size_t i = 0; i < N; ++i) {
+  for (size_t i = 0; i < N; ++i) {
     total += random.GetUInt64(args...);
   }
   auto end_time = std::chrono::high_resolution_clock::now();
