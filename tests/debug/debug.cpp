@@ -17,15 +17,15 @@ TEST_CASE("Test debug", "[debug]")
   EMP_TRACK_LINE("Test2");
   EMP_TRACK_LINE("Test3");
 
-  CHECK(emp::GetDebugLine("Test1") == "debug.cpp:15");
-  CHECK(emp::GetDebugLine("Test2") == "debug.cpp:16");
-  CHECK(emp::GetDebugLine("Test3") == "debug.cpp:17");
+  CHECK(emp::GetDebugLine("Test1") == "debug.cpp:16");
+  CHECK(emp::GetDebugLine("Test2") == "debug.cpp:17");
+  CHECK(emp::GetDebugLine("Test3") == "debug.cpp:18");
 
   EMP_TRACK_LINE("Test4");
 
   // Make sure they all work a second time and test the new one...
-  CHECK(emp::GetDebugLine("Test1") == "debug.cpp:15");
-  CHECK(emp::GetDebugLine("Test2") == "debug.cpp:16");
-  CHECK(emp::GetDebugLine("Test3") == "debug.cpp:17");
-  CHECK(emp::GetDebugLine("Test4") == "debug.cpp:23");
+  CHECK(emp::GetDebugLine("Test1") == "debug.cpp:16");
+  CHECK(emp::GetDebugLine("Test2") == "debug.cpp:17");
+  CHECK(emp::GetDebugLine("Test3") == "debug.cpp:18");
+  CHECK(emp::GetDebugLine("Test4") == "debug.cpp:24");
 }
