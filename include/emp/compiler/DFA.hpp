@@ -24,15 +24,15 @@
 
 namespace emp {
 
-  template <int NUM_SYMBOLS=128, typename STOP_TYPE=uint8_t>
+  template <int NUM_SYMBOLS=128, typename STOP_T=uint8_t>
   class tDFA {
   private:
-    emp::vector< emp::array<int, NUM_SYMBOLS> > transitions;
-    emp::vector< STOP_TYPE > stop_id;  // 0=not stop; other values for STOP return value.
+    emp::vector< emp::array<int, NUM_SYMBOLS> > transitions; // -1 = no transition (default)
+    emp::vector< STOP_T > stop_id;  // 0=not stop; other values for STOP return value.
 
-    using this_t = tDFA<NUM_SYMBOLS, STOP_TYPE>;
+    using this_t = tDFA<NUM_SYMBOLS, STOP_T>;
   public:
-    using stop_t = STOP_TYPE;
+    using stop_t = STOP_T;
     constexpr static size_t SYMBOL_START = 2;     ///< Symbol to indicate a start of line.
     constexpr static size_t SYMBOL_STOP = 3;      ///< Symbol to indicate an end of line.
     constexpr static size_t SYMBOL_MIN_INPUT = 9; ///< All symbols below this are control symbols.
@@ -45,7 +45,7 @@ namespace emp {
       auto old_size = transitions.size();
       transitions.resize(new_size);
       stop_id.resize(new_size, 0);
-      for (auto i = old_size; i < transitions.size(); i++) transitions[i].fill(-1);
+      for (auto i = old_size; i < new_size; i++) transitions[i].fill(-1);
     }
 
     /// Add a single new, empty state and return its position.
@@ -114,7 +114,10 @@ namespace emp {
 
     /// Determine if an entire series of symbols is valid.
     stop_t Test(const emp::String & str) const {
+      // Begin with the "start" symbol; reset if not used.
       int state = Next(0, SYMBOL_START);
+      if (state == -1) state = SYMBOL_START;
+
       state = Next(state, str);
       int eol_state = Next(state, SYMBOL_STOP);
       return std::max(GetStop(state), GetStop(eol_state));
