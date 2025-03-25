@@ -32,15 +32,17 @@ namespace emp {
    */
   template <typename VALUE_T, size_t MAX_SIZE=0>
   class Vector {
+  public:
+    static constexpr bool IS_STATIC = static_cast<bool>(MAX_SIZE);
+
   private:
     using this_t = Vector<VALUE_T, MAX_SIZE>;
     using static_t = StaticVector<VALUE_T, MAX_SIZE>;
     using dynamic_t = emp::vector<VALUE_T>;
-    using vec_t = std::conditional_t<MAX_SIZE, static_t, dynamic_t>;
+    using vec_t = std::conditional_t<IS_STATIC, static_t, dynamic_t>;
     vec_t values;
 
   public:
-    static constexpr bool IS_STATIC = MAX_SIZE;
     using value_type = VALUE_T;
     using size_type = std::size_t;
     using reference = value_type&;
@@ -62,8 +64,8 @@ namespace emp {
 
     auto begin() noexcept { return values.begin(); }
     auto begin() const noexcept { return values.begin(); }
-    auto end() noexcept { values.end(); }
-    auto end() const noexcept { values.end(); }
+    auto end() noexcept { return values.end(); }
+    auto end() const noexcept { return values.end(); }
 
     this_t & Resize(size_t new_size) { values.resize(new_size); return *this; }
     this_t & Resize(size_t new_size, const VALUE_T & default_value) {
@@ -104,7 +106,7 @@ namespace emp {
       return *this;
     }
 
-    VALUE_T && Pop() {
+    VALUE_T Pop() {
       if constexpr (IS_STATIC) {
         return values.Pop();
       } else {
