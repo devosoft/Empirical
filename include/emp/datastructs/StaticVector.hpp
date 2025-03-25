@@ -53,7 +53,10 @@ namespace emp {
     StaticVector(const StaticVector &) = default;
     StaticVector(StaticVector &&) = default;
     StaticVector(size_t count, const VALUE_T & value=VALUE_T()) : cur_size(count) { values.fill(value); }
-    StaticVector(std::initializer_list<VALUE_T> init) : values(init), cur_size(init.size()) { }
+    StaticVector(std::initializer_list<VALUE_T> init) : cur_size(init.size()) {
+      emp_assert(init.size() <= MAX_SIZE);
+      std::copy(init.begin(), init.end(), values.begin());
+    }
     ~StaticVector() = default;
 
     auto operator<=>(const this_t &) const = default;

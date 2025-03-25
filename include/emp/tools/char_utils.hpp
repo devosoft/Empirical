@@ -31,6 +31,7 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
+#include "../base/notify.hpp"
 #include "../base/Ptr.hpp"
 
 namespace emp {

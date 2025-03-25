@@ -83,7 +83,7 @@ namespace emp {
       SymbolTable() = default;
       SymbolTable(arg_t) { }
 
-      static_assert( std::is_same<typename MAP_T::key_type, emp::String>(),
+      static_assert( std::same_as<typename MAP_T::key_type, emp::String>,
                     "Any map type used by the parser must have a key type of emp::String");
 
       static fun_t MakeDatumAccessor(const emp::String & name) {
