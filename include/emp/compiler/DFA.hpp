@@ -116,7 +116,7 @@ namespace emp {
     stop_t Test(const emp::String & str) const {
       // Begin with the "start" symbol; reset if not used.
       int state = Next(0, SYMBOL_START);
-      if (state == -1) state = SYMBOL_START;
+      if (state == -1) state = 0;
 
       state = Next(state, str);
       int eol_state = Next(state, SYMBOL_STOP);
