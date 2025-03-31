@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief This file provides code to build NK landscapes, setup at compile time..
+ *  @brief This file provides code to build NK landscapes, setup at compile time.
  *
  *  Knowing the size of N and K at compile time allow for slightly more optimized code, at the
  *  expense of flexibility.
