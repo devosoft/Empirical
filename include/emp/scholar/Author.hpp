@@ -32,11 +32,14 @@ namespace emp {
     std::string last_name;
     std::string suffix;
 
+    static size_t ID_type;
+    static size_t ID_spacing;
+
     static Lexer & GetFormatLexer() {
       static Lexer lexer;
       if (lexer.GetNumTokens() == 0) {
-        lexer.AddToken("type", "[FMLfmlPSx]");
-        lexer.AddToken("spacing", "[- ,.:]+");
+        ID_type    = lexer.AddToken("type",    "[FMLfmlPSx]");
+        ID_spacing = lexer.AddToken("spacing", "[- ,.:]+");
       }
       return lexer;
     }
@@ -159,7 +162,8 @@ namespace emp {
     std::string GetName(std::string pattern="FML") {
       std::string out_name;
       Lexer & lexer = GetFormatLexer();
-      lexer.Process(pattern);
+      auto tokens = lexer.Tokenize(pattern);
+      (void) tokens;
       return out_name;
     }
 
