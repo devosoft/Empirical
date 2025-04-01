@@ -164,7 +164,7 @@ jobs:
       - run: cd doc && make coverage
       - run: ls doc/ && ls doc/_build
       - run: cd doc && python parse_documentation_coverage.py _build/doc-coverage.json >> doc-coverage.json
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: doc-coverage
           path: doc/doc-coverage.json
@@ -174,7 +174,7 @@ jobs:
     if: github.ref == 'refs/heads/master'
     needs: test-documentation
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         with:
           name: doc-coverage
           path: data
