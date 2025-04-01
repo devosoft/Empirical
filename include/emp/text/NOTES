@@ -74,21 +74,29 @@ MarkBack notes:
 
    `" Blockquote (Should be the first non-whitespace, or a preceding newline will be assumed)
    `% Comment that will be removed
-   `# Heading
+   `# Heading format
    `## Heading level 2
    `### etc. deeper headings.
    `- Ignore all special formatting for the rest of the line
    `: Continues the previous line for other tags in this group (should be first non-whitespace)
 
-   Anything with three backticks (```) before and after will be treated as code blocks.
+  Anything with three backticks (```) before and after will be treated as code blocks.
 
-   A single or double backtick indicates that everything in between is going to be inline
-   code.  A single backtick must be followed by an alphanumeric character or whitespace,
-   but a double backtick can be followed by anything.
+  A single or double backtick indicates that everything in between is going to be inline
+  code.  A single backtick must be followed by an alphanumeric character or whitespace,
+  but a double backtick can be followed by anything EXCEPT another backtick or backslash,
+  which still have special meanings.
 
    `This would be rendered as CODE`
    ``{This would also be rendered as code, _with_ the braces appearing}``
 
+  A triple backtick starts a coding region.  The remainder of the line specifies format.
+  Subsequent lines are assumed to be code and ALL characters are allowed until a final
+  line is reached with just a ``` on that line and nothing else except whitespace.
+
+   ```cpp
+   CPPFunctionCall(x, y);
+   ```
 
   Unused symbols for style: $&()+;',
   ALSO technically unused, but less useful: ]}
@@ -130,18 +138,18 @@ MarkBack notes:
    \&name; or \&{name} insert a character by a given HTML name (unicode works same as HTML)
 
   For embedded code:
-   \${var_value_printed_here} - see below
+   \{var_value_printed_here} - see below
    \?{TEST}{Optional text} - insert only if TEST is true.
 
 
-  Unused symbols for insertions: ~!@%;'",/ plus lots of letters
+  Unused symbols for insertions: $~!@%;'",/ plus lots of letters
   ALSO technically unused, but less useful: ]>})
 
 
   Now for the crazy.  We can EMBED CODE as needed.
 
    `{var name=value or other_code}
-   \${var_value_printed_here}
+   \{var_value_printed_here}
    `?{TEST}Optional formatting  -- e.g., ?{has_error}[red] or ?{important}*
    \?{TEST}{Optional text} - insert only if TEST is true.
 
