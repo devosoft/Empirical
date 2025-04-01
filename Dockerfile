@@ -175,7 +175,7 @@ RUN \
     && \
   python3.10 -m pip install --upgrade --force-reinstall pip virtualenv \
     && \
-  python3.10 -m pip install wheel==0.30.0 six==1.16.0 \
+  python3.10 -m pip install wheel==0.45.1 setuptools==78.1.0 six==1.16.0 \
     && \
   python3.10 -m pip install -r /opt/Empirical/third-party/requirements.txt \
     && \
