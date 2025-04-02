@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2024
+ *  date: 2015-2025
 */
 /**
  *  @file
@@ -43,6 +43,7 @@
 #include "../control/Signal.hpp"
 #include "../debug/mem_track.hpp"
 #include "../meta/meta.hpp"
+#include "../tools/String.hpp"
 
 #include "events.hpp"
 #include "Font.hpp"
