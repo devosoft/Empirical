@@ -68,18 +68,18 @@ namespace emp {
     }; /// The default - an empty struct
 
     struct fitness {
-        using has_fitness_t = std::true_type;
-        using has_mutations_t = std::false_type;
-        using has_phen_t = std::false_type;
+      using has_fitness_t = std::true_type;
+      using has_mutations_t = std::false_type;
+      using has_phen_t = std::false_type;
 
-        DataNode<double, data::Current, data::Range> fitness; /// This taxon's fitness (for assessing deleterious mutational steps)
-        void RecordFitness(double fit) {
-          fitness.Add(fit);
-        }
+      DataNode<double, data::Current, data::Range> fitness; /// This taxon's fitness (for assessing deleterious mutational steps)
+      void RecordFitness(double fit) {
+        fitness.Add(fit);
+      }
 
-        double GetFitness() const {
-          return fitness.GetMean();
-        }
+      [[nodiscard]] double GetFitness() const {
+        return fitness.GetMean();
+      }
     };
 
     /// Track information related to the mutational landscape
@@ -103,7 +103,7 @@ namespace emp {
       }
 
       /// @returns this taxon's fitness
-      double GetFitness() const {
+      [[nodiscard]] double GetFitness() const {
         return fitness.GetMean();
       }
 
@@ -178,58 +178,58 @@ namespace emp {
     Taxon & operator=(const Taxon &) = delete;
     Taxon & operator=(Taxon &&) = default;
 
-    bool operator<(const Taxon & other) const {
+    [[nodiscard]] bool operator<(const Taxon & other) const {
       return id < other.GetID();
     }
 
     /// Get a unique ID for this taxon; IDs are assigned sequentially, so newer taxa have higher IDs.
-    size_t GetID() const { return id; }
+    [[nodiscard]] size_t GetID() const { return id; }
 
     /// Retrieve the tracked info associated with this Taxon.
-    const info_t & GetInfo() const { return info; }
+    [[nodiscard]] const info_t & GetInfo() const { return info; }
 
     /// Retrieve a pointer to the parent Taxon.
-    Ptr<this_t> GetParent() const { return parent; }
+    [[nodiscard]] Ptr<this_t> GetParent() const { return parent; }
     void NullifyParent() {parent = nullptr;}
 
     /// Get the number of living organisms currently associated with this Taxon.
-    size_t GetNumOrgs() const { return num_orgs; }
+    [[nodiscard]] size_t GetNumOrgs() const { return num_orgs; }
 
     /// Set the number of living organisms currently associated with this Taxon.
     void SetNumOrgs(size_t n) { num_orgs = n; }
 
     /// Get the total number of organisms that have ever lived associated with this Taxon
-    size_t GetTotOrgs() const { return tot_orgs; }
+    [[nodiscard]] size_t GetTotOrgs() const { return tot_orgs; }
 
     /// Set the total number of organisms that have ever lived associated with this Taxon
     void SetTotOrgs(size_t n) { tot_orgs = n; }
 
     /// Get the number of taxa that were produced by organisms from this Taxon.
-    size_t GetNumOff() const { return num_offspring; }
+    [[nodiscard]] size_t GetNumOff() const { return num_offspring; }
 
     /// Get the number of taxanomic steps since the ancestral organism was injected into the World.
-    size_t GetDepth() const { return depth; }
+    [[nodiscard]] size_t GetDepth() const { return depth; }
 
     /// Get data struct associated with this taxon
-    data_t & GetData() {return data;}
+    [[nodiscard]] data_t & GetData() { return data; }
     /// Get data struct associated with this taxon
-    const data_t & GetData() const {return data;}
+    [[nodiscard]] const data_t & GetData() const { return data; }
 
     /// Get pointers to this taxon's offspring
-    std::set<Ptr<this_t> > GetOffspring() {return offspring;}
+    [[nodiscard]] std::set<Ptr<this_t> > GetOffspring() { return offspring; }
 
     /// Set this taxon's data struct to the given value
     void SetData(data_t d) {data = d;}
 
     /// @returns this taxon's origination time
-    double GetOriginationTime() const {return origination_time;}
+    [[nodiscard]] double GetOriginationTime() const { return origination_time; }
     /// Set this taxon's origination time
     void SetOriginationTime(double time) {origination_time = time;}
 
     /// @returns this taxon's destruction time
-    double GetDestructionTime() const {return destruction_time;}
+    [[nodiscard]] double GetDestructionTime() const { return destruction_time; }
     /// Sets this taxon's destruction time
-    void SetDestructionTime(double time) {destruction_time = time;}
+    void SetDestructionTime(double time) { destruction_time = time; }
 
     /// Add a new organism to this Taxon.
     void AddOrg() { ++num_orgs; ++tot_orgs; }
@@ -252,7 +252,7 @@ namespace emp {
 
     /// Get total number of offspring directly or indirectly
     /// descending from this taxon.
-    int GetTotalOffspring(){ return total_offspring; }
+    [[nodiscard]] int GetTotalOffspring(){ return total_offspring; }
 
     /// Remove an organism from this Taxon (after it dies).
     /// Removals must return true if the taxon needs to continue; false if it should deactivate.
@@ -320,43 +320,43 @@ namespace emp {
       , archive(store_ancestors || store_outside), store_position(_pos), track_synchronous(false)
       , org_count(0), total_depth(0), num_roots(0), max_depth(0), next_id(0), curr_update(0) { ; }
 
-    virtual ~SystematicsBase(){;}
+    virtual ~SystematicsBase() = default;
 
     using data_node_t = DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>;
     using data_ptr_t = Ptr<data_node_t>;
 
     /// Are we tracking a synchronous population?
-    bool GetTrackSynchronous() const {return track_synchronous; }
+    [[nodiscard]] bool GetTrackSynchronous() const {return track_synchronous; }
 
     /// Are we storing all taxa that are still alive in the population?
-    bool GetStoreActive() const { return store_active; }
+    [[nodiscard]] bool GetStoreActive() const { return store_active; }
 
     /// Are we storing all taxa that are the ancestors of living organisms in the population?
-    bool GetStoreAncestors() const { return store_ancestors; }
+    [[nodiscard]] bool GetStoreAncestors() const { return store_ancestors; }
 
     /// Are we storing all taxa that have died out, as have all of their descendants.
-    bool GetStoreOutside() const { return store_outside; }
+    [[nodiscard]] bool GetStoreOutside() const { return store_outside; }
 
     /// Are we storing any taxa types that have died out?
-    bool GetArchive() const { return archive; }
+    [[nodiscard]] bool GetArchive() const { return archive; }
 
     /// Are we storing the positions of taxa?
-    bool GetStorePosition() const { return store_position; }
+    [[nodiscard]] bool GetStorePosition() const { return store_position; }
 
     /// How many living organisms are currently being tracked?
-    size_t GetTotalOrgs() const { return org_count; }
+    [[nodiscard]] size_t GetTotalOrgs() const { return org_count; }
 
     /// How many independent trees are being tracked?
-    size_t GetNumRoots() const { return num_roots; }
+    [[nodiscard]] size_t GetNumRoots() const { return num_roots; }
 
     /// What ID will the next taxon have?
-    size_t GetNextID() const {return next_id;}
+    [[nodiscard]] size_t GetNextID() const {return next_id;}
 
     /// What is the average phylogenetic depth of organisms in the population?
-    double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
+    [[nodiscard]] double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
 
     /// @returns current update/time step
-    size_t GetUpdate() const {return curr_update;}
+    [[nodiscard]] size_t GetUpdate() const {return curr_update;}
 
     /// Are we tracking organisms evolving in synchronous generations?
     void SetTrackSynchronous(bool new_val) {track_synchronous = new_val; }
@@ -407,7 +407,7 @@ namespace emp {
     }
 
     /// @returns a pointer to the data node with the specified name
-    data_ptr_t GetDataNode(const std::string & name) {
+    [[nodiscard]] data_ptr_t GetDataNode(const std::string & name) {
       return &(data_nodes.Get(name));
     }
 
@@ -2206,7 +2206,7 @@ namespace emp {
     // We can only load phylogenies from file if their info can be
     // converted to this systematics object's ORG_INFO type (if you
     // have a complex type, you can just use a string representation)
-    if constexpr (!emp::is_streamable<std::stringstream, ORG_INFO>::value) {
+    if constexpr (!emp::is_streamable<ORG_INFO>()) {
       emp_optional_throw(false, "Failed to load phylogeny from file. ORG_INFO template type cannot be created from string");
       return;
     }

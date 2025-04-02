@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2023
+ *  date: 2023-2025
 */
 /**
  *  @file
@@ -12,7 +12,7 @@
  *  @todo Make constexpr
  *  @todo Make handle non-'char' strings (i.e., use CharT template parameter)
  *  @todo Make handle allocators
- *  @todo Make work more broadly with stringviews
+ *  @todo Make work more broadly with string_views
  *  @todo Maybe add special construct types like RESERVE, REPEAT, and TO_STRING for special builds?
  *
  */
@@ -23,6 +23,7 @@
 #include <algorithm>              // std::count
 #include <cctype>                 // std::toupper and std::tolower
 #include <functional>             // std::function
+#include <concepts>
 #include <initializer_list>
 #include <map>
 #include <sstream>
@@ -45,15 +46,15 @@ namespace emp {
   // Some stand-alone functions to generate String objects.
   template <typename... Ts> [[nodiscard]] inline String MakeString(Ts &&... args);
   [[nodiscard]] inline const String & MakeString(const String & in) { return in; };
-  [[nodiscard]] inline String MakeEscaped(char c);
-  [[nodiscard]] inline String MakeEscaped(const String & in);
+  [[nodiscard]] inline String MakeEscaped(char c, bool include_visible=true);
+  [[nodiscard]] inline String MakeEscaped(const String & in, bool include_visible=true);
   [[nodiscard]] inline String MakeCSVSafe(const String & in);
-  [[nodiscard]] inline String MakeWebSafe(const String & in);
+  [[nodiscard]] inline String MakeWebSafe(const String & in, bool convert_space=false);
   [[nodiscard]] inline String MakeLiteral(char value);
   [[nodiscard]] inline String MakeLiteral(const std::string & value);
   template <typename T> [[nodiscard]] inline String MakeLiteral(const T & value);
   [[nodiscard]] inline char MakeFromLiteral_Char(const String & value);
-  [[nodiscard]] inline String MakeFromLiteral_String(const String & value);
+  [[nodiscard]] inline String MakeFromLiteral_String(const String & value, CharSet quotes="\"");
   template <typename T> [[nodiscard]] inline T MakeFromLiteral(const String & value);
   [[nodiscard]] inline String MakeUpper(const String & in);
   [[nodiscard]] inline String MakeLower(const String & in);
@@ -61,7 +62,15 @@ namespace emp {
   [[nodiscard]] inline String MakeCount(int val, String item, const String & plural_suffix);
   [[nodiscard]] inline String MakeRoman(int val);
   template <typename CONTAINER_T>
+  [[nodiscard]] inline String MakeList(const CONTAINER_T & container, std::string separator=",");
+  template <typename... ARG_Ts>
+  [[nodiscard]] inline String MakeArgList(ARG_Ts &&... args);
+  template <typename CONTAINER_T, typename FUN_T>
+  [[nodiscard]] inline String MakeEnglishList(const CONTAINER_T & container, FUN_T transform_fun);
+  template <typename CONTAINER_T>
   [[nodiscard]] inline String MakeEnglishList(const CONTAINER_T & container);
+  template <typename CONTAINER_T>
+  [[nodiscard]] inline String MakeQuotedList(const CONTAINER_T & container);
   template <typename... Args>
   [[nodiscard]] inline String MakeFormatted(const String& format, Args... args);
   [[nodiscard]] inline String MakeRepeat(String base, size_t n);
@@ -206,7 +215,8 @@ namespace emp {
     [[nodiscard]] std::string_view ViewBack(size_t out_size) const
       { emp_assert(out_size <= size()); return View(size()-out_size, out_size); }
     [[nodiscard]] std::string_view ViewRange(size_t start, size_t end) const {
-      emp_assert(start <= end && end <= size(), start, end, size());
+      emp_assert(start <= end, start, end, size());
+      if (end > size()) end = size();
       return View(start, end - start);
     }
     [[nodiscard]] std::string_view ViewTo(CharSet stop_chars, size_t start=0,
@@ -266,7 +276,7 @@ namespace emp {
 
     // Count the number of occurrences of a specific character.
     [[nodiscard]] size_t Count(char c, size_t start=0) const
-      { return (size_t) std::count(_Iterator(start), end(), c); }
+      { return (size() == 0) ? 0 : (size_t) std::count(_Iterator(start), end(), c); }
 
     // Count the number of occurrences of a specific character within a range.
     [[nodiscard]] size_t Count(char c, size_t start, size_t end) const
@@ -276,13 +286,19 @@ namespace emp {
     [[nodiscard]] inline bool IsLiteralChar() const;
 
     /// Test if an string is formatted as a literal string.
-    [[nodiscard]] inline bool IsLiteralString(const String & quote_marks="\"") const;
+    [[nodiscard]] inline bool IsLiteralString(CharSet quote_marks="\"") const;
 
     /// Explain what string is NOT formatted as a literal string.
-    [[nodiscard]] inline String DiagnoseLiteralString(const String & quote_marks="\"") const;
+    [[nodiscard]] inline String DiagnoseLiteralString(CharSet quote_marks="\"") const;
 
     /// Is string composed only of a set of characters (can be provided as a string)
     [[nodiscard]] bool IsComposedOf(CharSet char_set) const { return char_set.Has(*this); }
+
+    /// Is this string one of the strings provided?
+    template <typename... ARG_Ts>
+    [[nodiscard]] bool IsOneOf(ARG_Ts &&... args) const
+      requires (std::equality_comparable_with<emp::String, ARG_Ts> && ...)
+      { return ((*this == args) || ...); }
 
     /// Is string a valid number (int, floating point, or scientific notation all valid)
     [[nodiscard]] inline bool IsNumber() const;
@@ -296,6 +312,7 @@ namespace emp {
     [[nodiscard]] bool OnlyDigits() const { return DigitCharSet().Has(*this); }
     [[nodiscard]] bool OnlyAlphanumeric() const { return AlphanumericCharSet().Has(*this); }
     [[nodiscard]] bool OnlyWhitespace() const { return WhitespaceCharSet().Has(*this); }
+    [[nodiscard]] bool OnlyIDChars() const { return IDCharSet().Has(*this); }
 
     [[nodiscard]] bool HasOneOf(CharSet char_set) const { return char_set.HasAny(*this); }
     [[nodiscard]] bool Has(char c) const { return Find(c) != npos; }
@@ -339,8 +356,15 @@ namespace emp {
     String & RemoveDigits()      { return RemoveChars(DigitCharSet()); }
     String & RemovePunctuation() { return RemoveChars(PunctuationCharSet()); }
 
+    String & Resize(size_t new_size) { resize(new_size); return *this; }
+    String & ResizeTo(CharSet chars, const Syntax & syntax=Syntax::None())
+      { return Resize( std::min(Find(chars, 0, syntax), size()) ); }
+    String & ResizeTo(String delim, const Syntax & syntax=Syntax::None())
+      { return Resize( std::min(Find(delim, 0, syntax), size()) ); }
+
     inline bool PopIf(char c);
     inline bool PopIf(String in);
+    inline bool PopIfAny(CharSet chars);
     inline String PopAll();
     inline String PopFixed(std::size_t end_pos, size_t delim_size=0);
     inline String Pop(CharSet chars=" \n\t\r", const Syntax & syntax=Syntax::None());
@@ -511,40 +535,25 @@ namespace emp {
     std::string_view ScanNestedBlock(size_t & pos) const { auto out=ViewNestedBlock(pos); pos+=out.size(); return out; }
     std::string_view ScanQuote(size_t & pos) const { auto out=ViewQuote(pos); pos+=out.size(); return out; }
 
+    // Additional scanning that also converts type.
+    char ScanAsChar(size_t & pos) const { return Get(pos++); }
+    inline int ScanAsInt(size_t & pos) const;
 
     // ------ Transformations into non-Strings ------
     // Note: For efficiency there are two versions of most of these: one where the output
     // data structure is provided and one where it must be generated.
 
     template <typename T>
-    T ConvertTo() {
-      // Is it already a string?
-      if constexpr (std::is_same<T, std::string>() || std::is_same<T, emp::String>()) return *this;
+    T ConvertTo();
 
-      else if constexpr (std::is_same<T, int>()) return std::stoi(*this);
-      else if constexpr (std::is_same<T, long>()) return std::stol(*this);
-      else if constexpr (std::is_same<T, long long>()) return std::stoll(*this);
-      else if constexpr (std::is_same<T, unsigned long>()) return std::stoul(*this);
-      else if constexpr (std::is_same<T, unsigned long long>()) return std::stoull(*this);
-      else if constexpr (std::is_same<T, float>()) return std::stof(*this);
-      else if constexpr (std::is_same<T, double>()) return std::stod(*this);
-      else if constexpr (std::is_same<T, long double>()) return std::stold(*this);
-
-      // All other printable cases:
-      else {
-        std::stringstream ss;
-        ss << *this;
-        T out_val;
-        ss >> out_val;
-        return out_val;
-      }
-    }
-
-    inline void Slice(emp::vector<String> & out_set, String delim=",",
+    template <typename DELIM_T=emp::String>
+    inline void Slice(emp::vector<String> & out_set, DELIM_T delim=",",
                       const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=false) const;
 
+    template <typename DELIM_T=emp::String>
     [[nodiscard]]
-    inline emp::vector<String> Slice(String delim=",", const Syntax & syntax=Syntax::Quotes(),
+    inline emp::vector<String> Slice(DELIM_T delim=",",
+                                     const Syntax & syntax=Syntax::Quotes(),
                                      bool trim_whitespace=false) const;
 
     inline void ViewSlices(
@@ -580,6 +589,16 @@ namespace emp {
     //  bool operator>=(const String & in) const
     //  bool operator<=>(const String & in) const
     //  std::string operator+(const std::string & in) const
+
+    template <typename T>
+    String operator+(T && in) const {
+      if constexpr (std::derived_from<T,std::string> || std::same_as<T,std::string_view>) {
+        return str() + std::forward<T>(in);
+      } else {
+        return str() + MakeString(in);
+      }
+    }
+
     String operator*(size_t count) const {
       String out; out.reserve(size() * count);
       for (size_t i = 0; i < count; ++i) out += *this;
@@ -599,24 +618,31 @@ namespace emp {
     String & Set(Ts... args) { return *this = MakeString(std::forward<Ts>(args)...); }
     template <typename T>
     T As() const { std::stringstream ss; ss << *this; T out; ss >> out; return out; }
+    double AsDouble() const { return std::stod(*this); }
+    int AsInt() const { return std::stoi(*this); }
+    unsigned long long AsULL() const { return std::stoull(*this); }
 
-    String & AppendEscaped(char c) { *this += MakeEscaped(c); return *this; }
-    String & SetEscaped(char c) { *this = MakeEscaped(c); return *this; }
+    String & AppendEscaped(char c, bool inc_visible=true) { *this += MakeEscaped(c, inc_visible); return *this; }
+    String & SetEscaped(char c, bool inc_visible=true) { *this = MakeEscaped(c, inc_visible); return *this; }
 
-    String & AppendEscaped(const String & in) { *this+=MakeEscaped(in); return *this; }
-    String & SetEscaped(const String & in) { *this = MakeEscaped(in); return *this; }
-    String & SetEscaped() { *this = MakeEscaped(*this); return *this; }
-    [[nodiscard]] String AsEscaped() const { return MakeEscaped(*this); }
+    String & AppendEscaped(const String & in, bool inc_visible=true) { *this+=MakeEscaped(in, inc_visible); return *this; }
+    String & SetEscaped(const String & in, bool inc_visible=true) { *this = MakeEscaped(in, inc_visible); return *this; }
+    String & SetEscaped(bool inc_visible=true) { *this = MakeEscaped(*this, inc_visible); return *this; }
+    [[nodiscard]] String AsEscaped(bool inc_visible=true) const { return MakeEscaped(*this, inc_visible); }
 
     String & AppendCSVSafe(String in) { *this+=MakeCSVSafe(in); return *this; }
     String & SetCSVSafe(const String & in) { *this = MakeCSVSafe(in); return *this; }
     String & SetCSVSafe() { *this = MakeCSVSafe(*this); return *this; }
     [[nodiscard]] String AsCSVSafe() const { return MakeCSVSafe(*this); }
 
-    String & AppendWebSafe(String in) { *this+=MakeWebSafe(in); return *this; }
-    String & SetWebSafe(const String & in) { *this = MakeWebSafe(in); return *this; }
-    String & SetWebSafe() { *this = MakeWebSafe(*this); return *this; }
-    [[nodiscard]] String AsWebSafe() const { return MakeWebSafe(*this); }
+    String & AppendWebSafe(String in, bool convert_space=false)
+      { *this+=MakeWebSafe(in, convert_space); return *this; }
+    String & SetWebSafe(const String & in, bool convert_space=false)
+      { *this = MakeWebSafe(in, convert_space); return *this; }
+    String & SetWebSafe(bool convert_space=false)
+      { *this = MakeWebSafe(*this, convert_space); return *this; }
+    [[nodiscard]] String AsWebSafe(bool convert_space=false) const
+      { return MakeWebSafe(*this, convert_space); }
 
     // <= Creating Literals =>
     template <typename T>
@@ -651,10 +677,25 @@ namespace emp {
     String & AppendRoman(int val) { *this+=MakeRoman(val); return *this; }
     String & SetRoman(int val) { *this = MakeRoman(val); return *this; }
 
-    template <typename CONTAINER_T> String & AppendEnglishList(const CONTAINER_T & container)
-      { *this += MakeEnglishList(container); return *this;}
-    template <typename CONTAINER_T> String & SetEnglishList(const CONTAINER_T & container)
-      { *this = MakeEnglishList(container); return *this;}
+    template <typename... Ts> String & AppendList(const Ts &... args)
+      { *this += MakeList(std::forward<Ts>(args)...); return *this;}
+    template <typename... Ts> String & SetList(const Ts &... args)
+      { *this = MakeList(std::forward<Ts>(args)...); return *this;}
+
+    template <typename... Ts> String & AppendArgList(const Ts &... args)
+      { *this += MakeArgList(std::forward<Ts>(args)...); return *this;}
+    template <typename... Ts> String & SetArgList(const Ts &... args)
+      { *this = MakeArgList(std::forward<Ts>(args)...); return *this;}
+
+    template <typename... Ts> String & AppendEnglishList(const Ts &... args)
+      { *this += MakeEnglishList(std::forward<Ts>(args)...); return *this;}
+    template <typename... Ts> String & SetEnglishList(const Ts &... args)
+      { *this = MakeEnglishList(std::forward<Ts>(args)...); return *this;}
+
+    template <typename CONTAINER_T> String & AppendQuotedList(const CONTAINER_T & container)
+      { *this += MakeQuotedList(container); return *this;}
+    template <typename CONTAINER_T> String & SetQuotedList(const CONTAINER_T & container)
+      { *this = MakeQuotedList(container); return *this;}
 
     template<typename... ARG_Ts> String & AppendFormatted(const std::string& format, ARG_Ts... args)
       { return *this += MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
@@ -711,7 +752,7 @@ namespace emp {
     [[nodiscard]] String AsRemoveChars(const CharSet & chars) const
       { return MakeRemoveChars(*this, chars); }
 
-    String & AppendSlugify(String in) { return *this += std::move(in.Slugify()); }
+    String & AppendSlugify(String in) { return Append(std::move(in.Slugify())); }
     String & SetSlugify(String in) { return *this = std::move(in.Slugify()); }
     String & Slugify()
       { return SetLower().RemovePunctuation().Compress().ReplaceChar(' ', '-'); }
@@ -1008,6 +1049,12 @@ namespace emp {
     return false;
   }
 
+  /// Pop the next character if it is any of the provided chars.  Return true/false if popped.
+  bool String::PopIfAny(CharSet chars) {
+    if (size() && chars.Has(Get(0))) { erase(0,1); return true; }
+    return false;
+  }
+
   /// Pop the entire string.
   String String::PopAll() {
     String out;
@@ -1100,13 +1147,51 @@ namespace emp {
     return MakeFromLiteral<T>(PopLiteral<T>(syntax));
   }
 
+  // Scanning that converts type.
+  int String::ScanAsInt(size_t & pos) const {
+    int result = 0;
+    while (pos < size() && is_digit(Get(pos))) {
+      result = result * 10 + (Get(pos) - '0');
+      ++pos;
+    }
+    return result;
+  }
+
+  // ------ Transformations into non-Strings ------
+
+  template <typename T>
+  T String::ConvertTo() {
+    // Is it already a string?
+    if constexpr (std::is_same<T, std::string>() || std::is_same<T, emp::String>()) return *this;
+
+    else if constexpr (std::is_same<T, int>()) return std::stoi(*this);
+    else if constexpr (std::is_same<T, long>()) return std::stol(*this);
+    else if constexpr (std::is_same<T, long long>()) return std::stoll(*this);
+    else if constexpr (std::is_same<T, unsigned long>()) return std::stoul(*this);
+    else if constexpr (std::is_same<T, unsigned long long>()) return std::stoull(*this);
+    else if constexpr (std::is_same<T, float>()) return std::stof(*this);
+    else if constexpr (std::is_same<T, double>()) return std::stod(*this);
+    else if constexpr (std::is_same<T, long double>()) return std::stold(*this);
+
+    // All other printable cases:
+    else {
+      std::stringstream ss;
+      ss << *this;
+      T out_val;
+      ss >> out_val;
+      return out_val;
+    }
+  }
+
+
   /// @brief Cut up a string based on the provided delimiter; fill them in to the provided vector.
   /// @param out_set destination vector
   /// @param delim delimiter to split on (default: ",")
   /// @param syntax identify quotes and parens that should be kept together.
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
+  template <typename DELIM_T>
   void String::Slice(
-    emp::vector<String> & out_set, String delim, const Syntax & syntax, bool trim_whitespace
+    emp::vector<String> & out_set, DELIM_T delim, const Syntax & syntax, bool trim_whitespace
   ) const {
     if (empty()) return; // Nothing to set!
 
@@ -1115,7 +1200,9 @@ namespace emp {
     while (found_pos < size()) {
       out_set.push_back( GetRange(start_pos, found_pos) );
       if (trim_whitespace) out_set.back().Trim();
-      start_pos = found_pos+delim.size();
+      if constexpr (std::derived_from<DELIM_T, std::string>) {
+        start_pos = found_pos + delim.size();
+      } else start_pos = found_pos+1; // Just a char.
       found_pos = Find(delim, found_pos+1, syntax);
     }
     out_set.push_back( GetRange(start_pos, found_pos) );
@@ -1127,8 +1214,9 @@ namespace emp {
   /// @param delim delimiter to split on (default: ",")
   /// @param syntax identify quotes and parens that should be kept together.
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
+  template <typename DELIM_T>
   emp::vector<String> String::Slice(
-    String delim, const Syntax & syntax, bool trim_whitespace
+    DELIM_T delim, const Syntax & syntax, bool trim_whitespace
   ) const {
     emp::vector<String> result;
     Slice(result, delim, syntax, trim_whitespace);
@@ -1308,9 +1396,9 @@ namespace emp {
   }
 
   /// Test if an input string is properly formatted as a literal string.
-  bool String::IsLiteralString(const String & quote_marks) const {
+  bool String::IsLiteralString(CharSet quote_marks) const {
     // Must begin and end with proper quote marks.
-    if (size() < 2 || !is_one_of(Get(0), quote_marks) || back() != Get(0)) return false;
+    if (size() < 2 || !quote_marks.Has(Get(0)) || back() != Get(0)) return false;
 
     // Are all of the characters valid?
     for (size_t pos = 1; pos < size() - 1; pos++) {
@@ -1328,10 +1416,10 @@ namespace emp {
   }
 
   /// Test if an input string is properly formatted as a literal string.
-  String String::DiagnoseLiteralString(const String & quote_marks) const {
+  String String::DiagnoseLiteralString(CharSet quote_marks) const {
     // A literal string must begin and end with a double quote and contain only valid characters.
     if (size() < 2) return "Too short!";
-    if (!is_one_of(Get(0), quote_marks)) return "Must begin an end in quotes.";
+    if (!quote_marks.Has(Get(0))) return "Must begin and end in quotes.";
     if (back() != Get(0)) return "Must have begin and end quotes that match.";
 
     // Are all of the characters valid?
@@ -1364,7 +1452,11 @@ namespace emp {
     return String::Make(std::forward<Ts>(args)...);
   }
 
-  String MakeEscaped(char c) {
+  /// @brief Convert a character into a escape sequence, if needed.
+  /// @param c Character to convert
+  /// @param include_visible Should we convert visible character that are often escaped (like " or \)
+  /// @return A string representing the escaped character
+  String MakeEscaped(char c, bool include_visible) {
     // If we just append as a normal character, do so!
     if ( (c >= 40 && c < 91) || (c > 96 && c < 127)) return emp::MakeString(c);
     switch (c) {
@@ -1401,17 +1493,21 @@ namespace emp {
     case 30: return "\\036";
     case 31: return "\\037";
 
-    case '\"': return "\\\"";  // case 34
-    case '\'': return "\\\'";  // case 39
-    case '\\': return "\\\\";  // case 92
+    case '\"': return include_visible ? "\\\"" : "\"";  // case 34
+    case '\'': return include_visible ? "\\\'" : "\'";  // case 39
+    case '\\': return include_visible ? "\\\\" : "\\";  // case 92
     case 127: return "\\177";  // (delete)
     }
 
     return emp::MakeString(c);
   }
 
-  String MakeEscaped(const String & in) {
-    return String(in, [](char c){ return MakeEscaped(c); });
+  /// @brief Convert chars in a string into escape sequences, as needed.
+  /// @param in String to convert
+  /// @param inc_visible Should we convert visible character that are often escaped (like " or \)
+  /// @return A string representing the escaped sequence of chars
+  String MakeEscaped(const String & in, bool inc_visible) {
+    return String(in, [inc_visible](char c){ return MakeEscaped(c, inc_visible); });
   }
 
   String MakeCSVSafe(const String & in) {
@@ -1432,7 +1528,7 @@ namespace emp {
   }
 
   /// Take a string and replace reserved HTML characters with character entities
-  String MakeWebSafe(const String & in) {
+  String MakeWebSafe(const String & in, bool convert_space) {
     String out;
     out.reserve(in.size());
     for (char c : in) {
@@ -1442,6 +1538,8 @@ namespace emp {
       case '>': out += "&gt;"; break;
       case '\'': out += "&apos;"; break;
       case '"': out += "&quot;"; break;
+      case ' ': out += convert_space ? "&nbsp" : " "; break;
+      case '\n': out += convert_space ? "<br>" : "\n"; break;
       default: out += c;
       }
     }
@@ -1456,7 +1554,7 @@ namespace emp {
   }
 
   /// Take a string or iterable and convert it to a C++-style literal.
-  // This is the version for string. The version for an iterable is below.
+  /// This is the version for string. The version for an iterable is below.
   [[nodiscard]] String MakeLiteral(const std::string & value) {
     // Add quotes to the ends and convert each character.
     std::stringstream ss;
@@ -1513,9 +1611,8 @@ namespace emp {
 
 
   /// Convert a literal string representation to an actual string.
-  [[nodiscard]] String MakeFromLiteral_String(const String & value) {
-  /// Convert a literal string representation to an actual string.
-    emp_assert(value.IsLiteralString(), value, value.DiagnoseLiteralString());
+  [[nodiscard]] String MakeFromLiteral_String(const String & value, [[maybe_unused]] CharSet quotes) {
+    emp_assert(value.IsLiteralString(quotes), value, value.DiagnoseLiteralString(quotes));
     // Given the assert, we can assume string DOES contain a literal string representation.
 
     String out_string;
@@ -1609,24 +1706,62 @@ namespace emp {
   }
 
   template <typename CONTAINER_T>
-  String MakeEnglishList(const CONTAINER_T & container) {
+  String MakeList(const CONTAINER_T & container, std::string separator) {
     if (container.size() == 0) return "";
-    if (container.size() == 1) return to_string(container.front());
 
+    // Print the first element in the list.
     auto it = container.begin();
-    if (container.size() == 2) return to_string(*it, " and ", *(it+1));
-
-    auto last_it = container.end() - 1;
     String out = MakeString(*it);
     ++it;
-    while (it != last_it) {
-      out += ',';
-      out += MakeString(*it);
+
+    // Print any additional elements with separator in between.
+    while (it != container.end) {
+      out.Append(separator, *it);
       ++it;
     }
-    out += MakeString(", and ", *it);
 
     return out;
+  }
+
+  template <typename... ARG_Ts>
+  [[nodiscard]] inline String MakeArgList(ARG_Ts &&... args) {
+    if constexpr (sizeof...(args) == 0) return "";
+    else {
+      emp::String out;
+      bool first = true;
+      ((out.Append((first ? "" : ","), args), first = false), ...);
+      return out;
+    }
+  }
+
+  template <typename CONTAINER_T, typename TRANSFORM_FUN_T>
+  String MakeEnglishList(const CONTAINER_T & container, TRANSFORM_FUN_T fun) {
+    if (container.size() == 0) return "";
+    if (container.size() == 1) return MakeString(fun(*container.begin()));
+
+    auto back_it = container.end();  back_it--;
+    if (container.size() == 2) return MakeString(fun(*container.begin()), " and ", fun(*back_it));
+
+    String out;;
+    for (auto it = container.begin(); it != back_it; ++it) {
+      out += MakeString(", ", fun(*it));
+    }
+    out += MakeString("and ", fun(*back_it));
+
+    return out;
+  }
+
+  /// Create a standard english list from a container of strings.
+  /// For example, the strings {"one", "two"} would become "one and two"
+  //  The strings {"one", "two", "three"} would become "one, two, and three"
+  template <typename CONTAINER_T>
+  String MakeEnglishList(const CONTAINER_T & container) {
+    return MakeEnglishList(container, [](typename CONTAINER_T::value_type x){ return x; });
+  }
+
+  template <typename CONTAINER_T>
+  String MakeQuotedList(const CONTAINER_T & container) {
+    return MakeEnglishList(container, [](typename CONTAINER_T::value_type x){ return MakeLiteral(x); });
   }
 
   /// Apply sprintf-like formatting to a string.

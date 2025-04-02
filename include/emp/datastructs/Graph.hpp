@@ -32,7 +32,8 @@ namespace emp {
       std::string label;
     public:
       Node(size_t num_nodes) : edge_set(num_nodes), label("") { ; }
-      Node(const Node & in_node) : edge_set(in_node.edge_set), label(in_node.label) { ; }
+      Node(const Node & in_node) = default;
+      Node(Node && in_node) = default;
       ~Node() { ; }
 
       /// Set this node to have the same connections as another node.

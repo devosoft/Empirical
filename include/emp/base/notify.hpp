@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021-2022
+ *  date: 2021-2024
 */
 /**
  *  @file
@@ -111,11 +111,6 @@ namespace notify {
     bool exit_on_fail = false;
 
   public:
-    HandlerSet() {}
-    HandlerSet(const HandlerSet &) = default;
-    HandlerSet(HandlerSet &&) = default;
-    ~HandlerSet() { }
-
     bool GetExitOnFail() const { return exit_on_fail; }
     HandlerSet & SetExitOnFail(bool _exit=true) {
       exit_on_fail = _exit;
@@ -194,11 +189,30 @@ namespace notify {
 
     HandlerSet & GetHandler(Type type) { return handler_map[TypeID(type)]; }
 
+    static void DefaultPrint(const std::string & msg, [[maybe_unused]] bool to_cerr=false) {
+      #if defined( __EMSCRIPTEN__ )
+        EM_ASM({
+          msg = UTF8ToString($0);
+          if (typeof alert == "undefined") {
+            // node polyfill
+            globalThis.alert = console.log;
+          }
+          alert(msg);
+        }, msg.c_str());
+      #else
+        if (to_cerr) {
+          std::cerr << msg <<std::endl;
+        } else {
+          std::cout << msg <<std::endl;
+        }
+      #endif
+    }
+
     NotifyData() {
       // Setup the default handlers and exit rules.
       GetHandler(Type::MESSAGE).Add(
         [](id_arg_t, message_arg_t msg) {
-          std::cout << msg << std::endl;
+          DefaultPrint(msg);
           return true;
         }
       );
@@ -209,7 +223,7 @@ namespace notify {
 #else
         [](id_arg_t,  message_arg_t msg) {
           const std::string tag = ColorTypeID(Type::DEBUG);
-          std::cout << tag << ": " << msg << std::endl;
+          DefaultPrint(tag + ": " + msg);
           return true;
         }
 #endif
@@ -218,7 +232,7 @@ namespace notify {
       GetHandler(Type::WARNING).Add(
         [](id_arg_t,  message_arg_t msg) {
           const std::string tag = ColorTypeID(Type::WARNING);
-          std::cout << tag << ": " << msg << std::endl;
+          DefaultPrint(tag + ": " + msg);
           return true;  // Only warning, do not exit.
         }
       );
@@ -226,7 +240,7 @@ namespace notify {
       GetHandler(Type::ERROR).Add(
         [](id_arg_t,  message_arg_t msg) {
           const std::string tag = ColorTypeID(Type::ERROR);
-          std::cout << tag << ": " << msg << std::endl;
+          DefaultPrint(tag + ": " + msg);
           return false;  // Does not correct the problem, so exit.
         }
       );
@@ -234,7 +248,9 @@ namespace notify {
       GetHandler(Type::EXCEPTION).Add(
         [](id_arg_t id,  message_arg_t msg) {
           const std::string tag = ColorTypeID(Type::EXCEPTION);
-          std::cerr << tag << " (" << id << "): " << msg << std::endl;
+          std::stringstream ss;
+          ss << tag << " (" << id << "): " << msg << std::endl;
+          DefaultPrint(ss.str(), true);
           return false;  // Does not correct the problem, so exit.
         }
       );

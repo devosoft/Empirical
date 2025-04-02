@@ -17,7 +17,7 @@ namespace emp {
 namespace web {
 
   /// The Close command will prevent the specified widget from accepting further appends
-  /// (and instead revert to trying parents)
+  /// (and instead revert to trying parent widgets)
   class Close : public internal::WidgetCommand {
   private:
     std::string close_id;

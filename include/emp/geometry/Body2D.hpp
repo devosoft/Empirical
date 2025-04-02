@@ -40,7 +40,7 @@ namespace emp {
 
   class Body2D_Base {
   protected:
-    // Bodies can be linked in seveal ways.
+    // Bodies can be linked in several ways.
     // DEFAULT -> Joined together with no extra meaning
     // REPRODUCTION -> "from" is gestating "to"
     // ATTACK -> "from" is trying to eat "to"
@@ -49,37 +49,33 @@ namespace emp {
 
     template <typename BODY_TYPE>
     struct BodyLink {
-      LINK_TYPE type;       // DEFAULT, REPRODUCTION, ATTACK, PARASITE
-      Ptr<BODY_TYPE> from;  // Initiator of the connection (e.g., parent, attacker)
-      Ptr<BODY_TYPE> to;    // Target of the connection (e.g., offspring, prey/host)
-      double cur_dist;      // How far are bodies currently being kept apart?
-      double target_dist;   // How far should the be moved to? (e.g., if growing)
+      LINK_TYPE type = LINK_TYPE::DEFAULT; // DEFAULT, REPRODUCTION, ATTACK, PARASITE
+      Ptr<BODY_TYPE> from = nullptr;       // Initiator of link (e.g., parent, attacker)
+      Ptr<BODY_TYPE> to = nullptr;         // Target of link (e.g., offspring, prey/host)
+      double cur_dist = 0.0;               // Current distance apart of bodies
+      double target_dist = 0.0;            // Goal for distance apart of bodies (e.g., if growing)
 
-      BodyLink() : type(LINK_TYPE::DEFAULT), from(nullptr), to(nullptr), cur_dist(0)
-                 , target_dist(0) { ; }
+      BodyLink() = default;
       BodyLink(LINK_TYPE t, Ptr<BODY_TYPE> _frm, Ptr<BODY_TYPE> _to, double cur=0, double target=0)
         : type(t), from(_frm), to(_to), cur_dist(cur), target_dist(target) { ; }
       BodyLink(const BodyLink &) = default;
-      ~BodyLink() { ; }
+      ~BodyLink() = default;
     };
 
-    double birth_time;      // At what time point was this organism born?
-    Angle orientation;      // Which way is body facing?
-    Point velocity;         // Speed and direction of movement
-    double mass;            // "Weight" of this object (@CAO not used yet..)
-    uint32_t color_id;      // Which color should this body appear?
-    int repro_count;        // Number of offspring currently being produced.
+    double birth_time = 0.0; // When was this body created / born?
+    Angle orientation;       // Which way is body facing?
+    Point velocity;          // Speed and direction of movement
+    double mass = 1.0;       // "Weight" of this body (@CAO not used yet..)
+    uint32_t color_id = 0;   // Which color should this body appear?
+    int repro_count = 0;     // Number of offspring currently being produced.
 
-    Point shift;            // How should this body be updated to minimize overlap.
-    Point cum_shift;        // Build up of shift not yet acted upon.
-    Point total_abs_shift;  // Total absolute-value of shifts (to calculate pressure)
-    double pressure;        // Current pressure on this body.
+    Point shift;             // How should this body be updated to minimize overlap.
+    Point cum_shift;         // Build up of shift not yet acted upon.
+    Point total_abs_shift;   // Total absolute-value of shifts (to calculate pressure)
+    double pressure = 0.0;   // Current pressure on this body.
 
-    bool detach_on_divide;  // Should offspring detach when born (or stay linked to parent)
+    bool detach_on_divide = true;  // Should offspring detach (or stay linked to parent)
   public:
-    Body2D_Base() : birth_time(0.0), orientation(), velocity(), mass(1.0), color_id(0), repro_count(0)
-                  , shift(), cum_shift(), total_abs_shift(), pressure(0), detach_on_divide(true) { ; }
-    virtual ~Body2D_Base() { ; }
 
     double GetBirthTime() const { return birth_time; }
     const Angle & GetOrientation() const { return orientation; }
@@ -126,7 +122,7 @@ namespace emp {
     emp::vector< Ptr< BodyLink<CircleBody2D> > > to_links;    // Active links targeting body
 
   public:
-    // delete to avoid a possiblity of EMP_TRACK_CONSTRUCT and EMP_TRACK_DESTRUCT mismatch
+    // delete to avoid a possibility of EMP_TRACK_CONSTRUCT and EMP_TRACK_DESTRUCT mismatch
     CircleBody2D() = delete;
     CircleBody2D(const Circle2D<double> & _p)
       : perimeter(_p), target_radius(_p.GetRadius()), from_links(0), to_links(0)
@@ -298,7 +294,7 @@ namespace emp {
       const double max_x = max_coords.GetX() - GetRadius();
       const double max_y = max_coords.GetY() - GetRadius();
 
-      // Update the caclulcation for pressure.
+      // Update the calculation for pressure.
 
       // Act on the accumulated shifts only when they add up enough.
       cum_shift += shift;
@@ -317,7 +313,7 @@ namespace emp {
           Translate(Point(0.01, 0.01));
         }
 
-        // Figure out how much each oragnism should move so that they will be properly spaced.
+        // Figure out how much each organism should move so that they will be properly spaced.
         const double start_dist = GetPosition().Distance(link->to->GetPosition());
         const double link_dist = link->cur_dist;
         const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;

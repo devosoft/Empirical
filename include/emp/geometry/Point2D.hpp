@@ -15,6 +15,7 @@
 #define EMP_GEOMETRY_POINT2D_HPP_INCLUDE
 
 #include <cmath>
+#include <compare>
 #include <iostream>
 
 #include "../math/math.hpp"
@@ -23,31 +24,26 @@ namespace emp {
 
   template <typename TYPE=double> class Point2D {
   private:
-    TYPE x;
-    TYPE y;
+    TYPE x = 0;
+    TYPE y = 0;
 
   public:
-    constexpr Point2D() : x(0.0), y(0.0) { ; }                      // Default = 0,0
-    constexpr Point2D(const Point2D & _in) : x(_in.x), y(_in.y) { ; } // Copy constructor
-    constexpr Point2D(TYPE _x, TYPE _y) : x(_x), y(_y) { ; }        // Two ints -> x and y
+    constexpr Point2D() = default;                          // Default = 0,0
+    constexpr Point2D(const Point2D & _in) = default;       // Copy constructor
+    constexpr Point2D(TYPE x, TYPE y) : x(x), y(y) { ; }    // Two ints -> x and y
     constexpr Point2D(const Point2D & _in, TYPE new_magnitude)
       : x(_in.x * ((double) new_magnitude) / ((double) _in.Magnitude()))
       , y(_in.y * ((double) new_magnitude) / ((double) _in.Magnitude()))
      { ; }
     // ~Point2D() { ; }
 
-    const Point2D & operator=(const Point2D & _in) { x = _in.x; y = _in.y; return *this; }
-    constexpr bool operator==(const Point2D & _in) const { return (x == _in.x) && (y == _in.y); }
-    constexpr bool operator!=(const Point2D & _in) const { return (x != _in.x) || (y != _in.y); }
+    Point2D & operator=(const Point2D & _in) = default;
+    constexpr auto operator<=>(const Point2D &) const = default;
 
-    // Inequalities have to do with BOTH ponts.
-    constexpr bool operator<=(const Point2D & _in) const { return (x <= _in.x) && (y <= _in.y); }
-    constexpr bool operator>=(const Point2D & _in) const { return (x >= _in.x) && (y >= _in.y); }
-
-    constexpr inline TYPE GetX() const { return x; }
-    constexpr inline TYPE GetY() const { return y; }
-    inline Point2D & SetX(TYPE in_x) { x = in_x; return *this; }
-    inline Point2D & SetY(TYPE in_y) { y = in_y; return *this; }
+    constexpr TYPE GetX() const { return x; }
+    constexpr TYPE GetY() const { return y; }
+    Point2D & SetX(TYPE in_x) { x = in_x; return *this; }
+    Point2D & SetY(TYPE in_y) { y = in_y; return *this; }
     Point2D & Set(TYPE _x, TYPE _y) { x=_x; y=_y; return *this; }
 
     constexpr double SquareMagnitude() const { return x*x + y*y; }
@@ -95,7 +91,7 @@ namespace emp {
     Point2D & Rot270() { return Set(-y, x); }
 
     // Square-roots are slow to calculate; if we're just doing comparisons, square-distance
-    // is usualy going to be sufficient.
+    // is usually going to be sufficient.
     TYPE SquareDistance(const Point2D & _in) const {
       const TYPE x_dist = x - _in.x;
       const TYPE y_dist = y - _in.y;

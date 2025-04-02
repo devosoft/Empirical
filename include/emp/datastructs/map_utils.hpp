@@ -145,9 +145,10 @@ namespace emp {
   }
 
   /// Take an std::map<A,B> and return the flipped map (now multimap to be safe): std::multimap<B,A>
-  template<typename A, typename B> std::multimap<B,A> flip_map(const std::map<A,B> &src)
+  template<typename A, typename B, typename OUT_MAP=std::multimap<B,A>>
+  OUT_MAP flip_map(const std::map<A,B> &src)
   {
-    std::multimap<B,A> dst;
+    OUT_MAP dst;
     for (const auto & x : src) dst.insert( flip_pair(x) );
     return dst;
   }

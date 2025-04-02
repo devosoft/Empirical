@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
+ *  date: 2016-2025.
 */
 /**
  *  @file
@@ -672,7 +672,7 @@ namespace emp {
       width = _max - _min;
       double bin_width = ((double) width) / (double) num_bins;
       bins.Resize(num_bins);
-      bins.AdjustAll(bin_width);
+      bins.SetAll(bin_width);
       counts.resize(num_bins);
       for (size_t & x : counts) x = 0.0;
     }

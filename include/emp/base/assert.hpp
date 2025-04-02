@@ -31,7 +31,7 @@
 
 #include "always_assert.hpp"
 
-/// NDEBUG hould trigger its EMP equivalent.
+/// NDEBUG should trigger its EMP equivalent.
 #ifdef NDEBUG
 #define EMP_NDEBUG
 #endif

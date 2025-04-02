@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2022.
+ *  date: 2016-2024.
 */
 /**
  *  @file
@@ -31,10 +31,10 @@
  *
  *
  *  @todo Implement  ^ and $ (beginning and end of line)
- *  @todo Implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respectively)
- *  @todo Implement \d (for digits), \s (for whitespace), etc.
+ *  @todo Implement / to separate a regex from another regex that must follow it
  *  @todo Consider a separator (maybe backtick?) to divide up a regex expression;
  *        the result can be returned by each section as a vector of strings.
+ *  @todo Consolidate most errors to a single pre-processing checker (perhaps using a lexer?)
  */
 
 #ifndef EMP_COMPILER_REGEX_HPP_INCLUDE
@@ -49,7 +49,7 @@
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../bits/BitSet.hpp"
-#include "../tools/string_utils.hpp"
+#include "../tools/String.hpp"
 
 #include "lexer_utils.hpp"
 #include "NFA.hpp"
@@ -61,17 +61,22 @@ namespace emp {
   private:
     constexpr static size_t NUM_SYMBOLS = 128; ///< Maximum number of symbol the RegEx can handle.
     using opts_t = BitSet<NUM_SYMBOLS>;
-    std::string regex;                         ///< Original string to define this RegEx.
-    emp::vector<std::string> notes;            ///< Any warnings or errors would be provided here.
+    emp::String regex;                         ///< Original string to define this RegEx.
+    emp::vector<emp::String> notes;            ///< Any warnings or errors would be provided here.
     bool valid = true;                         ///< Set to false if regex cannot be processed.
     size_t pos = 0;                            ///< Position being read in regex.
 
     mutable DFA dfa;                           ///< DFA that this RegEx translates to.
     mutable bool dfa_ready = false;            ///< Is the dfa ready? (or does it need to be generated?)
 
+    struct RepeatInfo {
+      int min_repeat = 1;
+      int max_repeat = 1;
+    };
+
     template <typename... T>
     void Error(T &&... args) {
-      notes.push_back(emp::to_string(std::forward<T>(args)...));
+      notes.push_back(emp::MakeString(std::forward<T>(args)...));
       valid = false;
     }
 
@@ -96,11 +101,11 @@ namespace emp {
 
     /// Representation of strings stored in a RegEx.
     struct re_string : public re_base {  // Series of specific chars
-      std::string str;
-      re_string() : str() { ; }
-      re_string(char c) : str() { str.push_back(c); }
-      re_string(const std::string & s) : str(s) { ; }
-      void Print(std::ostream & os) const override { os << "STR[" << to_escaped_string(str) << "]"; }
+      emp::String str{};
+      re_string() = default;
+      re_string(char c) { str.push_back(c); }
+      re_string(const emp::String & s) : str(s) { ; }
+      void Print(std::ostream & os) const override { os << "STR[" << str.AsEscaped() << "]"; }
       Ptr<re_string> AsString() override { return ToPtr(this); }
       size_t GetSize() const override { return str.size(); }
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
@@ -116,23 +121,30 @@ namespace emp {
 
     /// Representation of a character set e.g., [abc]
     struct re_charset : public re_base { // Any char from set.
-      opts_t char_set;
-      re_charset() : char_set() { ; }
-      re_charset(char x, bool neg=false) : char_set() {
-        char_set[(size_t)x]=true;
-        if (neg) char_set.NOT_SELF();
+      opts_t char_set{};
+      re_charset() { ; }
+      re_charset(char x, bool neg=false) {
+        char_set.Set(x);
+        if (neg) Negate();
       }
-      re_charset(const std::string & s, bool neg=false) : char_set() {
-        for (char x : s) char_set[(size_t)x]=true;
-        if (neg) char_set.NOT_SELF();
+      re_charset(const emp::String & s, bool neg=false) {
+        for (char x : s) char_set.Set(x);
+        if (neg) Negate();
+      }
+      void Negate() {
+        char_set.NOT_SELF();
+        char_set.Clear(0, DFA::SYMBOL_MIN_INPUT);
       }
       void Print(std::ostream & os) const override {
         auto chars = char_set.GetOnes();
         bool use_not = false;
-        if (chars.size() > 64) { chars = (~char_set).GetOnes(); use_not = true; }
+        if (chars.size() > 64) {
+          chars = (~char_set).Clear(0,DFA::SYMBOL_MIN_INPUT).GetOnes();
+          use_not = true;
+        }
         os << "SET[";
         if (use_not) os << "NOT ";
-        for (auto c : chars) os << to_escaped_string((char) c);
+        for (auto c : chars) os << MakeEscaped((char) c);
         os << "]";
       }
       Ptr<re_charset> AsCharSet() override { return ToPtr(this); }
@@ -148,7 +160,7 @@ namespace emp {
     protected:
       emp::vector<Ptr<re_base>> nodes;
     public:
-      re_parent() : nodes() { }
+      re_parent() = default;
       ~re_parent() { for (auto x : nodes) x.Delete(); }
       void Clear() { for (auto x : nodes) x.Delete(); nodes.resize(0); }
       virtual void push(Ptr<re_base> x) { emp_assert(x != nullptr); nodes.push_back(x); }
@@ -294,10 +306,53 @@ namespace emp {
       }
     };
 
-    re_block head;
+    /// Representations of specified number of instances of a component.  e.g., a{m,n}
+    struct re_repeat : public re_parent {      // From m to n times.
+      RepeatInfo repeat;
+      re_repeat(Ptr<re_base> c, RepeatInfo in_repeat) : repeat(in_repeat) { push(c); }
+      void Print(std::ostream & os) const override {
+        os << "{" << repeat.min_repeat << "," << repeat.max_repeat << "}[";
+        nodes[0]->Print(os);
+        os << "]"; }
+      virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        size_t state1 = nfa.AddNewState();
+        nfa.AddFreeTransition(start, state1);
 
-    /// Make sure that there is another element in the RegEx (e.g., after an '|') or else
-    /// trigger and error to report the problem.
+        // Start by making REQUIRED transitions.
+        for (int i = 0; i < repeat.min_repeat; ++i) {
+          size_t state2 = nfa.AddNewState();
+          nodes[0]->AddToNFA(nfa, state1, state2);
+          state1 = state2;
+        }
+
+        // If we are allowed to have any number of additional transitions, do so.
+        if (repeat.max_repeat == -1) {
+          size_t state2 = nfa.AddNewState();
+          nodes[0]->AddToNFA(nfa, state1, state2);
+          nfa.AddFreeTransition(state1, state2);    // Allow skipping over.
+          nfa.AddFreeTransition(state2, state1);    // Allow repeating.
+          state1 = state2;
+        }
+
+        // Otherwise allow for specific count of additional transitions.
+        else {
+          int opt_count = repeat.max_repeat - repeat.min_repeat;
+          for (int i = 0; i < opt_count; ++i) {
+            size_t state2 = nfa.AddNewState();
+            nodes[0]->AddToNFA(nfa, state1, state2);
+            nfa.AddFreeTransition(state1, state2);    // Allow skipping over.
+            state1 = state2;
+          }
+        }
+
+        nfa.AddFreeTransition(state1, stop);
+      }
+    };
+
+    emp::Ptr<re_parent> head_ptr = nullptr;
+
+    /// Make sure that there is another element in the RegEx (e.g., that '[' is followed by ']') or else
+    /// trigger an error to report the problem.
     bool EnsureNext(char x) {
       if (pos >= regex.size()) Error("Expected ", x, " before end.");
       else if (regex[pos] != x) Error("Expected ", x, " at position ", pos,
@@ -308,31 +363,43 @@ namespace emp {
 
     /// Construct a character range.
     Ptr<re_charset> ConstructSet() {
+      auto out = NewPtr<re_charset>();
+      if (pos >= regex.size()) return out;
       char c = regex[pos++];
       bool neg = false;
-      if (c == '^') { neg = true; c = regex[pos++]; }
-      auto out = NewPtr<re_charset>();
+      if (c == '^') {
+        neg = true;
+        if (pos >= regex.size()) return out;
+        c = regex[pos++];
+      }
       char prev_c = -1;
       while (c != ']' && pos < regex.size()) {
         // Hyphens indicate a range UNLESS they are the first character in the set.
         if (c == '-' && prev_c != -1) {
+          if (pos >= regex.size()) { Error("Character range must have end char: ", prev_c, '-'); continue; }
           c = regex[pos++];
           if (c < prev_c) { Error("Invalid character range ", prev_c, '-', c); continue; }
           for (char x = prev_c; x <= c; x++) {
-            out->char_set[(size_t)x] = true;
+            out->char_set.Set(x);
           }
           prev_c = -1;
+          if (pos >= regex.size()) { Error("Character set must have closing ']'"); continue; }
           c = regex[pos++];
           continue;
         }
         // Sets need to have certain escape characters identified.
         else if (c == '\\') {
+          if (pos >= regex.size()) break;
           c = regex[pos++];  // Identify the specific escape char.
           char c2, c3;       // In case they are needed.
           switch(c) {
+            // Escape sequences
+            case 'f': c = '\f'; break;
             case 'n': c = '\n'; break;
             case 'r': c = '\r'; break;
             case 't': c = '\t'; break;
+            case 'v': c = '\v'; break;
+
             // A backslash followed by a digit indicates we should expect an ascii code.
             case '0': case '1': case '2': case '3': case '4':
             case '5': case '6': case '7': case '8': case '9':
@@ -348,33 +415,45 @@ namespace emp {
               c = c*100 + c2*10 + c3;
               pos += 3;
               break;
-            // Any of these characters should just be themselves!
+            // Any of these characters should just be themselves; escaping may be only way to get them.
             case '-':
             case '\\':
             case ']':
-            case '[': // technically doesn't need to be escaped, but allowed.
+            case '[':  // Technically not needed. 
             case '^':
+
+            // These technically don't need to be escaped, but any symbol should be allowed to be escaped.
+            case '!':  case '\"':  case '#':  case '$':  case '%':  case '&':  case '\'':
+            case '(':  case ')':   case '*':  case '+':  case ',':  case '.':  case '/':
+            case ':':  case ';':   case '<':  case '=':  case '>':  case '?':  case '@':
+            case '_':  case '`':   case '{':  case '|':  case '}':  case '~':
               break;
-            default:
-              Error("Unknown escape char for char sets: '\\", c, "'.");
+            default:  // Give error for other characters, but use them directly.
+              Error("Unknown escape char for char set: '\\", c, "'; using directly.");
           }
         }
-        out->char_set[(size_t)c] = true;
+        out->char_set.Set(c);
         prev_c = c;
+        if (pos >= regex.size()) { Error("Character set must have closing ']'"); continue; }
         c = regex[pos++];
       }
-      if (neg) out->char_set.NOT_SELF();
+      if (neg) out->Negate();
       if (c == ']') --pos;  // SHOULD be the case, but is checked after return.
       return out;
     }
 
     /// Construct a string, loading everything needed.
     Ptr<re_string> ConstructString() {
-      char c = regex[pos++];
       auto out = NewPtr<re_string>();
+      if (pos >= regex.size()) {
+        Error("String must end with a close quote");
+        return out;
+      }
+      char c = regex[pos++];
       while (c != '\"' && pos < regex.size()) {
         // @CAO Error if we run out of chars before close '"'
         if (c == '\\') {
+          if (pos >= regex.size()) break;
           c = regex[pos++];  // Identify the specific escape char.
           switch(c) {
             case 'n': c = '\n'; break;
@@ -385,10 +464,14 @@ namespace emp {
             case '\\':
               break;
             default:
-              Error("Unknown escape char for literal string: '\\", c, "'.");
+              // Non-alphanumeric characters should also just be themselves.
+              if (is_alphanumeric(c)) {
+                Error("Unknown escape char for literal string: '\\", c, "'.");
+              }
           }
         }
         out->str.push_back(c);
+        if (pos >= regex.size()) { Error("Literal strings must end with a close quote."); continue; }
         c = regex[pos++];
       }
       if (c == '\"') --pos;
@@ -404,6 +487,12 @@ namespace emp {
         case '.':
           result = NewPtr<re_charset>('\n', true);  // Anything except newline.
           break;
+        case '^':
+          result = NewPtr<re_string>(DFA::SYMBOL_START);  // Must be a line start.
+          break;
+        case '$':
+          result = NewPtr<re_string>(DFA::SYMBOL_STOP);  // Must be a line end.
+          break;
         case '(':
           result = Process();         // Process the internal contents of parens.
           EnsureNext(')');            // Make sure last char is a paren and advance.
@@ -417,28 +506,42 @@ namespace emp {
           EnsureNext('"');            // Make sure last char is a quote and advance.
           break;
         case '\\':
+          if (pos >= regex.size()) {
+            Error("Backslash must be followed by an character to escape.");
+            result = NewPtr<re_string>(c);
+            break;
+          }
           c = regex[pos++];  // Identify the specific escape char.
           switch(c) {
-            case 'n': c = '\n'; break;
-            case 'r': c = '\r'; break;
-            case 't': c = '\t'; break;
+            // Shortcuts for character sets.
+            case 'd': result = NewPtr<re_charset>("0123456789"); break;
+            case 'D': result = NewPtr<re_charset>("0123456789", true); break;
+            case 'l': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"); break;
+            case 'L': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", true); break;
+            case 's': result = NewPtr<re_charset>(" \f\n\r\t\v"); break;
+            case 'S': result = NewPtr<re_charset>(" \f\n\r\t\v", true); break;
+            case 'w': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"); break;
+            case 'W': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_", true); break;
+            
+            // Special escape sequences
+            case 'f': result = NewPtr<re_string>('\f'); break;
+            case 'n': result = NewPtr<re_string>('\n'); break;
+            case 'r': result = NewPtr<re_string>('\r'); break;
+            case 't': result = NewPtr<re_string>('\t'); break;
+            case 'v': result = NewPtr<re_string>('\v'); break;
+
             // Any of these characters should just be themselves!
-            case '\\':
-            case '\"':
-            case '*':
-            case '+':
-            case '?':
-            case '.':
-            case '|':
-            case '(':
-            case ')':
-            case '[':
-            case ']':
+            case '!':  case '\"':  case '#':   case '$':  case '%':  case '&':  case '\'':
+            case '(':  case ')':   case '*':   case '+':  case ',':  case '-':  case '.':
+            case '/':  case ':':   case ';':   case '<':  case '=':  case '>':  case '?':
+            case '@':  case '[':   case '\\':  case ']':  case '^':  case '_':  case '`':
+            case '{':  case '|':   case '}':   case '~':
+              result = NewPtr<re_string>(c);
               break;
             default:
-              Error("Unknown escape char for regex: '\\", c, "'.");
+              Error("Unknown escape char: '\\", c, "'; ignoring backslash.");
+              result = NewPtr<re_string>(c);
           }
-          result = NewPtr<re_string>(c);
           break;
 
         // Error cases
@@ -452,7 +555,7 @@ namespace emp {
           break;
 
         default:
-          // Take this char directly.
+          // Take this character directly.
           result = NewPtr<re_string>(c);
       }
 
@@ -460,46 +563,71 @@ namespace emp {
       return result;
     }
 
-    /// Process the input regex into a tree representaion.
-    Ptr<re_block> Process(Ptr<re_block> cur_block=nullptr) {
-      emp_assert(pos < regex.size(), pos, regex.size());
+    // Read the body of an {m,n} style repeat, advancing pos past it.
+    RepeatInfo ReadRepeat() {
+      int min_repeat = regex.ScanAsInt(pos);
+      int max_repeat = min_repeat;
+      if (pos < regex.size() && regex[pos] == ',') {
+        ++pos;
+        if (pos < regex.size() && regex[pos] == '}') max_repeat = -1;
+        else max_repeat = regex.ScanAsInt(pos);
+      }
+      if (pos >= regex.size()) {
+        Error("Expected close brace ('}') at end of repeat.");
+      } else if (regex[pos] != '}') {
+        Error("Unexpected '", regex[pos], "' in repeat specifier.");
+      } else if (max_repeat != -1 && max_repeat < min_repeat) {
+        Error("In repeat block {m,n}, m must be <= n, but ", min_repeat, " > ", max_repeat, ".");
+      }
+      pos++; // Skip past '}'
+      return RepeatInfo{min_repeat,max_repeat};
+    }
 
-      // If caller does not provide current block, create one (and return it.)
-      if (cur_block==nullptr) cur_block = NewPtr<re_block>();
+    /// Process the input regex into a tree representation.
+    Ptr<re_parent> Process() {
+      Ptr<re_parent> cur_parent = NewPtr<re_block>();
+
+      // Make sure the input stream is good to load from.
+      if (pos >= regex.size()) {
+        if (regex.size() == 0) Error("Cannot process an empty RegEx");
+        else if (regex.back() == '|') Error("Another option must follow OR ('|'); use '?' to make a segment optional.");
+        else Error("Cannot end a RegEx with '", regex.back(), "'.");
+        return cur_parent;
+      }
 
       // All blocks need to start with a single token.
-      cur_block->push( ConstructSegment() );
+      cur_parent->push( ConstructSegment() );
 
       while (pos < regex.size()) {
         const char c = regex[pos++];
         switch (c) {
-          // case '|': cur_block->push( new re_or( cur_block->pop(), ConstructSegment() ) ); break;
-          case '|': cur_block->push( NewPtr<re_or>( cur_block->pop(), Process() ) ); break;
-          case '*': cur_block->push( NewPtr<re_star>( cur_block->pop() ) ); break;
-          case '+': cur_block->push( NewPtr<re_plus>( cur_block->pop() ) ); break;
-          case '?': cur_block->push( NewPtr<re_qm>( cur_block->pop() ) ); break;
-          case ')': pos--; return cur_block;  // Must be ending segment (restore pos to check on return)
+          case '|': cur_parent = NewPtr<re_or>( cur_parent, Process() ); break;
+          case '*': cur_parent->push( NewPtr<re_star>( cur_parent->pop() ) ); break;
+          case '+': cur_parent->push( NewPtr<re_plus>( cur_parent->pop() ) ); break;
+          case '?': cur_parent->push( NewPtr<re_qm>( cur_parent->pop() ) ); break;
+          case ')': pos--; return cur_parent;  // Must be ending segment (restore pos to check on return)
+          case '{': cur_parent->push( NewPtr<re_repeat>( cur_parent->pop(), ReadRepeat() ) ); break;
 
           default:     // Must be a regular "segment"
-            pos--;     // Restore to previous char to construct the next seqment.
-            cur_block->push( ConstructSegment() );
+            pos--;     // Restore to previous char to construct the next segment.
+            cur_parent->push( ConstructSegment() );
         }
       }
 
-      return cur_block;
+      return cur_parent;
     }
 
   public:
     RegEx() = delete;
-    RegEx(const std::string & r) : regex(r), dfa(), head() {
-      if (regex.size()) Process(ToPtr(&head));
-      while(head.Simplify());
+    RegEx(const emp::String & r) : regex(r) {
+      if (regex.size()) head_ptr = Process();
+      while(head_ptr->Simplify());
     }
-    RegEx(const RegEx & r) : regex(r.regex), dfa(), head() {
-      if (regex.size()) Process(ToPtr(&head));
-      while(head.Simplify());
+    RegEx(const RegEx & r) : regex(r.regex) {
+      if (regex.size()) head_ptr = Process();
+      while(head_ptr->Simplify());
     }
-    ~RegEx() { ; }
+    ~RegEx() { head_ptr.Delete(); }
 
     /// Set this RegEx equal to another.
     RegEx & operator=(const RegEx & r) {
@@ -507,44 +635,55 @@ namespace emp {
       notes.resize(0);
       valid = true;
       pos = 0;
-      head.Clear();
-      Process(ToPtr(&head));
-      while (head.Simplify());
+      head_ptr.Delete();
+      head_ptr = Process();
+      while (head_ptr->Simplify());
       return *this;
     }
 
-    /// Convert the RegEx to an standard string, readable from outsite this class.
-    std::string AsString() const { return to_literal(regex); }
+    /// Convert the RegEx to an standard string, readable from outside this class.
+    emp::String ToString() const { return regex.AsEscaped(false); }
+
+    /// Convert the RegEx to an standard string, readable from outside this class.
+    emp::String ToLiteral() const { return regex.AsLiteral(); }
 
     /// Add this regex to an NFA being built.
-    void AddToNFA(NFA & nfa, size_t start, size_t stop) const { head.AddToNFA(nfa, start, stop); }
+    void AddToNFA(NFA & nfa, size_t start, size_t stop) const {
+      emp_assert(head_ptr);
+      head_ptr->AddToNFA(nfa, start, stop);
+    }
 
     /// Assume the RegEx is ready and setup processing for it.
     void Generate() const;
 
-    /// Test if a string statisfies this regex.
-    bool Test(const std::string & str) const {
+    /// Test if a string satisfies this regex.
+    bool Test(const emp::String & str) const {
       if (!dfa_ready) Generate();
       return dfa.Test(str);
     }
 
+    const emp::vector<emp::String> & GetNotes() const { return notes; }
+
     /// For debugging: print the internal representation of the regex.
-    void PrintInternal() const { head.Print(std::cout); std::cout << std::endl; }
+    void PrintInternal() const {
+      emp_assert(head_ptr);
+      head_ptr->Print(std::cout); std::cout << std::endl;
+    }
 
     /// For debugging: print any internal notes generated about this regex.
     void PrintNotes() const {
-      for (const std::string & n : notes) {
+      for (const emp::String & n : notes) {
         std::cout << n << std::endl;
       }
     }
 
-    /// Print general debuging information about this regex.
+    /// Print general debugging information about this regex.
     void PrintDebug() const {
       if (notes.size()) {
         std::cout << "NOTES:" << std::endl;
         PrintNotes();
       }
-      std::cout << "RegEx: " << to_escaped_string(regex) << std::endl;
+      std::cout << "RegEx: " << regex.AsEscaped() << std::endl;
       std::cout << "INTERNAL: ";
       PrintInternal();
     }
@@ -556,6 +695,8 @@ namespace emp {
     NFA nfa(2);  // State 0 = start, state 1 = stop.
     nfa.SetStop(1, stop_id);
     regex.AddToNFA(nfa, 0, 1);
+    nfa.AddTransition(0, 0, DFA::SYMBOL_START);
+    nfa.AddTransition(1, 1, DFA::SYMBOL_STOP);
     return nfa;
   }
 

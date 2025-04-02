@@ -50,7 +50,7 @@ namespace emp {
       size_t id;                      ///< Which id does it represent?
     public:
       Proxy(UnorderedIndexMap & _im, size_t _id) : index_map(_im), id(_id) { ; }
-      operator double() const { return index_map.RawWeight(id); }
+      operator double() const { return index_map.weights[id]; }
       Proxy & operator=(double new_weight) { index_map.RawAdjust(id, new_weight); return *this; }
     };
 
@@ -65,6 +65,25 @@ namespace emp {
       }
 
       needs_refresh = false;
+    }
+
+    double RawProb(size_t id) const { ResolveRefresh(); return weights[id] / weights[0]; }
+
+    /// Adjust the weight associated with a particular index in the map.
+    /// @param id is the identification number of the item whose weight is being adjusted.
+    /// @param new_weight is the new weight for that entry.
+    void RawAdjust(size_t id, const double new_weight) {
+      // Update this node.
+      const double weight_diff = new_weight - weights[id]; // Track change size for tree weights.
+      weights[id] = new_weight;                            // Update THIS item weight
+
+      if (needs_refresh) return;     // If we already need a refresh don't update tree weights!
+
+      // Update tree to root.
+      while (id > 0) {
+        id = ParentID(id);
+        weights[id] += weight_diff;
+      }
     }
 
   public:
@@ -100,11 +119,9 @@ namespace emp {
     }
 
     /// What is the current weight of the specified index?
-    double RawWeight(size_t id) const { return weights[id]; }
-    double GetWeight(size_t id) const { return RawWeight(id + num_nodes); }
+    double GetWeight(size_t id) const { return weights[id + num_nodes]; }
 
     /// What is the probability of the specified index being selected?
-    double RawProb(size_t id) const { ResolveRefresh(); return weights[id] / weights[0]; }
     double GetProb(size_t id) const { return RawProb(id + num_nodes); }
 
     /// Change the number of indices in the map.
@@ -147,27 +164,14 @@ namespace emp {
       Clear();
     }
 
-    /// Adjust the weight associated with a particular index in the map.
-    /// @param id is the identification number of the item whose weight is being adjusted.
-    /// @param new_weight is the new weight for that entry.
-    void RawAdjust(size_t id, const double new_weight) {
-      // Update this node.
-      const double weight_diff = new_weight - weights[id]; // Track change size for tree weights.
-      weights[id] = new_weight;                            // Update THIS item weight
-
-      if (needs_refresh) return;     // If we already need a refresh don't update tree weights!
-
-      // Update tree to root.
-      while (id > 0) {
-        id = ParentID(id);
-        weights[id] += weight_diff;
-      }
+    // Set will adjust a value AND resize if needed.
+    void Set(size_t id, const double new_weight) {
+      if (id >= num_items) Resize(id+1);
+      RawAdjust(id + num_nodes, new_weight);
     }
 
-    void Adjust(size_t id, const double new_weight) { RawAdjust(id + num_nodes, new_weight); }
-
-    /// Adjust all index <weights to the set provided.
-    void Adjust(const emp::vector<double> & new_weights) {
+    /// Set all index weights to the ones provided, resizing as needed.
+    void Set(const emp::vector<double> & new_weights) {
       num_items = new_weights.size();
       num_nodes = num_items - 1;
       if (num_items > 0) {
@@ -177,11 +181,19 @@ namespace emp {
       needs_refresh = true;
     }
 
-    /// Adjust all index weights to the single weight provided.
-    void AdjustAll(double new_weight) {
+    /// Set all index weights to the single weight provided.
+    void SetAll(double new_weight) {
       for (size_t i = 0; i < num_items; i++) weights[i + num_nodes] = new_weight;
       needs_refresh = true;
     }
+
+    [[deprecated("Use Set(id,weight) instead")]]
+    void Adjust(size_t id, const double new_weight) { Set(id, new_weight); }
+    [[deprecated("Use Set(new_weights) instead")]]
+    void Adjust(const emp::vector<double> & new_weights) { Set(new_weights); }
+    [[deprecated("Use SetAll(new_weight) instead")]]
+    void AdjustAll(double new_weight) { SetAll(new_weight); }
+
 
     /// Determine the ID at the specified index position.
     size_t Index(double index, size_t cur_id=0) const {
@@ -203,8 +215,22 @@ namespace emp {
     // size_t operator[](double index) { return Index(index,0); }
 
     /// Index into a specified ID.
-    Proxy operator[](size_t id) { return Proxy(*this, id + num_nodes); }
-    double operator[](size_t id) const { return weights[id + num_nodes]; }
+    Proxy operator[](size_t id) {
+      emp_assert(id < num_items);
+      return Proxy(*this, id + num_nodes);
+    }
+    double operator[](size_t id) const {
+      emp_assert(id < num_items);
+      return weights[id + num_nodes];
+    }
+
+    void Swap(size_t id1, size_t id2) {
+      emp_assert(id1 < num_items && id2 < num_items, id1, id2, num_items);
+      const double w1 = weights[id1 + num_nodes];
+      const double w2 = weights[id2 + num_nodes];
+      RawAdjust(id1 + num_nodes, w2);
+      RawAdjust(id2 + num_nodes, w1);
+    }
 
     /// Add the weights in another index map to this one.
     UnorderedIndexMap & operator+=(UnorderedIndexMap & in_map) {

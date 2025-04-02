@@ -50,6 +50,7 @@
 
 #include "Bits.hpp"  // New version of BitVector is in Bits.hpp
 
+/*
 namespace emp::old {
 
   /// A drop-in replacement for std::vector<bool>, but with extra bitwise logic features.
@@ -2333,5 +2334,5 @@ namespace std {
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 }
 #endif
-
+*/
 #endif // #ifndef EMP_BITS_BITVECTOR_HPP_INCLUDE

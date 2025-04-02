@@ -1,0 +1,1061 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2024.
+*/
+/**
+ *  @file
+ *  @brief Basic regular expression handler.
+ *  @note Status: BETA
+ *
+ *  A fully (well, mostly) functional regular expression processor.
+ *
+ *  Special chars:
+ *   '|'          - or
+ *   '*'          - zero or more of previous
+ *   '+'          - one or more of previous
+ *   '?'          - previous is optional
+ *   '.'          - Match any character except \n
+ *
+ *  Plus the following group contents (and change may translation rules)
+ *   '(' and ')'  - group contents
+ *   '"'          - Ignore special characters in contents (quotes still need to be escaped)
+ *   '[' and ']'  - character set -- choose ONE character
+ *                  '^' as first char negates contents
+ *                  '-' indicates range UNLESS first or last.
+ *
+ *  Additional overloads for functions in lexer_utils.h:
+ *
+ *    static NFA to_NFA(const RegEx & regex, int stop_id=1);
+ *    static DFA to_DFA(const RegEx & regex);
+ *
+ *
+ *  @todo Implement  ^ and $ (beginning and end of line)
+ *  @todo Implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respectively)
+ *  @todo Consider a separator (maybe backtick?) to divide up a regex expression;
+ *        the result can be returned by each section as a vector of strings.
+ */
+
+#ifndef EMP_COMPILER_REGEX_HPP_INCLUDE
+#define EMP_COMPILER_REGEX_HPP_INCLUDE
+
+
+#include <algorithm>
+#include <array>
+#include <iostream>
+#include <ostream>
+#include <sstream>
+#include <stddef.h>
+#include <string>
+#include <unordered_map>
+
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
+#include "../bits/BitSet.hpp"
+#include "../tools/String.hpp"
+#include "../tools/string_utils.hpp"
+
+#include "lexer_utils.hpp"
+#include "NFA.hpp"
+
+namespace emp {
+
+  // Struct to store information about a found Token
+  struct RegEx_Token {
+    int id;                              // Type ID for token
+    std::string lexeme = "";             // Sequence matched by token
+    size_t line_id = 0;                  // Line token started on
+    emp::vector<RegEx_Token> children{}; // Sub-tokens if this is has ID_COMBO
+    int min_repeat = 1;                  // Change to 0 for ? or +
+    int max_repeat = 1;                  // Change to inf for + pr *
+
+    operator int() const { return id; } // Auto-convert tokens to IDs
+    void SetRepeat(int in_min, int in_max) {
+      min_repeat = in_min;
+      max_repeat = in_max;
+    }
+    void SetRepeat(emp::String lexeme) {
+      lexeme = lexeme.substr(1, lexeme.size()-2);  // Strip '{' and '}'
+      if (lexeme.Has(',')) {
+        min_repeat = lexeme.PopTo(",").AsInt();
+        max_repeat = lexeme.size() ? lexeme.AsInt() : -1;
+      } else {
+        min_repeat = max_repeat = lexeme.AsInt();
+      }
+    }    
+  };
+  
+  // Deterministic Finite Automaton (DFA) for token recognition.
+  class RegEx_DFA {
+  private:
+    static constexpr int NUM_SYMBOLS=128;
+    static constexpr int NUM_STATES=25;
+    using row_t = std::array<int, NUM_SYMBOLS>;
+  
+    // RegEx_DFA transition table
+    static constexpr std::array<row_t, NUM_STATES> table = {{
+      /* State 0 */ {1,1,1,1,1,1,1,1,1,1,-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,3,1,1,1,4,5,6,7,1,1,8,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,10,11,1,12,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,13,14,1,1,1},
+      /* State 1 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 2 */ {22,22,22,22,22,22,22,22,22,22,-1,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,23,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,24,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22},
+      /* State 3 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 4 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 5 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 6 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 7 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 8 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 9 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 10 */ {19,19,19,19,19,19,19,19,19,19,-1,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,20,-1,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19},
+      /* State 11 */ {18,18,18,18,18,18,18,18,18,18,-1,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18},
+      /* State 12 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 13 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,15,-1,-1,-1,16,16,16,16,16,16,16,16,16,16,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,17,-1,-1},
+      /* State 14 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 15 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,15,15,15,15,15,15,15,15,15,15,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,17,-1,-1},
+      /* State 16 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,15,-1,-1,-1,16,16,16,16,16,16,16,16,16,16,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,17,-1,-1},
+      /* State 17 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 18 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 19 */ {19,19,19,19,19,19,19,19,19,19,-1,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,20,21,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19},
+      /* State 20 */ {19,19,19,19,19,19,19,19,19,19,-1,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19},
+      /* State 21 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 22 */ {22,22,22,22,22,22,22,22,22,22,-1,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,23,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,24,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22},
+      /* State 23 */ {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+      /* State 24 */ {22,22,22,22,22,22,22,22,22,22,-1,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22}
+    }};
+    // RegEx_DFA stop states (0 indicates NOT a stop)
+    static constexpr std::array<int, NUM_STATES> stop_id = {0,242,242,244,247,246,249,250,243,251,242,242,245,242,248,0,0,252,255,0,0,254,0,253,0};
+  
+  public:
+    static constexpr int GetStop(int state) {
+      return (state >= 0) ? stop_id[static_cast<size_t>(state)] : 0;
+    }
+    static constexpr int GetNext(int state, int sym) {
+      if (state >= 0 && sym >= 0) {
+        return table[static_cast<size_t>(state)][static_cast<size_t>(sym)];
+      }
+      return -1;
+    }
+    static int GetNext(int state, const std::string & syms) {
+      for (char x : syms) state = GetNext(state, x);
+      return state;
+    }
+    static int Test(const std::string & str) {
+      int out = GetNext(0, str);
+      return GetStop(out);
+    }
+  };
+  
+  class RegEx_Lexer {
+  private:
+    static constexpr int ERROR_ID = -1;     ///< Code for unknown token ID.
+  
+    // -- Current State --
+    size_t cur_line = 1;   // Track LINE we are reading in the input.
+    int start_pos = 0;  // Track INDEX for the start of current lexeme.
+    std::string lexeme{};  // Lexeme found for the current token
+    std::string errors{};  // Description of any errors encountered
+  
+  public:    
+    // Identify if a token (by ID) should be skipped during tokenizing.
+    static constexpr bool IgnoreToken(int id) {
+      switch (id) {
+      case 0:
+        return true;
+      default: return false;
+      };
+    }
+  
+    // Generate and return the next token from the input stream.
+    RegEx_Token NextToken(std::string_view in) {
+      // If we cannot read in, return an "EOF" token.
+      if (start_pos >= std::ssize(in)) return { 0, "", cur_line };
+  
+      int cur_pos = start_pos;   // Position in the input that we are actively analyzing
+      int best_pos = start_pos;  // Best look-ahead we've found so far
+      int cur_state = 0;         // Next state for the DFA analysis
+      int cur_stop = 0;          // Current "stop" state (or 0 if we can't stop here)
+      int best_stop = -1;        // Best stop state found so far?
+  
+      // Keep looking as long as:
+      // 1: We may be able to continue the current lexeme, and
+      // 2: We have not entered an invalid state, and
+      // 3: Our input string has more symbols to provide
+      while (cur_stop >= 0 && cur_state >= 0 && cur_pos < std::ssize(in)) {
+        const char next_char = in[cur_pos++];
+        if (next_char < 0) break;
+        cur_state = RegEx_DFA::GetNext(cur_state, next_char);
+        cur_stop = RegEx_DFA::GetStop(cur_state);
+        if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }
+      }
+  
+      // If we did not find any options, peel off just one character.
+      if (best_pos == start_pos) best_pos++;
+  
+      // Update the line number we are on.
+      const size_t out_line = cur_line;
+      cur_line += static_cast<size_t>(std::count(lexeme.begin(),lexeme.end(),'\n'));
+  
+      lexeme = in.substr(start_pos, best_pos-start_pos);
+      start_pos += lexeme.size();
+  
+      // If we can't find a token, return error token.
+      if (best_stop < 0) return { ERROR_ID, lexeme, out_line };
+  
+      // Otherwise return the best token we've found so far.
+      return { best_stop, lexeme, out_line };
+    }
+  
+    // Convert an input string into a vector of tokens.
+    emp::vector<RegEx_Token> Tokenize(std::string_view in) {
+      start_pos = 0; // Start processing at beginning of string.
+      cur_line = 1;  // Start processing at the first line of the input.
+      emp::vector<RegEx_Token> out_tokens;
+      while (RegEx_Token token = NextToken(in)) {
+        if (!IgnoreToken(token.id)) out_tokens.push_back(token);
+      }
+      return out_tokens;
+    }
+  
+    // Convert an input stream to a string, then tokenize.
+    emp::vector<RegEx_Token> Tokenize(std::istream & is) {
+      return Tokenize(
+        std::string(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>())
+      );
+    }
+  };
+
+  /// A basic regular expression handler.
+  class RegEx {
+  private:
+    std::string regex;                         ///< Original string to define this RegEx.
+    emp::vector<std::string> notes;            ///< Any warnings or errors would be provided here.
+    bool valid = true;                         ///< Set to false if regex cannot be processed.
+    emp::vector<RegEx_Token> token_set;        ///< Processed set of tokens from regex.
+
+    mutable DFA dfa;                           ///< DFA that this RegEx translates to.
+    mutable bool dfa_ready = false;            ///< Is the dfa ready? (or does it need to be generated?)
+
+    static constexpr int ID_TEXT = 242;
+    static constexpr int ID_ANY = 243;
+    static constexpr int ID_END = 244;
+    static constexpr int ID_BEGIN = 245;
+    static constexpr int ID_CLOSE = 246;
+    static constexpr int ID_OPEN = 247;
+    static constexpr int ID_OR = 248;
+    static constexpr int ID_STAR = 249;
+    static constexpr int ID_PLUS = 250;
+    static constexpr int ID_QM = 251;
+    static constexpr int ID_REPEAT = 252;
+    static constexpr int ID_STRING = 253;
+    static constexpr int ID_SET = 254;
+    static constexpr int ID_ESCAPE = 255;
+
+    static constexpr int ID_COMBO = 256;  // Combination set of tokens
+
+    static RegEx_Lexer & GetLexer() {
+      static RegEx_Lexer lexer;
+      return lexer;
+    }
+
+    template <typename... T>
+    void Error(T &&... args) {
+      notes.push_back(emp::to_string(std::forward<T>(args)...));
+      valid = false;
+    }
+
+    char ToEscapeChar(char c) {
+      switch (c) {
+        case 'a': return '\a';   // Audible bell
+        case 'b': return '\b';   // Backspace
+        case 'f': return '\f';   // Form feed
+        case 'n': return '\n';   // Newline
+        case 'r': return '\r';   // Return
+        case 't': return '\t';   // Tab
+        case 'v': return '\v';   // Vertical tab
+        case '0': return '\0';   // Empty (character 0)
+        default:  return c;      // Return other chars directly.
+      }
+    }
+
+    void ToEscapeString(std::string & lexeme) {
+      size_t pos = 0;
+      for (size_t i = 0; i < lexeme.size(); ++i) {
+        if (lexeme[i] == '\\') {
+          lexeme[pos++] = ToEscapeChar(lexeme[++i]);
+        } else {
+          lexeme[pos++] = lexeme[i];
+        }
+      }
+    }
+
+    void CleanupEscapeToken(RegEx_Token & token) {
+      switch (token.lexeme[1] ) {
+        // Is this a shortcut for a character set
+        case 'd': token.id = ID_SET; token.lexeme = "[0-9]";          break;
+        case 'D': token.id = ID_SET; token.lexeme = "[^0-9]";         break;
+        case 'l': token.id = ID_SET; token.lexeme = "[a-zA-Z]";       break;
+        case 'L': token.id = ID_SET; token.lexeme = "[^a-zA-Z]";      break;
+        case 's': token.id = ID_SET; token.lexeme = "[ \f\n\r\t\v]";  break;
+        case 'S': token.id = ID_SET; token.lexeme = "[^ \f\n\r\t\v]"; break;
+        case 'w': token.id = ID_SET; token.lexeme = "[a-zA-Z0-9_]";   break;
+        case 'W': token.id = ID_SET; token.lexeme = "[^a-zA-Z0-9_]";  break;
+        default: // convert this to an escape character.
+          token.id = ID_TEXT;
+          token.lexeme[0] = ToEscapeChar(token.lexeme[1]); 
+          token.lexeme.resize(1);
+      }
+    }
+
+    void CleanupStringToken(RegEx_Token & token) {
+      size_t new_pos = 0;
+      for (size_t pos = 1; pos < token.lexeme.size() - 1; pos++) {
+        // If we don't have an escaped character, just move it over.
+        if (token.lexeme[pos] != '\\') token.lexeme[new_pos++] = token.lexeme[pos];
+        else token.lexeme[new_pos++] = ToEscapeChar(token.lexeme[++pos]);
+      }
+
+      token.id = ID_TEXT;
+    }
+
+    void CleanupAnyToken(RegEx_Token & token) {
+      token.lexeme="[^\\n]";
+      token.id = ID_SET;
+    }
+
+    void CleanupRemoveToken(char c) {
+      Error("Token '", c, "' not yet implemented.  Used '\\", c, "' for literal character.");
+      // @CAO Remove actual token?
+    }
+
+    // Clean up token lexemes (e.g., remove quotes from strings, convert escaped chars, etc.)
+    void CleanupTokens(emp::vector<RegEx_Token> & tokens) {
+      for (size_t i = 0; i < tokens.size(); ++i) {
+        RegEx_Token & token = tokens[i];
+        switch (token) {
+        case ID_ESCAPE: CleanupEscapeToken(token); break;  // \x      - Converted to ID_SET or ID_TEXT
+        case ID_STRING: CleanupStringToken(token); break;  // "abc"   - Converted to ID_TEXT
+        case ID_ANY:    CleanupAnyToken(token);    break;  // .       - Converted to ID_SET
+        case ID_BEGIN:  CleanupRemoveToken('^');   break;  // ^       - Remove and give warning.
+        case ID_END:    CleanupRemoveToken('$');   break;  // $       - Remove and give warning.
+        }        
+      }
+    }
+
+    // Collapse these tokens, processing parens and various repeat symbols.
+    // Return whether more processing is needed at outer level.
+    bool Parse(emp::vector<RegEx_Token> & tokens, size_t & start) {
+      emp::vector<RegEx_Token> out;
+      for (size_t pos=start; pos < token_set.size(); ++pos) {
+        switch (token_set[pos]) {
+        case ID_OPEN: {  // Collapse everything until close paren.
+          size_t sub_pos = pos+1;
+          RegEx_Token combo_token {
+            ID_COMBO,                 // Special token ID for collapsed sections.
+            "",                       // Combo token doesn't need a lexeme.
+            tokens[pos].line_id       // Use line number of open paren.
+          };
+          Parse(combo_token.children, sub_pos);    // All collapsed tokens should be here.
+          if (sub_pos >= tokens.size() || tokens[sub_pos] != ID_CLOSE) {
+            Error("Missing close paren; open at index ", start);
+          }
+          out.emplace_back(combo_token);
+          pos = sub_pos;
+          break;
+        }
+        case ID_CLOSE:
+          start = pos; // Don't advance -- close paren will be checked after exit.
+          token_set = out;
+          return true; // Need continued processing at outer level.
+        case ID_STAR:
+          if (out.size() == 0) Error("* must be preceded by a component to repeat.");
+          else out.back().SetRepeat(0, -1);
+          break;
+        case ID_PLUS:
+          if (out.size() == 0) Error("+ must be preceded by a component to repeat.");
+          else out.back().SetRepeat(1, -1);
+          break;
+        case ID_QM:
+          if (out.size() == 0) Error("? must be preceded by a component to repeat.");
+          else out.back().SetRepeat(0, 1);
+          break;
+        case ID_REPEAT:
+          if (out.size() == 0) Error("Bounded repeats ({m,n}) must be preceded by component to repeat.");
+          else out.back().SetRepeat(tokens[pos].lexeme);
+          break;
+        default:
+          out.push_back(tokens[pos]);
+        }
+      }
+      start = tokens.size(); // Indicate that we have reached the end.
+      token_set = out;
+      return false;
+    }
+
+
+    bool IsMergeable(const RegEx_Token & token) const {
+      return token.id == ID_TEXT && token.min_repeat == 1 && token.max_repeat == 1;
+    }
+
+    // If two neighboring tokens are both TEXT and appear ONCE, merge them.
+    // (@CAO: could potentially merge others if they are identical, just change counts...)
+    void Concatenate(emp::vector<RegEx_Token> & tokens) {
+      for (size_t i = 0; i < tokens.size(); ++i) {
+        if (tokens[i].id == ID_COMBO) Concatenate(tokens[i].children);
+        else if (i+1 < tokens.size() && IsMergeable(tokens[i]) && IsMergeable(tokens[i+1])) {
+          tokens[i].lexeme += tokens[i+1].lexeme;
+          tokens.erase(tokens.begin()+i+1);
+        }
+      }
+    }
+
+    // Identify OR tokens and put grouping under them.
+    void Disjoin(emp::vector<RegEx_Token> & tokens) {
+      // First pass - determine if we have any OR tokens and recurse as needed.
+      bool has_or = false;
+      for (auto & token : tokens) {
+        if (token.id == ID_OR) has_or = true;
+        else if (token.id == ID_COMBO) Disjoin(token.children);
+      }
+      if (!has_or) return;
+      RegEx_Token or_token{ID_OR};
+      RegEx_Token cur_combo{ID_COMBO};
+      for (auto & token : tokens) {
+        if (token.id != ID_OR) cur_combo.children.emplace_back(std::move(token));
+        else {
+          or_token.children.push_back(RegEx_Token{ID_COMBO});
+          std::swap(or_token.children.back(), cur_combo);
+        }
+      }
+      or_token.children.emplace_back(std::move(cur_combo)); // Final combo after last OR
+      tokens.clear();
+      tokens.emplace_back(std::move(or_token));
+    }
+
+    void Process(emp::vector<RegEx_Token> & tokens) {
+      // Clean up token lexemes (e.g., remove quotes from strings, convert escaped chars, etc.)
+      // Removes all: ID_ESCAPE, ID_STRING, and ID_ANY
+      CleanupTokens(tokens);
+
+      // Merge tokens as needed to deal with parentheses and deal with * + ? {m,n}
+      // Removes all: ID_OPEN, ID_CLOSE, ID_STAR, ID_PLUS, ID_QM, and ID_MULTI
+      // Adds: ID_COMBO
+      size_t start = 0;
+      tokens = Parse(tokens, start);
+      if (start < tokens.size()) Error("Extra close paren at index ", start);
+
+      // Deal with concatenation of neighboring sequences.
+      Concatenate(tokens);
+
+      // Restructure with OR statements
+      Disjoin(tokens);
+
+        // case ID_TEXT:   CleanupEscapeToken(token); break;  // a
+        // case ID_SET:    CleanupEscapeToken(token); break;  // [abc]
+        // case ID_OR:     CleanupEscapeToken(token); break;  // |
+        // case ID_BEGIN:  CleanupEscapeToken(token); break;  // $
+        // case ID_END:    CleanupEscapeToken(token); break;  // ^
+        // case ID_COMBO:
+    }
+
+    // Allow process to be called with a string input.
+    void Process() {
+      token_set = GetLexer().Tokenize(regex);
+      return Process(token_set);
+    }
+
+    void Print(const RegEx_Token & token, std::ostream & os=std::cout) const {
+      switch (token) {
+        case ID_TEXT: os << "[TEXT:" << token.lexeme; break;
+        case ID_ANY: os << "[ANY:" << token.lexeme; break;
+        case ID_END: os << "[END:" << token.lexeme; break;
+        case ID_BEGIN: os << "[BEGIN:" << token.lexeme; break;
+        case ID_CLOSE: os << "[CLOSE:" << token.lexeme; break;
+        case ID_OPEN: os << "[OPEN:" << token.lexeme; break;
+        case ID_STAR: os << "[STAR:" << token.lexeme; break;
+        case ID_PLUS: os << "[PLUS:" << token.lexeme; break;
+        case ID_QM: os << "[QM:" << token.lexeme; break;
+        case ID_REPEAT: os << "[REPEAT:" << token.lexeme; break;
+        case ID_STRING: os << "[STRING:" << token.lexeme; break;
+        case ID_SET: os << "[SET:" << token.lexeme; break;
+        case ID_ESCAPE: os << "[ESCAPE:" << token.lexeme; break;
+
+        case ID_OR: os << "[OR:" << token.lexeme << ":"; Print(token.children,os); break;
+        case ID_COMBO:  os << "[COMBO:" << token.lexeme << ":"; Print(token.children,os); break;
+      }
+      os << ":" << token.min_repeat << "," << token.max_repeat << "] ";
+    }
+  
+    void Print(const emp::vector<RegEx_Token> & tokens, std::ostream & os=std::cout) const {
+      os << "{";
+      for (const RegEx_Token & token : tokens) Print(token);
+      os << "} ";
+    }
+
+  public:
+    RegEx() = delete;
+    RegEx(const std::string & r) : regex(r) { Process(); }
+    RegEx(const RegEx & r) : regex(r.regex) { Process(); }
+    ~RegEx() = default;
+
+    /// Set this RegEx equal to another.
+    RegEx & operator=(const RegEx & r) {
+      regex = r.regex;
+      notes.resize(0);
+      valid = true;      
+      Process();
+      return *this;
+    }
+
+    /// Convert the RegEx to an standard string, readable from outside this class.
+    std::string AsString() const { return to_literal(regex); }
+
+    /// Add this regex to an NFA being built.
+    void AddToNFA(NFA & nfa, size_t start, size_t stop) const { head.AddToNFA(nfa, start, stop); }
+
+    /// Assume the RegEx is ready and setup processing for it.
+    void Generate() const;
+
+    /// Test if a string satisfies this regex.
+    bool Test(const std::string & str) const {
+      if (!dfa_ready) Generate();
+      return dfa.Test(str);
+    }
+
+    const emp::vector<std::string> & GetNotes() const { return notes; }
+
+    /// For debugging: print the internal representation of the regex.
+    void PrintInternal() const { Print(token_set); }
+
+    /// For debugging: print any internal notes generated about this regex.
+    void PrintNotes() const {
+      for (const std::string & n : notes) {
+        std::cout << n << std::endl;
+      }
+    }
+
+    /// Print general debugging information about this regex.
+    void PrintDebug() const {
+      if (notes.size()) {
+        std::cout << "NOTES:" << std::endl;
+        PrintNotes();
+      }
+      std::cout << "RegEx: " << to_escaped_string(regex) << std::endl;
+      std::cout << "INTERNAL: ";
+      PrintInternal();
+    }
+  };
+
+
+///////////////////////--------------------------------
+
+
+
+  //   /// Internal base representation of a portion of a regex
+  //   struct re_base {                     // Also used for empty regex
+  //     virtual ~re_base() { ; }
+  //     virtual void Print(std::ostream & os) const { os << "[]"; }
+  //     virtual Ptr<re_block> AsBlock() { return nullptr; }
+  //     virtual Ptr<re_charset> AsCharSet() { return nullptr; }
+  //     virtual Ptr<re_parent> AsParent() { return nullptr; }
+  //     virtual Ptr<re_string> AsString() { return nullptr; }
+  //     virtual size_t GetSize() const { return 0; }
+  //     virtual bool Simplify() { return false; }
+  //     virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const { nfa.AddFreeTransition(start, stop); }
+  //   };
+
+  //   /// Representation of strings stored in a RegEx.
+  //   struct re_string : public re_base {  // Series of specific chars
+  //     std::string str;
+  //     re_string() : str() { ; }
+  //     re_string(char c) : str() { str.push_back(c); }
+  //     re_string(const std::string & s) : str(s) { ; }
+  //     void Print(std::ostream & os) const override { os << "STR[" << to_escaped_string(str) << "]"; }
+  //     Ptr<re_string> AsString() override { return ToPtr(this); }
+  //     size_t GetSize() const override { return str.size(); }
+  //     virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+  //       size_t prev_id = start;
+  //       for (char x : str) {
+  //         size_t next_id = nfa.AddNewState();
+  //         nfa.AddTransition(prev_id, next_id, (size_t) x);
+  //         prev_id = next_id;
+  //       }
+  //       nfa.AddFreeTransition(prev_id, stop);
+  //     }
+  //   };
+
+  //   /// Representation of a character set e.g., [abc]
+  //   struct re_charset : public re_base { // Any char from set.
+  //     opts_t char_set;
+  //     re_charset() : char_set() { ; }
+  //     re_charset(char x, bool neg=false) : char_set() {
+  //       char_set[(size_t)x]=true;
+  //       if (neg) char_set.NOT_SELF();
+  //     }
+  //     re_charset(const std::string & s, bool neg=false) : char_set() {
+  //       for (char x : s) char_set[(size_t)x]=true;
+  //       if (neg) char_set.NOT_SELF();
+  //     }
+  //     void Print(std::ostream & os) const override {
+  //       auto chars = char_set.GetOnes();
+  //       bool use_not = false;
+  //       if (chars.size() > 64) { chars = (~char_set).GetOnes(); use_not = true; }
+  //       os << "SET[";
+  //       if (use_not) os << "NOT ";
+  //       for (auto c : chars) os << to_escaped_string((char) c);
+  //       os << "]";
+  //     }
+  //     Ptr<re_charset> AsCharSet() override { return ToPtr(this); }
+  //     size_t GetSize() const override { return char_set.CountOnes(); }
+  //     char First() const { return (char) char_set.FindOne(); }
+  //     virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+  //       for (size_t i = 0; i < NUM_SYMBOLS; i++) if (char_set[i]) nfa.AddTransition(start, stop, i);
+  //     }
+  //   };
+
+  //   /// Intermediate base class for RegEx components that have children (such as "and" and "or")
+  //   struct re_parent : public re_base {
+  //   protected:
+  //     emp::vector<Ptr<re_base>> nodes;
+  //   public:
+  //     re_parent() = default;
+  //     ~re_parent() { for (auto x : nodes) x.Delete(); }
+  //     void Clear() { for (auto x : nodes) x.Delete(); nodes.resize(0); }
+  //     virtual void push(Ptr<re_base> x) { emp_assert(x != nullptr); nodes.push_back(x); }
+  //     Ptr<re_base> pop() { auto out = nodes.back(); nodes.pop_back(); return out; }
+  //     size_t GetSize() const override { return nodes.size(); }
+  //     Ptr<re_parent> AsParent() override { return ToPtr(this); }
+
+  //     bool Simplify() override {
+  //       bool m=false;
+  //       for (auto & x : nodes) {
+  //         // Recursively simplify children.
+  //         m |= x->Simplify();
+  //         // A block with one child can be replaced by child.
+  //         if (x->AsBlock() && x->GetSize() == 1) {
+  //           auto child = x->AsParent()->nodes[0];
+  //           x->AsParent()->nodes.resize(0);
+  //           x.Delete();
+  //           x = child;
+  //           m = true;
+  //         }
+  //       }
+  //       return m;
+  //     }
+  //   };
+
+  //   /// Representation of a series of components...
+  //   struct re_block : public re_parent {   // Series of re's
+  //     void Print(std::ostream & os) const override {
+  //       os << "BLOCK[";
+  //       for (size_t i = 0; i < nodes.size(); i++) {
+  //         if (i > 0) os << " ";
+  //         nodes[i]->Print(os);
+  //       }
+  //       os << "]";
+  //     }
+  //     Ptr<re_block> AsBlock() override { return ToPtr(this); }
+  //     bool Simplify() override {
+  //       bool modify = false;
+  //       // Loop through block elements, simplifying when possible.
+  //       for (size_t i = 0; i < nodes.size(); i++) {
+  //         // If node is a charset with one option, replace it with a string.
+  //         if (nodes[i]->AsCharSet() && nodes[i]->GetSize() == 1) {
+  //           auto new_node = NewPtr<re_string>(nodes[i]->AsCharSet()->First());
+  //           nodes[i].Delete();
+  //           nodes[i] = new_node;
+  //           modify = true;
+  //         }
+
+  //         // If two neighboring nodes are strings, merge them.
+  //         if (i > 0 && nodes[i]->AsString() && nodes[i-1]->AsString()) {
+  //           nodes[i-1]->AsString()->str += nodes[i]->AsString()->str;
+  //           nodes[i].Delete();
+  //           nodes.erase(nodes.begin() + (int) i);
+  //           i--;
+  //           modify = true;
+  //           continue;
+  //         }
+
+  //         // If blocks are nested, merge them into a single block.
+  //         if (nodes[i]->AsBlock()) {
+  //           auto old_node = nodes[i]->AsBlock();    // Save the old node for merging.
+  //           nodes.erase(nodes.begin() + (int) i);   // Remove block from nodes.
+  //           if (old_node->nodes.size()) {
+  //             nodes.insert(nodes.begin() + (int) i, old_node->nodes.begin(), old_node->nodes.end());
+  //             old_node->nodes.resize(0);  // Don't recurse delete since nodes were moved!
+  //           }
+  //           old_node.Delete();
+  //           i--;
+  //           modify = true;
+  //           continue;
+  //         }
+  //       }
+
+  //       // Also run the default Simplify on nodes.
+  //       modify |= re_parent::Simplify();
+
+  //       return modify;
+  //     }
+  //     virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+  //       size_t prev_id = start;
+  //       for (auto x : nodes) {
+  //         size_t next_id = nfa.AddNewState();
+  //         x->AddToNFA(nfa, prev_id, next_id);
+  //         prev_id = next_id;
+  //       }
+  //       nfa.AddFreeTransition(prev_id, stop);
+  //     }
+  //   };
+
+  //   /// Representation of two options in a regex, e.g., a|b
+  //   struct re_or : public re_parent {      // lhs -or- rhs
+  //     re_or(Ptr<re_base> l, Ptr<re_base> r) { push(l); push(r); }
+  //     void Print(std::ostream & os) const override {
+  //       os << "|[";
+  //       nodes[0]->Print(os);
+  //       os << ",";
+  //       nodes[1]->Print(os);
+  //       os << "]";
+  //     }
+  //     virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+  //       nodes[0]->AddToNFA(nfa, start, stop);
+  //       nodes[1]->AddToNFA(nfa, start, stop);
+  //     }
+  //   };
+
+  //   /// Representations of zero-or-more instances of a component.  e.g., a*
+  //   struct re_star : public re_parent {    // zero-or-more
+  //     re_star(Ptr<re_base> c) { push(c); }
+  //     void Print(std::ostream & os) const override { os << "*["; nodes[0]->Print(os); os << "]"; }
+
+  //     virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+  //       const size_t origin = nfa.AddNewState();
+  //       const size_t target = nfa.AddNewState();
+  //       nodes[0]->AddToNFA(nfa, origin, target);
+  //       nfa.AddFreeTransition(start, origin);
+  //       nfa.AddFreeTransition(target, origin);
+  //       nfa.AddFreeTransition(origin, stop);
+  //     }
+  //   };
+
+  //   /// Representations of one-or-more instances of a component.  e.g., a+
+  //   struct re_plus : public re_parent {    // one-or-more
+  //     re_plus(Ptr<re_base> c) { push(c); }
+  //     void Print(std::ostream & os) const override { os << "+["; nodes[0]->Print(os); os << "]"; }
+  //     virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+  //       const size_t origin = nfa.AddNewState();
+  //       const size_t target = nfa.AddNewState();
+  //       nodes[0]->AddToNFA(nfa, origin, target);
+  //       // From the target, can either go back to origin and repeat, or straight to stop.
+  //       nfa.AddFreeTransition(start, origin);
+  //       nfa.AddFreeTransition(target, origin);
+  //       nfa.AddFreeTransition(target, stop);
+  //     }
+  //   };
+
+  //   /// Representations of zero-or-one instances of a component.  e.g., a?
+  //   struct re_qm : public re_parent {      // zero-or-one
+  //     re_qm(Ptr<re_base> c) { push(c); }
+  //     void Print(std::ostream & os) const override { os << "?["; nodes[0]->Print(os); os << "]"; }
+  //     virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+  //       nodes[0]->AddToNFA(nfa, start, stop);
+  //       nfa.AddFreeTransition(start, stop);
+  //     }
+  //   };
+
+  //   re_block head;
+
+  //   /// Make sure that there is another element in the RegEx (e.g., after an '|') or else
+  //   /// trigger and error to report the problem.
+  //   bool EnsureNext(char x) {
+  //     if (pos >= regex.size()) Error("Expected ", x, " before end.");
+  //     else if (regex[pos] != x) Error("Expected ", x, " at position ", pos,
+  //                                     "; found ", regex[pos], ".");
+  //     ++pos;               // We have what we were expecting!  Move on...
+  //     return valid;
+  //   }
+
+  //   /// Construct a character range.
+  //   Ptr<re_charset> ConstructSet() {
+  //     char c = regex[pos++];
+  //     bool neg = false;
+  //     if (c == '^') { neg = true; c = regex[pos++]; }
+  //     auto out = NewPtr<re_charset>();
+  //     char prev_c = -1;
+  //     while (c != ']' && pos < regex.size()) {
+  //       // Hyphens indicate a range UNLESS they are the first character in the set.
+  //       if (c == '-' && prev_c != -1) {
+  //         c = regex[pos++];
+  //         if (c < prev_c) { Error("Invalid character range ", prev_c, '-', c); continue; }
+  //         for (char x = prev_c; x <= c; x++) {
+  //           out->char_set[(size_t)x] = true;
+  //         }
+  //         prev_c = -1;
+  //         c = regex[pos++];
+  //         continue;
+  //       }
+  //       // Sets need to have certain escape characters identified.
+  //       else if (c == '\\') {
+  //         c = regex[pos++];  // Identify the specific escape char.
+  //         char c2, c3;       // In case they are needed.
+  //         switch(c) {
+  //           // Escape sequences
+  //           case 'f': c = '\f'; break;
+  //           case 'n': c = '\n'; break;
+  //           case 'r': c = '\r'; break;
+  //           case 't': c = '\t'; break;
+  //           case 'v': c = '\v'; break;
+
+  //           // A backslash followed by a digit indicates we should expect an ascii code.
+  //           case '0': case '1': case '2': case '3': case '4':
+  //           case '5': case '6': case '7': case '8': case '9':
+  //             if (pos+3 >= regex.size()) { Error("Escaped ascii codes must have three digits!"); }
+  //             c2 = regex[pos+1];
+  //             if (!is_digit(c2)) { Error("Escaped ascii codes must have three digits!"); }
+  //             c3 = regex[pos+2];
+  //             if (!is_digit(c3)) { Error("Escaped ascii codes must have three digits!"); }
+  //             c -= '0';  c2 -= '0'; c3 -= '0';   // Find actual digit values.
+  //             if (c > 1) { Error("Escaped ascii codes must be in range 0-127!"); }
+  //             if (c == 1 && c2 > 2) { Error("Escaped ascii codes must be in range 0-127!"); }
+  //             if (c == 1 && c2 == 2 && c3 > 7) { Error("Escaped ascii codes must be in range 0-127!"); }
+  //             c = c*100 + c2*10 + c3;
+  //             pos += 3;
+  //             break;
+  //           // Any of these characters should just be themselves; escaping may be only way to get them.
+  //           case '-':
+  //           case '\\':
+  //           case ']':
+  //           case '[':  // Technically not needed. 
+  //           case '^':
+
+  //           // These technically don't need to be escaped, but any symbol should be allowed to be escaped.
+  //           case '!':  case '\"':  case '#':  case '$':  case '%':  case '&':  case '\'':
+  //           case '(':  case ')':   case '*':  case '+':  case ',':  case '.':  case '/':
+  //           case ':':  case ';':   case '<':  case '=':  case '>':  case '?':  case '@':
+  //           case '_':  case '`':   case '{':  case '|':  case '}':  case '~':
+  //             break;
+  //           default:  // Give error for other characters, but use them directly.
+  //             Error("Unknown escape char for char set: '\\", c, "'; using directly.");
+  //         }
+  //       }
+  //       out->char_set[(size_t)c] = true;
+  //       prev_c = c;
+  //       c = regex[pos++];
+  //     }
+  //     if (neg) out->char_set.NOT_SELF();
+  //     if (c == ']') --pos;  // SHOULD be the case, but is checked after return.
+  //     return out;
+  //   }
+
+  //   /// Construct a string, loading everything needed.
+  //   Ptr<re_string> ConstructString() {
+  //     char c = regex[pos++];
+  //     auto out = NewPtr<re_string>();
+  //     while (c != '\"' && pos < regex.size()) {
+  //       // @CAO Error if we run out of chars before close '"'
+  //       if (c == '\\') {
+  //         c = regex[pos++];  // Identify the specific escape char.
+  //         switch(c) {
+  //           case 'n': c = '\n'; break;
+  //           case 'r': c = '\r'; break;
+  //           case 't': c = '\t'; break;
+  //           // Any of these characters should just be themselves!
+  //           case '\"':
+  //           case '\\':
+  //             break;
+  //           default:
+  //             Error("Unknown escape char for literal string: '\\", c, "'.");
+  //         }
+  //       }
+  //       out->str.push_back(c);
+  //       c = regex[pos++];
+  //     }
+  //     if (c == '\"') --pos;
+
+  //     return out;
+  //   }
+
+  //   /// Should only be called when we know we have a single unit to produce.  Build and return it.
+  //   Ptr<re_base> ConstructSegment() {
+  //     Ptr<re_base> result;
+  //     char c = regex[pos++];  // Grab the current character and move pos to next.
+  //     switch (c) {
+  //       case '.':
+  //         result = NewPtr<re_charset>('\n', true);  // Anything except newline.
+  //         break;
+  //       case '(':
+  //         result = Process();         // Process the internal contents of parens.
+  //         EnsureNext(')');            // Make sure last char is a paren and advance.
+  //         break;
+  //       case '[':
+  //         result = ConstructSet();    // Build the inside of the set.
+  //         EnsureNext(']');            // Make sure last char is a close-bracket and advance.
+  //         break;
+  //       case '"':
+  //         result = ConstructString(); // Build the inside of the string.
+  //         EnsureNext('"');            // Make sure last char is a quote and advance.
+  //         break;
+  //       case '\\':
+  //         c = regex[pos++];  // Identify the specific escape char.
+  //         switch(c) {
+  //           // Shortcuts for character sets.
+  //           case 'd': result = NewPtr<re_charset>("0123456789"); break;
+  //           case 'D': result = NewPtr<re_charset>("0123456789", true); break;
+  //           case 'l': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"); break;
+  //           case 'L': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", true); break;
+  //           case 's': result = NewPtr<re_charset>(" \f\n\r\t\v"); break;
+  //           case 'S': result = NewPtr<re_charset>(" \f\n\r\t\v", true); break;
+  //           case 'w': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"); break;
+  //           case 'W': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_", true); break;
+            
+  //           // Special escape sequences
+  //           case 'f': result = NewPtr<re_string>('\f'); break;
+  //           case 'n': result = NewPtr<re_string>('\n'); break;
+  //           case 'r': result = NewPtr<re_string>('\r'); break;
+  //           case 't': result = NewPtr<re_string>('\t'); break;
+  //           case 'v': result = NewPtr<re_string>('\v'); break;
+
+  //           // Any of these characters should just be themselves!
+  //           case '!':  case '\"':  case '#':   case '$':  case '%':  case '&':  case '\'':
+  //           case '(':  case ')':   case '*':   case '+':  case ',':  case '-':  case '.':
+  //           case '/':  case ':':   case ';':   case '<':  case '=':  case '>':  case '?':
+  //           case '@':  case '[':   case '\\':  case ']':  case '^':  case '_':  case '`':
+  //           case '{':  case '|':   case '}':   case '~':
+  //             result = NewPtr<re_string>(c);
+  //             break;
+  //           default:
+  //             Error("Unknown escape char: '\\", c, "'; ignoring backslash.");
+  //             result = NewPtr<re_string>(c);
+  //         }
+  //         break;
+
+  //       // Error cases
+  //       case '|':
+  //       case '*':
+  //       case '+':
+  //       case '?':
+  //       case ')':
+  //         Error("Expected regex segment but got '", c, "' at position ", pos, ".");
+  //         result = NewPtr<re_string>(c);
+  //         break;
+
+  //       default:
+  //         // Take this character directly.
+  //         result = NewPtr<re_string>(c);
+  //     }
+
+  //     emp_assert(result != nullptr);
+  //     return result;
+  //   }
+
+  //   /// Process the input regex into a tree representation.
+  //   Ptr<re_block> Process(Ptr<re_block> cur_block=nullptr) {
+  //     emp_assert(pos < regex.size(), pos, regex.size(), regex);
+
+  //     // If caller does not provide current block, create one (and return it.)
+  //     if (cur_block==nullptr) cur_block = NewPtr<re_block>();
+
+  //     // All blocks need to start with a single token.
+  //     cur_block->push( ConstructSegment() );
+
+  //     while (pos < regex.size()) {
+  //       const char c = regex[pos++];
+  //       switch (c) {
+  //         // case '|': cur_block->push( new re_or( cur_block->pop(), ConstructSegment() ) ); break;
+  //         case '|': cur_block->push( NewPtr<re_or>( cur_block->pop(), Process() ) ); break;
+  //         case '*': cur_block->push( NewPtr<re_star>( cur_block->pop() ) ); break;
+  //         case '+': cur_block->push( NewPtr<re_plus>( cur_block->pop() ) ); break;
+  //         case '?': cur_block->push( NewPtr<re_qm>( cur_block->pop() ) ); break;
+  //         case ')': pos--; return cur_block;  // Must be ending segment (restore pos to check on return)
+
+  //         default:     // Must be a regular "segment"
+  //           pos--;     // Restore to previous char to construct the next segment.
+  //           cur_block->push( ConstructSegment() );
+  //       }
+  //     }
+
+  //     return cur_block;
+  //   }
+
+  // public:
+  //   RegEx() = delete;
+  //   RegEx(const std::string & r) : regex(r) {
+  //     if (regex.size()) Process(ToPtr(&head));
+  //     while(head.Simplify());
+  //   }
+  //   RegEx(const RegEx & r) : regex(r.regex) {
+  //     if (regex.size()) Process(ToPtr(&head));
+  //     while(head.Simplify());
+  //   }
+  //   ~RegEx() = default;
+
+  //   /// Set this RegEx equal to another.
+  //   RegEx & operator=(const RegEx & r) {
+  //     regex = r.regex;
+  //     notes.resize(0);
+  //     valid = true;
+  //     pos = 0;
+  //     head.Clear();
+  //     Process(ToPtr(&head));
+  //     while (head.Simplify());
+  //     return *this;
+  //   }
+
+  //   /// Convert the RegEx to an standard string, readable from outside this class.
+  //   std::string AsString() const { return to_literal(regex); }
+
+  //   /// Add this regex to an NFA being built.
+  //   void AddToNFA(NFA & nfa, size_t start, size_t stop) const { head.AddToNFA(nfa, start, stop); }
+
+  //   /// Assume the RegEx is ready and setup processing for it.
+  //   void Generate() const;
+
+  //   /// Test if a string satisfies this regex.
+  //   bool Test(const std::string & str) const {
+  //     if (!dfa_ready) Generate();
+  //     return dfa.Test(str);
+  //   }
+
+  //   const emp::vector<std::string> & GetNotes() const { return notes; }
+
+  //   /// For debugging: print the internal representation of the regex.
+  //   void PrintInternal() const { head.Print(std::cout); std::cout << std::endl; }
+
+  //   /// For debugging: print any internal notes generated about this regex.
+  //   void PrintNotes() const {
+  //     for (const std::string & n : notes) {
+  //       std::cout << n << std::endl;
+  //     }
+  //   }
+
+  //   /// Print general debugging information about this regex.
+  //   void PrintDebug() const {
+  //     if (notes.size()) {
+  //       std::cout << "NOTES:" << std::endl;
+  //       PrintNotes();
+  //     }
+  //     std::cout << "RegEx: " << to_escaped_string(regex) << std::endl;
+  //     std::cout << "INTERNAL: ";
+  //     PrintInternal();
+  //   }
+  // };
+
+
+  /// Simple conversion of RegEx to NFA (mostly implemented in RegEx)
+  static NFA to_NFA(const RegEx & regex, size_t stop_id=1) {
+    NFA nfa(2);  // State 0 = start, state 1 = stop.
+    nfa.SetStop(1, stop_id);
+    regex.AddToNFA(nfa, 0, 1);
+    return nfa;
+  }
+
+  /// Conversion of RegEx to DFA, via NFA intermediate.
+  static DFA to_DFA(const RegEx & regex) {
+    return to_DFA( to_NFA(regex) );
+  }
+
+  void RegEx::Generate() const {
+    dfa = to_DFA(*this);
+    dfa_ready = true;
+  }
+}
+
+#endif // #ifndef EMP_COMPILER_REGEX_HPP_INCLUDE

@@ -16,74 +16,79 @@
 
 TEST_CASE("Testing HTMLText", "[text]") {
   emp::HTMLText text("Test Text");
-  REQUIRE(text.GetSize() == 9);
-  REQUIRE(text.GetText() == "Test Text");
-  REQUIRE(text.Encode() == "Test Text");
+  CHECK(text.GetSize() == 9);
+  CHECK(text.AsString() == "Test Text");
+  CHECK(text.Encode() == "Test Text");
 
   // Try adding style.
   text.Bold(5,9);
-  REQUIRE(text.GetSize() == 9);
-  REQUIRE(text.GetText() == "Test Text");
-  REQUIRE(text.Encode() == "Test <b>Text</b>");
+  CHECK(text.GetSize() == 9);
+  CHECK(text.AsString() == "Test Text");
+  CHECK(text.Encode() == "Test <b>Text</b>");
 
   // Try appending.
   text << " and more Text.";
-  REQUIRE(text.GetSize() == 24);
-  REQUIRE(text.GetText() == "Test Text and more Text.");
-  REQUIRE(text.Encode() == "Test <b>Text</b> and more Text.");
+  CHECK(text.GetSize() == 24);
+  CHECK(text.AsString() == "Test Text and more Text.");
+  CHECK(text.Encode() == "Test <b>Text</b> and more Text.");
 
   // Try changing letters.
   text[21] = 's';
   text[23] = 's';
-  REQUIRE(text.GetSize() == 24);
-  REQUIRE(text.GetText() == "Test Text and more Tests");
-  REQUIRE(text.Encode() == "Test <b>Text</b> and more Tests");
+  CHECK(text.GetSize() == 24);
+  CHECK(text.AsString() == "Test Text and more Tests");
+  CHECK(text.Encode() == "Test <b>Text</b> and more Tests");
 
   // Try making a change that involves style.
   text[19] = text[5];
-  REQUIRE(text.GetSize() == 24);
-  REQUIRE(text.GetText() == "Test Text and more Tests");
-  REQUIRE(text.Encode() == "Test <b>Text</b> and more <b>T</b>ests");
+  CHECK(text.GetSize() == 24);
+  CHECK(text.AsString() == "Test Text and more Tests");
+  CHECK(text.Encode() == "Test <b>Text</b> and more <b>T</b>ests");
 
   text.Italic(14,18);
-  REQUIRE(text.GetSize() == 24);
-  REQUIRE(text.GetText() == "Test Text and more Tests");
-  REQUIRE(text.Encode() == "Test <b>Text</b> and <i>more</i> <b>T</b>ests");
+  CHECK(text.GetSize() == 24);
+  CHECK(text.AsString() == "Test Text and more Tests");
+  CHECK(text.Encode() == "Test <b>Text</b> and <i>more</i> <b>T</b>ests");
 
   // Try erasing the text.
   text.Resize(0);
-  REQUIRE(text.GetSize() == 0);
-  REQUIRE(text.GetText() == "");
-  REQUIRE(text.Encode() == "");
-  REQUIRE(text.GetStyles().size() == 0);
+  CHECK(text.GetSize() == 0);
+  CHECK(text.AsString() == "");
+  CHECK(text.Encode() == "");
+  CHECK(text.GetStyles().size() == 0);
 
   text << "This is <b><i>Pre-</i>formatted</b> text.";
   // text.PrintDebug();
-  // REQUIRE(text.GetSize() == 27);
-  REQUIRE(text.GetText() == "This is Pre-formatted text.");
-  REQUIRE(text.Encode() == "This is <i><b>Pre-</i>formatted</b> text.");
+  // CHECK(text.GetSize() == 27);
+  CHECK(text.AsString() == "This is Pre-formatted text.");
+  CHECK(text.Encode() == "This is <i><b>Pre-</i>formatted</b> text.");
 
   emp::Text plain_text("The <b> and </b> here should not be converted.");
-  REQUIRE(plain_text.Encode() == "The <b> and </b> here should not be converted.");
+  CHECK(plain_text.Encode() == "The <b> and </b> here should not be converted.");
 
   // Now let's bold the word "not".
   plain_text.Bold(29,32);
 
   // Should not change the output of Encode(), just internal style.
-  REQUIRE(plain_text.Encode() == "The <b> and </b> here should not be converted.");
-  REQUIRE(plain_text[28].IsBold() == false);
-  REQUIRE(plain_text[29].IsBold() == true);
-  REQUIRE(plain_text[31].IsBold() == true);
-  REQUIRE(plain_text[32].IsBold() == false);
+  CHECK(plain_text.Encode() == "The <b> and </b> here should not be converted.");
+  CHECK(plain_text[28].IsBold() == false);
+  CHECK(plain_text[29].IsBold() == true);
+  CHECK(plain_text[31].IsBold() == true);
+  CHECK(plain_text[32].IsBold() == false);
 
   // But if we put it into an HTML object, the style should be reflected.
   emp::HTMLText html_text(plain_text);
-  REQUIRE(html_text.GetText() == "The <b> and </b> here should not be converted.");
-  REQUIRE(html_text.Encode() == "The &lt;b&gt; and &lt;/b&gt; here should <b>not</b> be converted.");
+  CHECK(html_text.AsString() == "The <b> and </b> here should not be converted.");
+  CHECK(html_text.Encode() == "The &lt;b&gt; and &lt;/b&gt; here should <b>not</b> be converted.");
 
-  emp::HTMLText text2 = "Now let's try something with a non-breaking&nbsp;space.";
-  REQUIRE(text2.GetText() == "Now let's try something with a non-breaking space.");
-  REQUIRE(text2.Encode() == "Now let's try something with a non-breaking&nbsp;space.");
+  emp::HTMLText text2 = "Now let's try <b>something</b> with a non-breaking&nbsp;space.";
+  CHECK(text2.AsString() == "Now let's try something with a non-breaking space.");
+  CHECK(text2.Encode() == "Now let's try <b>something</b> with a non-breaking&nbsp;space.");
+
+  emp::HTMLText text3 = "Three non-breaking spaces in a row&nbsp;&nbsp;&nbsp;!";
+  CHECK(text3.AsString() == "Three non-breaking spaces in a row   !");
+  CHECK(text3.Encode() == "Three non-breaking spaces in a row&nbsp;&nbsp;&nbsp;!");
+
 
   // Play with merging and converting.
   emp::HTMLText part1 = "Part 1 of text;";
@@ -93,6 +98,6 @@ TEST_CASE("Testing HTMLText", "[text]") {
   part2.Italic(18,22);
 
   emp::Text merged = emp::MakeHTMLText(part1, " ", part2);
-  REQUIRE(merged.GetText() == "Part 1 of text; And now part 2 of text.");
-  REQUIRE(merged.Encode() == "Part <b>1</b> of text; And now part <b>2</b> of <i>text</i>.");
+  CHECK(merged.AsString() == "Part 1 of text; And now part 2 of text.");
+  CHECK(merged.Encode() == "Part <b>1</b> of text; And now part <b>2</b> of <i>text</i>.");
 }

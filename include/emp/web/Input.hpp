@@ -22,7 +22,7 @@
  *    Input & Autofocus(bool in_af)
  *    Input & Disabled(bool in_dis)
  *
- *  Retriving current state:
+ *  Retrieving current state:
  *    const std::string & GetLabel() const
  *    bool HasAutofocus() const
  *    bool IsDisabled() const

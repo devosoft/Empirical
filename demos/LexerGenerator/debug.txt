@@ -1,0 +1,7 @@
+# Sample text; replace with whatever you want to try tokenizing.
+int countdown = 10;
+while (countdown > 0) {
+  print(countdown);
+  countdown = countdown - 1;
+}
+print("Boom!");

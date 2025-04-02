@@ -9,7 +9,7 @@
  *
  *  To wrap a function, call:
  *
- *     `uint32_t fun_id = emp::JSWrap(FunctionToBeWrapped, "JS_Function_Name");``
+ *     `uint32_t fun_id = emp::JSWrap(FunctionToBeWrapped, "JS_Function_Name");`
  *
  *  To manually callback a function from Javascript, first set `emp_i.cb_args` to an array of
  *  function arguments, then call `empCppCallback( fun_id );`   This all happens automatically
@@ -47,6 +47,8 @@
 #include <tuple>
 #include <type_traits>
 
+#include <emscripten/threading.h>
+
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/tuple_struct.hpp"
@@ -75,7 +77,7 @@ namespace emp {
   template <typename JSON_TYPE, int ARG_ID, int FIELD>
   struct LoadTuple;
 
-  /// This needs to go before LoadTuple is defined, in case there are nested tuple structs
+  // This needs to go before LoadTuple is defined, in case there are nested tuple structs
   template <int ARG_ID, typename T> static
   void LoadArg(T & arg_var) {
     if constexpr ( is_introspective_tuple<T>() ) {
@@ -93,11 +95,16 @@ namespace emp {
     }
   }
 
-  template <int ARG_ID> static void LoadArg(std::string & arg_var) {
+  template <int ARG_ID>
+  static void LoadArg(std::string & arg_var) {
     char * tmp_var = (char *) MAIN_THREAD_EM_ASM_INT({
-        return allocate(intArrayFromString(emp_i.cb_args[$0]), ALLOC_STACK);
+        var num_bytes = lengthBytesUTF8(emp_i.cb_args[$0]) + 1;
+        var string_on_wasm_heap = _malloc(num_bytes);
+        stringToUTF8(emp_i.cb_args[$0], string_on_wasm_heap, num_bytes);
+        return string_on_wasm_heap;
       }, ARG_ID);
-    arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
+    arg_var = tmp_var; // Set the specified argument variable
+    free(tmp_var);     // Free the allocated memory
   }
 
   template <int ARG_ID, size_t SIZE, typename T> static void LoadArg(emp::array<T, SIZE> & arg_var){
@@ -171,14 +178,21 @@ namespace emp {
     }, var.c_str());
   }
 
-  template <int ARG_ID> static void LoadArg(std::string & arg_var, std::string var) {
+  template <int ARG_ID>
+  static void LoadArg(std::string & arg_var, std::string var) {
     char * tmp_var = (char *) MAIN_THREAD_EM_ASM_INT({
-      if (emp_i.curr_obj[UTF8ToString($0)] == null){
-        emp_i.curr_obj[UTF8ToString($0)] = "undefined";
-      }
-      return allocate(intArrayFromString(emp_i.curr_obj[UTF8ToString($0)]), ALLOC_STACK);
+        var key = UTF8ToString($0);
+        if (emp_i.curr_obj[key] == null) {
+          emp_i.curr_obj[key] = "undefined";
+        }
+        var str = emp_i.curr_obj[key];
+        var num_bytes = lengthBytesUTF8(str) + 1;
+        var string_on_wasm_heap = _malloc(num_bytes);
+        stringToUTF8(str, string_on_wasm_heap, num_bytes);
+        return string_on_wasm_heap;
     }, var.c_str());
-    arg_var = tmp_var;   // Free memory here?
+    arg_var = tmp_var;
+    free(tmp_var); // Free the allocated memory
   }
 
   template <int ARG_ID, typename JSON_TYPE> static
@@ -241,7 +255,7 @@ namespace emp {
   template <typename RETURN_TYPE>
   static emp::sfinae_decoy<void, decltype(&RETURN_TYPE::StoreAsReturn)>
   StoreReturn(const RETURN_TYPE & ret_var) {
-    ret_var.template StoreAsReturn();
+    ret_var.template StoreAsReturn<RETURN_TYPE>();
   }
 
   /// Helper functions to store values inside JSON objects
@@ -614,7 +628,13 @@ void empCppCallback(const size_t cb_id) {
 
     });
 
-    emscripten_async_queue_on_thread(
+    // Preserve backward compatibility (EM_FUNC_SIG_VI is not defined in newer Emscripten)
+    #ifndef EM_FUNC_SIG_VI
+    #define EM_FUNC_SIG_VI "v(i)"
+    #endif
+
+//    emscripten_async_queue_on_thread(
+    emscripten_dispatch_to_thread(
       proxy_pthread_id,
       EM_FUNC_SIG_VI, // VI = no return value, one argument
       (void*) &empDoCppCallback,
