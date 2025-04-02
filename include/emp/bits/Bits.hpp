@@ -2678,7 +2678,7 @@ namespace emp {
   /// Find bit positions where ANY sequence has a one in that position.  
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindAnyOnes(const CONTAINER_T & container) {
-    using bits_t = CONTAINER_T::value_type;
+    using bits_t = typename CONTAINER_T::value_type;
 
     // Identify cells where exactly one state is possible.
     bits_t found;
@@ -2692,7 +2692,7 @@ namespace emp {
   /// Find bit positions where ALL sequences have a one in that position.  
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindAllOnes(const CONTAINER_T & container) {
-    using bits_t = CONTAINER_T::value_type;
+    using bits_t = typename CONTAINER_T::value_type;
 
     // Identify cells where exactly one state is possible.
     bits_t found;
@@ -2706,7 +2706,7 @@ namespace emp {
   /// Find bit positions where NO sequences have a one in that position.  
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindNoOnes(const CONTAINER_T & container) {
-    using bits_t = CONTAINER_T::value_type;
+    using bits_t = typename CONTAINER_T::value_type;
 
     // Identify cells where exactly one state is possible.
     bits_t ones_found;
@@ -2720,7 +2720,7 @@ namespace emp {
   /// Find bit positions where exactly one sequence has a one in that position.  
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindUniqueOnes(const CONTAINER_T & container, size_t start=0) {
-    using bits_t = CONTAINER_T::value_type;
+    using bits_t = typename CONTAINER_T::value_type;
 
     bits_t any_ones;     // Are there any ones at a position?
     bits_t multi_ones;   // Are there multiple ones at a position?
@@ -2735,7 +2735,7 @@ namespace emp {
   /// Find bit positions where multiple sequences have a one in that position.  
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindMultiOnes(const CONTAINER_T & container) {
-    using bits_t = CONTAINER_T::value_type;
+    using bits_t = typename CONTAINER_T::value_type;
 
     bits_t any_ones;
     bits_t multi_ones;
@@ -2750,7 +2750,7 @@ namespace emp {
   /// Find bit positions where exactly two sequences have a one in that position.  
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindTwoOnes(const CONTAINER_T & container) {
-    using bits_t = CONTAINER_T::value_type;
+    using bits_t = typename CONTAINER_T::value_type;
 
     // Identify cells where exactly one state is possible.
     bits_t any_ones;
@@ -2768,7 +2768,7 @@ namespace emp {
   /// Find bit positions where exactly three sequences have a one in that position.  
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindThreeOnes(const CONTAINER_T & container) {
-    using bits_t = CONTAINER_T::value_type;
+    using bits_t = typename CONTAINER_T::value_type;
 
     // Identify cells where exactly one state is possible.
     bits_t any_ones;
