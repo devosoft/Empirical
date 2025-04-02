@@ -34,25 +34,25 @@ TEST_CASE("Test type_traits", "[meta]")
   REQUIRE( emp::IsIterable<std::vector<int>>() == true );
   REQUIRE( emp::IsIterable<std::string>() == true);
 
-  REQUIRE( emp::HasToString<ExampleType1>() == true );
-  REQUIRE( emp::HasToString<ExampleType2>() == false );
-  REQUIRE( emp::HasToString<std::string>() == false );
-  REQUIRE( emp::HasToString<int>() == false );
+  REQUIRE( emp::hasToString<ExampleType1> == true );
+  REQUIRE( emp::hasToString<ExampleType2> == false );
+  REQUIRE( emp::hasToString<std::string> == false );
+  REQUIRE( emp::hasToString<int> == false );
 
-  REQUIRE( emp::HasToDouble<ExampleType1>() == false );
-  REQUIRE( emp::HasToDouble<ExampleType2>() == true );
-  REQUIRE( emp::HasToDouble<std::string>() == false );
-  REQUIRE( emp::HasToDouble<int>() == false );
+  REQUIRE( emp::hasToDouble<ExampleType1> == false );
+  REQUIRE( emp::hasToDouble<ExampleType2> == true );
+  REQUIRE( emp::hasToDouble<std::string> == false );
+  REQUIRE( emp::hasToDouble<int> == false );
 
-  REQUIRE( emp::HasFromString<ExampleType1>() == true );
-  REQUIRE( emp::HasFromString<ExampleType2>() == false );
-  REQUIRE( emp::HasFromString<std::string>() == false );
-  REQUIRE( emp::HasFromString<int>() == false );
+  REQUIRE( emp::hasFromString<ExampleType1> == true );
+  REQUIRE( emp::hasFromString<ExampleType2> == false );
+  REQUIRE( emp::hasFromString<std::string> == false );
+  REQUIRE( emp::hasFromString<int> == false );
 
-  REQUIRE( emp::HasFromDouble<ExampleType1>() == false );
-  REQUIRE( emp::HasFromDouble<ExampleType2>() == true );
-  REQUIRE( emp::HasFromDouble<std::string>() == false );
-  REQUIRE( emp::HasFromDouble<int>() == false );
+  REQUIRE( emp::hasFromDouble<ExampleType1> == false );
+  REQUIRE( emp::hasFromDouble<ExampleType2> == true );
+  REQUIRE( emp::hasFromDouble<std::string> == false );
+  REQUIRE( emp::hasFromDouble<int> == false );
 
   REQUIRE( emp::is_std_function<int>() == false );
   REQUIRE( emp::is_std_function<int(double)>() == false );
@@ -81,16 +81,8 @@ TEST_CASE("Test type_traits", "[meta]")
 
 TEST_CASE("Test is_streamable", "[meta]") {
 
-  REQUIRE( emp::is_streamable<std::ostream, int>::value == true );
-  REQUIRE( emp::is_streamable<std::ostream, std::string>::value == true );
-  REQUIRE(
-    emp::is_streamable<std::ostream, std::function<void()>>::value == false
-  );
-
-  REQUIRE( emp::is_streamable<std::stringstream, int>::value == true );
-  REQUIRE( emp::is_streamable<std::stringstream, std::string>::value == true );
-  REQUIRE(
-    emp::is_streamable<std::stringstream, std::function<void()>>::value == false
-  );
+  REQUIRE( emp::is_streamable<int>::value == true );
+  REQUIRE( emp::is_streamable<std::string>::value == true );
+  REQUIRE( emp::is_streamable<std::function<void()>>::value == false );
 
 }

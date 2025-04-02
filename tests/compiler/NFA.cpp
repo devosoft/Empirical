@@ -31,16 +31,16 @@ TEST_CASE("Test NFA", "[compiler]")
   size_t a = 97;
 
   // GetSymbolOptions
-  std::set<size_t> s;
-  s.insert(0);
+  emp::DynamicBits s;
+  s.Set(0);
   emp::BitSet<128> symbolOpts = nfa.GetSymbolOptions(s);
   REQUIRE(symbolOpts[97]); // ASCII value for a
   REQUIRE(symbolOpts[99]); // c
   REQUIRE(symbolOpts.count() == 2);
-  s.insert(1);
-  s.insert(2);
-  s.insert(3);
-  s.insert(4);
+  s.Set(1);
+  s.Set(2);
+  s.Set(3);
+  s.Set(4);
   symbolOpts = nfa.GetSymbolOptions(s);
   REQUIRE(symbolOpts[97]);  // ASCII a value
   REQUIRE(symbolOpts[98]);  // b
@@ -50,9 +50,9 @@ TEST_CASE("Test NFA", "[compiler]")
   REQUIRE(symbolOpts.count() == 5);
 
   // GetNext
-  std::set<size_t> nxt = nfa.GetNext(a);
-  REQUIRE(nxt.find(1) != nxt.end());
-  REQUIRE(nxt.find(0) == nxt.end());
+  emp::DynamicBits nxt = nfa.GetNext(a);
+  REQUIRE(nxt.Has(1));
+  REQUIRE(!nxt.Has(0));
 
   // assignment operator=
   emp::NFA nfa2 = nfa;
@@ -75,13 +75,13 @@ TEST_CASE("Test NFA", "[compiler]")
   REQUIRE(state.GetNFA().GetSize() == nfa.GetSize());
 
   // GetStateSet
-  std::set<size_t> states = state.GetStateSet();
-  REQUIRE(states.size() == 1);
-  REQUIRE(states.find(0) != states.end());
+  emp::DynamicBits states = state.GetStateSet();
+  REQUIRE(states.count() == 1);
+  REQUIRE(states.Has(0));
   state.Next("a");
   states = state.GetStateSet();
-  REQUIRE(states.size() == 1);
-  REQUIRE(states.find(1) != states.end());
+  REQUIRE(states.count() == 1);
+  REQUIRE(states.Has(1));
 
   // IsStop
   REQUIRE(!state.IsStop());
@@ -90,9 +90,9 @@ TEST_CASE("Test NFA", "[compiler]")
   REQUIRE(state.HasState(1));
 
   // SetStateSet
-  std::set<size_t> set1;
-  set1.insert(0);
-  set1.insert(2);
+  emp::DynamicBits set1;
+  set1.Set(0);
+  set1.Set(2);
   state.SetStateSet(set1);
   REQUIRE(state.GetStateSet() == set1);
 

@@ -155,7 +155,7 @@ namespace emp {
 
             return __impl_CallOrGetAttribute(
               // Check if the target attribute value is invocable
-              emp::is_invocable<ValueOfTargetType,
+              std::is_invocable<ValueOfTargetType,
                                 decltype(std::forward<U>(args))...>{},
               std::forward<V>(target), std::forward<U>(args)...);
           }

@@ -30,6 +30,8 @@ a.out.js
 
 incoming/
 tmp/
+**/bak/
+**/BAK/
 
 .vscode/
 
@@ -42,27 +44,12 @@ doc/api
 doc/doxyoutput
 doc/_build
 
-demos/Avida/Avida
-demos/Avida/web/Avida.js
-demos/Emphatic/Emphatic
-demos/Emphatic/examples/ConceptTest
-demos/Emphatic/examples/ConceptTest.cpp
-demos/MABE/examples/NK
+demos/Graphs/Steiner/Steiner
+demos/Graphs/Steiner/hw-tests/
+demos/LexerGenerator/Emplex
+demos/LexerGenerator/web/Emplex.js
 demos/MAP-Elites-Arm/web/MAP-Elites-Arm.js
-demos/NK.bak/
 demos/NK/NK
-demos/NK/web/NK.js
-demos/OEE-Breaker/OEE-Breaker
-demos/OpenWorld/OpenWorld
-demos/SelectionAnalyze/Lexicase
-demos/SelectionAnalyze/Roulette
-demos/SelectionAnalyze/out.csv
-demos/SelectionAnalyze/output
-demos/SpatialCoop2017/SimplePDWorld
-demos/SpatialCoop2017/web/SimplePDWorld.js
-demos/StateGrid/StateGrid
-demos/Sudoku/Sudoku.js
-demos/utils/graphs/web/MSS.js
 demos/NK/helloworld.cpp
 demos/NK/helloworld.js
 demos/NK/helloworld.js.mem
@@ -76,7 +63,13 @@ demos/NK/source/web
 demos/NK/web/jquery-1.11.2.min.js
 demos/NK/web/NK.asm.js
 demos/NK/web/NK.html
+demos/NK/web/NK.js
 demos/NK/web/NK.js.mem
+demos/SpatialCoop2017/SimplePDWorld
+demos/SpatialCoop2017/web/SimplePDWorld.js
+demos/StateGrid/StateGrid
+demos/Sudoku/Sudoku.js
+demos/utils/graphs/web/MSS.js
 demos/utils/words/Wordle/Wordle
 demos/utils/words/Wordle/web/
 demos/utils/words/annotate-length
@@ -102,7 +95,6 @@ tests/web/package.json
 tests/web/node_modules/
 tests/test_file.dat
 
-third-party/doxygen/
-third-party/emsdk/
+third-party/
 build/
 doc/_build/

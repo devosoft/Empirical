@@ -22,7 +22,7 @@
 namespace emp {
 
   /// Identical to std::function, but memorizes prior results (caches them) so that the function
-  /// doesn't have to process those results again.  (note: Genetic version is undefinined; must have
+  /// doesn't have to process those results again.  (note: Genetic version is undefined; must have
   /// a function signature.)
   template <class T> class memo_function;    // Not defined.
 
@@ -31,22 +31,21 @@ namespace emp {
   template <class R, class ARG>
   class memo_function<R(ARG)> {
   public:
-    using size_t = std::size_t;
     using return_t = R;
     using index_t = std::decay_t<ARG>;
     using fun_t = std::function<R(ARG)>;
     using this_t = memo_function<R(ARG)>;
 
   private:
-    mutable std::unordered_map<index_t, return_t> cache_map; ///< Cached results.
-    fun_t fun;                                               ///< Function to call.
+    mutable std::unordered_map<index_t, return_t> cache_map{}; ///< Cached results.
+    fun_t fun{};                                               ///< Function to call.
 
   public:
     template <typename T>
-    memo_function(T && fun_info) : cache_map(), fun(std::forward<T>(fun_info)) { ; }
+    memo_function(T && fun_info) : fun(std::forward<T>(fun_info)) { }
     memo_function(const this_t &) = default;
     memo_function(this_t &&) = default;
-    memo_function() : cache_map(), fun() { ; }
+    memo_function() { }
 
     /// Copy another memo_function of the same type.
     this_t & operator=(const this_t &) = default;

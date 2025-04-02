@@ -40,17 +40,17 @@ namespace emp {
       /// Conversion of this proxy to Boolean (as an rvalue)
       operator bool() const { return Get(); }
 
-      // Compound assignement operators with BitProxy as the lvalue.
+      // Compound assignment operators with BitProxy as the lvalue.
       BitProxy & operator &=(bool b) { return SetIf(!b, 0); }
       BitProxy & operator *=(bool b) { return SetIf(!b, 0); }
       BitProxy & operator |=(bool b) { return SetIf(b, 1); }
       BitProxy & operator +=(bool b) { return SetIf(b, 1); }
       BitProxy & operator -=(bool b) { return SetIf(b, 0); }
 
-      /// Compound assignement operator XOR using BitProxy as lvalue.
+      /// Compound assignment operator XOR using BitProxy as lvalue.
       BitProxy & operator ^=(bool b) { return ToggleIf(b); }
 
-      /// Compound assignement operator DIV using BitProxy as lvalue.
+      /// Compound assignment operator DIV using BitProxy as lvalue.
       /// @note Never use this function except for consistency in a template since must divide by 1.
       BitProxy & operator /=([[maybe_unused]] bool b) {
       emp_assert(b == true, "BitProxy Division by Zero error.");

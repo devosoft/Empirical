@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
+ *  date: 2015-2024
 */
 /**
  *  @file
@@ -22,7 +22,6 @@
  *  @todo IDEALLY: Make a single table that will look at what each cell is pointing to (table
  *     or text) and write out what it needs to, in place.
  *  @todo Add a ClearColumn method, as well as other column functionality.
- *  @todo Add an operator[] to table that returns the appropriate row (and one to row for cell).
  */
 
 #ifndef EMP_WEB_TABLE_HPP_INCLUDE
@@ -57,7 +56,7 @@ namespace web {
       size_t colspan=1;    ///< How many columns wide is this TableData?
       size_t rowspan=1;    ///< How many rows deep is this TableData?
       bool header=false;   ///< Is this TableData a header (<th> vs <td>)?
-      bool masked=false;   ///< Is this cell masked by another cell?
+      bool masked=false;   ///< Is this cell masked by the span of another cell?
       WidgetExtras extras; ///< Extra annotations (attributes, style, listeners)
 
       emp::vector<Widget> children;  ///< Widgets contained in this cell.
@@ -133,6 +132,19 @@ namespace web {
       std::string GetTypeName() const override { return "TableInfo"; }
 
       void Resize(size_t new_rows, size_t new_cols) {
+        // Clear children from all cells being removed; start with cols on kept rows.
+        size_t min_rows = std::min(row_count, new_rows);
+        for (size_t col_id = new_cols; col_id < col_count; col_id++) {
+          for (size_t row_id = 0; row_id < min_rows; ++row_id) {
+            ClearCellChildren(row_id, col_id);
+          }
+        }
+  
+        // Clear removed rows.
+        for (size_t row_id = new_rows; row_id < row_count; ++row_id) {
+          ClearRowChildren(row_id);
+        }
+
         // Resize preexisting rows if remaining
         if (new_cols != col_count) {
           for (size_t r = 0; r < rows.size() && r < new_rows; r++) {
@@ -534,8 +546,8 @@ namespace web {
     using parent_t = internal::WidgetFacet<TableWidget>;
 
     /// Get a properly cast version of info.
-    internal::TableInfo * Info() { return (internal::TableInfo *) info; }
-    internal::TableInfo * const Info() const { return (internal::TableInfo *) info; }
+//    internal::TableInfo * Info() { return (internal::TableInfo *) info; }
+    /* const */ internal::TableInfo * Info() const { return (internal::TableInfo *) info; }
 
     TableWidget(internal::TableInfo * in_info, size_t _row=0, size_t _col=0)
      : WidgetFacet(in_info), cur_row(_row), cur_col(_col) { ; }
@@ -602,6 +614,9 @@ namespace web {
     TableCell GetCell(size_t r, size_t c) const;  ///< Focus on a specific cell in the table.
     TableRow GetRow(size_t r) const;              ///< Focus on a specific row in the table.
     TableCol GetCol(size_t c) const;              ///< Focus on a specific column in the table.
+    TableRow operator[](size_t r) const;          ///< Indexing shortcut to get a row.
+    TableRow GetLastRow() const;                  ///< Focus the final row in the table.
+    TableCol GetLastCol() const;                  ///< Focus the final column in the table.
     TableRowGroup GetRowGroup(size_t r) const;    ///< Focus on a specific group of rows in the table.
     TableColGroup GetColGroup(size_t c) const;    ///< Focus on a specific group of columns in the table.
     Table GetTable() const;                       ///< Focus on a the entire table.
@@ -679,6 +694,18 @@ namespace web {
       if (cur_col >= c) cur_col = 0;
       return *this;
     }
+
+    // Add a single new Row to the table.
+    TableRow AddRow();
+
+    // Add a single new Column to the table.
+    TableCol AddCol();
+
+    // Remove the last row in the table.
+    TableRow RemoveRow();
+
+    // Remove the last column in the table.
+    TableCol RemoveCol();
 
     /// Fully resize the table (both rows and columns)
     Table & Resize(size_t r, size_t c) {
@@ -777,6 +804,18 @@ namespace web {
     return TableCol(Info(), c);
   }
 
+  TableRow TableWidget::operator[](size_t r) const {
+    return GetRow(r);
+  }
+
+  TableRow TableWidget::GetLastRow() const {
+    return TableRow(Info(), Info()->row_count - 1);
+  }
+
+  TableCol TableWidget::GetLastCol() const {
+    return TableCol(Info(), Info()->col_count - 1);
+  }
+
   TableRowGroup TableWidget::GetRowGroup(size_t r) const {
     emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
     return TableRowGroup(Info(), r);
@@ -801,6 +840,34 @@ namespace web {
     cell << text;
     cell.SetHeader();
     return *this;
+  }
+
+  //============  Table 
+
+  // Add a single new Row to the table.
+  TableRow Table::AddRow() {
+    Rows(GetNumRows()+1);
+    return GetLastRow();
+  }
+
+  // Add a single new Column to the table.
+  TableCol Table::AddCol() {
+    Cols(GetNumCols()+1);
+    return GetLastCol();
+  }
+
+  // Add a single new Row to the table.
+  TableRow Table::RemoveRow() {
+    emp_assert(GetNumRows() > 0);
+    Rows(GetNumRows()-1);
+    return GetLastRow();
+  }
+
+  // Add a single new Column to the table.
+  TableCol Table::RemoveCol() {
+    emp_assert(GetNumCols() > 0);
+    Cols(GetNumCols()-1);
+    return GetLastCol();
   }
 
 }

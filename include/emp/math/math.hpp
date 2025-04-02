@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2021.
+ *  date: 2016-2024.
 */
 /**
  *  @file
@@ -27,6 +27,14 @@
 #include "Random.hpp"
 
 namespace emp {
+
+  template <size_t N>
+  inline constexpr std::array<size_t, N> MakeSequenceArray(size_t start=0) {
+    std::array<size_t, N> out;
+    for (size_t i=0; i < N; ++i) out[i] = i+start;
+    return out;
+  }
+
 
   /// % is actually remainder; Mod is a proper modulus command that handles negative #'s correctly
   inline constexpr int Mod(int in_val, int mod_val) {
@@ -164,39 +172,35 @@ namespace emp {
     return (in1 < cur_result) ? cur_result : in1;
   }
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  namespace internal {
-    // A compile-time log calculator for values [1,2)
-    static constexpr double Log2_base(double x) {
-      emp_assert(x > 0);
-      return log2_chart_1_2[(int)((x-1.0)*1024)];
-      // return InterpolateTable(log2_chart_1_2, x-1.0, 1024);
-    }
-
-    // A compile-time log calculator for values < 1
-    static constexpr double Log2_frac(double x) {
-      emp_assert(x > 0);
-      return (x >= 1.0) ? Log2_base(x) : (Log2_frac(x*2.0) - 1.0);
-    }
-
-    // A compile-time log calculator for values >= 2
-    static constexpr double Log2_pos(double x) {
-      emp_assert(x > 0);
-      emp_assert(x != INFINITY);
-      return (x < 2.0) ? Log2_base(x) : (Log2_pos(x/2.0) + 1.0);
-    }
-
-  }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
-
   /// Compile-time log base 2 calculator.
-  static constexpr double Log2(double x) {
-    emp_assert(x > 0);
-    return (x < 1.0) ? internal::Log2_frac(x) : internal::Log2_pos(x);
+  [[nodiscard]] static constexpr double Log2(double x) {
+    // emp_assert(x > 0 && x != INFINITY);
+
+    if (x == 1.0) return 0.0; // Ensure a perfect answer if given a power of 2.
+
+    // If we are not between 1.0 and 2.0, do a recursive call to bring into range.
+    if (x >= 2.0) return Log2(x/2.0) + 1.0;
+    if (x < 1.0) return Log2(x*2.0) - 1.0;
+
+    // Apply Taylor series for log2(x)
+    double sum = 0.0;
+    double term = (x - 1) / (x + 1);
+    double term2 = term * term;
+
+    for (int i = 1; i <= 19; i += 2) {
+      sum += (1.0 / i) * term;
+      term *= term2;
+    }
+
+    return (2.0 * sum) / emp::LN2;
   }
 
   /// Compile-time log calculator
-  static constexpr double Log(double x, double base=10.0) { return Log2(x) / Log2(base); }
+  static constexpr double Log(double x, double base=10.0) {
+    if (x > base) return Log(x/base, base) + 1.0;
+    if (x < 1.0) return Log(x*base, base) - 1.0;
+    return Log2(x) / Log2(base);
+  }
   /// Compile-time natural log calculator
   static constexpr double Ln(double x) { return Log(x, emp::E); }   // Natural Log...
   /// Compile-time log base 10 calculator.

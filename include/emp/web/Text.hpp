@@ -30,13 +30,13 @@ namespace web {
   class Text : public internal::WidgetFacet<Text> {
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend class TextInfo;
-    #endif // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
 
     class TextInfo : public internal::WidgetInfo {
       #ifndef DOXYGEN_SHOULD_SKIP_THIS
       friend Text;
-      #endif // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
     protected:
       DynamicString strings;    ///< All string (and functions returning strings) in Text widget.
       bool append_ok;           ///< Can this Text widget be extended?

@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2022
+ *  date: 2015-2024
 */
 /**
  *  @file
@@ -14,8 +14,12 @@
 
 #include <iostream>
 #include <set>
+#include <sstream>
 #include <string>
 #include <type_traits>
+#include <unordered_map>
+
+#include "../base/notify.hpp"
 
 #define EMP_DEBUG_PRINT(...) std::cout << "[" << #__VA_ARGS__ << "] = " << __VA_ARGS__ << std::endl
 
@@ -53,10 +57,45 @@ namespace emp {
     std::cerr << std::endl;
   }
 
-  /// emp_debug() will print its contents as a message in debug mode and BLOCK release mode until
+  /// emp_debug_only() will print its contents as a message in debug mode and BLOCK release mode until
   /// it is removed.  It's a useful too for printing "Ping1", "Ping2", etc, but no forgetting to
   /// remove them.
-  #define emp_debug(...) { BlockRelease(true); emp::emp_debug_print(__VA_ARGS__); }
+  #define emp_debug_only(...) { BlockRelease(true); emp::emp_debug_print(__VA_ARGS__); }
+
+
+  /// emp_debug(...) will print its contents in debug mode, but ignore them otherwise.
+#ifdef NDEBUG
+  #define emp_debug(...)
+#else
+  #define emp_debug(...) emp::emp_debug_print(__VA_ARGS__)
+#endif
+
+  /// Track particular lines of code to report errors about them from elsewhere.
+  static auto & GetDebugLineMap() {
+    static std::unordered_map<std::string, std::string> line_map;
+    return line_map;
+  }
+
+  static bool HasDebugLine(std::string name) {
+    return GetDebugLineMap().find(name) != GetDebugLineMap().end();
+  }
+
+  static auto & GetDebugLine(std::string name) {
+    return GetDebugLineMap()[name];
+  }
+
+  [[maybe_unused]] static void AddDebugLine(std::string name, std::string file, size_t line) {
+    std::stringstream ss;
+    ss << file << ':' << line;
+    notify::TestError(HasDebugLine(name), "Adding a second debug line named '", name, "'.");
+    GetDebugLine(name) = ss.str();
+  }
+
+  #ifdef NDEBUG
+  #define EMP_TRACK_LINE(NAME)
+  #else
+  #define EMP_TRACK_LINE(NAME) emp::AddDebugLine(NAME, __FILE__, __LINE__)
+  #endif
 }
 
 #endif // #ifndef EMP_DEBUG_DEBUG_HPP_INCLUDE

@@ -51,10 +51,10 @@ namespace emp {
     /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2000000001; // 2x10^9 + 1
 
-  public:
     /// Setup a revision number - iterators must match the revision of their vector.
-    int revision;
+    int revision = 0;
 
+  public:
     /// Setup an iterator wrapper to make sure that they're not used again after a vector changes.
     template<typename ITERATOR_T>
     struct iterator_wrapper : public ITERATOR_T {
@@ -234,6 +234,7 @@ namespace emp {
       revision++;
     }
     this_t & operator=(const this_t &) & = default;
+    this_t & operator=(this_t &&) & = default;
 
     T & operator[](size_t pos) {
       emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
@@ -310,8 +311,9 @@ namespace emp {
     using reference = typename stdv_t::reference;
     using const_reference = typename stdv_t::const_reference;
 
-    vector() : stdv_t() {};
-    vector(const this_t & _in) : stdv_t(_in) {};
+    vector() = default;
+    vector(const this_t & _in) = default;
+    vector(this_t && _in) = default;
     vector(size_t size) : stdv_t(size) { emp_assert(size < MAX_SIZE, size); }
     vector(size_t size, bool val) : stdv_t(size, val) { emp_assert(size < MAX_SIZE, size); }
     vector(std::initializer_list<bool> in_list) : stdv_t(in_list) { ; }
@@ -329,6 +331,7 @@ namespace emp {
       stdv_t::resize(new_size, val);
     }
     this_t & operator=(const this_t &) & = default;
+    this_t & operator=(this_t &&) & = default;
 
     auto operator[](size_t pos) -> decltype(stdv_t::operator[](pos)) {
       emp_assert(pos < stdv_t::size(), pos, stdv_t::size());

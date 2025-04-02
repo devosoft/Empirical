@@ -1,14 +1,14 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017
+ *  date: 2017-2024
 */
 /**
  *  @file
  *  @brief Tools to step through combinations of items.
  *
- *  Step through all combinations of size K from a set of N values.  For ComboIDs just return the
- *  indecies (the specific of the container don't matter).  Other versions will directly wrapper
+ *  Step through all combinations of size k from a set of N values.  For ComboIDs just return the
+ *  indices (the specific of the container don't matter).  Other versions will directly wrapper
  *  containers.
  *
  *  @todo Allow a minimum and maximum combo size, not just a fixed combo size.  If no sizes are
@@ -24,8 +24,10 @@
 #include <iostream>
 #include <stddef.h>
 
+#include "../base/array.hpp"
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
+#include "../math/math.hpp"
 
 namespace emp {
 
@@ -36,7 +38,7 @@ namespace emp {
     emp::vector<size_t> max_combo;
     size_t num_combos;
 
-    static size_t CountCombos(size_t max_count, size_t combo_size);
+    static constexpr size_t CountCombos(size_t max_count, size_t combo_size);
   public:
     ComboIDs(size_t in_max, size_t combo_size);
     ~ComboIDs() { ; }
@@ -50,7 +52,7 @@ namespace emp {
     size_t & operator[](const size_t index) { return cur_combo[index];  }
     const size_t & operator[](const size_t index) const { return cur_combo[index];  }
 
-    // General Use manipulatros
+    // General Use manipulators
     const emp::vector<size_t> & Reset();
     bool NextCombo();
     void ResizeCombos(size_t new_size);
@@ -58,7 +60,7 @@ namespace emp {
     // Deal with inversions...
     emp::vector<size_t> GetInverseCombo();
 
-    // Make sure obvious operators also work plus standatd library compatability.
+    // Make sure obvious operators also work plus standard library compatibility.
     ComboIDs & operator++() { NextCombo(); return *this; }
     ComboIDs & operator++(int) { NextCombo(); return *this; }
     size_t size() { return num_combos; }
@@ -142,7 +144,7 @@ namespace emp {
   }
 
 
-  size_t ComboIDs::CountCombos(size_t max_count, size_t combo_size)
+  constexpr size_t ComboIDs::CountCombos(size_t max_count, size_t combo_size)
   {
     if (combo_size * 2 > max_count) combo_size = max_count - combo_size;
 

@@ -1,217 +1,285 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2021.
+ *  date: 2015-2025.
 */
 /**
  *  @file
- *  @brief A versatile and non-patterned pseudo-random-number generator.
+ *  @brief A versatile pseudo-random-number generator.
  *  Status: RELEASE
  */
 
 #ifndef EMP_MATH_RANDOM_HPP_INCLUDE
 #define EMP_MATH_RANDOM_HPP_INCLUDE
 
-#include <climits>
+#include "Random_Xoshiro256pp.hpp"
+#include "Random_MSWS.hpp"
+#include "Random_Xorshift.hpp"
+
 #include <cmath>
+#include <concepts>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <iterator>
 #include <stddef.h>
 
+#include "../base/array.hpp"
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../bits/bitset_utils.hpp"
 
+#include "constants.hpp"
 #include "Range.hpp"
 
 namespace emp {
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  using namespace emp;
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
-  ///  Middle Square Weyl Sequence: A versatile and non-patterned pseudo-random-number
-  ///  generator.
-  ///  Based on: https://en.wikipedia.org/wiki/Middle-square_method
-  class Random {
-  protected:
+  // Random_Base provides extra functionality for a given RNG Engine (passed in
+  // as a template parameter).
+  //
+  // The Engine must have:
+  // - A constructor that accepts a random number seed (64 bit unsigned int, guaranteed non-zero).
+  // - A `ResetSeed(uint64_t seed)` function that resets the engine appropriately.
+  // - A `Get()` function that returns an unsigned int in its native type (32 or 64 bits)
+  //
+  // Optionally, if it has these other functions they will be used rather than creating
+  // them internally:
+  // - A `Get32()` returning a random 32-bit int (alternative: use last 32 bits when called)
+  // - A `Get64()` returning a random 64-bit int (alternative: combine two 32-bit values)
+  // - A `GetType()` returning an std::string with the type name for this engine.
 
-    uint64_t value = 0;                       ///< Current squaring value
-    uint64_t weyl_state = 0;                  ///< Weyl sequence state
-    uint64_t original_seed = 0;               ///< Seed to start sequence; initialized weyl_state
+  template <typename ENGINE_T>
+  class Random_Base {
+  private:
+    ENGINE_T engine;
+    static constexpr bool NATIVE64 = std::same_as<decltype(engine.Get()), uint64_t>;
+
+    uint64_t original_seed = 0;     // Seed to start sequence
 
     // Members & functions for stat functions
     double expRV = 0.0;    ///< Exponential Random Variable for the randNormal function
 
-    // Constants ////////////////////////////////////////////////////////////////
-    static constexpr const uint64_t RAND_CAP = 4294967296;  // 2^32
-    static constexpr const uint64_t STEP_SIZE = 0xb5ad4eceda1ce2a9;  ///< Weyl sequence step size
+    // Constants
+    static constexpr uint64_t VAL32_CAP   = uint64_t{1} << 32; // 4'294'967'296 (1^32)
+    static constexpr double   VAL32_CAP_D = static_cast<double>(VAL32_CAP);
+    static constexpr double   VAL32_FRAC  = 1.0 / VAL32_CAP_D;
 
-    static constexpr const unsigned char BYTE1 = (unsigned char) 1;
+    static constexpr uint64_t VAL53_CAP   = uint64_t{1} << 53; // 9'007'199'254'740'992 (1^53)
+    static constexpr double   VAL53_CAP_D = static_cast<double>(VAL53_CAP);
+    static constexpr double   VAL53_FRAC  = 1.0 / VAL53_CAP_D;
 
-    /// Basic Random number
-    /// Returns a random number [0, RAND_CAP)
-    uint32_t Get() noexcept {
-      value *= value;                       // Square the current value.
-      value += (weyl_state += STEP_SIZE);   // Take a step in the Weyl sequence
-      value = (value>>32) | (value<<32);    // Return the middle of the value
-      return (uint32_t) value;
+    // Core functions
+    uint32_t Get32() noexcept {
+      if constexpr (requires { engine.Get32(); }) {
+        return engine.Get32();
+      } else {
+        return static_cast<uint32_t>(Get());
+      }
     }
 
+    uint64_t Get64() noexcept {
+      // Always prefer a call with the specified number of bits.
+      if constexpr (requires { engine.Get64(); }) { return engine.Get64(); }
+      
+      // If the regular Get() is already 64 bits, use it.
+      else if constexpr (NATIVE64) { return Get(); }
+
+      // Otherwise stitch two 32-bit random values together.
+      else { return (static_cast<uint64_t>(Get32()) << 32) + Get32(); }
+    }
+
+    // Get a value at the native resolution produced by the engine.
+    auto Get() noexcept { return engine.Get(); }
+   
   public:
-    /// Set up the random generator object with an optional seed value.
-    Random(const int seed = -1) noexcept {
-      ResetSeed(seed);  // Calls init()
-    }
-
-    ~Random() { ; }
+    /// Set up the random generator object with an optional seed value (0 = based on time and ptr).
+    Random_Base(uint64_t seed = 0) noexcept { ResetSeed(seed); }
 
     /// Advance pseudorandom number generation engine one step.
     void StepEngine() noexcept { Get(); }
 
     /// @return The current seed used to initialize this pseudo-random sequence.
-    inline uint64_t GetSeed() const noexcept { return original_seed; }
+    [[nodiscard]] uint64_t GetSeed() const noexcept { return original_seed; }
+
+    /// @return The type name of the engine.
+    [[nodiscard]] std::string GetEngineType() {
+      if constexpr (requires { engine.GetType(); }) { return engine.GetType(); }
+      return "Unknown";
+    }
 
     /// Starts a new sequence of pseudo random numbers.  A negative seed means that the random
     /// number generator gets its seed from the current system time and the process memory.
-    void ResetSeed(const int64_t seed) noexcept {
-      value = 0;
+    void ResetSeed(uint64_t seed) noexcept {
       expRV = 0.0;
 
-      // If the provided seed is <= 0, choose a unique seed based on time and memory location.
-      if (seed <= 0) {
-        uint64_t seed_time = (uint64_t) time(NULL);
-        uint64_t seed_mem = (uint64_t) this;
-        weyl_state = seed_time ^ seed_mem;
+      // If the provided seed is 0, choose a unique seed based on time and memory location.
+      if (seed == 0) {
+        uint64_t seed_time = static_cast<uint64_t>(time(NULL));
+        uint64_t seed_mem = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(this));
+        seed_mem = (seed_mem << 32) + (seed_mem >> 32);
+        seed = seed_time ^ seed_mem;
       }
 
-      else weyl_state = (uint64_t) seed;
-
-      // Save the seed that was ultimately used to start this pseudo-random sequence.
-      original_seed = weyl_state;
-
-      weyl_state *= 2;  // Make sure starting state is even.
-
-      // Reset other internal state
-      value = 0;
-      expRV = 0.0;
-
-      Get(); // Prime the new sequence by skipping the first number.
+      original_seed = seed;
+      engine.ResetSeed(seed);
     }
-
 
     // Random Number Generation /////////////////////////////////////////////////
 
-    /// @return A pseudo-random double value between 0.0 and 1.0
-    inline double GetDouble() noexcept { return Get() / (double) RAND_CAP; }
+    /// @return A pseudo-random double value between [0.0, 1.0)
+    [[nodiscard]] double GetDouble() noexcept {
+      if constexpr (NATIVE64) {
+        return (Get64() >> 11) * VAL53_FRAC;  // Doubles have 53 bits of precision.
+      } else {
+        return Get32() * VAL32_FRAC;
+      }
+    }
 
-    /// @return A pseudo-random double value between 0.0 and max
-    inline double GetDouble(const double max) noexcept { return GetDouble() * max; }
+    /// @return A pseudo-random double value between [0.0, max)
+    [[nodiscard]] double GetDouble(const double max) noexcept {
+      return GetDouble() * max;
+    }
 
-    /// @return A pseudo-random double value between min and max
-    inline double GetDouble(const double min, const double max) noexcept {
-      return GetDouble() * (max - min) + min;
+    /// @return A pseudo-random double value between [min, max)
+    [[nodiscard]] double GetDouble(const double min, const double max) noexcept {
+      emp_assert(min < max, min, max);
+      return GetDouble(max - min) + min;
     }
 
     /// @return A pseudo-random double in the provided range.
-    inline double GetDouble(const Range<double> range) noexcept {
+    [[nodiscard]] double GetDouble(const Range<double> range) noexcept {
       return GetDouble(range.GetLower(), range.GetUpper());
     }
 
-    /// @return A pseudo-random double value between (0.0, 1.0]
-    inline double GetDoubleNonZero() noexcept {
-      double d = Get() / (double) RAND_CAP;
-      while(d == 0.0) {d = Get() / (double) RAND_CAP;}
-      return d;
+    /// @return A pseudo-random double value between (0.0, 1.0)
+    [[nodiscard]] double GetDoubleNonZero() noexcept {
+      double result;
+      do { result = GetDouble(); } while (result == 0.0);
+      return result;
     }
 
+    /// @return A pseudo-random 64-bit (8 byte) unsigned int value.
+    [[nodiscard]] uint64_t GetUInt() noexcept { return Get64(); }
+
+    /// @return A pseudo-random 64-bit unsigned int value between [0, max)
+    template <typename T>
+    [[nodiscard]] uint64_t GetUInt(const T max) noexcept {
+      return static_cast<uint64_t>(GetDouble() * static_cast<double>(max));
+    }
+
+    /// @return A pseudo-random 64-bit unsigned int value between [min, max)
+    template <typename T1, typename T2>
+    [[nodiscard]] uint64_t GetUInt(const T1 min, const T2 max) noexcept {
+      return GetUInt(max - min) + min;
+    }
+
+    /// @return A pseudo-random 64-bit unsigned int value in the provided range.
+    template <typename T>
+    [[nodiscard]] uint64_t GetUInt(const Range<T> range) noexcept {
+      return GetUInt(range.GetLower(), range.GetUpper());
+    }
+
+    // == You can specify the number of bits in a UInt ==
 
     /// @return A pseudo-random 32-bit (4 byte) unsigned int value.
-    inline uint32_t GetUInt() noexcept { return Get(); }
+    [[nodiscard]] uint32_t GetUInt32() noexcept { return Get32(); }
 
-    /// @return A pseudo-random 32-bit unsigned int value between 0 and max
+    /// @return A pseudo-random 32-bit unsigned int value between [0, max)
     template <typename T>
-    inline uint32_t GetUInt(const T max) noexcept {
+    [[nodiscard]] uint32_t GetUInt32(const T max) noexcept {
       return static_cast<uint32_t>(GetDouble() * static_cast<double>(max));
     }
 
-    /// @return A pseudo-random 32-bit unsigned int value between min and max
+    /// @return A pseudo-random 32-bit unsigned int value between [min, max)
     template <typename T1, typename T2>
-    inline uint32_t GetUInt(const T1 min, const T2 max) noexcept {
+    [[nodiscard]] uint32_t GetUInt32(const T1 min, const T2 max) noexcept {
       return GetUInt<uint32_t>((uint32_t) max - (uint32_t) min) + (uint32_t) min;
     }
 
     /// @return A pseudo-random 32-bit unsigned int value in the provided range.
     template <typename T>
-    inline uint32_t GetUInt(const Range<T> range) noexcept {
+    [[nodiscard]] uint32_t GetUInt32(const Range<T> range) noexcept {
       return GetUInt(range.GetLower(), range.GetUpper());
     }
 
 
-    /// @return A pseudo-random 32 bits (unsigned int) with a 12.5% chance of each bit being 1.
-    inline uint32_t GetBits12_5() noexcept { return Get() & Get() & Get(); }
-
-    /// @return A pseudo-random 32 bits (unsigned int) with a 25% chance of each bit being 1.
-    inline uint32_t GetBits25() noexcept { return Get() & Get(); }
-
-    /// @return A pseudo-random 32 bits (unsigned int) with a 37.5% chance of each bit being 1.
-    inline uint32_t GetBits37_5() noexcept { return (Get() | Get()) & Get(); }
-
-    /// @return A pseudo-random 32 bits (unsigned int) with a 50% chance of each bit being 1.
-    inline uint32_t GetBits50() noexcept { return Get(); }
-
-    /// @return A pseudo-random 32 bits (unsigned int) with a 62.5% chance of each bit being 1.
-    inline uint32_t GetBits62_5() noexcept { return (Get() & Get()) | Get(); }
-
-    /// @return A pseudo-random 32 bits (unsigned int) with a 75% chance of each bit being 1.
-    inline uint32_t GetBits75() noexcept { return Get() | Get(); }
-
-    /// @return A pseudo-random 32 bits (unsigned int) with a 87.5% chance of each bit being 1.
-    inline uint32_t GetBits87_5() noexcept { return Get() | Get() | Get(); }
-
-
     /// @return A pseudo-random 64-bit (8 byte) unsigned int value.
-    inline uint64_t GetUInt64() noexcept {
-      return ( static_cast<uint64_t>(GetUInt()) << 32 )
-             + static_cast<uint64_t>(GetUInt());
-    }
+    [[nodiscard]] uint64_t GetUInt64() noexcept { return Get64(); }
 
-    /// @return A pseudo-random 64-bit unsigned int value between 0 and max
+    /// @return A pseudo-random 64-bit unsigned int value between [0, max)
+    /// This is a high-precision accessor with perfectly even probabilities in the range.
     inline uint64_t GetUInt64(const uint64_t max) noexcept {
-      if (max <= RAND_CAP) return (uint64_t) GetUInt(max);  // Don't need extra precision.
+      if (max <= VAL32_CAP) return GetUInt(max);    // Don't need extra precision.
 
-      uint64_t mask = emp::MaskUsed(max);            // Create a mask for just the bits we need.
-      uint64_t val = GetUInt64() & mask;             // Grab a value using just the current bits.
-      while (val >= max) val = GetUInt64() & mask;   // Grab new values until we find a valid one.
+      const uint64_t mask = emp::MaskUsed(max);     // Create a mask for just the bits we need.
+      uint64_t val = GetUInt64() & mask;            // Grab a value using just the current bits.
+      while (val >= max) val = GetUInt64() & mask;  // Grab new values until we find a valid one.
 
       return val;
     }
 
-
-    /// @return A pseudo-random 32-bit (4 byte) int value between 0 and max
-    inline int32_t GetInt(const int32_t max) noexcept {
-      return static_cast<int32_t>(GetUInt((uint32_t) max));
+    /// @return A pseudo-random 64-bit unsigned int value between [min, max)
+    template <typename T1, typename T2>
+    [[nodiscard]] uint64_t GetUInt64(const T1 min, const T2 max) noexcept {
+      return GetUInt64(max - min) + min;
     }
 
-    /// @return A pseudo-random 32-bit (4 byte) int value between min and max
-    inline int32_t GetInt(const int min, const int max) noexcept { return GetInt(max - min) + min; }
+    /// @return A pseudo-random 64-bit unsigned int value in the provided range.
+    template <typename T>
+    [[nodiscard]] uint64_t GetUInt64(const Range<T> range) noexcept {
+      return GetUInt(range.GetLower(), range.GetUpper());
+    }
 
-    /// @return A pseudo-random 32-bit (4 byte) int value in range
-    inline int32_t GetInt(const Range<int> range) noexcept {
+    /// @return A pseudo-random int value in [0, max)
+    [[nodiscard]] int GetInt(const int max) noexcept {
+      emp_assert(max > 0, "If you want a random negative int, specify both min and max", max);
+      return static_cast<int>(GetUInt(static_cast<uint64_t>(max)));
+    }
+
+    /// @return A pseudo-random int value in [min, max)
+    [[nodiscard]] int GetInt(const int min, const int max) noexcept {
+      emp_assert(min < max, min, max);
+      return GetInt(max - min) + min;
+    }
+
+    /// @return A pseudo-random int value in range
+    [[nodiscard]] int GetInt(const Range<int> range) noexcept {
       return GetInt(range.GetLower(), range.GetUpper());
     }
 
+
+    /// @return A pseudo-random 64 bits (unsigned int) with a 12.5% chance of each bit being 1.
+    [[nodiscard]] uint64_t GetBits12_5() noexcept { return Get64() & Get64() & Get64(); }
+
+    /// @return A pseudo-random 64 bits (unsigned int) with a 25% chance of each bit being 1.
+    [[nodiscard]] uint64_t GetBits25() noexcept { return Get64() & Get64(); }
+
+    /// @return A pseudo-random 64 bits (unsigned int) with a 37.5% chance of each bit being 1.
+    [[nodiscard]] uint64_t GetBits37_5() noexcept { return (Get64() | Get64()) & Get64(); }
+
+    /// @return A pseudo-random 64 bits (unsigned int) with a 50% chance of each bit being 1.
+    [[nodiscard]] uint64_t GetBits50() noexcept { return Get64(); }
+
+    /// @return A pseudo-random 64 bits (unsigned int) with a 62.5% chance of each bit being 1.
+    [[nodiscard]] uint64_t GetBits62_5() noexcept { return (Get64() & Get64()) | Get64(); }
+
+    /// @return A pseudo-random 64 bits (unsigned int) with a 75% chance of each bit being 1.
+    [[nodiscard]] uint64_t GetBits75() noexcept { return Get64() | Get64(); }
+
+    /// @return A pseudo-random 64 bits (unsigned int) with a 87.5% chance of each bit being 1.
+    [[nodiscard]] uint64_t GetBits87_5() noexcept { return Get64() | Get64() | Get64(); }
+
+
     /// Enumeration for common probabilities.
-    /// (not class, so can be referred to elsewhere as e.g., Random::PROB_50)
+    /// (not class, so can be referred to as e.g., Random::PROB_50)
     enum Prob { PROB_0   = 0,   PROB_12_5 = 125,
                 PROB_25  = 250, PROB_37_5 = 375,
                 PROB_50  = 500, PROB_62_5 = 625,
                 PROB_75  = 750, PROB_87_5 = 875,
                 PROB_100 = 1000 };
 
-    /// Shortcut type for all functions that deal witch chunks of memory.
-    using mem_ptr_t = emp::Ptr<unsigned char>;
+    /// Shortcut type for all functions that deal with chunks of memory.
+    using mem_ptr_t = emp::Ptr<uint8_t>;
 
     /// Randomize a contiguous segment of memory.
     void RandFill(mem_ptr_t dest, const size_t num_bytes) noexcept {
@@ -238,7 +306,7 @@ namespace emp {
       } else if constexpr (PROB == PROB_87_5) {
         dest.FillMemoryFunction( num_bytes, [this](){ return GetBits87_5(); } );
       } else if constexpr (PROB == PROB_100) {
-        dest.FillMemoryFunction( num_bytes, [](){ return (size_t) -1; } );
+        dest.FillMemoryFunction( num_bytes, [](){ return static_cast<size_t>(-1); } );
       }
     }
 
@@ -253,7 +321,7 @@ namespace emp {
       const size_t end_byte_id = stop_bit >> 3;        // At which byte do we stop?
       const size_t start_bit_id = start_bit & 7;       // Which bit to start at in byte?
       const size_t end_bit_id = stop_bit & 7;          // Which bit to stop before in byte?
-      constexpr double p = ((double) PROB) / 1000.0;   // Determine actual probability of a 1
+      constexpr double p = static_cast<double>(PROB) / 1000.0;   // Determine actual probability of a 1
 
       // If the start byte and end byte are the same, just fill those in.
       if (start_byte_id == end_byte_id) {
@@ -317,7 +385,7 @@ namespace emp {
     void RandFill100( mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit) noexcept
       { RandFillP<PROB_100> (dest, bytes, start_bit, stop_bit); }
 
-    /// Randomize a contiguous segment of memory with a given probability of each bit being on.
+    /// Randomize a contiguous segment of memory with a given probability of ones.
     void RandFill(mem_ptr_t dest, const size_t num_bytes, const double p) noexcept {
       // Try to find a shortcut if p allows....
       if (p == 0.0)        return RandFill0(dest, num_bytes);
@@ -335,7 +403,7 @@ namespace emp {
       for (size_t i = 0; i < num_bytes; i++) dest[i] = GetByte(p);
     }
 
-    /// Randomize a contiguous segment of memory with a given probability of each bit being on.
+    /// Randomize a contiguous segment of memory with a given probability of ones.
     void RandFill(mem_ptr_t dest, const size_t num_bytes, const double p,
                   const size_t start_bit, const size_t stop_bit) noexcept {
       emp_assert((stop_bit >> 3) <= num_bytes);
@@ -371,32 +439,26 @@ namespace emp {
 
     /// Tests a random value [0,1) against a given probability p, and returns true of false.
     /// @param p The probability of the result being "true".
-    inline bool P(const double p) noexcept {
+    [[nodiscard]] bool P(const double p) noexcept {
       emp_assert(p >= 0.0 && p <= 1.0, p);
-      return (Get() < (p * RAND_CAP));
+      return (GetDouble() < p);
     }
 
     /// Full random byte with each bit being a one with a given probability.
-    unsigned char GetByte(const double p) noexcept {
-      unsigned char out_byte = 0;
-      if (P(p)) out_byte |= 1;
-      if (P(p)) out_byte |= 2;
-      if (P(p)) out_byte |= 4;
-      if (P(p)) out_byte |= 8;
-      if (P(p)) out_byte |= 16;
-      if (P(p)) out_byte |= 32;
-      if (P(p)) out_byte |= 64;
-      if (P(p)) out_byte |= 128;
+    [[nodiscard]] uint8_t GetByte(const double p) noexcept {
+      uint8_t out_byte = 0;
+      for (unsigned i = 0; i < 8; ++i) {
+        if (P(p)) out_byte |= (1 << i);
+      }
       return out_byte;
     }
 
-
-    // Statistical functions ////////////////////////////////////////////////////
+    // =======================  Statistical Functions  =======================
 
     // Distributions //
 
     /// Generate a random variable drawn from a unit normal distribution.
-    double GetNormal() noexcept {
+    [[nodiscard]] double GetNormal() noexcept {
       // Draw from a Unit Normal Dist
       // Using Rejection Method and saving of initial exponential random variable
       double expRV2;
@@ -413,23 +475,23 @@ namespace emp {
     /// @return A random variable drawn from a normal distribution.
     /// @param mean Center of distribution.
     /// @param std Standard deviation of distribution.
-    inline double GetNormal(const double mean, const double std) { return mean + GetNormal() * std; }
+    [[nodiscard]] double GetNormal(const double mean, const double std) { return mean + GetNormal() * std; }
 
     /// Generate a random variable drawn from a Poisson distribution.
-    inline uint32_t GetPoisson(const double n, const double p) {
+    [[nodiscard]] uint64_t GetPoisson(const double n, const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);
-      // Optimizes for speed and calculability using symetry of the distribution
-      if (p > .5) return (uint32_t) n - GetPoisson(n * (1 - p));
+      // Optimizes for speed and calculability using symmetry of the distribution
+      if (p > .5) return static_cast<uint64_t>(n) - GetPoisson(n * (1 - p));
       else return GetPoisson(n * p);
     }
 
     /// Generate a random variable drawn from a Poisson distribution.
-    inline uint32_t GetPoisson(const double mean) {
-      // Draw from a Poisson Dist with mean; if cannot calculate, return UINT_MAX.
+    [[nodiscard]] uint64_t GetPoisson(const double mean) {
+      // Draw from a Poisson Dist with mean; if cannot calculate, return max value.
       // Uses Rejection Method
       const double a = exp(-mean);
-      if (a <= 0) return UINT_MAX; // cannot calculate, so return UINT_MAX
-      uint32_t k = 0;
+      if (a <= 0) return MAX_8BYTE; // cannot calculate, so return max
+      uint64_t k = 0;
       double u = GetDouble();
       while (u >= a) {
         u *= GetDouble();
@@ -441,43 +503,47 @@ namespace emp {
     /// Generate a random variable drawn from a Binomial distribution.
     ///
     /// This function is exact, but slow.
-    /// @see Random::GetApproxRandBinomial
+    /// @see Random_Base::GetApproxRandBinomial
     /// @see emp::Binomial in source/tools/Distribution.h
-    inline uint32_t GetBinomial(const double n, const double p) { // Exact
+    [[nodiscard]] uint64_t GetBinomial(const double n, const double p) { // Exact
       emp_assert(p >= 0.0 && p <= 1.0, p);
       emp_assert(n >= 0.0, n);
       // Actually try n Bernoulli events, each with probability p
-      uint32_t k = 0;
-      for (uint32_t i = 0; i < n; ++i) if (P(p)) k++;
+      uint64_t k = 0;
+      for (uint64_t i = 0; i < n; ++i) if (P(p)) k++;
       return k;
     }
 
     /// Generate a random variable drawn from an exponential distribution.
-    inline double GetExponential(double p) {
+    [[nodiscard]] double GetExponential(double p) {
       emp_assert(p > 0.0 && p <= 1.0, p);
-      // if (p == 0.0) return std::numeric_limits<double>::infinity();
       if (p == 1.0) return 0.0;
       return std::log(GetDouble()) / std::log(1.0 - p);
     }
 
     /// Generate a random variable drawn from a geometric distribution.
-    inline uint32_t GetGeometric(double p) {
+    [[nodiscard]] uint64_t GetGeometric(double p) {
       emp_assert(p > 0.0 && p <= 1.0, p);
-      return static_cast<uint32_t>( GetExponential(p) ) + 1;
+      return static_cast<uint64_t>( GetExponential(p) ) + 1;
     }
 
   };
 
+  using RandomBest = Random_Base<emp::Random_Xoshiro256pp>;
+  using Random32 = Random_Base<emp::Random_MSWS>;
+  using RandomFast = Random_Base<emp::Random_Xorshift>;
 
-  /// This is an adaptor to make Random behave like a proper STL random number generator.
+  using Random = RandomBest;
+
+  /// This is an adaptor to make Random behave like a Standard Library random number generator.
   struct RandomStdAdaptor {
-    typedef int argument_type;
-    typedef int result_type;
+    using argument_type = int;
+    using result_type = int;
 
-    RandomStdAdaptor(Random& rng) : _rng(rng) { }
+    RandomStdAdaptor(Random & rng) : _rng(rng) { }
     int operator()(int n) { return _rng.GetInt(n); }
 
-    Random& _rng;
+    Random & _rng;
   };
 
 
@@ -487,14 +553,13 @@ namespace emp {
                                ForwardIterator last,
                                OutputIterator ofirst,
                                OutputIterator olast,
-                               RNG rng) noexcept {
+                               RNG & rng) noexcept {
     std::size_t range = std::distance(first, last);
     while(ofirst != olast) {
       *ofirst = *(first+rng(range));
       ++ofirst;
     }
   }
-
 
 } // END emp namespace
 

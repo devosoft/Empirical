@@ -132,7 +132,7 @@ namespace emp {
       : num_items(_items), zero_offset(CalcZeroOffset()), needs_refresh(true)
       , weights(num_items*2-1, 0.0)
     {
-      if (init_weight != 0.0) AdjustAll(init_weight);
+      if (init_weight != 0.0) SetAll(init_weight);
     }
     IndexMap(const IndexMap &) = default;
     IndexMap(IndexMap &&) = default;
@@ -198,10 +198,10 @@ namespace emp {
       Clear();
     }
 
-    void Adjust(size_t id, const double new_weight) { RawAdjust(ToInternalID(id), new_weight); }
+    void Set(size_t id, const double new_weight) { RawAdjust(ToInternalID(id), new_weight); }
 
-    /// Adjust all index weights to the set provided.
-    void Adjust(const emp::vector<double> & new_weights) {
+    /// Set all index weights to the set provided.
+    void Set(const emp::vector<double> & new_weights) {
       num_items = new_weights.size();
       if (num_items > 0) {
         weights.resize(num_items*2 - 1);
@@ -211,11 +211,18 @@ namespace emp {
       needs_refresh = true;
     }
 
-    /// Adjust all index weights to the set provided.
-    void AdjustAll(double new_weight) {
+    /// Set all index weights to the set provided.
+    void SetAll(double new_weight) {
       for (size_t i = 0; i < num_items; i++) weights[ToInternalID(i)] = new_weight;
       needs_refresh = true;
     }
+
+    [[deprecated("Use Set(id,weight) instead")]]
+    void Adjust(size_t id, const double new_weight) { Set(id, new_weight); }
+    [[deprecated("Use Set(new_weights) instead")]]
+    void Adjust(const emp::vector<double> & new_weights) { Set(new_weights); }
+    [[deprecated("Use SetAll(new_weight) instead")]]
+    void AdjustAll(double new_weight) { SetAll(new_weight); }
 
     /// Determine the ID at the specified index position.
     size_t Index(double index, size_t cur_id=0) const {

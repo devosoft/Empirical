@@ -211,6 +211,14 @@ namespace emp {
     return Range<T, INCLUDE_UPPER>(_l,_u);
   }
 
+  /// Build a new range from a string.
+  template <typename T, bool INCLUDE_UPPER=true>
+  Range<T, INCLUDE_UPPER> MakeRange(emp::String in_str) {
+    T val1 = in_str.Pop("-").As<T>();               // Respect a dash if there is one.
+    T val2 = in_str.size() ? in_str.As<T>() : val1;
+    return emp::MakeRange(val1, val2);
+  }
+
   /// Build a new range of type int.
   template <bool INCLUDE_UPPER=true>
   inline Range<int, INCLUDE_UPPER> IntRange(int _l, int _u) {
@@ -221,6 +229,13 @@ namespace emp {
   template <bool INCLUDE_UPPER=true>
   inline Range<double, INCLUDE_UPPER> DRange(double _l, double _u) {
     return Range<double, INCLUDE_UPPER>(_l,_u);
+  }
+
+  // Allow a Range to be printed.
+  template <typename T, bool INCLUDE_UPPER=true>
+  std::ostream & operator<<(std::ostream & out, const emp::Range<T,INCLUDE_UPPER> & range) {
+    out << '[' << range.GetLower() << ',' << range.GetUpper() << (INCLUDE_UPPER ? ']' : ')');
+    return out;
   }
 }
 

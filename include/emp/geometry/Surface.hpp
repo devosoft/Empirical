@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief This file defines a templated class to represent a 2D suface capable of maintaining data
+ *  @brief This file defines a templated class to represent a 2D surface capable of maintaining data
  *  about which 2D bodies are currently on that surface and rapidly identifying if they are
  *  overlapping.
  *
@@ -302,7 +302,7 @@ namespace emp {
     /// Add a function to call in the case of overlaps (using an std::function object)
     template <typename BODY1_T, typename BODY2_T>
     void AddOverlapFun(const std::function< void(BODY1_T &, BODY2_T &) > & overlap_fun) {
-      type_tracker.template AddFunction(
+      type_tracker.AddFunction(
         [overlap_fun](Ptr<BODY1_T> ptr1, Ptr<BODY2_T> ptr2){ overlap_fun(*ptr1, *ptr2); }
       );
     }

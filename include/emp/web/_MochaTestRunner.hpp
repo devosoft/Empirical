@@ -311,7 +311,7 @@ namespace web {
           MAIN_THREAD_EM_ASM(
             {
               const id = UTF8ToString($0);
-              document.getElementById(id).innerHTML = '';
+              document.getElementById(id).innerHTML = "";
             },
             id.c_str()
           );

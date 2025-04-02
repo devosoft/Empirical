@@ -40,7 +40,7 @@ namespace emp {
       , background(width, height)
       , detach_on_birth(detach)
     { ; }
-    ~Physics2D() { ; }
+    ~Physics2D() = default;
 
     const Surface_t & GetSurface() const { return surface; }
     const Surface_t & GetBackground() const { return background; }
@@ -82,8 +82,8 @@ namespace emp {
     bool TestPairCollision(BODY_TYPE & body1, BODY_TYPE & body2) {
       if (body1.IsLinked(body2)) return false;  // Linked bodies can overlap.
 
-      const Point dist = body1.GetCenter() - body2.GetCenter();
-      const double sq_pair_dist = dist.SquareMagnitude();
+      Point dist = body1.GetCenter() - body2.GetCenter();
+      double sq_pair_dist = dist.SquareMagnitude();
       const double radius_sum = body1.GetRadius() + body2.GetRadius();
       const double sq_min_dist = radius_sum * radius_sum;
 
@@ -92,7 +92,9 @@ namespace emp {
 
       if (sq_pair_dist == 0.0) {
         // If the shapes are on top of each other, we have a problem.  Shift one!
-        body2.Translate(Point(0.01, 0.01));
+        dist.SetX(0.01);
+        body2.Translate(dist);
+        sq_pair_dist = 0.01;
       }
 
       // @CAO If objects can phase or explode, identify that here.
@@ -101,9 +103,9 @@ namespace emp {
       const double true_dist = sqrt(sq_pair_dist);
       const double overlap_dist = ((double) radius_sum) - true_dist;
       const double overlap_frac = overlap_dist / true_dist;
-      const Point cur_shift = dist * (overlap_frac / 2.0);
-      body1.AddShift(cur_shift);
-      body2.AddShift(-cur_shift);
+      const Point shift_dist = dist * (overlap_frac / 2.0);
+      body1.AddShift(shift_dist);
+      body2.AddShift(-shift_dist);
 
       // @CAO if we have inelastic collisions, we just take the weighted average of velocites
       // and let the move together.

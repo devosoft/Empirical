@@ -1,8 +1,8 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2018.
-*/
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017-2018.
+ */
 /**
  *  @file
  *  @brief StateGrid maintains a rectilinear grid that agents can traverse.
@@ -44,7 +44,7 @@ namespace emp {
     struct StateInfo {
       int state_id;        ///< Ordinal id for this state.
       char symbol;         ///< Symbol for printing this state.
-      double score_change; ///< Change ammount for organism score by stepping on this square.
+      double score_change; ///< Change amount for organism score by stepping on this square.
       std::string name;    ///< Name of this state.
       std::string desc;    ///< Explanation of this state.
 
@@ -65,32 +65,26 @@ namespace emp {
     std::map<char, size_t> symbol_map;       ///< Map of symbols to associated key ID
     std::map<std::string, size_t> name_map;  ///< Map of names to associated key ID
 
-    size_t GetKey(int state_id) const { return Find(state_map, state_id, 0); }
-    size_t GetKey(char symbol) const { return Find(symbol_map, symbol, 0); }
-    size_t GetKey(const std::string & name) const { return Find(name_map, name, 0); }
+    [[nodiscard]] size_t GetKey(int state_id) const { return Find(state_map, state_id, 0); }
+    [[nodiscard]] size_t GetKey(char symbol) const { return Find(symbol_map, symbol, 0); }
+    [[nodiscard]] size_t GetKey(const std::string & name) const { return Find(name_map, name, 0); }
   public:
-    StateGridInfo() : states(), state_map(), symbol_map(), name_map() { ; }
-    StateGridInfo(const StateGridInfo &) = default;
-    StateGridInfo(StateGridInfo &&) = default;
-    ~StateGridInfo() { ; }
-
-    StateGridInfo & operator=(const StateGridInfo &) = default;
-    StateGridInfo & operator=(StateGridInfo &&) = default;
-
     size_t GetNumStates() const { return states.size(); }
 
     // Convert from state ids...
-    char GetSymbol(int state_id) const { return states[ GetKey(state_id) ].symbol; }
-    double GetScoreChange(int state_id) const { return states[ GetKey(state_id) ].score_change; }
-    const std::string & GetName(int state_id) const { return states[ GetKey(state_id) ].name; }
-    const std::string & GetDesc(int state_id) const { return states[ GetKey(state_id) ].desc; }
+    [[nodiscard]] char GetSymbol(int state_id) const { return states[ GetKey(state_id) ].symbol; }
+    [[nodiscard]] double GetScoreChange(int state_id) const { return states[ GetKey(state_id) ].score_change; }
+    [[nodiscard]] const std::string & GetName(int state_id) const { return states[ GetKey(state_id) ].name; }
+    [[nodiscard]] const std::string & GetDesc(int state_id) const { return states[ GetKey(state_id) ].desc; }
 
     // Convert to state ids...
-    int GetState(char symbol) const {
+    [[nodiscard]] int GetState(char symbol) const {
       emp_assert( states.size() > GetKey(symbol), states.size(), symbol, (int) symbol );
       return states[ GetKey(symbol) ].state_id;
     }
-    int GetState(const std::string & name) const { return states[ GetKey(name) ].state_id; }
+    [[nodiscard]] int GetState(const std::string & name) const {
+      return states[ GetKey(name) ].state_id;
+    }
 
     void AddState(int id, char symbol, double mult=1.0, std::string name="", std::string desc="") {
       size_t key_id = states.size();
@@ -105,70 +99,72 @@ namespace emp {
   /// A StateGrid describes a map of grid positions to the current state of each position.
   class StateGrid {
   protected:
-    size_t width;             ///< Width of the overall grid
-    size_t height;            ///< Height of the overall grid
+    size_t width = 0;         ///< Width of the overall grid
+    size_t height = 0;        ///< Height of the overall grid
     emp::vector<int> states;  ///< Specific states at each position in the grid.
     StateGridInfo info;       ///< Information about the set of states used in this grid.
 
   public:
-    StateGrid() : width(0), height(0), states(0), info() { ; }
+    StateGrid() = default;
     StateGrid(StateGridInfo & _i, size_t _w=1, size_t _h=1, int init_val=0)
       : width(_w), height(_h), states(_w*_h,init_val), info(_i) { ; }
     StateGrid(StateGridInfo & _i, const std::string & filename)
       : width(1), height(1), states(), info(_i) { Load(filename); }
     StateGrid(const StateGrid &) = default;
     StateGrid(StateGrid && in) = default;
-    ~StateGrid() { ; }
+    ~StateGrid() = default;
 
     StateGrid & operator=(const StateGrid &) = default;
     StateGrid & operator=(StateGrid &&) = default;
 
-    size_t GetWidth() const { return width; }
-    size_t GetHeight() const { return height; }
-    size_t GetSize() const { return states.size(); }
-    const emp::vector<int> GetStates() const { return states; }
-    const StateGridInfo & GetInfo() const { return info; }
+    [[nodiscard]] size_t GetWidth() const { return width; }
+    [[nodiscard]] size_t GetHeight() const { return height; }
+    [[nodiscard]] size_t GetSize() const { return states.size(); }
+    [[nodiscard]] const emp::vector<int> GetStates() const { return states; }
+    [[nodiscard]] const StateGridInfo & GetInfo() const { return info; }
 
-    int & operator()(size_t x, size_t y) {
+    [[nodiscard]] int & operator()(size_t x, size_t y) {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       return states[y*width+x];
     }
-    int operator()(size_t x, size_t y) const {
+    [[nodiscard]] int operator()(size_t x, size_t y) const {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       return states[y*width+x];
     }
-    int GetState(size_t x, size_t y) const {
+    [[nodiscard]] int GetState(size_t x, size_t y) const {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       return states[y*width+x];
     }
-    int GetState(size_t id) const { return states[id]; }
+    [[nodiscard]] int GetState(size_t id) const { return states[id]; }
+
     StateGrid & SetState(size_t x, size_t y, int in) {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       states[y*width+x] = in;
       return *this;
     }
-    char GetSymbol(size_t x, size_t y) const {
+
+    [[nodiscard]] char GetSymbol(size_t x, size_t y) const {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       return info.GetSymbol(GetState(x,y));
     }
-    double GetScoreChange(size_t x, size_t y) const {
+    [[nodiscard]] double GetScoreChange(size_t x, size_t y) const {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       return info.GetScoreChange(GetState(x,y));
     }
-    const std::string & GetName(size_t x, size_t y) const {
+    [[nodiscard]] const std::string & GetName(size_t x, size_t y) const {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       return info.GetName(GetState(x,y));
     }
 
     /// Return a BitVector indicating which positions in the state grid have a particular state.
-    emp::BitVector IsState(int target_state) {
+    [[nodiscard]] emp::BitVector IsState(int target_state) const {
       emp::BitVector sites(states.size());
       for (size_t i = 0; i < states.size(); i++) sites[i] = (states[i] == target_state);
       return sites;
@@ -245,11 +241,12 @@ namespace emp {
   class StateGridStatus {
   protected:
     struct State {
-      size_t x;      ///< X-coordinate of this agent
-      size_t y;      ///< Y-coordinate of this agent.
-      int facing;    ///< 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
+      size_t x = 0;    ///< X-coordinate of this agent
+      size_t y = 0;    ///< Y-coordinate of this agent.
+      int facing = 1;  ///< 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
 
-      State(size_t _x=0, size_t _y=0, size_t _f=1) : x(_x), y(_y), facing((int)_f) { ; }
+      State() = default;
+      State(size_t _x, size_t _y, size_t _f=1) : x(_x), y(_y), facing((int)_f) { ; }
       bool IsAt(size_t _x, size_t _y) const { return x == _x && y == _y; }
     };
 
@@ -275,28 +272,29 @@ namespace emp {
     }
 
   public:
-    StateGridStatus() : cur_state(0,0,1), track_moves(false) { ; }
+    StateGridStatus() = default;
     StateGridStatus(const StateGridStatus &) = default;
     StateGridStatus(StateGridStatus &&) = default;
+    ~StateGridStatus() = default;
 
     StateGridStatus & operator=(const StateGridStatus &) = default;
     StateGridStatus & operator=(StateGridStatus &&) = default;
 
-    size_t GetX() const { return cur_state.x; }
-    size_t GetY() const { return cur_state.y; }
-    size_t GetFacing() const {
+    [[nodiscard]] size_t GetX() const { return cur_state.x; }
+    [[nodiscard]] size_t GetY() const { return cur_state.y; }
+    [[nodiscard]] size_t GetFacing() const {
       emp_assert(cur_state.facing >= 0 && cur_state.facing < 8);
       return (size_t) cur_state.facing;
     }
 
-    bool IsAt(size_t x, size_t y) const { return cur_state.IsAt(x,y); }
-    bool WasAt(size_t x, size_t y) const {
+    [[nodiscard]] bool IsAt(size_t x, size_t y) const { return cur_state.IsAt(x,y); }
+    [[nodiscard]] bool WasAt(size_t x, size_t y) const {
       for (const State & state : history) if (state.IsAt(x,y)) return true;
       return false;
     }
 
     /// Get a BitVector indicating the full history of which positions this organism has traversed.
-    emp::BitVector GetVisited(const StateGrid & grid) const {
+    [[nodiscard]] emp::BitVector GetVisited(const StateGrid & grid) const {
       emp::BitVector at_array(grid.GetSize());
       for (const State & state : history) {
         size_t pos = state.x + grid.GetWidth() * state.y;

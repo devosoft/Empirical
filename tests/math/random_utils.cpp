@@ -64,16 +64,13 @@ TEST_CASE("Test random_utils", "[math]")
 
 TEST_CASE("Test CountRngTouches", "[math]") {
 
-  REQUIRE( 0 == emp::CountRngTouches([](emp::Random& rand){
-  }) );
+  REQUIRE( 0 == emp::CountRngTouches<emp::Random>([](emp::Random& /*rand*/){}) );
 
-  REQUIRE( 1 == emp::CountRngTouches([](emp::Random& rand){
-    rand.GetUInt();
-  }) );
+  REQUIRE( 1 == emp::CountRngTouches<emp::Random>([](emp::Random& rand){ rand.StepEngine(); }) );
 
-  REQUIRE( 2 == emp::CountRngTouches([](emp::Random& rand){
-    rand.GetUInt();
-    rand.GetUInt();
+  REQUIRE( 2 == emp::CountRngTouches<emp::Random>([](emp::Random& rand){
+    rand.StepEngine();
+    rand.StepEngine();
   }) );
 
 }
