@@ -1756,12 +1756,12 @@ namespace emp {
   //  The strings {"one", "two", "three"} would become "one, two, and three"
   template <typename CONTAINER_T>
   String MakeEnglishList(const CONTAINER_T & container) {
-    return MakeEnglishList(container, [](CONTAINER_T::value_type x){ return x; });
+    return MakeEnglishList(container, [](typename CONTAINER_T::value_type x){ return x; });
   }
 
   template <typename CONTAINER_T>
   String MakeQuotedList(const CONTAINER_T & container) {
-    return MakeEnglishList(container, [](CONTAINER_T::value_type x){ return MakeLiteral(x); });
+    return MakeEnglishList(container, [](typename CONTAINER_T::value_type x){ return MakeLiteral(x); });
   }
 
   /// Apply sprintf-like formatting to a string.
