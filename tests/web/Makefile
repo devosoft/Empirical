@@ -3,8 +3,8 @@ SHELL := /bin/bash
 # @MAM 04-18-2024
 # turned off as part of dejquerification, manually verified still working
 # these tests should get fixed and reactivated at some point
-# TODO ConfigPanel Card Modal ToggleSwitch CodeBlock FontAwesomeIcon ClickCounterDemo ClickCollapseDemo ValueBox ReadoutPanel
-TEST_NAMES = Collapse LoadingModal CommentBox LoadingIcon Element TextFeed js_utils JSWrap Widget
+# TODO ConfigPanel Card Modal ToggleSwitch CodeBlock FontAwesomeIcon ClickCounterDemo ClickCollapseDemo ValueBox ReadoutPanel Collapse js_utils JSWrap
+TEST_NAMES =  LoadingModal CommentBox LoadingIcon Element TextFeed Widget
 
 # Currently a couple of the tests won't compile to native so this is a separate list for now. Eventually we should fix
 # that and just have one list
