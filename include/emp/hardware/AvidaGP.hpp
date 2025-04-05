@@ -1,11 +1,11 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2021.
+ *  date: 2017-2024.
 */
 /**
  *  @file
- *  @brief This is a simple, efficient CPU for and applied version of Avida.
+ *  @brief This is a simple, efficient CPU for an argument-based Avida genome.
  *
  *  @todo Should we save a copy of the original genome?  (or create a new "memory" member)
  *  @todo We should clean up how we handle scope; the root scope is zero, so the arg-based
@@ -51,7 +51,7 @@ namespace emp {
     using this_t = AvidaCPU_Base<HARDWARE>;
     using hardware_t = HARDWARE;
     using inst_t = Instruction;
-    using arg_t = size_t;                                               // Args are indecies.
+    using arg_t = size_t;                                               // Args are indicies.
     using inst_lib_t = AvidaCPU_InstLib<hardware_t, arg_t, INST_ARGS>;
     using genome_t = Genome<Instruction, inst_lib_t>;
 

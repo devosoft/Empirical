@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2022.
+ *  date: 2016-2025.
 */
 /**
  *  @file
@@ -32,6 +32,8 @@
 #define EMP_BASE_PTR_HPP_INCLUDE
 
 #include <cstring>
+#include <sstream>
+#include <string>
 #include <stddef.h>
 #include <unordered_map>
 
@@ -210,9 +212,16 @@ namespace emp {
     /// Treat this class as a singleton with a single Get() method to retrieve it.
     static PtrTracker & Get() { static PtrTracker tracker; return tracker; }
 
+    /// Retrieve the ID associated with a pointer.
+    size_t GetCurID(const void * ptr) const { 
+      auto it = ptr_id.find(ptr);
+      emp_assert(it != ptr_id.end(), "Ptr is not tracked!");
+      return it->second;
+    }
+
     /// Get the info associated with an existing pointer.
-    PtrInfo & GetInfo(const void * ptr) { return id_info[ptr_id[ptr]]; }
-    PtrInfo & GetInfo(size_t id) { return id_info[id]; }
+    const PtrInfo & GetInfo(const void * ptr) const { return id_info[GetCurID(ptr)]; }
+    const PtrInfo & GetInfo(size_t id) const { return id_info[id]; }
 
     /// Determine if a pointer is being tracked.
     bool HasPtr(const void * ptr) const {
@@ -220,46 +229,59 @@ namespace emp {
       return ptr_id.find(ptr) != ptr_id.end();
     }
 
-    /// Retrieve the ID associated with a pointer.
-    size_t GetCurID(const void * ptr) { emp_assert(HasPtr(ptr)); return ptr_id[ptr]; }
-
     /// Lookup how many pointers are being tracked.
     size_t GetNumIDs() const { return id_info.size(); }
 
     /// How big is an array associated with an ID?
     size_t GetArrayBytes(size_t id) const { return id_info[id].GetArrayBytes(); }
 
+    bool OK(size_t id) const {
+      if (id == UNTRACKED_ID) return true;      
+      if (id >= id_info.size()) return false;
+      return id_info[id].OK();
+    }
+
+    bool IsTracked(size_t id) const { emp_assert(OK(id)); return id != UNTRACKED_ID; }
+
     /// Check if an ID is for a pointer that has been deleted.
     bool IsDeleted(size_t id) const {
-      if (id == UNTRACKED_ID) return false;   // Not tracked, so not deleted.
+      emp_assert(OK(id)); 
+      if (!IsTracked(id)) return false;   // Not tracked, so not deleted.
       if (internal::ptr_debug) std::cout << "IsDeleted: " << id << std::endl;
       return !id_info[id].IsActive();
     }
 
     /// Is a pointer active and ready to be used?
-    bool IsActive(const void * ptr) {
+    bool IsActive(const void * ptr) const {
       if (internal::ptr_debug) std::cout << "IsActive: " << ptr << std::endl;
       if (ptr_id.find(ptr) == ptr_id.end()) return false; // Not in database.
       return GetInfo(ptr).IsActive();
     }
 
     /// Is a pointer id associated with a pointer that's active and ready to be used?
-    bool IsActiveID(size_t id) {
-      if (id == UNTRACKED_ID) return false;
-      if (id >= id_info.size()) return false;
+    bool IsActiveID(size_t id) const {
+      emp_assert(OK(id)); 
+      if (id >= id_info.size()) return false; // Includes untracked.
       return id_info[id].IsActive();
     }
 
     /// Is an ID associated with an array?
-    bool IsArrayID(size_t id) {
+    bool IsArrayID(size_t id) const {
+      emp_assert(OK(id)); 
       if (internal::ptr_debug) std::cout << "IsArrayID: " << id << std::endl;
-      if (id == UNTRACKED_ID) return false;
-      if (id >= id_info.size()) return false;
+      if (id >= id_info.size()) return false;  // Includes untracked.
       return id_info[id].IsArray();
+    }
+
+    /// Check if an ID is for a pointer that can be followed.
+    bool IsUsable(size_t id) const {
+      emp_assert(OK(id)); 
+      return !IsTracked(id) || IsActiveID(id);
     }
 
     /// How many Ptr objects are associated with an ID?
     int GetIDCount(size_t id) const {
+      emp_assert(OK(id)); 
       if (internal::ptr_debug) std::cout << "Count:  " << id << std::endl;
       return id_info[id].GetCount();
     }
@@ -292,6 +314,7 @@ namespace emp {
 
     /// Increment the number of Pointers associated with an ID
     void IncID(size_t id) {
+      emp_assert(OK(id));
       if (id == UNTRACKED_ID) return;   // Not tracked!
       if (internal::ptr_debug) std::cout << "Inc:    " << id << std::endl;
       id_info[id].Inc(id);
@@ -299,6 +322,7 @@ namespace emp {
 
     /// Decrement the number of Pointers associated with an ID
     void DecID(size_t id) {
+      emp_assert(OK(id)); 
       if (id == UNTRACKED_ID) return;   // Not tracked!
       auto & info = id_info[id];
       if (internal::ptr_debug) std::cout << "Dec:    " << id << "(" << info.GetPtr() << ")" << std::endl;
@@ -309,6 +333,7 @@ namespace emp {
 
     /// Mark the pointers associated with this ID as deleted.
     void MarkDeleted(size_t id) {
+      emp_assert(OK(id)); 
 #ifdef EMP_ABORT_PTR_DELETE
       if (id == EMP_ABORT_PTR_DELETE) {
         std::cerr << "Aborting at deletion of Ptr id " << id << std::endl;
@@ -349,6 +374,24 @@ namespace emp {
   /// Base class with common functionality (that should not exist in void pointers)
   template <typename TYPE>
   class BasePtr {
+  private:    
+    bool IsUsable() const {
+      return Tracker().IsUsable(id) && (ptr != nullptr);
+    }
+    std::string Diagnose() const {
+      std::stringstream ss;
+      ss << "IsNull:" << (ptr == nullptr)
+         << " id:";
+      if (id == static_cast<size_t>(-1)) ss << "UNTRACKED";
+      else ss << id << " (of " << Tracker().GetNumIDs() << ")";
+      if (id < Tracker().GetNumIDs()) {
+        ss << " active:" << Tracker().IsActiveID(id)
+           << " array:" << Tracker().IsArrayID(id)
+           << " usable:" << Tracker().IsUsable(id)
+           << " deleted:" << Tracker().IsDeleted(id);
+      }
+      return ss.str();
+    }    
   public:
     TYPE * ptr;                 ///< The raw pointer associated with this Ptr object.
     size_t id;                  ///< A unique ID for this pointer type.
@@ -362,30 +405,29 @@ namespace emp {
     }
 
     static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
+    bool OK() const { return Tracker().OK(id); }
 
     /// Dereference a pointer.
     [[nodiscard]] TYPE & operator*() const {
-      // Make sure a pointer is active and non-null before we dereference it.
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
+      emp_assert(OK(), Diagnose());
+      emp_assert(IsUsable(), Diagnose());
       return *ptr;
     }
 
     /// Follow a pointer.
     TYPE * operator->() const {
-      // Make sure a pointer is active before we follow it.
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
+      emp_assert(OK(), Diagnose());
+      emp_assert(IsUsable(), "Trying to follow and invalid pointer.", Diagnose());
       return ptr;
     }
 
     /// Indexing into array
     TYPE & operator[](size_t pos) const {
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
+      emp_assert(OK(), Diagnose());
+      emp_assert(IsUsable(), Diagnose());
       emp_assert(id == UNTRACKED_ID || Tracker().IsArrayID(id), "Only arrays can be indexed into.", id);
       emp_assert(id == UNTRACKED_ID || Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
         "Indexing out of range.", id, ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
-      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr[pos];
     }
 
@@ -765,6 +807,9 @@ namespace emp {
       // Untracked ID's should not have pointers in the Tracker.
       if (id == UNTRACKED_ID) return !Tracker().HasPtr(ptr);
 
+      // Make sure the tracker has a proper pointer for this id.
+      if (!Tracker().OK(id)) return false;
+
       // Make sure this pointer is linked to the correct info.
       if (Tracker().GetInfo(id).GetPtr() != ptr) return false;
 
@@ -800,7 +845,7 @@ namespace emp {
     TYPE * ptr;                 ///< The raw pointer associated with this Ptr object.
 
   public:
-    BasePtr(TYPE * in_ptr) : ptr(in_ptr) { }
+    BasePtr(TYPE * in_ptr=nullptr) : ptr(in_ptr) { }
 
     // Dereference a pointer.
     [[nodiscard]] TYPE & operator*() const { return *ptr; }
@@ -818,13 +863,13 @@ namespace emp {
 
   /// Base class with functionality only needed in void pointers.
   template <> class BasePtr<void> {
-  protected: void * ptr;                 ///< The raw pointer associated with this Ptr object.
-  public: BasePtr(void * in_ptr) : ptr(in_ptr) { }
+  protected: void * ptr;                ///< The raw pointer associated with this Ptr object.
+  public: BasePtr(void * in_ptr=nullptr) : ptr(in_ptr) { }
   };
 
   template <> class BasePtr<const void> {
   protected: const void * ptr;           ///< The raw pointer associated with this Ptr object.
-  public: BasePtr(const void * in_ptr) : ptr(in_ptr) { }
+  public: BasePtr(const void * in_ptr=nullptr) : ptr(in_ptr) { }
   };
 
   template <typename TYPE>
@@ -836,13 +881,13 @@ namespace emp {
     using element_type = TYPE;
 
     /// Default constructor
-    Ptr() : BasePtr<TYPE>(nullptr) {}
+    Ptr() = default;
 
     /// Copy constructor
     Ptr(const Ptr<TYPE> & _in) : BasePtr<TYPE>(_in.ptr) {}
 
     /// Construct from raw ptr
-    template <typename T2> Ptr(T2 * in_ptr, bool=false) : BasePtr<TYPE>(in_ptr) {}
+    template <typename T2> Ptr(T2 * _ptr, bool=false) : BasePtr<TYPE>(_ptr) {}
 
     /// Construct from array
     template <typename T2> Ptr(T2 * _ptr, size_t, bool) : BasePtr<TYPE>(_ptr) {}
@@ -854,7 +899,7 @@ namespace emp {
     Ptr(std::nullptr_t) : Ptr() {}
 
     /// Destructor
-    ~Ptr() { ; }
+    ~Ptr() = default;
 
     [[nodiscard]] bool IsNull() const { return ptr == nullptr; }
     [[nodiscard]] TYPE * Raw() const { return ptr; }
@@ -977,6 +1022,10 @@ namespace emp {
     // new (ptr) T(std::forward<ARGS>(args)...);   // Special new that uses allocated space.
     return Ptr<T>(ptr, true);
   }
+
+  /// Test if we have a Ptr type.
+  template <typename T> struct is_Ptr : std::false_type {};
+  template <typename T> struct is_Ptr<Ptr<T>> : std::true_type {};
 
   /// Copy an object pointed to and return a Ptr to the copy.
   template <typename T>

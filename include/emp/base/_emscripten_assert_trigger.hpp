@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020.
+ *  date: 2020-2024.
 */
 /**
  *  @file
@@ -19,7 +19,7 @@
 
 #include <emscripten.h>
 
-#include "_is_streamable.hpp"
+#include "concepts.hpp"
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -36,7 +36,7 @@ namespace emp {
   /// Print out information about the next variable and recurse...
   template <typename T, typename... EXTRA>
   void assert_print(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
-    if constexpr ( emp::is_streamable<std::stringstream, T>::value ) {
+    if constexpr ( emp::is_streamable<T>::value ) {
       ss << name << ": [" << val << "]" << std::endl;
     } else ss << name << ": (non-streamable type)" << std::endl;
     assert_print(ss, std::forward<EXTRA>(extra)...);

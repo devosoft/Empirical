@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2022
+ *  date: 2015-2025
 */
 /**
  *  @file
@@ -43,6 +43,7 @@
 #include "../control/Signal.hpp"
 #include "../debug/mem_track.hpp"
 #include "../meta/meta.hpp"
+#include "../tools/String.hpp"
 
 #include "events.hpp"
 #include "Font.hpp"
@@ -138,6 +139,7 @@ namespace web {
 
     bool IsButton()   const { return GetInfoTypeName() == "ButtonInfo"; }
     bool IsCanvas()   const { return GetInfoTypeName() == "CanvasInfo"; }
+    bool IsCheckBox() const { return GetInfoTypeName() == "CheckBoxInfo"; }
     bool IsDiv()      const { return GetInfoTypeName() == "DivInfo"; }
     bool IsImage()    const { return GetInfoTypeName() == "ImageInfo"; }
     bool IsInput()    const { return GetInfoTypeName() == "InputInfo"; }
@@ -164,13 +166,13 @@ namespace web {
     /// Determine is an attribute has been set on this Widget.
     virtual bool HasAttr(const std::string & setting);
 
-    /// Are two Widgets refering to the same HTML object?
+    /// Are two Widgets referring to the same HTML object?
     bool operator==(const Widget & in) const { return info == in.info; }
 
-    /// Are two Widgets refering to different HTML objects?
+    /// Are two Widgets referring to different HTML objects?
     bool operator!=(const Widget & in) const { return info != in.info; }
 
-    /// Conver Widget to bool (I.e., is this Widget active?)
+    /// Convert Widget to bool (I.e., is this Widget active?)
     operator bool() const { return info != nullptr; }
 
     const std::string & GetTitle() const { return GetAttr("title"); }  /// Get current tooltip on this widget.
@@ -618,21 +620,21 @@ namespace web {
     class WidgetFacet : public Widget {
     protected:
       /// WidgetFacet cannot be built unless within derived class, so constructors are protected
-      WidgetFacet(const std::string & in_id="") : Widget(in_id) { ; }
-      WidgetFacet(const WidgetFacet & in) : Widget(in) { ; }
+      WidgetFacet(const std::string & in_id="") : Widget(in_id) { }
+      WidgetFacet(const WidgetFacet & in) : Widget(in) { }
       WidgetFacet(const Widget & in) : Widget(in) {
         // Converting from a generic widget; make sure type is correct or non-existant!
         emp_assert(!in || dynamic_cast<typename RETURN_TYPE::INFO_TYPE *>( Info(in) ) != NULL,
                    in.GetID());
       }
-      WidgetFacet(WidgetInfo * in_info) : Widget(in_info) { ; }
+      WidgetFacet(WidgetInfo * in_info) : Widget(in_info) { }
       WidgetFacet & operator=(const WidgetFacet & in) { Widget::operator=(in); return *this; }
       virtual ~WidgetFacet() { ; }
 
       /// CSS-related options may be overridden in derived classes that have multiple styles.
       /// By default DoCSS will track the new information and apply it (if active) to the widget.
       virtual void DoCSS(const std::string & setting, const std::string & value) {
-        info->extras.style.DoSet(setting, value);
+        info->extras.style.Set(setting, value);
         if (IsActive()) Style::Apply(info->id, setting, value);
       }
 
@@ -644,7 +646,7 @@ namespace web {
       /// Attr-related options may be overridden in derived classes that have multiple attributes.
       /// By default DoAttr will track the new information and apply it (if active) to the widget.
       virtual void DoAttr(const std::string & setting, const std::string & value) {
-        info->extras.attr.DoSet(setting, value);
+        info->extras.attr.Set(setting, value);
         if (IsActive()) Attributes::Apply(info->id, setting, value);
       }
 
@@ -833,6 +835,21 @@ namespace web {
       /// Provide a function to be called whenever text is pasted in this Widget.
       template <typename T> return_t & OnPaste(T && arg) { return On("paste", arg); }
 
+      /// Trigger a click on this widget.
+
+      return_t & DoClick() {
+#ifdef __EMSCRIPTEN__
+        MAIN_THREAD_EM_ASM({
+          var id = UTF8ToString($0);
+          var element = document.getElementById(id);
+          if (element) element.click();
+        }, info->id.c_str());
+#else
+        emp::notify::Message("Triggering click on '", info->id, "'.");
+#endif
+        return (return_t &) *this;
+      }
+
       /// Create a tooltip for this Widget.
       return_t & SetTitle(const std::string & _in) { return SetAttr("title", _in); }
 
@@ -900,7 +917,7 @@ namespace web {
         { return SetPosition(x, y, unit, "fixed", "left", "bottom"); }
 
 
-      /// Set this Widget to float appropriately within its containter.
+      /// Set this Widget to float appropriately within its container.
       return_t & SetFloat(const std::string & f="left") { return SetCSS("float", f); }
 
       /// Setup how this Widget should handle overflow.
@@ -942,6 +959,9 @@ namespace web {
       /// Align text to be centered.
       return_t & SetCenterText() { return SetCSS("text-align", "center"); }
 
+      /// Align text to be vertically centered.
+      return_t & SetMiddleText() { return SetCSS("vertical-align", "middle"); }
+
       /// Set the background color of this Widget.
       return_t & SetBackground(const std::string & v) { return SetCSS("background-color", v); }
 
@@ -959,6 +979,11 @@ namespace web {
       /// The the number of pixels (or alternate unit) for the padding around cells (used with Tables)
       return_t & SetPadding(double p, const std::string & unit="px") {
         return SetCSS("padding", emp::to_string(p, unit));
+      }
+
+      /// Make a widget appear or disappear.
+      return_t & Hide(bool hide=true, String display_type="block") {
+        return SetCSS("display", hide ? "none" : display_type);
       }
 
       /// Wrap a wrapper around this Widget.

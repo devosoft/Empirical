@@ -42,11 +42,15 @@ namespace emp {
     // ------------------------------------------------------------------------------------
 
     /// Dynamic size is stored here to work with, but not the actual bits.
-    template <size_t DEFAULT_SIZE=0>
+    template <size_t DEFAULT_SIZE=0, bool AUTO_RESIZE=false>
     struct Bits_Data_Size_Var {
       using field_t = bits_field_t;
 
       size_t num_bits;           ///< Total number of bits are we using
+
+      static constexpr bool IsFixedSize() { return false; }
+      static constexpr bool IsAutoResize() { return AUTO_RESIZE; }
+      static constexpr size_t GetDefaultSize() { return DEFAULT_SIZE; }
 
       constexpr void SetSize(size_t new_size) { num_bits = new_size; }
 
@@ -93,6 +97,8 @@ namespace emp {
       Bits_Data_Size_Var(size_t in_size=DEFAULT_SIZE) : num_bits(in_size) { }
       Bits_Data_Size_Var(const Bits_Data_Size_Var &) = default;
 
+      Bits_Data_Size_Var & operator=(const Bits_Data_Size_Var &) = default;
+
       template <class Archive>
       void serialize(Archive & ar) { ar(num_bits); }
 
@@ -105,8 +111,12 @@ namespace emp {
       using field_t = bits_field_t;
       static constexpr size_t DEFAULT_SIZE = NUM_BITS;
 
-      constexpr void SetSize(size_t new_size) {
-        emp_assert(new_size == NUM_BITS, "Cannot change to new_size");
+      static constexpr bool IsFixedSize() { return true; }
+      static constexpr bool IsAutoResize() { return false; }
+      static constexpr size_t GetDefaultSize() { return DEFAULT_SIZE; }
+
+      constexpr void SetSize([[maybe_unused]] size_t new_size) {
+        emp_assert(new_size == NUM_BITS, "Cannot change to new_size", new_size, NUM_BITS);
       }
 
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return NUM_BITS; }
@@ -219,10 +229,10 @@ namespace emp {
       Bits_Data_Mem_Static_Base< Bits_Data_Size_Fixed<DEFAULT_SIZE>, CAPACITY >;
 
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
-    template <size_t DEFAULT_SIZE=0>
-    struct Bits_Data_Mem_Dynamic : public Bits_Data_Size_Var<DEFAULT_SIZE>
+    template <size_t DEFAULT_SIZE=0, bool AUTO_RESIZE=false>
+    struct Bits_Data_Mem_Dynamic : public Bits_Data_Size_Var<DEFAULT_SIZE, AUTO_RESIZE>
     {
-      using base_t = Bits_Data_Size_Var<DEFAULT_SIZE>;
+      using base_t = Bits_Data_Size_Var<DEFAULT_SIZE, AUTO_RESIZE>;
       using base_size_t = base_t;
       using field_t = bits_field_t;
 
@@ -451,6 +461,7 @@ namespace emp {
 
   using Bits_WatermarkData = internal::Bits_Data< internal::Bits_Data_Mem_Watermark<0> >;
   using Bits_DynamicData   = internal::Bits_Data< internal::Bits_Data_Mem_Dynamic<0> >;
+  using Bits_AutoData   = internal::Bits_Data< internal::Bits_Data_Mem_Dynamic<0, true> >;
   template <size_t NUM_BITS>
   using Bits_FixedData     = internal::Bits_Data< internal::Bits_Data_Mem_Fixed<NUM_BITS> >;
   template <size_t MAX_BITS>

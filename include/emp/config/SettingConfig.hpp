@@ -1,12 +1,12 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020
+ *  date: 2020-2024
 */
 /**
  *  @file
  *  @brief A tool for collecting settings, including from files and the command line.
- *  @note Status: DEPRECATED!
+ *  @note Status: DEPRECATED!  Use SettingCombos instead.
  */
 
 #ifndef EMP_CONFIG_SETTINGCONFIG_HPP_INCLUDE
@@ -45,7 +45,7 @@ namespace emp {
                   const char _flag, const std::string & _args_label)
         : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name))
         , args_label(_args_label) { }
-      virtual ~SettingBase() { }
+      virtual ~SettingBase() = default;
 
       virtual size_t GetSize() const = 0;                    ///< How many values are available?
       virtual std::string AsString() const = 0;              ///< All values, as a single string.

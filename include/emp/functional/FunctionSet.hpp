@@ -21,7 +21,7 @@ namespace emp {
 
   template <typename T> class FunctionSet;
 
-  /// A vector of functions that can all be triggered at onece; results can either be returned
+  /// A vector of functions that can all be triggered at once; results can either be returned
   /// in a vector or post-processed in a function (such as max, min, etc.)
   /// Derived from emp::vector, hence with all of the same methods as vector.
   template <typename RETURN_T, typename... ARGS>
@@ -40,7 +40,7 @@ namespace emp {
     /// How many functions are in this FunctionSet?
     size_t GetSize() const { return base_t::size(); }
 
-    /// Add a new funtion to this FunctionSet
+    /// Add a new function to this FunctionSet
     void Add(const value_type & in_fun) { base_t::push_back(in_fun); }
 
     /// Remove the function at a specified position.

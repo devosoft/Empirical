@@ -113,7 +113,7 @@ namespace web {
       : duration(d*1000), default_target(t), running(false)
       , start_time(0.0), cur_time(0.0), run_time(0.0)
     {
-      emp::InitializeAnim();  // Make sure JS is intialized for animations.
+      emp::InitializeAnim();  // Make sure JS is initialized for animations.
       callback_id = JSWrap( std::function<void()>([this](){ this->AdvanceFrame(); }) );
     }
     ~Tween() {

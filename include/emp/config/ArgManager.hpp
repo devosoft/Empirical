@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief A tool for sythesizing command-line arguments, URL query params, and config files.
+ *  @brief A tool for synthesizing command-line arguments, URL query params, and config files.
  *  @note Status: BETA
  */
 
@@ -760,7 +760,7 @@ namespace emp {
         return false;
       }
 
-      /// Leaving TestUnknown for backward compatability; returns opposite of HasUnknown().
+      /// Leaving TestUnknown for backward compatibility; returns opposite of HasUnknown().
       bool TestUnknown(std::ostream & os=std::cerr) const { return !HasUnknown(os); }
 
       /// Convert settings from a configure object to command-line arguments.

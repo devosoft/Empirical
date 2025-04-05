@@ -28,16 +28,19 @@ namespace emp {
 namespace web {
 
   ///  Class to maintain a map of setting names to values that can be easily ported
-  ///  over to JavaScript.  A companial class, Attributes, also exists.
+  ///  over to JavaScript.  A companion class, Attributes, also exists.
   class Style {
   private:
     std::map<std::string, std::string> settings;  ///< CSS Setting values being tracked.
     std::set<std::string> classes;  ///< CSS classes
 
   public:
-    Style() { ; }
+    Style() = default;
     Style(const Style &) = default;
     Style(Style &&) = default;
+    template <typename... Ts>
+    Style(Ts &&... args) { Set(std::forward<Ts>(args)...); }
+
     Style & operator=(const Style &) = default;
     Style & operator=(Style &&) = default;
 
@@ -46,22 +49,20 @@ namespace web {
     /// Return a count of the number of classes that have been added.
     size_t GetNClasses() const { return classes.size(); }
 
-   Style & AddClass(const std::string & in_clss) {
-      classes.insert(in_clss);
-      return *this;
-    }
-
-
-    Style & DoSet(const std::string & in_set, const std::string & in_val) {
-      settings[in_set] = in_val;
+   Style & AddClass(const std::string & in_class) {
+      classes.insert(in_class);
       return *this;
     }
 
     /// Record that setting "s" is set to value "v" (converted to string) and return this object.
-    template <typename SET_TYPE>
-    Style & Set(const std::string & s, SET_TYPE v) {
-      return DoSet(s, emp::to_string(v));
+    template <typename SET_TYPE, typename... EXTRA_Ts>
+    Style & Set(const std::string & s, SET_TYPE v, EXTRA_Ts &&... extras) {
+      settings[s] = emp::to_string(v);
+      return Set(std::forward<EXTRA_Ts>(extras)...);
     }
+
+    /// Null condition; Set may have no arguments.
+    Style & Set() { return *this; }
 
     /// Set all values from in_css here as well.  Return this object.
     Style & Insert(const Style & in_css) {

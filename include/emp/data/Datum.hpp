@@ -1,11 +1,11 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021-2023
+ *  date: 2021-2024
 */
 /**
  *  @file
- *  @brief A single piece of data, either a value or a string.
+ *  @brief A single piece of data, either a value or an emp::String.
  *  @note Status: ALPHA
  *
  *  DEVELOPER NOTES:
@@ -16,11 +16,10 @@
 #ifndef EMP_DATA_DATUM_HPP_INCLUDE
 #define EMP_DATA_DATUM_HPP_INCLUDE
 
-#include <string>
-
 #include "../base/assert.hpp"
 #include "../base/notify.hpp"
 #include "../math/math.hpp"
+#include "../tools/String.hpp"
 
 namespace emp {
 
@@ -28,19 +27,20 @@ namespace emp {
   private:
     union {
       double num;
-      std::string str;
+      emp::String str;
     };
     bool is_num = true;
 
-    void InitString() { new (&str) std::string; is_num = false; }
+    void InitString() { new (&str) emp::String; is_num = false; }
     template <typename T>
-    void InitString(T && in) { new (&str) std::string(std::forward<T>(in)); is_num = false; }
-    void FreeString() { if (!is_num) str.~basic_string(); }
+    void InitString(T && in) { new (&str) emp::String(std::forward<T>(in)); is_num = false; }
+    void FreeString() { if (!is_num) str.~String(); }
   public:
     Datum() : num(0.0), is_num(true) { }
     Datum(double in) : num(in), is_num(true) { }
     Datum(const std::string & in) { InitString(in); }
-    Datum(std::string && in) { InitString(in); }
+    Datum(const emp::String & in) { InitString(in); }
+    Datum(emp::String && in) { InitString(in); }
     Datum(const char * in) { InitString(in); }
     Datum(const Datum & in) {
       if (in.is_num) num = in.num;
@@ -60,8 +60,8 @@ namespace emp {
     double NativeDouble() const { emp_assert(is_num); return num; }
 
     /// If we know Datum is a String, we can request its native form.
-    std::string & NativeString() { emp_assert(!is_num); return str; }
-    const std::string & NativeString() const { emp_assert(!is_num); return str; }
+    emp::String & NativeString() { emp_assert(!is_num); return str; }
+    const emp::String & NativeString() const { emp_assert(!is_num); return str; }
 
     double AsDouble() const {
       if (is_num) return num;
@@ -76,7 +76,7 @@ namespace emp {
       return 0.0;
     }
 
-    std::string AsString() const {
+    emp::String AsString() const {
       if (!is_num) return str;
       std::stringstream ss;
       ss << num;
@@ -86,6 +86,7 @@ namespace emp {
 
     operator double() const { return AsDouble(); }
     operator std::string() const { return AsString(); }
+    operator emp::String() const { return AsString(); }
 
     Datum & SetDouble(double in) {  // If this were previously a string, clean it up!
       FreeString();  // If there was previously a string, make sure to free it.
@@ -94,9 +95,10 @@ namespace emp {
       return *this;
     }
 
-    Datum & SetString(const std::string & in) {
-      if (is_num) InitString(in);  // Convert to string.
-      else str = in;               // Already a string.
+    template <typename T>
+    Datum & SetString(T && in) {
+      if (is_num) InitString(std::forward<T>(in));  // Convert to string.
+      else str = std::forward<T>(in);               // Already a string.
       return *this;
     }
 
@@ -107,6 +109,7 @@ namespace emp {
 
     Datum & operator=(double in) { return SetDouble(in); }
     Datum & operator=(const std::string & in) { return SetString(in); }
+    Datum & operator=(emp::String && in) { return SetString(in); }
     Datum & operator=(const char * in) { return SetString(in); }
     Datum & operator=(const Datum & in) { return Set(in); }
 
@@ -149,7 +152,7 @@ namespace emp {
     }
     Datum operator*(double in) const {
       if (IsDouble()) return NativeDouble() * in;
-      std::string out_string;
+      emp::String out_string;
       const size_t count = static_cast<size_t>(in);
       out_string.reserve(NativeString().size() * count);
       for (size_t i = 0; i < count; ++i) out_string += NativeString();
@@ -165,7 +168,7 @@ namespace emp {
     }
     Datum operator*(const Datum & in) const {
       if (IsDouble()) return NativeDouble() * in.AsDouble();
-      std::string out_string;
+      emp::String out_string;
       size_t count = static_cast<size_t>(in.AsDouble());
       out_string.reserve(NativeString().size() * count);
       for (size_t i = 0; i < count; i++) out_string += NativeString();

@@ -9,7 +9,7 @@
  *  @note Status: ALPHA
  *
  *  StringMap is setup to be a generic dictionary that can link strings to objects of any other
- *  desginated type.  It is more powerful than std::unordered_map because it will accept strings wrapped in
+ *  designated type.  It is more powerful than std::unordered_map because it will accept strings wrapped in
  *  the EMP_STRING_ID macro, which is hashed at compile-time instead of run-time.
  *
  *  \@CO2:

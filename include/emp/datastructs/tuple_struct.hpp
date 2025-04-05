@@ -6,7 +6,7 @@
 /**
  *  @file
  *  @brief These macros will build a tuple and accessors to that tuple's members inside of a
- * class definintion.
+ * class definition.
  *
  *  @note Status: ALPHA
  *
@@ -47,7 +47,7 @@
  *      )
  *    };`
  *
- *  This struct can now be used as a C++ stand-in for Javscript objects for use with
+ *  This struct can now be used as a C++ stand-in for Javascript objects for use with
  *  JSWrap.
  *
  *  Introspective tuple structs have a static member n_fields that indicates how
@@ -206,7 +206,7 @@ namespace emp {
 
 }
 
-/// This varient of the tuple building macro can be used in situations where
+/// This variant of the tuple building macro can be used in situations where
 /// access to stringified versions of variable names is necessary.
 /// It stores an array of stringified variable names called var_names in the
 /// struct this macro was called from. It also stores an array containing the

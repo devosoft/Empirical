@@ -88,3 +88,11 @@ TEST_CASE("Another test vector", "[base]")
 
   REQUIRE(count == 467);
 }
+
+
+TEST_CASE("Initializer list with vector", "[base]")
+{
+  emp::vector<int> v = {1, 2, 3, 4, 5};
+  CHECK(v.size() == 5);
+  CHECK(v[1] == 2);
+}

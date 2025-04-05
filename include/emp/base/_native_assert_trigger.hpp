@@ -17,7 +17,7 @@
 #include <stddef.h>
 #include <string>
 
-#include "_is_streamable.hpp"
+#include "concepts.hpp"
 
 namespace emp {
 
@@ -29,7 +29,7 @@ namespace emp {
   /// Print out information about the next variable and recurse...
   template <typename T, typename... EXTRA>
   void assert_print(std::string name, T && val, EXTRA &&... extra) {
-    if constexpr ( emp::is_streamable<decltype( std::cerr ), T>::value ) {
+    if constexpr ( emp::canStreamTo<decltype(std::cerr), T> ) {
       // If we had a literal string fed in, print it as a message.
       if (name[0] == '"') {
         std::cerr << "MESSAGE: " << val << std::endl;

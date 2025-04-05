@@ -1,0 +1,40 @@
+FEATURES:
+- Set up language choice in compilation: Python, Java, C, and Rust are all good options.
+- Colorize code examples on "Generated C++ Code" page.
+- In advanced options allow toggling of helper functions.
+- SAVE advanced settings when saving regex's
+- Add $ and ^ regex's to work directly in stream input.
+- Make {alias} tokens work as aliases only in Lexers.
+- Make REGA/REGB work (match REGA iff REGB follows; REGB counts toward length.)
+  - Probably easiest to combine REGA/REGB in first pass, and then fix it AFTER match us known.
+
+FOLLOW-UP: Empala!  Parser generator (name based off of Yak and Bison)
+
+VALUE     LIT_NUMBER
+          LIT_STRING
+          IDENTIFIER
+
+EXPR{0}   '-' :EXPR
+          '!' :EXPR
+EXPR{1}   '(' ::EXPR ')'          // :: => use RULE in place of this one (do not put this in AST)
+EXPR{2}   :EXPR '*' :EXPR
+          :EXPR '/' :EXPR
+          :EXPR '%' :EXPR
+EXPR{3}   :EXPR '+' :EXPR
+          :EXPR '-' :EXPR
+EXPR{4}   :EXPR COMPARE :EXPR     // <, <=, >, and >=
+EXPR{5}   :EXPR COMPARE_EQ :EXPR  // == and !=
+EXPR{6}   :EXPR BOOL_AND :EXPR    // &&
+EXPR{7}   :EXPR BOOL_OR :EXPR     // ||
+EXPR{8}   :EXPR '=' :EXPR
+EXPR{9}   ::VALUE
+
+STATEMENT ::EXPR ';'
+          VAR IDENTIFIER ('=' :EXPR)? ';'
+          IF '(' :EXPR ')' :STATEMENT
+          WHILE '(' :EXPR ')' :STATEMENT
+          PRINT '(' :EXPR (',' :EXPR)+ ')'
+          '{' ::STATEMENT_LIST '}'
+          :: ';'                  // :: with a rule means leave out of AST, just use for shaping.
+
+STATEMENT_LIST  :STATEMENT*       // * Means "any number of" (+ is at least one; ? is optional)

@@ -72,6 +72,8 @@ namespace web {
       DivInfo(const DivInfo &) = delete;              // No copies of INFO allowed
       DivInfo & operator=(const DivInfo &) = delete;  // No copies of INFO allowed
       virtual ~DivInfo() {
+        state = Widget::INACTIVE;
+        ClearChildren();                              // Unlink all children.
         for (auto & p : anim_map) delete p.second;    // Delete this document's animations.
       }
 
@@ -342,8 +344,8 @@ namespace web {
       return false;
     }
 
-    /// Remove this widget from the current document.
-    void Deactivate(bool top_level) override {
+    /// Remove this widget from the current document (argument is for internal, recursive use only).
+    void Deactivate(bool top_level=true) override {
       // Deactivate children before this node.
       for (auto & child : Info()->m_children) child.Deactivate(false);
       Widget::Deactivate(top_level);
@@ -379,7 +381,7 @@ namespace web {
     web::Animate & Animate (const std::string & in_id) { return *(Info()->anim_map[in_id]); }
   };
 
-  // using Slate = Div;    // For backward compatability...
+  // using Slate = Div;    // For backward compatibility...
 }
 }
 

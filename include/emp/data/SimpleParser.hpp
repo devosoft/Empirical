@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021-2022
+ *  date: 2021-2024
 */
 /**
  *  @file
@@ -10,9 +10,9 @@
  *
  *  A fully functional parser that will convert a string-description of a function to a C++
  *  lambda.  A map-typed object should be passed in to provide values associated with variables.
- *  Allowed map types include std::map<std::string,T>, std::unordered_map<std::string,T>,
+ *  Allowed map types include std::map<emp::String,T>, std::unordered_map<emp::String,T>,
  *  emp::DataMap, and (soon) derivations from emp::AnnotatedType.  For standard maps, T must be
- *  convertable to emp::Datum.
+ *  convertible to emp::Datum.
  *
  *  Developer TODO:
  *  - Setup operator RegEx to be built dynamically
@@ -35,6 +35,7 @@
 #include "../datastructs/ra_map.hpp"
 #include "../math/Random.hpp"
 #include "../meta/meta.hpp"
+#include "../tools/String.hpp"
 
 #include "AnnotatedType.hpp"
 #include "DataMap.hpp"
@@ -49,21 +50,22 @@ namespace emp {
       using fun_t = std::function<emp::Datum(ARG_T)>;
       enum type_t { ERROR=0, VALUE, FUNCTION };
 
-      type_t type;
+      type_t type = ERROR;
       emp::Datum value;
       fun_t fun;
 
-      ValueType() : type(ERROR) {}
+      ValueType() = default;
       ValueType(const ValueType &) = default;
+      ValueType(ValueType &&) = default;
       ValueType(double in_val) : type(VALUE), value(in_val) { }
-      ValueType(std::string in_val) : type(VALUE), value(in_val) { }
+      ValueType(emp::String in_val) : type(VALUE), value(in_val) { }
       ValueType(emp::Datum in_val) : type(VALUE), value(in_val) { }
       ValueType(fun_t in_fun) : type(FUNCTION), fun(in_fun) { }
 
       ValueType & operator=(const ValueType &) = default;
       ValueType & operator=(emp::Datum in_val) { type = VALUE; value = in_val; return *this; }
       ValueType & operator=(double in_val) { type = VALUE; value = in_val; return *this; }
-      ValueType & operator=(const std::string & in_val) { type = VALUE; value = in_val; return *this; }
+      ValueType & operator=(const emp::String & in_val) { type = VALUE; value = in_val; return *this; }
       ValueType & operator=(fun_t in_fun) { type = FUNCTION; fun = in_fun; return *this; }
 
       fun_t AsFunction() {
@@ -78,13 +80,13 @@ namespace emp {
       using fun_t = std::function<emp::Datum(arg_t)>;
       using value_t = ValueType<arg_t>;
 
-      SymbolTable() { }
+      SymbolTable() = default;
       SymbolTable(arg_t) { }
 
-      static_assert( std::is_same<typename MAP_T::key_type, std::string>(),
-                    "Any map type used by the parser must have a key type of std::string");
+      static_assert( std::same_as<typename MAP_T::key_type, emp::String>,
+                    "Any map type used by the parser must have a key type of emp::String");
 
-      static fun_t MakeDatumAccessor(const std::string & name) {
+      static fun_t MakeDatumAccessor(const emp::String & name) {
         return [name](arg_t symbol_vals){
           auto val_it = symbol_vals.find(name);
           emp_assert(val_it != symbol_vals.end());
@@ -92,23 +94,23 @@ namespace emp {
         };
       }
 
-      /// By default, let the value handle its own converstion to a function.
+      /// By default, let the value handle its own conversion to a function.
       auto AsFunction(ValueType<arg_t> & val) const { return val.AsFunction(); }
     };
 
     template <typename VALUE_T, typename DUMMY_T>
-    struct SymbolTable<emp::ra_map<std::string,VALUE_T>, DUMMY_T> {
-      using map_t = emp::ra_map<std::string,VALUE_T>;
+    struct SymbolTable<emp::ra_map<emp::String,VALUE_T>, DUMMY_T> {
+      using map_t = emp::ra_map<emp::String,VALUE_T>;
       using arg_t = const map_t &;
       using fun_t = std::function<emp::Datum(arg_t)>;
       using value_t = ValueType<arg_t>;
 
       const typename map_t::layout_t & layout;
 
-      SymbolTable(const emp::ra_map<std::string,VALUE_T> & in_map)
+      SymbolTable(const emp::ra_map<emp::String,VALUE_T> & in_map)
         : layout(in_map.GetLayout()) { }
 
-      fun_t MakeDatumAccessor(const std::string & name) const {
+      fun_t MakeDatumAccessor(const emp::String & name) const {
         emp_assert(layout.find(name) != layout.end());
         size_t id = layout.find(name)->second;
         #ifdef NDEBUG
@@ -121,7 +123,7 @@ namespace emp {
         };
       }
 
-      /// By default, let the value handle its own converstion to a function.
+      /// By default, let the value handle its own conversion to a function.
       auto AsFunction(ValueType<arg_t> & val) const {
         // @CAO: Could check layout correctness in debug mode.
         return val.AsFunction();
@@ -139,7 +141,7 @@ namespace emp {
 
       SymbolTable(const emp::DataLayout & in_layout) : layout(in_layout) { }
 
-      auto MakeDatumAccessor(const std::string & name) const {
+      auto MakeDatumAccessor(const emp::String & name) const {
         return emp::DataMap::MakeDatumAccessor(layout, name);
       }
 
@@ -244,13 +246,13 @@ namespace emp {
     MapLexer lexer;
 
     // Operators and functions that should be used when parsing.
-    std::unordered_map<std::string, std::function<emp::Datum(emp::Datum)>> unary_ops;
-    std::unordered_map<std::string, BinaryOperator> binary_ops;
-    std::unordered_map<std::string, Function> functions;
+    std::unordered_map<emp::String, std::function<emp::Datum(emp::Datum)>> unary_ops;
+    std::unordered_map<emp::String, BinaryOperator> binary_ops;
+    std::unordered_map<emp::String, Function> functions;
     emp::vector<emp::Datum> external_vals;
 
     // The set of data map entries accessed when the last function was parsed.
-    std::set<std::string> var_names;
+    std::set<emp::String> var_names;
 
     // Track the number of errors and the function to call when errors occur.
     template<typename... Ts>
@@ -272,12 +274,12 @@ namespace emp {
     { AddRandomFunctions(random); }
 
     /// Get the set of variable names that the most recently generated function used.
-    const std::set<std::string> & GetNamesUsed() const { return var_names; }
+    const std::set<emp::String> & GetNamesUsed() const { return var_names; }
 
     /// Get the set of names used in the provided equation.
-    const std::set<std::string> & GetNamesUsed(const std::string & expression) {
+    const std::set<emp::String> & GetNamesUsed(const emp::String & expression) {
       var_names.clear();
-      emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression: ") + expression);
+      emp::TokenStream tokens = lexer.Tokenize(expression, emp::String("Expression: ") + expression);
       for (emp::Token token : tokens) {
         if (lexer.IsID(token) && !emp::Has(functions, token.lexeme)) {
           var_names.insert(token.lexeme);
@@ -288,12 +290,12 @@ namespace emp {
 
 
     /// Add a unary operator
-    void AddOp(const std::string & op, std::function<emp::Datum(emp::Datum)> fun) {
+    void AddOp(const emp::String & op, std::function<emp::Datum(emp::Datum)> fun) {
       unary_ops[op] = fun;
     }
 
     /// Add a binary operator
-    void AddOp(const std::string & op, size_t prec,
+    void AddOp(const emp::String & op, size_t prec,
                std::function<emp::Datum(emp::Datum,emp::Datum)> fun) {
       binary_ops[op].Set(prec, fun);
     }
@@ -452,7 +454,7 @@ namespace emp {
       }
 
       // Otherwise it should be and identifier!
-      const std::string & name = pos->lexeme;
+      const emp::String & name = pos->lexeme;
       ++pos;
 
       // If it is followed by a parenthesis, it should be a function.
@@ -526,7 +528,7 @@ namespace emp {
         // If we have an operator, act on it!
         if (Has(binary_ops, pos->lexeme)) {
           const BinaryOperator & op = binary_ops[pos->lexeme];
-          if (prec_limit >= op.prec) return val1; // Precedence not allowed; return currnet value.
+          if (prec_limit >= op.prec) return val1; // Precedence not allowed; return current value.
           ++pos;
           value_t val2 = ParseMath(symbols, pos, op.prec);
           if (val1.type == value_t::VALUE) {
@@ -561,7 +563,7 @@ namespace emp {
     template <typename T1, typename... Ts>
     void SetupStaticValues(T1 arg1, Ts... args) {
       // If we have a vector of incoming values, make sure it is valid and then just pass it along.
-      if constexpr (sizeof...(Ts) == 0 && emp::is_emp_vector<T1>()) {
+      if constexpr (sizeof...(Ts) == 0 && (emp::is_emp_vector<T1>() || emp::is_std_vector<T1>())) {
         using value_t = typename T1::value_type;
         static_assert(std::is_same<value_t, emp::Datum>(),
           "If BuildMathFunction is provided a vector, it must contain only emp::Datum.");
@@ -588,9 +590,9 @@ namespace emp {
 
     template <typename MAP_T, typename... EXTRA_Ts>
     auto BuildMathFunction(
-      const MAP_T & symbol_map,            ///< The map or layout to use, specifying variables.
-      const std::string & expression,   ///< The primary expression to convert.
-      EXTRA_Ts... extra_args            ///< Extra value arguments (accessed as $1, $2, etc.)
+      const MAP_T & symbol_map,   ///< The map or layout to use, specifying variables.
+      std::string_view expression,     ///< The primary expression to convert.
+      EXTRA_Ts... extra_args      ///< Extra value arguments (accessed as $1, $2, etc.)
     ) {
       // If we have incoming values, store them appropriately.
       SetupStaticValues(extra_args...);
@@ -599,7 +601,7 @@ namespace emp {
       SymbolTable<MAP_T> symbol_table(symbol_map);
 
       // Tokenize the expression.
-      emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression: ") + expression);
+      emp::TokenStream tokens = lexer.Tokenize(expression, emp::String("Expression: ") + expression);
       if constexpr (verbose) tokens.Print();
       var_names.clear();    // Reset the names used from data map.
       pos_t pos = tokens.begin();

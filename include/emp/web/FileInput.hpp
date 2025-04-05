@@ -89,14 +89,14 @@ namespace web {
     }; // End of FileInputInfo definition
     #endif // DOXYGEN_SHOULD_SKIP_THIS
 
-    // Get a properly cast version of indo.
+    // Get a properly cast version of info.
     FileInputInfo * Info() { return (FileInputInfo *) info; }
     const FileInputInfo * Info() const { return (FileInputInfo *) info; }
 
     FileInput(FileInputInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
-    /// Create a new Fileinput; supply the function to call with the file contents as a string
+    /// Create a new FileInput; supply the function to call with the file contents as a string
     /// (and optionally the HTML identifier to be used).
     FileInput(const std::function<void(const std::string &)> & in_cb, const std::string & in_id="")
       : WidgetFacet(in_id)
@@ -114,13 +114,14 @@ namespace web {
 
     /// Create a new FileInput; supply the function to call with the file contents as a File object
     /// (and optionally the HTML identifier to be used).
-    FileInput(const std::function<void(const emp::File &)> & cb, const std::string & /*in_id*/="")
-      : FileInput( [cb](const std::string & in){ std::stringstream ss(in); File file(ss); cb(file); } ) { ; }
+    FileInput(const std::function<void(emp::File)> & cb, const std::string & in_id="")
+      : FileInput( [cb](const std::string & in){ std::stringstream ss(in); File file(ss); cb(file); }, in_id )
+    { ; }
 
     /// Load a pre-existing FileInput object.
-    FileInput(const FileInput & in) : WidgetFacet(in) { ; }
+    FileInput(const FileInput & in) = default;
     FileInput(const Widget & in) : WidgetFacet(in) { ; }
-    virtual ~FileInput() { ; }
+    virtual ~FileInput() = default;
 
     using INFO_TYPE = FileInputInfo;
 
@@ -133,7 +134,7 @@ namespace web {
     /// Set this FileInput object to have autofocus (or not)
     FileInput & Autofocus(bool in_af) { Info()->UpdateAutofocus(in_af); return *this; }
 
-    /// Set this FileInput object to be disabled (or renable it.)
+    /// Set this FileInput object to be disabled (or reenable it.)
     FileInput & Disabled(bool in_dis) { Info()->UpdateDisabled(in_dis); return *this; }
 
     /// Determine if this object currently has autofocus.

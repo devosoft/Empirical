@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2022.
+ *  date: 2016-2024.
 */
 /**
  *  @file
@@ -20,81 +20,171 @@
 #include <type_traits>
 #include <utility>
 
-#include "../base/_is_streamable.hpp"
-//^ provides is_streamable implementation,
-// located in base directory to preserve levelization
-
+#include "../base/concepts.hpp"
 #include "meta.hpp"
 
 
 namespace emp {
 
-  // Predeclarations used below.
-  template <typename TYPE> class Ptr;
-  #ifdef NDEBUG
-  template <typename T, typename... Ts> using vector = std::vector<T, Ts...>;
-  #else
-  template <typename T, typename... Ts> class vector;
-  #endif
+  /// Type trait framework for working with whole TYPE PACKS.
+  template <template <typename...> typename TRAIT, typename... Ts>
+  struct has_trait_any : std::false_type {};
+  template <template <typename...> typename TRAIT, typename T, typename... EXTRA_Ts>
+  struct has_trait_any<TRAIT, T, EXTRA_Ts...>
+      : std::bool_constant<TRAIT<T>::value || has_trait_any<TRAIT, EXTRA_Ts...>::value> {};
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this
-  // adapted from https://stackoverflow.com/a/29634934
-  namespace detail {
+  template <template <typename...> typename TRAIT, typename... Ts>
+  struct has_trait_all : std::true_type {};
+  template <template <typename...> typename TRAIT, typename T, typename... EXTRA_Ts>
+  struct has_trait_all<TRAIT, T, EXTRA_Ts...>
+      : std::bool_constant<TRAIT<T>::value && has_trait_all<TRAIT, EXTRA_Ts...>::value> {};
 
-    // using statements allow Argument-Dependent Lookup (ADL)
-    // with custom begin/end
-    // see https://en.cppreference.com/w/cpp/language/adl
-    using std::begin;
-    using std::end;
+  template <template <typename...> typename TRAIT, typename... Ts>
+  struct has_trait_none : std::negate<emp::has_trait_any<TRAIT, Ts...>> {};
 
-    template <typename T>
-    auto is_iterable_impl(int)
-    -> decltype (
-      // begin/end and operator !=
-      begin(std::declval<T&>()) != end(std::declval<T&>()),
-      // Handle evil operator ,
-      void(),
-      // operator ++
-      ++std::declval<decltype(begin(std::declval<T&>()))&>(),
-      // operator*
-      void(*begin(std::declval<T&>())),
-      std::true_type{}
-    );
 
-    template <typename T>
-    std::false_type is_iterable_impl(...);
-  }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  template <typename... Ts> using has_any_void = has_trait_any<std::is_void, Ts...>;
+  template <typename... Ts> using has_only_void = has_trait_all<std::is_void, Ts...>;
+  template <typename... Ts> using has_no_void = has_trait_none<std::is_void, Ts...>;
 
-  /// Determine if a type is iterable.
-  template <typename T>
-  using IsIterable = decltype(detail::is_iterable_impl<T>(0));
+  template <typename... Ts> using has_any_null_pointer = has_trait_any<std::is_null_pointer, Ts...>;
+  template <typename... Ts> using has_only_null_pointer = has_trait_all<std::is_null_pointer, Ts...>;
+  template <typename... Ts> using has_no_null_pointer = has_trait_none<std::is_null_pointer, Ts...>;
 
-  // Determine if a type has a ToString() member function.
-  template <typename T, typename=void> struct HasToString : std::false_type { };
-  template<typename T>
-  struct HasToString<emp::decoy_t<T, decltype(std::declval<T>().ToString())>> : std::true_type{};
+  template <typename... Ts> using has_any_integral = has_trait_any<std::is_integral, Ts...>;
+  template <typename... Ts> using has_only_integral = has_trait_all<std::is_integral, Ts...>;
+  template <typename... Ts> using has_no_integral = has_trait_none<std::is_integral, Ts...>;
 
-  // Determine if a type has a ToDouble() member function.
-  template <typename T, typename=void> struct HasToDouble : std::false_type { };
-  template<typename T>
-  struct HasToDouble<emp::decoy_t<T, decltype(std::declval<T>().ToDouble())>> : std::true_type{};
+  template <typename... Ts> using has_any_floating_point = has_trait_any<std::is_floating_point, Ts...>;
+  template <typename... Ts> using has_only_floating_point = has_trait_all<std::is_floating_point, Ts...>;
+  template <typename... Ts> using has_no_floating_point = has_trait_none<std::is_floating_point, Ts...>;
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // Determine if a type has a FromString() member function.
-  template <typename T, typename=void> struct HasFromString : std::false_type { };
-  template<typename T>
-  struct HasFromString<emp::decoy_t<T, decltype(std::declval<T>().FromString(""))>> : std::true_type{};
+  template <typename... Ts> using has_any_array = has_trait_any<std::is_array, Ts...>;
+  template <typename... Ts> using has_only_array = has_trait_all<std::is_array, Ts...>;
+  template <typename... Ts> using has_no_array = has_trait_none<std::is_array, Ts...>;
 
-  // Determine if a type has a FromDouble() member function.
-  template <typename T, typename=void> struct HasFromDouble : std::false_type { };
-  template<typename T>
-  struct HasFromDouble<emp::decoy_t<T, decltype(std::declval<T>().FromDouble(0.0))>> : std::true_type{};
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  template <typename... Ts> using has_any_enum = has_trait_any<std::is_enum, Ts...>;
+  template <typename... Ts> using has_only_enum = has_trait_all<std::is_enum, Ts...>;
+  template <typename... Ts> using has_no_enum = has_trait_none<std::is_enum, Ts...>;
 
-  /// Determine if a type passed in is an std::function type (vs a lambda or a raw function)
-  template <typename> struct is_std_function : std::false_type { };
-  template <typename... Ts> struct is_std_function<std::function<Ts...>> : std::true_type { };
+  template <typename... Ts> using has_any_union = has_trait_any<std::is_union, Ts...>;
+  template <typename... Ts> using has_only_union = has_trait_all<std::is_union, Ts...>;
+  template <typename... Ts> using has_no_union = has_trait_none<std::is_union, Ts...>;
+
+  template <typename... Ts> using has_any_class = has_trait_any<std::is_class, Ts...>;
+  template <typename... Ts> using has_only_class = has_trait_all<std::is_class, Ts...>;
+  template <typename... Ts> using has_no_class = has_trait_none<std::is_class, Ts...>;
+
+  template <typename... Ts> using has_any_function = has_trait_any<std::is_function, Ts...>;
+  template <typename... Ts> using has_only_function = has_trait_all<std::is_function, Ts...>;
+  template <typename... Ts> using has_no_function = has_trait_none<std::is_function, Ts...>;
+
+  template <typename... Ts> using has_any_pointer = has_trait_any<std::is_pointer, Ts...>;
+  template <typename... Ts> using has_only_pointer = has_trait_all<std::is_pointer, Ts...>;
+  template <typename... Ts> using has_no_pointer = has_trait_none<std::is_pointer, Ts...>;
+
+  template <typename... Ts> using has_any_lvalue_reference = has_trait_any<std::is_lvalue_reference, Ts...>;
+  template <typename... Ts> using has_only_lvalue_reference = has_trait_all<std::is_lvalue_reference, Ts...>;
+  template <typename... Ts> using has_no_lvalue_reference = has_trait_none<std::is_lvalue_reference, Ts...>;
+
+  template <typename... Ts> using has_any_rvalue_reference = has_trait_any<std::is_rvalue_reference, Ts...>;
+  template <typename... Ts> using has_only_rvalue_reference = has_trait_all<std::is_rvalue_reference, Ts...>;
+  template <typename... Ts> using has_no_rvalue_reference = has_trait_none<std::is_rvalue_reference, Ts...>;
+
+  template <typename... Ts> using has_any_member_object_pointer = has_trait_any<std::is_member_object_pointer, Ts...>;
+  template <typename... Ts> using has_only_member_object_pointer = has_trait_all<std::is_member_object_pointer, Ts...>;
+  template <typename... Ts> using has_no_member_object_pointer = has_trait_none<std::is_member_object_pointer, Ts...>;
+
+  template <typename... Ts> using has_any_member_function_pointer = has_trait_any<std::is_member_function_pointer, Ts...>;
+  template <typename... Ts> using has_only_member_function_pointer = has_trait_all<std::is_member_function_pointer, Ts...>;
+  template <typename... Ts> using has_no_member_function_pointer = has_trait_none<std::is_member_function_pointer, Ts...>;
+
+
+  template <typename... Ts> using has_any_fundamental = has_trait_any<std::is_fundamental, Ts...>;
+  template <typename... Ts> using has_only_fundamental = has_trait_all<std::is_fundamental, Ts...>;
+  template <typename... Ts> using has_no_fundamental = has_trait_none<std::is_fundamental, Ts...>;
+
+  template <typename... Ts> using has_any_arithmetic = has_trait_any<std::is_arithmetic, Ts...>;
+  template <typename... Ts> using has_only_arithmetic = has_trait_all<std::is_arithmetic, Ts...>;
+  template <typename... Ts> using has_no_arithmetic = has_trait_none<std::is_arithmetic, Ts...>;
+
+  template <typename... Ts> using has_any_scalar = has_trait_any<std::is_scalar, Ts...>;
+  template <typename... Ts> using has_only_scalar = has_trait_all<std::is_scalar, Ts...>;
+  template <typename... Ts> using has_no_scalar = has_trait_none<std::is_scalar, Ts...>;
+
+  template <typename... Ts> using has_any_object = has_trait_any<std::is_object, Ts...>;
+  template <typename... Ts> using has_only_object = has_trait_all<std::is_object, Ts...>;
+  template <typename... Ts> using has_no_object = has_trait_none<std::is_object, Ts...>;
+
+  template <typename... Ts> using has_any_compound = has_trait_any<std::is_compound, Ts...>;
+  template <typename... Ts> using has_only_compound = has_trait_all<std::is_compound, Ts...>;
+  template <typename... Ts> using has_no_compound = has_trait_none<std::is_compound, Ts...>;
+
+  template <typename... Ts> using has_any_reference = has_trait_any<std::is_reference, Ts...>;
+  template <typename... Ts> using has_only_reference = has_trait_all<std::is_reference, Ts...>;
+  template <typename... Ts> using has_no_reference = has_trait_none<std::is_reference, Ts...>;
+
+  template <typename... Ts> using has_any_member_pointer = has_trait_any<std::is_member_pointer, Ts...>;
+  template <typename... Ts> using has_only_member_pointer = has_trait_all<std::is_member_pointer, Ts...>;
+  template <typename... Ts> using has_no_member_pointer = has_trait_none<std::is_member_pointer, Ts...>;
+  
+  
+  template <typename... Ts> using has_any_const = has_trait_any<std::is_const, Ts...>;
+  template <typename... Ts> using has_only_const = has_trait_all<std::is_const, Ts...>;
+  template <typename... Ts> using has_no_const = has_trait_none<std::is_const, Ts...>;
+
+  template <typename... Ts> using has_any_volatile = has_trait_any<std::is_volatile, Ts...>;
+  template <typename... Ts> using has_only_volatile = has_trait_all<std::is_volatile, Ts...>;
+  template <typename... Ts> using has_no_volatile = has_trait_none<std::is_volatile, Ts...>;
+
+  template <typename... Ts> using has_any_trivial = has_trait_any<std::is_trivial, Ts...>;
+  template <typename... Ts> using has_only_trivial = has_trait_all<std::is_trivial, Ts...>;
+  template <typename... Ts> using has_no_trivial = has_trait_none<std::is_trivial, Ts...>;
+
+  template <typename... Ts> using has_any_trivially_copyable = has_trait_any<std::is_trivially_copyable, Ts...>;
+  template <typename... Ts> using has_only_trivially_copyable = has_trait_all<std::is_trivially_copyable, Ts...>;
+  template <typename... Ts> using has_no_trivially_copyable = has_trait_none<std::is_trivially_copyable, Ts...>;
+
+  template <typename... Ts> using has_any_standard_layout = has_trait_any<std::is_standard_layout, Ts...>;
+  template <typename... Ts> using has_only_standard_layout = has_trait_all<std::is_standard_layout, Ts...>;
+  template <typename... Ts> using has_no_standard_layout = has_trait_none<std::is_standard_layout, Ts...>;
+
+  template <typename... Ts> using has_any_empty = has_trait_any<std::is_empty, Ts...>;
+  template <typename... Ts> using has_only_empty = has_trait_all<std::is_empty, Ts...>;
+  template <typename... Ts> using has_no_empty = has_trait_none<std::is_empty, Ts...>;
+
+  template <typename... Ts> using has_any_polymorphic = has_trait_any<std::is_polymorphic, Ts...>;
+  template <typename... Ts> using has_only_polymorphic = has_trait_all<std::is_polymorphic, Ts...>;
+  template <typename... Ts> using has_no_polymorphic = has_trait_none<std::is_polymorphic, Ts...>;
+
+  template <typename... Ts> using has_any_abstract = has_trait_any<std::is_abstract, Ts...>;
+  template <typename... Ts> using has_only_abstract = has_trait_all<std::is_abstract, Ts...>;
+  template <typename... Ts> using has_no_abstract = has_trait_none<std::is_abstract, Ts...>;
+
+  template <typename... Ts> using has_any_final = has_trait_any<std::is_final, Ts...>;
+  template <typename... Ts> using has_only_final = has_trait_all<std::is_final, Ts...>;
+  template <typename... Ts> using has_no_final = has_trait_none<std::is_final, Ts...>;
+
+  template <typename... Ts> using has_any_aggregate = has_trait_any<std::is_aggregate, Ts...>;
+  template <typename... Ts> using has_only_aggregate = has_trait_all<std::is_aggregate, Ts...>;
+  template <typename... Ts> using has_no_aggregate = has_trait_none<std::is_aggregate, Ts...>;
+
+  template <typename... Ts> using has_any_signed = has_trait_any<std::is_signed, Ts...>;
+  template <typename... Ts> using has_only_signed = has_trait_all<std::is_signed, Ts...>;
+  template <typename... Ts> using has_no_signed = has_trait_none<std::is_signed, Ts...>;
+
+  template <typename... Ts> using has_any_unsigned = has_trait_any<std::is_unsigned, Ts...>;
+  template <typename... Ts> using has_only_unsigned = has_trait_all<std::is_unsigned, Ts...>;
+  template <typename... Ts> using has_no_unsigned = has_trait_none<std::is_unsigned, Ts...>;
+
+  template <typename... Ts> using has_any_bounded_array = has_trait_any<std::is_bounded_array, Ts...>;
+  template <typename... Ts> using has_only_bounded_array = has_trait_all<std::is_bounded_array, Ts...>;
+  template <typename... Ts> using has_no_bounded_array = has_trait_none<std::is_bounded_array, Ts...>;
+
+  template <typename... Ts> using has_any_unbounded_array = has_trait_any<std::is_unbounded_array, Ts...>;
+  template <typename... Ts> using has_only_unbounded_array = has_trait_all<std::is_unbounded_array, Ts...>;
+  template <typename... Ts> using has_no_unbounded_array = has_trait_none<std::is_unbounded_array, Ts...>;
+
 
   /// Convert std::function to base function type.
   template <typename T> struct remove_std_function_type { using type = T; };
@@ -105,19 +195,6 @@ namespace emp {
   template <typename T> struct element_type { using type = T; };
   template <template <typename...> class TMPL, typename T> struct element_type<TMPL<T>>  { using type = T; };
   template <typename T> using element_t = typename element_type<T>::type;
-  // template<typename T> using element_type_t = std::remove_reference_t<decltype(*std::begin(std::declval<T&>()))>;
-
-  /// Determine if we have an emp::vector.
-  template <typename> struct is_emp_vector : std::false_type { };
-  template <typename T, typename... Ts>
-  struct is_emp_vector<emp::vector<T, Ts...>> : std::true_type { };
-
-  /// Determine if we have a span.
-  template <typename> struct is_span : std::false_type { };
-  template <typename T>
-  struct is_span<std::span<T>> : std::true_type { };
-  // template <typename T, size_t SIZE>
-  // struct is_span<std::span<T,SIZE>> : std::true_type { };
 
   // Customized type traits; for the moment, make sure that emp::Ptr is handled correctly.
   template <typename> struct is_ptr_type : public std::false_type { };
@@ -155,6 +232,18 @@ namespace emp {
 
   template <size_t BIT_COUNT, typename DEFAULT=void>
   using uint_bit_count_t = typename uint_bit_count<BIT_COUNT, DEFAULT>::type;
+
+  // Determine the type of each state given the number of possible states.
+  template <size_t NUM_STATES>
+  static constexpr auto StateBitCount() {
+    if constexpr (NUM_STATES <= 256) return uint8_t{8};
+    else if constexpr (NUM_STATES <= 65536) return uint16_t{16};
+    else if constexpr (NUM_STATES <= 4294967296) return uint32_t{32};
+    else return uint64_t{64};
+  }
+
+  template <size_t NUM_STATES>
+  using min_uint_type = decltype(StateBitCount<NUM_STATES>());
 
   /// Figure out which type is an integer with a specified number of bits.
   template <size_t BIT_COUNT, typename DEFAULT=void> struct int_bit_count {
@@ -200,43 +289,6 @@ namespace emp {
     static constexpr bool ConvertOK(T *) { return false; }
   };
 
-  namespace detail {
-    template <typename Fn, typename... Args>
-    struct is_invocable_helper {
-      private:
-      // If U can be invoked with Args... for arguments, then it will have some
-      // return value, and we try to create a pointer to it. Note the use of
-      // decay_t. This will remove any references from the return value, which
-      // would cause SFINAE to fail, since C++ does not allow pointers to
-      // references
-      template <typename U>
-      static std::true_type check(
-        U &&,
-        std::decay_t<decltype(std::declval<U>()(std::declval<Args>()...))> * =
-          nullptr) {
-        return {};
-      }
-
-      // Catchall which handles the cases where U is not callable with Args
-      // arguments
-      template <typename U>
-      static std::false_type check(...) {
-        return {};
-      }
-
-      public:
-      static constexpr decltype(check<Fn>(std::declval<Fn>())) value() {
-        return {};
-      }
-    };
-  }  // namespace detail
-
-  template <typename Fn, typename... Args>
-  struct is_invocable
-    : decltype(detail::is_invocable_helper<Fn, Args...>::value()) {};
-
-  // @todo: It might be a good idea to move these to a separate file
-  // @todo: should these be using the std naming convention?
 
   namespace __impl_variadics_type_traits {
     // General container type which represents a parameter pack

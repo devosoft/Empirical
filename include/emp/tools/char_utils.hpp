@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022
+ *  date: 2022-2024
 */
 /**
  *  @file
@@ -31,6 +31,7 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
+#include "../base/notify.hpp"
 #include "../base/Ptr.hpp"
 
 namespace emp {
@@ -44,7 +45,7 @@ namespace emp {
     char_set_t char_set{};
 
   public:
-    CharSetBase() : char_set() { }
+    CharSetBase() = default;
 
     CharSetBase(CHAR_T c) { char_set[static_cast<size_t>(c)] = true; }
     CharSetBase(const std::string & in_chars) {
@@ -276,6 +277,7 @@ namespace emp {
   /// Convert a char after a backslash to its escaped version.
   inline char ToEscapeChar(char c) {
     switch (c) {
+      case 'a': return '\a';   // Audible bell
       case 'b': return '\b';   // Backspace
       case 'f': return '\f';   // Form feed
       case 'n': return '\n';   // Newline
@@ -283,12 +285,14 @@ namespace emp {
       case 't': return '\t';   // Tab
       case 'v': return '\v';   // Vertical tab
       case '0': return '\0';   // Empty (character 0)
-      case '\\': return '\\';  // Backslash
-      case '"': return '"';    // Double quote
-      case '\'': return '\'';  // Single quote
-      case '`': return '`';    // Backquote
+      // case '\\': return '\\';  // Backslash
+      // case '"': return '"';    // Double quote
+      // case '\'': return '\'';  // Single quote
+      // case '`': return '`';    // Backquote
       default:
-        emp_assert(false, "unknown escape char used; probably need to update converter!");
+        // By default, keep any symbol character as-is.
+        notify::TestWarning(is_alphanumeric(c), "\\", c, " is not a valid escape sequence.");
+        return c;
     }
 
     // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
