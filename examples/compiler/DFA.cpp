@@ -12,7 +12,7 @@
 
 #include "emp/compiler/DFA.hpp"
 
-emp::DFA dfa(10);
+emp::DFA dfa;
 
 void TestDFA(const std::string & test_str)
 {
@@ -25,6 +25,7 @@ int main()
 {
   std::cout << "Ping!" << std::endl;
 
+  dfa.Resize(10);
   dfa.SetTransition(0, 1, 'a');
   dfa.SetTransition(1, 2, 'a');
   dfa.SetTransition(2, 0, 'a');
