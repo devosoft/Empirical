@@ -13,6 +13,7 @@
 
 #include <iostream>
 
+#include "../bits/Bits.hpp"
 #include "../tools/string_utils.hpp"
 #include "../tools/String.hpp"
 
@@ -78,7 +79,7 @@ namespace emp {
     void Clear() { slices.resize(0); final_state = UNSOLVED; }
 
     size_t CountTypes() const {
-      BitVector types;
+      emp::BitVector types;
       for (Slice slice : slices) {
         if (types.size() <= slice.level) types.resize(slice.level+8);
         types.Set(slice.level);
@@ -224,15 +225,32 @@ namespace emp {
       return true;
     }
 
+    bool LoadArray(const values_t & vals) {
+      notify::TestError(vals.size() != NUM_CELLS,
+        "Attempting to load a board of size ", vals.size(), ", but ", NUM_CELLS, " required.");
+      Clear();
+
+      for (size_t i = 0; i < NUM_CELLS; ++i) {
+        notify::TestError(vals[i] >= NUM_STATES,
+          "Attempting to set board state to ", vals[i], ", but max state is ", NUM_STATES);
+        if (vals[i]) {
+          if (!HasOption(i, vals[i])) return false;
+          Set(i, vals[i]);
+        }
+      }
+
+      return true;
+    }
+
     // Load a board from a generic input stream.
     bool Load(std::istream & is, emp::CharSet empty="-.") {
-      return Load( LoadToArray(is, empty) );
+      return LoadArray( LoadToArray(is, empty) );
     }
 
     // Load a board state from a file.
     bool Load(const emp::String & filename, emp::CharSet empty="-") {
       std::ifstream file(filename);
-      return Load( LoadToArray(file, empty) );
+      return LoadArray( LoadToArray(file, empty) );
     }
 
     /// Convert a cell ID to its coordinates.
