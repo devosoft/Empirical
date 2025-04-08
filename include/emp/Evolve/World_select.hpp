@@ -168,7 +168,7 @@ namespace emp {
     // Load fitnesses from current population.
     IndexMap fitness_index(world.GetSize());
     for (size_t id = 0; id < world.GetSize(); id++) {
-      fitness_index.Adjust(id, world.CalcFitnessID(id));
+      fitness_index.Set(id, world.CalcFitnessID(id));
     }
 
     for (size_t n = 0; n < count; n++) {
@@ -176,7 +176,7 @@ namespace emp {
       const size_t parent_id = fitness_index.Index(fit_pos);
       const size_t offspring_id = world.DoBirth( world.GetGenomeAt(parent_id), parent_id ).GetIndex();
       if (world.IsSynchronous() == false) {
-        fitness_index.Adjust(offspring_id, world.CalcFitnessID(offspring_id));
+        fitness_index.Set(offspring_id, world.CalcFitnessID(offspring_id));
       }
     }
   }
