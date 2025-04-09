@@ -31,9 +31,9 @@ void Print(const emp::AvidaGP & cpu) {
   std::cout << " IP=" << cpu.GetIP() << std::endl;
 }
 
-constexpr size_t POP_SIZE = 1000;
-constexpr size_t GENOME_SIZE = 50;
-constexpr size_t UPDATES = 50;
+// constexpr size_t POP_SIZE = 1000;
+// constexpr size_t GENOME_SIZE = 50;
+// constexpr size_t UPDATES = 50;
 
 int main()
 {

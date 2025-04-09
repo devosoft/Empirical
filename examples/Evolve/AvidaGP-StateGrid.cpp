@@ -165,6 +165,7 @@ int main()
   // When an organism is added to the world, supply it with a state grid.
   world.OnPlacement( [&state_grid, &world, &random](size_t pos){
     world.GetOrg(pos).SetStateGrid(state_grid);
+    (void) random;
     // if (pos && random.P(0.1)) world.GetOrg(pos).GetSGStatus().Randomize(state_grid, random);
   } );
 

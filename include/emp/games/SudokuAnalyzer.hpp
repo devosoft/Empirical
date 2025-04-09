@@ -174,7 +174,7 @@ namespace emp {
     /// Convert a set of region bits into the combined grid cells in those regions.
     grid_bits_t ComboRegion(region_bits_t region_ids) {
       grid_bits_t out;
-      region_ids.ForEach([this,&out](size_t region_id){ out |= RegionMap(region_id); });
+      region_ids.ForEach([&out](size_t region_id){ out |= RegionMap(region_id); });
       return out;
     }
 
@@ -406,7 +406,7 @@ namespace emp {
       // Identify which sites have exactly two or three options.
       grid_bits_t two_ones = FindTwoOnes(bit_options);
       grid_bits_t three_ones = FindThreeOnes(bit_options);
-      grid_bits_t valid = two_ones | three_ones;
+      // grid_bits_t valid = two_ones | three_ones;
 
       // Try all (9*8*7/6=84) triples of states and measure which sites have these options.
       for (uint8_t state1 = 1; state1 < NUM_STATES-1; ++state1) {
