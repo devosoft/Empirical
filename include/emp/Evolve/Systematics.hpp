@@ -559,13 +559,8 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
-<<<<<<< HEAD
     emp::vector<Ptr<taxon_t>> to_be_removed = {}; ///< Taxon to remove org from after next call to AddOrg
     emp::vector<emp::WorldPosition> removal_pos = {};   ///< Position of taxon to next be removed
-=======
-    Ptr<taxon_t> to_be_removed = nullptr; ///< Taxon to remove org from after next call to AddOrg
-    emp::WorldPosition removal_pos = {emp::WorldPosition::invalid_id, emp::WorldPosition::invalid_id};   ///< Position of taxon to next be removed
->>>>>>> aa9da03b730e528237b460719e19f1ab6786b231
 
     emp::vector<emp::vector<Ptr<taxon_t> > > taxon_locations; ///< Positions in this vector indicate taxon positions in world
 
@@ -584,13 +579,11 @@ namespace emp {
     /// Called when there are no more living members of a taxon.  There may be descendants.
     void MarkExtinct(Ptr<taxon_t> taxon);
 
-<<<<<<< HEAD
     /// Called to remove taxa that are supposed to be removed on a delay
     void ClearRemoveAfterReproQueue(WorldPosition skip = {WorldPosition::invalid_id, WorldPosition::invalid_id});
-=======
+
     /// Called when a taxon has no living members and only a single offspring
     void CollapseUnifurcation(Ptr<taxon_t> taxon);
->>>>>>> aa9da03b730e528237b460719e19f1ab6786b231
 
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
     /// Helper function for RemoveBefore
@@ -1392,18 +1385,7 @@ namespace emp {
     if (track_synchronous) {
 
       // Clear pending removal
-<<<<<<< HEAD
       ClearRemoveAfterReproQueue();
-=======
-      if (to_be_removed != nullptr) {
-        RemoveOrg(to_be_removed);
-        if (store_position) {
-          taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
-          removal_pos.MarkInvalid();
-        }
-        to_be_removed = nullptr;
-      }
->>>>>>> aa9da03b730e528237b460719e19f1ab6786b231
 
       // Assumes that synchronous worlds have two populations, with 0
       // being currently alive and 1 being the one being created
@@ -1622,20 +1604,7 @@ namespace emp {
     cur_taxon->AddOrg();                    // Record the current organism in its taxon.
     total_depth += cur_taxon->GetDepth();   // Track the total depth (for averaging)
 
-<<<<<<< HEAD
     ClearRemoveAfterReproQueue(pos);
-=======
-    if (to_be_removed) {
-      RemoveOrg(to_be_removed);
-      to_be_removed = nullptr;
-      if (store_position && removal_pos.IsValid()) {
-        if ((pos.GetPopID() != removal_pos.GetPopID()) || (pos.GetIndex() != removal_pos.GetIndex())) {
-          taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
-        }
-        removal_pos.MarkInvalid();
-      }      
-    }
->>>>>>> aa9da03b730e528237b460719e19f1ab6786b231
 
     most_recent = cur_taxon;
     return cur_taxon;                       // Return the taxon used.
@@ -1658,20 +1627,8 @@ namespace emp {
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(Ptr<taxon_t> taxon) {
-<<<<<<< HEAD
     to_be_removed.push_back(taxon);
     removal_pos.push_back(WorldPosition(WorldPosition::invalid_id, WorldPosition::invalid_id));
-=======
-    if (to_be_removed != nullptr) {
-      RemoveOrg(to_be_removed);
-      if (store_position) {
-        taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
-        removal_pos.MarkInvalid();
-      }
-      to_be_removed = nullptr;
-    }
-    to_be_removed = taxon;
->>>>>>> aa9da03b730e528237b460719e19f1ab6786b231
   }
 
 
