@@ -712,6 +712,8 @@ TEST_CASE("World systematics integration", "[evo]") {
 
   CHECK(old_taxon->GetNumOrgs() == 0);
   CHECK(old_taxon->GetNumOff() == 1);
+  CHECK(old_taxon != sys->GetTaxonAt(0));
+  CHECK(sys->GetTaxonAt(0)->GetParent());
   CHECK(sys->GetTaxonAt(0)->GetParent()->GetData().phenotype == 10);
   CHECK((*sys->GetActive().begin())->GetNumOrgs() == 1);
 
@@ -1449,6 +1451,38 @@ TEST_CASE("Test tracking position", "[Evolve]") {
   CHECK(id4->GetNumOrgs() == 0);
   CHECK(id4->GetNumOff() == 1);
   CHECK(Has(sys.GetAncestors(), id4));
+}
+
+TEST_CASE("Test Remove Org After Repro") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+
+  auto org1 = sys.AddOrg(1, nullptr);
+  auto org2 = sys.AddOrg(2, org1);
+  auto org3 = sys.AddOrg(3, org2);
+  auto org4 = sys.AddOrg(4, org3);
+  auto org5 = sys.AddOrg(5, org3);
+  auto org6 = sys.AddOrg(6, org2);
+  auto org7 = sys.AddOrg(7, org6);
+  auto org8 = sys.AddOrg(8, org6);
+  auto org9 = sys.AddOrg(9, org1);
+  auto org10 = sys.AddOrg(10, org9);
+  auto org11 = sys.AddOrg(11, org9);
+  auto org12 = sys.AddOrg(12, org1);
+  auto org13 = sys.AddOrg(13, org4);
+
+  sys.RemoveOrgAfterRepro(org1);
+  sys.RemoveOrgAfterRepro(org2);
+  sys.RemoveOrgAfterRepro(org3);
+
+  CHECK(emp::Has(sys.GetActive(), org1));
+  CHECK(emp::Has(sys.GetActive(), org2));
+  CHECK(emp::Has(sys.GetActive(), org3));
+
+  auto org14 = sys.AddOrg(14, org13);
+
+  CHECK(!emp::Has(sys.GetActive(), org1));
+  CHECK(!emp::Has(sys.GetActive(), org2));
+  CHECK(!emp::Has(sys.GetActive(), org3));
 }
 
 TEST_CASE("Test Total Offspring") {

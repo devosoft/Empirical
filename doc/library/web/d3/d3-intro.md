@@ -1,4 +1,4 @@
-# Using Empirica's D3.js Wrapper
+# Using Empirical's D3.js Wrapper
 
 If you're writing scientific code that runs on the web, you'll
 probably want to visualize the results (either as your program runs or

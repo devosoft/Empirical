@@ -32,13 +32,6 @@ namespace web {
 
       global.dom = (new JSDOM(`<div id="emp_base"></div>`));
 
-      // setup jquery
-      var jquery = require('jquery');
-      global.$ = jquery( dom.window );
-
-      global.window = dom.window;
-      global.document = dom.window.document;
-
       // shim for alert
       global.alert = console.log;
 

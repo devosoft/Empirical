@@ -184,7 +184,12 @@ namespace web {
           MAIN_THREAD_ASYNC_EM_ASM({
             parent_id = UTF8ToString($0);
             child_id = UTF8ToString($1);
-            $(`#${parent_id}`).append(`<span id="${child_id}"></span>`);
+            let parent = document.getElementById(parent_id);
+            if (parent) {
+              let span = document.createElement('span');
+              span.id = child_id;
+              parent.appendChild(span);
+            }
           }, id.c_str(), in.GetID().c_str());
 
           // Now that the new widget has some place to hook in, activate it!
@@ -267,7 +272,7 @@ namespace web {
         if (scroll_top >= 0.0) {
           MAIN_THREAD_ASYNC_EM_ASM({
               var div_id = UTF8ToString($0);
-              var div_obj = $(`#${div_id}`);
+              var div_obj = document.getElementById(div_id);
               if (div_obj == null) alert(div_id);
               // alert('id=' + div_id + '  top=' + $1 +
               //       '  height=' + div_obj.scrollHeight);

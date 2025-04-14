@@ -65,14 +65,14 @@ namespace emp {
   static void SetBackgroundColor(const std::string color) {
     MAIN_THREAD_ASYNC_EM_ASM({
         var color = UTF8ToString($0);
-        $("body").first().css("background-color", color);
+        document.body.style.backgroundColor = color;
       }, color.c_str());
   }
 
   static void SetColor(const std::string color) {
     MAIN_THREAD_ASYNC_EM_ASM({
         var color = UTF8ToString($0);
-        $("body").first().css("color", color);
+        document.body.style.color = color;
       }, color.c_str());
   }
 

@@ -131,6 +131,7 @@ namespace web {
             function modifyInputs() {
 
                 var input_el = document.getElementById(UTF8ToString($0));
+                if (!input_el) return;
                 input_el.addEventListener("input", modifyOffset);
                 // the following taken from http://stackoverflow.com/questions/2856513/trigger-onchange-event-manually
                 if ("fireEvent" in input_el) {

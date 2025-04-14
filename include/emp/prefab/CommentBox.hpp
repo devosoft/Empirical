@@ -29,7 +29,7 @@ namespace prefab {
   class CommentBox: public web::Div {
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend ConfigPanel;
-    #endif DOXYGEN_SHOULD_SKIP_THIS
+    #endif // #ifndef DOXYGEN_SHOULD_SKIP_THIS
     private:
       // ID for the comment box Div
       std::string box_base = this->GetID();

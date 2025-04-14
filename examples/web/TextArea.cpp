@@ -23,11 +23,6 @@ int main()
 {
   doc << "<h1>Testing!</h1>";
 
-  out1_font.SetColor("green");
-  out2_font.SetColor("blue");
-  text_reflect << out1_font;
-  text_reflect2 << out2_font;
-
   text_area.SetCallback([](const std::string & in){
       text_area.SetText("Changed!");
     });
@@ -46,4 +41,10 @@ int main()
                   }, "Update" )
       << "<br>" << text_reflect
       << "<br><br>" << text_reflect2;
+
+  out1_font.SetColor("green");
+  out2_font.SetColor("blue");
+  text_reflect << out1_font;
+  text_reflect2 << out2_font;
+
 }

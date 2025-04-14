@@ -1,22 +1,23 @@
 # YAML 1.2
 # Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
-cff-version: 1.0.3
-message: If you use this software, please cite it using these metadata.
-title: 'Empirical: C++ library for efficient, reliable, and accessible scientific software'
-doi: 10.5281/zenodo.4141943
+cff-version: "1.2.0"
 authors:
 - given-names: Charles
   family-names: Ofria
+  orcid: 'https://orcid.org/0000-0003-2924-1732'
   affiliation: Michigan State University
 - given-names: Matthew Andres
   family-names: Moreno
-  affiliation: Michigan State University
+  affiliation: University of Michigan
   orcid: 'https://orcid.org/0000-0003-4726-4479'
 - given-names: Emily
   family-names: Dolson
   affiliation: Michigan State University
-- given-names: Alex
+  orcid: 'https://orcid.org/0000-0001-8616-4898'
+- given-names: Alexander
   family-names: Lalejini
+  orcid: 'https://orcid.org/0000-0003-0994-2718'
+  affiliation: Grand Valley State University
 - given-names: Santiago
   family-names: Rodriguez Papa
 - given-names: Jake
@@ -42,6 +43,8 @@ authors:
   family-names: ''
 - given-names: Anya
   family-names: Vostinar
+  orcid: 'https://orcid.org/0000-0001-7216-5283'
+  affiliation: Carleton College
 - given-names: Ryan
   family-names: Moreno
 - given-names: Jory
@@ -49,10 +52,44 @@ authors:
   affiliation: Michigan State University
 - given-names: Luis
   family-names: Zaman
-  affiliation: University of Washington
+  affiliation: University of Michigan
 - given-names: djrain
   family-names: ''
-version: 0.0.4
-date-released: 2020-10-27
+doi: 10.5281/zenodo.11420797
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Vostinar
+    given-names: Anya
+    orcid: "https://orcid.org/0000-0001-7216-5283"
+  - family-names: Lalejini
+    given-names: Alexander
+    orcid: "https://orcid.org/0000-0003-0994-2718"
+  - family-names: Ofria
+    given-names: Charles
+    orcid: "https://orcid.org/0000-0003-2924-1732"
+  - family-names: Dolson
+    given-names: Emily
+    orcid: "https://orcid.org/0000-0001-8616-4898"
+  - family-names: Moreno
+    given-names: Matthew Andres
+    orcid: "https://orcid.org/0000-0003-4726-4479"
+  date-published: 2024-06-02
+  doi: 10.21105/joss.06617
+  issn: 2475-9066
+  issue: 98
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 6617
+  title: "Empirical: A scientific software library for research,
+    education, and public engagement"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.06617"
+  volume: 9
+title: "Empirical: A scientific software library for research,
+  education, and public engagement"
+version: 1.1.5
 repository-code: https://github.com/devosoft/Empirical
 license: MIT

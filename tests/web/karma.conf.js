@@ -21,7 +21,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      {pattern: 'examples/web/jquery-1.11.2.min.js'},
+      {pattern: 'third-party/jquery-1.11.2.min.js'},
       {pattern: 'third-party/node_modules/mocha/mocha.js'},
       {pattern: 'third-party/node_modules/chai/chai.js'},
       {pattern: 'include/emp/web/d3/d3.min.js'},

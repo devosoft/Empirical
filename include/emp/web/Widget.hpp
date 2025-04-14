@@ -384,7 +384,8 @@ namespace web {
         MAIN_THREAD_EM_ASM({
             var widget_id = UTF8ToString($0);
             var out_html = UTF8ToString($1);
-            $('#' + widget_id).replaceWith(out_html);
+            var element = document.getElementById(widget_id);
+            if (element) element.outerHTML = out_html;
           }, id.c_str(), ss.str().c_str());
 
         // If active update style, trigger JS, and recurse to children!
@@ -476,9 +477,9 @@ namespace web {
     emp_assert(GetID() != "");  // Must have a name!
     return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
-      var rect = $('#' + id).position();
-      if (rect === undefined) return -1.0;
-      return rect.left;
+      var element = document.getElementById(id);
+      if (!element) return -1.0; // Check if element exists
+      return element.offsetLeft;
     }, GetID().c_str());
   }
 
@@ -487,9 +488,9 @@ namespace web {
     emp_assert(GetID() != "");  // Must have a name!
     return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
-      var rect = $('#' + id).position();
-      if (rect === undefined) return -1.0;
-      return rect.top;
+      var element = document.getElementById(id);
+      if (!element) return -1.0; // Check if element exists
+      return element.offsetTop;
     }, GetID().c_str());
   }
 
@@ -498,7 +499,9 @@ namespace web {
     emp_assert(GetID() != "");  // Must have a name!
     return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
-      return $('#' + id).width();
+      var element = document.getElementById(id);
+      if (!element) return -1.0; // Check if element exists
+      return element.clientWidth;
     }, GetID().c_str());
   }
   double Widget::GetHeight(){
@@ -506,7 +509,9 @@ namespace web {
     emp_assert(GetID() != "");  // Must have a name!
     return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
-      return $('#' + id).height();
+      var element = document.getElementById(id);
+      if (!element) return -1.0; // Check if element exists
+      return element.clientHeight;
     }, GetID().c_str());
   }
   double Widget::GetInnerWidth(){
@@ -514,7 +519,14 @@ namespace web {
     emp_assert(GetID() != "");  // Must have a name!
     return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
-      return $('#' + id).innerWidth();
+      var element = document.getElementById(id);
+      if (!element) return 0.0; // Check if element exists
+      var style = window.getComputedStyle(element);
+      return (
+        element.clientWidth
+        - parseFloat(style.paddingLeft)
+        - parseFloat(style.paddingRight)
+      );
     }, GetID().c_str());
   }
   double Widget::GetInnerHeight(){
@@ -522,7 +534,14 @@ namespace web {
     emp_assert(GetID() != "");  // Must have a name!
     return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
-      return $('#' + id).innerHeight();
+      var element = document.getElementById(id);
+      if (!element) return 0.0; // Check if element exists
+      var style = window.getComputedStyle(element);
+      return (
+        element.clientHeight
+        - parseFloat(style.paddingTop)
+        - parseFloat(style.paddingBottom)
+      );
     }, GetID().c_str());
   }
   double Widget::GetOuterWidth(){
@@ -530,7 +549,9 @@ namespace web {
     emp_assert(GetID() != "");  // Must have a name!
     return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
-      return $('#' + id).outerWidth();
+      var element = document.getElementById(id);
+      if (!element) return 0.0; // Check if element exists
+      return element.offsetWidth;
     }, GetID().c_str());
   }
   double Widget::GetOuterHeight(){
@@ -538,7 +559,9 @@ namespace web {
     emp_assert(GetID() != "");  // Must have a name!
     return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
-      return $('#' + id).outerHeight();
+      var element = document.getElementById(id);
+      if (!element) return 0.0; // Check if element exists
+      return element.offsetHeight;
     }, GetID().c_str());
   }
 
