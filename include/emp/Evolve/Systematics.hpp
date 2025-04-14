@@ -550,8 +550,8 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
-    Ptr<taxon_t> to_be_removed = nullptr; ///< Taxon to remove org from after next call to AddOrg
-    emp::WorldPosition removal_pos = {0, 0};   ///< Position of taxon to next be removed
+    emp::vector<Ptr<taxon_t>> to_be_removed = {}; ///< Taxon to remove org from after next call to AddOrg
+    emp::vector<emp::WorldPosition> removal_pos = {};   ///< Position of taxon to next be removed
 
     emp::vector<emp::vector<Ptr<taxon_t> > > taxon_locations; ///< Positions in this vector indicate taxon positions in world
 
@@ -569,6 +569,9 @@ namespace emp {
 
     /// Called when there are no more living members of a taxon.  There may be descendants.
     void MarkExtinct(Ptr<taxon_t> taxon);
+
+    /// Called to remove taxa that are supposed to be removed on a delay
+    void ClearRemoveAfterReproQueue(WorldPosition skip = {WorldPosition::invalid_id, WorldPosition::invalid_id});
 
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
     /// Helper function for RemoveBefore
@@ -1345,16 +1348,28 @@ namespace emp {
   // ======= Functions for manipulating systematics manager internals
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::ClearRemoveAfterReproQueue(WorldPosition skip) {
+      if (to_be_removed.size()) {
+        for (emp::Ptr<taxon_t> tax : to_be_removed){
+          RemoveOrg(tax);
+        }
+        for (emp::WorldPosition pos : removal_pos) {
+          // Skip lets us skip newly-added org
+          if (pos.IsValid() && (pos.GetIndex() != skip.GetIndex() || pos.GetPopID() != skip.GetPopID())) {
+            taxon_locations[pos.GetPopID()][pos.GetIndex()] = nullptr;
+          }
+        }
+        to_be_removed.clear();
+        removal_pos.clear();
+      }    
+  }
+
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::Update() {
     if (track_synchronous) {
 
       // Clear pending removal
-      if (to_be_removed != nullptr) {
-        RemoveOrg(to_be_removed);
-        taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
-        to_be_removed = nullptr;
-        removal_pos = {0, 0};
-      }
+      ClearRemoveAfterReproQueue();
 
       // Assumes that synchronous worlds have two populations, with 0
       // being currently alive and 1 being the one being created
@@ -1539,10 +1554,7 @@ namespace emp {
     cur_taxon->AddOrg();                    // Record the current organism in its taxon.
     total_depth += cur_taxon->GetDepth();   // Track the total depth (for averaging)
 
-    if (to_be_removed) {
-      RemoveOrg(to_be_removed);
-      to_be_removed = nullptr;
-    }
+    ClearRemoveAfterReproQueue(pos);
 
     most_recent = cur_taxon;
     return cur_taxon;                       // Return the taxon used.
@@ -1559,19 +1571,14 @@ namespace emp {
       return;
     }
 
-    RemoveOrgAfterRepro(taxon_locations[pos.GetPopID()][pos.GetIndex()]);
-    removal_pos = pos;
+    to_be_removed.push_back(taxon_locations[pos.GetPopID()][pos.GetIndex()]);
+    removal_pos.push_back(pos);
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(Ptr<taxon_t> taxon) {
-    if (to_be_removed != nullptr) {
-      RemoveOrg(to_be_removed);
-      taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
-      to_be_removed = nullptr;
-      removal_pos = {0, 0};
-    }
-    to_be_removed = taxon;
+    to_be_removed.push_back(taxon);
+    removal_pos.push_back(WorldPosition(WorldPosition::invalid_id, WorldPosition::invalid_id));
   }
 
 
