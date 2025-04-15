@@ -303,6 +303,7 @@ namespace emp {
     bool store_position;      ///< Keep a vector mapping  positions to pointers
     bool track_synchronous;   ///< Does this systematics manager need to keep track of current and next positions?
     bool collapse_unifurcations; ///< Should this systematics manager collapse unifurcations?
+    bool manual_clear_remove_queue; ///< Should we clear the remove queue manually?
 
     // Stats about active taxa... (totals are across orgs, not taxa)
     size_t org_count;         ///< How many organisms are currently active?
@@ -348,6 +349,9 @@ namespace emp {
     /// Are we collapsing unifurcations?
     bool GetCollapseUnifurcations() const {return collapse_unifurcations; }
 
+    /// Are we manually clearing the remove queue?
+    bool GetManualClearRemoveQueue() const {return manual_clear_remove_queue; }
+
     /// How many living organisms are currently being tracked?
     size_t GetTotalOrgs() const { return org_count; }
 
@@ -383,6 +387,9 @@ namespace emp {
 
     /// Are we collapsing unifurcations?
     void SetCollapseUnifurcations(bool new_val) { collapse_unifurcations = new_val; }
+
+    /// Are we manually clearing the remove queue?
+    void SetManualClearRemoveQueue(bool new_val) { manual_clear_remove_queue = new_val; }
 
     /// Sets the current update/time step
     void SetUpdate(size_t ud) {curr_update = ud;}
@@ -500,6 +507,7 @@ namespace emp {
     using parent_t::next_id;
     using parent_t::curr_update;
     using parent_t::max_depth;
+    using parent_t::manual_clear_remove_queue;
 
 
   public:
