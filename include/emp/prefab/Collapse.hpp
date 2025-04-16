@@ -80,6 +80,7 @@ namespace prefab {
       std::string target_class;
       // counter used to generate unique class names, shared by all instances of this class
       inline static int counter = 0;
+      int widget_counter = 0;
 
     public:
       /**
@@ -147,7 +148,7 @@ namespace prefab {
         const std::string target,
         const bool expanded=false,
         const std::string in_class=""
-      ): CollapseCoupling(web::Div{} << controller, web::Div{} << target, expanded, in_class) { ; }
+      ): CollapseCoupling(web::Div("emp__collapse_controller_div_" + std::to_string(counter)), web::Div("emp__collapse_target_div_" + std::to_string(counter)), expanded, in_class) { counter++; }
 
       /**
        * Adds a controller to the vector of controllers for this CollapseCouple
@@ -171,7 +172,8 @@ namespace prefab {
        * as when trying to do this with the constructor
        */
       void AddController(const std::string controller, const bool expanded) {
-        AddController(web::Div{} << controller, expanded);
+        AddController(web::Div("emp__collapse_controller_div_" + std::to_string(counter) + "_" + std::to_string(widget_counter)), expanded);
+        widget_counter++;
       }
 
       /**
