@@ -1,8 +1,12 @@
 #pragma once
 
+#ifndef DEMOS_GRAPHS_STEINER_GRAPH_HPP_INCLUDE
+#define DEMOS_GRAPHS_STEINER_GRAPH_HPP_INCLUDE
+
 #include "../../../include/emp/base/vector.hpp"
 #include "../../../include/emp/bits/BitVector.hpp"
 #include "../../../include/emp/debug/debug.hpp"
+
 
 template <size_t MAX_BITS>
 class Graph {
@@ -364,3 +368,5 @@ public:
     os << std::endl;
   }
 };
+
+#endif // #ifndef DEMOS_GRAPHS_STEINER_GRAPH_HPP_INCLUDE

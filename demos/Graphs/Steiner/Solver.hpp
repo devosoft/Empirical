@@ -3,6 +3,9 @@
 #include "../../../include/emp/base/array.hpp"
 #include "../../../include/emp/base/vector.hpp"
 
+#ifndef DEMOS_GRAPHS_STEINER_SOLVER_HPP_INCLUDE
+#define DEMOS_GRAPHS_STEINER_SOLVER_HPP_INCLUDE
+
 #include "Graph.hpp"
 
 class Solver {
@@ -102,3 +105,5 @@ public:
     }
   }
 };
+
+#endif // #ifndef DEMOS_GRAPHS_STEINER_SOLVER_HPP_INCLUDE
