@@ -2753,7 +2753,7 @@ struct ImportExportTester {
     emp::BitArray<SOURCE_BITS> source(rand);
     emp::BitArray<DEST_BITS> dest(rand);
 
-    dest.template Import(source);
+    dest.Import(source);
 
     for (size_t i = 0; i < std::min(source.GetSize(), dest.GetSize()); ++i) {
       CHECK(source.Get(i) == dest.Get(i));
@@ -2779,7 +2779,7 @@ struct ImportExportTester {
     for (size_t from_bit = 0; from_bit < source.GetSize(); ++from_bit) {
       // std::cout << "---------" << std::endl;
       // std::cout << source << std::endl;
-      dest.template Import(source, from_bit);
+      dest.Import(source, from_bit);
       // std::cout << "=========" << std::endl;
       // std::cout << from_bit << std::endl;
       // std::cout << source << std::endl;
