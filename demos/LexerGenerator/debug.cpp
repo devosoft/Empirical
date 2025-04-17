@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+
 #include "lexer-debug.hpp"
 
 int main() {

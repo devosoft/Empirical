@@ -13,6 +13,7 @@
 #define EMP_TOOLS_VALUE_UTILS_HPP_INCLUDE
 
 #include <string>
+
 #include "String.hpp"
 
 namespace emp {
