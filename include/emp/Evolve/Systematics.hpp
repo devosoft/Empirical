@@ -245,8 +245,10 @@ namespace emp {
     // Should this be protected or private or something?
     void AddTotalOffspring() {
       ++total_offspring;
-      if (parent) { // Keep going until we hit root
-        parent->AddTotalOffspring();
+      Ptr<this_t> temp_parent = parent;
+      while (temp_parent) { // Keep going until we hit root
+        temp_parent->total_offspring++;
+        temp_parent = temp_parent->parent;
       }
     }
 
@@ -283,8 +285,10 @@ namespace emp {
     /// all ancestors (gets called on a taxon's parent when that taxon goes extinct)
     void RemoveTotalOffspring() {
       --total_offspring;
-      if (parent) { // Keep going until we hit root
-        parent->RemoveTotalOffspring();
+      Ptr<this_t> temp_parent = parent;
+      while (temp_parent) { // Keep going until we hit root
+        temp_parent->total_offspring--;
+        temp_parent = temp_parent->parent;
       }
     }
   };
@@ -566,6 +570,7 @@ namespace emp {
     Signal<void(Ptr<taxon_t>, ORG & org)> on_new_sig; ///< Trigger when a new taxon is created
     Signal<void(Ptr<taxon_t>)> on_extinct_sig; ///< Trigger when a taxon goes extinct
     Signal<void(Ptr<taxon_t>)> on_prune_sig; ///< Trigger when any organism is pruned from tree
+    Signal<void(Ptr<taxon_t>)> on_collapse_unifurcation_sig; ///< Trigger when a unifurcation is collapsed    
 
     mutable Ptr<taxon_t> mrca;  ///< Most recent common ancestor in the population.
 
@@ -883,6 +888,11 @@ namespace emp {
     /// Trigger:  Taxon is about to be killed
     /// Argument: Pointer to taxon
     SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
+
+    /// Provide a function for Systematics to call each time a unifurcation is collapsed.
+    /// Trigger:  Taxon is about to be collapsed
+    /// Argument: Pointer to taxon
+    SignalKey OnCollapseUnifurcation(std::function<void(Ptr<taxon_t>)> & fun) { return on_collapse_unifurcation_sig.AddAction(fun); }
 
     // ===== Functions for adding data nodes to systematics manager ====
 
@@ -1370,7 +1380,7 @@ namespace emp {
         }
         for (emp::WorldPosition pos : removal_pos) {
           // Skip lets us skip newly-added org
-          if (pos.IsValid() && (pos.GetIndex() != skip.GetIndex() || pos.GetPopID() != skip.GetPopID())) {
+          if (pos.IsValid() && !(pos.GetIndex() == skip.GetIndex() && pos.GetPopID() == skip.GetPopID())) {
             taxon_locations[pos.GetPopID()][pos.GetIndex()] = nullptr;
           }
         }
@@ -1431,16 +1441,32 @@ namespace emp {
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::CollapseUnifurcation(Ptr<taxon_t> taxon) {
-    for (Ptr<taxon_t> off_tax : taxon->GetOffspring()) {
-      off_tax->parent = taxon->GetParent();
-      if (taxon->GetParent()) {
-        taxon->GetParent()->offspring.insert(off_tax);
-        taxon->GetParent()->num_offspring++;
+    // Give user a chance to do something with taxon before collapsing
+    on_collapse_unifurcation_sig.Trigger(taxon);
+    
+    Ptr<taxon_t> parent = taxon->GetParent();
+
+    for (Ptr<taxon_t> offspring_taxon : taxon->GetOffspring()) {
+      offspring_taxon->parent = parent;
+      offspring_taxon->depth--;
+      if (parent) {
+        parent->offspring.insert(offspring_taxon);
+        parent->num_offspring++;
       }
     }
 
-    if (taxon->GetParent()) {
-      taxon->GetParent()->RemoveOffspring(taxon);
+    if (parent) {
+      // Update stats by merging appropriate ones
+      parent->tot_orgs += taxon->GetNumOrgs();
+      parent->destruction_time = std::max(parent->destruction_time, taxon->GetDestructionTime());
+      parent->origination_time = std::min(parent->origination_time, taxon->GetOriginationTime());      
+      parent->RemoveOffspring(taxon);
+      parent->RemoveTotalOffspring();
+      
+      // other stats:
+      // - depth is handled in offspring
+      // - num_orgs must be 0 for both taxa already
+      // - num_offspring handled above
     }
     taxon.Delete();      
     return;
