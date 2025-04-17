@@ -26,6 +26,7 @@
 #include "../base/vector.hpp"
 #include "../meta/FunInfo.hpp"
 #include "../tools/String.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 
