@@ -2050,7 +2050,7 @@ namespace emp {
         bit_count += std_bs.count();
       }
 
-    emp_assert(bit_count <= GetSize(), but_count, GetSize());
+    emp_assert(bit_count <= GetSize(), bit_count, GetSize());
     return bit_count;
   }
 
