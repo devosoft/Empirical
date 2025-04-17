@@ -67,8 +67,8 @@
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
 #include "../math/Range.hpp"
-#include "../meta/type_traits.hpp"
 #include "../meta/TypeID.hpp"
+#include "../meta/type_traits.hpp"
 #include "../tools/String.hpp"
 
 #include "Bits_Data.hpp"

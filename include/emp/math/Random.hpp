@@ -12,9 +12,9 @@
 #ifndef EMP_MATH_RANDOM_HPP_INCLUDE
 #define EMP_MATH_RANDOM_HPP_INCLUDE
 
-#include "Random_Xoshiro256pp.hpp"
 #include "Random_MSWS.hpp"
 #include "Random_Xorshift.hpp"
+#include "Random_Xoshiro256pp.hpp"
 
 #include <cmath>
 #include <concepts>

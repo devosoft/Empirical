@@ -22,8 +22,8 @@
 
 #include <algorithm>              // std::count
 #include <cctype>                 // std::toupper and std::tolower
-#include <functional>             // std::function
 #include <concepts>
+#include <functional>             // std::function
 #include <initializer_list>
 #include <map>
 #include <sstream>

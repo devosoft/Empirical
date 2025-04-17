@@ -2,8 +2,8 @@
 #include <istream>
 #include <ostream>
 
-#include "../../../include/emp/base/vector.hpp"
 #include "Graph.hpp"
+#include "../../../include/emp/base/vector.hpp"
 #include "Solver.hpp"
 
 void Load(Graph<256> & graph, std::istream & is) {

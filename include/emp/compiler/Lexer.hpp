@@ -43,11 +43,11 @@
 #include "../datastructs/map_utils.hpp"
 #include "../tools/String.hpp"
 
+#include "lexer_utils.hpp"
+#include "RegEx.hpp"
 #include "_Token.hpp"
 #include "_TokenStream.hpp"
 #include "_TokenType.hpp"
-#include "lexer_utils.hpp"
-#include "RegEx.hpp"
 
 namespace emp {
 

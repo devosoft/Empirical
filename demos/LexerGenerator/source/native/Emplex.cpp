@@ -2,12 +2,12 @@
 #include <istream>
 #include <ostream>
 
-#include "emp/base/vector.hpp"
 #include "emp/base/notify.hpp"
+#include "emp/base/vector.hpp"
 #include "emp/compiler/Lexer.hpp"
 #include "emp/config/command_line.hpp"
-#include "emp/io/File.hpp"
 #include "emp/io/CPPFile.hpp"
+#include "emp/io/File.hpp"
 #include "emp/tools/String.hpp"
 
 void LoadTokens(emp::Lexer & lexer, emp::String filename, bool verbose) {

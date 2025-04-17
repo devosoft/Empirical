@@ -39,8 +39,8 @@
 #include <string>
 
 #include "../base/vector.hpp"
-#include "../tools/string_utils.hpp"
 #include "../tools/String.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
   namespace cl {
