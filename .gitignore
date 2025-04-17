@@ -92,6 +92,7 @@ examples/*/*
 tests/StatsConfig.cfg
 tests/web/*.js
 tests/web/package.json
+tests/web/package-lock.json
 tests/web/node_modules/
 tests/test_file.dat
 
